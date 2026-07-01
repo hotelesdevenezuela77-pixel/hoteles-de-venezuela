@@ -450,7 +450,7 @@ export function AdminDashboard() {
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 shrink-0">
                   <button
                     onClick={handleToggleMaintenance}
-                    disabled={updatingMaintenance || (!maintenanceOn && !Object.values(checklist).every(Boolean))}
+                    disabled={updatingMaintenance || (!maintenanceOn && !Object.values(checklist).some(Boolean))}
                     className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white transition-all hover:scale-102 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
                     style={{
                       background: maintenanceOn
@@ -528,9 +528,9 @@ export function AdminDashboard() {
                       </div>
                     </label>
                   </div>
-                  {!Object.values(checklist).every(Boolean) && (
+                  {!Object.values(checklist).some(Boolean) && (
                     <div className="mt-3.5 text-[10px] text-amber-400 font-bold bg-amber-950/20 border border-amber-900/30 rounded-lg p-2 flex items-center gap-1.5">
-                      <AlertCircle className="w-3.5 h-3.5" /> Debe marcar todos los requisitos de la lista para poder activar la pantalla de mantenimiento.
+                      <AlertCircle className="w-3.5 h-3.5" /> Debe marcar al menos un requisito de la lista para poder activar la pantalla de mantenimiento.
                     </div>
                   )}
                 </div>
