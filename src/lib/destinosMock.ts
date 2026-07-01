@@ -1,0 +1,231 @@
+export interface Destination {
+  id: number;
+  slug: string;
+  name: string;
+  state: string;
+  image_url: string;
+  description: string;
+  long_description: string;
+  climate: string;
+  how_to_get_there: string;
+  best_time_to_visit: string;
+  attractions: string;
+  gallery_images: string;
+  latitude: number;
+  longitude: number;
+  gastronomy: string;
+  is_featured: boolean;
+  status: string;
+}
+
+export const DESTINOS_MOCK: Destination[] = [
+  {
+    id: 1,
+    slug: "caracas",
+    name: "Caracas",
+    state: "Distrito Capital",
+    image_url: "https://images.unsplash.com/photo-1599940824399-b87987ceb72a?auto=format&fit=crop&w=1200&q=80",
+    description: "Caracas es una vibrante metrópolis custodiada por el imponente cerro El Ávila. Entre el bullicio urbano y su herencia histórica, ofrece museos modernos y gastronomía de talla mundial.",
+    long_description: "Ubicada en un estrecho valle de la cordillera de la costa, Caracas es el corazón palpitante de Venezuela. Es una ciudad de contrastes donde la arquitectura colonial del casco central convive con audaces rascacielos y murales de arte cinético. Su mayor tesoro es el Parque Nacional El Ávila, que no solo sirve como brújula natural, sino como el pulmón verde donde locales y turistas escapan para conectar con la naturaleza. Desde la bohemia de El Hatillo hasta la elegancia de Altamira, Caracas invita a explorar su rica agenda cultural, sus centros comerciales de vanguardia y una vida nocturna que nunca se detiene, todo bajo la sombra de su montaña eterna.",
+    climate: "Caracas goza de un clima de sabana tropical, a menudo descrito como una 'eterna primavera'. Debido a su altitud (aprox. 900 m.s.n.m.), las temperaturas son muy agradables, oscilando generalmente entre los 18°C y 28°C. Presenta dos estaciones marcadas: la seca (verano) de diciembre a abril, y la de lluvias (invierno) de mayo a noviembre.",
+    how_to_get_there: "Vía Aérea: A través del Aeropuerto Internacional de Maiquetía 'Simón Bolívar' (CCS), situado a unos 45 minutos de la ciudad. Conecta con las principales ciudades del país y destinos internacionales.\n\nVía Terrestre: Caracas es el nodo principal de las autopistas del país. Se puede llegar en autobús o vehículo particular desde el occidente por la Autopista Regional del Centro y desde el oriente por la Autopista Gran Mariscal de Ayacucho.",
+    best_time_to_visit: "La temporada ideal es durante los meses de diciembre a abril. Este período corresponde a la estación seca, donde el clima es más fresco y los días son mayormente soleados, permitiendo disfrutar de las vistas despejadas desde el Ávila.",
+    attractions: "Parque Nacional El Ávila (Waraira Repano), Teleférico de Caracas, Casa Natal del Libertador Simón Bolívar, Panteón Nacional, Museo de Arte Contemporáneo, Parque del Este, Plaza Francia (Altamira), Paseo Los Próceres, El Hatillo, Universidad Central de Venezuela, Esfera de Soto.",
+    gallery_images: "https://images.unsplash.com/photo-1599940824399-b87987ceb72a?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+    latitude: 10.48,
+    longitude: -66.903,
+    gastronomy: "La oferta caraqueña es cosmopolita pero mantiene sus raíces criollas. Los platos imprescindibles son el Pabellón Criollo, la Arepa Reina Pepiada, el Asado Negro y los tradicionales Golfeados con queso de mano.",
+    is_featured: false,
+    status: "approved"
+  },
+  {
+    id: 6,
+    slug: "los-roques",
+    name: "Los Roques",
+    state: "Dependencias Federales",
+    image_url: "https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&w=1200&q=80",
+    description: "Un archipiélago de ensueño con las aguas más cristalinas del Caribe. Los Roques es un Parque Nacional protegido de arena blanca, turquesa infinito y posadas exclusivas.",
+    long_description: "Declarado Parque Nacional en 1972, el Archipiélago de Los Roques es uno de los sistemas arrecifales más grandes y mejor conservados del mundo. Al aterrizar en la pequeña pista de Gran Roque, la única isla habitada, te sumerges en un mundo sin asfalto ni rascacielos. Aquí, el lujo reside en la sencillez: caminar descalzo por sus calles de arena y navegar cada día hacia un cayo diferente. Desde el icónico Cayo de Agua, con su istmo de arena que parece dividir el mar, hasta Francisquí o Madrisquí, cada rincón es una postal de azules eléctricos.",
+    climate: "El clima es árido y cálido, con sol radiante durante casi 360 días al año. Las temperaturas oscilan entre los 25°C y 30°C. La brisa marina es constante y refrescante, pero el sol es extremadamente fuerte debido al reflejo del agua y la arena blanca.",
+    how_to_get_there: "Vía Aérea: Es la forma principal y más recomendada. Pequeñas aeronaves y vuelos comerciales parten desde el Aeropuerto de Maiquetía (CCS) o el Aeropuerto de Higuerote. El vuelo dura aproximadamente 35 a 45 minutos.\n\nVía Marítima: Existe la opción de embarcaciones privadas o yates desde la costa central, pero el trayecto es largo (unas 6-8 horas) y el mar puede ser picado.",
+    best_time_to_visit: "La mejor época es de febrero a agosto. Durante estos meses el mar está más calmado (ideal para el traslado entre cayos) y las lluvias son casi inexistentes. Para el kitesurf, de enero a abril ofrece los mejores vientos.",
+    attractions: "Cayo de Agua, Francisquí, Madrisquí, Crasquí, Cayo Pirata, Dos Mosquises (Centro de Rescate de Tortugas Marinas), Gran Roque (Faro Holandés), buceo en la Barrera Arrecifal, Kitesurf.",
+    gallery_images: "https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=800&q=80",
+    latitude: 11.85,
+    longitude: -66.75,
+    gastronomy: "La gastronomía roqueña está basada en la pesca del día: Langosta fresca (en temporada de noviembre a abril), carpaccio de mero o pargo, pescado en papillote y deliciosas cenas gourmet frente al mar.",
+    is_featured: true,
+    status: "approved"
+  },
+  {
+    id: 7,
+    slug: "canaima",
+    name: "Canaima",
+    state: "Bolívar",
+    image_url: "https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=1200&q=80",
+    description: "El corazón del Escudo Guayanés y Patrimonio de la Humanidad. Un mundo de tepuyes milenarios, selvas vírgenes y el Salto Ángel, la caída de agua más alta del planeta.",
+    long_description: "El Parque Nacional Canaima es una de las joyas más preciosas de la humanidad. Con una extensión de 30,000 km², este santuario geológico alberga los famosos tepuyes, mesetas de roca vertical que se cuentan entre las formaciones más antiguas del planeta. Es el hogar ancestral de la etnia Pemón, quienes custodian este territorio de ríos color ámbar y arenas rosadas. Aquí, la naturaleza se manifiesta en su forma más épica: desde la fuerza atronadora de las siete cascadas de la Laguna de Canaima hasta la mística del Salto Ángel, que se desprende del Auyantepuy.",
+    climate: "Tropical lluvioso y de selva. Las temperaturas oscilan entre 22°C y 32°C. El clima es muy cambiante; las mañanas pueden ser muy calurosas y las noches frescas. Las lluvias son frecuentes y repentinas.",
+    how_to_get_there: "Vía Aérea (Única forma viable): No existen carreteras que lleguen a Canaima. Se debe volar en avionetas o vuelos comerciales desde Puerto Ordaz o Ciudad Bolívar (aprox. 1 hora). También existen conexiones estacionales directas desde Caracas.",
+    best_time_to_visit: "Para ver el Salto Ángel en su splendido caudal: De junio a noviembre (temporada de lluvias), cuando los ríos tienen caudal para navegar. Para fotografía y caminatas: De diciembre a mayo (temporada seca), aunque el salto tiene menos agua.",
+    attractions: "Salto Ángel (Kerepakupai Vená), Laguna de Canaima (Saltos Hacha, Wadaima, Golondrina y Ucaima), Salto Sapo y Sapito, Auyantepuy, Cueva de Kavac, Isla Ratón.",
+    gallery_images: "https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1542224566-6e85f2e6772f?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",
+    latitude: 6.2419,
+    longitude: -62.8531,
+    gastronomy: "Platos tradicionales de la etnia Pemón como el Tumá (un caldo picante y vigorizante de pescado o carne), Casabe de yuca, Picante de Catara (elaborado con bachacos) y pescados locales como el Pavón a la brasa.",
+    is_featured: true,
+    status: "approved"
+  },
+  {
+    id: 8,
+    slug: "isla-de-margarita",
+    name: "Isla de Margarita",
+    state: "Nueva Esparta",
+    image_url: "https://images.unsplash.com/photo-1589979482837-e74f2e145060?auto=format&fit=crop&w=1200&q=80",
+    description: "La Perla del Caribe. Margarita combina playas de ensueño, castillos coloniales y compras libres de impuestos en una isla vibrante que ofrece relajación y vida nocturna.",
+    long_description: "Bañada por las aguas turquesas del Mar Caribe, la Isla de Margarita es un mosaico de experiencias. Desde las olas perfectas para el surf y windsurf en Playa El Yaque, hasta la paz absoluta de las ensenadas de la Península de Macanao, la isla tiene un rincón para cada tipo de viajero. Su historia se respira en los fortines de La Asunción y Juan Griego, mientras que su lado moderno brilla en los centros comerciales y restaurantes de Pampatar.",
+    climate: "El clima es árido tropical, muy soleado. Las temperaturas se mantienen constantes entre los 24°C y 32°C. La brisa marina es permanente, lo que suaviza el calor, especialmente en las costas.",
+    how_to_get_there: "Vía Aérea: A través del Aeropuerto Internacional 'Santiago Mariño' (PMV), que recibe vuelos diarios desde Caracas y otras ciudades de Venezuela.\n\nVía Marítima: Mediante ferrys (rápidos y convencionales) que parten desde Puerto La Cruz o Cumaná hasta Punta de Piedras.",
+    best_time_to_visit: "Sol garantizado casi todo el año. La mejor época es de enero a junio, cuando es más fresco y menos húmedo. Las temporadas altas son Semana Santa, agosto y diciembre.",
+    attractions: "Playa El Agua, Playa Parguito, Laguna de La Restinga, Basílica de la Virgen del Valle, Castillo San Carlos de Borromeo, Fortín de la Galera, Playa El Yaque, Península de Macanao.",
+    gallery_images: "https://images.unsplash.com/photo-1589979482837-e74f2e145060?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+    latitude: 10.997,
+    longitude: -63.911,
+    gastronomy: "Una culinaria caribeña deliciosa: el Pastel de Chucho (combinación de cazón, plátano dulce y queso), Empanadas de cazón, Fosforera (sopa de mariscos) y pescado fresco frito con arepas y tostones.",
+    is_featured: true,
+    status: "approved"
+  },
+  {
+    id: 9,
+    slug: "merida",
+    name: "Mérida",
+    state: "Mérida",
+    image_url: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80",
+    description: "La ciudad de las cumbres nevadas y la eterna juventud. Mérida ofrece el teleférico más alto del mundo, paisajes de frailejones y el encanto de pueblos andinos.",
+    long_description: "Asentada en una meseta en medio de la Cordillera de los Andes, Mérida es el destino de aventura y romance por excelencia en Venezuela. Custodiada por el Pico Bolívar, la ciudad combina su herencia colonial con el dinamismo de la Universidad de los Andes. Aquí puedes pasar de la calidez de su casco histórico al frío intenso de los páramos en apenas unas horas. Sus parques nacionales son un refugio para la biodiversidad, donde los frailejones adornan lagunas de origen glaciar.",
+    climate: "El clima es templado de montaña. En la ciudad, las temperaturas oscilan entre los 13°C y 24°C. Al subir hacia el Páramo o las estaciones del teleférico, las temperaturas pueden descender por debajo de los 0°C. La neblina es común en las tardes.",
+    how_to_get_there: "Vía Aérea: A través del Aeropuerto Alberto Carnevalli (MRD) en la ciudad (vuelos limitados) o el Aeropuerto de El Vigía (VIG), a 1.5 horas de Mérida.\n\nVía Terrestre: Se conecta por la Carretera Trasandina, que cruza el páramo, o por la vía de los llanos (vía Barinas).",
+    best_time_to_visit: "De diciembre a marzo (temporada seca) para ver cielos despejados y cumbres nevadas. Para ver nevadas en las cumbres más altas, los meses de julio y agosto son los ideales.",
+    attractions: "Teleférico Mukumbarí, Parque Nacional Sierra Nevada, Laguna de Mucubají, Pico Espejo, Los Aleros, La Venezuela de Antier, Mercado Principal, Capilla de Piedra de Juan Félix Sánchez, Jají.",
+    gallery_images: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1486873249359-2731bd6dafc7?auto=format&fit=crop&w=800&q=80",
+    latitude: 8.59,
+    longitude: -71.14,
+    gastronomy: "Comida reconfortante para el frío: la Pizca Andina (caldo con papa, leche, queso y cilantro), trucha fresca al ajillo, arepas de harina de trigo, pastelitos andinos y de postre los ricos dulces abrillantados.",
+    is_featured: true,
+    status: "approved"
+  },
+  {
+    id: 10,
+    slug: "morrocoy",
+    name: "Morrocoy",
+    state: "Falcón",
+    image_url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+    description: "Santuario de cayos de arena blanca y manglares rodeados de aguas turquesas y poco profundas. Morrocoy es el paraíso de la navegación recreativa y el buceo.",
+    long_description: "Ubicado en el estado Falcón, el Parque Nacional Morrocoy es un complejo de islotes (cayos) y bajos de arena que parecen sacados de una postal. Su geografía única, protegida por arrecifes de coral, crea lagunas internas de aguas cálidas y calmadas, perfectas para nadar o practicar paddle board. Desde Tucacas o Chichiriviche, las peñillas te llevan a descubrir desde el animado Cayo Sombrero hasta la serenidad de Playa Mero. Es un refugio vital para flamencos y corocoras.",
+    climate: "El clima es árido tropical, caluroso y seco. Las temperaturas oscilan entre los 25°C y 32°C. La brisa marina es constante, pero el sol es muy intenso debido al reflejo de la arena blanca.",
+    how_to_get_there: "Vía Terrestre: A unas 3 o 4 horas de Caracas siguiendo la Autopista Regional del Centro y luego la Carretera de la Costa (Troncal 3). Las ciudades de entrada son Tucacas o Chichiriviche.\n\nVía Aérea: El aeropuerto comercial más cercano es el de Valencia (VLN), continuando 1.5 horas por tierra.",
+    best_time_to_visit: "De enero a junio, con cielos despejados y mar calmado tipo 'espejo'. De martes a jueves para evitar la afluencia masiva de los fines de semana.",
+    attractions: "Cayo Sombrero, Cayo Peraza, Cayo Sal, Bajo Juanes, Playa Mero, Cayo Borracho, Bajo de las Estrellas, Puente de Piedra, Refugio de Fauna Silvestre Cuare.",
+    gallery_images: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&w=800&q=80",
+    latitude: 10.83,
+    longitude: -68.3,
+    gastronomy: "Gastronomía playera fresca: Cócteles 'Rompe Colchón' y 'Siete Potencias', Pescado frito con tostones crujientes y ensalada de repollo, langostas en los cayos y las ricas conservas de coco.",
+    is_featured: true,
+    status: "approved"
+  },
+  {
+    id: 11,
+    slug: "mochima",
+    name: "Mochima",
+    state: "Sucre",
+    image_url: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80",
+    description: "Laberinto de islas vírgenes, bahías profundas y delfines juguetones. Mochima es el destino idóneo para navegar en kayak, hacer snorkel y descansar en playas tranquilas.",
+    long_description: "Ubicado entre los estados Anzoátegui y Sucre, el Parque Nacional Mochima es un espectáculo geológico único. Aquí, el relieve montañoso crea un sinfín de ensenadas y bahías protegidas del oleaje fuerte, lo que convierte a sus playas en auténticas 'piscinas naturales'. Desde el pintoresco pueblo de Mochima o las marinas de Puerto La Cruz, pequeñas embarcaciones te llevan a descubrir cayos emblemáticos como Playa Blanca o Las Maritas.",
+    climate: "El clima es árido y semiárido, muy soleado y con brisas refrescantes. Las temperaturas oscilan entre los 24°C y 33°C. Al ser una zona de bahías protegidas, el agua suele tener una temperatura templada deliciosa.",
+    how_to_get_there: "Vía Aérea: Los aeropuertos más cercanos son el de Barcelona (BLA) en Anzoátegui o el de Cumaná (CUM) en Sucre.\n\nVía Terrestre: A través de la Troncal 9. Se puede acceder al parque desde Puerto La Cruz (embarcadero de Guanta) o directamente desde el pueblo de Mochima.",
+    best_time_to_visit: "De enero a mayo, cuando el cielo está despejado y el mar presenta su mayor transparencia. Ideal para avistar delfines.",
+    attractions: "Isla de Plata, Playa Blanca, Las Maritas, Cayo Iguana, Bahía de Mochima, Isla Arapo y Arapito, Playa Colorada, Cueva de la Virgen, avistamiento de delfines.",
+    gallery_images: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=800&q=80",
+    latitude: 10.355,
+    longitude: -64.358,
+    gastronomy: "Pescado frito (pargo o carite) con ensalada rallada y tostones, ceviche fresco, consomé de chipichipi y empanadas orientales de cazón o mariscos en los paraderos de la carretera.",
+    is_featured: false,
+    status: "approved"
+  },
+  {
+    id: 12,
+    slug: "choroni",
+    name: "Choroní",
+    state: "Aragua",
+    image_url: "https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&w=1200&q=80",
+    description: "Paraíso donde la selva nublada se funde con el Caribe. Choroní te recibe con fachadas coloniales de colores, ritmos de tambores y la espectacular Playa Grande.",
+    long_description: "Cruzar el Parque Nacional Henri Pittier a través de sus frondosas montañas es el preludio mágico para llegar a Choroní. Este pintoresco pueblo colonial, fundado en 1616, conserva un encanto histórico único con sus calles empedradas y casas de colores brillantes. A solo unos minutos se encuentra Puerto Colombia, el muelle desde donde parten las peñillas hacia ensenadas vírgenes como Cepe o Chuao. Choroní no es solo sol y arena; es un refugio donde el aroma al cacao, los tambores y la hospitalidad crean una mística inolvidable.",
+    climate: "El clima es tropical cálido. En la zona costera, las temperaturas oscilan entre los 24°C y 32°C. El camino de acceso (la montaña) tiene un clima de selva nublada templada y fría.",
+    how_to_get_there: "Vía Terrestre: Desde Maracay (Estado Aragua), se toma la carretera que atraviesa el Parque Nacional Henri Pittier. Es un trayecto de aproximadamente 2 horas por una vía estrecha con curvas pronunciadas y paisajes espectaculares de selva nublada.",
+    best_time_to_visit: "De diciembre a mayo. Las lluvias disminuyen y el mar es ideal para bañistas. Los fines de semana hay gran actividad cultural y de tambores en la plaza de Puerto Colombia.",
+    attractions: "Playa Grande, Pueblo Colonial de Choroní, Puerto Colombia (Muelle), Playa Cuyagua (famosa para el surf), Excursiones en lancha a Chuao (pueblo de cacao ancestral), Cepe y Valle Seco.",
+    gallery_images: "https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=800&q=80",
+    latitude: 10.4907,
+    longitude: -67.6083,
+    gastronomy: "Platos a base de pescados frescos del Caribe, tostones gigantes con ensalada y queso rallado, empanadas de cazón, y bebidas a base de cacao local y cócteles tropicales cocinados en el muelle.",
+    is_featured: true,
+    status: "approved"
+  },
+  {
+    id: 4,
+    slug: "barquisimeto",
+    name: "Barquisimeto",
+    state: "Lara",
+    image_url: "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1200&q=80",
+    description: "La Ciudad de los Crepúsculos. Corazón musical y cultural de Venezuela, famoso por su catedral de diseño futurista, fe mariana y atardeceres espectaculares.",
+    long_description: "Barquisimeto, la cuarta ciudad más grande de Venezuela, cautiva por su mezcla única de tradición y modernidad. Es famosa por su Catedral de diseño futurista, el Obelisco y el Manto de María, el monumento mariano más alto del mundo. Estratégicamente ubicada, sirve como puente entre el centro, occidente y los llanos venezolanos. Es un centro artístico por excelencia, hogar de destacados músicos y artesanos. Sus visitantes no pueden irse sin probar su gastronomía local, como el suero de leche y las acemas larenses, mientras contemplan cómo el cielo se tiñe de tonos púrpuras y naranjas al caer la tarde.",
+    climate: "El clima es cálido tropical semiárido. Las temperaturas oscilan entre los 20°C y 31°C. Los vientos alisios soplan constantemente refrescando las tardes.",
+    how_to_get_there: "Vía Aérea: A través del Aeropuerto Internacional Jacinto Lara (BRM), con vuelos directos desde Caracas. Vía Terrestre: Conectada por las principales autopistas del país. La distancia desde Caracas es de aproximadamente 350 km (unas 5-6 horas de viaje).",
+    best_time_to_visit: "De diciembre a marzo (temporada seca) para disfrutar de los famosos crepúsculos despejados. Y el 14 de enero para vivir la procesión multitudinaria de la Divina Pastora.",
+    attractions: "Catedral Metropolitana de Barquisimeto, Monumento Manto de María, Flor de Venezuela (Pabellón de Hannover), Obelisco de Barquisimeto, Pueblo de Santa Rosa, Parque Ayacucho, Teatro Juárez, Parque Zoológico y Botánico Bararida.",
+    gallery_images: "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1542224566-6e85f2e6772f?auto=format&fit=crop&w=800&q=80",
+    latitude: 10.07389,
+    longitude: -69.32278,
+    gastronomy: "Cocina larense rústica: Suero de leche curado en taparas, Lomo prensado de Carora (carne de cerdo especiada), Acema larense y Pan de Tunja, chivo en coco, y las ricas empanadas de pabellón del mercado Terepaima.",
+    is_featured: false,
+    status: "approved"
+  },
+  {
+    id: 3,
+    slug: "valencia",
+    name: "Valencia",
+    state: "Carabobo",
+    image_url: "https://images.unsplash.com/photo-1542224566-6e85f2e6772f?auto=format&fit=crop&w=1200&q=80",
+    description: "Potencia industrial con alma histórica. Valencia ofrece una mezcla de modernidad urbana, monumentos de la gesta libertadora y verdes colinas andinas.",
+    long_description: "Valencia es una de las ciudades más dinámicas y modernas del país. Estratégicas y bien ubicada en el centro-norte, es famosa por ser el corazón manufacturero de Venezuela, pero también por su riquísimo legado histórico. Desde el imponente Campo de Carabobo, donde se respira la gesta libertadora, hasta su revitalizado casco central con la Catedral y el Teatro Municipal, la ciudad ofrece un viaje en el tiempo.",
+    climate: "El clima es tropical cálido, suavizado por la cercanía a las montañas. Las temperaturas suelen oscilar entre los 20°C y 32°C. Las noches suelen ser muy frescas y agradables.",
+    how_to_get_there: "Vía Aérea: A través del Aeropuerto Internacional Arturo Michelena (VLN). Vía Terrestre: Principal nodo vial del país, se llega fácilmente desde Caracas (2 horas) por la Autopista Regional del Centro (ARC).",
+    best_time_to_visit: "De diciembre a marzo, durante la temporada seca, ideal para caminatas al aire libre y visitas históricas. En noviembre se celebra la Feria de la Virgen del Socorro.",
+    attractions: "Campo de Carabobo, Acuario de Valencia, Casco Histórico, Teatro Municipal, Casa de la Estrella, Parque Fernando Peñalver, Termas de Las Trincheras, Cerro El Casupo.",
+    gallery_images: "https://images.unsplash.com/photo-1542224566-6e85f2e6772f?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+    latitude: 10.16,
+    longitude: -67.9,
+    gastronomy: "Panelas de San Joaquín (bizcochos dulces de almidón de yuca), Queso de mano criollo para cachapas, carne en vara en las afueras, y una amplia propuesta de restaurantes de nivel internacional.",
+    is_featured: false,
+    status: "approved"
+  },
+  {
+    id: 5,
+    slug: "puerto-la-cruz",
+    name: "Puerto La Cruz",
+    state: "Anzoátegui",
+    image_url: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80",
+    description: "Ventana al Caribe oriental. Combina una moderna red de canales residenciales y marinas con el acceso directo a las islas del Parque Nacional Mochima.",
+    long_description: "Puerto La Cruz es el epicentro del turismo náutico en Venezuela. Esta ciudad portuaria ha crecido de cara al mar, desarrollando complejos residenciales de canales únicos en el mundo y marinas de clase internacional. Su gran atractivo es el icónico Paseo de la Cruz y el Mar (antiguo Paseo Colón), donde la brisa marina acompaña a locales y turistas en sus caminatas nocturnas.",
+    climate: "El clima es tropical semiárido, con mucho sol todo el año. Temperaturas de 24°C a 33°C con brisa fresca del mar Caribe.",
+    how_to_get_there: "Vía Aérea: Aeropuerto de Barcelona (BLA) a 20 minutos. Vía Terrestre: Autopista de Oriente (Troncal 9) a 4-5 horas de Caracas. Vía Marítima: Puerto principal de ferris a la Isla de Margarita.",
+    best_time_to_visit: "De diciembre a mayo. Clima seco, cielos abiertos sin lluvias, ideal para navegar por las playas caribeñas de Mochima.",
+    attractions: "Paseo de la Cruz y el Mar, Complejo Turístico El Morro, Isla de Plata, Playa Mansa, C.C. Plaza Mayor, Islas Chimanas, Mirador de El Hatillo.",
+    gallery_images: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+    latitude: 10.201,
+    longitude: -64.633,
+    gastronomy: "Cocina marina fresca: pescado frito con arepa rallada y tostones, asopado caliente de mariscos en las marinas, empanadas de cazón y consomé energizante de chipichipi.",
+    is_featured: false,
+    status: "approved"
+  }
+];

@@ -1,0 +1,146 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  /* Paleta de Colores Oficiales (Fucsia, Magenta, Azul Turquesa, Púrpura) */
+  --color-brand-magenta: #FF0096;
+  --color-brand-turquesa: #00C8D4;
+  --color-brand-purple: #9B00CC;
+  --color-brand-purple-dark: #1a0533;
+  --color-brand-purple-deep: #0e011f;
+
+  /* Colores de fondo en modo claro */
+  --color-bg-light: #FFFFFF;
+  --color-bg-card: #F9FAFB;
+  --color-text-dark: #1F2937;
+  --color-text-muted: #4B5563;
+
+  /* Tipografía */
+  --font-sans: 'Montserrat', 'Outfit', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --font-serif: 'Playfair Display', 'Cinzel', serif;
+  --font-display: 'Cinzel', 'Playfair Display', serif;
+
+  /* Custom overrides for luxury dark slate-gray instead of pure black */
+  --color-gray-950: #1e293b;
+  --color-gray-900: #334155;
+  --color-gray-800: #475569;
+  --color-slate-950: #1e293b;
+  --color-slate-900: #334155;
+  --color-slate-800: #475569;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-bg-light);
+    color: var(--color-text-dark);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: 0.04em;
+    color: var(--color-slate-900);
+  }
+
+  /* Barras de desplazamiento */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #F3F4F6;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #D1D5DB;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-brand-magenta);
+  }
+}
+
+/* Ticker Gradient (Magenta a Púrpura) */
+.ticker-gradient {
+  background: linear-gradient(90deg, var(--color-brand-magenta) 0%, var(--color-brand-purple) 100%);
+}
+
+/* Degradado de Texto de la Marca (Magenta a Turquesa) */
+.text-gradient-brand {
+  background: linear-gradient(135deg, var(--color-brand-magenta) 0%, var(--color-brand-turquesa) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Degradado para Botones y Acentos (Cian/Turquesa a Azul) */
+.btn-cyan-gradient {
+  background: linear-gradient(90deg, #00C8D4 0%, #0099AA 100%);
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.btn-cyan-gradient:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+}
+
+.btn-magenta-gradient {
+  background: linear-gradient(90deg, #FF0096 0%, #9B00CC 100%);
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.btn-magenta-gradient:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+}
+
+/* Efecto de Vidrio Claro */
+.glass-panel-light {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Efecto de Vidrio Oscuro (para el footer) */
+.glass-panel-dark {
+  background: rgba(26, 5, 51, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Fondo de Banner Hero con Playa del Caribe */
+.hero-banner-bg {
+  background: linear-gradient(135deg, #0e0120 0%, #1a0533 60%, #0d1a2e 100%);
+  background-size: cover;
+  background-position: center;
+}
+
+/* Override light admin background with premium dark purple gradient */
+.bg-\[\#f8fafc\] {
+  background: linear-gradient(135deg, #0e0120 0%, #1a0533 60%, #0d1a2e 100%) !important;
+}
+
+/* Pulsating glow animation for the search bar (matches the chat widget ping feel) */
+@keyframes search-glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 200, 212, 0.4), 0 0 0 0 rgba(255, 0, 150, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 200, 212, 0), 0 0 0 10px rgba(255, 0, 150, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 200, 212, 0), 0 0 0 0 rgba(255, 0, 150, 0);
+  }
+}
+.animate-search-glow {
+  animation: search-glow 2s infinite;
+}
+
