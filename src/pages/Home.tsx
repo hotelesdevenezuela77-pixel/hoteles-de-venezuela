@@ -432,7 +432,7 @@ export function Home() {
     description: "Promovemos el turismo real verificado sin comisiones.",
     isActive: true
   };
-  const videoSection = sections.find(s => s.sectionKey === "video") || {
+  const videoSection = sections.find(s => s.sectionKey === "video" || s.sectionKey === "youtube_video") || {
     title: "El valor del turismo real verificado",
     subtitle: "NUESTRO VIDEO PRESENTACIÓN",
     description: "Descubre en este video cómo nuestro equipo de auditoría recorre cada rincón de Venezuela para validar la hospitalidad nacional, sin intermediarios.",

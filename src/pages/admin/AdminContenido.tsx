@@ -18,14 +18,19 @@ interface SiteSetting { id: number; settingKey: string; settingValue: string | n
 interface CustomPage { id: number; slug: string; title: string; h1Title: string | null; metaDescription: string | null; metaKeywords: string | null; content: string | null; isPublished: boolean | null; featuredImage: string | null; videoUrl: string | null; galleryImages: string | null; relatedEstablishments: string | null; }
 
 const SECTION_META: Record<string, { label: string; icon: string; color: string }> = {
-  hero:         { label: "Hero Principal",    icon: "🏔️", color: "#FF0096" },
-  HERO_BANNER:  { label: "Hero Principal",    icon: "🏔️", color: "#FF0096" },
-  about:        { label: "Sobre Nosotros",    icon: "ℹ️", color: "#9B00CC" },
-  features:     { label: "Características",   icon: "⭐", color: "#00C8D4" },
-  video:        { label: "Video Promocional", icon: "🎥", color: "#EF4444" },
-  cta:          { label: "Call to Action",    icon: "🚀", color: "#F59E0B" },
-  testimonials: { label: "Testimonios",       icon: "💬", color: "#10B981" },
-  partners:     { label: "Nuestros Aliados",  icon: "🤝", color: "#6366F1" },
+  hero:                 { label: "Hero Principal",    icon: "🏔️", color: "#FF0096" },
+  HERO_BANNER:          { label: "Hero Principal",    icon: "🏔️", color: "#FF0096" },
+  hero_banner:          { label: "Hero Principal (Legacy)", icon: "🏔️", color: "#FF0096" },
+  about:                { label: "Sobre Nosotros",    icon: "ℹ️", color: "#9B00CC" },
+  features:             { label: "Características",   icon: "⭐", color: "#00C8D4" },
+  video:                { label: "Video Promocional", icon: "🎥", color: "#EF4444" },
+  youtube_video:        { label: "Video Promocional (YouTube)", icon: "🎥", color: "#EF4444" },
+  featured_section:     { label: "Negocios Destacados", icon: "⭐", color: "#F59E0B" },
+  destinations_section: { label: "Destinos Populares", icon: "📍", color: "#00C8D4" },
+  how_it_works:         { label: "Cómo Funciona",     icon: "⚙️", color: "#10B981" },
+  cta:                  { label: "Call to Action",    icon: "🚀", color: "#F59E0B" },
+  testimonials:         { label: "Testimonios",       icon: "💬", color: "#10B981" },
+  partners:             { label: "Nuestros Aliados",  icon: "🤝", color: "#6366F1" },
 };
 
 const SETTINGS_META: Record<string, { label: string; group: string; type: "text" | "url" | "tel" | "toggle" }> = {
@@ -332,10 +337,96 @@ export function AdminContenido() {
                     {!isEditing && <button type="button" onClick={() => setEditSection({ ...s })} className="px-3.5 py-1.5 bg-[#170e2e] hover:bg-[#251747] border border-slate-800 rounded-xl text-[10px] font-black uppercase text-purple-400 tracking-wider">Modificar</button>}
                   </div>
                   {isEditing && editSection ? (
-                    <div className="space-y-4">
-                      <input value={editSection.title || ""} onChange={e => setEditSection({ ...editSection, title: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] p-3 rounded-xl text-xs font-bold text-white outline-none" />
-                      <textarea value={editSection.description || ""} onChange={e => setEditSection({ ...editSection, description: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] p-3 rounded-xl text-xs font-bold text-white outline-none h-20 resize-none" />
-                      <div className="flex gap-2"><button type="button" onClick={() => setEditSection(null)} className="px-4 py-2 bg-[#170e2e] rounded-xl text-xs font-black uppercase text-slate-400">Cerrar</button><button type="button" onClick={() => updateSection.mutate(editSection)} className="px-5 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl text-xs font-black uppercase">Actualizar</button></div>
+                    <div className="space-y-4 mt-3 bg-[#0a0418] p-5 rounded-xl border border-slate-900">
+                      <div>
+                        <label className="text-[10px] uppercase font-black text-slate-400 block mb-1 tracking-widest">Título</label>
+                        <input 
+                          value={editSection.title || ""} 
+                          onChange={e => setEditSection({ ...editSection, title: e.target.value })} 
+                          className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] p-3 rounded-xl text-xs font-bold text-white outline-none" 
+                        />
+                      </div>
+                      
+                      {(editSection.sectionKey.includes("video") || editSection.sectionKey.includes("hero") || editSection.subtitle !== null) && (
+                        <div>
+                          <label className="text-[10px] uppercase font-black text-slate-400 block mb-1 tracking-widest">Subtítulo</label>
+                          <input 
+                            value={editSection.subtitle || ""} 
+                            onChange={e => setEditSection({ ...editSection, subtitle: e.target.value })} 
+                            className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] p-3 rounded-xl text-xs font-bold text-white outline-none" 
+                          />
+                        </div>
+                      )}
+
+                      <div>
+                        <label className="text-[10px] uppercase font-black text-slate-400 block mb-1 tracking-widest">Descripción</label>
+                        <textarea 
+                          value={editSection.description || ""} 
+                          onChange={e => setEditSection({ ...editSection, description: e.target.value })} 
+                          className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] p-3 rounded-xl text-xs font-bold text-white outline-none h-20 resize-none" 
+                        />
+                      </div>
+
+                      {(editSection.sectionKey.includes("video") || editSection.sectionKey.includes("cta") || editSection.buttonUrl !== null) && (
+                        <div>
+                          <label className="text-[10px] uppercase font-black text-slate-400 block mb-1 tracking-widest">
+                            {editSection.sectionKey.includes("video") ? "Enlace del Video de YouTube" : "Enlace del Botón"}
+                          </label>
+                          <input 
+                            value={editSection.buttonUrl || ""} 
+                            onChange={e => setEditSection({ ...editSection, buttonUrl: e.target.value })} 
+                            placeholder={editSection.sectionKey.includes("video") ? "Ej: https://www.youtube.com/watch?v=HeVUUQgwjvA" : "Ej: /destinos o https://..."}
+                            className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] p-3 rounded-xl text-xs font-bold text-white outline-none" 
+                          />
+                        </div>
+                      )}
+
+                      {(editSection.buttonText !== null || editSection.sectionKey.includes("video") || editSection.sectionKey.includes("featured") || editSection.sectionKey.includes("destinations")) && (
+                        <div>
+                          <label className="text-[10px] uppercase font-black text-slate-400 block mb-1 tracking-widest">Texto del Botón</label>
+                          <input 
+                            value={editSection.buttonText || ""} 
+                            onChange={e => setEditSection({ ...editSection, buttonText: e.target.value })} 
+                            className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] p-3 rounded-xl text-xs font-bold text-white outline-none" 
+                          />
+                        </div>
+                      )}
+
+                      {(editSection.sectionKey.includes("video") || editSection.sectionKey.includes("hero") || editSection.imageUrl !== null) && (
+                        <div>
+                          <label className="text-[10px] uppercase font-black text-slate-400 block mb-1.5 tracking-widest">Imagen / Miniatura</label>
+                          <div className="flex gap-2">
+                            <input 
+                              value={editSection.imageUrl || ""} 
+                              onChange={e => setEditSection({ ...editSection, imageUrl: e.target.value })} 
+                              className="flex-1 bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] rounded-xl px-4 py-3 text-xs font-bold text-white outline-none" 
+                              placeholder="https://url-de-la-imagen.jpg" 
+                            />
+                            <label className="flex items-center justify-center px-4 py-3 border border-dashed border-purple-500/40 bg-[#1e123a] hover:bg-[#251747] rounded-xl text-xs font-black uppercase text-white tracking-wider cursor-pointer transition-colors">
+                              <Upload className="w-4 h-4 text-[#FF0096] mr-1" /> Subir
+                              <input 
+                                type="file" 
+                                accept="image/*" 
+                                className="hidden" 
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0]; if (!file) return;
+                                  const r = new FileReader(); r.onload = () => setEditSection({ ...editSection, imageUrl: r.result as string }); r.readAsDataURL(file);
+                                }} 
+                              />
+                            </label>
+                          </div>
+                          {editSection.imageUrl && (
+                            <div className="mt-3 relative inline-block">
+                              <img src={editSection.imageUrl} alt="preview" className="h-16 w-auto object-cover rounded-xl border border-slate-800" />
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="flex gap-3 pt-2">
+                        <button type="button" onClick={() => setEditSection(null)} className="flex-1 py-3 bg-[#170e2e] hover:bg-[#221544] border border-slate-800 rounded-xl text-xs font-black uppercase text-slate-300 tracking-wider transition-colors">Cancelar</button>
+                        <button type="button" onClick={() => updateSection.mutate(editSection)} className="flex-1 py-3 text-white rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-pink-500 to-purple-600">Sincronizar</button>
+                      </div>
                     </div>
                   ) : (
                     <p className="text-xs text-slate-300 font-medium bg-[#0a0418] p-4 rounded-xl border border-slate-900/50 line-clamp-2">{s.title || "Sin registros semánticos"}</p>
