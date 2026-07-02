@@ -202,9 +202,12 @@ export function NationalParkDetail() {
         <img 
           src={park.image_url} 
           alt={park.name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover scale-[1.08]"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+        
+        {/* Bottom white fade overlay to blend with the page background */}
+        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none z-10" />
         
         {/* Breadcrumb Nav */}
         <div className="absolute top-8 left-0 right-0 z-10">

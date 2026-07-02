@@ -233,6 +233,9 @@ export function NationalParks() {
       
       {/* Hero Section */}
       <section className="relative overflow-hidden py-16 bg-gradient-to-br from-emerald-800 via-teal-700 to-cyan-900 text-white text-center">
+        {/* Bottom white fade overlay to blend with the white page background */}
+        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none z-10" />
+
         <div className="absolute top-0 left-1/4 w-[400px] h-[200px] bg-emerald-400/10 rounded-full blur-[100px] pointer-events-none"></div>
         <div className="absolute bottom-0 right-1/4 w-[400px] h-[200px] bg-cyan-400/10 rounded-full blur-[100px] pointer-events-none"></div>
         

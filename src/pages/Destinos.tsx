@@ -51,6 +51,9 @@ export function Destinos() {
     <div className="min-h-screen bg-gray-50/30 pb-20">
       {/* Hero Banner Minimalista Premium */}
       <div className="relative overflow-hidden py-16 bg-gradient-to-br from-brand-purple-dark via-brand-purple-deep to-black text-white text-center">
+        {/* Bottom white fade overlay to blend with the white page background */}
+        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none z-10" />
+
         {/* Luces decorativas */}
         <div className="absolute top-0 left-1/4 w-[500px] h-[300px] bg-brand-magenta/10 rounded-full blur-[120px] pointer-events-none"></div>
         <div className="absolute bottom-0 right-1/4 w-[500px] h-[300px] bg-brand-turquesa/10 rounded-full blur-[120px] pointer-events-none"></div>

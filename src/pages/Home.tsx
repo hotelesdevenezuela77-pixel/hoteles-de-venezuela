@@ -511,6 +511,9 @@ export function Home() {
         className="relative pt-24 pb-28 md:pt-32 md:pb-36 px-4 hero-banner-bg flex flex-col items-center justify-center text-center overflow-hidden"
         style={heroStyle}
       >
+        {/* Bottom white fade overlay to blend with the white page background */}
+        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none z-10" />
+
         {/* Glow Spots (sólo visibles cuando se usa el degradado morado de fondo) */}
         {(!heroSection.imageUrl || loading) && (
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
