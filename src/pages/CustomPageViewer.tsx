@@ -267,40 +267,32 @@ export function CustomPageViewer() {
         </div>
       )}
 
-      {/* Breadcrumb Navigation */}
-      <div className="max-w-7xl mx-auto px-6 pt-6">
-        <Link href="/" className="inline-flex items-center gap-2 text-xs font-black text-gray-500 hover:text-brand-magenta transition-colors cursor-pointer">
-          <ArrowLeft className="w-4 h-4" />
-          <span>INICIO</span>
-        </Link>
-      </div>
+      {/* Main Cover Header - Full Width Bleed */}
+      <div className="w-full relative h-[400px] md:h-[550px] overflow-hidden">
+        {page.featuredImage ? (
+          <img 
+            src={page.featuredImage} 
+            alt={page.title} 
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&w=1200&q=80";
+            }}
+          />
+        ) : (
+          <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #0e0120, #1a0533, #0a1628)" }} />
+        )}
 
-      {/* Main Cover Header */}
-      <div className="max-w-7xl mx-auto px-6 mt-6">
-        <div className="relative rounded-3xl overflow-hidden shadow-2xl h-[350px] md:h-[450px]">
-          {page.featuredImage ? (
-            <img 
-              src={page.featuredImage} 
-              alt={page.title} 
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&w=1200&q=80";
-              }}
-            />
-          ) : (
-            <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #0e0120, #1a0533, #0a1628)" }} />
-          )}
+        {/* overlay shade */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10" />
 
-          {/* overlay shade */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20" />
-
-          {/* info overlay */}
-          <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12 text-white text-left">
+        {/* info overlay - aligned content */}
+        <div className="absolute inset-0 flex items-end">
+          <div className="max-w-7xl w-full mx-auto px-6 pb-12 md:pb-16 text-white text-left">
             <span className="inline-flex items-center gap-1.5 bg-brand-magenta text-white text-[10px] font-black tracking-widest px-3 py-1 rounded-full uppercase shadow-lg shadow-brand-magenta/25 mb-4">
-              <ImageIcon className="w-3 h-3" />
+              <ImageIcon className="w-3.5 h-3.5" />
               <span>Explorar Venezuela</span>
             </span>
-            <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight drop-shadow-md leading-tight max-w-4xl">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white tracking-tight drop-shadow-lg leading-tight max-w-4xl">
               {page.h1Title || page.title}
             </h1>
           </div>
@@ -308,7 +300,15 @@ export function CustomPageViewer() {
       </div>
 
       {/* Rich Page Body Content */}
-      <div className="max-w-4xl mx-auto px-6 mt-12">
+      <div className="max-w-4xl mx-auto px-6 mt-12 mb-16">
+        {/* Breadcrumb Navigation */}
+        <div className="mb-6">
+          <Link href="/" className="inline-flex items-center gap-2 text-xs font-black text-gray-500 hover:text-brand-magenta transition-colors cursor-pointer">
+            <ArrowLeft className="w-4 h-4" />
+            <span>INICIO</span>
+          </Link>
+        </div>
+
         <div className="bg-white border border-gray-100 rounded-3xl p-8 md:p-12 shadow-lg shadow-gray-250/20 text-left">
           {isHtmlContent ? (
             <div 
