@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { AdminTabBar } from "@/components/admin/AdminTabBar";
-import { MapPin, Plus, Edit2, Trash2, Star, Eye, X, Loader2 } from "lucide-react";
+import { MapPin, Plus, Edit2, Trash2, Star, Eye, X, Loader2, Upload } from "lucide-react";
 
 interface Destination {
   id: number;
@@ -14,6 +14,8 @@ interface Destination {
   imageUrl: string | null;
   description: string | null;
   isFeatured: boolean | null;
+  galleryImages?: string[];
+  attractions?: string | null;
 }
 
 function autoSlug(name: string) {
@@ -27,6 +29,23 @@ const VE_STATES = [
   "Yaracuy","Zulia",
 ];
 
+async function uploadImageIfNeeded(url: string | null, pathPrefix: string): Promise<string | null> {
+  if (!url) return null;
+  if (!url.startsWith("data:")) return url;
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const fileName = `destinos/${pathPrefix}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}.jpg`;
+    const { error } = await supabase.storage.from("establecimientos").upload(fileName, blob, { contentType: "image/jpeg", upsert: true });
+    if (error) throw error;
+    const { data: { publicUrl } } = supabase.storage.from("establecimientos").getPublicUrl(fileName);
+    return publicUrl;
+  } catch (err) {
+    console.error("Failed to upload image:", err);
+    return null;
+  }
+}
+
 interface DestForm {
   name: string;
   slug: string;
@@ -34,9 +53,11 @@ interface DestForm {
   description: string;
   imageUrl: string;
   isFeatured: boolean;
+  galleryImages: string[];
+  attractions: string;
 }
 
-const EMPTY: DestForm = { name: "", slug: "", state: "", description: "", imageUrl: "", isFeatured: false };
+const EMPTY: DestForm = { name: "", slug: "", state: "", description: "", imageUrl: "", isFeatured: false, galleryImages: [], attractions: "" };
 
 export function AdminDestinos() {
   const { user, profile, loading: authLoading } = useAuth();
@@ -76,7 +97,9 @@ export function AdminDestinos() {
         state: d.state || null,
         imageUrl: d.image_url || null,
         description: d.description || null,
-        isFeatured: !!d.is_featured
+        isFeatured: !!d.is_featured,
+        galleryImages: d.gallery_images ? d.gallery_images.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
+        attractions: d.attractions || null
       }));
     }
   });
@@ -84,13 +107,21 @@ export function AdminDestinos() {
   // Mutation to create destination
   const createMut = useMutation({
     mutationFn: async (d: DestForm) => {
+      const finalMainImg = await uploadImageIfNeeded(d.imageUrl, "main");
+      const finalGalleryUrls = await Promise.all(
+        d.galleryImages.map((imgUrl, i) => uploadImageIfNeeded(imgUrl, `gallery-${i}`))
+      );
+      const galleryString = finalGalleryUrls.filter(Boolean).join(",");
+
       const payload = {
         name: d.name,
         slug: d.slug,
         state: d.state || null,
         description: d.description || null,
-        image_url: d.imageUrl || null,
-        is_featured: d.isFeatured
+        image_url: finalMainImg,
+        is_featured: d.isFeatured,
+        gallery_images: galleryString || null,
+        attractions: d.attractions || null
       };
 
       const { error } = await supabase
@@ -114,13 +145,21 @@ export function AdminDestinos() {
       const localDests = JSON.parse(localStorage.getItem(localDestsKey) || "[]");
       const hasLocal = localDests.some((d: any) => d.id === id);
 
+      const finalMainImg = await uploadImageIfNeeded(data.imageUrl, "main");
+      const finalGalleryUrls = await Promise.all(
+        data.galleryImages.map((imgUrl, i) => uploadImageIfNeeded(imgUrl, `gallery-${i}`))
+      );
+      const galleryString = finalGalleryUrls.filter(Boolean).join(",");
+
       const payload = {
         name: data.name,
         slug: data.slug,
         state: data.state || null,
         description: data.description || null,
-        image_url: data.imageUrl || null,
-        is_featured: data.isFeatured
+        image_url: finalMainImg,
+        is_featured: data.isFeatured,
+        gallery_images: galleryString || null,
+        attractions: data.attractions || null
       };
 
       if (hasLocal) {
@@ -186,7 +225,9 @@ export function AdminDestinos() {
       state: d.state ?? "",
       description: d.description ?? "",
       imageUrl: d.imageUrl ?? "",
-      isFeatured: !!d.isFeatured
+      isFeatured: !!d.isFeatured,
+      galleryImages: d.galleryImages ?? [],
+      attractions: d.attractions ?? ""
     });
     setShowForm(true);
   };
@@ -271,15 +312,73 @@ export function AdminDestinos() {
                 </select>
               </div>
               <div>
-                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 block">URL de Imagen</label>
-                <input placeholder="https://..." className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-purple-400 font-semibold" value={form.imageUrl}
-                  onChange={e => setForm(f => ({ ...f, imageUrl: e.target.value }))} />
+                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 block">Atracciones Turísticas (Separadas por comas)</label>
+                <input placeholder="Ej: Cayo Sombrero, Cayo Sal, Ruinas de El Tocuyo" className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-purple-400 font-semibold" value={form.attractions}
+                  onChange={e => setForm(f => ({ ...f, attractions: e.target.value }))} />
+              </div>
+              <div className="md:col-span-2">
+                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 block">Imagen de Portada (URL o Subir)</label>
+                <div className="flex gap-2">
+                  <input placeholder="https://..." className="flex-1 bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-purple-400 font-semibold font-mono" value={form.imageUrl}
+                    onChange={e => setForm(f => ({ ...f, imageUrl: e.target.value }))} />
+                  <label className="flex items-center justify-center px-4 py-2 border border-dashed border-[#00C8D4]/40 bg-[#00C8D4]/5 hover:bg-[#00C8D4]/10 rounded-xl text-xs font-bold uppercase text-[#00C8D4] tracking-wider cursor-pointer transition-colors shrink-0">
+                    <Upload className="w-4 h-4 mr-1" /> Subir
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      className="hidden" 
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]; if (!file) return;
+                        const r = new FileReader(); r.onload = () => setForm(f => ({ ...f, imageUrl: r.result as string })); r.readAsDataURL(file);
+                      }} 
+                    />
+                  </label>
+                </div>
               </div>
               <div className="md:col-span-2">
                 <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 block">Descripción</label>
                 <textarea rows={3} placeholder="Describe brevemente este destino..." className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-purple-400 font-semibold resize-none"
                   value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
               </div>
+              
+              {/* GALERÍA DE IMÁGENES */}
+              <div className="md:col-span-2 border-t border-slate-100 pt-4">
+                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-2 block">Galería de Fotos del Destino</label>
+                
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 mb-3">
+                  {form.galleryImages.map((imgUrl, i) => (
+                    <div key={i} className="relative aspect-video rounded-xl overflow-hidden bg-gray-50 border border-gray-100 group">
+                      <img src={imgUrl} alt={`gallery-${i}`} className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setForm(f => ({ ...f, galleryImages: f.galleryImages.filter((_, idx) => idx !== i) }))}
+                        className="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-500 hover:bg-red-650 text-white flex items-center justify-center text-xs font-bold cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
+                        title="Eliminar foto"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                  
+                  {/* Add Image Card */}
+                  <label className="flex flex-col items-center justify-center aspect-video rounded-xl border-2 border-dashed border-gray-200 hover:border-[#00C8D4] hover:bg-cyan-50/5 cursor-pointer transition-all text-gray-400 hover:text-[#00C8D4] group">
+                    <Plus className="w-5 h-5 mb-0.5 group-hover:scale-110 transition-transform" />
+                    <span className="text-[9px] font-bold uppercase tracking-wider">Añadir Foto</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]; if (!file) return;
+                        const r = new FileReader();
+                        r.onload = () => setForm(f => ({ ...f, galleryImages: [...f.galleryImages, r.result as string] }));
+                        r.readAsDataURL(file);
+                      }}
+                    />
+                  </label>
+                </div>
+              </div>
+
               <div className="flex items-center mt-2">
                 <button type="button" onClick={() => setForm(f => ({ ...f, isFeatured: !f.isFeatured }))}
                   className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer"
