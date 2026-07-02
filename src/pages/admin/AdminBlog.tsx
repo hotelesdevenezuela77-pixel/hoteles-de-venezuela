@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { AdminTabBar } from "@/components/admin/AdminTabBar";
-import { Newspaper, Plus, Edit2, Trash2, X, Loader2, Globe, Search } from "lucide-react";
+import { Newspaper, Plus, Edit2, Trash2, X, Loader2, Globe, Search, Upload } from "lucide-react";
 
 interface Post {
   id: number;
@@ -99,11 +99,33 @@ export function AdminBlog() {
       const localBlogKey = "hdv_mock_blog_posts";
       const localPosts = JSON.parse(localStorage.getItem(localBlogKey) || "[]");
 
+      let finalImageUrl = d.featuredImage;
+      if (finalImageUrl && finalImageUrl.startsWith("data:")) {
+        const response = await fetch(finalImageUrl);
+        const blob = await response.blob();
+        const fileName = `blog/main-${Date.now()}.jpg`;
+        const { error: uploadError } = await supabase.storage.from("establecimientos").upload(fileName, blob, { contentType: "image/jpeg", upsert: true });
+        if (uploadError) throw uploadError;
+        const { data: { publicUrl } } = supabase.storage.from("establecimientos").getPublicUrl(fileName);
+        finalImageUrl = publicUrl;
+      }
+
+      const payload = {
+        title: d.title,
+        slug: d.slug,
+        excerpt: d.excerpt,
+        content: d.content,
+        featuredImage: finalImageUrl,
+        authorName: d.authorName,
+        readingTime: d.readingTime,
+        status: d.status
+      };
+
       if (isEdit && editId) {
         // Update mock or database
         const hasLocal = localPosts.some((p: any) => p.id === editId);
         if (hasLocal) {
-          const updated = localPosts.map((p: any) => p.id === editId ? { ...p, ...d } : p);
+          const updated = localPosts.map((p: any) => p.id === editId ? { ...p, ...payload } : p);
           localStorage.setItem(localBlogKey, JSON.stringify(updated));
           return { success: true };
         }
@@ -116,7 +138,7 @@ export function AdminBlog() {
               slug: d.slug,
               excerpt: d.excerpt,
               content: d.content,
-              featured_image: d.featuredImage,
+              featured_image: finalImageUrl,
               author_name: d.authorName,
               reading_time: d.readingTime,
               status: d.status
@@ -125,7 +147,7 @@ export function AdminBlog() {
           if (error) throw error;
         } catch {
           // If update fails, update locally
-          const updated = localPosts.map((p: any) => p.id === editId ? { ...p, ...d } : p);
+          const updated = localPosts.map((p: any) => p.id === editId ? { ...p, ...payload } : p);
           localStorage.setItem(localBlogKey, JSON.stringify(updated));
         }
       } else {
@@ -133,7 +155,7 @@ export function AdminBlog() {
         const newId = Date.now();
         const newPost = {
           id: newId,
-          ...d,
+          ...payload,
           publishedAt: new Date().toISOString()
         };
 
@@ -145,7 +167,7 @@ export function AdminBlog() {
               slug: d.slug,
               excerpt: d.excerpt,
               content: d.content,
-              featured_image: d.featuredImage,
+              featured_image: finalImageUrl,
               author_name: d.authorName,
               reading_time: d.readingTime,
               status: d.status
@@ -404,8 +426,23 @@ export function AdminBlog() {
                 <div><label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 block">Tiempo de Lectura (minutos)</label>
                   <input type="number" value={form.readingTime} onChange={e => setF("readingTime", parseInt(e.target.value) || 5)} className={inp} /></div>
               </div>
-              <div><label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 block">URL de Imagen Principal</label>
-                <input value={form.featuredImage} onChange={e => setF("featuredImage", e.target.value)} className={inp} placeholder="https://..." /></div>
+              <div><label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 block">URL de Imagen Principal (o Subir)</label>
+                <div className="flex gap-2">
+                  <input value={form.featuredImage} onChange={e => setF("featuredImage", e.target.value)} className={inp + " flex-1"} placeholder="https://..." />
+                  <label className="flex items-center justify-center px-4 py-2 border border-dashed border-[#00C8D4]/40 bg-[#00C8D4]/5 hover:bg-[#00C8D4]/10 rounded-xl text-xs font-bold uppercase text-[#00C8D4] tracking-wider cursor-pointer transition-colors shrink-0">
+                    <Upload className="w-4 h-4 mr-1" /> Subir
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      className="hidden" 
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]; if (!file) return;
+                        const r = new FileReader(); r.onload = () => setF("featuredImage", r.result as string); r.readAsDataURL(file);
+                      }} 
+                    />
+                  </label>
+                </div>
+              </div>
               <div><label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 block">Estado de Publicación</label>
                 <select value={form.status} onChange={e => setF("status", e.target.value)} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs text-gray-700 bg-white focus:outline-none font-bold">
                   <option value="draft">Borrador (Oculto)</option>

@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { AdminTabBar } from "@/components/admin/AdminTabBar";
-import { Map, Plus, Edit2, Trash2, GripVertical, X, Loader2, Star } from "lucide-react";
+import { Map, Plus, Edit2, Trash2, GripVertical, X, Loader2, Star, Upload } from "lucide-react";
 
 interface Site {
   id: number;
@@ -134,12 +134,22 @@ export function AdminSitios() {
   const save = useMutation({
     mutationFn: async (d: typeof EMPTY) => {
       const isEdit = modal === "edit";
+      let finalImageUrl = d.imageUrl;
+      if (finalImageUrl && finalImageUrl.startsWith("data:")) {
+        const response = await fetch(finalImageUrl);
+        const blob = await response.blob();
+        const fileName = `sitios/main-${Date.now()}.jpg`;
+        const { error: uploadError } = await supabase.storage.from("establecimientos").upload(fileName, blob, { contentType: "image/jpeg", upsert: true });
+        if (uploadError) throw uploadError;
+        const { data: { publicUrl } } = supabase.storage.from("establecimientos").getPublicUrl(fileName);
+        finalImageUrl = publicUrl;
+      }
       const payload = {
         name: d.name,
         slug: d.slug,
         short_description: d.shortDescription,
         long_description: d.longDescription,
-        image_url: d.imageUrl,
+        image_url: finalImageUrl,
         destination_id: d.destinationId,
         category: d.category,
         highlights: d.highlights,
@@ -380,8 +390,22 @@ export function AdminSitios() {
                 </div>
               </div>
               <div>
-                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 block">URL de Imagen</label>
-                <input value={form.imageUrl} onChange={e => setF("imageUrl", e.target.value)} className={inp} placeholder="https://..." />
+                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 block">URL de Imagen (o Subir)</label>
+                <div className="flex gap-2">
+                  <input value={form.imageUrl} onChange={e => setF("imageUrl", e.target.value)} className={inp + " flex-1"} placeholder="https://..." />
+                  <label className="flex items-center justify-center px-4 py-2 border border-dashed border-[#00C8D4]/40 bg-[#00C8D4]/5 hover:bg-[#00C8D4]/10 rounded-xl text-xs font-bold uppercase text-[#00C8D4] tracking-wider cursor-pointer transition-colors shrink-0">
+                    <Upload className="w-4 h-4 mr-1" /> Subir
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      className="hidden" 
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]; if (!file) return;
+                        const r = new FileReader(); r.onload = () => setF("imageUrl", r.result as string); r.readAsDataURL(file);
+                      }} 
+                    />
+                  </label>
+                </div>
               </div>
               <div>
                 <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 block">Descripción Corta *</label>
