@@ -146,9 +146,12 @@ function Footer() {
                 <Phone className="w-4 h-4 text-green-400 shrink-0" />
                 <span className="text-gray-300 text-sm font-light">+58 414 5069774</span>
               </li>
-              <li className="flex items-center gap-2.5">
-                <MapPin className="w-4 h-4 text-yellow-400 shrink-0" />
-                <span className="text-gray-300 text-sm font-light">Caracas, Venezuela</span>
+              <li className="flex items-start gap-2.5">
+                <MapPin className="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" />
+                <span className="text-gray-300 text-sm font-light leading-snug flex items-center gap-1.5">
+                  <span>408 W POPLAR ST OLATHE, KS 66061</span>
+                  <span className="text-xs" title="Dirección de la LLC en USA">🇺🇸</span>
+                </span>
               </li>
             </ul>
           </div>
