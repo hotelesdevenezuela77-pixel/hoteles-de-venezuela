@@ -192,19 +192,36 @@ export function AdminDashboard() {
     try {
       setUpdatingMaintenance(true);
       const nextValue = !maintenanceOn;
+
+      // Fetch existing settings to find the id of maintenance_mode or compute a safe new id
+      const { data: allSettings } = await supabase
+        .from("site_settings")
+        .select("id, setting_key");
+      
+      const existing = allSettings?.find(s => s.setting_key === "maintenance_mode");
+      const payload: any = {
+        setting_key: "maintenance_mode",
+        setting_value: nextValue ? "true" : "false",
+        setting_label: "Modo Mantenimiento",
+        setting_group: "system"
+      };
+
+      if (existing) {
+        payload.id = existing.id;
+      } else {
+        const maxId = allSettings?.reduce((max, s) => s.id > max ? s.id : max, 0) || 0;
+        payload.id = maxId + 1;
+      }
+
       const { error } = await supabase
         .from("site_settings")
-        .upsert({ 
-          setting_key: "maintenance_mode", 
-          setting_value: nextValue ? "true" : "false",
-          setting_label: "Modo Mantenimiento",
-          setting_group: "system"
-        }, { onConflict: "setting_key" });
+        .upsert(payload, { onConflict: "setting_key" });
 
       if (error) throw error;
       setMaintenanceOn(nextValue);
     } catch (err) {
       console.error("Error updating maintenance settings:", err);
+      alert("Error al actualizar la configuración de mantenimiento: " + (err as any).message);
     } finally {
       setUpdatingMaintenance(false);
     }

@@ -64,7 +64,7 @@ import AdminConversacionalIA from "./pages/admin/AdminConversacionalIA";
 
 function App() {
   const [location] = useLocation();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
 
   // Scroll to top on route change
   useEffect(() => {
@@ -86,7 +86,7 @@ function App() {
   });
 
   const isMaintenanceMode = settings.find(s => s.setting_key === "maintenance_mode" || s.settingKey === "maintenance_mode")?.setting_value === "true";
-  const isBypassed = user?.email?.toLowerCase() === "hotelesdevenezuela77@gmail.com";
+  const isBypassed = user?.email?.toLowerCase() === "hotelesdevenezuela77@gmail.com" || profile?.role === "admin";
   const isAdminRoute = location.startsWith("/admin") || location === "/hdv-acceso-llc2027" || location === "/login";
 
   if (isMaintenanceMode && !isBypassed && !isAdminRoute) {
