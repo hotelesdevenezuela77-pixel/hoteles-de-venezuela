@@ -268,12 +268,12 @@ export function CustomPageViewer() {
       )}
 
       {/* Main Cover Header - Full Width Bleed */}
-      <div className="w-full relative h-[400px] md:h-[550px] overflow-hidden">
+      <div className="w-full relative h-[400px] md:h-[500px] overflow-hidden">
         {page.featuredImage ? (
           <img 
             src={page.featuredImage} 
             alt={page.title} 
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover scale-[1.08]"
             onError={(e) => {
               (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&w=1200&q=80";
             }}
@@ -282,20 +282,20 @@ export function CustomPageViewer() {
           <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #0e0120, #1a0533, #0a1628)" }} />
         )}
 
-        {/* overlay shade */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10" />
+        {/* Top/Middle dark overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/25 to-transparent pointer-events-none" />
 
-        {/* info overlay - aligned content */}
-        <div className="absolute inset-0 flex items-end">
-          <div className="max-w-7xl w-full mx-auto px-6 pb-12 md:pb-16 text-white text-left">
-            <span className="inline-flex items-center gap-1.5 bg-brand-magenta text-white text-[10px] font-black tracking-widest px-3 py-1 rounded-full uppercase shadow-lg shadow-brand-magenta/25 mb-4">
-              <ImageIcon className="w-3.5 h-3.5" />
-              <span>Explorar Venezuela</span>
-            </span>
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white tracking-tight drop-shadow-lg leading-tight max-w-4xl">
-              {page.h1Title || page.title}
-            </h1>
-          </div>
+        {/* Bottom white fade overlay to blend with the white page background */}
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none" />
+
+        {/* Center-aligned info overlay */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+          <p className="text-white/80 text-[10px] md:text-xs font-black tracking-[0.3em] uppercase mb-3 drop-shadow-md">
+            EL PARAÍSO TE ESPERA
+          </p>
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white tracking-tight drop-shadow-2xl leading-tight max-w-4xl playfair">
+            {page.h1Title || page.title}
+          </h1>
         </div>
       </div>
 
