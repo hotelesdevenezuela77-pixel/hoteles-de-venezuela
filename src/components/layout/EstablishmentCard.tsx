@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { MapPin, Star, Wifi, Car, Waves, Utensils, TreePine, Dumbbell, Sparkles, Phone } from "lucide-react";
+import { MapPin, Star, Wifi, Car, Waves, Utensils, TreePine, Dumbbell, Sparkles, Phone, BarChart3 } from "lucide-react";
 import { TrackedWhatsAppButton } from "./TrackedWhatsAppButton";
 
 export interface Establishment {
@@ -113,8 +113,9 @@ export function EstablishmentCard({
                   type="checkbox"
                   checked={isComparing}
                   onChange={onCompareToggle}
-                  className="accent-white w-3 h-3 cursor-pointer"
+                  className="hidden"
                 />
+                <BarChart3 className={`w-3.5 h-3.5 ${isComparing ? "text-white animate-pulse" : "text-white/60"}`} />
                 <span>Comparador</span>
               </label>
             </div>
@@ -202,7 +203,7 @@ export function EstablishmentCard({
               href={`tel:${establishment.phone}`}
               className="flex-1"
             >
-              <button className="w-full bg-brand-magenta hover:bg-brand-magenta/95 text-white text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer">
+              <button className="w-full bg-gradient-to-r from-[#00C8D4] to-[#008ba3] text-white text-xs font-extrabold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md shadow-[#00C8D4]/15 hover:scale-102 transition-all cursor-pointer border-none">
                 <Phone className="w-4 h-4" />
                 Llamar
               </button>
@@ -274,8 +275,9 @@ export function EstablishmentListItem({
                 type="checkbox"
                 checked={isComparing}
                 onChange={onCompareToggle}
-                className="accent-white w-3 h-3 cursor-pointer"
+                className="hidden"
               />
+              <BarChart3 className={`w-3.5 h-3.5 ${isComparing ? "text-white animate-pulse" : "text-white/60"}`} />
               <span>Comparador</span>
             </label>
           </div>
@@ -363,7 +365,7 @@ export function EstablishmentListItem({
               href={`tel:${establishment.phone}`}
               className="flex-1"
             >
-              <button className="w-full bg-brand-magenta hover:bg-brand-magenta/95 text-white text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer">
+              <button className="w-full bg-gradient-to-r from-[#00C8D4] to-[#008ba3] text-white text-xs font-extrabold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md shadow-[#00C8D4]/15 hover:scale-102 transition-all cursor-pointer border-none">
                 <Phone className="w-4 h-4" />
                 Llamar
               </button>

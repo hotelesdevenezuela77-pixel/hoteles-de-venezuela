@@ -802,7 +802,7 @@ export function Home() {
               <Play className="w-4 h-4 fill-white text-white" />
               <span>{videoSection.subtitle || "NUESTRO VIDEO PRESENTACIÓN"}</span>
             </div>
-            <h2 className="text-3xl md:text-4xl font-extrabold mb-3">
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-3 text-white">
               {videoSection.title}
             </h2>
             <p className="text-slate-300 text-xs max-w-xl mx-auto leading-relaxed mb-10">
