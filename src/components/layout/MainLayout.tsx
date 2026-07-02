@@ -110,13 +110,13 @@ function Footer() {
             </div>
             <ul className="space-y-2.5">
               {[
-                { href: "/andromeda",    label: "50 Fundadores" },
-                { href: "/andromeda",    label: "Alianzas para Agencias" },
+                { href: "/50-fundadores", label: "50 Fundadores" },
+                { href: "/alianzas-para-agencias", label: "Alianzas para Agencias" },
                 { href: "/membresias",   label: "Membresías" },
                 { href: "/reportar-pago", label: "Reportar Pago Local" },
                 { href: "/sobre-nosotros", label: "Publicidad" },
                 { href: "/mis-negocios", label: "Registrar mi negocio" },
-                { href: "/andromeda",    label: "Servicios B2B" },
+                { href: "/servicios-b2b", label: "Servicios B2B" },
                 { href: "/blog",         label: "Blog" },
               ].map((l, i) => (
                 <li key={i}>

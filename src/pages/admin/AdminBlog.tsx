@@ -243,9 +243,9 @@ export function AdminBlog() {
   // Filter posts based on search term
   const filtered = posts.filter(p => {
     const q = search.toLowerCase();
-    return p.title.toLowerCase().includes(q) || 
-           p.excerpt.toLowerCase().includes(q) || 
-           p.authorName.toLowerCase().includes(q);
+    return p.title.toLowerCase().includes(q) ||
+      p.excerpt.toLowerCase().includes(q) ||
+      p.authorName.toLowerCase().includes(q);
   });
 
   if (authLoading) {
@@ -278,14 +278,14 @@ export function AdminBlog() {
       <AdminTabBar />
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-        
+
         {/* Blog Title & Add Button */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
             <h2 className="text-xl font-bold text-gray-900 leading-tight">Blog</h2>
             <p className="text-xs text-gray-500 font-semibold mt-1">Gestiona los artículos del blog</p>
           </div>
-          <button 
+          <button
             onClick={openCreate}
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-white text-xs font-bold shrink-0 transition-all hover:scale-102 cursor-pointer shadow-md shadow-pink-100"
             style={{ background: "linear-gradient(90deg, #FF0096, #cc007a)" }}
@@ -338,10 +338,10 @@ export function AdminBlog() {
                       <td className="px-6 py-4">
                         <div className="flex gap-4 items-center">
                           {p.featuredImage ? (
-                            <img 
-                              src={p.featuredImage} 
-                              alt={p.title} 
-                              className="w-16 h-12 rounded-lg object-cover shrink-0 border border-slate-100 shadow-sm" 
+                            <img
+                              src={p.featuredImage}
+                              alt={p.title}
+                              className="w-16 h-12 rounded-lg object-cover shrink-0 border border-slate-100 shadow-sm"
                               onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
                             />
                           ) : (
@@ -364,33 +364,32 @@ export function AdminBlog() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${
-                          p.status === "published"
-                            ? "bg-emerald-100 text-emerald-700 border border-emerald-200" 
-                            : "bg-slate-100 text-slate-600 border border-slate-200"
-                        }`}>
+                        <span className={`inline-flex items-center text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${p.status === "published"
+                          ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                          : "bg-slate-100 text-slate-600 border border-slate-200"
+                          }`}>
                           {p.status === "published" ? "Publicado" : "Borrador"}
                         </span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-center gap-1.5">
-                          <a 
-                            href={`/blog/${p.slug}`} 
-                            target="_blank" 
+                          <a
+                            href={`/blog/${p.slug}`}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-brand-magenta transition-colors cursor-pointer"
                             title="Ver en la web"
                           >
                             <Globe className="w-4 h-4" />
                           </a>
-                          <button 
+                          <button
                             onClick={() => openEdit(p)}
                             className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-blue-500 transition-colors cursor-pointer"
                             title="Editar artículo"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
-                          <button 
+                          <button
                             onClick={() => setDelId(p.id)}
                             className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-red-500 transition-colors cursor-pointer"
                             title="Eliminar artículo"
@@ -431,14 +430,14 @@ export function AdminBlog() {
                   <input value={form.featuredImage} onChange={e => setF("featuredImage", e.target.value)} className={inp + " flex-1"} placeholder="https://..." />
                   <label className="flex items-center justify-center px-4 py-2 border border-dashed border-[#00C8D4]/40 bg-[#00C8D4]/5 hover:bg-[#00C8D4]/10 rounded-xl text-xs font-bold uppercase text-[#00C8D4] tracking-wider cursor-pointer transition-colors shrink-0">
                     <Upload className="w-4 h-4 mr-1" /> Subir
-                    <input 
-                      type="file" 
-                      accept="image/*" 
-                      className="hidden" 
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
                       onChange={(e) => {
                         const file = e.target.files?.[0]; if (!file) return;
                         const r = new FileReader(); r.onload = () => setF("featuredImage", r.result as string); r.readAsDataURL(file);
-                      }} 
+                      }}
                     />
                   </label>
                 </div>
