@@ -202,6 +202,41 @@ export function Home() {
 
   const [establishments, setEstablishments] = useState<Establishment[]>(ESTABLISHMENTS_MOCK);
   const [destinations, setDestinations] = useState<Destination[]>(DEFAULT_DESTINOS_MOCK);
+  const [comparedIds, setComparedIds] = useState<number[]>([]);
+
+  // Load compared hotels on mount
+  useEffect(() => {
+    const stored = localStorage.getItem("hdv_compare_list");
+    if (stored) setComparedIds(JSON.parse(stored));
+  }, []);
+
+  // Sync compare list across events
+  useEffect(() => {
+    const handleSync = () => {
+      const stored = localStorage.getItem("hdv_compare_list");
+      if (stored) setComparedIds(JSON.parse(stored));
+    };
+    window.addEventListener("hdv_compare_updated", handleSync);
+    return () => window.removeEventListener("hdv_compare_updated", handleSync);
+  }, []);
+
+  const handleCompareToggle = (id: number) => {
+    setComparedIds(prev => {
+      let next;
+      if (prev.includes(id)) {
+        next = prev.filter(item => item !== id);
+      } else {
+        if (prev.length >= 3) {
+          alert("Puedes comparar hasta un máximo de 3 establecimientos simultáneamente.");
+          return prev;
+        }
+        next = [...prev, id];
+      }
+      localStorage.setItem("hdv_compare_list", JSON.stringify(next));
+      window.dispatchEvent(new Event("hdv_compare_updated"));
+      return next;
+    });
+  };
 
   const filteredDestinations = destinations.filter(d => 
     d.name.toLowerCase().includes(locationSearchInput.toLowerCase())
@@ -739,7 +774,11 @@ export function Home() {
             <div className={hotels.length < 3 ? "flex flex-wrap justify-center gap-8" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"}>
               {hotels.map((hotel) => (
                 <div key={hotel.id} className={hotels.length < 3 ? "w-full max-w-sm flex" : ""}>
-                  <EstablishmentCard establishment={hotel} />
+                  <EstablishmentCard 
+                    establishment={hotel} 
+                    isComparing={comparedIds.includes(hotel.id)}
+                    onCompareToggle={() => handleCompareToggle(hotel.id)}
+                  />
                 </div>
               ))}
             </div>
@@ -852,7 +891,11 @@ export function Home() {
             <div className={posadas.length < 3 ? "flex flex-wrap justify-center gap-8" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"}>
               {posadas.map((posada) => (
                 <div key={posada.id} className={posadas.length < 3 ? "w-full max-w-sm flex" : ""}>
-                  <EstablishmentCard establishment={posada} />
+                  <EstablishmentCard 
+                    establishment={posada} 
+                    isComparing={comparedIds.includes(posada.id)}
+                    onCompareToggle={() => handleCompareToggle(posada.id)}
+                  />
                 </div>
               ))}
             </div>
@@ -1000,7 +1043,11 @@ export function Home() {
             <div className={complexes.length < 3 ? "flex flex-wrap justify-center gap-8" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"}>
               {complexes.map((complex) => (
                 <div key={complex.id} className={complexes.length < 3 ? "w-full max-w-sm flex" : ""}>
-                  <EstablishmentCard establishment={complex} />
+                  <EstablishmentCard 
+                    establishment={complex} 
+                    isComparing={comparedIds.includes(complex.id)}
+                    onCompareToggle={() => handleCompareToggle(complex.id)}
+                  />
                 </div>
               ))}
             </div>
@@ -1034,6 +1081,49 @@ export function Home() {
             </div>
           </div>
         </section>
+      )}
+
+      {/* Floating Compare Bar */}
+      {comparedIds.length > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 backdrop-blur-md border border-white/10 rounded-full px-6 py-4 flex items-center gap-6 shadow-2xl text-white max-w-[90vw] md:max-w-max animate-fade-in">
+          <div className="flex items-center gap-4">
+            <span className="text-[11px] md:text-xs font-bold whitespace-nowrap">
+              Comparando <span className="text-brand-magenta font-black">{comparedIds.length}</span> de 3
+            </span>
+            <div className="flex -space-x-2 flex-wrap">
+              {comparedIds.map(id => {
+                const hotel = establishments.find(e => e.id === id);
+                if (!hotel) return null;
+                return (
+                  <img
+                    key={id}
+                    src={hotel.primary_image || "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=100"}
+                    alt={hotel.name}
+                    className="w-7 h-7 rounded-full border-2 border-slate-900 object-cover shrink-0"
+                    title={hotel.name}
+                  />
+                );
+              })}
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => {
+                localStorage.setItem("hdv_compare_list", "[]");
+                setComparedIds([]);
+                window.dispatchEvent(new Event("hdv_compare_updated"));
+              }}
+              className="text-white/60 hover:text-white text-xs font-bold px-3 py-1.5 rounded-full hover:bg-white/5 transition-all cursor-pointer"
+            >
+              Limpiar
+            </button>
+            <Link href="/comparar">
+              <button className="btn-magenta-gradient text-xs font-black px-4 py-2 rounded-full cursor-pointer hover:scale-103 transition-transform shadow-md">
+                Comparar
+              </button>
+            </Link>
+          </div>
+        </div>
       )}
 
     </div>
