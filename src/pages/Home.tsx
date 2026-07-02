@@ -389,17 +389,23 @@ export function Home() {
     {
       name: "hotelesdevenezuela.com",
       url: "https://hotelesdevenezuela.com",
-      description: "Catálogo oficial nacional con contacto directo libre de comisiones."
+      description: "Catálogo oficial nacional con contacto directo libre de comisiones.",
+      gradient: "from-[#FF0096] to-[#9B00CC]",
+      shadow: "shadow-[#FF0096]/25"
     },
     {
       name: "hotelesenmorrocoy.com", 
       url: "https://hotelesenmorrocoy.com",
-      description: "Especialistas en posadas y cayos del Parque Nacional Morrocoy."
+      description: "Especialistas en posadas y cayos del Parque Nacional Morrocoy.",
+      gradient: "from-[#00C8D4] to-[#008ba3]",
+      shadow: "shadow-[#00C8D4]/25"
     },
     {
       name: "hotelesdevenezuela.online",
       url: "https://hotelesdevenezuela.online",
-      description: "Motor de reservas directas y pasarela directa al WhatsApp del hotel."
+      description: "Motor de reservas directas y pasarela directa al WhatsApp del hotel.",
+      gradient: "from-[#9B00CC] to-[#4f46e5]",
+      shadow: "shadow-[#9B00CC]/25"
     }
   ];
 
@@ -640,18 +646,18 @@ export function Home() {
                   href={site.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-brand-magenta/30 hover:shadow-xl transition-all duration-300 relative overflow-hidden text-left block"
+                  className={`group bg-gradient-to-br ${site.gradient} rounded-2xl p-6 hover:-translate-y-1.5 hover:shadow-2xl ${site.shadow} transition-all duration-300 relative overflow-hidden text-left block border border-white/10`}
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-magenta-50/20 flex items-center justify-center text-brand-magenta">
+                    <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-white border border-white/10">
                       <Globe className="w-5 h-5" />
                     </div>
-                    <ExternalLink className="w-4 h-4 text-gray-300 group-hover:text-brand-magenta transition-colors" />
+                    <ExternalLink className="w-4 h-4 text-white/60 group-hover:text-white transition-colors" />
                   </div>
-                  <h3 className="font-extrabold text-base text-gray-800 mb-1 group-hover:text-brand-magenta transition-colors">
+                  <h3 className="font-extrabold text-base text-white mb-1 drop-shadow-xs">
                     {site.name}
                   </h3>
-                  <p className="text-xs text-gray-400 leading-relaxed">{site.description}</p>
+                  <p className="text-xs text-white/90 leading-relaxed">{site.description}</p>
                 </a>
               ))}
             </div>
@@ -669,9 +675,10 @@ export function Home() {
               </div>
             )}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="flex flex-col gap-3 text-center items-center">
-                <div className="w-12 h-12 rounded-2xl bg-magenta-50/20 flex items-center justify-center border border-brand-magenta/10">
-                  <Compass className="w-6 h-6 text-brand-magenta" />
+              <div className="flex flex-col gap-3 text-center items-center bg-gradient-to-br from-pink-50/40 to-white border border-pink-100/50 rounded-3xl p-8 hover:shadow-xl hover:shadow-pink-900/5 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-full h-[4px] bg-[#FF0096]" />
+                <div className="w-12 h-12 rounded-2xl bg-[#FF0096]/10 flex items-center justify-center border border-[#FF0096]/20 shadow-xs group-hover:scale-110 transition-transform">
+                  <Compass className="w-6 h-6 text-[#FF0096]" />
                 </div>
                 <h3 className="text-base font-extrabold text-gray-800">Curaduría Experta</h3>
                 <p className="text-gray-400 text-xs leading-relaxed max-w-xs">
@@ -679,9 +686,10 @@ export function Home() {
                 </p>
               </div>
 
-              <div className="flex flex-col gap-3 text-center items-center">
-                <div className="w-12 h-12 rounded-2xl bg-purple-50/20 flex items-center justify-center border border-brand-purple/10">
-                  <Award className="w-6 h-6 text-brand-purple" />
+              <div className="flex flex-col gap-3 text-center items-center bg-gradient-to-br from-purple-50/40 to-white border border-purple-100/50 rounded-3xl p-8 hover:shadow-xl hover:shadow-purple-900/5 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-full h-[4px] bg-[#9B00CC]" />
+                <div className="w-12 h-12 rounded-2xl bg-[#9B00CC]/10 flex items-center justify-center border border-[#9B00CC]/20 shadow-xs group-hover:scale-110 transition-transform">
+                  <Award className="w-6 h-6 text-[#9B00CC]" />
                 </div>
                 <h3 className="text-base font-extrabold text-gray-800">Sello de Calidad HDV</h3>
                 <p className="text-gray-400 text-xs leading-relaxed max-w-xs">
@@ -689,9 +697,10 @@ export function Home() {
                 </p>
               </div>
 
-              <div className="flex flex-col gap-3 text-center items-center">
-                <div className="w-12 h-12 rounded-2xl bg-cyan-50/20 flex items-center justify-center border border-brand-turquesa/10">
-                  <ShieldCheck className="w-6 h-6 text-brand-turquesa" />
+              <div className="flex flex-col gap-3 text-center items-center bg-gradient-to-br from-cyan-50/40 to-white border border-cyan-100/50 rounded-3xl p-8 hover:shadow-xl hover:shadow-cyan-900/5 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-full h-[4px] bg-[#00C8D4]" />
+                <div className="w-12 h-12 rounded-2xl bg-[#00C8D4]/10 flex items-center justify-center border border-[#00C8D4]/20 shadow-xs group-hover:scale-110 transition-transform">
+                  <ShieldCheck className="w-6 h-6 text-[#00C8D4]" />
                 </div>
                 <h3 className="text-base font-extrabold text-gray-800">Conexión Directa</h3>
                 <p className="text-gray-400 text-xs leading-relaxed max-w-xs">
@@ -740,10 +749,13 @@ export function Home() {
 
       {/* 5. NUESTRO VIDEO */}
       {videoSection.isActive && (
-        <section className="py-16 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white relative overflow-hidden px-4">
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 left-1/4 w-80 h-80 bg-brand-magenta rounded-full blur-3xl" />
-            <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-brand-turquesa rounded-full blur-3xl" />
+        <section 
+          className="py-16 text-white relative overflow-hidden px-4"
+          style={{ background: "linear-gradient(135deg, #0e0120 0%, #1a0533 60%, #0d1a2e 100%)" }}
+        >
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full blur-3xl opacity-20" style={{ background: "#FF0096" }} />
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-15" style={{ background: "#00C8D4" }} />
           </div>
           
           <div className="max-w-5xl mx-auto relative z-10 text-center">
