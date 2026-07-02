@@ -23,6 +23,8 @@ import { NationalParkDetail } from "./pages/NationalParkDetail";
 import { B2BMarketplace } from "./pages/B2BMarketplace";
 import { Comparar } from "./pages/Comparar";
 import { Membresias } from "./pages/Membresias";
+import { ReportarPago } from "./pages/ReportarPago";
+import { AdminPagos } from "./pages/admin/AdminPagos";
 
 // Admin Sub-routed Panels
 import { AdminDashboard } from "./pages/admin/AdminDashboard";
@@ -115,6 +117,7 @@ function App() {
         <Route path="/links" component={LinkHub} />
 
         <Route path="/membresias" component={Membresias} />
+        <Route path="/reportar-pago" component={ReportarPago} />
 
         {/* Dashboards Propietarios */}
         <Route path="/mis-negocios" component={OwnerDashboard} />
@@ -148,6 +151,7 @@ function App() {
         <Route path="/admin/config" component={AdminConfig} />
         <Route path="/admin/correos" component={AdminCorreos} />
         <Route path="/admin/finanzas" component={AdminFinanzas} />
+        <Route path="/admin/pagos" component={AdminPagos} />
         <Route path="/admin/solicitudes" component={AdminSolicitudes} />
         <Route path="/admin/reservas-paquetes" component={AdminReservasPaquetes} />
         <Route path="/admin/reseñas" component={AdminReseñas} />

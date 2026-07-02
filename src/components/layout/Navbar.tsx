@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import {
-  Map, Menu, X, ChevronDown, Sparkles, Briefcase, LogOut, Heart, User, Globe, ShieldAlert
+  Map, Menu, X, ChevronDown, Sparkles, Briefcase, LogOut, Heart, User, Globe, ShieldAlert, Receipt
 } from "lucide-react";
 import { useAuth } from "../../lib/auth";
 
@@ -183,6 +183,9 @@ export function Navbar() {
                     </Link>
                     <Link href="/andromeda" className="flex items-center gap-2 px-4 py-2 text-xs text-gray-700 hover:bg-pink-50 hover:text-brand-magenta transition-colors">
                       <Sparkles className="w-3.5 h-3.5 text-brand-purple" /> Panel Andromeda
+                    </Link>
+                    <Link href="/reportar-pago" className="flex items-center gap-2 px-4 py-2 text-xs text-gray-700 hover:bg-pink-50 hover:text-brand-magenta transition-colors">
+                      <Receipt className="w-3.5 h-3.5 text-brand-magenta" /> Reportar Pago local
                     </Link>
                   </div>
                   <div className="border-t border-gray-50 pt-1">

@@ -112,7 +112,8 @@ function Footer() {
               {[
                 { href: "/andromeda",    label: "50 Fundadores" },
                 { href: "/andromeda",    label: "Alianzas para Agencias" },
-                { href: "/andromeda",    label: "Membresías" },
+                { href: "/membresias",   label: "Membresías" },
+                { href: "/reportar-pago", label: "Reportar Pago Local" },
                 { href: "/sobre-nosotros", label: "Publicidad" },
                 { href: "/mis-negocios", label: "Registrar mi negocio" },
                 { href: "/andromeda",    label: "Servicios B2B" },

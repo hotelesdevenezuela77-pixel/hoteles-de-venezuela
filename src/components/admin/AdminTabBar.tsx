@@ -47,6 +47,7 @@ const TABS = [
   { href: "/admin/linkhub",            label: "Link Hub",          icon: Link2,           countKey: undefined         },
   { href: "/admin/config",             label: "Configuración",     icon: Settings,        countKey: undefined         },
   { href: "/admin/finanzas",           label: "Finanzas",          icon: DollarSign,      countKey: undefined         },
+  { href: "/admin/pagos",              label: "Verificar Pagos",   icon: Receipt,         countKey: undefined         },
   { href: "/admin/solicitudes",        label: "Solicitudes",       icon: ClipboardList,   countKey: undefined         },
   { href: "/admin/reservas-paquetes",  label: "Reservas Paquetes", icon: Package,         countKey: undefined         },
   { href: "/admin/reseñas",            label: "Reseñas",           icon: Star,            countKey: undefined         },
