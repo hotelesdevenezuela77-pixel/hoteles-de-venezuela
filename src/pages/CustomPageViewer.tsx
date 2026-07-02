@@ -300,7 +300,7 @@ export function CustomPageViewer() {
               <ImageIcon className="w-3 h-3" />
               <span>Explorar Venezuela</span>
             </span>
-            <h1 className="text-3xl md:text-5xl font-black tracking-tight drop-shadow-md leading-tight max-w-4xl">
+            <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight drop-shadow-md leading-tight max-w-4xl">
               {page.h1Title || page.title}
             </h1>
           </div>
