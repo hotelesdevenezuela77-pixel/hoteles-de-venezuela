@@ -60,6 +60,8 @@ import { Centauros } from "./pages/Centauros";
 import { CustomPageViewer } from "./pages/CustomPageViewer";
 import { Paquetes } from "./pages/Paquetes";
 import { LinkHub } from "./pages/LinkHub";
+import { BlogDetalle } from "./pages/BlogDetalle";
+import { SitioDetalle } from "./pages/SitioDetalle";
 
 // Importación del Agente IA sin llaves apuntando a la carpeta admin
 import AdminConversacionalIA from "./pages/admin/AdminConversacionalIA";
@@ -159,6 +161,8 @@ function App() {
         <Route path="/admin/clientes" component={AdminClientes} />
 
         {/* Atajos y Catch-all */}
+        <Route path="/blog/:slug" component={BlogDetalle} />
+        <Route path="/sitio/:slug" component={SitioDetalle} />
         <Route path="/crm" component={AdminComercial} />
         <Route path="/centaurus" component={Centauros} />
         <Route path="/:slug" component={CustomPageViewer} />

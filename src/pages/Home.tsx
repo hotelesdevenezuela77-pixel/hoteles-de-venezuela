@@ -206,6 +206,7 @@ export function Home() {
 
   // Load compared hotels on mount
   useEffect(() => {
+    document.title = "Hoteles de Venezuela | Guía y Reservas Oficiales";
     const stored = localStorage.getItem("hdv_compare_list");
     if (stored) setComparedIds(JSON.parse(stored));
   }, []);
@@ -979,25 +980,29 @@ export function Home() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {sites.map((site) => (
-              <div key={site.id} className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 text-left flex flex-col justify-between h-full">
+              <article key={site.id} className="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 text-left flex flex-col justify-between h-full">
                 <div>
-                  <div className="h-44 overflow-hidden relative">
-                    <img 
-                      src={getCleanedImageUrl(site.image_url, site.name)} 
-                      alt={site.name} 
-                      className="w-full h-full object-cover" 
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800";
-                      }}
-                    />
-                    <span className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm text-gray-700 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-lg">
-                      {site.category}
-                    </span>
-                  </div>
+                  <Link href={`/sitio/${site.slug}`}>
+                    <div className="h-44 overflow-hidden relative cursor-pointer">
+                      <img 
+                        src={getCleanedImageUrl(site.image_url, site.name)} 
+                        alt={site.name} 
+                        className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500" 
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800";
+                        }}
+                      />
+                      <span className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm text-gray-700 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-lg">
+                        {site.category}
+                      </span>
+                    </div>
+                  </Link>
                   <div className="p-5">
-                    <h3 className="font-extrabold text-base text-gray-800 mb-2">
-                      {site.name}
-                    </h3>
+                    <Link href={`/sitio/${site.slug}`}>
+                      <h3 className="font-extrabold text-base text-gray-800 mb-2 hover:text-brand-magenta transition-colors cursor-pointer">
+                        {site.name}
+                      </h3>
+                    </Link>
                     <p className="text-xs text-gray-400 line-clamp-3 leading-relaxed">
                       {site.short_description}
                     </p>
@@ -1005,15 +1010,21 @@ export function Home() {
                 </div>
 
                 <div className="p-5 pt-0">
-                  <div className="flex flex-wrap gap-1 mb-4">
+                  <div className="flex flex-wrap gap-1 mb-4 col-span-3">
                     {site.highlights.split(",").slice(0, 3).map((hl, i) => (
                       <span key={i} className="px-2 py-0.5 bg-gray-50 border border-gray-100 text-[9px] text-gray-400 rounded-full font-bold">
                         {hl.trim()}
                       </span>
                     ))}
                   </div>
+                  <Link href={`/sitio/${site.slug}`}>
+                    <button className="w-full bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:opacity-90 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-md hover:scale-102 transition-all">
+                      <span>Ver Sitio Turístico</span>
+                      <span className="text-sm">→</span>
+                    </button>
+                  </Link>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
         </div>
