@@ -633,21 +633,14 @@ export function InteractiveMap() {
                 {/* Contact & Link Actions */}
                 <div className="pt-4 border-t border-gray-100 space-y-2.5">
                   <div className="flex gap-2">
-                    {selectedEst.whatsapp ? (
+                    {(selectedEst.whatsapp || selectedEst.phone) ? (
                       <div className="flex-1">
                         <TrackedWhatsAppButton 
-                          whatsappNumber={selectedEst.whatsapp}
+                          whatsappNumber={selectedEst.whatsapp || selectedEst.phone}
                           establishmentId={selectedEst.id}
                           establishmentName={selectedEst.name}
                         />
                       </div>
-                    ) : selectedEst.phone ? (
-                      <a href={`tel:${selectedEst.phone}`} className="flex-1">
-                        <button className="w-full bg-brand-magenta hover:bg-brand-magenta/95 text-white text-xs font-bold py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer">
-                          <Phone className="w-4 h-4" />
-                          <span>Llamar</span>
-                        </button>
-                      </a>
                     ) : null}
 
                     <Link href={`/establecimiento/${selectedEst.slug}`} className="flex-1">

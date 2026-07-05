@@ -317,7 +317,8 @@ export function Home() {
               is_featured: item.is_featured || false,
               services: item.services || "[]",
               membership_tier: item.membership_tier || "basic",
-              has_hdv_seal: item.has_hdv_seal || false
+              has_hdv_seal: item.has_hdv_seal || false,
+              homepage_priority: item.homepage_priority
             };
           });
           setEstablishments(mapped);
@@ -374,12 +375,18 @@ export function Home() {
   }, []);
 
   // ... (El resto de la lógica de renderizado se mantiene intacta)
-  const dbHoteles = establishments.filter(e => e.category_slug === "hoteles");
-  const dbPosadas = establishments.filter(e => e.category_slug === "posadas");
-  const dbComplexes = establishments.filter(e => e.category_slug === "complejos");
+  const dbHoteles = establishments.filter(e => e.category_slug === "hoteles" && e.homepage_priority !== null);
+  const dbPosadas = establishments.filter(e => e.category_slug === "posadas" && e.homepage_priority !== null);
+  const dbComplexes = establishments.filter(e => e.category_slug === "complejos" && e.homepage_priority !== null);
 
   const getCategorizedItems = (dbItems: Establishment[], categorySlug: string) => {
     const combined = [...dbItems];
+    // Sort db items by homepage_priority ascending
+    combined.sort((a, b) => {
+      const pA = a.homepage_priority ?? 999;
+      const pB = b.homepage_priority ?? 999;
+      return pA - pB;
+    });
     const mockItems = ESTABLISHMENTS_MOCK.filter(e => e.category_slug === categorySlug);
     for (const mock of mockItems) {
       if (combined.length >= 6) break;
@@ -782,7 +789,7 @@ export function Home() {
                     establishment={hotel} 
                     isComparing={comparedIds.includes(hotel.id)}
                     onCompareToggle={() => handleCompareToggle(hotel.id)}
-                    isPriority={index === 0}
+                    isPriority={hotel.is_featured}
                   />
                 </div>
               ))}
@@ -900,7 +907,7 @@ export function Home() {
                     establishment={posada} 
                     isComparing={comparedIds.includes(posada.id)}
                     onCompareToggle={() => handleCompareToggle(posada.id)}
-                    isPriority={index === 0}
+                    isPriority={posada.is_featured}
                   />
                 </div>
               ))}
@@ -1063,7 +1070,7 @@ export function Home() {
                     establishment={complex} 
                     isComparing={comparedIds.includes(complex.id)}
                     onCompareToggle={() => handleCompareToggle(complex.id)}
-                    isPriority={index === 0}
+                    isPriority={complex.is_featured}
                   />
                 </div>
               ))}

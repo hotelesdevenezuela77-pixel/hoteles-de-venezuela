@@ -13,7 +13,8 @@ import {
   Plus, 
   Search,
   Sparkles,
-  ChevronDown
+  ChevronDown,
+  MapPin
 } from "lucide-react";
 
 interface Establishment {
@@ -80,6 +81,22 @@ export function AdminPrioridades() {
       const { error } = await supabase
         .from("establishments")
         .update({ homepage_priority: homepagePriority })
+        .eq("id", id);
+
+      if (error) throw error;
+      return { success: true };
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-establishments-all"] });
+    }
+  });
+
+  // Mutation to patch featured status
+  const patchFeatured = useMutation({
+    mutationFn: async ({ id, isFeatured }: { id: number; isFeatured: boolean }) => {
+      const { error } = await supabase
+        .from("establishments")
+        .update({ is_featured: isFeatured })
         .eq("id", id);
 
       if (error) throw error;
@@ -190,7 +207,7 @@ export function AdminPrioridades() {
                     <th className="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-wider">Establecimiento</th>
                     <th className="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-wider">Categoría</th>
                     <th className="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-wider">Destino</th>
-                    <th className="text-center px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-wider w-36">Estado</th>
+                    <th className="text-center px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-wider w-36">Ficha Destacada</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -226,20 +243,31 @@ export function AdminPrioridades() {
                           </div>
                           <div>
                             <span className="font-bold text-gray-800 text-xs block leading-snug">{item.name}</span>
-                            <span className="text-[10px] text-slate-400 font-bold block mt-0.5 uppercase tracking-wide">📍 {item.state}</span>
+                            <span className="text-[10px] text-slate-400 font-bold block mt-0.5 uppercase tracking-wide flex items-center gap-1">
+                              <MapPin className="w-3 h-3 text-[#00C8D4]" />
+                              {item.state}
+                            </span>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">{item.categoryName || "-"}</td>
                       <td className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">{item.destinationName || "-"}</td>
                       <td className="px-6 py-4 text-center">
-                        <span className={`inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${
-                          item.isFeatured 
-                            ? "bg-amber-100 text-amber-700 border border-amber-200" 
-                            : "bg-slate-100 text-slate-600 border border-slate-200"
-                        }`}>
-                          {item.isFeatured ? "⭐ Destacado" : "Normal"}
-                        </span>
+                        <button
+                          onClick={() => patchFeatured.mutate({
+                            id: item.id,
+                            isFeatured: !item.isFeatured
+                          })}
+                          className={`inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full cursor-pointer transition-all duration-200 shadow-sm ${
+                            item.isFeatured 
+                              ? "bg-[#FF0096] text-white hover:bg-[#e00084] border border-[#FF0096]" 
+                              : "bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200"
+                          }`}
+                          title={item.isFeatured ? "Quitar de Fichas Destacadas" : "Hacer Ficha Destacada"}
+                        >
+                          <Star className={`w-3 h-3 ${item.isFeatured ? "fill-white text-white" : "text-slate-400"}`} />
+                          <span>{item.isFeatured ? "Destacado" : "Normal"}</span>
+                        </button>
                       </td>
                     </tr>
                   ))}

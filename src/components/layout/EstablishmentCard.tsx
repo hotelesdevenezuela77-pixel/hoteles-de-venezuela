@@ -23,6 +23,7 @@ export interface Establishment {
   services: string;
   membership_tier: string;
   has_hdv_seal?: boolean;
+  homepage_priority?: number | null;
 }
 
 const tierConfig: Record<string, { label: string; color: string; bgColor: string }> = {
@@ -199,25 +200,15 @@ export function EstablishmentCard({
         {/* Action Buttons */}
         <div className="px-5 pb-5">
           <div className={`flex gap-2.5 pt-4 border-t mt-4 ${isPriority ? "border-white/10" : "border-gray-50"}`}>
-            {establishment.whatsapp ? (
+            {(establishment.whatsapp || establishment.phone) ? (
               <div className="flex-1">
                 <TrackedWhatsAppButton
-                  whatsappNumber={establishment.whatsapp}
+                  whatsappNumber={establishment.whatsapp || establishment.phone}
                   establishmentId={establishment.id}
                   establishmentName={establishment.name}
                   isPriority={isPriority}
                 />
               </div>
-            ) : establishment.phone ? (
-              <a
-                href={`tel:${establishment.phone}`}
-                className="flex-1"
-              >
-                <button className="w-full bg-gradient-to-r from-[#00C8D4] to-[#008ba3] text-white text-xs font-extrabold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md shadow-[#00C8D4]/15 hover:scale-102 transition-all cursor-pointer border-none">
-                  <Phone className="w-4 h-4" />
-                  Llamar
-                </button>
-              </a>
             ) : null}
 
             <Link href={`/establecimiento/${establishment.slug}`} className="flex-1">
@@ -372,25 +363,15 @@ export function EstablishmentListItem({
 
           {/* Action Buttons */}
           <div className={`flex gap-2.5 pt-4 border-t mt-4 max-w-sm ${isPriority ? "border-white/10" : "border-gray-50"}`}>
-            {establishment.whatsapp ? (
+            {(establishment.whatsapp || establishment.phone) ? (
               <div className="flex-1">
                 <TrackedWhatsAppButton
-                  whatsappNumber={establishment.whatsapp}
+                  whatsappNumber={establishment.whatsapp || establishment.phone}
                   establishmentId={establishment.id}
                   establishmentName={establishment.name}
                   isPriority={isPriority}
                 />
               </div>
-            ) : establishment.phone ? (
-              <a
-                href={`tel:${establishment.phone}`}
-                className="flex-1"
-              >
-                <button className="w-full bg-gradient-to-r from-[#00C8D4] to-[#008ba3] text-white text-xs font-extrabold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md shadow-[#00C8D4]/15 hover:scale-102 transition-all cursor-pointer border-none">
-                  <Phone className="w-4 h-4" />
-                  Llamar
-                </button>
-              </a>
             ) : null}
 
             <Link href={`/establecimiento/${establishment.slug}`} className="flex-1">

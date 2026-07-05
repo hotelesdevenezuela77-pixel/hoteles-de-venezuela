@@ -497,9 +497,9 @@ export function EstablecimientoDetalle() {
 
               {/* Action Buttons */}
               <div className="space-y-3 pt-4 border-t border-gray-50 mt-4">
-                {establishment.whatsapp && (
+                {(establishment.whatsapp || establishment.phone) && (
                   <TrackedWhatsAppButton
-                    whatsappNumber={establishment.whatsapp}
+                    whatsappNumber={establishment.whatsapp || establishment.phone}
                     establishmentId={establishment.id}
                     establishmentName={establishment.name}
                   >
