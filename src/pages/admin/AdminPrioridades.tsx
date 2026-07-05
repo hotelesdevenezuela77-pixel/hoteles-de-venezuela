@@ -210,6 +210,7 @@ export function AdminPrioridades() {
                     <th className="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-wider">Establecimiento</th>
                     <th className="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-wider">Categoría</th>
                     <th className="text-center px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-wider w-28">Boutique</th>
+                    <th className="text-center px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-wider w-28">Resort</th>
                     <th className="text-center px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-wider w-36">Ficha Destacada</th>
                   </tr>
                 </thead>
@@ -220,7 +221,7 @@ export function AdminPrioridades() {
                       className={`hover:bg-slate-50/50 transition-colors ${item.homepagePriority !== null ? "bg-emerald-50/20" : ""}`}
                     >
                       <td className="px-6 py-4 text-center">
-                        {(item.categorySlug === 'hoteles' || item.categorySlug === 'complejos') ? (
+                        {item.categorySlug === 'hoteles' ? (
                           <button
                             onClick={() => patchPriority.mutate({ 
                               id: item.id, 
@@ -271,6 +272,30 @@ export function AdminPrioridades() {
                                 : "bg-slate-100 text-slate-400 hover:bg-slate-200"
                             }`}
                             title={item.homepagePriority !== null ? "Quitar de Boutique & Encanto" : "Destacar en Boutique & Encanto"}
+                          >
+                            {item.homepagePriority !== null ? (
+                              <Check className="w-4 h-4" />
+                            ) : (
+                              <Plus className="w-4 h-4" />
+                            )}
+                          </button>
+                        ) : (
+                          <span className="text-slate-300 text-xs font-semibold">-</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        {(item.categorySlug !== 'hoteles' && item.categorySlug !== 'posadas') ? (
+                          <button
+                            onClick={() => patchPriority.mutate({ 
+                              id: item.id, 
+                              homepagePriority: item.homepagePriority !== null ? null : 1 
+                            })}
+                            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer mx-auto ${
+                              item.homepagePriority !== null 
+                                ? "bg-emerald-500 text-white shadow-md shadow-emerald-100 hover:bg-emerald-600" 
+                                : "bg-slate-100 text-slate-400 hover:bg-slate-200"
+                            }`}
+                            title={item.homepagePriority !== null ? "Quitar de Resorts & Complejos" : "Destacar en Resorts & Complejos"}
                           >
                             {item.homepagePriority !== null ? (
                               <Check className="w-4 h-4" />

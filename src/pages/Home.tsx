@@ -377,7 +377,11 @@ export function Home() {
   // ... (El resto de la lógica de renderizado se mantiene intacta)
   const dbHoteles = establishments.filter(e => e.category_slug === "hoteles" && e.homepage_priority !== null);
   const dbPosadas = establishments.filter(e => e.category_slug === "posadas" && e.homepage_priority !== null);
-  const dbComplexes = establishments.filter(e => e.category_slug === "complejos" && e.homepage_priority !== null);
+  const dbComplexes = establishments.filter(e => 
+    e.category_slug !== "hoteles" && 
+    e.category_slug !== "posadas" && 
+    e.homepage_priority !== null
+  );
 
   const getCategorizedItems = (dbItems: Establishment[], categorySlug: string) => {
     const combined = [...dbItems];
