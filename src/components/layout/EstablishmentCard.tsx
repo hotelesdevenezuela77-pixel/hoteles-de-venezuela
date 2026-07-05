@@ -205,6 +205,7 @@ export function EstablishmentCard({
                   whatsappNumber={establishment.whatsapp}
                   establishmentId={establishment.id}
                   establishmentName={establishment.name}
+                  isPriority={isPriority}
                 />
               </div>
             ) : establishment.phone ? (
@@ -377,6 +378,7 @@ export function EstablishmentListItem({
                   whatsappNumber={establishment.whatsapp}
                   establishmentId={establishment.id}
                   establishmentName={establishment.name}
+                  isPriority={isPriority}
                 />
               </div>
             ) : establishment.phone ? (

@@ -199,3 +199,19 @@
   scrollbar-width: none;  /* Firefox */
 }
 
+/* Animated Priority WhatsApp Button Blinking Effect */
+@keyframes priority-whatsapp-blink {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+  }
+}
+
+.animate-whatsapp-priority {
+  animation: priority-whatsapp-blink 1.8s infinite ease-in-out;
+}
+

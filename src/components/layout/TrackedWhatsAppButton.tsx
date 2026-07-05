@@ -10,6 +10,7 @@ interface TrackedWhatsAppButtonProps {
   className?: string;
   children?: React.ReactNode;
   iconOnly?: boolean;
+  isPriority?: boolean;
 }
 
 // Track analytics event directly in Supabase
@@ -64,7 +65,8 @@ export function TrackedWhatsAppButton({
   message,
   className = "",
   children,
-  iconOnly = false
+  iconOnly = false,
+  isPriority = false
 }: TrackedWhatsAppButtonProps) {
   const [showModal, setShowModal] = useState(false);
   const [visitorName, setVisitorName] = useState("");
@@ -305,7 +307,9 @@ export function TrackedWhatsAppButton({
       <button
         type="button"
         onClick={handleButtonClick}
-        className={`w-full bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer ${className}`}
+        className={`w-full bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer ${
+          isPriority ? "animate-whatsapp-priority" : ""
+        } ${className}`}
       >
         <MessageCircle className="w-4 h-4" />
         {children || "WhatsApp"}
