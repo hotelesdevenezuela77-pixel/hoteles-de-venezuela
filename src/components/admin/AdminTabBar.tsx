@@ -151,7 +151,7 @@ export function AdminTabBar() {
   return (
     <div className="bg-[#100720]/90 border-b border-white/5 backdrop-blur-md sticky top-0 z-30 shadow-xs">
       <div className="container mx-auto px-4 py-3">
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-nowrap overflow-x-auto gap-2 pb-1.5 no-scrollbar" style={{ WebkitOverflowScrolling: "touch" }}>
           {TABS.map((tab) => {
             const active = isActive(tab.href);
             const cnt = getCount(tab.countKey);

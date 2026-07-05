@@ -624,17 +624,27 @@ export function AdminEstablecimientoNuevo() {
                 <div key={i} className="relative rounded-xl overflow-hidden border-2" style={{ borderColor: photo.isPrimary ? "#9B00CC" : "#E5E7EB" }}>
                   <img src={photo.url} className="w-full h-24 object-cover" />
                   {photo.isPrimary && (
-                    <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full text-[9px] font-black text-white bg-purple-600">
+                    <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full text-[9px] font-black text-white bg-purple-600 z-10">
                       Principal
                     </span>
                   )}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 flex items-center justify-center gap-2 transition-opacity">
+                  <div className="absolute top-1.5 right-1.5 flex gap-1.5 z-10">
                     {!photo.isPrimary && (
-                      <button type="button" onClick={() => setPrimary(i)} className="p-1 bg-white rounded-full text-yellow-500">
+                      <button 
+                        type="button" 
+                        onClick={() => setPrimary(i)} 
+                        className="w-7 h-7 rounded-full bg-white/90 border border-gray-200 flex items-center justify-center text-amber-500 shadow-md active:scale-90 transition-transform cursor-pointer"
+                        title="Hacer Principal"
+                      >
                         <Star className="w-3.5 h-3.5 fill-current" />
                       </button>
                     )}
-                    <button type="button" onClick={() => removePhoto(i)} className="p-1 bg-white rounded-full text-red-500">
+                    <button 
+                      type="button" 
+                      onClick={() => removePhoto(i)} 
+                      className="w-7 h-7 rounded-full bg-white/90 border border-gray-200 flex items-center justify-center text-red-500 shadow-md active:scale-90 transition-transform cursor-pointer"
+                      title="Eliminar"
+                    >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
