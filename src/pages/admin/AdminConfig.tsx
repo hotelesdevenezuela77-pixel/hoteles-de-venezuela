@@ -21,6 +21,18 @@ const SETTING_LABELS: Record<string, string> = {
   facebook_url: "Facebook URL",
   instagram_url: "Instagram URL",
   twitter_url: "Twitter URL",
+  
+  // Métodos de Pago
+  payment_pagomovil_bank: "Pago Móvil - Banco",
+  payment_pagomovil_phone: "Pago Móvil - Teléfono",
+  payment_pagomovil_rif: "Pago Móvil - RIF",
+  payment_zelle_email: "Zelle - Correo",
+  payment_zelle_holder: "Zelle - Titular",
+  payment_usdt_binance_id: "USDT - Binance ID",
+  payment_usdt_email: "USDT - Correo Binance",
+  payment_paypal_email: "PayPal - Correo",
+  payment_paypal_note: "PayPal - Nota",
+  payment_stripe_info: "Stripe - Información / Instrucciones",
 };
 
 export function AdminConfig() {
@@ -51,10 +63,30 @@ export function AdminConfig() {
         .select("setting_key, setting_value");
       if (error) throw error;
       
-      return (data || []).map((s: any) => ({
-        key: s.setting_key,
-        value: s.setting_value
+      const dbSettings = data || [];
+      const dbMap = new Map<string, string>();
+      dbSettings.forEach((s: any) => {
+        dbMap.set(s.setting_key, s.setting_value);
+      });
+
+      // Ensure all predefined keys in SETTING_LABELS exist in the returned array
+      const allKeys = Object.keys(SETTING_LABELS);
+      const result = allKeys.map(key => ({
+        key,
+        value: dbMap.has(key) ? dbMap.get(key)! : ""
       }));
+
+      // Add any other custom keys that are in the database but not in SETTING_LABELS
+      dbSettings.forEach((s: any) => {
+        if (!SETTING_LABELS[s.setting_key]) {
+          result.push({
+            key: s.setting_key,
+            value: s.setting_value
+          });
+        }
+      });
+
+      return result;
     }
   });
 

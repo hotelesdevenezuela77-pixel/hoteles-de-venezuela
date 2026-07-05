@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { supabase } from "../lib/supabase";
 import { useMutation } from "@tanstack/react-query";
@@ -23,6 +23,61 @@ const METHODS = [
 
 export function ReportarPago() {
   const [success, setSuccess] = useState(false);
+  const [settings, setSettings] = useState<Record<string, string>>({
+    payment_pagomovil_bank: "Banesco (0102)",
+    payment_pagomovil_phone: "0414-5069774",
+    payment_pagomovil_rif: "J-123456789",
+    payment_zelle_email: "payments@hotelesdevenezuela.com",
+    payment_zelle_holder: "Hoteles de Venezuela LLC",
+    payment_usdt_binance_id: "774892102",
+    payment_usdt_email: "binance@hotelesdevenezuela.com",
+    payment_paypal_email: "paypal@hotelesdevenezuela.com",
+    payment_paypal_note: "Sumar la comisión correspondiente",
+    payment_stripe_info: ""
+  });
+
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const { data, error } = await supabase
+          .from("site_settings")
+          .select("setting_key, setting_value")
+          .in("setting_key", [
+            "payment_pagomovil_bank",
+            "payment_pagomovil_phone",
+            "payment_pagomovil_rif",
+            "payment_zelle_email",
+            "payment_zelle_holder",
+            "payment_usdt_binance_id",
+            "payment_usdt_email",
+            "payment_paypal_email",
+            "payment_paypal_note",
+            "payment_stripe_info"
+          ]);
+        if (error) throw error;
+        if (data && data.length > 0) {
+          const mapped: Record<string, string> = {};
+          data.forEach((s: any) => {
+            if (s.setting_value) {
+              mapped[s.setting_key] = s.setting_value;
+            }
+          });
+          setSettings(prev => ({ ...prev, ...mapped }));
+        }
+      } catch (err) {
+        console.warn("Failed to load site settings for payments:", err);
+      }
+    }
+    loadSettings();
+  }, []);
+
+  const paymentMethods = [
+    { value: "pago_movil", label: "Pago Móvil (Bs.)" },
+    { value: "zelle", label: "Zelle (USD)" },
+    { value: "usdt", label: "USDT / Binance Pay" },
+    { value: "paypal", label: "PayPal (USD)" },
+    ...(settings.payment_stripe_info ? [{ value: "stripe", label: "Stripe (Tarjeta de Crédito)" }] : [])
+  ];
   const [form, setForm] = useState({
     reason: "membresia",
     reasonDetail: "",
@@ -284,7 +339,7 @@ export function ReportarPago() {
                       }} 
                       className={inp + " h-[46px]"}
                     >
-                      {METHODS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+                      {paymentMethods.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
                     </select>
                   </div>
                   
@@ -471,20 +526,20 @@ export function ReportarPago() {
                     <Landmark className="w-3.5 h-3.5 text-[#00C8D4]" /> Pago Móvil (VES)
                   </div>
                   <div className="font-semibold text-slate-400 mt-1 space-y-0.5 font-mono text-[10px]">
-                    <p>Banco: Banesco (0102)</p>
-                    <p>Teléfono: 0414-5069774</p>
-                    <p>Rif: J-123456789</p>
+                    <p>Banco: {settings.payment_pagomovil_bank}</p>
+                    <p>Teléfono: {settings.payment_pagomovil_phone}</p>
+                    <p>Rif: {settings.payment_pagomovil_rif}</p>
                   </div>
                 </div>
 
                 {/* Zelle */}
                 <div className="border-b border-slate-800/80 pb-3">
                   <div className="font-bold flex items-center gap-1.5 text-white/90">
-                    <DollarSign className="w-3.5 h-3.5 text-emerald-450" /> Zelle (USD)
+                    <DollarSign className="w-3.5 h-3.5 text-[#00C8D4]" /> Zelle (USD)
                   </div>
                   <div className="font-semibold text-slate-400 mt-1 font-mono text-[10px]">
-                    <p>Correo: payments@hotelesdevenezuela.com</p>
-                    <p>Titular: Hoteles de Venezuela LLC</p>
+                    <p>Correo: {settings.payment_zelle_email}</p>
+                    <p>Titular: {settings.payment_zelle_holder}</p>
                   </div>
                 </div>
 
@@ -494,21 +549,33 @@ export function ReportarPago() {
                     <CreditCard className="w-3.5 h-3.5 text-amber-500" /> USDT (Binance Pay)
                   </div>
                   <div className="font-semibold text-slate-400 mt-1 font-mono text-[10px]">
-                    <p>Binance ID: 774892102</p>
-                    <p>Email: binance@hotelesdevenezuela.com</p>
+                    <p>Binance ID: {settings.payment_usdt_binance_id}</p>
+                    <p>Email: {settings.payment_usdt_email}</p>
                   </div>
                 </div>
 
                 {/* PayPal */}
-                <div>
+                <div className={settings.payment_stripe_info ? "border-b border-slate-800/80 pb-3" : ""}>
                   <div className="font-bold flex items-center gap-1.5 text-white/90">
                     <MessageSquare className="w-3.5 h-3.5 text-blue-400" /> PayPal (USD)
                   </div>
                   <div className="font-semibold text-slate-400 mt-1 font-mono text-[10px]">
-                    <p>Correo: paypal@hotelesdevenezuela.com</p>
-                    <p>Nota: Sumar la comisión correspondiente</p>
+                    <p>Correo: {settings.payment_paypal_email}</p>
+                    <p>Nota: {settings.payment_paypal_note}</p>
                   </div>
                 </div>
+
+                {/* Stripe */}
+                {settings.payment_stripe_info && (
+                  <div>
+                    <div className="font-bold flex items-center gap-1.5 text-white/90">
+                      <CreditCard className="w-3.5 h-3.5 text-indigo-400" /> Stripe (USD)
+                    </div>
+                    <div className="font-semibold text-slate-400 mt-1 font-mono text-[10px]">
+                      <p>{settings.payment_stripe_info}</p>
+                    </div>
+                  </div>
+                )}
 
               </div>
             </div>
