@@ -220,7 +220,7 @@ export function EstablishmentCard({
             ) : null}
 
             <Link href={`/establecimiento/${establishment.slug}`} className="flex-1">
-              <button className="w-full btn-magenta-gradient text-white text-xs font-extrabold py-2.5 px-4 rounded-xl flex items-center justify-center shadow-md shadow-brand-magenta/10 hover:scale-102 transition-all cursor-pointer">
+              <button className="w-full btn-cyan-gradient text-white text-xs font-extrabold py-2.5 px-4 rounded-xl flex items-center justify-center shadow-md shadow-brand-turquesa/10 hover:scale-102 transition-all cursor-pointer">
                 Ver Ficha
               </button>
             </Link>
@@ -392,7 +392,7 @@ export function EstablishmentListItem({
             ) : null}
 
             <Link href={`/establecimiento/${establishment.slug}`} className="flex-1">
-              <button className="w-full btn-magenta-gradient text-white text-xs font-extrabold py-2.5 px-4 rounded-xl flex items-center justify-center shadow-md shadow-brand-magenta/10 hover:scale-102 transition-all cursor-pointer">
+              <button className="w-full btn-cyan-gradient text-white text-xs font-extrabold py-2.5 px-4 rounded-xl flex items-center justify-center shadow-md shadow-brand-turquesa/10 hover:scale-102 transition-all cursor-pointer">
                 Ver Detalles
               </button>
             </Link>
