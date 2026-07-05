@@ -144,3 +144,48 @@
   animation: search-glow 2s infinite;
 }
 
+/* Animated Priority Border Card Effect */
+@keyframes priority-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.priority-glow-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px; /* Matches rounded-3xl */
+  padding: 3.5px; /* Border thickness */
+  background: #0e011f; /* Contrast dark bg fallback */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.priority-glow-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(180deg, #00C8D4 0%, #FF0096 100%);
+  animation: priority-rotate 3s linear infinite;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.priority-glow-card-inner {
+  position: relative;
+  z-index: 10;
+  border-radius: 21px; /* Inner rounding adjusted to account for padding */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+

@@ -776,12 +776,13 @@ export function Home() {
             </div>
           ) : (
             <div className={hotels.length < 3 ? "flex flex-wrap justify-center gap-8" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"}>
-              {hotels.map((hotel) => (
+              {hotels.map((hotel, index) => (
                 <div key={hotel.id} className={hotels.length < 3 ? "w-full max-w-sm flex" : ""}>
                   <EstablishmentCard 
                     establishment={hotel} 
                     isComparing={comparedIds.includes(hotel.id)}
                     onCompareToggle={() => handleCompareToggle(hotel.id)}
+                    isPriority={index === 0}
                   />
                 </div>
               ))}
@@ -893,12 +894,13 @@ export function Home() {
             </div>
           ) : (
             <div className={posadas.length < 3 ? "flex flex-wrap justify-center gap-8" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"}>
-              {posadas.map((posada) => (
+              {posadas.map((posada, index) => (
                 <div key={posada.id} className={posadas.length < 3 ? "w-full max-w-sm flex" : ""}>
                   <EstablishmentCard 
                     establishment={posada} 
                     isComparing={comparedIds.includes(posada.id)}
                     onCompareToggle={() => handleCompareToggle(posada.id)}
+                    isPriority={index === 0}
                   />
                 </div>
               ))}
@@ -1055,12 +1057,13 @@ export function Home() {
             </div>
           ) : (
             <div className={complexes.length < 3 ? "flex flex-wrap justify-center gap-8" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"}>
-              {complexes.map((complex) => (
+              {complexes.map((complex, index) => (
                 <div key={complex.id} className={complexes.length < 3 ? "w-full max-w-sm flex" : ""}>
                   <EstablishmentCard 
                     establishment={complex} 
                     isComparing={comparedIds.includes(complex.id)}
                     onCompareToggle={() => handleCompareToggle(complex.id)}
+                    isPriority={index === 0}
                   />
                 </div>
               ))}
