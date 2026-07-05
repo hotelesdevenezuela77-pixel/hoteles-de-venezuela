@@ -331,8 +331,9 @@ export function EstablecimientoDetalle() {
                   {establishment.name}
                 </h1>
                 {establishment.has_hdv_seal && (
-                  <div className="px-3 py-1 rounded-lg bg-yellow-50 border border-yellow-200 text-xs font-black text-yellow-600 uppercase tracking-widest shrink-0 self-start sm:self-center">
-                    🏆 SELLO DE CALIDAD HDV
+                  <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-xs font-black text-amber-700 uppercase tracking-wider shrink-0 self-start sm:self-center shadow-sm">
+                    <img src="/images/sello-hdv.png" alt="Sello HDV" className="w-5 h-5 object-contain" />
+                    <span>Calidad Garantizada HDV</span>
                   </div>
                 )}
               </div>

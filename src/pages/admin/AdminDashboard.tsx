@@ -443,7 +443,11 @@ export function AdminDashboard() {
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border border-white/10"
                     style={{ background: "rgba(255,255,255,0.2)" }}>
-                    {maintenanceOn ? <Wrench className="w-5 h-5 text-white" /> : <Eye className="w-5 h-5 text-white" />}
+                    {maintenanceOn ? (
+                      <Wrench key="maintenance-wrench" className="w-5 h-5 text-white" />
+                    ) : (
+                      <Eye key="maintenance-eye" className="w-5 h-5 text-white" />
+                    )}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
@@ -476,11 +480,11 @@ export function AdminDashboard() {
                     }}
                   >
                     {updatingMaintenance ? (
-                      <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Procesando...</>
+                      <span key="maint-updating" className="flex items-center gap-1.5"><Loader2 className="w-3.5 h-3.5 animate-spin" /> Procesando...</span>
                     ) : maintenanceOn ? (
-                      <><Eye className="w-3.5 h-3.5" /> Abrir Plataforma</>
+                      <span key="maint-open" className="flex items-center gap-1.5"><Eye className="w-3.5 h-3.5" /> Abrir Plataforma</span>
                     ) : (
-                      <><Wrench className="w-3.5 h-3.5" /> Cerrar por Mantenimiento</>
+                      <span key="maint-close" className="flex items-center gap-1.5"><Wrench className="w-3.5 h-3.5" /> Cerrar por Mantenimiento</span>
                     )}
                   </button>
                 </div>

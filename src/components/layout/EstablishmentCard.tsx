@@ -92,23 +92,25 @@ export function EstablishmentCard({
               </span>
             )}
             {establishment.category_name && (
-              <span className="px-2.5 py-1 bg-gradient-to-r from-[#00C8D4] to-[#0099AA] text-white text-[10px] font-bold uppercase tracking-wider rounded-lg shadow-sm">
+              <span className="px-3.5 py-1.5 bg-white/20 backdrop-blur-md border border-white/20 text-white text-[10px] font-black uppercase tracking-wider rounded-full shadow-md flex items-center">
                 {establishment.category_name}
               </span>
             )}
           </div>
 
-          {/* Price Badge */}
-          {establishment.price_level && (
-            <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-brand-magenta/90 backdrop-blur-sm text-white text-xs font-bold rounded-xl shadow-md">
-              Desde <span className="text-sm font-black">{establishment.price_level}</span> / noche
-            </div>
+          {/* Official HDV Seal Image (replaces "desde moderado / noche" button) */}
+          {establishment.has_hdv_seal && (
+            <img 
+              src="/images/sello-hdv.png" 
+              alt="Sello de Calidad Hoteles de Venezuela" 
+              className="absolute bottom-2.5 right-2.5 w-14 h-14 object-contain z-10 drop-shadow-md hover:scale-110 transition-transform duration-300 pointer-events-none" 
+            />
           )}
 
           {/* Compare Checkbox */}
           {onCompareToggle && (
-            <div className="absolute top-4 right-14 flex gap-2">
-              <label className="flex items-center gap-1.5 bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:opacity-90 transition-opacity px-2.5 py-1.5 rounded-full text-white text-[10px] font-bold cursor-pointer shadow-md">
+            <div className="absolute top-4 right-4 flex gap-2">
+              <label className="flex items-center gap-1.5 bg-white/20 backdrop-blur-md border border-white/20 hover:bg-white/30 transition-all px-3 py-1.5 rounded-full text-white text-[10px] font-bold cursor-pointer shadow-md">
                 <input
                   type="checkbox"
                   checked={isComparing}
@@ -260,17 +262,19 @@ export function EstablishmentListItem({
           )}
         </div>
 
-        {/* Price Badge */}
-        {establishment.price_level && (
-          <div className="absolute bottom-3 right-3 px-3 py-1 bg-brand-magenta/95 backdrop-blur-sm text-white text-[11px] font-bold rounded-lg shadow">
-            Desde <span className="font-extrabold text-xs">{establishment.price_level}</span>
-          </div>
+        {/* Official HDV Seal Image (replaces "desde moderado / noche" button) */}
+        {establishment.has_hdv_seal && (
+          <img 
+            src="/images/sello-hdv.png" 
+            alt="Sello de Calidad Hoteles de Venezuela" 
+            className="absolute bottom-2 right-2 w-12 h-12 object-contain z-10 drop-shadow-md hover:scale-110 transition-transform duration-300 pointer-events-none" 
+          />
         )}
 
         {/* Compare Checkbox */}
         {onCompareToggle && (
           <div className="absolute top-3 right-3 flex gap-2">
-            <label className="flex items-center gap-1.5 bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:opacity-90 transition-opacity px-2.5 py-1.5 rounded-full text-white text-[10px] font-bold cursor-pointer shadow-md">
+            <label className="flex items-center gap-1.5 bg-white/20 backdrop-blur-md border border-white/20 hover:bg-white/30 transition-all px-3 py-1.5 rounded-full text-white text-[10px] font-bold cursor-pointer shadow-md">
               <input
                 type="checkbox"
                 checked={isComparing}

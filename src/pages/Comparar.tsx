@@ -327,8 +327,9 @@ export function Comparar() {
                       {comparedHotels.map(hotel => (
                         <td key={hotel.id} className="p-5 border-l border-gray-100">
                           {hotel.has_hdv_seal ? (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-50 border border-yellow-200 text-yellow-700 text-[9px] font-black uppercase tracking-widest rounded-lg">
-                              🏆 Sello de Oro HDV
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 border border-amber-200 text-amber-700 text-[9px] font-black uppercase tracking-wider rounded-lg">
+                              <img src="/images/sello-hdv.png" alt="Sello HDV" className="w-4 h-4 object-contain" />
+                              <span>Sello de Oro HDV</span>
                             </span>
                           ) : (
                             <span className="text-gray-400 font-medium">Estándar</span>
