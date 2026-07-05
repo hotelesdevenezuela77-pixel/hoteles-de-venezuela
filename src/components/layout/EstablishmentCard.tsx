@@ -106,7 +106,7 @@ export function EstablishmentCard({
             </div>
 
             {/* Official HDV Seal Image (replaces "desde moderado / noche" button) */}
-            {establishment.has_hdv_seal && (
+            {(establishment.has_hdv_seal || isPriority) && (
               <img 
                 src="/images/sello-hdv.png" 
                 alt="Sello de Calidad Hoteles de Venezuela" 
@@ -147,7 +147,7 @@ export function EstablishmentCard({
               </div>
 
               {/* HDV Seal */}
-              {establishment.has_hdv_seal && (
+              {(establishment.has_hdv_seal || isPriority) && (
                 <div className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest shrink-0 self-center border ${isPriority ? "bg-amber-500/10 border-amber-500/20 text-amber-300" : "bg-yellow-50 border border-yellow-200 text-yellow-600"}`}>
                   SELLO HDV
                 </div>
@@ -278,7 +278,7 @@ export function EstablishmentListItem({
           </div>
 
           {/* Official HDV Seal Image (replaces "desde moderado / noche" button) */}
-          {establishment.has_hdv_seal && (
+          {(establishment.has_hdv_seal || isPriority) && (
             <img 
               src="/images/sello-hdv.png" 
               alt="Sello de Calidad Hoteles de Venezuela" 
@@ -314,7 +314,7 @@ export function EstablishmentListItem({
                       {establishment.category_name}
                     </span>
                   )}
-                  {establishment.has_hdv_seal && (
+                  {(establishment.has_hdv_seal || isPriority) && (
                     <span className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border ${isPriority ? "bg-amber-500/10 border-amber-500/20 text-amber-300" : "bg-yellow-50 border border-yellow-200 text-yellow-600"}`}>
                       Sello HDV
                     </span>
