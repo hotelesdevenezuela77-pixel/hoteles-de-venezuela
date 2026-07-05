@@ -22,6 +22,7 @@ interface Establishment {
   name: string;
   slug: string;
   categoryName: string;
+  categorySlug: string;
   destinationName: string;
   state: string;
   status: string;
@@ -49,7 +50,7 @@ export function AdminPrioridades() {
         .from("establishments")
         .select(`
           id, name, slug, status, is_featured, homepage_priority,
-          categories (name),
+          categories (name, slug),
           destinations (name, state)
         `)
         .order("name", { ascending: true });
@@ -58,6 +59,7 @@ export function AdminPrioridades() {
 
       return (estData || []).map(est => {
         const catName = est.categories ? (est.categories as any).name : "Otros";
+        const catSlug = est.categories ? (est.categories as any).slug : "";
         const dest = est.destinations ? (est.destinations as any) : null;
         
         return {
@@ -65,6 +67,7 @@ export function AdminPrioridades() {
           name: est.name,
           slug: est.slug,
           categoryName: catName,
+          categorySlug: catSlug,
           destinationName: dest?.name || "Otros",
           state: dest?.state || dest?.name || "Otros",
           status: est.status,
@@ -203,10 +206,10 @@ export function AdminPrioridades() {
               <table className="w-full min-w-[700px] text-left border-collapse">
                 <thead className="bg-slate-50 border-b border-slate-100">
                   <tr>
-                    <th className="text-center px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-wider w-24">En Home</th>
+                    <th className="text-center px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-wider w-24">Élite</th>
                     <th className="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-wider">Establecimiento</th>
                     <th className="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-wider">Categoría</th>
-                    <th className="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-wider">Destino</th>
+                    <th className="text-center px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-wider w-28">Boutique</th>
                     <th className="text-center px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-wider w-36">Ficha Destacada</th>
                   </tr>
                 </thead>
@@ -217,24 +220,28 @@ export function AdminPrioridades() {
                       className={`hover:bg-slate-50/50 transition-colors ${item.homepagePriority !== null ? "bg-emerald-50/20" : ""}`}
                     >
                       <td className="px-6 py-4 text-center">
-                        <button
-                          onClick={() => patchPriority.mutate({ 
-                            id: item.id, 
-                            homepagePriority: item.homepagePriority !== null ? null : 1 
-                          })}
-                          className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer mx-auto ${
-                            item.homepagePriority !== null 
-                              ? "bg-emerald-500 text-white shadow-md shadow-emerald-100 hover:bg-emerald-600" 
-                              : "bg-slate-100 text-slate-400 hover:bg-slate-200"
-                          }`}
-                          title={item.homepagePriority !== null ? "Quitar de la página principal" : "Destacar en página principal"}
-                        >
-                          {item.homepagePriority !== null ? (
-                            <Check className="w-4 h-4" />
-                          ) : (
-                            <Plus className="w-4 h-4" />
-                          )}
-                        </button>
+                        {(item.categorySlug === 'hoteles' || item.categorySlug === 'complejos') ? (
+                          <button
+                            onClick={() => patchPriority.mutate({ 
+                              id: item.id, 
+                              homepagePriority: item.homepagePriority !== null ? null : 1 
+                            })}
+                            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer mx-auto ${
+                              item.homepagePriority !== null 
+                                ? "bg-emerald-500 text-white shadow-md shadow-emerald-100 hover:bg-emerald-600" 
+                                : "bg-slate-100 text-slate-400 hover:bg-slate-200"
+                            }`}
+                            title={item.homepagePriority !== null ? "Quitar de Hospedajes Élite" : "Destacar en Hospedajes Élite"}
+                          >
+                            {item.homepagePriority !== null ? (
+                              <Check className="w-4 h-4" />
+                            ) : (
+                              <Plus className="w-4 h-4" />
+                            )}
+                          </button>
+                        ) : (
+                          <span className="text-slate-300 text-xs font-semibold">-</span>
+                        )}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3.5">
@@ -251,7 +258,30 @@ export function AdminPrioridades() {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">{item.categoryName || "-"}</td>
-                      <td className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">{item.destinationName || "-"}</td>
+                      <td className="px-6 py-4 text-center">
+                        {item.categorySlug === 'posadas' ? (
+                          <button
+                            onClick={() => patchPriority.mutate({ 
+                              id: item.id, 
+                              homepagePriority: item.homepagePriority !== null ? null : 1 
+                            })}
+                            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer mx-auto ${
+                              item.homepagePriority !== null 
+                                ? "bg-emerald-500 text-white shadow-md shadow-emerald-100 hover:bg-emerald-600" 
+                                : "bg-slate-100 text-slate-400 hover:bg-slate-200"
+                            }`}
+                            title={item.homepagePriority !== null ? "Quitar de Boutique & Encanto" : "Destacar en Boutique & Encanto"}
+                          >
+                            {item.homepagePriority !== null ? (
+                              <Check className="w-4 h-4" />
+                            ) : (
+                              <Plus className="w-4 h-4" />
+                            )}
+                          </button>
+                        ) : (
+                          <span className="text-slate-300 text-xs font-semibold">-</span>
+                        )}
+                      </td>
                       <td className="px-6 py-4 text-center">
                         <button
                           onClick={() => patchFeatured.mutate({
