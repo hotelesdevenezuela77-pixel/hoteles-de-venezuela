@@ -10,6 +10,17 @@ import {
   X, ChevronDown, Star, Clock, StickyNote, Loader2, Bot
 } from "lucide-react";
 
+function cleanWhatsAppNumber(phone: string): string {
+  let cleaned = phone.replace(/\D/g, "");
+  if (cleaned.startsWith("0")) {
+    cleaned = cleaned.substring(1);
+  }
+  if (cleaned.length === 10 && !cleaned.startsWith("58")) {
+    cleaned = "58" + cleaned;
+  }
+  return cleaned;
+}
+
 /* ── colours ── */
 const C = { fucsia: "#FF0096", teal: "#00C8D4", purple: "#7C3AED", green: "#10B981", amber: "#F59E0B", red: "#EF4444", blue: "#3B82F6" };
 
@@ -143,7 +154,7 @@ function LeadModal({ lead, stages, onClose, onSave }: { lead: Lead; stages: type
         <TextareaField label="Notas" value={form.notes} onChange={v => setForm(f => ({...f, notes: v}))} />
         <div className="flex justify-between pt-1 flex-wrap gap-2">
           {lead.phone ? (
-            <a href={`https://wa.me/${lead.phone.replace(/\D/g,"")}`} target="_blank" rel="noopener noreferrer"
+            <a href={`https://wa.me/${cleanWhatsAppNumber(lead.phone)}`} target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white transition-opacity hover:opacity-90" style={{ background: "#25D366" }}>
               <MessageSquare className="w-3.5 h-3.5" /> WhatsApp
             </a>
@@ -186,7 +197,7 @@ function ProspectModal({ prospect, stages, onClose, onSave }: { prospect: Prospe
         <TextareaField label="Notas" value={form.notes} onChange={v => setForm(f => ({...f, notes: v}))} />
         <div className="flex justify-between pt-1 flex-wrap gap-2">
           {form.phone ? (
-            <a href={`https://wa.me/${form.phone.replace(/\D/g,"")}`} target="_blank" rel="noopener noreferrer"
+            <a href={`https://wa.me/${cleanWhatsAppNumber(form.phone)}`} target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white transition-opacity hover:opacity-90" style={{ background: "#25D366" }}>
               <MessageSquare className="w-3.5 h-3.5" /> WhatsApp
             </a>

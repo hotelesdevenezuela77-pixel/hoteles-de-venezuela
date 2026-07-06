@@ -9,6 +9,17 @@ import {
   MapPin, X, Save, User, Tag, Calendar, FileText, ChevronDown, Clock, Loader2
 } from "lucide-react";
 
+function cleanWhatsAppNumber(phone: string): string {
+  let cleaned = phone.replace(/\D/g, "");
+  if (cleaned.startsWith("0")) {
+    cleaned = cleaned.substring(1);
+  }
+  if (cleaned.length === 10 && !cleaned.startsWith("58")) {
+    cleaned = "58" + cleaned;
+  }
+  return cleaned;
+}
+
 /* ── types ───────────────────────────────────────────────── */
 interface Lead {
   id: number; phone: string; name: string; email: string; source: string;
@@ -435,7 +446,7 @@ export function AdminComercial() {
 
                         <div className="flex gap-2 pt-1">
                           {l.phone && (
-                            <a href={`https://wa.me/${l.phone.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer"
+                            <a href={`https://wa.me/${cleanWhatsAppNumber(l.phone)}`} target="_blank" rel="noopener noreferrer"
                               className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-sm"
                               style={{ background: "#25D366" }}>
                               <Phone className="w-3.5 h-3.5" /> Abrir WhatsApp
@@ -505,7 +516,7 @@ export function AdminComercial() {
                           </div>
                           <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-start">
                             {p.phone && (
-                              <a href={`https://wa.me/${p.phone.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer"
+                              <a href={`https://wa.me/${cleanWhatsAppNumber(p.phone)}`} target="_blank" rel="noopener noreferrer"
                                 className="w-8 h-8 rounded-lg flex items-center justify-center bg-green-50 border border-green-200 hover:bg-green-100 transition-colors">
                                 <Phone className="w-3.5 h-3.5 text-green-600" />
                               </a>

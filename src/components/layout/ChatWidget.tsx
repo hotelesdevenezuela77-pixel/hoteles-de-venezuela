@@ -203,6 +203,7 @@ async function trackEvent(eventType: string, name: string, phone: string, tipo: 
       device_type: deviceType,
       browser: browser,
       ip_address: clientIp,
+      ip_hash: clientIp,
       extra_data: JSON.stringify(extraDataObj)
     };
 
