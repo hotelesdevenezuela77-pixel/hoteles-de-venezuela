@@ -153,6 +153,7 @@ export function InteractiveMap() {
   useEffect(() => {
     async function fetchMapData() {
       try {
+        setLoading(true);
         // 1. Fetch Categories & Destinations
         const [catsRes, destsRes, estsRes] = await Promise.all([
           supabase.from("categories").select("slug, name").order("name"),
@@ -207,6 +208,8 @@ export function InteractiveMap() {
         }
       } catch (err) {
         console.error("Error loading map data from Supabase in background:", err);
+      } finally {
+        setLoading(false);
       }
     }
     fetchMapData();

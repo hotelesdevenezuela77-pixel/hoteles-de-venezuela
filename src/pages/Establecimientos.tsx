@@ -125,6 +125,7 @@ export function Establecimientos() {
   useEffect(() => {
     async function fetchData() {
       try {
+        setLoading(true);
         const { data, error } = await supabase
           .from("establishments")
           .select(`
@@ -170,6 +171,8 @@ export function Establecimientos() {
         }
       } catch (err) {
         console.warn("Error consultando Supabase para establecimientos en segundo plano:", err);
+      } finally {
+        setLoading(false);
       }
     }
     fetchData();

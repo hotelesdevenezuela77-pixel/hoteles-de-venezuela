@@ -276,6 +276,7 @@ export function Home() {
   useEffect(() => {
     async function loadHomeData() {
       try {
+        setLoading(true);
         // Consultas concurrentes en paralelo para velocidad óptima (UX instantánea)
         const [estRes, destRes, sectionRes, blogRes, siteRes, catsRes] = await Promise.all([
           supabase.from("establishments").select(`
@@ -369,6 +370,8 @@ export function Home() {
         }
       } catch (err) {
         console.warn("Error consultando base de datos en segundo plano:", err);
+      } finally {
+        setLoading(false);
       }
     }
     loadHomeData();
