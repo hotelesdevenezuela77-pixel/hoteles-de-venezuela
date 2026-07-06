@@ -41,10 +41,59 @@ interface ChatbotRule {
   response: string;
 }
 
-function autoReply(text: string, tipo: "turista" | "propietario", dbRules: ChatbotRule[]): string {
+function autoReply(
+  text: string,
+  tipo: "turista" | "propietario",
+  dbRules: ChatbotRule[],
+  destinos: any[],
+  hoteles: any[]
+): string {
   const lower = text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  
-  // 1. Intentar buscar en las reglas dinámicas de la base de datos primero
+
+  if (tipo === "turista") {
+    // 1. Buscar si menciona algún destino
+    const matchedDest = destinos.find(d => {
+      const destNameNormalized = d.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const destSlugNormalized = d.slug.toLowerCase().replace(/-/g, " ");
+      return lower.includes(destNameNormalized) || lower.includes(destSlugNormalized);
+    });
+
+    if (matchedDest) {
+      // Buscar hoteles de ese destino
+      const destHoteles = hoteles.filter(h => h.destination_id === matchedDest.id);
+      let response = `¡${matchedDest.name} es un destino espectacular en el estado ${matchedDest.state || ""}! 🌴\n\n${matchedDest.description || ""}\n\n`;
+      
+      if (destHoteles.length > 0) {
+        response += `En esta zona contamos con excelentes opciones de hospedaje recomendadas:\n`;
+        destHoteles.forEach(h => {
+          response += `👉 [${h.name}](/establecimiento/${h.slug})\n`;
+        });
+        response += `\n`;
+      }
+      
+      response += `🔗 [Ver todos los alojamientos en ${matchedDest.name}](/buscar?destination=${matchedDest.slug})`;
+      return response;
+    }
+
+    // 2. Buscar si menciona algún hotel
+    const matchedHotel = hoteles.find(h => {
+      const hotelNameNormalized = h.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      return lower.includes(hotelNameNormalized);
+    });
+
+    if (matchedHotel) {
+      const dest = destinos.find(d => d.id === matchedHotel.destination_id);
+      let response = `¡Excelente elección! 🏨 **${matchedHotel.name}** es una opción de hospedaje fantástica en nuestro portal.\n\n`;
+      response += `👉 [Ver detalles de ${matchedHotel.name}](/establecimiento/${matchedHotel.slug})\n\n`;
+      
+      if (dest) {
+        response += `También puedes explorar más hospedajes en la zona:\n🔗 [Ver alojamientos en ${dest.name}](/buscar?destination=${dest.slug})`;
+      }
+      return response;
+    }
+  }
+
+  // 3. Intentar buscar en las reglas dinámicas de la base de datos primero
   const mappedUserType = tipo === "turista" ? "tourist" : "business";
   const matchedDbRule = dbRules.find(rule => {
     if (rule.user_type !== mappedUserType) return false;
@@ -58,7 +107,7 @@ function autoReply(text: string, tipo: "turista" | "propietario", dbRules: Chatb
     return matchedDbRule.response;
   }
 
-  // 2. Fallback a las reglas estáticas
+  // 4. Fallback a las reglas estáticas
   const rules = tipo === "turista" ? RULES_TURISTA : RULES_PROPIETARIO;
   for (const rule of rules) {
     if (rule.k.some(k => lower.includes(k))) return rule.r;
@@ -249,25 +298,41 @@ export function ChatWidget() {
 
   /* db chatbot rules state */
   const [dbRules, setDbRules]   = useState<ChatbotRule[]>([]);
+  const [destinos, setDestinos] = useState<any[]>([]);
+  const [hoteles, setHoteles]   = useState<any[]>([]);
 
   useEffect(() => {
-    async function loadRules() {
+    async function loadData() {
       try {
-        const { data, error } = await supabase
+        // Cargar reglas del chatbot
+        const { data: rulesData, error: errRules } = await supabase
           .from("chatbot_rules")
           .select("id, user_type, language, keywords, response");
-        if (error) {
-          console.warn("Could not fetch chatbot rules from Supabase:", error);
-          return;
+        if (!errRules && rulesData) {
+          setDbRules(rulesData as ChatbotRule[]);
         }
-        if (data) {
-          setDbRules(data as ChatbotRule[]);
+
+        // Cargar destinos
+        const { data: destsData, error: errDests } = await supabase
+          .from("destinations")
+          .select("id, name, slug, state, description");
+        if (!errDests && destsData) {
+          setDestinos(destsData);
+        }
+
+        // Cargar hoteles aprobados
+        const { data: hotelsData, error: errHotels } = await supabase
+          .from("establishments")
+          .select("id, name, slug, destination_id, status")
+          .eq("status", "approved");
+        if (!errHotels && hotelsData) {
+          setHoteles(hotelsData);
         }
       } catch (err) {
-        console.warn("Error fetching chatbot rules:", err);
+        console.warn("Error loading chatbot data from Supabase:", err);
       }
     }
-    loadRules();
+    loadData();
   }, []);
 
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -315,7 +380,7 @@ export function ChatWidget() {
     if (leadId) await saveMessage(leadId, txt, "inbound", false);
     setTyping(true);
     setTimeout(async () => {
-      const reply = autoReply(txt, tipo, dbRules);
+      const reply = autoReply(txt, tipo, dbRules, destinos, hoteles);
       setTyping(false);
       setMsgs(p => [...p, { role: "bot", text: reply, ts: ts() }]);
       if (leadId) await saveMessage(leadId, reply, "outbound", true);
