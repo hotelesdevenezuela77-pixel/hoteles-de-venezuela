@@ -84,9 +84,6 @@ async function getClientIp(): Promise<string> {
 /* ── track ───────────────────────────────────────────────── */
 async function createLead(name: string, phone: string, tipo: "turista" | "propietario", source: string): Promise<number | null> {
   try {
-    const clientIp = await getClientIp();
-    const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
     const { data, error } = await supabase
       .from("whatsapp_leads")
       .insert([{
@@ -96,14 +93,13 @@ async function createLead(name: string, phone: string, tipo: "turista" | "propie
         status: "nuevo",
         lead_type: tipo,
         interest: `Widget ${source} · ${window.location.pathname}`,
-        ip_address: clientIp,
-        timezone: userTimeZone
+        channel: source === "whatsapp_widget" ? "whatsapp" : "chat"
       }])
       .select("id")
       .single();
 
     if (error) {
-      console.warn("Supabase query failed for inserting whatsapp_lead, using local storage fallback");
+      console.warn("Supabase query failed for inserting whatsapp_lead, using local storage fallback:", error);
       const localLeadsKey = "hdv_mock_whatsapp_leads";
       const localLeads = JSON.parse(localStorage.getItem(localLeadsKey) || "[]");
       const newId = Date.now();
@@ -115,8 +111,7 @@ async function createLead(name: string, phone: string, tipo: "turista" | "propie
         status: "nuevo",
         lead_type: tipo,
         interest: `Widget ${source} · ${window.location.pathname}`,
-        ip_address: clientIp,
-        timezone: userTimeZone,
+        channel: source === "whatsapp_widget" ? "whatsapp" : "chat",
         created_at: new Date().toISOString()
       };
       localStorage.setItem(localLeadsKey, JSON.stringify([...localLeads, newMockLead]));
@@ -125,8 +120,6 @@ async function createLead(name: string, phone: string, tipo: "turista" | "propie
     return data?.id ?? null;
   } catch (err) {
     console.error("Catch error in createLead:", err);
-    const clientIp = await getClientIp().catch(() => "127.0.0.1");
-    const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const localLeadsKey = "hdv_mock_whatsapp_leads";
     const localLeads = JSON.parse(localStorage.getItem(localLeadsKey) || "[]");
     const newId = Date.now();
@@ -138,8 +131,7 @@ async function createLead(name: string, phone: string, tipo: "turista" | "propie
       status: "nuevo",
       lead_type: tipo,
       interest: `Widget ${source} · ${window.location.pathname}`,
-      ip_address: clientIp,
-      timezone: userTimeZone,
+      channel: source === "whatsapp_widget" ? "whatsapp" : "chat",
       created_at: new Date().toISOString()
     };
     localStorage.setItem(localLeadsKey, JSON.stringify([...localLeads, newMockLead]));

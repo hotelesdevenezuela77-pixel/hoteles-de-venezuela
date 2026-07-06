@@ -45,6 +45,7 @@ export const trackEvent = async (
       device_type: deviceType,
       browser: browser,
       ip_address: clientIp,
+      ip_hash: clientIp,
       extra_data: extraData ? JSON.stringify(extraData) : null
     }]);
   } catch (e) {
@@ -59,9 +60,6 @@ const createWhatsAppLead = async (data: {
   establishment_name?: string;
 }): Promise<boolean> => {
   try {
-    const clientIp = await getClientIp();
-    const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
     const { error } = await supabase
       .from("whatsapp_leads")
       .insert([{
@@ -71,8 +69,7 @@ const createWhatsAppLead = async (data: {
         status: "nuevo",
         lead_type: "turista",
         interest: `Establecimiento: ${data.establishment_name || "Negocio"}`,
-        ip_address: clientIp,
-        timezone: userTimeZone
+        channel: "whatsapp"
       }]);
 
     if (error) throw error;
