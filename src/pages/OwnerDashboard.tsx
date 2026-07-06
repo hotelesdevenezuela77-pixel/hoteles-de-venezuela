@@ -481,7 +481,8 @@ export function OwnerDashboard() {
         category_id: parseInt(formData.category_id),
         destination_id: parseInt(formData.destination_id),
         services: JSON.stringify(formData.services),
-        status: "pending" // Admin approval required
+        status: "pending", // Admin approval required
+        has_reservations_enabled: false // Admin authorization required
       };
 
       const { error } = await supabase.from("establishments").insert([payload]);

@@ -330,6 +330,7 @@ export function AdminEstablecimientoNuevo() {
           .from("establishments")
           .insert({
             ...payload,
+            has_reservations_enabled: false,
             created_at: new Date().toISOString()
           })
           .select("id")

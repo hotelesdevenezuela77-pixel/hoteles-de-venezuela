@@ -112,7 +112,7 @@ export function EstablecimientoDetalle() {
             services: data.services || "[]",
             membership_tier: data.membership_tier || "basic",
             has_hdv_seal: data.has_hdv_seal || false,
-            has_reservations_enabled: true, // Forzado a true para ver el calendario en todas las fichas
+            has_reservations_enabled: data.has_reservations_enabled || false,
             images: allImages,
             latitude: data.latitude,
             longitude: data.longitude,
