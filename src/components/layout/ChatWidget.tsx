@@ -71,7 +71,7 @@ function autoReply(
         response += `\n`;
       }
       
-      response += `🔗 [Ver todos los alojamientos en ${matchedDest.name}](/buscar?destination=${matchedDest.slug})`;
+      response += `🔗 [Ver todos los alojamientos en ${matchedDest.name}](/establecimientos?destination=${matchedDest.slug})`;
       return response;
     }
 
@@ -87,7 +87,7 @@ function autoReply(
       response += `👉 [Ver detalles de ${matchedHotel.name}](/establecimiento/${matchedHotel.slug})\n\n`;
       
       if (dest) {
-        response += `También puedes explorar más hospedajes en la zona:\n🔗 [Ver alojamientos en ${dest.name}](/buscar?destination=${dest.slug})`;
+        response += `También puedes explorar más hospedajes en la zona:\n🔗 [Ver alojamientos en ${dest.name}](/establecimientos?destination=${dest.slug})`;
       }
       return response;
     }
@@ -300,7 +300,10 @@ function renderMessageText(text: string) {
       parts.push(text.substring(lastIndex, matchIndex));
     }
     
-    const fullUrl = url.startsWith("/") ? `https://hotelesdevenezuela.com${url}` : url;
+    let fullUrl = url.startsWith("/") ? `https://hotelesdevenezuela.com${url}` : url;
+    if (fullUrl.includes("/buscar?")) {
+      fullUrl = fullUrl.replace("/buscar?", "/establecimientos?");
+    }
     
     parts.push(
       <a key={matchIndex} href={fullUrl} target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-300 hover:underline font-extrabold transition-all" style={{ textDecoration: "underline" }}>
@@ -464,16 +467,16 @@ export function ChatWidget() {
           {panel !== "wa" && (
             <>
               <span className="absolute w-12 h-12 rounded-full animate-ping opacity-40"
-                style={{ background: "#00C8D4", animationDuration: "2s", animationDelay: "0.3s" }} />
+                style={{ background: "#25D366", animationDuration: "2s", animationDelay: "0.3s" }} />
               <span className="absolute w-12 h-12 rounded-full animate-ping opacity-20"
-                style={{ background: "#00C8D4", animationDuration: "2s", animationDelay: "0.9s" }} />
+                style={{ background: "#25D366", animationDuration: "2s", animationDelay: "0.9s" }} />
             </>
           )}
           <button
             onClick={() => panel === "wa" ? setPanel(null) : open("wa")}
             title="WhatsApp"
             className="relative w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95 cursor-pointer"
-            style={{ background: panel === "wa" ? "#00A8B5" : "linear-gradient(135deg, #00C8D4, #009BA5)" }}>
+            style={{ background: panel === "wa" ? "#128C7E" : "#25D366" }}>
             <WaIcon />
           </button>
         </div>
@@ -500,7 +503,7 @@ export function ChatWidget() {
 
       {/* ── WhatsApp panel ── */}
       {panel === "wa" && (
-        <FloatPanel title="WhatsApp" subtitle="Responde en minutos" onClose={() => setPanel(null)} accent="#00C8D4">
+        <FloatPanel title="WhatsApp" subtitle="Responde en minutos" onClose={() => setPanel(null)} accent="#25D366">
           {step === "form" ? (
             <PreForm
               target="wa"
@@ -522,7 +525,7 @@ export function ChatWidget() {
               <p className="text-xs text-gray-500">Se abrió WhatsApp con un mensaje personalizado. Si no se abrió automáticamente:</p>
               <button onClick={continueWa}
                 className="w-full py-3.5 rounded-xl text-white text-xs font-bold flex items-center justify-center gap-2 cursor-pointer active:scale-98"
-                style={{ background: "linear-gradient(135deg, #00C8D4, #009BA5)" }}>
+                style={{ background: "#25D366" }}>
                 <WaIcon /> Abrir WhatsApp de nuevo
               </button>
               <button onClick={() => { setStep("form"); setWaDone(false); }}
@@ -592,7 +595,7 @@ export function ChatWidget() {
                 </div>
                 <button onClick={continueWa}
                   className="w-full py-2.5 rounded-xl text-white text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer active:scale-98"
-                  style={{ background: "linear-gradient(135deg, #00C8D4, #009BA5)" }}>
+                  style={{ background: "#25D366" }}>
                   <WaIcon size={14} /> Continuar por WhatsApp
                 </button>
               </div>
@@ -679,7 +682,7 @@ function PreForm({ target, name, setName, phone, setPhone, tipo, setTipo, submit
 
       <button onClick={() => submitForm(target)} disabled={!isFormValid}
         className="w-full py-3.5 rounded-xl text-white text-xs font-bold flex items-center justify-center gap-2 disabled:opacity-40 transition-opacity cursor-pointer active:scale-98"
-        style={{ background: target === "wa" ? "linear-gradient(135deg, #00C8D4, #009BA5)" : "linear-gradient(90deg, #FF0096, #9B00CC)" }}>
+        style={{ background: target === "wa" ? "#25D366" : "linear-gradient(90deg, #FF0096, #9B00CC)" }}>
         {target === "wa"
           ? (<><WaIcon /> Abrir WhatsApp →</>)
           : "Iniciar chat →"}
