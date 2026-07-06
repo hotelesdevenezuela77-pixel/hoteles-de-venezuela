@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Send, Phone, User, ChevronDown, MessageCircle } from "lucide-react";
+import { X, Send, Phone, User, ChevronDown, MessageCircle, Compass, Building2, Bot } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 /* ── config ─────────────────────────────────────────────── */
@@ -268,6 +268,56 @@ async function trackEvent(eventType: string, name: string, phone: string, tipo: 
   }
 }
 
+function renderMessageText(text: string) {
+  const mdLinkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  
+  if (!text.includes("[") || !text.includes("](")) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    return parts.map((part, index) => {
+      if (urlRegex.test(part)) {
+        return (
+          <a key={index} href={part} target="_blank" rel="noopener noreferrer" className="text-pink-500 hover:underline font-bold break-all">
+            {part}
+          </a>
+        );
+      }
+      return part;
+    });
+  }
+  
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+  
+  mdLinkRegex.lastIndex = 0;
+  
+  while ((match = mdLinkRegex.exec(text)) !== null) {
+    const [fullMatch, linkText, url] = match;
+    const matchIndex = match.index;
+    
+    if (matchIndex > lastIndex) {
+      parts.push(text.substring(lastIndex, matchIndex));
+    }
+    
+    const fullUrl = url.startsWith("/") ? `https://hotelesdevenezuela.com${url}` : url;
+    
+    parts.push(
+      <a key={matchIndex} href={fullUrl} target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-300 hover:underline font-extrabold transition-all" style={{ textDecoration: "underline" }}>
+        {linkText}
+      </a>
+    );
+    
+    lastIndex = mdLinkRegex.lastIndex;
+  }
+  
+  if (lastIndex < text.length) {
+    parts.push(text.substring(lastIndex));
+  }
+  
+  return parts;
+}
+
 /* ── types ───────────────────────────────────────────────── */
 interface Msg { role: "bot" | "user"; text: string; ts: string }
 type Tipo = "turista" | "propietario";
@@ -414,16 +464,16 @@ export function ChatWidget() {
           {panel !== "wa" && (
             <>
               <span className="absolute w-12 h-12 rounded-full animate-ping opacity-40"
-                style={{ background: "#25D366", animationDuration: "2s", animationDelay: "0.3s" }} />
+                style={{ background: "#00C8D4", animationDuration: "2s", animationDelay: "0.3s" }} />
               <span className="absolute w-12 h-12 rounded-full animate-ping opacity-20"
-                style={{ background: "#25D366", animationDuration: "2s", animationDelay: "0.9s" }} />
+                style={{ background: "#00C8D4", animationDuration: "2s", animationDelay: "0.9s" }} />
             </>
           )}
           <button
             onClick={() => panel === "wa" ? setPanel(null) : open("wa")}
             title="WhatsApp"
             className="relative w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95 cursor-pointer"
-            style={{ background: panel === "wa" ? "#128C7E" : "#25D366" }}>
+            style={{ background: panel === "wa" ? "#00A8B5" : "linear-gradient(135deg, #00C8D4, #009BA5)" }}>
             <WaIcon />
           </button>
         </div>
@@ -442,7 +492,7 @@ export function ChatWidget() {
             onClick={() => panel === "chat" ? setPanel(null) : open("chat")}
             title="Chat"
             className="relative w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition-all hover:scale-110 active:scale-95 cursor-pointer"
-            style={{ background: panel === "chat" ? "#7C3AED" : "linear-gradient(135deg, #FF0096, #9B00CC)" }}>
+            style={{ background: "linear-gradient(135deg, #FF0096, #9B00CC)" }}>
             {panel === "chat" ? <ChevronDown className="w-7 h-7 text-white" /> : <MessageCircle className="w-7 h-7 text-white" />}
           </button>
         </div>
@@ -450,7 +500,7 @@ export function ChatWidget() {
 
       {/* ── WhatsApp panel ── */}
       {panel === "wa" && (
-        <FloatPanel title="WhatsApp" subtitle="Responde en minutos" onClose={() => setPanel(null)} accent="#25D366">
+        <FloatPanel title="WhatsApp" subtitle="Responde en minutos" onClose={() => setPanel(null)} accent="#00C8D4">
           {step === "form" ? (
             <PreForm
               target="wa"
@@ -472,7 +522,7 @@ export function ChatWidget() {
               <p className="text-xs text-gray-500">Se abrió WhatsApp con un mensaje personalizado. Si no se abrió automáticamente:</p>
               <button onClick={continueWa}
                 className="w-full py-3.5 rounded-xl text-white text-xs font-bold flex items-center justify-center gap-2 cursor-pointer active:scale-98"
-                style={{ background: "#25D366" }}>
+                style={{ background: "linear-gradient(135deg, #00C8D4, #009BA5)" }}>
                 <WaIcon /> Abrir WhatsApp de nuevo
               </button>
               <button onClick={() => { setStep("form"); setWaDone(false); }}
@@ -487,7 +537,7 @@ export function ChatWidget() {
       {/* ── Chat panel ── */}
       {panel === "chat" && (
         <FloatPanel title={`Chat HDV${name ? ` · ${name.split(" ")[0]}` : ""}`}
-          subtitle={name ? `${tipo === "turista" ? "🌴 Turista" : "🏨 Propietario"} · En línea` : "Asistente virtual"}
+          subtitle={name ? `${tipo === "turista" ? "Turista" : "Propietario"} · En línea` : "Asistente virtual"}
           onClose={() => setPanel(null)} accent="#FF0096">
           {step === "form" ? (
             <PreForm
@@ -510,7 +560,7 @@ export function ChatWidget() {
                     <div className={`max-w-[82%] rounded-2xl px-3.5 py-2.5 text-xs whitespace-pre-line leading-relaxed text-left ${
                       m.role === "user" ? "text-white rounded-br-sm shadow-xs" : "bg-white text-gray-700 rounded-bl-sm shadow-xs border border-slate-100"
                     }`} style={m.role === "user" ? { background: "linear-gradient(135deg, #FF0096, #9B00CC)" } : {}}>
-                      {m.text}
+                      {renderMessageText(m.text)}
                       <div className={`text-[9px] mt-1 ${m.role === "user" ? "text-white/60 text-right" : "text-gray-400"}`}>{m.ts}</div>
                     </div>
                   </div>
@@ -542,7 +592,7 @@ export function ChatWidget() {
                 </div>
                 <button onClick={continueWa}
                   className="w-full py-2.5 rounded-xl text-white text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer active:scale-98"
-                  style={{ background: "#25D366" }}>
+                  style={{ background: "linear-gradient(135deg, #00C8D4, #009BA5)" }}>
                   <WaIcon size={14} /> Continuar por WhatsApp
                 </button>
               </div>
@@ -581,10 +631,26 @@ function PreForm({ target, name, setName, phone, setPhone, tipo, setTipo, submit
         <div className="grid grid-cols-2 gap-2">
           {(["turista", "propietario"] as ("turista" | "propietario")[]).map(t => (
             <button key={t} onClick={() => setTipo(t)}
-              className={`py-3 rounded-xl border-2 text-sm font-bold transition-all flex flex-col items-center gap-1 cursor-pointer ${
-                tipo === t ? "border-pink-500 bg-pink-50 text-pink-700" : "border-gray-200 text-gray-500 hover:border-gray-300"
+              className={`py-3 rounded-xl border-2 text-xs font-bold transition-all flex flex-col items-center gap-2 cursor-pointer ${
+                tipo === t 
+                  ? t === "turista" 
+                    ? "border-[#00C8D4] bg-cyan-50 text-[#00C8D4]" 
+                    : "border-[#FF0096] bg-pink-50 text-[#FF0096]" 
+                  : "border-gray-200 text-gray-550 hover:border-gray-300"
               }`}>
-              <span className="text-lg">{t === "turista" ? "🌴" : "🏨"}</span>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                tipo === t 
+                  ? t === "turista" 
+                    ? "bg-[#00C8D4] text-white" 
+                    : "bg-[#FF0096] text-white" 
+                  : "bg-gray-50 text-gray-400"
+              }`}>
+                {t === "turista" ? (
+                  <Compass className="w-4 h-4 shrink-0" />
+                ) : (
+                  <Building2 className="w-4 h-4 shrink-0" />
+                )}
+              </div>
               <span className="capitalize">{t}</span>
             </button>
           ))}
@@ -613,7 +679,7 @@ function PreForm({ target, name, setName, phone, setPhone, tipo, setTipo, submit
 
       <button onClick={() => submitForm(target)} disabled={!isFormValid}
         className="w-full py-3.5 rounded-xl text-white text-xs font-bold flex items-center justify-center gap-2 disabled:opacity-40 transition-opacity cursor-pointer active:scale-98"
-        style={{ background: target === "wa" ? "#25D366" : "linear-gradient(90deg, #FF0096, #9B00CC)" }}>
+        style={{ background: target === "wa" ? "linear-gradient(135deg, #00C8D4, #009BA5)" : "linear-gradient(90deg, #FF0096, #9B00CC)" }}>
         {target === "wa"
           ? (<><WaIcon /> Abrir WhatsApp →</>)
           : "Iniciar chat →"}
