@@ -384,38 +384,65 @@ export function Home() {
   );
 
   const getCategorizedItems = (dbItems: Establishment[], categorySlug: string) => {
-    const combined = [...dbItems];
-    // Sort db items by homepage_priority ascending
-    combined.sort((a, b) => {
-      const pA = a.homepage_priority ?? 999;
-      const pB = b.homepage_priority ?? 999;
-      return pA - pB;
+    // Create an array of 6 slots
+    const slots = new Array<Establishment | null>(6).fill(null);
+
+    // Place DB items in their exact slot (positions 1-6 map to indices 0-5)
+    dbItems.forEach(item => {
+      const pos = item.homepage_priority;
+      if (pos !== null && pos >= 1 && pos <= 6) {
+        slots[pos - 1] = item;
+      }
     });
+
+    // Get mock items for this category
     const mockItems = ESTABLISHMENTS_MOCK.filter(e => e.category_slug === categorySlug);
-    for (const mock of mockItems) {
-      if (combined.length >= 6) break;
-      if (!combined.some(item => item.slug === mock.slug || item.id === mock.id)) {
-        combined.push(mock);
+    
+    // Separate mock items into featured and normal
+    const mockFeatured = mockItems.filter(e => e.is_featured);
+    const mockNormal = mockItems.filter(e => !e.is_featured);
+
+    let mfIdx = 0;
+    let mnIdx = 0;
+
+    // Fill remaining slots
+    for (let i = 0; i < 6; i++) {
+      if (slots[i] === null) {
+        const isFeaturedSlot = (i % 2 === 0); // Slot 1 (i=0), 3 (i=2), 5 (i=4) are featured
+        if (isFeaturedSlot) {
+          while (mfIdx < mockFeatured.length && slots.some(s => s && (s.slug === mockFeatured[mfIdx].slug || s.id === mockFeatured[mfIdx].id))) {
+            mfIdx++;
+          }
+          if (mfIdx < mockFeatured.length) {
+            slots[i] = mockFeatured[mfIdx++];
+          } else {
+            while (mnIdx < mockNormal.length && slots.some(s => s && (s.slug === mockNormal[mnIdx].slug || s.id === mockNormal[mnIdx].id))) {
+              mnIdx++;
+            }
+            if (mnIdx < mockNormal.length) slots[i] = mockNormal[mnIdx++];
+          }
+        } else {
+          while (mnIdx < mockNormal.length && slots.some(s => s && (s.slug === mockNormal[mnIdx].slug || s.id === mockNormal[mnIdx].id))) {
+            mnIdx++;
+          }
+          if (mnIdx < mockNormal.length) {
+            slots[i] = mockNormal[mnIdx++];
+          } else {
+            while (mfIdx < mockFeatured.length && slots.some(s => s && (s.slug === mockFeatured[mfIdx].slug || s.id === mockFeatured[mfIdx].id))) {
+              mfIdx++;
+            }
+            if (mfIdx < mockFeatured.length) slots[i] = mockFeatured[mfIdx++];
+          }
+        }
       }
     }
-    return combined.slice(0, 6);
+
+    return slots.filter((item): item is Establishment => item !== null);
   };
 
-  const interleaveItems = (items: Establishment[]): Establishment[] => {
-    const featured = items.filter(item => item.is_featured);
-    const normal = items.filter(item => !item.is_featured);
-    const result: Establishment[] = [];
-    const maxLength = Math.max(featured.length, normal.length);
-    for (let i = 0; i < maxLength; i++) {
-      if (i < featured.length) result.push(featured[i]);
-      if (i < normal.length) result.push(normal[i]);
-    }
-    return result;
-  };
-
-  const hotels = interleaveItems(getCategorizedItems(dbHoteles, "hoteles"));
-  const posadas = interleaveItems(getCategorizedItems(dbPosadas, "posadas"));
-  const complexes = interleaveItems(getCategorizedItems(dbComplexes, "complejos"));
+  const hotels = getCategorizedItems(dbHoteles, "hoteles");
+  const posadas = getCategorizedItems(dbPosadas, "posadas");
+  const complexes = getCategorizedItems(dbComplexes, "complejos");
 
   const featuredDestinations = (destinations.length > 0 ? destinations : DEFAULT_DESTINOS_MOCK)
     .filter(d => d.is_featured !== false)

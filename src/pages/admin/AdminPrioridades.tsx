@@ -78,28 +78,23 @@ export function AdminPrioridades() {
     }
   });
 
-  // Mutation to patch homepage priority toggle
-  const patchPriority = useMutation({
-    mutationFn: async ({ id, homepagePriority }: { id: number; homepagePriority: number | null }) => {
+  // Mutation to patch homepage position and featured status
+  const patchPosition = useMutation({
+    mutationFn: async ({ 
+      id, 
+      homepagePriority, 
+      isFeatured 
+    }: { 
+      id: number; 
+      homepagePriority: number | null; 
+      isFeatured: boolean; 
+    }) => {
       const { error } = await supabase
         .from("establishments")
-        .update({ homepage_priority: homepagePriority })
-        .eq("id", id);
-
-      if (error) throw error;
-      return { success: true };
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["admin-establishments-all"] });
-    }
-  });
-
-  // Mutation to patch featured status
-  const patchFeatured = useMutation({
-    mutationFn: async ({ id, isFeatured }: { id: number; isFeatured: boolean }) => {
-      const { error } = await supabase
-        .from("establishments")
-        .update({ is_featured: isFeatured })
+        .update({ 
+          homepage_priority: homepagePriority,
+          is_featured: isFeatured
+        })
         .eq("id", id);
 
       if (error) throw error;
@@ -222,24 +217,29 @@ export function AdminPrioridades() {
                     >
                       <td className="px-6 py-4 text-center">
                         {item.categorySlug === 'hoteles' ? (
-                          <button
-                            onClick={() => patchPriority.mutate({ 
-                              id: item.id, 
-                              homepagePriority: item.homepagePriority !== null ? null : 1 
+                          <div className="flex justify-center gap-1">
+                            {[2, 4, 6].map(num => {
+                              const active = item.homepagePriority === num && !item.isFeatured;
+                              return (
+                                <button
+                                  key={num}
+                                  onClick={() => patchPosition.mutate({
+                                    id: item.id,
+                                    homepagePriority: active ? null : num,
+                                    isFeatured: false
+                                  })}
+                                  className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black transition-all cursor-pointer ${
+                                    active 
+                                      ? "bg-emerald-500 text-white shadow-md shadow-emerald-100 hover:bg-emerald-600" 
+                                      : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                                  }`}
+                                  title={`Posición ${num} (Normal)`}
+                                >
+                                  {num}
+                                </button>
+                              );
                             })}
-                            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer mx-auto ${
-                              item.homepagePriority !== null 
-                                ? "bg-emerald-500 text-white shadow-md shadow-emerald-100 hover:bg-emerald-600" 
-                                : "bg-slate-100 text-slate-400 hover:bg-slate-200"
-                            }`}
-                            title={item.homepagePriority !== null ? "Quitar de Hospedajes Élite" : "Destacar en Hospedajes Élite"}
-                          >
-                            {item.homepagePriority !== null ? (
-                              <Check className="w-4 h-4" />
-                            ) : (
-                              <Plus className="w-4 h-4" />
-                            )}
-                          </button>
+                          </div>
                         ) : (
                           <span className="text-slate-300 text-xs font-semibold">-</span>
                         )}
@@ -261,68 +261,86 @@ export function AdminPrioridades() {
                       <td className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">{item.categoryName || "-"}</td>
                       <td className="px-6 py-4 text-center">
                         {item.categorySlug === 'posadas' ? (
-                          <button
-                            onClick={() => patchPriority.mutate({ 
-                              id: item.id, 
-                              homepagePriority: item.homepagePriority !== null ? null : 1 
+                          <div className="flex justify-center gap-1">
+                            {[2, 4, 6].map(num => {
+                              const active = item.homepagePriority === num && !item.isFeatured;
+                              return (
+                                <button
+                                  key={num}
+                                  onClick={() => patchPosition.mutate({
+                                    id: item.id,
+                                    homepagePriority: active ? null : num,
+                                    isFeatured: false
+                                  })}
+                                  className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black transition-all cursor-pointer ${
+                                    active 
+                                      ? "bg-emerald-500 text-white shadow-md shadow-emerald-100 hover:bg-emerald-600" 
+                                      : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                                  }`}
+                                  title={`Posición ${num} (Normal)`}
+                                >
+                                  {num}
+                                </button>
+                              );
                             })}
-                            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer mx-auto ${
-                              item.homepagePriority !== null 
-                                ? "bg-emerald-500 text-white shadow-md shadow-emerald-100 hover:bg-emerald-600" 
-                                : "bg-slate-100 text-slate-400 hover:bg-slate-200"
-                            }`}
-                            title={item.homepagePriority !== null ? "Quitar de Boutique & Encanto" : "Destacar en Boutique & Encanto"}
-                          >
-                            {item.homepagePriority !== null ? (
-                              <Check className="w-4 h-4" />
-                            ) : (
-                              <Plus className="w-4 h-4" />
-                            )}
-                          </button>
+                          </div>
                         ) : (
                           <span className="text-slate-300 text-xs font-semibold">-</span>
                         )}
                       </td>
                       <td className="px-6 py-4 text-center">
                         {(item.categorySlug !== 'hoteles' && item.categorySlug !== 'posadas') ? (
-                          <button
-                            onClick={() => patchPriority.mutate({ 
-                              id: item.id, 
-                              homepagePriority: item.homepagePriority !== null ? null : 1 
+                          <div className="flex justify-center gap-1">
+                            {[2, 4, 6].map(num => {
+                              const active = item.homepagePriority === num && !item.isFeatured;
+                              return (
+                                <button
+                                  key={num}
+                                  onClick={() => patchPosition.mutate({
+                                    id: item.id,
+                                    homepagePriority: active ? null : num,
+                                    isFeatured: false
+                                  })}
+                                  className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black transition-all cursor-pointer ${
+                                    active 
+                                      ? "bg-emerald-500 text-white shadow-md shadow-emerald-100 hover:bg-emerald-600" 
+                                      : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                                  }`}
+                                  title={`Posición ${num} (Normal)`}
+                                >
+                                  {num}
+                                </button>
+                              );
                             })}
-                            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer mx-auto ${
-                              item.homepagePriority !== null 
-                                ? "bg-emerald-500 text-white shadow-md shadow-emerald-100 hover:bg-emerald-600" 
-                                : "bg-slate-100 text-slate-400 hover:bg-slate-200"
-                            }`}
-                            title={item.homepagePriority !== null ? "Quitar de Resorts & Complejos" : "Destacar en Resorts & Complejos"}
-                          >
-                            {item.homepagePriority !== null ? (
-                              <Check className="w-4 h-4" />
-                            ) : (
-                              <Plus className="w-4 h-4" />
-                            )}
-                          </button>
+                          </div>
                         ) : (
                           <span className="text-slate-300 text-xs font-semibold">-</span>
                         )}
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <button
-                          onClick={() => patchFeatured.mutate({
-                            id: item.id,
-                            isFeatured: !item.isFeatured
+                        <div className="flex justify-center gap-1">
+                          {[1, 3, 5].map(num => {
+                            const active = item.homepagePriority === num && item.isFeatured;
+                            return (
+                              <button
+                                key={num}
+                                onClick={() => patchPosition.mutate({
+                                  id: item.id,
+                                  homepagePriority: active ? null : num,
+                                  isFeatured: !active
+                                })}
+                                className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black transition-all cursor-pointer ${
+                                  active 
+                                    ? "bg-[#FF0096] text-white shadow-md shadow-pink-100 hover:bg-[#e00084]" 
+                                    : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                                }`}
+                                title={`Posición ${num} (Destacada)`}
+                              >
+                                {num}
+                              </button>
+                            );
                           })}
-                          className={`inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full cursor-pointer transition-all duration-200 shadow-sm ${
-                            item.isFeatured 
-                              ? "bg-[#FF0096] text-white hover:bg-[#e00084] border border-[#FF0096]" 
-                              : "bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200"
-                          }`}
-                          title={item.isFeatured ? "Quitar de Fichas Destacadas" : "Hacer Ficha Destacada"}
-                        >
-                          <Star className={`w-3 h-3 ${item.isFeatured ? "fill-white text-white" : "text-slate-400"}`} />
-                          <span>{item.isFeatured ? "Destacado" : "Normal"}</span>
-                        </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
