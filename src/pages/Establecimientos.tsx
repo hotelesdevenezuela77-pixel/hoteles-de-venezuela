@@ -132,7 +132,8 @@ export function Establecimientos() {
             categories (name, slug),
             destinations (name, slug),
             establishment_images (image_url, is_primary)
-          `);
+          `)
+          .eq("status", "approved");
 
         if (error) throw error;
 

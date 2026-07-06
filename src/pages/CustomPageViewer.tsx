@@ -168,7 +168,8 @@ export function CustomPageViewer() {
             destinations (name, slug),
             establishment_images (image_url, is_primary)
           `)
-          .in("id", ids);
+          .in("id", ids)
+          .eq("status", "approved");
 
         if (error) throw error;
 

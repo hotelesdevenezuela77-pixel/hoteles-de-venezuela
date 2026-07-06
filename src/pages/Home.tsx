@@ -283,7 +283,7 @@ export function Home() {
             categories (name, slug),
             destinations (name, slug),
             establishment_images (image_url, is_primary)
-          `),
+          `).eq("status", "approved"),
           supabase.from("destinations").select("id, name, slug, state, image_url, description, is_featured, status"),
           supabase.from("site_sections").select("*").order("id"),
           supabase.from("blog_posts").select("id, title, slug, excerpt, featured_image, published_at, reading_time").order("published_at", { ascending: false }).limit(3),

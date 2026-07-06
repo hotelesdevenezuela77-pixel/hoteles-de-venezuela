@@ -74,6 +74,7 @@ export function EstablecimientoDetalle() {
             establishment_images (image_url, is_primary)
           `)
           .eq("slug", slug)
+          .eq("status", "approved")
           .maybeSingle();
 
         if (error) throw error;

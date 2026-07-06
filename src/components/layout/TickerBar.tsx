@@ -31,6 +31,7 @@ export function TickerBar() {
         const { data, error } = await supabase
           .from("establishments")
           .select("id, name, rating_avg")
+          .eq("status", "approved")
           .gt("rating_avg", 0)
           .order("rating_avg", { ascending: false })
           .limit(40);

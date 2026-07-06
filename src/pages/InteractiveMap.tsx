@@ -170,6 +170,7 @@ export function InteractiveMap() {
               destinations (name, slug, state, latitude, longitude),
               establishment_images (image_url, is_primary)
             `)
+            .eq("status", "approved")
         ]);
 
         if (catsRes.data && catsRes.data.length > 0) setCategories(catsRes.data);
