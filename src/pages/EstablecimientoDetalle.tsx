@@ -123,48 +123,11 @@ export function EstablecimientoDetalle() {
           setEstablishment(mapped);
           document.title = `${mapped.name} | Hoteles de Venezuela`;
         } else {
-          // Fallback to Mock
-          const mockMatch = ESTABLISHMENTS_MOCK.find(e => e.slug === slug);
-          if (mockMatch) {
-            setEstablishment({
-              ...mockMatch,
-              category_name: mockMatch.category_name || "Establecimiento",
-              category_slug: mockMatch.category_slug || "",
-              destination_name: mockMatch.destination_name || "",
-              destination_slug: mockMatch.destination_slug || "",
-              primary_image: mockMatch.primary_image || "",
-              city: "",
-              state: "",
-              email: "",
-              images: [mockMatch.primary_image || ""],
-              has_reservations_enabled: true // Habilitado para ver el calendario en mock
-            });
-            document.title = `${mockMatch.name} | Hoteles de Venezuela (Mock)`;
-          } else {
-            setError(true);
-          }
-        }
-      } catch (err) {
-        console.warn("Error al cargar detalles de Supabase, usando mocks:", err);
-        const mockMatch = ESTABLISHMENTS_MOCK.find(e => e.slug === slug);
-        if (mockMatch) {
-          setEstablishment({
-            ...mockMatch,
-            category_name: mockMatch.category_name || "Establecimiento",
-            category_slug: mockMatch.category_slug || "",
-            destination_name: mockMatch.destination_name || "",
-            destination_slug: mockMatch.destination_slug || "",
-            primary_image: mockMatch.primary_image || "",
-            city: "",
-            state: "",
-            email: "",
-            images: [mockMatch.primary_image || ""],
-            has_reservations_enabled: true
-          });
-          document.title = `${mockMatch.name} | Hoteles de Venezuela (Mock)`;
-        } else {
           setError(true);
         }
+      } catch (err) {
+        console.error("Error al cargar detalles de Supabase:", err);
+        setError(true);
       } finally {
         setLoading(false);
       }

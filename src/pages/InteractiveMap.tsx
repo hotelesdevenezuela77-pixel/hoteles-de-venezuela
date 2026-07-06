@@ -129,13 +129,7 @@ const createMarkerIcon = (color: string) => {
 };
 
 export function InteractiveMap() {
-  const [establishments, setEstablishments] = useState<Establishment[]>(() => {
-    return ESTABLISHMENTS_MOCK.map((m: any) => ({
-      ...m,
-      latitude: m.latitude !== undefined ? m.latitude : null,
-      longitude: m.longitude !== undefined ? m.longitude : null
-    })) as Establishment[];
-  });
+  const [establishments, setEstablishments] = useState<Establishment[]>([]);
   const [categories, setCategories] = useState<CategoryFilterOption[]>([]);
   const [destinations, setDestinations] = useState<DestinationFilterOption[]>([]);
   const [loading, setLoading] = useState(false);
@@ -176,7 +170,7 @@ export function InteractiveMap() {
         if (catsRes.data && catsRes.data.length > 0) setCategories(catsRes.data);
         if (destsRes.data && destsRes.data.length > 0) setDestinations(destsRes.data);
 
-        if (estsRes.data && estsRes.data.length > 0) {
+        if (estsRes.data) {
           const mapped: Establishment[] = estsRes.data.map((item: any) => {
             const primaryImg = item.establishment_images?.find((img: any) => img.is_primary)?.image_url 
               || item.establishment_images?.[0]?.image_url 

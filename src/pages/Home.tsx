@@ -200,7 +200,7 @@ export function Home() {
     setIsLocationDropdownOpen(false);
   };
 
-  const [establishments, setEstablishments] = useState<Establishment[]>(ESTABLISHMENTS_MOCK);
+  const [establishments, setEstablishments] = useState<Establishment[]>([]);
   const [destinations, setDestinations] = useState<Destination[]>(DEFAULT_DESTINOS_MOCK);
   const [comparedIds, setComparedIds] = useState<number[]>([]);
 
@@ -291,7 +291,7 @@ export function Home() {
           supabase.from("categories").select("id, name, slug").order("name")
         ]);
 
-        if (estRes.data && estRes.data.length > 0) {
+        if (estRes.data) {
           const mapped: Establishment[] = estRes.data.map((item: any) => {
             const primaryImg = item.establishment_images?.find((img: any) => img.is_primary)?.image_url 
               || item.establishment_images?.[0]?.image_url 
@@ -394,48 +394,6 @@ export function Home() {
         slots[pos - 1] = item;
       }
     });
-
-    // Get mock items for this category
-    const mockItems = ESTABLISHMENTS_MOCK.filter(e => e.category_slug === categorySlug);
-    
-    // Separate mock items into featured and normal
-    const mockFeatured = mockItems.filter(e => e.is_featured);
-    const mockNormal = mockItems.filter(e => !e.is_featured);
-
-    let mfIdx = 0;
-    let mnIdx = 0;
-
-    // Fill remaining slots
-    for (let i = 0; i < 6; i++) {
-      if (slots[i] === null) {
-        const isFeaturedSlot = (i % 2 === 0); // Slot 1 (i=0), 3 (i=2), 5 (i=4) are featured
-        if (isFeaturedSlot) {
-          while (mfIdx < mockFeatured.length && slots.some(s => s && (s.slug === mockFeatured[mfIdx].slug || s.id === mockFeatured[mfIdx].id))) {
-            mfIdx++;
-          }
-          if (mfIdx < mockFeatured.length) {
-            slots[i] = mockFeatured[mfIdx++];
-          } else {
-            while (mnIdx < mockNormal.length && slots.some(s => s && (s.slug === mockNormal[mnIdx].slug || s.id === mockNormal[mnIdx].id))) {
-              mnIdx++;
-            }
-            if (mnIdx < mockNormal.length) slots[i] = mockNormal[mnIdx++];
-          }
-        } else {
-          while (mnIdx < mockNormal.length && slots.some(s => s && (s.slug === mockNormal[mnIdx].slug || s.id === mockNormal[mnIdx].id))) {
-            mnIdx++;
-          }
-          if (mnIdx < mockNormal.length) {
-            slots[i] = mockNormal[mnIdx++];
-          } else {
-            while (mfIdx < mockFeatured.length && slots.some(s => s && (s.slug === mockFeatured[mfIdx].slug || s.id === mockFeatured[mfIdx].id))) {
-              mfIdx++;
-            }
-            if (mfIdx < mockFeatured.length) slots[i] = mockFeatured[mfIdx++];
-          }
-        }
-      }
-    }
 
     return slots.filter((item): item is Establishment => item !== null);
   };

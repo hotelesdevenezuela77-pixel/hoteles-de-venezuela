@@ -204,19 +204,10 @@ export function CustomPageViewer() {
           });
         }
 
-        // Supplement with mock database items if offline or mock IDs used
-        const mockMatches = ESTABLISHMENTS_MOCK.filter(e => ids.includes(String(e.id)));
-        const combined = [...mapped];
-        for (const mock of mockMatches) {
-          if (!combined.some(c => c.id === mock.id)) {
-            combined.push(mock);
-          }
-        }
-        setRelatedEsts(combined);
+        setRelatedEsts(mapped);
       } catch (err) {
-        console.warn("Failed to load establishments from Supabase, resolving from mock:", err);
-        const mockMatches = ESTABLISHMENTS_MOCK.filter(e => ids.includes(String(e.id)));
-        setRelatedEsts(mockMatches);
+        console.warn("Failed to load establishments from Supabase:", err);
+        setRelatedEsts([]);
       }
     }
 

@@ -216,19 +216,10 @@ export function SitioDetalle() {
           });
         }
 
-        // Fallback mock items
-        const mockMatches = ESTABLISHMENTS_MOCK.filter(e => e.destination_name.toLowerCase().includes(destinationName.toLowerCase()) || String(e.destination_slug) === "morrocoy");
-        const combined = [...mapped];
-        mockMatches.slice(0, 3).forEach(mock => {
-          if (!combined.some(c => c.id === mock.id)) {
-            combined.push(mock);
-          }
-        });
-        setRelatedEsts(combined.slice(0, 3));
+        setRelatedEsts(mapped.slice(0, 3));
       } catch (err) {
         console.warn("Error fetching related establishments:", err);
-        const mockMatches = ESTABLISHMENTS_MOCK.filter(e => e.destination_name.toLowerCase().includes(destinationName.toLowerCase()));
-        setRelatedEsts(mockMatches.slice(0, 3));
+        setRelatedEsts([]);
       }
     }
 

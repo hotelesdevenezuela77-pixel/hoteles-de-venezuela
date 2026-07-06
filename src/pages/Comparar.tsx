@@ -29,44 +29,7 @@ interface ComparedEstablishment {
 }
 
 export function Comparar() {
-  const [comparedHotels, setComparedHotels] = useState<ComparedEstablishment[]>(() => {
-    const stored = localStorage.getItem("hdv_compare_list");
-    if (!stored) return [];
-    try {
-      const compareIds: number[] = JSON.parse(stored);
-      return ESTABLISHMENTS_MOCK.filter(e => compareIds.includes(e.id)).map(m => {
-        let servicesArray: string[] = [];
-        try {
-          const parsed = JSON.parse(m.services);
-          servicesArray = Array.isArray(parsed) ? parsed : [];
-        } catch {
-          servicesArray = m.services ? m.services.split(",").map((s: string) => s.trim().toLowerCase()) : [];
-        }
-        return {
-          id: m.id,
-          slug: m.slug,
-          name: m.name,
-          description: m.description || "",
-          address: m.address || "",
-          phone: m.phone || "",
-          whatsapp: m.whatsapp || "",
-          website: m.website || "",
-          category_name: m.category_name || "Establecimiento",
-          destination_name: m.destination_name || "Venezuela",
-          primary_image: m.primary_image,
-          rating_avg: m.rating_avg || 0,
-          review_count: m.review_count || 0,
-          price_level: m.price_level || "",
-          is_featured: m.is_featured || false,
-          services: servicesArray,
-          membership_tier: m.membership_tier || "basic",
-          has_hdv_seal: m.has_hdv_seal || false
-        };
-      }) as ComparedEstablishment[];
-    } catch {
-      return [];
-    }
-  });
+  const [comparedHotels, setComparedHotels] = useState<ComparedEstablishment[]>([]);
   const [loading, setLoading] = useState(false);
 
   const loadComparedHotels = async () => {

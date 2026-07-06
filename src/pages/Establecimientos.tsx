@@ -21,7 +21,7 @@ interface Destination {
 }
 
 export function Establecimientos() {
-  const [establishments, setEstablishments] = useState<Establishment[]>(ESTABLISHMENTS_MOCK);
+  const [establishments, setEstablishments] = useState<Establishment[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [loading, setLoading] = useState(false);
@@ -137,7 +137,7 @@ export function Establecimientos() {
 
         if (error) throw error;
 
-        if (data && data.length > 0) {
+        if (data) {
           const mapped: Establishment[] = data.map((item: any) => {
             const primaryImg = item.establishment_images?.find((img: any) => img.is_primary)?.image_url 
               || item.establishment_images?.[0]?.image_url 
