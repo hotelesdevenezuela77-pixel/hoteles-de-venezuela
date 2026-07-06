@@ -170,13 +170,17 @@ async function saveMessage(leadId: number, message: string, direction: "inbound"
 async function trackEvent(eventType: string, name: string, phone: string, tipo: string) {
   try {
     const clientIp = await getClientIp();
+    const deviceType = /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop";
+    const browser = navigator.userAgent.slice(0, 80);
+    const extraDataObj = { name, phone, tipo, capturedAt: new Date().toISOString() };
+
     const payload = {
       event_type: eventType,
       page_url: window.location.href,
-      device_type: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop",
-      browser: navigator.userAgent.slice(0, 80),
+      device_type: deviceType,
+      browser: browser,
       ip_hash: clientIp,
-      extra_data: JSON.stringify({ name, phone, tipo, capturedAt: new Date().toISOString() })
+      extra_data: JSON.stringify(extraDataObj)
     };
 
     const { error } = await supabase
@@ -191,13 +195,31 @@ async function trackEvent(eventType: string, name: string, phone: string, tipo: 
         id: Date.now(),
         event_type: eventType,
         page_url: window.location.href,
-        device_type: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop",
-        browser: navigator.userAgent.slice(0, 80),
+        device_type: deviceType,
+        browser: browser,
         ip_hash: clientIp,
-        extra_data: JSON.stringify({ name, phone, tipo, capturedAt: new Date().toISOString() }),
+        extra_data: JSON.stringify(extraDataObj),
         created_at: new Date().toISOString()
       };
       localStorage.setItem(localKey, JSON.stringify([...localEvents, newMockEvent]));
+    }
+
+    // Insert also in analytics_events for the analytics visual charts
+    const analyticsPayload = {
+      event_type: eventType,
+      page_url: window.location.href,
+      device_type: deviceType,
+      browser: browser,
+      ip_address: clientIp,
+      extra_data: JSON.stringify(extraDataObj)
+    };
+
+    const { error: errorAnalytics } = await supabase
+      .from("analytics_events")
+      .insert([analyticsPayload]);
+
+    if (errorAnalytics) {
+      console.warn("Supabase query failed for inserting analytics_event:", errorAnalytics);
     }
   } catch (err) {
     console.warn("Error tracking event:", err);

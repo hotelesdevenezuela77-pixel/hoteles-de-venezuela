@@ -13,6 +13,19 @@ interface TrackedWhatsAppButtonProps {
   isPriority?: boolean;
 }
 
+let cachedIp = "";
+async function getClientIp(): Promise<string> {
+  if (cachedIp) return cachedIp;
+  try {
+    const res = await fetch("https://api.ipify.org?format=json");
+    const json = await res.json();
+    cachedIp = json.ip || "";
+    return cachedIp;
+  } catch {
+    return "127.0.0.1";
+  }
+}
+
 // Track analytics event directly in Supabase
 export const trackEvent = async (
   eventType: string,
@@ -20,11 +33,18 @@ export const trackEvent = async (
   extraData?: Record<string, any>
 ) => {
   try {
+    const clientIp = await getClientIp().catch(() => "127.0.0.1");
+    const deviceType = /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop";
+    const browser = navigator.userAgent.slice(0, 80);
+
     await supabase.from("analytics_events").insert([{
       event_type: eventType,
       establishment_id: establishmentId,
       page_url: window.location.href,
       referrer_url: document.referrer || null,
+      device_type: deviceType,
+      browser: browser,
+      ip_address: clientIp,
       extra_data: extraData ? JSON.stringify(extraData) : null
     }]);
   } catch (e) {
@@ -32,7 +52,38 @@ export const trackEvent = async (
   }
 };
 
-// Save WhatsApp lead in Supabase
+// Save WhatsApp lead in general lead list
+const createWhatsAppLead = async (data: {
+  visitor_name: string;
+  visitor_phone: string;
+  establishment_name?: string;
+}): Promise<boolean> => {
+  try {
+    const clientIp = await getClientIp();
+    const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    const { error } = await supabase
+      .from("whatsapp_leads")
+      .insert([{
+        name: data.visitor_name,
+        phone: data.visitor_phone,
+        source: "whatsapp_establishment",
+        status: "nuevo",
+        lead_type: "turista",
+        interest: `Establecimiento: ${data.establishment_name || "Negocio"}`,
+        ip_address: clientIp,
+        timezone: userTimeZone
+      }]);
+
+    if (error) throw error;
+    return true;
+  } catch (e) {
+    console.error("Error creating lead in whatsapp_leads:", e);
+    return false;
+  }
+};
+
+// Save WhatsApp lead in Supabase for the specific establishment
 const saveWhatsAppLead = async (data: {
   establishment_id: number;
   establishment_name?: string;
@@ -125,11 +176,17 @@ export function TrackedWhatsAppButton({
         visitor_phone: visitorPhone.trim(),
         message: message
       }),
-      trackEvent("whatsapp_click", establishmentId, {
+      createWhatsAppLead({
+        visitor_name: visitorName.trim(),
+        visitor_phone: visitorPhone.trim(),
+        establishment_name: establishmentName
+      }),
+      trackEvent("whatsapp_lead", establishmentId, {
         establishment_name: establishmentName,
         whatsapp_number: whatsappNumber,
         visitor_name: visitorName.trim(),
-        visitor_phone: visitorPhone.trim()
+        visitor_phone: visitorPhone.trim(),
+        source: "whatsapp_establishment"
       })
     ]);
 
