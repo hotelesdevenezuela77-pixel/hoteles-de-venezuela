@@ -537,7 +537,7 @@ export function AdminAnaliticas() {
                                 {l.deviceType || "desktop"}
                               </div>
                             </td>
-                            <td className="px-4 py-3 font-mono text-gray-400 text-[10px]">{l.ipHash ? `${l.ipHash.slice(0, 10)}...` : "—"}</td>
+                            <td className="px-4 py-3 font-mono text-gray-500 text-[10px]">{(l.ipHash || l.ipAddress) || "—"}</td>
                             <td className="px-4 py-3 text-right text-gray-400 font-bold">
                               <div>{date.toLocaleDateString("es-VE")}</div>
                               <div className="text-[9px] text-gray-300 mt-0.5">{date.toLocaleTimeString("es-VE")}</div>
