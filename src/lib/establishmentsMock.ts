@@ -84,7 +84,7 @@ export const ESTABLISHMENTS_MOCK: Establishment[] = [
     rating_avg: 4.9,
     review_count: 145,
     price_level: "$$$$",
-    is_featured: false,
+    is_featured: true,
     services: "[\"wifi\", \"estacionamiento\", \"piscina\", \"restaurante\", \"gimnasio\"]",
     membership_tier: "diamante",
     has_hdv_seal: true
@@ -128,7 +128,7 @@ export const ESTABLISHMENTS_MOCK: Establishment[] = [
     rating_avg: 4.8,
     review_count: 88,
     price_level: "$$$$",
-    is_featured: false,
+    is_featured: true,
     services: "[\"wifi\", \"restaurante\", \"piscina\", \"spa\"]",
     membership_tier: "diamante",
     has_hdv_seal: true
@@ -240,7 +240,7 @@ export const ESTABLISHMENTS_MOCK: Establishment[] = [
     rating_avg: 4.8,
     review_count: 112,
     price_level: "$$$$",
-    is_featured: false,
+    is_featured: true,
     services: "[\"wifi\", \"piscina\", \"restaurante\", \"estacionamiento\"]",
     membership_tier: "diamante",
     has_hdv_seal: true
@@ -284,7 +284,7 @@ export const ESTABLISHMENTS_MOCK: Establishment[] = [
     rating_avg: 4.6,
     review_count: 53,
     price_level: "$$",
-    is_featured: false,
+    is_featured: true,
     services: "[\"wifi\", \"estacionamiento\", \"restaurante\", \"jardin\"]",
     membership_tier: "plata",
     has_hdv_seal: false
@@ -330,7 +330,7 @@ export const ESTABLISHMENTS_MOCK: Establishment[] = [
     rating_avg: 4.5,
     review_count: 310,
     price_level: "$$$$",
-    is_featured: false,
+    is_featured: true,
     services: "[\"wifi\", \"estacionamiento\", \"piscina\", \"restaurante\", \"gimnasio\", \"spa\"]",
     membership_tier: "diamante",
     has_hdv_seal: true

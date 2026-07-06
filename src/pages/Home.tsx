@@ -401,9 +401,21 @@ export function Home() {
     return combined.slice(0, 6);
   };
 
-  const hotels = getCategorizedItems(dbHoteles, "hoteles");
-  const posadas = getCategorizedItems(dbPosadas, "posadas");
-  const complexes = getCategorizedItems(dbComplexes, "complejos");
+  const interleaveItems = (items: Establishment[]): Establishment[] => {
+    const featured = items.filter(item => item.is_featured);
+    const normal = items.filter(item => !item.is_featured);
+    const result: Establishment[] = [];
+    const maxLength = Math.max(featured.length, normal.length);
+    for (let i = 0; i < maxLength; i++) {
+      if (i < featured.length) result.push(featured[i]);
+      if (i < normal.length) result.push(normal[i]);
+    }
+    return result;
+  };
+
+  const hotels = interleaveItems(getCategorizedItems(dbHoteles, "hoteles"));
+  const posadas = interleaveItems(getCategorizedItems(dbPosadas, "posadas"));
+  const complexes = interleaveItems(getCategorizedItems(dbComplexes, "complejos"));
 
   const featuredDestinations = (destinations.length > 0 ? destinations : DEFAULT_DESTINOS_MOCK)
     .filter(d => d.is_featured !== false)
