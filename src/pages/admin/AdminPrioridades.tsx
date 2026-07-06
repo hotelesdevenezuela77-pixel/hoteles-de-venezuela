@@ -83,12 +83,38 @@ export function AdminPrioridades() {
     mutationFn: async ({ 
       id, 
       homepagePriority, 
-      isFeatured 
+      isFeatured,
+      categorySlug
     }: { 
       id: number; 
       homepagePriority: number | null; 
       isFeatured: boolean; 
+      categorySlug: string;
     }) => {
+      // Clear any other establishment in the same category group that has the same position
+      if (homepagePriority !== null) {
+        const isHotel = categorySlug === "hoteles";
+        const isPosada = categorySlug === "posadas";
+        
+        const conflictingEst = ests.find(e => 
+          e.id !== id && 
+          e.homepagePriority === homepagePriority && 
+          (
+            (isHotel && e.categorySlug === "hoteles") ||
+            (isPosada && e.categorySlug === "posadas") ||
+            (!isHotel && !isPosada && e.categorySlug !== "hoteles" && e.categorySlug !== "posadas")
+          )
+        );
+
+        if (conflictingEst) {
+          const { error: clearError } = await supabase
+            .from("establishments")
+            .update({ homepage_priority: null, is_featured: false })
+            .eq("id", conflictingEst.id);
+          if (clearError) throw clearError;
+        }
+      }
+
       const { error } = await supabase
         .from("establishments")
         .update({ 
@@ -226,7 +252,8 @@ export function AdminPrioridades() {
                                   onClick={() => patchPosition.mutate({
                                     id: item.id,
                                     homepagePriority: active ? null : num,
-                                    isFeatured: false
+                                    isFeatured: false,
+                                    categorySlug: item.categorySlug
                                   })}
                                   className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black transition-all cursor-pointer ${
                                     active 
@@ -270,7 +297,8 @@ export function AdminPrioridades() {
                                   onClick={() => patchPosition.mutate({
                                     id: item.id,
                                     homepagePriority: active ? null : num,
-                                    isFeatured: false
+                                    isFeatured: false,
+                                    categorySlug: item.categorySlug
                                   })}
                                   className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black transition-all cursor-pointer ${
                                     active 
@@ -299,7 +327,8 @@ export function AdminPrioridades() {
                                   onClick={() => patchPosition.mutate({
                                     id: item.id,
                                     homepagePriority: active ? null : num,
-                                    isFeatured: false
+                                    isFeatured: false,
+                                    categorySlug: item.categorySlug
                                   })}
                                   className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black transition-all cursor-pointer ${
                                     active 
@@ -327,7 +356,8 @@ export function AdminPrioridades() {
                                 onClick={() => patchPosition.mutate({
                                   id: item.id,
                                   homepagePriority: active ? null : num,
-                                  isFeatured: !active
+                                  isFeatured: !active,
+                                  categorySlug: item.categorySlug
                                 })}
                                 className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black transition-all cursor-pointer ${
                                   active 
