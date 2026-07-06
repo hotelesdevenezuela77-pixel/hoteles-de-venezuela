@@ -233,14 +233,14 @@ export function Paquetes() {
 
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Category filters */}
-        <div className="flex flex-wrap items-center justify-center gap-3 mb-12">
+        <div className="flex overflow-x-auto no-scrollbar md:flex-wrap items-center md:justify-center gap-3 mb-12 pb-3 w-full -mx-6 px-6 md:mx-0 md:px-0 scroll-smooth snap-x">
           {CATEGORIES.map(cat => {
             const isSelected = selectedCat === cat.id;
             return (
               <button
                 key={cat.id}
                 onClick={() => setSelectedCat(cat.id)}
-                className="flex items-center gap-2 px-5 py-3 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 active:scale-95 cursor-pointer border"
+                className="flex items-center gap-2 px-5 py-3 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 active:scale-95 cursor-pointer border shrink-0 snap-start"
                 style={{
                   background: isSelected ? `linear-gradient(135deg, ${cat.color}, ${cat.color}dd)` : "rgba(255, 255, 255, 0.03)",
                   borderColor: isSelected ? cat.color : "rgba(255, 255, 255, 0.08)",

@@ -123,11 +123,11 @@ export function B2BMarketplace() {
           });
           setServices(mapped);
         } else {
-          setServices(SERVICES_MOCK);
+          setServices([]);
         }
       } catch (err) {
-        console.warn("Error consultando Supabase para servicios B2B, usando mock local:", err);
-        setServices(SERVICES_MOCK);
+        console.warn("Error consultando Supabase para servicios B2B:", err);
+        setServices([]);
       } finally {
         setLoading(false);
       }
@@ -403,7 +403,11 @@ export function B2BMarketplace() {
           <div className="text-center py-20 bg-white rounded-3xl border border-gray-200 p-8 shadow-sm">
             <Sparkles className="w-16 h-16 text-gray-200 mx-auto mb-4" />
             <h3 className="text-lg font-bold text-gray-700">No se encontraron servicios</h3>
-            <p className="text-gray-400 text-xs mt-1">Intenta ajustando los criterios de filtrado.</p>
+            <p className="text-gray-400 text-xs mt-1">
+              {hasActiveFilters 
+                ? "Intenta ajustando los criterios de filtrado." 
+                : "De momento no se encuentran servicios activos en el marketplace. Los operadores registrados los publicarán en breve."}
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
