@@ -466,9 +466,9 @@ export function ChatWidget() {
         <div className="relative flex items-center justify-center">
           {panel !== "wa" && (
             <>
-              <span className="absolute w-12 h-12 rounded-full animate-ping opacity-40"
+              <span className="absolute w-12 h-12 rounded-full animate-ping opacity-40 hidden md:block"
                 style={{ background: "#25D366", animationDuration: "2s", animationDelay: "0.3s" }} />
-              <span className="absolute w-12 h-12 rounded-full animate-ping opacity-20"
+              <span className="absolute w-12 h-12 rounded-full animate-ping opacity-20 hidden md:block"
                 style={{ background: "#25D366", animationDuration: "2s", animationDelay: "0.9s" }} />
             </>
           )}
@@ -485,9 +485,9 @@ export function ChatWidget() {
         <div className="relative flex items-center justify-center">
           {panel !== "chat" && (
             <>
-              <span className="absolute w-14 h-14 rounded-full animate-ping opacity-50"
+              <span className="absolute w-14 h-14 rounded-full animate-ping opacity-50 hidden md:block"
                 style={{ background: "#FF0096", animationDuration: "1.8s" }} />
-              <span className="absolute w-14 h-14 rounded-full animate-ping opacity-25"
+              <span className="absolute w-14 h-14 rounded-full animate-ping opacity-25 hidden md:block"
                 style={{ background: "#9B00CC", animationDuration: "1.8s", animationDelay: "0.6s" }} />
             </>
           )}

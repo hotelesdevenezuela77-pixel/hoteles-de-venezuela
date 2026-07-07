@@ -287,11 +287,10 @@ export function Membresias() {
             </div>
           </div>
 
-          <a href={`https://wa.me/${PHONE.replace(/\D/g,"")}`} target="_blank" rel="noreferrer">
-            <button className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-bold text-white text-base mb-4"
-              style={{ background: `linear-gradient(90deg,${F},${P})` }}>
-              <Phone className="w-4 h-4" /> {PHONE}
-            </button>
+          <a href={`https://wa.me/${PHONE.replace(/\D/g,"")}`} target="_blank" rel="noreferrer"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-bold text-white text-base mb-4 transition-all hover:opacity-90 shadow-md"
+            style={{ background: `linear-gradient(90deg,${F},${P})` }}>
+            <Phone className="w-4 h-4" /> {PHONE}
           </a>
         </div>
       </section>
@@ -382,13 +381,10 @@ export function Membresias() {
                   <a
                     href={`https://wa.me/${PHONE.replace(/\D/g,"")}?text=Hola, estoy interesado en el servicio de ${encodeURIComponent(s.name)} para mi establecimiento.`}
                     target="_blank" rel="noreferrer"
+                    className="w-full py-3 rounded-xl font-semibold text-sm text-white transition-all hover:opacity-90 flex items-center justify-center gap-2"
+                    style={{ background: `linear-gradient(90deg,${s.color},${P})` }}
                   >
-                    <button
-                      className="w-full py-3 rounded-xl font-semibold text-sm text-white transition-all hover:opacity-90 flex items-center justify-center gap-2"
-                      style={{ background: `linear-gradient(90deg,${s.color === F || s.color === "#D97706" ? s.color : s.color},${P})` }}
-                    >
-                      {s.cta} <ChevronRight className="w-4 h-4" />
-                    </button>
+                    {s.cta} <ChevronRight className="w-4 h-4" />
                   </a>
                 </div>
               );
@@ -403,10 +399,8 @@ export function Membresias() {
                 ¿No puedes pagar con tarjeta de crédito internacional a través de Stripe? No te preocupes. Aceptamos <strong>Pago Móvil (Bs.), Zelle, USDT (Binance Pay) y PayPal</strong>. 
                 Realiza tu transferencia y reporta el pago con tu captura de pantalla en nuestro módulo de verificación.
               </p>
-              <Link href="/reportar-pago">
-                <button className="px-6 py-3 bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] text-white text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-md hover:shadow-lg cursor-pointer">
-                  Reportar Pago Realizado →
-                </button>
+              <Link href="/reportar-pago" className="inline-block px-6 py-3 bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] text-white text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-md hover:shadow-lg cursor-pointer text-center">
+                Reportar Pago Realizado →
               </Link>
             </div>
           </div>
@@ -437,11 +431,10 @@ export function Membresias() {
             })}
           </div>
           <div className="text-center mt-10">
-            <a href={`https://wa.me/${PHONE.replace(/\D/g,"")}`} target="_blank" rel="noreferrer">
-              <button className="px-8 py-3.5 rounded-full font-bold text-white text-sm"
-                style={{ background: `linear-gradient(90deg,${F},${P})` }}>
-                COMENZAR AHORA →
-              </button>
+            <a href={`https://wa.me/${PHONE.replace(/\D/g,"")}`} target="_blank" rel="noreferrer"
+              className="inline-flex items-center justify-center px-8 py-3.5 rounded-full font-bold text-white text-sm transition-all hover:opacity-90 shadow-md"
+              style={{ background: `linear-gradient(90deg,${F},${P})` }}>
+              COMENZAR AHORA →
             </a>
           </div>
         </div>
@@ -497,11 +490,9 @@ export function Membresias() {
             <p className="text-white/60 text-sm mb-6 leading-relaxed">
               Explora Hoteles de Venezuela y descubre los mejores hoteles, posadas y destinos turísticos del país.
             </p>
-            <Link href="/establecimientos">
-              <button className="px-6 py-3 rounded-xl font-semibold text-white text-sm"
-                style={{ background: `linear-gradient(90deg,${T},#0891B2)` }}>
-                Explorar destinos →
-              </button>
+            <Link href="/establecimientos" className="inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold text-white text-sm transition-all hover:opacity-90 shadow-md"
+              style={{ background: `linear-gradient(90deg,${T},#0891B2)` }}>
+              Explorar destinos →
             </Link>
           </div>
 
@@ -513,17 +504,14 @@ export function Membresias() {
               Registra tu hotel, posada o negocio turístico y empieza a recibir clientes desde el primer día.
             </p>
             <div className="flex flex-col gap-3">
-              <Link href="/registro-negocio">
-                <button className="w-full px-6 py-3 rounded-xl font-semibold text-white text-sm"
-                  style={{ background: `linear-gradient(90deg,${F},${P})` }}>
-                  Registrar mi negocio →
-                </button>
+              <Link href="/registro-negocio" className="w-full px-6 py-3 rounded-xl font-semibold text-white text-sm transition-all hover:opacity-90 flex items-center justify-center shadow-md"
+                style={{ background: `linear-gradient(90deg,${F},${P})` }}>
+                Registrar mi negocio →
               </Link>
-              <a href={`https://wa.me/${PHONE.replace(/\D/g,"")}`} target="_blank" rel="noreferrer">
-                <button className="w-full px-6 py-3 rounded-xl font-semibold text-sm border-2"
-                  style={{ borderColor: F, color: F }}>
-                  📱 {PHONE}
-                </button>
+              <a href={`https://wa.me/${PHONE.replace(/\D/g,"")}`} target="_blank" rel="noreferrer"
+                className="w-full px-6 py-3 rounded-xl font-semibold text-sm border-2 transition-all hover:opacity-90 flex items-center justify-center"
+                style={{ borderColor: F, color: F }}>
+                📱 {PHONE}
               </a>
             </div>
           </div>
@@ -540,11 +528,10 @@ export function Membresias() {
           <p className="text-white/80 mb-8 max-w-xl mx-auto">
             Cada día que pasa sin estar en HDV es un cliente más para tu competencia. Comienza hoy.
           </p>
-          <a href={`https://wa.me/${PHONE.replace(/\D/g,"")}`} target="_blank" rel="noreferrer">
-            <button className="px-10 py-4 bg-white rounded-full font-bold text-sm hover:shadow-xl transition-all"
-              style={{ color: F }}>
-              Hablar con un asesor ahora →
-            </button>
+          <a href={`https://wa.me/${PHONE.replace(/\D/g,"")}`} target="_blank" rel="noreferrer"
+            className="inline-flex items-center justify-center px-10 py-4 bg-white rounded-full font-bold text-sm hover:shadow-xl transition-all"
+            style={{ color: F }}>
+            Hablar con un asesor ahora →
           </a>
         </div>
       </section>
