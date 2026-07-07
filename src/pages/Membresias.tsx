@@ -331,48 +331,53 @@ export function Membresias() {
             <p className="text-gray-500 text-lg">Elige el plan o servicio que mejor se adapte a tu negocio turístico</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="flex flex-col md:grid md:grid-cols-3 gap-6">
             {SERVICIOS.map((s) => {
               const Icon = s.icon;
+              const isPopular = s.popular;
               return (
                 <div
                   key={s.id}
-                  className="relative bg-white rounded-2xl border-2 p-6 flex flex-col shadow-sm md:hover:shadow-lg md:transition-shadow md:duration-300"
-                  style={{ borderColor: s.border }}
+                  className={`relative rounded-3xl border p-7 flex flex-col shadow-sm transition-shadow duration-300 ${
+                    isPopular 
+                      ? "text-white border-[#FF0096]/40 shadow-xl" 
+                      : "bg-white text-slate-800 border-slate-100 hover:shadow-md"
+                  }`}
+                  style={isPopular ? { background: "linear-gradient(135deg, #0e011f 0%, #1a0533 100%)" } : {}}
                 >
-                  {s.popular && (
-                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold text-white whitespace-nowrap"
-                      style={{ background: `linear-gradient(90deg,${F},${P})` }}>
-                      ⭐ Más Popular
+                  {isPopular && (
+                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-[10px] font-bold text-white whitespace-nowrap uppercase tracking-widest shadow-md"
+                      style={{ background: F }}>
+                      Recomendado
                     </div>
                   )}
 
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ background: s.bg }}>
-                      <Icon className="w-5 h-5" style={{ color: s.color }} />
+                  <div className="flex items-center gap-4 mb-5">
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
+                      style={{ background: isPopular ? "rgba(255, 0, 150, 0.15)" : s.bg }}>
+                      <Icon className="w-6 h-6" style={{ color: isPopular ? F : s.color }} />
                     </div>
                     <div>
-                      <h3 className="font-bold text-gray-900 text-base leading-tight">{s.name}</h3>
-                      <div className="flex items-end gap-1 mt-0.5">
-                        <span className="text-xl font-bold" style={{ color: s.color }}>{s.price}</span>
-                        <span className="text-xs text-gray-400 mb-0.5">{s.period}</span>
+                      <h3 className={`font-bold text-base leading-tight font-serif ${isPopular ? "text-white" : "text-slate-900"}`}>{s.name}</h3>
+                      <div className="flex items-end gap-1 mt-1">
+                        <span className="text-2xl font-bold font-sans" style={{ color: isPopular ? T : s.color }}>{s.price}</span>
+                        <span className={`text-xs ${isPopular ? "text-slate-400" : "text-gray-400"} mb-0.5`}>{s.period}</span>
                       </div>
                     </div>
                   </div>
 
-                  <p className="text-gray-500 text-sm mb-4 leading-relaxed">{s.desc}</p>
+                  <p className={`text-sm mb-5 leading-relaxed ${isPopular ? "text-slate-300" : "text-gray-500"}`}>{s.desc}</p>
 
                   {s.highlight && (
-                    <div className="text-xs font-semibold mb-4 p-2.5 rounded-lg" style={{ background: s.bg, color: s.color }}>
+                    <div className="text-xs font-semibold mb-5 p-3 rounded-xl" style={{ background: isPopular ? "rgba(0, 200, 212, 0.1)" : s.bg, color: isPopular ? T : s.color }}>
                       {s.highlight}
                     </div>
                   )}
 
-                  <ul className="space-y-2 mb-6 flex-1">
+                  <ul className="space-y-3 mb-6 flex-1">
                     {s.features.map((f, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                        <Check className="w-4 h-4 mt-0.5 shrink-0" style={{ color: s.color }} />
+                      <li key={i} className={`flex items-start gap-2.5 text-xs ${isPopular ? "text-white/90" : "text-slate-650"}`}>
+                        <Check className="w-4 h-4 mt-0.5 shrink-0" style={{ color: isPopular ? "#FFFFFF" : s.color }} />
                         {f}
                       </li>
                     ))}
@@ -381,8 +386,8 @@ export function Membresias() {
                   <a
                     href={`https://wa.me/${PHONE.replace(/\D/g,"")}?text=Hola, estoy interesado en el servicio de ${encodeURIComponent(s.name)} para mi establecimiento.`}
                     target="_blank" rel="noreferrer"
-                    className="w-full py-3 rounded-xl font-semibold text-sm text-white transition-all hover:opacity-90 flex items-center justify-center gap-2"
-                    style={{ background: `linear-gradient(90deg,${s.color},${P})` }}
+                    className="w-full py-3.5 rounded-xl font-bold text-xs text-white flex items-center justify-center gap-2 transition-all hover:opacity-95 shadow-md active:scale-98"
+                    style={{ background: isPopular ? `linear-gradient(90deg, ${F}, ${P})` : `linear-gradient(90deg, ${s.color}, ${P})` }}
                   >
                     {s.cta} <ChevronRight className="w-4 h-4" />
                   </a>
