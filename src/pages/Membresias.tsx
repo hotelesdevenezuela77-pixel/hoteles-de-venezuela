@@ -331,13 +331,13 @@ export function Membresias() {
             <p className="text-gray-500 text-lg">Elige el plan o servicio que mejor se adapte a tu negocio turístico</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {SERVICIOS.map((s) => {
               const Icon = s.icon;
               return (
                 <div
                   key={s.id}
-                  className="relative bg-white rounded-2xl border-2 p-6 flex flex-col shadow-sm hover:shadow-lg transition-all duration-300"
+                  className="relative bg-white rounded-2xl border-2 p-6 flex flex-col shadow-sm md:hover:shadow-lg md:transition-shadow md:duration-300"
                   style={{ borderColor: s.border }}
                 >
                   {s.popular && (
@@ -446,7 +446,7 @@ export function Membresias() {
           <div className="text-center mb-12">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900">¿Página Web o Aplicación Web?</h2>
           </div>
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="rounded-2xl border-2 border-gray-200 p-7 bg-gray-50">
               <h3 className="font-bold text-gray-700 text-lg mb-5 flex items-center gap-2">
                 <X className="w-5 h-5 text-red-500" /> Página Web Tradicional
@@ -482,7 +482,7 @@ export function Membresias() {
 
       {/* ── DOS CTAs ──────────────────────────────────────── */}
       <section className="py-20 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-6 grid md:grid-cols-2 gap-8">
+        <div className="max-w-4xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Turista */}
           <div className="rounded-2xl p-8" style={{ background: "linear-gradient(135deg,#0e0120,#1a0533)" }}>
             <Award className="w-10 h-10 mb-4" style={{ color: T }} />
