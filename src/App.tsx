@@ -68,49 +68,17 @@ import AdminConversacionalIA from "./pages/admin/AdminConversacionalIA";
 
 function App() {
   const [location] = useLocation();
-  const { user, profile } = useAuth();
+  const { user, profile, trackLocation } = useAuth();
 
   // Scroll to top on route change
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location]);
 
-  // Real-time Presence Tracking
+  // Track location changes
   useEffect(() => {
-    const sessionToken = sessionStorage.getItem("hdv_session_token") || Math.random().toString(36).substring(2, 15);
-    sessionStorage.setItem("hdv_session_token", sessionToken);
-
-    const presenceKey = user ? `auth:${user.id}` : `anon:${sessionToken}`;
-
-    const channel = supabase.channel("hdv-online-users", {
-      config: {
-        presence: {
-          key: presenceKey,
-        },
-      },
-    });
-
-    channel.subscribe(async (status) => {
-      if (status === "SUBSCRIBED") {
-        try {
-          await channel.track({
-            user_id: user?.id || null,
-            email: user?.email || null,
-            name: profile?.name || (user?.email ? user.email.split("@")[0] : "Visitante"),
-            role: profile?.role || "visitor",
-            pathname: location,
-            online_at: new Date().toISOString(),
-          });
-        } catch (err) {
-          console.error("Error tracking presence:", err);
-        }
-      }
-    });
-
-    return () => {
-      channel.unsubscribe();
-    };
-  }, [user, profile, location]);
+    trackLocation(location);
+  }, [location, trackLocation]);
 
   const { data: settings = [] } = useQuery<any[]>({
     queryKey: ["site-settings"],

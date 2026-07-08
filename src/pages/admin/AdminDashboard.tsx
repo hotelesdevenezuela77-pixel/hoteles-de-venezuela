@@ -99,7 +99,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export function AdminDashboard() {
-  const { user, profile, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading, onlineUsers } = useAuth();
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState("resumen");
   
@@ -111,42 +111,6 @@ export function AdminDashboard() {
   const [destinations, setDestinations] = useState<any[]>([]);
   const [reservations, setReservations] = useState<any[]>([]);
   const [reviewsCount, setReviewsCount] = useState(0);
-
-  // Real-time online users state
-  const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
-
-  useEffect(() => {
-    const channel = supabase.channel("hdv-online-users");
-
-    const syncPresence = () => {
-      const presenceState = channel.presenceState();
-      const usersList: any[] = [];
-      
-      Object.keys(presenceState).forEach((key) => {
-        const presences = presenceState[key];
-        if (Array.isArray(presences)) {
-          presences.forEach((p: any) => {
-            usersList.push({
-              presenceKey: key,
-              ...p,
-            });
-          });
-        }
-      });
-      
-      setOnlineUsers(usersList);
-    };
-
-    channel
-      .on("presence", { event: "sync" }, syncPresence)
-      .on("presence", { event: "join" }, syncPresence)
-      .on("presence", { event: "leave" }, syncPresence)
-      .subscribe();
-
-    return () => {
-      channel.unsubscribe();
-    };
-  }, []);
 
   // Compute real-time online stats
   const onlineStats = useMemo(() => {

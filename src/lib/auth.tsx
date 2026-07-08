@@ -18,6 +18,8 @@ interface AuthContextType {
   loginWithGoogle: () => Promise<{ error: any }>;
   register: (email: string, password: string, name: string, role?: string) => Promise<{ error: any }>;
   logout: () => Promise<void>;
+  onlineUsers: any[];
+  trackLocation: (pathname: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -206,8 +208,82 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error };
   };
 
+  // Real-time Presence Tracking
+  const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
+  const [currentChannel, setCurrentChannel] = useState<any>(null);
+
+  useEffect(() => {
+    const sessionToken = sessionStorage.getItem("hdv_session_token") || Math.random().toString(36).substring(2, 15);
+    sessionStorage.setItem("hdv_session_token", sessionToken);
+
+    const presenceKey = user ? `auth:${user.id}` : `anon:${sessionToken}`;
+
+    const channel = supabase.channel("hdv-online-users", {
+      config: {
+        presence: {
+          key: presenceKey,
+        },
+      },
+    });
+
+    const syncPresence = () => {
+      const presenceState = channel.presenceState();
+      const usersList: any[] = [];
+      
+      Object.keys(presenceState).forEach((key) => {
+        const presences = presenceState[key];
+        if (Array.isArray(presences)) {
+          presences.forEach((p: any) => {
+            usersList.push({
+              presenceKey: key,
+              ...p,
+            });
+          });
+        }
+      });
+      setOnlineUsers(usersList);
+    };
+
+    channel
+      .on("presence", { event: "sync" }, syncPresence)
+      .on("presence", { event: "join" }, syncPresence)
+      .on("presence", { event: "leave" }, syncPresence);
+
+    channel.subscribe((status) => {
+      if (status === "SUBSCRIBED") {
+        channel.track({
+          user_id: user?.id || null,
+          email: user?.email || null,
+          name: profile?.name || (user?.email ? user.email.split("@")[0] : "Visitante"),
+          role: profile?.role || "visitor",
+          pathname: window.location.pathname,
+          online_at: new Date().toISOString(),
+        }).catch(err => console.error("Error tracking presence:", err));
+      }
+    });
+
+    setCurrentChannel(channel);
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [user, profile]);
+
+  const trackLocation = (pathname: string) => {
+    if (currentChannel) {
+      currentChannel.track({
+        user_id: user?.id || null,
+        email: user?.email || null,
+        name: profile?.name || (user?.email ? user.email.split("@")[0] : "Visitante"),
+        role: profile?.role || "visitor",
+        pathname: pathname,
+        online_at: new Date().toISOString(),
+      }).catch(err => console.error("Error tracking presence location update:", err));
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, profile, loading, login, loginWithGoogle, register, logout }}>
+    <AuthContext.Provider value={{ user, profile, loading, login, loginWithGoogle, register, logout, onlineUsers, trackLocation }}>
       {children}
     </AuthContext.Provider>
   );
