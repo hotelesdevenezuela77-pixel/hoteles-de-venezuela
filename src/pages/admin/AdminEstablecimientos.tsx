@@ -160,7 +160,13 @@ export function AdminEstablecimientos() {
   const patchMut = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: Record<string, any> }) => {
       const mappedData: Record<string, any> = {};
-      if ("status" in data) mappedData.status = data.status;
+      if ("status" in data) {
+        mappedData.status = data.status;
+        if (data.status !== "approved") {
+          mappedData.homepage_priority = null;
+          mappedData.is_featured = false;
+        }
+      }
       if ("isFeatured" in data) mappedData.is_featured = data.isFeatured;
       if ("hasHdvSeal" in data) mappedData.has_hdv_seal = data.hasHdvSeal;
       if ("hasReservationsEnabled" in data) mappedData.has_reservations_enabled = data.hasReservationsEnabled;

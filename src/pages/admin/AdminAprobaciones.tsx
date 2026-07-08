@@ -87,9 +87,14 @@ export function AdminAprobaciones() {
   // Mutation to approve/reject
   const patchMut = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
+      const updateData: any = { status };
+      if (status !== "approved") {
+        updateData.homepage_priority = null;
+        updateData.is_featured = false;
+      }
       const { error } = await supabase
         .from("establishments")
-        .update({ status })
+        .update(updateData)
         .eq("id", id);
       if (error) throw error;
       return { success: true };

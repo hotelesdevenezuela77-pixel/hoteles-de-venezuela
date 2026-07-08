@@ -246,9 +246,11 @@ export function AdminPrioridades() {
                           <div className="flex justify-center gap-1">
                             {[2, 4, 6].map(num => {
                               const active = item.homepagePriority === num && !item.isFeatured;
+                              const isUnapproved = item.status !== "approved";
                               return (
                                 <button
                                   key={num}
+                                  disabled={isUnapproved}
                                   onClick={() => patchPosition.mutate({
                                     id: item.id,
                                     homepagePriority: active ? null : num,
@@ -259,8 +261,8 @@ export function AdminPrioridades() {
                                     active 
                                       ? "bg-emerald-500 text-white shadow-md shadow-emerald-100 hover:bg-emerald-600" 
                                       : "bg-slate-100 text-slate-500 hover:bg-slate-200"
-                                  }`}
-                                  title={`Posición ${num} (Normal)`}
+                                  } disabled:opacity-30 disabled:cursor-not-allowed`}
+                                  title={isUnapproved ? "Aprobar establecimiento para priorizar" : `Posición ${num} (Normal)`}
                                 >
                                   {num}
                                 </button>
@@ -277,7 +279,16 @@ export function AdminPrioridades() {
                             <Building2 className="w-4 h-4 text-[#9B00CC]" />
                           </div>
                           <div>
-                            <span className="font-bold text-gray-800 text-xs block leading-snug">{item.name}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-gray-800 text-xs block leading-snug">{item.name}</span>
+                              {item.status !== "approved" && (
+                                <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${
+                                  item.status === "pending" ? "bg-amber-100 text-amber-800 border border-amber-200" : "bg-red-100 text-red-800 border border-red-200"
+                                }`}>
+                                  {item.status === "pending" ? "Pendiente" : "Rechazado"}
+                                </span>
+                              )}
+                            </div>
                             <span className="text-[10px] text-slate-400 font-bold block mt-0.5 uppercase tracking-wide flex items-center gap-1">
                               <MapPin className="w-3 h-3 text-[#00C8D4]" />
                               {item.state}
@@ -291,9 +302,11 @@ export function AdminPrioridades() {
                           <div className="flex justify-center gap-1">
                             {[2, 4, 6].map(num => {
                               const active = item.homepagePriority === num && !item.isFeatured;
+                              const isUnapproved = item.status !== "approved";
                               return (
                                 <button
                                   key={num}
+                                  disabled={isUnapproved}
                                   onClick={() => patchPosition.mutate({
                                     id: item.id,
                                     homepagePriority: active ? null : num,
@@ -304,8 +317,8 @@ export function AdminPrioridades() {
                                     active 
                                       ? "bg-emerald-500 text-white shadow-md shadow-emerald-100 hover:bg-emerald-600" 
                                       : "bg-slate-100 text-slate-500 hover:bg-slate-200"
-                                  }`}
-                                  title={`Posición ${num} (Normal)`}
+                                  } disabled:opacity-30 disabled:cursor-not-allowed`}
+                                  title={isUnapproved ? "Aprobar establecimiento para priorizar" : `Posición ${num} (Normal)`}
                                 >
                                   {num}
                                 </button>
@@ -321,9 +334,11 @@ export function AdminPrioridades() {
                           <div className="flex justify-center gap-1">
                             {[2, 4, 6].map(num => {
                               const active = item.homepagePriority === num && !item.isFeatured;
+                              const isUnapproved = item.status !== "approved";
                               return (
                                 <button
                                   key={num}
+                                  disabled={isUnapproved}
                                   onClick={() => patchPosition.mutate({
                                     id: item.id,
                                     homepagePriority: active ? null : num,
@@ -334,8 +349,8 @@ export function AdminPrioridades() {
                                     active 
                                       ? "bg-emerald-500 text-white shadow-md shadow-emerald-100 hover:bg-emerald-600" 
                                       : "bg-slate-100 text-slate-500 hover:bg-slate-200"
-                                  }`}
-                                  title={`Posición ${num} (Normal)`}
+                                  } disabled:opacity-30 disabled:cursor-not-allowed`}
+                                  title={isUnapproved ? "Aprobar establecimiento para priorizar" : `Posición ${num} (Normal)`}
                                 >
                                   {num}
                                 </button>
@@ -350,9 +365,11 @@ export function AdminPrioridades() {
                         <div className="flex justify-center gap-1">
                           {[1, 3, 5].map(num => {
                             const active = item.homepagePriority === num && item.isFeatured;
+                            const isUnapproved = item.status !== "approved";
                             return (
                               <button
                                 key={num}
+                                disabled={isUnapproved}
                                 onClick={() => patchPosition.mutate({
                                   id: item.id,
                                   homepagePriority: active ? null : num,
@@ -363,8 +380,8 @@ export function AdminPrioridades() {
                                   active 
                                     ? "bg-[#FF0096] text-white shadow-md shadow-pink-100 hover:bg-[#e00084]" 
                                     : "bg-slate-100 text-slate-500 hover:bg-slate-200"
-                                }`}
-                                title={`Posición ${num} (Destacada)`}
+                                } disabled:opacity-30 disabled:cursor-not-allowed`}
+                                title={isUnapproved ? "Aprobar establecimiento para priorizar" : `Posición ${num} (Destacada)`}
                               >
                                 {num}
                               </button>
