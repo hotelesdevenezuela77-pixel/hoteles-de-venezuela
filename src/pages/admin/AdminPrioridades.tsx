@@ -250,7 +250,7 @@ export function AdminPrioridades() {
                               return (
                                 <button
                                   key={num}
-                                  disabled={isUnapproved}
+                                  disabled={isUnapproved && !active}
                                   onClick={() => patchPosition.mutate({
                                     id: item.id,
                                     homepagePriority: active ? null : num,
@@ -262,7 +262,7 @@ export function AdminPrioridades() {
                                       ? "bg-emerald-500 text-white shadow-md shadow-emerald-100 hover:bg-emerald-600" 
                                       : "bg-slate-100 text-slate-500 hover:bg-slate-200"
                                   } disabled:opacity-30 disabled:cursor-not-allowed`}
-                                  title={isUnapproved ? "Aprobar establecimiento para priorizar" : `Posición ${num} (Normal)`}
+                                  title={isUnapproved ? (active ? "Haga clic para quitar de Home" : "Aprobar establecimiento para priorizar") : `Posición ${num} (Normal)`}
                                 >
                                   {num}
                                 </button>
@@ -306,7 +306,7 @@ export function AdminPrioridades() {
                               return (
                                 <button
                                   key={num}
-                                  disabled={isUnapproved}
+                                  disabled={isUnapproved && !active}
                                   onClick={() => patchPosition.mutate({
                                     id: item.id,
                                     homepagePriority: active ? null : num,
@@ -318,7 +318,7 @@ export function AdminPrioridades() {
                                       ? "bg-emerald-500 text-white shadow-md shadow-emerald-100 hover:bg-emerald-600" 
                                       : "bg-slate-100 text-slate-500 hover:bg-slate-200"
                                   } disabled:opacity-30 disabled:cursor-not-allowed`}
-                                  title={isUnapproved ? "Aprobar establecimiento para priorizar" : `Posición ${num} (Normal)`}
+                                  title={isUnapproved ? (active ? "Haga clic para quitar de Home" : "Aprobar establecimiento para priorizar") : `Posición ${num} (Normal)`}
                                 >
                                   {num}
                                 </button>
@@ -338,7 +338,7 @@ export function AdminPrioridades() {
                               return (
                                 <button
                                   key={num}
-                                  disabled={isUnapproved}
+                                  disabled={isUnapproved && !active}
                                   onClick={() => patchPosition.mutate({
                                     id: item.id,
                                     homepagePriority: active ? null : num,
@@ -350,7 +350,7 @@ export function AdminPrioridades() {
                                       ? "bg-emerald-500 text-white shadow-md shadow-emerald-100 hover:bg-emerald-600" 
                                       : "bg-slate-100 text-slate-500 hover:bg-slate-200"
                                   } disabled:opacity-30 disabled:cursor-not-allowed`}
-                                  title={isUnapproved ? "Aprobar establecimiento para priorizar" : `Posición ${num} (Normal)`}
+                                  title={isUnapproved ? (active ? "Haga clic para quitar de Home" : "Aprobar establecimiento para priorizar") : `Posición ${num} (Normal)`}
                                 >
                                   {num}
                                 </button>
@@ -369,7 +369,7 @@ export function AdminPrioridades() {
                             return (
                               <button
                                 key={num}
-                                disabled={isUnapproved}
+                                disabled={isUnapproved && !active}
                                 onClick={() => patchPosition.mutate({
                                   id: item.id,
                                   homepagePriority: active ? null : num,
@@ -381,7 +381,7 @@ export function AdminPrioridades() {
                                     ? "bg-[#FF0096] text-white shadow-md shadow-pink-100 hover:bg-[#e00084]" 
                                     : "bg-slate-100 text-slate-500 hover:bg-slate-200"
                                 } disabled:opacity-30 disabled:cursor-not-allowed`}
-                                title={isUnapproved ? "Aprobar establecimiento para priorizar" : `Posición ${num} (Destacada)`}
+                                title={isUnapproved ? (active ? "Haga clic para quitar de Home" : "Aprobar establecimiento para priorizar") : `Posición ${num} (Destacada)`}
                               >
                                 {num}
                               </button>
