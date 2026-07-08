@@ -33,13 +33,21 @@ async function run() {
   console.log("Connected successfully!");
 
   try {
-    console.log("Applying RLS policies to all tables...");
+    console.log("Applying RLS policies and enabling RLS on all tables...");
 
     const sqlScript = `
-      -- 1. For all tables, set up public SELECT and admin ALL policies by default.
+      -- 1. For all tables, enable RLS and set up policies.
       DO $$
       DECLARE
           r RECORD;
+          sensitive_tables text[] := ARRAY[
+              'users', 'staff_members', 'abandoned_bookings', 'booking_requests', 
+              'quotes', 'reservations', 'tour_package_bookings', 'whatsapp_leads', 
+              'establishment_whatsapp_leads', 'whatsapp_messages', 'b2b_messages', 
+              'b2b_transactions', 'andromeda_points', 'andromeda_withdrawals', 
+              'ai_conversations', 'ai_messages', 'analytics_events', 'commercial_prospects', 
+              'expenses', 'membership_payments', 'tasks'
+          ];
       BEGIN
           FOR r IN (
               SELECT tablename 
@@ -47,12 +55,25 @@ async function run() {
               WHERE schemaname = 'public' 
                 AND tablename NOT IN ('user_profiles')
           ) LOOP
+              -- Enable Row Level Security on the table
+              EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', r.tablename);
+
               -- Drop existing policies to prevent conflicts
               EXECUTE format('DROP POLICY IF EXISTS "Allow public select" ON public.%I', r.tablename);
+              EXECUTE format('DROP POLICY IF EXISTS "Allow authenticated select" ON public.%I', r.tablename);
               EXECUTE format('DROP POLICY IF EXISTS "Allow admin all" ON public.%I', r.tablename);
               
-              -- Create public SELECT policy
-              EXECUTE format('CREATE POLICY "Allow public select" ON public.%I FOR SELECT USING (true)', r.tablename);
+              -- Create SELECT policy based on sensitivity
+              IF r.tablename = 'users' THEN
+                  -- Highly private legacy table: no public select policy (only postgres/service_role can read)
+                  NULL;
+              ELSIF r.tablename = ANY(sensitive_tables) THEN
+                  -- Sensitive customer data: restrict read access to authenticated users only
+                  EXECUTE format('CREATE POLICY "Allow authenticated select" ON public.%I FOR SELECT TO authenticated USING (true)', r.tablename);
+              ELSE
+                  -- Safe public data: allow anyone to select
+                  EXECUTE format('CREATE POLICY "Allow public select" ON public.%I FOR SELECT USING (true)', r.tablename);
+              END IF;
               
               -- Create admin ALL policy (restrict to official admin accounts or users with admin role in user_profiles)
               EXECUTE format('
@@ -69,13 +90,18 @@ async function run() {
       END $$;
 
       -- 2. Specific policies for user_profiles (allowing registration, upserts, and admin operations)
+      -- Enable RLS on user_profiles
+      ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
+
       DROP POLICY IF EXISTS "Allow public select on user_profiles" ON public.user_profiles;
+      DROP POLICY IF EXISTS "Allow individual select on user_profiles" ON public.user_profiles;
       DROP POLICY IF EXISTS "Allow individual insert on user_profiles" ON public.user_profiles;
       DROP POLICY IF EXISTS "Allow individual update on user_profiles" ON public.user_profiles;
       DROP POLICY IF EXISTS "Allow admin all on user_profiles" ON public.user_profiles;
 
-      CREATE POLICY "Allow public select on user_profiles" ON public.user_profiles 
-          FOR SELECT USING (true);
+      -- Restrict profile reading to the individual user or official admin email
+      CREATE POLICY "Allow individual select on user_profiles" ON public.user_profiles 
+          FOR SELECT USING (auth.uid()::text = user_id OR auth.jwt() ->> 'email' IN ('hotelesdevenezuela77@gmail.com', 'webmasterpro177@gmail.com', 'admin-test@hotelesdevenezuela.com'));
 
       CREATE POLICY "Allow individual insert on user_profiles" ON public.user_profiles 
           FOR INSERT WITH CHECK (auth.uid()::text = user_id);
@@ -112,7 +138,7 @@ async function run() {
     `;
 
     await client.query(sqlScript);
-    console.log("RLS policies successfully applied!");
+    console.log("RLS policies and tables successfully secured and updated!");
 
   } catch (err) {
     console.error("Migration failed:", err.message);

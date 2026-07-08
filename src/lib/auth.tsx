@@ -49,11 +49,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setProfile(userProfile);
       } else {
         // Si no existe, crear el perfil automáticamente en la base de datos pública
+        const pendingRole = localStorage.getItem("hdv_pending_signup_role") || "user";
+        localStorage.removeItem("hdv_pending_signup_role");
+
         const newProfile: UserProfile = {
           user_id: userId,
           email: email,
           name: nameFallback || email.split("@")[0],
-          role: isAdminGeneral ? "admin" : (roleFallback || "user")
+          role: isAdminGeneral ? "admin" : (roleFallback || pendingRole)
         };
 
         const { data: insertedData, error: insertError } = await supabase
