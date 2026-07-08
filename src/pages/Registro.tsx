@@ -12,7 +12,7 @@ export function Registro() {
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [loadingForm, setLoadingForm] = useState(false);
-  const { register } = useAuth();
+  const { register, loginWithGoogle } = useAuth();
   const [, setLocation] = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -52,6 +52,19 @@ export function Registro() {
       console.error(err);
     } finally {
       setLoadingForm(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      setErrorMsg("");
+      const { error } = await loginWithGoogle();
+      if (error) {
+        setErrorMsg("Error al conectar con Google: " + error.message);
+      }
+    } catch (err) {
+      setErrorMsg("Ocurrió un error inesperado al iniciar sesión con Google.");
+      console.error(err);
     }
   };
 
@@ -209,6 +222,28 @@ export function Registro() {
             )}
           </button>
         </form>
+
+        {/* Separador */}
+        <div className="relative my-6 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-100"></div>
+          </div>
+          <span className="relative bg-white px-4 text-[10px] uppercase font-bold text-gray-400 tracking-wider z-10">O continuar con</span>
+        </div>
+
+        {/* Botón de Google */}
+        <button 
+          type="button"
+          onClick={handleGoogleLogin}
+          className="w-full flex items-center justify-center gap-3 py-3 border border-gray-100 hover:border-brand-turquesa/30 bg-white rounded-xl font-bold text-xs text-gray-700 shadow-sm transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+        >
+          <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-brand-turquesa shrink-0">
+            <svg className="w-3.5 h-3.5 text-white fill-current" viewBox="0 0 24 24">
+              <path d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114-3.41 0-6.177-2.767-6.177-6.177S10.582 6.16 13.991 6.16c1.558 0 2.977.576 4.07 1.526l3.14-3.14C19.273 2.766 16.79 1.6 13.99 1.6 8.252 1.6 3.6 6.252 3.6 12s4.652 10.4 10.39 10.4c5.776 0 10.38-4.232 10.38-10.4 0-.693-.082-1.353-.245-1.715H12.24z"/>
+            </svg>
+          </span>
+          <span>Google</span>
+        </button>
 
         <p className="text-gray-500 text-xs mt-8">
           ¿Ya posees una cuenta?{" "}

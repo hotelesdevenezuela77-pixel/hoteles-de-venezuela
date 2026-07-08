@@ -15,6 +15,7 @@ interface AuthContextType {
   profile: UserProfile | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<{ error: any }>;
+  loginWithGoogle: () => Promise<{ error: any }>;
   register: (email: string, password: string, name: string, role?: string) => Promise<{ error: any }>;
   logout: () => Promise<void>;
 }
@@ -191,8 +192,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setProfile(null);
   };
 
+  // Función de Login con Google OAuth
+  const loginWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin,
+      },
+    });
+    return { error };
+  };
+
   return (
-    <AuthContext.Provider value={{ user, profile, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, profile, loading, login, loginWithGoogle, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
