@@ -12,7 +12,7 @@ import {
   Package, BarChart3, Tag, Newspaper, CheckCircle, Clock,
   XCircle, Star, MessageSquare, Settings, Globe,
   ShieldCheck, TrendingUp, Wrench, Eye, Loader2, DollarSign, ClipboardList,
-  AlertCircle
+  AlertCircle, Award, Activity
 } from "lucide-react";
 
 const C = {
@@ -111,6 +111,89 @@ export function AdminDashboard() {
   const [destinations, setDestinations] = useState<any[]>([]);
   const [reservations, setReservations] = useState<any[]>([]);
   const [reviewsCount, setReviewsCount] = useState(0);
+
+  // Real-time online users state
+  const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
+
+  useEffect(() => {
+    const channel = supabase.channel("hdv-online-users");
+
+    const syncPresence = () => {
+      const presenceState = channel.presenceState();
+      const usersList: any[] = [];
+      
+      Object.keys(presenceState).forEach((key) => {
+        const presences = presenceState[key];
+        if (Array.isArray(presences)) {
+          presences.forEach((p: any) => {
+            usersList.push({
+              presenceKey: key,
+              ...p,
+            });
+          });
+        }
+      });
+      
+      setOnlineUsers(usersList);
+    };
+
+    channel
+      .on("presence", { event: "sync" }, syncPresence)
+      .on("presence", { event: "join" }, syncPresence)
+      .on("presence", { event: "leave" }, syncPresence)
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, []);
+
+  // Compute real-time online stats
+  const onlineStats = useMemo(() => {
+    const counts = {
+      total: 0,
+      logged: 0,
+      visitors: 0,
+      admin: 0,
+      owner: 0, // 'owner' or 'business_owner'
+      tourist: 0, // 'user'
+      agent: 0, // 'agent'
+    };
+
+    const uniqueKeys = new Set<string>();
+    const list: any[] = [];
+
+    onlineUsers.forEach((u) => {
+      const key = u.user_id ? `auth:${u.user_id}` : u.presenceKey;
+      if (!uniqueKeys.has(key)) {
+        uniqueKeys.add(key);
+        list.push(u);
+      }
+    });
+
+    list.forEach((u) => {
+      counts.total++;
+      if (u.user_id) {
+        counts.logged++;
+        if (u.role === "admin" || u.role === "superadmin") {
+          counts.admin++;
+        } else if (u.role === "owner" || u.role === "business_owner") {
+          counts.owner++;
+        } else if (u.role === "user") {
+          counts.tourist++;
+        } else if (u.role === "agent") {
+          counts.agent++;
+        }
+      } else {
+        counts.visitors++;
+      }
+    });
+
+    return {
+      counts,
+      usersList: list,
+    };
+  }, [onlineUsers]);
 
   // Maintenance mode
   const [maintenanceOn, setMaintenanceOn] = useState(false);
@@ -434,6 +517,148 @@ export function AdminDashboard() {
               <StatCard icon={Users}       label="Usuarios"          value={counts.users} color={C.teal}   loading={loading} />
               <StatCard icon={Tag}         label="Categorías"        value={counts.categories} color={C.purple} loading={loading} />
               <StatCard icon={Star}        label="Destacados"        value={counts.featured} color={C.orange} loading={loading} />
+            </div>
+
+            {/* ── Monitoreo en Tiempo Real (Telemetría en Vivo) ── */}
+            <div className="rounded-2xl border border-white/10 overflow-hidden shadow-xl" style={{ background: "linear-gradient(135deg, #0e011f 0%, #1a0533 100%)" }}>
+              <div className="p-6">
+                
+                {/* Header de Monitoreo */}
+                <div className="flex items-center justify-between flex-wrap gap-4 mb-6 pb-4 border-b border-white/5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-[#00C8D4] flex items-center justify-center text-white shrink-0 shadow-md">
+                      <Activity className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+                        Monitoreo en Tiempo Real
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                      </h2>
+                      <p className="text-[10px] text-white/50 font-bold uppercase mt-0.5">Usuarios conectados en la plataforma actualmente</p>
+                    </div>
+                  </div>
+                  <div className="px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-black uppercase tracking-wider text-white flex items-center gap-2">
+                    <span className="text-[#00C8D4] animate-pulse">•</span> {onlineStats.counts.total} personas online
+                  </div>
+                </div>
+
+                {/* Grid de Contadores de Conexión */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  {/* Card 1: Total en Línea */}
+                  <div className="rounded-xl p-4 bg-white/5 border border-white/5 flex items-center gap-3 hover:bg-white/8 transition-all">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-[#00C8D4] shadow-sm">
+                      <Globe className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-black text-white leading-none">{onlineStats.counts.total}</div>
+                      <div className="text-[9px] text-white/50 font-black uppercase tracking-wider mt-1.5">En Línea</div>
+                    </div>
+                  </div>
+
+                  {/* Card 2: Visitantes Anónimos */}
+                  <div className="rounded-xl p-4 bg-white/5 border border-white/5 flex items-center gap-3 hover:bg-white/8 transition-all">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-[#9B00CC] shadow-sm">
+                      <Eye className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-black text-white leading-none">{onlineStats.counts.visitors}</div>
+                      <div className="text-[9px] text-white/50 font-black uppercase tracking-wider mt-1.5">Visitantes</div>
+                    </div>
+                  </div>
+
+                  {/* Card 3: Turistas Logeados */}
+                  <div className="rounded-xl p-4 bg-white/5 border border-white/5 flex items-center gap-3 hover:bg-white/8 transition-all">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-[#FF0096] shadow-sm">
+                      <Award className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-black text-white leading-none">{onlineStats.counts.tourist}</div>
+                      <div className="text-[9px] text-white/50 font-black uppercase tracking-wider mt-1.5">Turistas</div>
+                    </div>
+                  </div>
+
+                  {/* Card 4: Propietarios y Admins */}
+                  <div className="rounded-xl p-4 bg-white/5 border border-white/5 flex items-center gap-3 hover:bg-white/8 transition-all">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-emerald-500 shadow-sm">
+                      <ShieldCheck className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-black text-white leading-none">{onlineStats.counts.admin + onlineStats.counts.owner}</div>
+                      <div className="text-[9px] text-white/50 font-black uppercase tracking-wider mt-1.5">Propietarios / Admins</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Lista detallada de usuarios en línea */}
+                <div className="bg-black/20 rounded-xl border border-white/5 overflow-hidden">
+                  <div className="p-4 bg-white/5 border-b border-white/5 flex items-center justify-between">
+                    <h3 className="text-xs font-bold text-white uppercase tracking-wider">Detalle de Sesiones Activas</h3>
+                    <span className="text-[9px] font-black uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">Actualización Automática</span>
+                  </div>
+                  <div className="overflow-x-auto max-h-60 custom-scrollbar">
+                    {onlineStats.usersList.length === 0 ? (
+                      <div className="p-8 text-center text-xs text-white/40 font-bold uppercase">
+                        Ninguna sesión detectada en este momento
+                      </div>
+                    ) : (
+                      <table className="w-full text-left border-collapse text-xs">
+                        <thead>
+                          <tr className="border-b border-white/5 text-white/50 text-[10px] uppercase font-bold tracking-wider bg-black/10">
+                            <th className="p-4">Usuario / Sesión</th>
+                            <th className="p-4">Rol</th>
+                            <th className="p-4">Página Visitada</th>
+                            <th className="p-4 text-right">Activo Desde</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {onlineStats.usersList.map((u, i) => {
+                            let badgeStyle = { bg: "bg-slate-500/10 text-slate-400 border-slate-500/20", label: "Visitante" };
+                            if (u.user_id) {
+                              if (u.role === "admin" || u.role === "superadmin") {
+                                badgeStyle = { bg: "bg-purple-500/10 text-[#9B00CC] border-purple-500/20", label: "Administrador" };
+                              } else if (u.role === "owner" || u.role === "business_owner") {
+                                badgeStyle = { bg: "bg-cyan-500/10 text-[#00C8D4] border-cyan-500/20", label: "Propietario" };
+                              } else if (u.role === "user") {
+                                badgeStyle = { bg: "bg-pink-500/10 text-[#FF0096] border-pink-500/20", label: "Turista" };
+                              } else if (u.role === "agent") {
+                                badgeStyle = { bg: "bg-amber-500/10 text-amber-500 border-amber-500/20", label: "Agente" };
+                              }
+                            }
+
+                            return (
+                              <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition-colors text-white font-semibold">
+                                <td className="p-4">
+                                  <div className="flex flex-col">
+                                    <span className="text-xs text-white font-bold">{u.name}</span>
+                                    {u.email && <span className="text-[10px] text-white/55 font-medium mt-0.5">{u.email}</span>}
+                                  </div>
+                                </td>
+                                <td className="p-4">
+                                  <span className={`px-2 py-0.5 rounded-full border text-[9px] font-black uppercase tracking-wider ${badgeStyle.bg}`}>
+                                    {badgeStyle.label}
+                                  </span>
+                                </td>
+                                <td className="p-4">
+                                  <code className="px-2 py-1 rounded bg-black/30 border border-white/5 text-[#00C8D4] text-[10px] font-mono break-all inline-block max-w-[250px] truncate" title={u.pathname || "/"}>
+                                    {u.pathname || "/"}
+                                  </code>
+                                </td>
+                                <td className="p-4 text-right text-[10px] text-white/50">
+                                  {new Date(u.online_at).toLocaleTimeString("es-VE")}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+                </div>
+
+              </div>
             </div>
 
             {/* ─ Maintenance mode toggle ─ */}
