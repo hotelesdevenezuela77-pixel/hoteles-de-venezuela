@@ -256,7 +256,7 @@ export function Establecimientos() {
                 <ChevronDown className="w-4 h-4 text-gray-400" />
               </button>
               
-              <div className="absolute top-full left-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-50 p-2 z-30 min-w-[200px] opacity-0 scale-95 origin-top-left pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-200">
+              <div className="absolute top-full left-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-50 p-2 z-30 min-w-[200px] opacity-0 scale-95 origin-top-left pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-200 before:absolute before:content-[''] before:w-full before:h-2 before:-top-2 before:left-0">
                 <button
                   onClick={() => handleCategoryChange("")}
                   className={`w-full text-left px-3 py-2 text-xs rounded-xl hover:bg-gray-50 font-bold ${!selectedCategory ? "text-brand-magenta bg-magenta-50/10" : "text-gray-500"}`}
@@ -283,7 +283,7 @@ export function Establecimientos() {
                 <ChevronDown className="w-4 h-4 text-gray-400" />
               </button>
               
-              <div className="absolute top-full left-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-50 p-2 z-30 min-w-[220px] max-h-60 overflow-y-auto opacity-0 scale-95 origin-top-left pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-200">
+              <div className="absolute top-full left-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-50 p-2 z-30 min-w-[220px] max-h-60 overflow-y-auto opacity-0 scale-95 origin-top-left pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-200 before:absolute before:content-[''] before:w-full before:h-2 before:-top-2 before:left-0">
                 <button
                   onClick={() => handleDestinationChange("")}
                   className={`w-full text-left px-3 py-2 text-xs rounded-xl hover:bg-gray-50 font-bold ${!selectedDestination ? "text-brand-magenta bg-magenta-50/10" : "text-gray-500"}`}
