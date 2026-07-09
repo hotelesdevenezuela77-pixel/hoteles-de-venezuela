@@ -27,12 +27,25 @@ export function Establecimientos() {
   const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<"category" | "destination" | null>(null);
   const [comparedIds, setComparedIds] = useState<number[]>([]);
 
   // Load compared hotels on mount
   useEffect(() => {
     const stored = localStorage.getItem("hdv_compare_list");
     if (stored) setComparedIds(JSON.parse(stored));
+  }, []);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".dropdown-container")) {
+        setActiveDropdown(null);
+      }
+    };
+    document.addEventListener("click", handleOutsideClick);
+    return () => document.removeEventListener("click", handleOutsideClick);
   }, []);
 
   // Sync compare list across events
@@ -84,11 +97,13 @@ export function Establecimientos() {
   const handleCategoryChange = (slug: string) => {
     setSelectedCategory(slug);
     updateURLParams(slug, selectedDestination, searchQuery);
+    setActiveDropdown(null);
   };
 
   const handleDestinationChange = (slug: string) => {
     setSelectedDestination(slug);
     updateURLParams(selectedCategory, slug, searchQuery);
+    setActiveDropdown(null);
   };
 
   const handleSearchChange = (val: string) => {
@@ -250,13 +265,23 @@ export function Establecimientos() {
           <div className={`pt-2 flex-wrap items-center gap-3 ${showFilters ? "flex" : "hidden md:flex"}`}>
             
             {/* Category Dropdown */}
-            <div className="relative group">
-              <button className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 hover:bg-gray-100/80 border border-gray-100 rounded-2xl text-xs font-bold text-gray-600 transition-all cursor-pointer">
+            <div className="relative group dropdown-container">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveDropdown(activeDropdown === "category" ? null : "category");
+                }}
+                className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 hover:bg-gray-100/80 border border-gray-100 rounded-2xl text-xs font-bold text-gray-600 transition-all cursor-pointer"
+              >
                 <span>Categoría: {selectedCategory ? getCategoryName(selectedCategory) : "Todas"}</span>
                 <ChevronDown className="w-4 h-4 text-gray-400" />
               </button>
               
-              <div className="absolute top-full left-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-50 p-2 z-30 min-w-[200px] opacity-0 scale-95 origin-top-left pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-200 before:absolute before:content-[''] before:w-full before:h-2 before:-top-2 before:left-0">
+              <div className={`absolute top-full left-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-50 p-2 z-30 min-w-[200px] origin-top-left transition-all duration-200 before:absolute before:content-[''] before:w-full before:h-2 before:-top-2 before:left-0 ${
+                activeDropdown === "category"
+                  ? "opacity-100 scale-100 pointer-events-auto"
+                  : "opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto"
+              }`}>
                 <button
                   onClick={() => handleCategoryChange("")}
                   className={`w-full text-left px-3 py-2 text-xs rounded-xl hover:bg-gray-50 font-bold ${!selectedCategory ? "text-brand-magenta bg-magenta-50/10" : "text-gray-500"}`}
@@ -276,14 +301,24 @@ export function Establecimientos() {
             </div>
 
             {/* Destination Dropdown */}
-            <div className="relative group">
-              <button className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 hover:bg-gray-100/80 border border-gray-100 rounded-2xl text-xs font-bold text-gray-600 transition-all cursor-pointer">
+            <div className="relative group dropdown-container">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveDropdown(activeDropdown === "destination" ? null : "destination");
+                }}
+                className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 hover:bg-gray-100/80 border border-gray-100 rounded-2xl text-xs font-bold text-gray-600 transition-all cursor-pointer"
+              >
                 <MapPin className="w-4 h-4 text-brand-turquesa" />
                 <span>Destino: {selectedDestination ? getDestinationName(selectedDestination) : "Todos"}</span>
                 <ChevronDown className="w-4 h-4 text-gray-400" />
               </button>
               
-              <div className="absolute top-full left-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-50 p-2 z-30 min-w-[220px] opacity-0 scale-95 origin-top-left pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-200 before:absolute before:content-[''] before:w-full before:h-2 before:-top-2 before:left-0">
+              <div className={`absolute top-full left-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-50 p-2 z-30 min-w-[220px] origin-top-left transition-all duration-200 before:absolute before:content-[''] before:w-full before:h-2 before:-top-2 before:left-0 ${
+                activeDropdown === "destination"
+                  ? "opacity-100 scale-100 pointer-events-auto"
+                  : "opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto"
+              }`}>
                 <div className="max-h-60 overflow-y-auto custom-scrollbar">
                   <button
                     onClick={() => handleDestinationChange("")}
