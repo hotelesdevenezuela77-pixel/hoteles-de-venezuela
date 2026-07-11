@@ -66,9 +66,28 @@ import { SitioDetalle } from "./pages/SitioDetalle";
 // Importación del Agente IA sin llaves apuntando a la carpeta admin
 import AdminConversacionalIA from "./pages/admin/AdminConversacionalIA";
 
+// Importación de la arquitectura multi-tenant de los Nodos Cliente
+import TenantApp from "./tenants/TenantApp";
+import { TENANTS_REGISTRY } from "./tenants/tenantContext";
+
 function App() {
   const [location] = useLocation();
   const { user, profile, trackLocation } = useAuth();
+
+  // 1. Detección y Enrutamiento Multi-tenant (SaaS Tenant Redirect)
+  const params = new URLSearchParams(window.location.search);
+  const hasTenantParam = params.has("tenant") || params.has("establishment");
+  const hostname = window.location.hostname;
+  const isCustomDomain = Object.values(TENANTS_REGISTRY).some(
+    (t) => t.domain.toLowerCase() === hostname.toLowerCase() || hostname.toLowerCase().includes(t.slug.toLowerCase())
+  );
+  const isEnvTenant = !!import.meta.env.VITE_TENANT_SLUG;
+
+  // Desviar a la vista del nodo inquilino si aplica
+  if (isEnvTenant || hasTenantParam || (isCustomDomain && hostname !== "localhost" && hostname !== "127.0.0.1")) {
+    return <TenantApp />;
+  }
+
 
   // Scroll to top on route change
   useEffect(() => {

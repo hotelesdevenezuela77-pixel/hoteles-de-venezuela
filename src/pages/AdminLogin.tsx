@@ -9,8 +9,27 @@ export function AdminLogin() {
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [loadingForm, setLoadingForm] = useState(false);
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const [, setLocation] = useLocation();
+
+  const handleGoogleLogin = async () => {
+    try {
+      setErrorMsg("");
+      setLoadingForm(true);
+      
+      // Especificamos la redirección directa al Panel de Administración (/admin)
+      const { error } = await loginWithGoogle(window.location.origin + "/admin");
+      
+      if (error) {
+        setErrorMsg("Error al conectar con Google: " + error.message);
+        setLoadingForm(false);
+      }
+    } catch (err) {
+      setErrorMsg("Ocurrió un error inesperado al iniciar sesión con Google.");
+      console.error(err);
+      setLoadingForm(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,6 +149,26 @@ export function AdminLogin() {
             ) : (
               <span>Autenticar Administrador</span>
             )}
+          </button>
+
+          <div className="flex items-center my-4">
+            <div className="flex-grow border-t border-white/10"></div>
+            <span className="px-3 text-[10px] text-gray-500 uppercase tracking-widest">O</span>
+            <div className="flex-grow border-t border-white/10"></div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={loadingForm}
+            className="w-full bg-[#1e2230] border border-white/10 hover:border-red-500/50 text-white py-3.5 rounded-xl font-bold text-xs flex items-center justify-center gap-3 cursor-pointer active:scale-98 hover:scale-101 transition-all disabled:opacity-50"
+          >
+            <span className="flex items-center justify-center w-5 h-5 rounded-md bg-red-600 shrink-0">
+              <svg className="w-3 h-3 text-white fill-current" viewBox="0 0 24 24">
+                <path d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114-3.41 0-6.177-2.767-6.177-6.177S10.582 6.16 13.991 6.16c1.558 0 2.977.576 4.07 1.526l3.14-3.14C19.273 2.766 16.79 1.6 13.99 1.6 8.252 1.6 3.6 6.252 3.6 12s4.652 10.4 10.39 10.4c5.776 0 10.38-4.232 10.38-10.4 0-.693-.082-1.353-.245-1.715H12.24z"/>
+              </svg>
+            </span>
+            <span>Iniciar Sesión con Google Admin</span>
           </button>
         </form>
 

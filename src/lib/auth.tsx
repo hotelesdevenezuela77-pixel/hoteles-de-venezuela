@@ -15,7 +15,7 @@ interface AuthContextType {
   profile: UserProfile | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<{ error: any }>;
-  loginWithGoogle: () => Promise<{ error: any }>;
+  loginWithGoogle: (redirectTo?: string) => Promise<{ error: any }>;
   register: (email: string, password: string, name: string, role?: string) => Promise<{ error: any }>;
   logout: () => Promise<void>;
   onlineUsers: any[];
@@ -198,11 +198,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Función de Login con Google OAuth
-  const loginWithGoogle = async () => {
+  const loginWithGoogle = async (redirectTo?: string) => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: window.location.origin + "/perfil",
+        redirectTo: redirectTo || (window.location.origin + "/perfil"),
       },
     });
     return { error };

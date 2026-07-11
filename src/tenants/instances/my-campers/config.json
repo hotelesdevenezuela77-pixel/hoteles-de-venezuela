@@ -1,0 +1,28 @@
+{
+  "establishment_id": 103,
+  "slug": "my-campers",
+  "name": "My Campers Venezuela",
+  "template": "A",
+  "domain": "mycampers.com.ve",
+  "branding": {
+    "primary_color": "#9B00CC",
+    "secondary_color": "#00C8D4",
+    "accent_color": "#FF0096",
+    "font_title": "Playfair Display",
+    "font_body": "Inter",
+    "logo_url": "https://r2.hotelesdevenezuela.com/my-campers/logo.png",
+    "banner_url": "https://images.unsplash.com/photo-1533873984035-25970ab07461?w=1600&auto=format&fit=crop"
+  },
+  "modules": {
+    "reservas": true,
+    "pos": false,
+    "galeria": true,
+    "contacto": true
+  },
+  "contact": {
+    "phone": "+58 416 333 4455",
+    "whatsapp": "+58 416 333 4455",
+    "email": "hola@mycampers.com.ve",
+    "instagram": "@mycampers.ve"
+  }
+}

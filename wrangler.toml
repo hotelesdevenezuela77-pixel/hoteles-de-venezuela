@@ -1,0 +1,18 @@
+name = "hdv-rate-limiter"
+main = "cloudflare/rate-limiter.ts"
+compatibility_date = "2024-05-02"
+
+[vars]
+# Reemplazar con el dominio de Cloudflare Pages donde está desplegado el Core central
+CORE_DOMAIN = "hotelesdevenezuela.pages.dev"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+# ID de la base de datos KV creada en la consola de Cloudflare
+id = "xxxxxx_your_kv_namespace_id_xxxxxx"
+
+[[r2_buckets]]
+binding = "ASSETS_R2"
+# Nombre del bucket R2 creado en Cloudflare para almacenar imágenes de los hoteles
+bucket_name = "hoteles-de-venezuela-assets"
+preview_bucket_name = "hoteles-de-venezuela-assets-preview"
