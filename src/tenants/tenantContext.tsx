@@ -37,6 +37,8 @@ export interface TenantConfig {
   };
 }
 
+import { supabase } from "../lib/supabase";
+
 export const TENANTS_REGISTRY: Record<string, TenantConfig> = {
   "aparto-posada-del-mar": apartoPosadaConfig as TenantConfig,
   "perla-negra": perlaNegraConfig as TenantConfig,
@@ -59,32 +61,81 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    function resolveTenant() {
+    async function resolveTenant() {
       try {
-        // 1. Detección por variable de entorno de compilación (Vite)
+        let activeTenantsList: TenantConfig[] = [];
+
+        // 1. Intentar consultar en base de datos de Supabase
+        try {
+          const { data, error: dbError } = await supabase.from("tenant_configurations").select("*");
+          if (!dbError && data && data.length > 0) {
+            activeTenantsList = data.map((t: any) => ({
+              establishment_id: t.establishment_id,
+              slug: t.slug,
+              name: t.name,
+              template: t.template,
+              domain: t.domain,
+              branding: typeof t.branding === "string" ? JSON.parse(t.branding) : t.branding,
+              modules: typeof t.modules === "string" ? JSON.parse(t.modules) : t.modules,
+              contact: typeof t.contact === "string" ? JSON.parse(t.contact) : t.contact
+            }));
+            console.log(`[Multi-tenant] ${activeTenantsList.length} configuraciones cargadas desde la DB.`);
+          }
+        } catch (dbErr) {
+          console.warn("[Multi-tenant] Falló consulta a Supabase (tabla tenant_configurations), usando respaldo local:", dbErr);
+        }
+
+        // 2. Intentar cargar desde el localStorage (sincronizado por AdminSaaS)
+        if (activeTenantsList.length === 0) {
+          try {
+            const localData = localStorage.getItem("hdv_tenants_configurations");
+            if (localData) {
+              activeTenantsList = JSON.parse(localData);
+              console.log("[Multi-tenant] Cargando configuraciones de respaldo de localStorage.");
+            }
+          } catch (localErr) {
+            console.error("[Multi-tenant] Error al parsear localStorage:", localErr);
+          }
+        }
+
+        // 3. Fallback final: Usar el registro estático local de los archivos config.json
+        if (activeTenantsList.length === 0) {
+          activeTenantsList = Object.values(TENANTS_REGISTRY);
+          console.log("[Multi-tenant] Usando el registro estático de archivos locales config.json");
+        }
+
+        // Mapear el registro activo
+        const activeRegistry: Record<string, TenantConfig> = {};
+        activeTenantsList.forEach((t) => {
+          activeRegistry[t.slug] = t;
+        });
+
+        // ── DETECCIÓN DEL INQUILINO ACTIVO ──
+
+        // A. Detección por variable de entorno de compilación (Vite)
         const envSlug = import.meta.env.VITE_TENANT_SLUG;
-        if (envSlug && TENANTS_REGISTRY[envSlug]) {
+        if (envSlug && activeRegistry[envSlug]) {
           console.log(`[Multi-tenant] Cargando desde variable de entorno: ${envSlug}`);
-          setConfig(TENANTS_REGISTRY[envSlug]);
+          setConfig(activeRegistry[envSlug]);
           setIsLoading(false);
           return;
         }
 
-        // 2. Detección por query parameter (útil en desarrollo local: ?tenant=slug)
+        // B. Detección por query parameter (útil en desarrollo local: ?tenant=slug)
         const params = new URLSearchParams(window.location.search);
         const querySlug = params.get("tenant") || params.get("establishment");
-        if (querySlug && TENANTS_REGISTRY[querySlug]) {
+        if (querySlug && activeRegistry[querySlug]) {
           console.log(`[Multi-tenant] Cargando desde query parameter: ${querySlug}`);
-          setConfig(TENANTS_REGISTRY[querySlug]);
+          setConfig(activeRegistry[querySlug]);
           setIsLoading(false);
           return;
         }
 
-        // 3. Detección por Hostname (Producción / Subdominios)
+        // C. Detección por Hostname (Producción / Subdominios)
         const hostname = window.location.hostname;
         
         // Buscar coincidencia exacta del dominio
-        const matchedByDomain = Object.values(TENANTS_REGISTRY).find(
+        const matchedByDomain = Object.values(activeRegistry).find(
           (t) => t.domain.toLowerCase() === hostname.toLowerCase()
         );
         if (matchedByDomain) {
@@ -95,7 +146,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
         }
 
         // Buscar si el hostname contiene el slug (ej. aparto-posada-del-mar.hotelesdevenezuela.com)
-        const matchedBySubdomain = Object.values(TENANTS_REGISTRY).find((t) =>
+        const matchedBySubdomain = Object.values(activeRegistry).find((t) =>
           hostname.toLowerCase().includes(t.slug.toLowerCase())
         );
         if (matchedBySubdomain) {
@@ -105,10 +156,10 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        // 4. Fallback para desarrollo local (puerto de Vite local sin slug)
+        // D. Fallback para desarrollo local (puerto de Vite local sin slug)
         if (hostname === "localhost" || hostname === "127.0.0.1") {
           console.warn("[Multi-tenant] Ejecutando en localhost. Se cargará Aparto Posada del Mar como tenant por defecto.");
-          setConfig(TENANTS_REGISTRY["aparto-posada-del-mar"]);
+          setConfig(activeRegistry["aparto-posada-del-mar"] || Object.values(activeRegistry)[0]);
           setIsLoading(false);
           return;
         }
