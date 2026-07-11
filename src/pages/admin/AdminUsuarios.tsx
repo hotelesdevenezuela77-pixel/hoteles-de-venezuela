@@ -1,4 +1,5 @@
 import { useAuth } from "@/lib/auth";
+import { logActivity } from "../../lib/activityLogger";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
@@ -120,7 +121,17 @@ export function AdminUsuarios() {
       if (error) throw error;
       return { success: true };
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
+      // Buscar el usuario editado para obtener su email
+      const editedUser = allUsers.find(u => String(u.id) === String(variables.id));
+      const targetEmail = editedUser?.email || "usuario@hotelesdevenezuela.com";
+      
+      logActivity(
+        user?.id || null,
+        user?.email || "hotelesdevenezuela77@gmail.com",
+        "UPDATE_ROLE",
+        `Cambio de rol del usuario ${targetEmail} a ${variables.role.toUpperCase()}.`
+      );
       qc.invalidateQueries({ queryKey: ["admin-users"] });
     }
   });

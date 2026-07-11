@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "./supabase";
+import { logActivity } from "./activityLogger";
 
 interface UserProfile {
   id?: number;
@@ -123,6 +124,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           session.user.user_metadata?.name || "",
           session.user.user_metadata?.role
         );
+        if (_event === "SIGNED_IN") {
+          logActivity(
+            session.user.id,
+            session.user.email || "",
+            "LOGIN",
+            `Inicio de sesión exitoso. Proveedor: ${session.user.app_metadata?.provider || "OAuth"}.`
+          );
+        }
       } else {
         setUser(null);
         setProfile(null);
@@ -150,6 +159,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(mockUser);
       setProfile(mockProfile as UserProfile);
       localStorage.setItem("hdv_admin_bypass", JSON.stringify({ user: mockUser, profile: mockProfile }));
+      logActivity(
+        "admin-bypass-id-7777",
+        "hotelesdevenezuela77@gmail.com",
+        "LOGIN_BYPASS",
+        "Inicio de sesión administrativo mediante bypass de desarrollo local."
+      );
       return { error: null };
     }
     const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -181,6 +196,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           role: role
         };
         await supabase.from("user_profiles").upsert(newProfile, { onConflict: 'user_id' });
+        logActivity(
+          data.user.id,
+          email,
+          "REGISTER",
+          `Registro de nueva cuenta de usuario con rol: ${role}.`
+        );
       } catch (err) {
         console.error("Error creando perfil inicial durante registro:", err);
       }

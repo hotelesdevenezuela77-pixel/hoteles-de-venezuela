@@ -6,7 +6,7 @@ import {
   Tag, MapPin, FileText, Globe, Star, MessageSquare, Leaf,
   Map, TreePine, Repeat2, Sparkles, Receipt, Briefcase,
   BarChart3, Mail, Newspaper, Search, Link2, Settings, CalendarDays, Package, DollarSign,
-  ClipboardList, Bot, Network
+  ClipboardList, Bot, Network, Shield
 } from "lucide-react";
 
 interface TabCounts {
@@ -52,6 +52,7 @@ const TABS = [
   { href: "/admin/reservas-paquetes",  label: "Reservas Paquetes", icon: Package,         countKey: undefined         },
   { href: "/admin/reseñas",            label: "Reseñas",           icon: Star,            countKey: undefined         },
   { href: "/admin/saas",               label: "Gestión SaaS",      icon: Network,         countKey: undefined         },
+  { href: "/admin/logs",               label: "Auditoría Logs",    icon: Shield,          countKey: undefined         },
 ];
 
 const FUCSIA = "#FF0096";

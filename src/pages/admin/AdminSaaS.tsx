@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useAuth } from "../../lib/auth";
+import { logActivity } from "../../lib/activityLogger";
 import { useLocation } from "wouter";
 import { supabase } from "../../lib/supabase";
 import { AdminTabBar } from "../../components/admin/AdminTabBar";
@@ -193,6 +194,13 @@ export function AdminSaaS() {
       localStorage.setItem(localKey, JSON.stringify(currentList));
       setTenants(currentList);
 
+      logActivity(
+         user?.id || null,
+         user?.email || "hotelesdevenezuela77@gmail.com",
+         isNew ? "CREATE_TENANT" : "EDIT_TENANT",
+         `${isNew ? "Creación" : "Edición"} de la configuración SaaS para el establecimiento ${editingTenant.name} (${editingTenant.slug}).`
+       );
+
       setFeedbackMsg({ type: "success", text: "Configuración guardada e inyectada con éxito." });
       
       // Recargar cambios
@@ -222,9 +230,17 @@ export function AdminSaaS() {
 
       // 2. Borrar en local
       const localKey = "hdv_tenants_configurations";
+      const deletedTenant = tenants.find(t => t.establishment_id === id);
       const updated = tenants.filter(t => t.establishment_id !== id);
       localStorage.setItem(localKey, JSON.stringify(updated));
       setTenants(updated);
+       
+      logActivity(
+        user?.id || null,
+        user?.email || "hotelesdevenezuela77@gmail.com",
+        "DELETE_TENANT",
+        `Eliminación del establecimiento SaaS: ${deletedTenant?.name || "Desconocido"} (ID: ${id}).`
+      );
     } catch (e) {
       console.error(e);
     }
