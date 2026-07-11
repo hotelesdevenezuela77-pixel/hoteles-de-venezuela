@@ -133,7 +133,11 @@ export function AdminSaaS() {
         reservas: true,
         pos: false,
         galeria: true,
-        contacto: true
+        contacto: true,
+        tareas: false,
+        finanzas: false,
+        cms: false,
+        analiticas: false
       },
       contact: {
         phone: "+58 412 000 0000",
@@ -558,6 +562,56 @@ export function AdminSaaS() {
                         <span className="text-[#00C8D4]">Zonas y Experiencias VIP</span>
                       </label>
                     )}
+                    
+                    {/* Nuevos Módulos Adicionales (PMS & CMS) */}
+                    <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={editingTenant.modules?.tareas || false}
+                        onChange={e => setEditingTenant(prev => ({
+                          ...prev,
+                          modules: { ...prev.modules!, tareas: e.target.checked }
+                        }))}
+                        className="rounded accent-[#9B00CC] w-4 h-4 bg-slate-950/40 border border-white/10"
+                      />
+                      <span>Módulo Gestión de Tareas</span>
+                    </label>
+                    <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={editingTenant.modules?.finanzas || false}
+                        onChange={e => setEditingTenant(prev => ({
+                          ...prev,
+                          modules: { ...prev.modules!, finanzas: e.target.checked }
+                        }))}
+                        className="rounded accent-[#00C8D4] w-4 h-4 bg-slate-950/40 border border-white/10"
+                      />
+                      <span>Módulo Finanzas y Gastos</span>
+                    </label>
+                    <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={editingTenant.modules?.cms || false}
+                        onChange={e => setEditingTenant(prev => ({
+                          ...prev,
+                          modules: { ...prev.modules!, cms: e.target.checked }
+                        }))}
+                        className="rounded accent-[#FF0096] w-4 h-4 bg-slate-950/40 border border-white/10"
+                      />
+                      <span>Administrador de Contenidos (CMS)</span>
+                    </label>
+                    <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={editingTenant.modules?.analiticas || false}
+                        onChange={e => setEditingTenant(prev => ({
+                          ...prev,
+                          modules: { ...prev.modules!, analiticas: e.target.checked }
+                        }))}
+                        className="rounded accent-indigo-500 w-4 h-4 bg-slate-950/40 border border-white/10"
+                      />
+                      <span>Módulo Estadísticas Generales</span>
+                    </label>
                   </div>
                 </div>
               </div>

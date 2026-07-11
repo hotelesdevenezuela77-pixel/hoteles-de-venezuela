@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useTenant } from "../tenantContext";
 import { GradientHeader } from "../components/GradientHeader";
 import { BookingForm } from "./components/BookingForm";
@@ -9,8 +9,20 @@ import {
   MapPin, Check, Star 
 } from "lucide-react";
 
+// Importación de módulos PMS & CMS
+import { TaskModule } from "./components/TaskModule";
+import { FinanceModule } from "./components/FinanceModule";
+import { CMSModule } from "./components/CMSModule";
+import { AnalyticsModule } from "./components/AnalyticsModule";
+
 export function TemplateB() {
-  const { config } = useTenant();
+  const { config, updateConfig } = useTenant();
+
+  // Estados del Portal del Staff
+  const [showStaffPanel, setShowStaffPanel] = useState(false);
+  const [staffPassword, setStaffPassword] = useState("");
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [activeTab, setActiveTab] = useState<"tareas" | "finanzas" | "cms" | "analiticas">("cms");
 
   // Mapeo de iconos para servicios premium (cajas de fondo sólido de color con SVG blanco puro)
   const premiumServices = [
@@ -194,6 +206,164 @@ export function TemplateB() {
 
         </div>
       </section>
+
+      {/* ── CONSOLA OPERATIVA (PORTAL STAFF PMS/CMS) ── */}
+      <div className="py-10 bg-[#0b0c10] border-t border-white/5 text-center">
+        {!showStaffPanel ? (
+          <button
+            onClick={() => {
+              setShowStaffPanel(true);
+              const m = config.modules;
+              if (m.cms) setActiveTab("cms");
+              else if (m.tareas) setActiveTab("tareas");
+              else if (m.finanzas) setActiveTab("finanzas");
+              else if (m.analiticas) setActiveTab("analiticas");
+            }}
+            className="text-[10px] uppercase font-bold tracking-widest text-[#00C8D4] hover:text-white transition-colors duration-200 cursor-pointer"
+          >
+            Consola Operativa (Portal Staff)
+          </button>
+        ) : (
+          <div className="max-w-4xl mx-auto px-6 space-y-6 text-left">
+            
+            {!isAuthorized ? (
+              <div className="max-w-md mx-auto bg-[#121620] border border-white/10 p-6 rounded-3xl space-y-4 shadow-xl">
+                <div className="text-center">
+                  <h4 className="text-sm font-bold text-white font-serif uppercase tracking-wider">Acceso Staff PMS/CMS</h4>
+                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1">Introduce la clave de la posada</p>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="password"
+                    placeholder="Clave (Default: admin123)"
+                    value={staffPassword}
+                    onChange={e => setStaffPassword(e.target.value)}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white"
+                  />
+                  <button
+                    onClick={() => {
+                      if (staffPassword === "admin123" || staffPassword === String(config.establishment_id)) {
+                        setIsAuthorized(true);
+                      } else {
+                        alert("Clave incorrecta.");
+                      }
+                    }}
+                    className="bg-[#00C8D4] text-[#0b0c10] px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider cursor-pointer"
+                  >
+                    Entrar
+                  </button>
+                </div>
+                <div className="text-center">
+                  <button 
+                    onClick={() => setShowStaffPanel(false)}
+                    className="text-[9px] uppercase font-extrabold text-gray-500 hover:text-white cursor-pointer"
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-4 gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#FF0096] animate-ping shrink-0"></span>
+                    <h4 className="text-sm font-black font-serif text-white uppercase tracking-wider">Consola Operativa: {config.name}</h4>
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    {config.modules.cms && (
+                      <button
+                        onClick={() => setActiveTab("cms")}
+                        className={`px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                          activeTab === "cms" ? "bg-[#FF0096] text-white" : "bg-white/5 text-gray-400 hover:text-white"
+                        }`}
+                      >
+                        CMS Web
+                      </button>
+                    )}
+                    {config.modules.tareas && (
+                      <button
+                        onClick={() => setActiveTab("tareas")}
+                        className={`px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                          activeTab === "tareas" ? "bg-[#9B00CC] text-white" : "bg-white/5 text-gray-400 hover:text-white"
+                        }`}
+                      >
+                        Tareas
+                      </button>
+                    )}
+                    {config.modules.finanzas && (
+                      <button
+                        onClick={() => setActiveTab("finanzas")}
+                        className={`px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                          activeTab === "finanzas" ? "bg-[#00C8D4] text-[#0b0c10]" : "bg-white/5 text-gray-400 hover:text-white"
+                        }`}
+                      >
+                        Finanzas
+                      </button>
+                    )}
+                    {config.modules.analiticas && (
+                      <button
+                        onClick={() => setActiveTab("analiticas")}
+                        className={`px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                          activeTab === "analiticas" ? "bg-indigo-600 text-white" : "bg-white/5 text-gray-400 hover:text-white"
+                        }`}
+                      >
+                        Estadísticas
+                      </button>
+                    )}
+                    <button
+                      onClick={() => {
+                        setIsAuthorized(false);
+                        setShowStaffPanel(false);
+                        setStaffPassword("");
+                      }}
+                      className="px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider bg-white/5 text-gray-400 hover:text-white cursor-pointer"
+                    >
+                      Salir
+                    </button>
+                  </div>
+                </div>
+
+                <div className="animate-fade-in">
+                  {activeTab === "cms" && config.modules.cms && (
+                    <CMSModule 
+                      config={config} 
+                      onConfigChange={updateConfig} 
+                      primaryColor={config.branding.primary_color}
+                      secondaryColor={config.branding.secondary_color}
+                      accentColor={config.branding.accent_color}
+                    />
+                  )}
+                  {activeTab === "tareas" && config.modules.tareas && (
+                    <TaskModule 
+                      establishmentId={config.establishment_id}
+                      primaryColor={config.branding.primary_color}
+                      secondaryColor={config.branding.secondary_color}
+                      accentColor={config.branding.accent_color}
+                    />
+                  )}
+                  {activeTab === "finanzas" && config.modules.finanzas && (
+                    <FinanceModule 
+                      establishmentId={config.establishment_id}
+                      primaryColor={config.branding.primary_color}
+                      secondaryColor={config.branding.secondary_color}
+                      accentColor={config.branding.accent_color}
+                    />
+                  )}
+                  {activeTab === "analiticas" && config.modules.analiticas && (
+                    <AnalyticsModule 
+                      establishmentId={config.establishment_id}
+                      primaryColor={config.branding.primary_color}
+                      secondaryColor={config.branding.secondary_color}
+                      accentColor={config.branding.accent_color}
+                    />
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* 6. Sección de Cierre unificada (AGENTS.md) */}
       <BottomCTA />

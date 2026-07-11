@@ -28,6 +28,10 @@ export interface TenantConfig {
     vip_zones?: boolean;
     galeria: boolean;
     contacto: boolean;
+    tareas?: boolean;
+    finanzas?: boolean;
+    cms?: boolean;
+    analiticas?: boolean;
   };
   contact: {
     phone: string;
@@ -51,6 +55,7 @@ interface TenantContextType {
   config: TenantConfig;
   isLoading: boolean;
   error: string | null;
+  updateConfig: (newConfig: TenantConfig) => void;
 }
 
 const TenantContext = createContext<TenantContextType | undefined>(undefined);
@@ -224,8 +229,12 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
     );
   }
 
+  const updateConfig = (newConfig: TenantConfig) => {
+    setConfig(newConfig);
+  };
+
   return (
-    <TenantContext.Provider value={{ config, isLoading, error }}>
+    <TenantContext.Provider value={{ config, isLoading, error, updateConfig }}>
       {children}
     </TenantContext.Provider>
   );
