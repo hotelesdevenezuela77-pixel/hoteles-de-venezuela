@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { supabase } from "../lib/supabase";
 import { 
   Award, Building2, Check, MapPin, Search, Sparkles, 
-  Star, Shield, Loader2, HelpCircle, AlertTriangle 
+  Star, Shield, Loader2, HelpCircle, AlertTriangle, Zap, CheckCircle2
 } from "lucide-react";
 
 // Paleta de colores oficial (para referencia y estilos inline/clases de Tailwind)
@@ -121,7 +121,7 @@ export function ExcelenciaLanding() {
     return () => clearTimeout(delayDebounce);
   }, [searchQuery]);
 
-  // Validar y publicar perfil
+  // Validar y publicar perfil (actualiza status a pending_validation)
   const handleValidate = async () => {
     if (!hotel) return;
     setValidating(true);
@@ -134,7 +134,6 @@ export function ExcelenciaLanding() {
       if (error) throw error;
       setValidated(true);
       
-      // Registrar log o evento en consola
       console.log(`Hotel ${hotel.name} validado exitosamente.`);
     } catch (err) {
       console.error("Error al validar el establecimiento:", err);
@@ -161,23 +160,23 @@ export function ExcelenciaLanding() {
         <Sparkles className="w-4 h-4 text-[#00C8D4] animate-spin" />
         <span>
           {hotel 
-            ? `Solo quedan ${cupos} cupos de excelencia disponibles en ${hotel.city || "su zona"}`
-            : "Comité de Excelencia 2026: Cupos de nominación limitados por región geográfica"}
+            ? `Solo quedan ${cupos} invitaciones de prestigio disponibles en ${hotel.city || "su zona"}`
+            : "Sincronización abierta: Cupos de distinción digital limitados por región geográfica"}
         </span>
       </div>
 
       {/* ── HERO BANNER PORTADA (FULL-BLEED) ────────────────────────────────── */}
-      <div className="w-full relative h-[450px] md:h-[550px] overflow-hidden bg-[#0e011f]">
+      <div className="w-full relative h-[480px] md:h-[580px] overflow-hidden bg-[#0e011f]">
         
         {/* Imagen del Banner con zoom de seguridad scale-[1.08] */}
         <img 
           src={hotel?.primary_image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1800&q=80"} 
-          alt="Índice de Excelencia 2026"
-          className="w-full h-full object-cover scale-[1.08] opacity-60"
+          alt="Índice de Prestigio 2026"
+          className="w-full h-full object-cover scale-[1.08] opacity-50"
         />
 
         {/* Degradado superior para legibilidad */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/35 to-transparent pointer-events-none" />
 
         {/* Degradado inferior blanco para fundirse con el fondo */}
         <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none" />
@@ -185,19 +184,19 @@ export function ExcelenciaLanding() {
         {/* Contenido centrado del Banner */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 z-10">
           <p className="text-[#00C8D4] text-xs md:text-sm font-black tracking-[0.4em] uppercase mb-4 drop-shadow-md">
-            NOMINACIÓN EXCLUSIVA 2026
+            SINCRONIZACIÓN DE PRESTIGIO 2026
           </p>
           
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-normal text-white mb-6 leading-tight max-w-4xl tracking-wide font-serif" style={{ fontFamily: "'Playfair Display', 'Cinzel', serif" }}>
             {hotel 
-              ? `Bienvenido al Comité de Excelencia, ${hotel.name}`
-              : "Índice de Excelencia 2026: Nominación de Establecimientos"}
+              ? `Bienvenido al Comité de Prestigio, ${hotel.name}`
+              : "Índice de Prestigio y Distinción 2026"}
           </h1>
           
-          <p className="text-white/90 text-sm md:text-base max-w-2xl mx-auto font-sans leading-relaxed drop-shadow">
+          <p className="text-white/95 text-sm md:text-base max-w-3xl mx-auto font-sans leading-relaxed drop-shadow">
             {hotel 
-              ? "Hemos pre-cargado sus datos en nuestro Índice de Excelencia 2026. Su única tarea es validar que la información represente la calidad de su establecimiento."
-              : "La selección oficial de los hoteles más prestigiosos de cada zona geográfica de Venezuela. Valide el perfil borrador de su establecimiento para asegurar su publicación."}
+              ? "Reconocemos y honramos el prestigio de los establecimientos que ya cumplen con los más altos estándares del país. No competimos con entidades de certificación de calidad: somos su complemento tecnológico definitivo."
+              : "Validamos el prestigio de los hoteles y posadas de alta gama en Venezuela. Integre su excelencia de servicio con la eficiencia digital y de conversión que ofrece nuestro ecosistema."}
           </p>
         </div>
       </div>
@@ -208,7 +207,7 @@ export function ExcelenciaLanding() {
         {loading ? (
           <div className="bg-white rounded-3xl shadow-xl p-12 text-center border border-gray-100 flex flex-col items-center justify-center min-h-[300px]">
             <Loader2 className="w-12 h-12 animate-spin text-[#FF0096] mb-4" />
-            <p className="text-gray-500 font-medium">Buscando registro en la base de datos de excelencia...</p>
+            <p className="text-gray-500 font-medium">Buscando registro en la base de datos de prestigio...</p>
           </div>
         ) : !hotel ? (
           
@@ -222,7 +221,7 @@ export function ExcelenciaLanding() {
                 Busque su Establecimiento Nominado
               </h2>
               <p className="text-gray-500 text-sm md:text-base">
-                Si su hotel ha sido pre-seleccionado por nuestro comité de evaluación, su borrador de perfil estará listo para ser validado. Ingrese el nombre para buscarlo.
+                Si su hotel ya pertenece a grupos de prestigio como el <em>Circuito de la Excelencia</em> u otros sellos de alta hospitalidad, su borrador de perfil tecnológico ya ha sido pre-generado. Ingrese el nombre para sincronizar su presencia digital.
               </p>
             </div>
 
@@ -282,14 +281,14 @@ export function ExcelenciaLanding() {
             ) : searchQuery.trim() && !searching ? (
               <div className="text-center py-8 text-gray-400">
                 <AlertTriangle className="w-8 h-8 mx-auto mb-2 text-amber-500" />
-                No se encontraron establecimientos nominados con ese nombre.
+                No se encontraron establecimientos pre-cargados con ese nombre.
               </div>
             ) : null}
 
             {/* Lista Recomendada por Defecto */}
             <div className="border-t border-gray-100 pt-10">
               <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest text-center mb-6">
-                Establecimientos Nominados Recientes
+                Establecimientos Pre-Cargados Recientes
               </h3>
               
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -316,7 +315,7 @@ export function ExcelenciaLanding() {
                           {item.city}, {item.state}
                         </p>
                         <p className="text-xs text-slate-500 line-clamp-2">
-                          {item.description || "Información del establecimiento precargada para la auditoría de calidad de 2026."}
+                          {item.description || "Información del establecimiento pre-cargada para la auditoría técnica digital."}
                         </p>
                       </div>
                     </div>
@@ -330,7 +329,7 @@ export function ExcelenciaLanding() {
                         }}
                         className="w-full py-2.5 bg-gray-50 hover:bg-[#00C8D4] hover:text-white rounded-xl text-xs font-bold text-[#00C8D4] border border-gray-100 hover:border-transparent transition-all text-center"
                       >
-                        Validar Borrador
+                        Revisar Ficha
                       </button>
                     </div>
                   </div>
@@ -353,13 +352,13 @@ export function ExcelenciaLanding() {
                     <Check className="w-8 h-8 stroke-[3]" />
                   </div>
                   <h2 className="text-2xl font-bold text-emerald-950 mb-2">
-                    ¡Perfil Validado Correctamente!
+                    ¡Presencia Digital Sincronizada!
                   </h2>
                   <p className="text-emerald-800 text-sm max-w-lg mx-auto mb-6">
-                    El estatus del establecimiento ha sido actualizado a <strong className="font-semibold">pendiente de validación</strong>. Nuestro comité técnico revisará los datos definitivos y se comunicará vía WhatsApp para habilitar la publicación oficial y la insignia de excelencia.
+                    La ficha de conversión del hotel ha sido configurada a <strong className="font-semibold">pendiente de validación</strong>. El equipo tecnológico de Hoteles de Venezuela activará su redireccionamiento web y enlace de WhatsApp directo para completar la sincronización.
                   </p>
                   <a
-                    href={getWhatsAppLink(`Hola, acabo de validar mi hotel "${hotel.name}" (ID: ${hotel.id}) para el Índice de Excelencia 2026. Quisiera proceder con la revisión técnica.`)}
+                    href={getWhatsAppLink(`Hola, acabo de sincronizar mi hotel "${hotel.name}" (ID: ${hotel.id}) para activar la Ficha de Distinción en el ecosistema 2026. Quisiera proceder con el enlace técnico.`)}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-[#25D366] hover:bg-[#20ba56] text-white font-bold rounded-2xl shadow-md transition-all text-sm"
@@ -367,7 +366,7 @@ export function ExcelenciaLanding() {
                     <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
                       <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.625 1.451 5.436.002 9.858-4.405 9.86-9.83.001-2.628-1.02-5.1-2.871-6.955C16.398 1.959 13.93 1.905 12.01 1.905c-5.438 0-9.86 4.405-9.864 9.83-.001 1.798.485 3.5 1.408 4.949l-1.02 3.735 3.834-1.009z" />
                     </svg>
-                    Contactar al Comité por WhatsApp
+                    Conectar con el Equipo Técnico
                   </a>
                 </div>
               ) : hotel.status === "pending_validation" ? (
@@ -376,18 +375,18 @@ export function ExcelenciaLanding() {
                     <Shield className="w-8 h-8" />
                   </div>
                   <h2 className="text-2xl font-bold text-amber-950 mb-2">
-                    Validación en Proceso
+                    Sincronización en Proceso
                   </h2>
                   <p className="text-amber-800 text-sm max-w-lg mx-auto mb-6">
-                    Este establecimiento ya ha sido enviado para validación técnica. Su estatus actual es <strong className="font-semibold">pendiente de validación</strong>. Si necesita realizar modificaciones, contacte a soporte.
+                    La sincronización técnica de este establecimiento está en marcha. Su ficha se encuentra en estatus <strong className="font-semibold">pendiente de validación</strong>. Si requiere cambios inmediatos de datos, póngase en contacto.
                   </p>
                   <a
-                    href={getWhatsAppLink(`Hola, mi hotel "${hotel.name}" (ID: ${hotel.id}) está en estatus pendiente de validación. Me gustaría acelerar el proceso.`)}
+                    href={getWhatsAppLink(`Hola, mi hotel "${hotel.name}" (ID: ${hotel.id}) está en proceso de sincronización digital. Solicito revisión prioritaria.`)}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-[#25D366] hover:bg-[#20ba56] text-white font-bold rounded-2xl shadow-md transition-all text-sm"
                   >
-                    Solicitar Revisión Prioritaria
+                    Solicitar Activación Prioritaria
                   </a>
                 </div>
               ) : null}
@@ -399,10 +398,10 @@ export function ExcelenciaLanding() {
                     <div className="p-1.5 rounded-lg bg-[#FF0096] text-white">
                       <Building2 className="w-4 h-4" />
                     </div>
-                    <span className="text-xs font-bold uppercase tracking-wider font-sans">Borrador de Auditoría Interna</span>
+                    <span className="text-xs font-bold uppercase tracking-wider font-sans">Ficha de Distinción Digital (Pre-Visualización)</span>
                   </div>
                   <span className="text-[10px] font-black uppercase bg-[#00C8D4] text-[#0e011f] px-2.5 py-1 rounded-full shadow-sm">
-                    Pre-Cargado
+                    Pre-Cargada
                   </span>
                 </div>
 
@@ -420,7 +419,7 @@ export function ExcelenciaLanding() {
                     {/* Badge de Sello Calidad Virtual */}
                     <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-sm border border-gray-100 px-3.5 py-2 rounded-xl shadow-lg flex items-center gap-1.5">
                       <Award className="w-5 h-5 text-[#FF0096]" />
-                      <span className="text-[10px] font-black text-slate-800 uppercase tracking-wider">Excelencia 2026</span>
+                      <span className="text-[10px] font-black text-slate-800 uppercase tracking-wider">Distinción 2026</span>
                     </div>
                   </div>
 
@@ -429,7 +428,7 @@ export function ExcelenciaLanding() {
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
                         <span className="text-xs font-bold text-[#FF0096] uppercase tracking-wider bg-pink-50 px-2.5 py-1 rounded-md">
-                          {hotel.category_name || "Hotel Prestigiado"}
+                          {hotel.category_name || "Hospedaje de Prestigio"}
                         </span>
                         <h2 className="text-2xl md:text-3xl font-extrabold text-[#0f172a] mt-2 font-serif" style={{ fontFamily: "'Playfair Display', serif" }}>
                           {hotel.name}
@@ -448,12 +447,22 @@ export function ExcelenciaLanding() {
                       <span>{hotel.address || `${hotel.city}, ${hotel.state}, Venezuela`}</span>
                     </p>
 
+                    {/* Copy persuasivo y técnico de sinergia */}
+                    <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5 my-5">
+                      <h4 className="text-xs font-black uppercase text-[#00C8D4] tracking-wider mb-2.5 flex items-center gap-1.5">
+                        <Zap className="w-4 h-4" /> La Sinergia del Prestigio
+                      </h4>
+                      <p className="text-xs text-slate-600 leading-relaxed">
+                        Ustedes garantizan la calidad excepcional de las instalaciones y el servicio de hospitalidad (estándares del <strong>Circuito de la Excelencia</strong>). Nosotros aportamos la arquitectura de captación digital moderna: posicionamiento #1 en búsquedas de Google, optimización de velocidad instantánea y un embudo directo de reservas para maximizar el retorno de su prestigio.
+                      </p>
+                    </div>
+
                     <div className="border-t border-b border-gray-100 py-5 my-4">
                       <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider mb-2.5">
-                        Descripción de Calidad Registrada
+                        Descripción General del Establecimiento
                       </h4>
                       <p className="text-slate-600 text-sm leading-relaxed">
-                        {hotel.description || `Este establecimiento ha sido auditado y pre-seleccionado bajo criterios de servicio excepcional, infraestructura premium y altos estándares de hospitalidad en la región de ${hotel.city}. La nominación le otorga el derecho de figurar de forma destacada en la plataforma líder de turismo nacional.`}
+                        {hotel.description || `Este prestigioso establecimiento ha sido seleccionado bajo criterios de servicio de alta gama y hospitalidad premium en la región de ${hotel.city}. Sincronizar su presencia habilitará las herramientas avanzadas de contacto directo y visualización geográfica.`}
                       </p>
                     </div>
 
@@ -504,12 +513,12 @@ export function ExcelenciaLanding() {
                         {validating ? (
                           <>
                             <Loader2 className="w-5 h-5 animate-spin" />
-                            Actualizando registro...
+                            Sincronizando...
                           </>
                         ) : (
                           <>
                             <Check className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                            Validar y Publicar Perfil (Espacio Gratuito)
+                            Sincronizar Presencia Digital (Habilitar Canal Gratuito)
                           </>
                         )}
                       </button>
@@ -549,16 +558,16 @@ export function ExcelenciaLanding() {
                   <div className="w-10 h-10 rounded-xl bg-purple-950 border border-purple-500/30 text-[#00C8D4] flex items-center justify-center">
                     <Shield className="w-5 h-5" />
                   </div>
-                  <h3 className="text-lg font-bold text-white font-serif">Compromiso Oficial</h3>
+                  <h3 className="text-lg font-bold text-white font-serif">Motor de Resultados</h3>
                   <p className="text-xs text-white/70 leading-relaxed">
-                    La validación de sus datos garantiza la presencia permanente de su establecimiento en el mapa nacional de excelencia turística de Venezuela.
+                    Nuestra Ficha de Distinción Especial no otorga una calificación física de su hotel; en su lugar, le proporciona la infraestructura de ventas digitales más veloz de Venezuela.
                   </p>
                   <ul className="space-y-2.5 pt-2">
                     {[
-                      "Acceso inmediato al portal de gestión",
-                      "Visualización en el mapa de geolocalización",
-                      "Indexación preferente en motores de búsqueda",
-                      "Publicación sin costos de mantenimiento"
+                      "Complemento al Circuito de la Excelencia",
+                      "Enlaces directos a sus canales de reserva",
+                      "Visualización geográfica en el mapa nacional",
+                      "Infraestructura Cloudflare de carga instantánea"
                     ].map((feat, i) => (
                       <li key={i} className="flex items-start gap-2 text-xs text-white/90">
                         <Check className="w-4 h-4 text-[#00C8D4] shrink-0 mt-0.5" />
@@ -573,26 +582,20 @@ export function ExcelenciaLanding() {
               <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
                 <div className="flex items-center gap-2">
                   <HelpCircle className="w-5 h-5 text-slate-400" />
-                  <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Preguntas Frecuentes</h4>
+                  <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Acerca de la Integración</h4>
                 </div>
                 
                 <div className="space-y-4 divide-y divide-gray-100">
                   <div className="pt-3 first:pt-0">
-                    <h5 className="text-xs font-bold text-slate-800 mb-1">¿Por qué es gratuito?</h5>
+                    <h5 className="text-xs font-bold text-slate-800 mb-1">¿Competimos con sellos de calidad?</h5>
                     <p className="text-[11px] text-gray-500 leading-relaxed">
-                      El Índice de Excelencia 2026 busca cartografiar de forma neutral los establecimientos con mejor reputación. No hay cobros obligatorios por figurar en la base pública.
+                      No. Respetamos y avalamos las acreditaciones externas. Nuestro foco es estrictamente tecnológico: posicionar su marca en Google y conectar clientes a su WhatsApp.
                     </p>
                   </div>
                   <div className="pt-3">
-                    <h5 className="text-xs font-bold text-slate-800 mb-1">¿Qué es el estado de validación?</h5>
+                    <h5 className="text-xs font-bold text-slate-800 mb-1">¿Qué incluye el espacio gratuito?</h5>
                     <p className="text-[11px] text-gray-500 leading-relaxed">
-                      Al validar, usted confirma que representa la propiedad. Nuestro equipo técnico audita las fotos y la descripción final antes de publicarlo.
-                    </p>
-                  </div>
-                  <div className="pt-3">
-                    <h5 className="text-xs font-bold text-slate-800 mb-1">¿Cómo edito la información?</h5>
-                    <p className="text-[11px] text-gray-500 leading-relaxed">
-                      Una vez completado el proceso de validación, recibirá acceso a su panel propietario para actualizar fotos, tarifas y disponibilidad en tiempo real.
+                      Ficha de presentación completa, geolocalización precisa, fotos descriptivas de alta calidad y enlaces a sus datos de contacto directo de forma permanente.
                     </p>
                   </div>
                 </div>
@@ -600,6 +603,60 @@ export function ExcelenciaLanding() {
 
             </div>
 
+          </div>
+        )}
+
+        {/* Sección de Comparativa Persuasiva: Sinergia de Prestigio */}
+        {hotel && (
+          <div className="mt-12 bg-white rounded-3xl border border-gray-100 p-8 md:p-10 shadow-sm">
+            <h3 className="text-xl md:text-2xl font-bold text-slate-800 text-center mb-8 font-serif" style={{ fontFamily: "'Playfair Display', serif" }}>
+              La Sinergia de Alta Gama
+            </h3>
+            <div className="grid md:grid-cols-2 gap-8 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+              
+              {/* Lado 1: Hotel */}
+              <div className="space-y-4 text-left">
+                <div className="flex items-center gap-2.5 text-[#FF0096]">
+                  <div className="p-1.5 rounded-lg bg-pink-50 text-[#FF0096]">
+                    <Award className="w-5 h-5" />
+                  </div>
+                  <h4 className="font-bold text-slate-800 text-sm uppercase tracking-wider">Su Dominio: La Hospitalidad Física</h4>
+                </div>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  Ustedes lideran el confort, la calidez del servicio, la gastronomía autóctona y el mantenimiento de estándares de primer nivel. Es la distinción en el mundo real que define a los mejores establecimientos del país.
+                </p>
+                <ul className="space-y-2">
+                  {["Calidad del servicio al huésped", "Arquitectura y confort local", "Gastronomía e identidad regional"].map((item, i) => (
+                    <li key={i} className="flex items-center gap-2 text-xs text-slate-600">
+                      <CheckCircle2 className="w-4 h-4 text-[#FF0096] shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Lado 2: Plataforma */}
+              <div className="space-y-4 text-left pt-6 md:pt-0 md:pl-8">
+                <div className="flex items-center gap-2.5 text-[#00C8D4]">
+                  <div className="p-1.5 rounded-lg bg-cyan-50 text-[#00C8D4]">
+                    <Zap className="w-5 h-5" />
+                  </div>
+                  <h4 className="font-bold text-slate-800 text-sm uppercase tracking-wider">Nuestro Dominio: La Conversión Digital</h4>
+                </div>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  Nosotros nos encargamos del embudo tecnológico: optimizar la visibilidad en motores de búsqueda, asegurar velocidades de carga instantáneas y establecer vías directas de cotización sin intermediarios.
+                </p>
+                <ul className="space-y-2">
+                  {["Posicionamiento prioritario en Google", "Carga ultra-rápida (Cloudflare Edge)", "Redireccionamiento directo a reservas"].map((item, i) => (
+                    <li key={i} className="flex items-center gap-2 text-xs text-slate-600">
+                      <CheckCircle2 className="w-4 h-4 text-[#00C8D4] shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+            </div>
           </div>
         )}
 
@@ -615,20 +672,20 @@ export function ExcelenciaLanding() {
 
             <div className="relative z-10 max-w-2xl mx-auto space-y-6">
               <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em] bg-white/20 px-3.5 py-1.5 rounded-full inline-block">
-                Soporte de Auditoría 24/7
+                Soporte de Integración 24/7
               </span>
               
               <h2 className="text-2xl md:text-4xl font-normal leading-tight font-serif" style={{ fontFamily: "'Playfair Display', serif" }}>
-                ¿Tiene dudas sobre el proceso o requiere ayuda con la carga de fotos?
+                ¿Listo para sincronizar sus canales de reserva digital?
               </h2>
               
               <p className="text-white/80 text-sm leading-relaxed max-w-lg mx-auto">
-                Escriba directamente a la mesa técnica de validación de Hoteles de Venezuela. Uno de nuestros analistas le asistirá en tiempo real.
+                Consulte con un analista técnico de integración para optimizar su ficha de conversión o realizar ajustes a sus fotografías pre-cargadas en tiempo real.
               </p>
 
               <div className="pt-4">
                 <a
-                  href={getWhatsAppLink(`Hola, necesito soporte con respecto a la validación de mi hotel para el Índice de Excelencia 2026.`)}
+                  href={getWhatsAppLink(`Hola, quisiera contactar con un analista de soporte técnico para sincronizar y optimizar la Ficha de Distinción de mi hotel.`)}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 px-8 py-4 bg-white hover:bg-gray-50 text-[#FF0096] font-bold rounded-2xl shadow-xl transition-all text-sm md:text-base group"
@@ -637,7 +694,7 @@ export function ExcelenciaLanding() {
                   <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
                     <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.625 1.451 5.436.002 9.858-4.405 9.86-9.83.001-2.628-1.02-5.1-2.871-6.955C16.398 1.959 13.93 1.905 12.01 1.905c-5.438 0-9.86 4.405-9.864 9.83-.001 1.798.485 3.5 1.408 4.949l-1.02 3.735 3.834-1.009z" />
                   </svg>
-                  Atención por WhatsApp
+                  Sincronizar por WhatsApp
                 </a>
               </div>
             </div>
