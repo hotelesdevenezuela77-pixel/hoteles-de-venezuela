@@ -3,10 +3,11 @@ import { useLocation } from "wouter";
 import { supabase } from "../lib/supabase";
 import { 
   Award, Building2, Check, MapPin, Search, Sparkles, 
-  Star, Shield, Loader2, HelpCircle, AlertTriangle, Zap, CheckCircle2
+  Star, Shield, Loader2, HelpCircle, AlertTriangle, Zap, 
+  CheckCircle2, Compass, Phone, Users, Landmark, Globe, CheckCircle
 } from "lucide-react";
 
-// Paleta de colores oficial (para referencia y estilos inline/clases de Tailwind)
+// Paleta de colores oficial
 // Cian: #00C8D4, Magenta: #FF0096, Púrpura: #9B00CC
 // Oscuros: #0e011f y #1a0533
 
@@ -143,14 +144,13 @@ export function ExcelenciaLanding() {
     }
   };
 
-  // Enlace de WhatsApp para contacto
   const WHATSAPP_NUMBER = "584145069774";
   const getWhatsAppLink = (text: string) => {
     return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
   };
 
   return (
-    <div className="min-h-screen bg-white text-[#1e293b] font-sans pb-16">
+    <div className="min-h-screen bg-[#f8fafc] text-[#1e293b] font-sans pb-16">
       
       {/* ── BARRA DE ESTATUS DE COMITÉ (FOMO) ────────────────────────────────── */}
       <div 
@@ -160,26 +160,26 @@ export function ExcelenciaLanding() {
         <Sparkles className="w-4 h-4 text-[#00C8D4] animate-spin" />
         <span>
           {hotel 
-            ? `Solo quedan ${cupos} invitaciones de prestigio disponibles en ${hotel.city || "su zona"}`
+            ? `Solo quedan ${cupos} cupos de distinción digital disponibles en ${hotel.city || "su zona"}`
             : "Sincronización abierta: Cupos de distinción digital limitados por región geográfica"}
         </span>
       </div>
 
       {/* ── HERO BANNER PORTADA (FULL-BLEED) ────────────────────────────────── */}
-      <div className="w-full relative h-[480px] md:h-[580px] overflow-hidden bg-[#0e011f]">
+      <div className="w-full relative h-[450px] md:h-[550px] overflow-hidden bg-[#0e011f]">
         
         {/* Imagen del Banner con zoom de seguridad scale-[1.08] */}
         <img 
-          src={hotel?.primary_image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1800&q=80"} 
+          src={hotel?.primary_image || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1800&q=80"} 
           alt="Índice de Prestigio 2026"
-          className="w-full h-full object-cover scale-[1.08] opacity-50"
+          className="w-full h-full object-cover scale-[1.08] opacity-40"
         />
 
         {/* Degradado superior para legibilidad */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/35 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/45 to-transparent pointer-events-none" />
 
         {/* Degradado inferior blanco para fundirse con el fondo */}
-        <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-[#f8fafc] via-[#f8fafc]/50 to-transparent pointer-events-none" />
 
         {/* Contenido centrado del Banner */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 z-10">
@@ -195,14 +195,14 @@ export function ExcelenciaLanding() {
           
           <p className="text-white/95 text-sm md:text-base max-w-3xl mx-auto font-sans leading-relaxed drop-shadow">
             {hotel 
-              ? "Reconocemos y honramos el prestigio de los establecimientos que ya cumplen con los más altos estándares del país. No competimos con entidades de certificación de calidad: somos su complemento tecnológico definitivo."
-              : "Validamos el prestigio de los hoteles y posadas de alta gama en Venezuela. Integre su excelencia de servicio con la eficiencia digital y de conversión que ofrece nuestro ecosistema."}
+              ? "Reconocemos y honramos el prestigio de los establecimientos que ya lideran con los más altos estándares físicos del país. No somos una entidad de certificación de calidad; somos su complemento de captación digital moderna."
+              : "Validamos la excelencia operativa de los hoteles y posadas de alta gama en Venezuela. Integre su distinción física con la infraestructura de visibilidad y conversión de nuestro ecosistema."}
           </p>
         </div>
       </div>
 
-      {/* ── CUERPO PRINCIPAL ──────────────────────────────────────────────── */}
-      <div className="max-w-5xl mx-auto px-6 -mt-10 relative z-20">
+      {/* ── SECCIÓN 1: FICHA DE DISTINCIÓN DIGITAL (EL BORRADOR DEL HOTEL) ── */}
+      <div className="max-w-5xl mx-auto px-6 -mt-16 relative z-20 mb-20">
         
         {loading ? (
           <div className="bg-white rounded-3xl shadow-xl p-12 text-center border border-gray-100 flex flex-col items-center justify-center min-h-[300px]">
@@ -211,7 +211,7 @@ export function ExcelenciaLanding() {
           </div>
         ) : !hotel ? (
           
-          /* ── CASO 1: BUSCADOR DE HOTELES (SIN HOTEL_ID O INVÁLIDO) ── */
+          /* BUSCADOR DE HOTELES (SIN HOTEL_ID O INVÁLIDO) */
           <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 border border-gray-100">
             <div className="max-w-2xl mx-auto text-center mb-8">
               <div className="inline-flex p-3 rounded-full bg-cyan-50 text-[#00C8D4] mb-4">
@@ -221,7 +221,7 @@ export function ExcelenciaLanding() {
                 Busque su Establecimiento Nominado
               </h2>
               <p className="text-gray-500 text-sm md:text-base">
-                Si su hotel ya pertenece a grupos de prestigio como el <em>Circuito de la Excelencia</em> u otros sellos de alta hospitalidad, su borrador de perfil tecnológico ya ha sido pre-generado. Ingrese el nombre para sincronizar su presencia digital.
+                Si su establecimiento pertenece a asociaciones o grupos exclusivos de alta hospitalidad, su ficha pre-cargada ya está lista. Escriba el nombre a continuación para visualizarla y sincronizar su canal de reservas.
               </p>
             </div>
 
@@ -261,7 +261,7 @@ export function ExcelenciaLanding() {
                   >
                     <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-100 shrink-0">
                       <img 
-                        src={item.primary_image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=150&q=80"} 
+                        src={item.primary_image || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=150&q=80"} 
                         alt={item.name}
                         className="w-full h-full object-cover"
                       />
@@ -288,7 +288,7 @@ export function ExcelenciaLanding() {
             {/* Lista Recomendada por Defecto */}
             <div className="border-t border-gray-100 pt-10">
               <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest text-center mb-6">
-                Establecimientos Pre-Cargados Recientes
+                Establecimientos Recientes Nominados
               </h3>
               
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -300,7 +300,7 @@ export function ExcelenciaLanding() {
                     <div>
                       <div className="h-40 bg-slate-100 relative">
                         <img 
-                          src={item.primary_image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80"} 
+                          src={item.primary_image || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=400&q=80"} 
                           alt={item.name}
                           className="w-full h-full object-cover"
                         />
@@ -315,7 +315,7 @@ export function ExcelenciaLanding() {
                           {item.city}, {item.state}
                         </p>
                         <p className="text-xs text-slate-500 line-clamp-2">
-                          {item.description || "Información del establecimiento pre-cargada para la auditoría técnica digital."}
+                          {item.description || "Datos pre-cargados para la validación y sincronización de conversión digital en nuestro ecosistema de reservas."}
                         </p>
                       </div>
                     </div>
@@ -339,34 +339,31 @@ export function ExcelenciaLanding() {
           </div>
         ) : (
           
-          /* ── CASO 2: VISTA DETALLADA DEL HOTEL SELECCIONADO (FICHA DE AUDITORÍA) ── */
+          /* DETALLE DEL HOTEL CON SU FICHA Y TARJETA DE ESTADÍSTICAS B2B */
           <div className="grid lg:grid-cols-3 gap-8">
             
-            {/* Columna Izquierda/Central: Borrador y Proceso de Validación */}
+            {/* Lado izquierdo: Ficha del Borrador */}
             <div className="lg:col-span-2 space-y-6">
               
-              {/* Tarjeta de Estado Validado o Pendiente */}
+              {/* Tarjeta de estado */}
               {validated ? (
                 <div className="bg-emerald-50 rounded-3xl p-8 border border-emerald-100 text-center shadow-md animate-fade-in">
                   <div className="w-16 h-16 rounded-full bg-emerald-500 text-white flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-200">
                     <Check className="w-8 h-8 stroke-[3]" />
                   </div>
-                  <h2 className="text-2xl font-bold text-emerald-950 mb-2">
-                    ¡Presencia Digital Sincronizada!
+                  <h2 className="text-2xl font-bold text-emerald-950 mb-2 font-serif" style={{ fontFamily: "'Playfair Display', serif" }}>
+                    ¡Sincronización Recibida!
                   </h2>
                   <p className="text-emerald-800 text-sm max-w-lg mx-auto mb-6">
-                    La ficha de conversión del hotel ha sido configurada a <strong className="font-semibold">pendiente de validación</strong>. El equipo tecnológico de Hoteles de Venezuela activará su redireccionamiento web y enlace de WhatsApp directo para completar la sincronización.
+                    Su estado ha sido actualizado a <strong className="font-bold">pendiente de validación</strong>. El equipo técnico de Hoteles de Venezuela activará su redireccionamiento web y su enlace de WhatsApp directo.
                   </p>
                   <a
-                    href={getWhatsAppLink(`Hola, acabo de sincronizar mi hotel "${hotel.name}" (ID: ${hotel.id}) para activar la Ficha de Distinción en el ecosistema 2026. Quisiera proceder con el enlace técnico.`)}
+                    href={getWhatsAppLink(`Hola, acabo de sincronizar mi hotel "${hotel.name}" (ID: ${hotel.id}) para el Índice de Prestigio 2026. Quisiera configurar los enlaces de reserva directos.`)}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-[#25D366] hover:bg-[#20ba56] text-white font-bold rounded-2xl shadow-md transition-all text-sm"
                   >
-                    <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.625 1.451 5.436.002 9.858-4.405 9.86-9.83.001-2.628-1.02-5.1-2.871-6.955C16.398 1.959 13.93 1.905 12.01 1.905c-5.438 0-9.86 4.405-9.864 9.83-.001 1.798.485 3.5 1.408 4.949l-1.02 3.735 3.834-1.009z" />
-                    </svg>
-                    Conectar con el Equipo Técnico
+                    Contactar Soporte Técnico por WhatsApp
                   </a>
                 </div>
               ) : hotel.status === "pending_validation" ? (
@@ -374,71 +371,68 @@ export function ExcelenciaLanding() {
                   <div className="w-16 h-16 rounded-full bg-amber-500 text-white flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-200">
                     <Shield className="w-8 h-8" />
                   </div>
-                  <h2 className="text-2xl font-bold text-amber-950 mb-2">
-                    Sincronización en Proceso
+                  <h2 className="text-2xl font-bold text-amber-950 mb-2 font-serif" style={{ fontFamily: "'Playfair Display', serif" }}>
+                    Sincronización en Progreso
                   </h2>
                   <p className="text-amber-800 text-sm max-w-lg mx-auto mb-6">
-                    La sincronización técnica de este establecimiento está en marcha. Su ficha se encuentra en estatus <strong className="font-semibold">pendiente de validación</strong>. Si requiere cambios inmediatos de datos, póngase en contacto.
+                    Esta propiedad se encuentra actualmente en estatus <strong className="font-bold">pendiente de validación</strong>. El equipo está auditando las imágenes y el direccionamiento de reservas.
                   </p>
                   <a
-                    href={getWhatsAppLink(`Hola, mi hotel "${hotel.name}" (ID: ${hotel.id}) está en proceso de sincronización digital. Solicito revisión prioritaria.`)}
+                    href={getWhatsAppLink(`Hola, solicito activar prioritariamente la Ficha de Distinción de mi hotel "${hotel.name}" (ID: ${hotel.id}).`)}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-[#25D366] hover:bg-[#20ba56] text-white font-bold rounded-2xl shadow-md transition-all text-sm"
                   >
-                    Solicitar Activación Prioritaria
+                    Acelerar Activación
                   </a>
                 </div>
               ) : null}
 
-              {/* Ficha "Borrador de Auditoría" (Pre-visualización de Perfil) */}
+              {/* Ficha Principal de Borrador */}
               <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
                 <div className="px-6 py-5 bg-gradient-to-r from-[#0e011f] to-[#1a0533] text-white flex items-center justify-between border-b border-gray-800">
                   <div className="flex items-center gap-2">
                     <div className="p-1.5 rounded-lg bg-[#FF0096] text-white">
                       <Building2 className="w-4 h-4" />
                     </div>
-                    <span className="text-xs font-bold uppercase tracking-wider font-sans">Ficha de Distinción Digital (Pre-Visualización)</span>
+                    <span className="text-xs font-bold uppercase tracking-wider font-sans">Borrador de Ficha de Distinción</span>
                   </div>
                   <span className="text-[10px] font-black uppercase bg-[#00C8D4] text-[#0e011f] px-2.5 py-1 rounded-full shadow-sm">
-                    Pre-Cargada
+                    Pre-Cargado
                   </span>
                 </div>
 
-                {/* Previsualización del Hotel */}
                 <div className="p-6 md:p-8 space-y-6">
                   
-                  {/* Foto de Portada del Borrador */}
+                  {/* Imagen */}
                   <div className="h-64 md:h-80 w-full rounded-2xl overflow-hidden bg-slate-100 relative shadow-inner">
                     <img 
-                      src={hotel.primary_image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80"} 
+                      src={hotel.primary_image || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80"} 
                       alt={hotel.name}
                       className="w-full h-full object-cover"
                     />
                     
-                    {/* Badge de Sello Calidad Virtual */}
                     <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-sm border border-gray-100 px-3.5 py-2 rounded-xl shadow-lg flex items-center gap-1.5">
                       <Award className="w-5 h-5 text-[#FF0096]" />
                       <span className="text-[10px] font-black text-slate-800 uppercase tracking-wider">Distinción 2026</span>
                     </div>
                   </div>
 
-                  {/* Detalles de Texto */}
+                  {/* Info */}
                   <div className="space-y-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
                         <span className="text-xs font-bold text-[#FF0096] uppercase tracking-wider bg-pink-50 px-2.5 py-1 rounded-md">
-                          {hotel.category_name || "Hospedaje de Prestigio"}
+                          {hotel.category_name || "Establecimiento Nominado"}
                         </span>
                         <h2 className="text-2xl md:text-3xl font-extrabold text-[#0f172a] mt-2 font-serif" style={{ fontFamily: "'Playfair Display', serif" }}>
                           {hotel.name}
                         </h2>
                       </div>
                       
-                      {/* Rating Mocked / Cargado */}
                       <div className="flex items-center gap-1 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-xl">
                         <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                        <span className="text-xs font-extrabold text-amber-900">{hotel.rating_avg || "4.8"} / 5.0</span>
+                        <span className="text-xs font-extrabold text-amber-900">{hotel.rating_avg || "4.9"} / 5.0</span>
                       </div>
                     </div>
 
@@ -447,41 +441,30 @@ export function ExcelenciaLanding() {
                       <span>{hotel.address || `${hotel.city}, ${hotel.state}, Venezuela`}</span>
                     </p>
 
-                    {/* Copy persuasivo y técnico de sinergia */}
-                    <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5 my-5">
-                      <h4 className="text-xs font-black uppercase text-[#00C8D4] tracking-wider mb-2.5 flex items-center gap-1.5">
-                        <Zap className="w-4 h-4" /> La Sinergia del Prestigio
-                      </h4>
-                      <p className="text-xs text-slate-600 leading-relaxed">
-                        Ustedes garantizan la calidad excepcional de las instalaciones y el servicio de hospitalidad (estándares del <strong>Circuito de la Excelencia</strong>). Nosotros aportamos la arquitectura de captación digital moderna: posicionamiento #1 en búsquedas de Google, optimización de velocidad instantánea y un embudo directo de reservas para maximizar el retorno de su prestigio.
-                      </p>
-                    </div>
-
                     <div className="border-t border-b border-gray-100 py-5 my-4">
                       <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider mb-2.5">
-                        Descripción General del Establecimiento
+                        Descripción Auditada
                       </h4>
                       <p className="text-slate-600 text-sm leading-relaxed">
-                        {hotel.description || `Este prestigioso establecimiento ha sido seleccionado bajo criterios de servicio de alta gama y hospitalidad premium en la región de ${hotel.city}. Sincronizar su presencia habilitará las herramientas avanzadas de contacto directo y visualización geográfica.`}
+                        {hotel.description || `Establecimiento de alta hospitalidad auditado bajo criterios de servicio personalizado y excelencia operativa en ${hotel.city}. La sincronización de esta ficha habilitará de forma gratuita los canales de reserva directa.`}
                       </p>
                     </div>
 
-                    {/* Características / Servicios en Iconos Unicolor (Directriz AGENTS.md) */}
+                    {/* Características / Servicios en Iconos Unicolor */}
                     <div>
                       <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider mb-3">
-                        Servicios Verificados del Establecimiento
+                        Servicios y Atributos de Prestigio
                       </h4>
                       <div className="flex flex-wrap gap-4">
                         {[
-                          { label: "Piscina Premium", icon: Star },
-                          { label: "Wi-Fi de Alta Velocidad", icon: Shield },
-                          { label: "Atención al Cliente VIP", icon: Award },
-                          { label: "Ubicación Privilegiada", icon: MapPin }
+                          { label: "Servicio de Alta Hospitalidad", icon: Star },
+                          { label: "Seguridad y Privacidad", icon: Shield },
+                          { label: "Experiencia Gourmet", icon: Award },
+                          { label: "Ubicación Exclusiva", icon: MapPin }
                         ].map((serv, index) => {
                           const IconComp = serv.icon;
                           return (
                             <div key={index} className="flex items-center gap-2 bg-gray-50 pr-3.5 pl-1.5 py-1.5 rounded-xl border border-gray-100">
-                              {/* Caja de fondo sólido de color con el vector SVG calado en blanco puro por dentro */}
                               <div className="p-1 rounded-lg bg-[#00C8D4] text-white flex items-center justify-center">
                                 <IconComp className="w-3.5 h-3.5" />
                               </div>
@@ -494,11 +477,11 @@ export function ExcelenciaLanding() {
 
                   </div>
 
-                  {/* Acciones del Borrador */}
+                  {/* Acciones */}
                   {!validated && hotel.status !== "pending_validation" && (
                     <div className="pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
                       <div className="text-left">
-                        <p className="text-xs text-gray-500">Publicación básica estándar</p>
+                        <p className="text-xs text-gray-500">Activación del espacio en el ecosistema</p>
                         <p className="text-lg font-black text-[#00C8D4] flex items-center gap-1.5">
                           Gratuito Permanente
                           <span className="text-xs font-normal text-slate-400 line-through">$120/año</span>
@@ -517,8 +500,8 @@ export function ExcelenciaLanding() {
                           </>
                         ) : (
                           <>
-                            <Check className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                            Sincronizar Presencia Digital (Habilitar Canal Gratuito)
+                            <Check className="w-5 h-5" />
+                            Sincronizar Presencia Digital (Canal Gratuito)
                           </>
                         )}
                       </button>
@@ -528,7 +511,6 @@ export function ExcelenciaLanding() {
                 </div>
               </div>
 
-              {/* Botón para regresar al buscador en caso de querer cambiar de hotel */}
               <div className="text-center pt-2">
                 <button
                   onClick={() => {
@@ -545,162 +527,419 @@ export function ExcelenciaLanding() {
 
             </div>
 
-            {/* Columna Derecha: Información Institucional y FOMO */}
+            {/* Lado derecho: Tarjeta de datos/estadísticas (Como la tarjeta turquesa de la imagen) */}
             <div className="space-y-6">
               
-              {/* Tarjeta Destacada de Garantía (Directriz de AGENTS.md) */}
-              <div className="bg-[#0e011f] rounded-3xl p-6 border border-purple-900/30 text-white shadow-xl relative overflow-hidden">
-                {/* Capas decorativas de gradiente */}
-                <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-[#9B00CC] blur-3xl opacity-20 pointer-events-none" />
-                <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-[#00C8D4] blur-3xl opacity-10 pointer-events-none" />
+              {/* Tarjeta de Métricas e Indicadores de Visibilidad */}
+              <div className="rounded-3xl p-6 text-white shadow-xl flex flex-col justify-between relative overflow-hidden" 
+                style={{ background: "linear-gradient(135deg, #00C8D4 0%, #009ba6 100%)" }}>
                 
-                <div className="relative z-10 space-y-4">
-                  <div className="w-10 h-10 rounded-xl bg-purple-950 border border-purple-500/30 text-[#00C8D4] flex items-center justify-center">
-                    <Shield className="w-5 h-5" />
+                {/* Decoración de fondo */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+                
+                <div className="relative z-10 space-y-6">
+                  <div className="flex items-center gap-2 text-white">
+                    <Zap className="w-5 h-5 text-white fill-current" />
+                    <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded">Estadísticas 2026</span>
                   </div>
-                  <h3 className="text-lg font-bold text-white font-serif">Motor de Resultados</h3>
-                  <p className="text-xs text-white/70 leading-relaxed">
-                    Nuestra Ficha de Distinción Especial no otorga una calificación física de su hotel; en su lugar, le proporciona la infraestructura de ventas digitales más veloz de Venezuela.
-                  </p>
-                  <ul className="space-y-2.5 pt-2">
-                    {[
-                      "Complemento al Circuito de la Excelencia",
-                      "Enlaces directos a sus canales de reserva",
-                      "Visualización geográfica en el mapa nacional",
-                      "Infraestructura Cloudflare de carga instantánea"
-                    ].map((feat, i) => (
-                      <li key={i} className="flex items-start gap-2 text-xs text-white/90">
-                        <Check className="w-4 h-4 text-[#00C8D4] shrink-0 mt-0.5" />
+                  
+                  <div>
+                    <h3 className="text-lg font-bold text-white leading-snug">Estatus del Ecosistema</h3>
+                    <p className="text-white/80 text-xs mt-1">Estimaciones de conversión y visibilidad proyectadas en la plataforma.</p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 border-t border-white/20 pt-4">
+                    <div>
+                      <span className="text-[10px] text-white/70 uppercase font-bold">Alcance Estimado</span>
+                      <p className="text-2xl font-extrabold mt-1 font-serif">+25k</p>
+                      <span className="text-[9px] text-white/60">búsquedas/mes</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-white/70 uppercase font-bold">Conversión Directa</span>
+                      <p className="text-2xl font-extrabold mt-1 font-serif">4.8%</p>
+                      <span className="text-[9px] text-white/60">leads a WhatsApp</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/15 rounded-2xl p-3 border border-white/10 text-center">
+                    <span className="text-[10px] font-bold text-white/90">Sincronización Gratuita Permanente</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Caja de Compromiso */}
+              <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-[#FF0096]" />
+                  <h4 className="text-xs font-black uppercase text-slate-800 tracking-wider">Garantía Tecnológica</h4>
+                </div>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  No calificamos la hospitalidad de su hotel: ese prestigio ya está consolidado. Nos encargamos de que la tecnología de reservas esté a la altura de su servicio físico.
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+        )}
+
+      </div>
+
+      {/* ── SECCIÓN 2: ¿PARA QUIÉN ES ESTE ECOSISTEMA? ── */}
+      <section className="py-20 bg-white border-t border-b border-gray-100">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-3xl font-normal text-slate-900 mb-4 font-serif" style={{ fontFamily: "'Playfair Display', serif" }}>
+              ¿Para Quién es Este Ecosistema?
+            </h2>
+            <p className="text-gray-500 text-sm md:text-base">
+              Diseñado exclusivamente para propiedades de alta hospitalidad en Venezuela que buscan maximizar sus canales de reserva directa.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                title: "Hoteles Boutique & de Colección",
+                desc: "Propiedades exclusivas que ofrecen una experiencia íntima, diseño de autor y atención altamente personalizada.",
+                icon: Landmark,
+                features: ["Ficha de conversión avanzada", "Galería de imágenes premium", "Botón directo de reserva"],
+                color: "#FF0096"
+              },
+              {
+                title: "Posadas & Lodges de Alta Gama",
+                desc: "Establecimientos en destinos naturales exclusivos (Los Roques, Canaima, Mérida) que requieren un canal de venta directo y sin comisiones.",
+                icon: Compass,
+                features: ["Ubicación precisa en el mapa", "Integración directa de WhatsApp", "Redireccionamiento web propio"],
+                color: "#00C8D4"
+              },
+              {
+                title: "Resorts & Complejos de Lujo",
+                desc: "Establecimientos de alta infraestructura que necesitan complementar sus canales tradicionales de captación comercial.",
+                icon: Building2,
+                features: ["Sincronización multi-canal", "Visibilidad prioritaria en Google", "Acceso al panel de analíticas"],
+                color: "#9B00CC"
+              }
+            ].map((card, i) => {
+              const Icon = card.icon;
+              return (
+                <div key={i} className="bg-gray-50/50 rounded-3xl p-6 border border-gray-100 flex flex-col justify-between hover:shadow-lg transition-all">
+                  <div className="space-y-4">
+                    <div className="p-3.5 rounded-2xl text-white inline-block shadow-sm" style={{ backgroundColor: card.color }}>
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-800 font-serif">{card.title}</h3>
+                    <p className="text-xs text-gray-500 leading-relaxed">{card.desc}</p>
+                  </div>
+                  
+                  <ul className="space-y-2 border-t border-gray-100 pt-5 mt-6">
+                    {card.features.map((feat, idx) => (
+                      <li key={idx} className="flex items-center gap-2 text-xs text-slate-700">
+                        <Check className="w-4 h-4 text-[#FF0096] shrink-0" />
                         <span>{feat}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
-              </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
-              {/* Preguntas Frecuentes Cortas */}
-              <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
-                <div className="flex items-center gap-2">
-                  <HelpCircle className="w-5 h-5 text-slate-400" />
-                  <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Acerca de la Integración</h4>
+      {/* ── SECCIÓN 3: BENEFICIOS DE INTEGRACIÓN DIGITAL (6 TARJETAS 3x2) ── */}
+      <section className="py-20 bg-gray-50/30">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-3xl font-normal text-slate-900 mb-4 font-serif" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Beneficios de Sincronizar su Presencia
+            </h2>
+            <p className="text-gray-500 text-sm">
+              La sinergia perfecta entre sus estándares de hospitalidad y nuestra infraestructura de marketing digital.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                title: "Posicionamiento Google #1",
+                desc: "Visibilidad garantizada en los términos de búsqueda más cotizados de hospitalidad en el país.",
+                icon: Globe
+              },
+              {
+                title: "Carga Edge en Cloudflare",
+                desc: "Fichas técnicas alojadas en infraestructura perimetral de carga instantánea, reduciendo rebotes.",
+                icon: Zap
+              },
+              {
+                title: "Reservas sin Comisión",
+                desc: "A diferencia de las OTAs convencionales, no cobramos porcentaje alguno sobre sus ventas directas.",
+                icon: Award
+              },
+              {
+                title: "Redireccionamiento Directo",
+                desc: "Enlace su WhatsApp comercial y página web directamente para recibir leads calificados sin intermediarios.",
+                icon: Phone
+              },
+              {
+                title: "Geolocalización Turística",
+                desc: "Aparezca en el mapa interactivo de destinos exclusivos de Venezuela con un pin preferente.",
+                icon: MapPin
+              },
+              {
+                title: "Panel Propietario Avanzado",
+                desc: "Autonomía completa para actualizar fotos, tarifas, temporadas y servicios en tiempo real.",
+                icon: Users
+              }
+            ].map((ben, i) => {
+              const IconComp = ben.icon;
+              return (
+                <div key={i} className="bg-white rounded-3xl p-6 border border-gray-100/80 shadow-sm hover:shadow-md transition-all flex items-start gap-4">
+                  <div className="p-3 rounded-2xl bg-[#00C8D4] text-white shrink-0 shadow-sm">
+                    <IconComp className="w-5 h-5" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="font-bold text-slate-800 text-sm">{ben.title}</h4>
+                    <p className="text-xs text-gray-500 leading-relaxed">{ben.desc}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── SECCIÓN 4: ¿CÓMO FUNCIONA? (FONDO OSCURO) ── */}
+      <section className="py-20 text-white relative overflow-hidden bg-[#0e011f]" style={{ background: "linear-gradient(135deg, #0e011f 0%, #1a0533 100%)" }}>
+        
+        {/* Luces difuminadas de fondo */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#9B00CC] blur-3xl opacity-20 pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-[#00C8D4] blur-3xl opacity-15 pointer-events-none" />
+
+        <div className="relative z-10 max-w-5xl mx-auto px-6">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-3xl font-normal text-white mb-4 font-serif" style={{ fontFamily: "'Playfair Display', serif" }}>
+              ¿Cómo Funciona el Proceso?
+            </h2>
+            <p className="text-white/60 text-sm">
+              Sincronizar la excelencia de su establecimiento en el ecosistema digital toma solo unos minutos.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              {
+                n: "01",
+                title: "Ubique su Hotel",
+                desc: "Busque su propiedad en la base de datos de nominación utilizando nuestro motor de búsqueda."
+              },
+              {
+                n: "02",
+                title: "Valide el Borrador",
+                desc: "Verifique que las fotos, la descripción de alta gama y la localización reflejen su calidad."
+              },
+              {
+                n: "03",
+                title: "Enlace Canales",
+                desc: "Conecte sus líneas comerciales de WhatsApp o enlaces web de reservas directas."
+              },
+              {
+                n: "04",
+                title: "Activación en Vivo",
+                desc: "Su ficha se publica con insignia de distinción digital activa para reservas directas 2026."
+              }
+            ].map((step, i) => (
+              <div key={i} className="space-y-4 relative group">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl font-extrabold font-serif text-[#00C8D4]" style={{ fontFamily: "'Playfair Display', serif" }}>{step.n}</span>
+                  <div className="h-[2px] bg-gradient-to-r from-[#00C8D4] to-transparent flex-1" />
+                </div>
+                <h4 className="font-bold text-white text-base font-serif">{step.title}</h4>
+                <p className="text-xs text-white/60 leading-relaxed">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── SECCIÓN 5: MODELOS DE PRESENCIA Y CAPTACIÓN ── */}
+      <section className="py-20 bg-white">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-3xl font-normal text-slate-900 mb-4 font-serif" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Modelos de Presencia y Captación
+            </h2>
+            <p className="text-gray-500 text-sm">
+              Elija el nivel de integración tecnológica que requiere su propiedad dentro del ecosistema 2026.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 items-stretch">
+            
+            {/* Tarjeta 1: Sincronización Básica */}
+            <div className="bg-white rounded-3xl border border-gray-200/80 p-6 flex flex-col justify-between hover:shadow-md transition-all">
+              <div className="space-y-5">
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Espacio Básico</span>
+                  <h3 className="text-xl font-bold text-slate-800 mt-1">Sincronización Básica</h3>
                 </div>
                 
-                <div className="space-y-4 divide-y divide-gray-100">
-                  <div className="pt-3 first:pt-0">
-                    <h5 className="text-xs font-bold text-slate-800 mb-1">¿Competimos con sellos de calidad?</h5>
-                    <p className="text-[11px] text-gray-500 leading-relaxed">
-                      No. Respetamos y avalamos las acreditaciones externas. Nuestro foco es estrictamente tecnológico: posicionar su marca en Google y conectar clientes a su WhatsApp.
-                    </p>
-                  </div>
-                  <div className="pt-3">
-                    <h5 className="text-xs font-bold text-slate-800 mb-1">¿Qué incluye el espacio gratuito?</h5>
-                    <p className="text-[11px] text-gray-500 leading-relaxed">
-                      Ficha de presentación completa, geolocalización precisa, fotos descriptivas de alta calidad y enlaces a sus datos de contacto directo de forma permanente.
-                    </p>
-                  </div>
+                <div className="pt-2">
+                  <p className="text-2xl font-black text-slate-900 font-serif">Gratuito</p>
+                  <span className="text-xs text-slate-400">permanente sin cuota anual</span>
                 </div>
-              </div>
-
-            </div>
-
-          </div>
-        )}
-
-        {/* Sección de Comparativa Persuasiva: Sinergia de Prestigio */}
-        {hotel && (
-          <div className="mt-12 bg-white rounded-3xl border border-gray-100 p-8 md:p-10 shadow-sm">
-            <h3 className="text-xl md:text-2xl font-bold text-slate-800 text-center mb-8 font-serif" style={{ fontFamily: "'Playfair Display', serif" }}>
-              La Sinergia de Alta Gama
-            </h3>
-            <div className="grid md:grid-cols-2 gap-8 divide-y md:divide-y-0 md:divide-x divide-gray-100">
-              
-              {/* Lado 1: Hotel */}
-              <div className="space-y-4 text-left">
-                <div className="flex items-center gap-2.5 text-[#FF0096]">
-                  <div className="p-1.5 rounded-lg bg-pink-50 text-[#FF0096]">
-                    <Award className="w-5 h-5" />
-                  </div>
-                  <h4 className="font-bold text-slate-800 text-sm uppercase tracking-wider">Su Dominio: La Hospitalidad Física</h4>
-                </div>
+                
                 <p className="text-xs text-gray-500 leading-relaxed">
-                  Ustedes lideran el confort, la calidez del servicio, la gastronomía autóctona y el mantenimiento de estándares de primer nivel. Es la distinción en el mundo real que define a los mejores establecimientos del país.
+                  Ficha estándar en el buscador y el mapa interactivo nacional con datos y enlace de contacto básico.
                 </p>
-                <ul className="space-y-2">
-                  {["Calidad del servicio al huésped", "Arquitectura y confort local", "Gastronomía e identidad regional"].map((item, i) => (
+
+                <ul className="space-y-2.5 pt-4 border-t border-gray-100">
+                  {["Visualización en el mapa", "Foto de perfil", "Enlace básico de reservas"].map((feat, i) => (
                     <li key={i} className="flex items-center gap-2 text-xs text-slate-600">
-                      <CheckCircle2 className="w-4 h-4 text-[#FF0096] shrink-0" />
-                      <span>{item}</span>
+                      <Check className="w-4 h-4 text-[#FF0096]" />
+                      <span>{feat}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              {/* Lado 2: Plataforma */}
-              <div className="space-y-4 text-left pt-6 md:pt-0 md:pl-8">
-                <div className="flex items-center gap-2.5 text-[#00C8D4]">
-                  <div className="p-1.5 rounded-lg bg-cyan-50 text-[#00C8D4]">
-                    <Zap className="w-5 h-5" />
-                  </div>
-                  <h4 className="font-bold text-slate-800 text-sm uppercase tracking-wider">Nuestro Dominio: La Conversión Digital</h4>
+              <div className="pt-6">
+                <button 
+                  onClick={() => hotelId && setHotelId(hotelId)}
+                  className="w-full py-3 bg-gray-50 hover:bg-[#00C8D4] hover:text-white rounded-2xl text-xs font-bold text-[#00C8D4] border border-gray-100 hover:border-transparent transition-all"
+                >
+                  Habilitar Ficha
+                </button>
+              </div>
+            </div>
+
+            {/* Tarjeta 2: Ficha de Distinción (Recomendado/Turquesa) */}
+            <div className="rounded-3xl p-6 text-white flex flex-col justify-between hover:shadow-xl transition-all relative overflow-hidden"
+              style={{ background: "linear-gradient(135deg, #00C8D4 0%, #009ba6 100%)" }}>
+              
+              <div className="absolute top-0 right-0 bg-[#FF0096] text-white text-[9px] font-black uppercase tracking-wider px-3.5 py-1 rounded-bl-2xl">
+                Recomendado
+              </div>
+
+              <div className="space-y-5">
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-white/70">Destacado B2B</span>
+                  <h3 className="text-xl font-bold text-white mt-1">Ficha de Distinción</h3>
                 </div>
-                <p className="text-xs text-gray-500 leading-relaxed">
-                  Nosotros nos encargamos del embudo tecnológico: optimizar la visibilidad en motores de búsqueda, asegurar velocidades de carga instantáneas y establecer vías directas de cotización sin intermediarios.
+                
+                <div className="pt-2">
+                  <p className="text-2xl font-black text-white font-serif">$30 <span className="text-xs font-normal text-white/75">/ mes</span></p>
+                  <span className="text-xs text-white/80">facturado anualmente</span>
+                </div>
+                
+                <p className="text-xs text-white/90 leading-relaxed">
+                  Posicionamiento preferente en destinos turísticos, galería ilimitada y redireccionamiento directo y prioritario a WhatsApp comercial.
                 </p>
-                <ul className="space-y-2">
-                  {["Posicionamiento prioritario en Google", "Carga ultra-rápida (Cloudflare Edge)", "Redireccionamiento directo a reservas"].map((item, i) => (
-                    <li key={i} className="flex items-center gap-2 text-xs text-slate-600">
-                      <CheckCircle2 className="w-4 h-4 text-[#00C8D4] shrink-0" />
-                      <span>{item}</span>
+
+                <ul className="space-y-2.5 pt-4 border-t border-white/20">
+                  {["Todo lo del plan básico", "Posición prioritaria en su zona", "Insignia de Prestigio Digital", "Analíticas de clics y leads"].map((feat, i) => (
+                    <li key={i} className="flex items-center gap-2 text-xs text-white">
+                      <Check className="w-4 h-4 text-white" />
+                      <span>{feat}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-            </div>
-          </div>
-        )}
-
-        {/* ── SECCIÓN DE CIERRE (BOTTOM CTA) (Directriz AGENTS.md) ──────────────── */}
-        <div className="mt-16">
-          <div 
-            className="p-8 md:p-12 rounded-3xl text-center text-white relative overflow-hidden shadow-2xl"
-            style={{ background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)" }}
-          >
-            {/* Elemento de fondo difuminado */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/25 rounded-full blur-2xl pointer-events-none" />
-
-            <div className="relative z-10 max-w-2xl mx-auto space-y-6">
-              <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em] bg-white/20 px-3.5 py-1.5 rounded-full inline-block">
-                Soporte de Integración 24/7
-              </span>
-              
-              <h2 className="text-2xl md:text-4xl font-normal leading-tight font-serif" style={{ fontFamily: "'Playfair Display', serif" }}>
-                ¿Listo para sincronizar sus canales de reserva digital?
-              </h2>
-              
-              <p className="text-white/80 text-sm leading-relaxed max-w-lg mx-auto">
-                Consulte con un analista técnico de integración para optimizar su ficha de conversión o realizar ajustes a sus fotografías pre-cargadas en tiempo real.
-              </p>
-
-              <div className="pt-4">
-                <a
-                  href={getWhatsAppLink(`Hola, quisiera contactar con un analista de soporte técnico para sincronizar y optimizar la Ficha de Distinción de mi hotel.`)}
+              <div className="pt-6">
+                <a 
+                  href={getWhatsAppLink("Hola, me interesa activar el plan 'Ficha de Distinción' para mi hotel.")}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-white hover:bg-gray-50 text-[#FF0096] font-bold rounded-2xl shadow-xl transition-all text-sm md:text-base group"
+                  className="block w-full py-3 bg-white text-[#00C8D4] hover:bg-gray-50 rounded-2xl text-xs font-bold text-center shadow-md transition-all"
                 >
-                  {/* Icono de WhatsApp */}
-                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.625 1.451 5.436.002 9.858-4.405 9.86-9.83.001-2.628-1.02-5.1-2.871-6.955C16.398 1.959 13.93 1.905 12.01 1.905c-5.438 0-9.86 4.405-9.864 9.83-.001 1.798.485 3.5 1.408 4.949l-1.02 3.735 3.834-1.009z" />
-                  </svg>
-                  Sincronizar por WhatsApp
+                  Contactar Asesor
                 </a>
               </div>
             </div>
+
+            {/* Tarjeta 3: Ecosistema Corporativo (Fondo oscuro) */}
+            <div className="bg-[#0e011f] rounded-3xl border border-purple-950 p-6 flex flex-col justify-between text-white hover:shadow-md transition-all relative">
+              <div className="space-y-5">
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#FF0096]">Socio Tecnológico</span>
+                  <h3 className="text-xl font-bold text-white mt-1">Ecosistema SaaS</h3>
+                </div>
+                
+                <div className="pt-2">
+                  <p className="text-2xl font-black text-white font-serif">$80 <span className="text-xs font-normal text-white/75">/ mes</span></p>
+                  <span className="text-xs text-white/60">con aplicación web incluida</span>
+                </div>
+                
+                <p className="text-xs text-white/70 leading-relaxed">
+                  Aplicación web y motor de reservas independiente para el hotel, integrado en el portal nacional de Hoteles de Venezuela.
+                </p>
+
+                <ul className="space-y-2.5 pt-4 border-t border-purple-900/50">
+                  {["Todo lo anterior incluido", "App web personalizada propia", "Gestión de habitaciones y tarifas", "Soporte técnico dedicado 24/7"].map((feat, i) => (
+                    <li key={i} className="flex items-center gap-2 text-xs text-white/90">
+                      <Check className="w-4 h-4 text-[#FF0096]" />
+                      <span>{feat}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="pt-6">
+                <a 
+                  href={getWhatsAppLink("Hola, deseo solicitar una demo de la solución corporativa 'Ecosistema SaaS' para mi hotel.")}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block w-full py-3 bg-[#FF0096] hover:bg-[#ff0096]/95 rounded-2xl text-xs font-bold text-center transition-all"
+                >
+                  Solicitar Demostración
+                </a>
+              </div>
+            </div>
+
           </div>
         </div>
+      </section>
 
+      {/* ── SECCIÓN DE CIERRE (BOTTOM CTA) (Directriz AGENTS.md) ──────────────── */}
+      <div className="max-w-5xl mx-auto px-6 mt-12">
+        <div 
+          className="p-8 md:p-12 rounded-3xl text-center text-white relative overflow-hidden shadow-2xl"
+          style={{ background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)" }}
+        >
+          {/* Elemento de fondo difuminado */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/25 rounded-full blur-2xl pointer-events-none" />
+
+          <div className="relative z-10 max-w-2xl mx-auto space-y-6">
+            <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em] bg-white/20 px-3.5 py-1.5 rounded-full inline-block">
+              Soporte de Integración 24/7
+            </span>
+            
+            <h2 className="text-2xl md:text-4xl font-normal leading-tight font-serif" style={{ fontFamily: "'Playfair Display', serif" }}>
+              ¿Listo para Sincronizar su Presencia?
+            </h2>
+            
+            <p className="text-white/80 text-sm leading-relaxed max-w-lg mx-auto">
+              Consulte con un analista de integración para activar sus enlaces de reserva directo o resolver cualquier duda técnica de sincronización en tiempo real.
+            </p>
+
+            <div className="pt-4">
+              <a
+                href={getWhatsAppLink(`Hola, deseo contactar con un analista técnico para sincronizar y optimizar la Ficha de Distinción de mi hotel.`)}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-white hover:bg-gray-50 text-[#FF0096] font-bold rounded-2xl shadow-xl transition-all text-sm md:text-base group"
+              >
+                {/* Icono de WhatsApp */}
+                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                  <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.625 1.451 5.436.002 9.858-4.405 9.86-9.83.001-2.628-1.02-5.1-2.871-6.955C16.398 1.959 13.93 1.905 12.01 1.905c-5.438 0-9.86 4.405-9.864 9.83-.001 1.798.485 3.5 1.408 4.949l-1.02 3.735 3.834-1.009z" />
+                </svg>
+                Sincronizar por WhatsApp
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
 
     </div>
