@@ -170,9 +170,9 @@ export function ExcelenciaLanding() {
         
         {/* Imagen del Banner con zoom de seguridad scale-[1.08] */}
         <img 
-          src="/images/landing.png" 
+          src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1800&q=80" 
           alt="Índice de Prestigio 2026"
-          className="w-full h-full object-cover scale-[1.08] opacity-50"
+          className="w-full h-full object-cover scale-[1.08] opacity-40"
         />
 
         {/* Degradado superior para legibilidad */}
@@ -183,6 +183,11 @@ export function ExcelenciaLanding() {
 
         {/* Contenido centrado del Banner */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 z-10">
+          <img 
+            src="/images/logo-hdv-transparent.png" 
+            alt="Hoteles de Venezuela" 
+            className="h-16 md:h-20 mb-6 object-contain drop-shadow-lg"
+          />
           <p className="text-[#00C8D4] text-xs md:text-sm font-black tracking-[0.4em] uppercase mb-4 drop-shadow-md">
             SINCRONIZACIÓN DE PRESTIGIO 2026
           </p>
