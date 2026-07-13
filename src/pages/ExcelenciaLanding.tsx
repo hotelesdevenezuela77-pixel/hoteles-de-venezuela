@@ -170,9 +170,9 @@ export function ExcelenciaLanding() {
         
         {/* Imagen del Banner con zoom de seguridad scale-[1.08] */}
         <img 
-          src={hotel?.primary_image || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1800&q=80"} 
+          src="/images/landing.png" 
           alt="Índice de Prestigio 2026"
-          className="w-full h-full object-cover scale-[1.08] opacity-40"
+          className="w-full h-full object-cover scale-[1.08] opacity-50"
         />
 
         {/* Degradado superior para legibilidad */}
@@ -651,10 +651,10 @@ export function ExcelenciaLanding() {
       <section className="py-20 bg-gray-50/30">
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-3xl font-normal text-slate-900 mb-4 font-serif" style={{ fontFamily: "'Playfair Display', serif" }}>
+            <h2 className="text-3xl font-normal text-white mb-4 font-serif" style={{ fontFamily: "'Playfair Display', serif" }}>
               Beneficios de Sincronizar su Presencia
             </h2>
-            <p className="text-gray-500 text-sm">
+            <p className="text-white/70 text-sm">
               La sinergia perfecta entre sus estándares de hospitalidad y nuestra infraestructura de marketing digital.
             </p>
           </div>
@@ -916,7 +916,7 @@ export function ExcelenciaLanding() {
               Soporte de Integración 24/7
             </span>
             
-            <h2 className="text-2xl md:text-4xl font-normal leading-tight font-serif" style={{ fontFamily: "'Playfair Display', serif" }}>
+            <h2 className="text-2xl md:text-4xl font-normal leading-tight font-serif text-white" style={{ fontFamily: "'Playfair Display', serif" }}>
               ¿Listo para Sincronizar su Presencia?
             </h2>
             
