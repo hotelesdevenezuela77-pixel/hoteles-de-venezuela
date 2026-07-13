@@ -147,7 +147,7 @@ function App() {
 
         <Route path="/membresias" component={Membresias} />
         <Route path="/reportar-pago" component={ReportarPago} />
-        <Route path="/excelencia-2026" component={ExcelenciaLanding} />
+        <Route path="/prestigio-2026" component={ExcelenciaLanding} />
 
         {/* Dashboards Propietarios */}
         <Route path="/mis-negocios" component={OwnerDashboard} />

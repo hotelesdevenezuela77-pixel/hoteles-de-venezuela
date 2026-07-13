@@ -186,7 +186,7 @@ export function ExcelenciaLanding() {
           <img 
             src="/images/logo-hdv-transparent.png" 
             alt="Hoteles de Venezuela" 
-            className="h-16 md:h-20 mb-6 object-contain drop-shadow-lg"
+            className="max-h-16 md:max-h-20 w-auto object-contain mb-6 drop-shadow-lg block"
           />
           <p className="text-[#00C8D4] text-xs md:text-sm font-black tracking-[0.4em] uppercase mb-4 drop-shadow-md">
             SINCRONIZACIÓN DE PRESTIGIO 2026
