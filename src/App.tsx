@@ -64,6 +64,7 @@ import { Paquetes } from "./pages/Paquetes";
 import { LinkHub } from "./pages/LinkHub";
 import { BlogDetalle } from "./pages/BlogDetalle";
 import { SitioDetalle } from "./pages/SitioDetalle";
+import { ExcelenciaLanding } from "./pages/ExcelenciaLanding";
 
 // Importación del Agente IA sin llaves apuntando a la carpeta admin
 import AdminConversacionalIA from "./pages/admin/AdminConversacionalIA";
@@ -146,6 +147,7 @@ function App() {
 
         <Route path="/membresias" component={Membresias} />
         <Route path="/reportar-pago" component={ReportarPago} />
+        <Route path="/excelencia-2026" component={ExcelenciaLanding} />
 
         {/* Dashboards Propietarios */}
         <Route path="/mis-negocios" component={OwnerDashboard} />
