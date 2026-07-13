@@ -172,11 +172,11 @@ export function ExcelenciaLanding() {
         <img 
           src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1800&q=80" 
           alt="Índice de Prestigio 2026"
-          className="w-full h-full object-cover scale-[1.08] opacity-40"
+          className="w-full h-full object-cover scale-[1.08] opacity-90"
         />
 
-        {/* Degradado superior para legibilidad */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/45 to-transparent pointer-events-none" />
+        {/* Degradado superior para legibilidad (suavizado) */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-transparent pointer-events-none" />
 
         {/* Degradado inferior blanco para fundirse con el fondo */}
         <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-[#f8fafc] via-[#f8fafc]/50 to-transparent pointer-events-none" />
