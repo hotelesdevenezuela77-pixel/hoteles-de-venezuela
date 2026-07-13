@@ -170,35 +170,27 @@ export function ExcelenciaLanding() {
         
         {/* Imagen del Banner con zoom de seguridad scale-[1.08] */}
         <img 
-          src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1800&q=80" 
+          src="/images/landing.png" 
           alt="Índice de Prestigio 2026"
-          className="w-full h-full object-cover scale-[1.08] opacity-90"
+          className="w-full h-full object-cover scale-[1.08]"
         />
-
-        {/* Degradado superior para legibilidad (suavizado) */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-transparent pointer-events-none" />
 
         {/* Degradado inferior blanco para fundirse con el fondo */}
         <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-[#f8fafc] via-[#f8fafc]/50 to-transparent pointer-events-none" />
 
         {/* Contenido centrado del Banner */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 z-10">
-          <img 
-            src="/images/logo-hdv-transparent.png" 
-            alt="Hoteles de Venezuela" 
-            className="max-h-16 md:max-h-20 w-auto object-contain mb-6 drop-shadow-lg block"
-          />
-          <p className="text-[#00C8D4] text-xs md:text-sm font-black tracking-[0.4em] uppercase mb-4 drop-shadow-md">
+          <p className="text-[#00C8D4] text-xs md:text-sm font-black tracking-[0.4em] uppercase mb-4 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
             SINCRONIZACIÓN DE PRESTIGIO 2026
           </p>
           
-          <h1 className="text-3xl md:text-5xl lg:text-6xl font-normal text-white mb-6 leading-tight max-w-4xl tracking-wide font-serif" style={{ fontFamily: "'Playfair Display', 'Cinzel', serif" }}>
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-normal text-white mb-6 leading-tight max-w-4xl tracking-wide font-serif drop-shadow-[0_3px_10px_rgba(0,0,0,0.95)]" style={{ fontFamily: "'Playfair Display', 'Cinzel', serif" }}>
             {hotel 
               ? `Bienvenido al Comité de Prestigio, ${hotel.name}`
               : "Índice de Prestigio y Distinción 2026"}
           </h1>
           
-          <p className="text-white/95 text-sm md:text-base max-w-3xl mx-auto font-sans leading-relaxed drop-shadow">
+          <p className="text-white/95 text-sm md:text-base max-w-3xl mx-auto font-sans leading-relaxed drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]">
             {hotel 
               ? "Reconocemos y honramos el prestigio de los establecimientos que ya lideran con los más altos estándares físicos del país. No somos una entidad de certificación de calidad; somos su complemento de captación digital moderna."
               : "Validamos la excelencia operativa de los hoteles y posadas de alta gama en Venezuela. Integre su distinción física con la infraestructura de visibilidad y conversión de nuestro ecosistema."}
