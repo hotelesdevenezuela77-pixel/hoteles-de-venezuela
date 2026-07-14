@@ -352,7 +352,8 @@ export function ExcelenciaLanding() {
       </div>
 
       {/* ── SECCIÓN 1: FICHA DE DISTINCIÓN DIGITAL (EL BORRADOR DEL HOTEL) ── */}
-      <div id="ficha-distincion" className="max-w-5xl mx-auto px-6 -mt-10 relative z-20 mb-20">
+      <div className="w-full bg-white py-12 relative z-20">
+        <div id="ficha-distincion" className="max-w-5xl mx-auto px-6 -mt-24 relative z-20 mb-20">
         
         {loading ? (
           <div className="bg-white rounded-3xl shadow-xl p-12 text-center border border-gray-100 flex flex-col items-center justify-center min-h-[300px]">
@@ -362,7 +363,8 @@ export function ExcelenciaLanding() {
         ) : !hotel ? (
           
           /* BUSCADOR DE HOTELES (SIN HOTEL_ID O INVÁLIDO) */
-          <div id="buscador-prestigio" className="bg-white rounded-3xl shadow-xl p-8 md:p-12 border border-gray-100">
+          <div id="buscador-prestigio" className="priority-glow-card group shadow-2xl transition-all duration-300 w-full animate-fade-in" style={{ padding: "3px", background: "white" }}>
+            <div className="priority-glow-card-inner bg-white p-8 md:p-12 border border-gray-100 flex flex-col justify-between">
             <div className="max-w-2xl mx-auto text-center mb-8">
               <div className="inline-flex p-3 rounded-full bg-cyan-50 text-[#00C8D4] mb-4">
                 <Award className="w-8 h-8" />
@@ -487,6 +489,7 @@ export function ExcelenciaLanding() {
               </div>
             </div>
           </div>
+        </div>
         ) : (
           
           /* DETALLE DEL HOTEL CON SU FICHA Y TARJETA DE ESTADÍSTICAS B2B */
@@ -733,6 +736,7 @@ export function ExcelenciaLanding() {
           </div>
         )}
 
+        </div>
       </div>
 
       {/* ── SECCIÓN 2: ¿PARA QUIÉN ES ESTE ECOSISTEMA? ── */}
