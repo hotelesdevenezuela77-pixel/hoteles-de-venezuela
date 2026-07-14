@@ -165,41 +165,121 @@ export function ExcelenciaLanding() {
         </span>
       </div>
 
-      {/* ── HERO BANNER PORTADA (FULL-BLEED) ────────────────────────────────── */}
-      <div className="w-full relative h-[450px] md:h-[550px] overflow-hidden bg-[#0e011f]">
+      {/* ── HERO BANNER PORTADA (NUEVA ESTRATEGIA: SPLIT MODERN HERO) ─────────── */}
+      <div className="w-full min-h-[500px] lg:min-h-[580px] relative overflow-hidden bg-[#0e011f] flex items-center pt-10 pb-20 lg:py-0">
         
-        {/* Imagen del Banner con zoom de seguridad scale-[1.08] */}
-        <img 
-          src="/images/landing.png" 
-          alt="Índice de Prestigio 2026"
-          className="w-full h-full object-cover scale-[1.08]"
-        />
-
-        {/* Degradado inferior blanco para fundirse con el fondo */}
-        <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-[#f8fafc] via-[#f8fafc]/50 to-transparent pointer-events-none" />
-
-        {/* Contenido centrado del Banner */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 z-10">
-          <p className="text-[#00C8D4] text-xs md:text-sm font-black tracking-[0.4em] uppercase mb-4 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-            SINCRONIZACIÓN DE PRESTIGIO 2026
-          </p>
+        {/* Luces y degradados de fondo neon */}
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#9B00CC] blur-[120px] opacity-25 pointer-events-none" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#00C8D4] blur-[120px] opacity-15 pointer-events-none" />
+        
+        {/* Contenedor principal con grid */}
+        <div className="max-w-6xl mx-auto px-6 w-full grid lg:grid-cols-12 gap-10 items-center relative z-10">
           
-          <h1 className="text-3xl md:text-5xl lg:text-6xl font-normal text-white mb-6 leading-tight max-w-4xl tracking-wide font-serif drop-shadow-[0_3px_10px_rgba(0,0,0,0.95)]" style={{ fontFamily: "'Playfair Display', 'Cinzel', serif" }}>
-            {hotel 
-              ? `Bienvenido al Comité de Prestigio, ${hotel.name}`
-              : "Índice de Prestigio y Distinción 2026"}
-          </h1>
-          
-          <p className="text-white/95 text-sm md:text-base max-w-3xl mx-auto font-sans leading-relaxed drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]">
-            {hotel 
-              ? "Reconocemos y honramos el prestigio de los establecimientos que ya lideran con los más altos estándares físicos del país. No somos una entidad de certificación de calidad; somos su complemento de captación digital moderna."
-              : "Validamos la excelencia operativa de los hoteles y posadas de alta gama en Venezuela. Integre su distinción física con la infraestructura de visibilidad y conversión de nuestro ecosistema."}
-          </p>
+          {/* Lado izquierdo: Textos y Acciones */}
+          <div className="lg:col-span-7 text-left space-y-6">
+            <span className="text-[#00C8D4] text-xs md:text-sm font-black tracking-[0.3em] uppercase block">
+              SINCRONIZACIÓN DE PRESTIGIO 2026
+            </span>
+            
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-normal text-white leading-tight tracking-wide font-serif" style={{ fontFamily: "'Playfair Display', 'Cinzel', serif" }}>
+              {hotel 
+                ? <>Bienvenido al <span className="text-[#FF0096] font-bold">Comité de Prestigio</span>, {hotel.name}</>
+                : <>Índice de <span className="text-[#FF0096]">Prestigio</span> y <span className="text-[#00C8D4]">Distinción</span> 2026</>}
+            </h1>
+            
+            <p className="text-slate-300 text-sm md:text-base max-w-xl font-sans leading-relaxed">
+              {hotel 
+                ? "Reconocemos y honramos el prestigio de los establecimientos que ya lideran con los más altos estándares físicos del país. No somos una entidad de certificación de calidad; somos su complemento de captación digital moderna."
+                : "Validamos la excelencia operativa de los hoteles y posadas de alta gama en Venezuela. Integre su distinción física con la infraestructura de visibilidad y conversión de nuestro ecosistema."}
+            </p>
+
+            {/* CTAs rápidos en el Hero */}
+            <div className="flex flex-wrap items-center gap-4 pt-2">
+              {hotel ? (
+                <button
+                  onClick={() => {
+                    const el = document.getElementById("ficha-distincion");
+                    el?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  className="px-6 py-3.5 bg-gradient-to-r from-[#FF0096] to-[#9B00CC] text-white font-bold rounded-2xl shadow-lg hover:opacity-90 transition-all text-sm cursor-pointer"
+                >
+                  Ver Ficha de Distinción
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    const el = document.getElementById("buscador-prestigio");
+                    el?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  className="px-6 py-3.5 bg-gradient-to-r from-[#00C8D4] to-[#009ba6] text-white font-bold rounded-2xl shadow-lg hover:opacity-90 transition-all text-sm cursor-pointer"
+                >
+                  Buscar mi Hotel Nominado
+                </button>
+              )}
+              <a
+                href={getWhatsAppLink("Hola, deseo más información sobre el Índice de Prestigio 2026.")}
+                target="_blank"
+                rel="noreferrer"
+                className="px-6 py-3.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl border border-white/20 transition-all text-sm flex items-center gap-2"
+              >
+                Hablar con Asesor
+              </a>
+            </div>
+          </div>
+
+          {/* Lado derecho: Mockup de Ficha / Vista de Prestigio */}
+          <div className="lg:col-span-5 flex justify-center lg:justify-end">
+            <div className="w-full max-w-[380px] rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-[#1a0533]/80 backdrop-blur-md relative group hover:scale-[1.02] transition-all duration-300">
+              
+              {/* Imagen del hotel / resort */}
+              <div className="h-48 bg-slate-800 relative overflow-hidden">
+                <img 
+                  src="/images/landing.png" 
+                  alt="Prestigio 2026"
+                  className="w-full h-full object-cover scale-[1.08] transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute top-4 left-4 bg-[#FF0096] text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-md">
+                  Insignia Oficial 2026
+                </div>
+              </div>
+
+              {/* Contenido de la tarjeta */}
+              <div className="p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#00C8D4]">Comité de Selección</span>
+                  <div className="flex items-center gap-1 text-amber-400">
+                    <Star className="w-3.5 h-3.5 fill-current" />
+                    <span className="text-xs font-bold text-white">4.9 / 5.0</span>
+                  </div>
+                </div>
+
+                <h3 className="text-base font-bold text-white font-serif">
+                  {hotel ? hotel.name : "Establecimientos de Alta Gama"}
+                </h3>
+
+                <p className="text-xs text-slate-300 leading-relaxed line-clamp-2">
+                  {hotel ? hotel.description : "Acceso a la vitrina digital exclusiva que conecta directamente a los viajeros premium de Venezuela con su canal oficial de reservas."}
+                </p>
+
+                <div className="border-t border-white/10 pt-4 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
+                    <span className="text-[10px] font-bold text-slate-300 uppercase">Validación Disponible</span>
+                  </div>
+                  <span className="text-xs font-bold text-[#00C8D4]">Canal Gratuito</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
+
+        {/* Degradado inferior blanco para fundirse con el fondo de la página */}
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#f8fafc] via-[#f8fafc]/40 to-transparent pointer-events-none" />
       </div>
 
       {/* ── SECCIÓN 1: FICHA DE DISTINCIÓN DIGITAL (EL BORRADOR DEL HOTEL) ── */}
-      <div className="max-w-5xl mx-auto px-6 -mt-16 relative z-20 mb-20">
+      <div id="ficha-distincion" className="max-w-5xl mx-auto px-6 -mt-10 relative z-20 mb-20">
         
         {loading ? (
           <div className="bg-white rounded-3xl shadow-xl p-12 text-center border border-gray-100 flex flex-col items-center justify-center min-h-[300px]">
@@ -209,7 +289,7 @@ export function ExcelenciaLanding() {
         ) : !hotel ? (
           
           /* BUSCADOR DE HOTELES (SIN HOTEL_ID O INVÁLIDO) */
-          <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 border border-gray-100">
+          <div id="buscador-prestigio" className="bg-white rounded-3xl shadow-xl p-8 md:p-12 border border-gray-100">
             <div className="max-w-2xl mx-auto text-center mb-8">
               <div className="inline-flex p-3 rounded-full bg-cyan-50 text-[#00C8D4] mb-4">
                 <Award className="w-8 h-8" />
@@ -648,10 +728,10 @@ export function ExcelenciaLanding() {
       <section className="py-20 bg-gray-50/30">
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-3xl font-normal text-white mb-4 font-serif" style={{ fontFamily: "'Playfair Display', serif" }}>
+            <h2 className="text-3xl font-normal text-slate-900 mb-4 font-serif" style={{ fontFamily: "'Playfair Display', serif" }}>
               Beneficios de Sincronizar su Presencia
             </h2>
-            <p className="text-white/70 text-sm">
+            <p className="text-slate-600 text-sm">
               La sinergia perfecta entre sus estándares de hospitalidad y nuestra infraestructura de marketing digital.
             </p>
           </div>
