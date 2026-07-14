@@ -58,6 +58,7 @@ import { AdminReseñas } from "./pages/admin/AdminReseñas";
 import { AdminClientes } from "./pages/admin/AdminClientes";
 import { AdminSaaS } from "./pages/admin/AdminSaaS";
 import { AdminLogs } from "./pages/admin/AdminLogs";
+import { AdminGuiones } from "./pages/admin/AdminGuiones";
 import { Centauros } from "./pages/Centauros";
 import { CustomPageViewer } from "./pages/CustomPageViewer";
 import { Paquetes } from "./pages/Paquetes";
@@ -186,6 +187,7 @@ function App() {
         <Route path="/admin/reservas-paquetes" component={AdminReservasPaquetes} />
         <Route path="/admin/reseñas" component={AdminReseñas} />
         <Route path="/admin/ia-conversacional" component={AdminConversacionalIA} />
+        <Route path="/admin/asistente-guiones" component={AdminGuiones} />
         <Route path="/admin/clientes" component={AdminClientes} />
         <Route path="/admin/saas" component={AdminSaaS} />
         <Route path="/admin/logs" component={AdminLogs} />

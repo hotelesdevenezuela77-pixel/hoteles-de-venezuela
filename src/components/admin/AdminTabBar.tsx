@@ -32,6 +32,7 @@ const TABS = [
   { href: "/centaurus",                label: "Centaurus",         icon: Star,            countKey: undefined         },
   { href: "/crm",                      label: "WhatsApp CRM",      icon: MessageSquare,   countKey: undefined         },
   { href: "/admin/ia-conversacional",  label: "Agente IA",         icon: Bot,             countKey: undefined         },
+  { href: "/admin/asistente-guiones",  label: "Asistente Guiones", icon: Sparkles,        countKey: undefined         },
   { href: "/admin/clientes",           label: "Base de Clientes",  icon: Users,           countKey: undefined         },
   { href: "/admin/tips",               label: "Tips Turismo",      icon: Leaf,            countKey: undefined         },
   { href: "/admin/sitios",             label: "Sitios Turísticos", icon: Map,             countKey: undefined         },
