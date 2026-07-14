@@ -154,7 +154,7 @@ export function ExcelenciaLanding() {
       
       {/* ── BARRA DE ESTATUS DE COMITÉ (FOMO) ────────────────────────────────── */}
       <div 
-        className="w-full text-white text-center py-2.5 px-4 text-xs md:text-sm font-semibold sticky top-0 z-50 shadow-md flex items-center justify-center gap-2 animate-pulse"
+        className="w-full text-white text-center py-2.5 px-4 text-xs md:text-sm font-semibold shadow-md flex items-center justify-center gap-2 animate-pulse"
         style={{ background: "linear-gradient(90deg, #FF0096, #9B00CC)" }}
       >
         <Sparkles className="w-4 h-4 text-[#00C8D4] animate-spin" />
@@ -164,28 +164,6 @@ export function ExcelenciaLanding() {
             : "Sincronización abierta: Cupos de distinción digital limitados por región geográfica"}
         </span>
       </div>
-
-      {/* ── CUSTOM MINIMALIST LANDING HEADER ────────────────────────────────── */}
-      <header className="w-full bg-[#0e011f] border-b border-white/5 py-4 px-6 flex items-center justify-between relative z-30">
-        <div className="max-w-6xl mx-auto w-full flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <img 
-              src="/images/logo-hdv-transparent.png" 
-              alt="Hoteles de Venezuela"
-              className="h-9 w-auto object-contain brightness-0 invert"
-            />
-          </Link>
-          
-          <a
-            href={getWhatsAppLink("Hola, deseo más información sobre el Índice de Prestigio 2026.")}
-            target="_blank"
-            rel="noreferrer"
-            className="px-4 py-2 bg-gradient-to-r from-[#00C8D4] to-[#009ba6] text-white font-bold text-xs rounded-xl shadow-md transition-all hover:scale-[1.03] active:scale-[0.98]"
-          >
-            Soporte B2B
-          </a>
-        </div>
-      </header>
 
       {/* ── HERO BANNER PORTADA (NUEVA ESTRATEGIA: SPLIT MODERN HERO) ─────────── */}
       <div className="w-full min-h-[500px] lg:min-h-[580px] relative overflow-hidden bg-[#0e011f] flex items-center pt-10 pb-20 lg:py-0">
@@ -746,14 +724,18 @@ export function ExcelenciaLanding() {
         </div>
       </section>
 
-      {/* ── SECCIÓN 3: BENEFICIOS DE INTEGRACIÓN DIGITAL (6 TARJETAS 3x2) ── */}
-      <section className="py-20 bg-gray-50/30">
-        <div className="max-w-5xl mx-auto px-6">
+      {/* ── SECCIÓN 3: BENEFICIOS DE INTEGRACIÓN DIGITAL (PARALLAX BEACH BACKGROUND) ── */}
+      <section className="py-24 relative overflow-hidden bg-fixed bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/images/beach_parallax.png')" }}>
+        
+        {/* Capa de superposición para contraste y tinte de marca */}
+        <div className="absolute inset-0 bg-[#0e011f]/80 z-0" />
+        
+        <div className="max-w-5xl mx-auto px-6 relative z-10">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-3xl font-normal text-slate-900 mb-4 font-serif" style={{ fontFamily: "'Playfair Display', serif" }}>
+            <h2 className="text-3xl font-normal text-white mb-4 font-serif" style={{ fontFamily: "'Playfair Display', serif" }}>
               Beneficios de Sincronizar su Presencia
             </h2>
-            <p className="text-slate-600 text-sm">
+            <p className="text-slate-200 text-sm">
               La sinergia perfecta entre sus estándares de hospitalidad y nuestra infraestructura de marketing digital.
             </p>
           </div>
@@ -1041,17 +1023,6 @@ export function ExcelenciaLanding() {
         </div>
       </div>
 
-      {/* ── SIMPLE LANDING FOOTER ───────────────────────────────────────────── */}
-      <footer className="w-full py-8 text-center text-xs text-slate-400 bg-white border-t border-gray-100 mt-20">
-        <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p>© {new Date().getFullYear()} Hoteles de Venezuela LLC. Todos los derechos reservados.</p>
-          <div className="flex gap-4">
-            <Link href="/privacidad" className="hover:text-[#FF0096] transition-colors">Privacidad</Link>
-            <Link href="/terminos" className="hover:text-[#FF0096] transition-colors">Términos</Link>
-            <Link href="/" className="hover:text-[#FF0096] transition-colors">Volver a Inicio</Link>
-          </div>
-        </div>
-      </footer>
 
     </div>
   );
