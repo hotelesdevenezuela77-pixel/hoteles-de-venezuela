@@ -820,7 +820,7 @@ export function ExcelenciaLanding() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
-                title: "Posicionamiento Google #1",
+                title: "Posicionamiento en Google",
                 desc: "Visibilidad garantizada en los términos de búsqueda más cotizados de hospitalidad en el país.",
                 icon: Globe
               },
