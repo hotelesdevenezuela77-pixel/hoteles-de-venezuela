@@ -432,30 +432,30 @@ export function Home() {
       };
     });
 
-  const websites = [
+  const programs = [
     {
-      name: "hotelesdevenezuela.com",
-      url: "https://hotelesdevenezuela.com",
-      description: "Catálogo oficial nacional con contacto directo libre de comisiones.",
+      name: "Prestigio 2026",
+      url: "/prestigio-2026",
+      description: "Postula tu hospedaje al sello de calidad más prestigioso del turismo en Venezuela.",
       gradient: "from-[#FF0096] to-[#9B00CC]",
       shadow: "shadow-[#FF0096]/25",
-      inactive: false
+      icon: Award
     },
     {
-      name: "hotelesenmorrocoy.com", 
-      url: "https://hotelesenmorrocoy.com",
-      description: "Especialistas en posadas y cayos del Parque Nacional Morrocoy.",
+      name: "50 Fundadores",
+      url: "/50-fundadores",
+      description: "Asegura tu posición VIP y forma parte del selecto club de hoteles fundadores del portal.",
       gradient: "from-[#00C8D4] to-[#008ba3]",
       shadow: "shadow-[#00C8D4]/25",
-      inactive: true
+      icon: ShieldCheck
     },
     {
-      name: "hotelesdevenezuela.online",
-      url: "https://hotelesdevenezuela.online",
-      description: "Motor de reservas directas y pasarela directa al WhatsApp del hotel.",
+      name: "Alianzas para Agencias",
+      url: "/alianzas-para-agencias",
+      description: "Conecta tu agencia de viajes con la red de hospedajes más grande de Venezuela y obtén beneficios.",
       gradient: "from-[#9B00CC] to-[#4f46e5]",
       shadow: "shadow-[#9B00CC]/25",
-      inactive: true
+      icon: Compass
     }
   ];
 
@@ -675,68 +675,57 @@ export function Home() {
         <span>⚡ Conexión Directa Verificada: El 100% de los establecimientos en nuestro portal han sido auditados en persona.</span>
       </div>
 
-      {/* 2. NUESTRA RED DE SITIOS */}
-      {aboutSection.isActive && (
-        <section className="py-16 bg-gray-50 border-b border-gray-100 px-4">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-10">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-magenta/10 border border-brand-magenta/20 text-xs font-black text-brand-magenta mb-4">
-                <Globe className="w-3.5 h-3.5" />
-                <span>{aboutSection.subtitle || "RED DE SITIOS OFICIAL"}</span>
+      {/* 2. PROGRAMAS Y OPORTUNIDADES */}
+      {aboutSection.isActive && (() => {
+        const sectionSubtitle = aboutSection.subtitle === "RED DE SITIOS OFICIAL" ? "PROGRAMAS Y ALIANZAS" : aboutSection.subtitle;
+        const sectionTitle = aboutSection.title === "Ecosistema Hoteles de Venezuela" ? "Programas y Oportunidades" : aboutSection.title;
+        const sectionDescription = aboutSection.description === "Nuestra red de portales conecta a miles de turistas cada día directamente con los hoteleros locales." 
+          ? "Únete a nuestras iniciativas oficiales para potenciar tu hospedaje, captar clientes y forjar alianzas de valor." 
+          : aboutSection.description;
+        
+        return (
+          <section className="py-16 bg-gray-50 border-b border-gray-100 px-4">
+            <div className="max-w-7xl mx-auto">
+              <div className="text-center mb-10">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-magenta/10 border border-brand-magenta/20 text-xs font-black text-brand-magenta mb-4">
+                  {sectionSubtitle === "PROGRAMAS Y ALIANZAS" ? <Sparkles className="w-3.5 h-3.5" /> : <Globe className="w-3.5 h-3.5" />}
+                  <span>{sectionSubtitle}</span>
+                </div>
+                <h2 className="text-2xl md:text-3xl font-black text-gray-800 tracking-tight">
+                  {sectionTitle}
+                </h2>
+                <p className="text-gray-400 text-xs mt-2 max-w-lg mx-auto">
+                  {sectionDescription}
+                </p>
               </div>
-              <h2 className="text-2xl md:text-3xl font-black text-gray-800 tracking-tight">
-                {aboutSection.title}
-              </h2>
-              <p className="text-gray-400 text-xs mt-2 max-w-lg mx-auto">
-                {aboutSection.description}
-              </p>
-            </div>
 
-            <div className="grid md:grid-cols-3 gap-6">
-              {websites.map((site) => {
-                const CardComponent = site.inactive ? 'div' : 'a';
-                return (
-                  <CardComponent
-                    key={site.name}
-                    {...(site.inactive ? {} : { href: site.url, target: "_blank", rel: "noopener noreferrer" })}
-                    className={`group bg-gradient-to-br ${site.gradient} rounded-2xl p-6 ${
-                      site.inactive
-                        ? 'opacity-80 cursor-default select-none'
-                        : 'hover:-translate-y-1.5 hover:shadow-2xl transition-all duration-300'
-                    } ${site.shadow} relative overflow-hidden text-left block border border-white/10`}
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-white border border-white/10">
-                        <Globe className="w-5 h-5" />
+              <div className="grid md:grid-cols-3 gap-6">
+                {programs.map((site) => {
+                  const IconComponent = site.icon;
+                  return (
+                    <Link
+                      key={site.name}
+                      href={site.url}
+                      className={`group bg-gradient-to-br ${site.gradient} rounded-2xl p-6 hover:-translate-y-1.5 hover:shadow-2xl ${site.shadow} transition-all duration-300 relative overflow-hidden text-left block border border-white/10`}
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-white border border-white/10">
+                          <IconComponent className="w-5 h-5" />
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-white group-hover:translate-x-1 transition-all" />
                       </div>
-                      {site.inactive ? (
-                        <span className="bg-white/20 text-white text-[9px] uppercase font-black tracking-wider px-2.5 py-1 rounded-md flex items-center gap-1.5 animate-pulse">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                          En Migración
-                        </span>
-                      ) : (
-                        <ExternalLink className="w-4 h-4 text-white/60 group-hover:text-white transition-colors" />
-                      )}
-                    </div>
-                    <h3 className="font-extrabold text-base text-white mb-1 drop-shadow-xs">
-                      {site.name}
-                    </h3>
-                    <p className="text-xs text-white/90 leading-relaxed mb-2">
-                      {site.description}
-                    </p>
-                    {site.inactive && (
-                      <div className="mt-3 pt-3 border-t border-white/10 flex items-center gap-1.5 text-[10px] text-amber-200 font-bold">
-                        <Info className="w-3.5 h-3.5 shrink-0" />
-                        <span>Inactiva temporalmente por migración de servidor</span>
-                      </div>
-                    )}
-                  </CardComponent>
-                );
-              })}
+                      <h3 className="font-extrabold text-base text-white mb-1 drop-shadow-xs">
+                        {site.name}
+                      </h3>
+                      <p className="text-xs text-white/90 leading-relaxed">{site.description}</p>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        </section>
-      )}
+          </section>
+        );
+      })()}
 
       {/* 3. VENTAJAS / ¿QUÉ HACEMOS? */}
       {featuresSection.isActive && (
