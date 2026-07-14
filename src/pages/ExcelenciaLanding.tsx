@@ -6,6 +6,7 @@ import {
   Star, Shield, Loader2, HelpCircle, AlertTriangle, Zap, 
   CheckCircle2, Compass, Phone, Users, Landmark, Globe, CheckCircle
 } from "lucide-react";
+import { TrackedWhatsAppButton } from "../components/layout/TrackedWhatsAppButton";
 
 // Paleta de colores oficial
 // Cian: #00C8D4, Magenta: #FF0096, Púrpura: #9B00CC
@@ -23,6 +24,8 @@ interface Establishment {
   rating_avg: number | null;
   primary_image: string | null;
   address: string | null;
+  whatsapp?: string | null;
+  phone?: string | null;
 }
 
 export function ExcelenciaLanding() {
@@ -56,7 +59,7 @@ export function ExcelenciaLanding() {
         // Cargar algunos hoteles prestigiosos aprobados para mostrar por defecto si no hay ID
         const { data: popular, error: popErr } = await supabase
           .from("establishments")
-          .select("id, name, slug, description, city, state, status, category_name, rating_avg, primary_image, address")
+          .select("id, name, slug, description, city, state, status, category_name, rating_avg, primary_image, address, whatsapp, phone")
           .eq("status", "approved")
           .limit(6);
           
@@ -67,7 +70,7 @@ export function ExcelenciaLanding() {
         if (hotelId) {
           const { data, error } = await supabase
             .from("establishments")
-            .select("id, name, slug, description, city, state, status, category_name, rating_avg, primary_image, address")
+            .select("id, name, slug, description, city, state, status, category_name, rating_avg, primary_image, address, whatsapp, phone")
             .eq("id", hotelId)
             .maybeSingle();
 
@@ -104,7 +107,7 @@ export function ExcelenciaLanding() {
       try {
         const { data, error } = await supabase
           .from("establishments")
-          .select("id, name, slug, description, city, state, status, category_name, rating_avg, primary_image, address")
+          .select("id, name, slug, description, city, state, status, category_name, rating_avg, primary_image, address, whatsapp, phone")
           .ilike("name", `%${searchQuery}%`)
           .eq("status", "approved")
           .limit(10);
@@ -165,12 +168,15 @@ export function ExcelenciaLanding() {
         </span>
       </div>
 
-      {/* ── HERO BANNER PORTADA (NUEVA ESTRATEGIA: SPLIT MODERN HERO) ─────────── */}
-      <div className="w-full min-h-[500px] lg:min-h-[580px] relative overflow-hidden bg-[#0e011f] flex items-center pt-10 pb-20 lg:py-0">
+      {/* ── HERO BANNER PORTADA (SPLIT MODERN HERO CON FONDO DE PLAYA) ─────────── */}
+      <div className="w-full min-h-[500px] lg:min-h-[580px] relative overflow-hidden bg-[#0e011f] flex items-center pt-10 pb-20 lg:py-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/images/beach_parallax.png')" }}>
+        
+        {/* Capa de superposición para contraste y tinte de marca */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0e011f]/95 via-[#0e011f]/85 to-[#1a0533]/95 z-0" />
         
         {/* Luces y degradados de fondo neon */}
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#9B00CC] blur-[120px] opacity-25 pointer-events-none" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#00C8D4] blur-[120px] opacity-15 pointer-events-none" />
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#9B00CC] blur-[120px] opacity-25 pointer-events-none z-0" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#00C8D4] blur-[120px] opacity-15 pointer-events-none z-0" />
         
         {/* Contenedor principal con grid */}
         <div className="max-w-6xl mx-auto px-6 w-full grid lg:grid-cols-12 gap-10 items-center relative z-10">
@@ -227,46 +233,113 @@ export function ExcelenciaLanding() {
             </div>
           </div>
 
-          {/* Lado derecho: Mockup de Ficha / Vista de Prestigio */}
-          <div className="lg:col-span-5 flex justify-center lg:justify-end">
-            <div className="w-full max-w-[380px] rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-[#1a0533]/80 backdrop-blur-md relative group hover:scale-[1.02] transition-all duration-300">
-              
-              {/* Imagen del hotel / resort */}
-              <div className="h-48 bg-slate-800 relative overflow-hidden">
-                <img 
-                  src="/images/landing.png" 
-                  alt="Prestigio 2026"
-                  className="w-full h-full object-cover scale-[1.08] transition-transform duration-700 group-hover:scale-110"
-                />
-                <div className="absolute top-4 left-4 bg-[#FF0096] text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-md">
-                  Insignia Oficial 2026
-                </div>
-              </div>
+          {/* Lado derecho: Ficha Oficial Premium con efectos y borde animado */}
+          <div className="lg:col-span-5 flex justify-center lg:justify-end relative z-10 w-full">
+            <div className="w-full max-w-[370px] priority-glow-card group shadow-2xl hover:shadow-[#FF0096]/20 transition-all duration-300">
+              <div className="priority-glow-card-inner bg-gradient-to-br from-[#0e011f] to-[#1a0533] text-white flex flex-col h-full justify-between">
+                <div>
+                  {/* Image Section */}
+                  <div className="relative h-48 overflow-hidden bg-slate-800">
+                    <img 
+                      src={hotel ? (hotel.primary_image || "/images/landing.png") : "/images/landing.png"} 
+                      alt={hotel ? hotel.name : "Eurobuilding Hotel & Suites"}
+                      className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
+                    />
+                    
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    
+                    {/* Badges */}
+                    <div className="absolute top-3.5 left-3.5 flex flex-col gap-2">
+                      <span className="px-3.5 py-1.5 bg-white/20 backdrop-blur-md border border-white/20 text-white text-[10px] font-black uppercase tracking-wider rounded-full shadow-md flex items-center">
+                        HOTELES
+                      </span>
+                    </div>
 
-              {/* Contenido de la tarjeta */}
-              <div className="p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-[#00C8D4]">Comité de Selección</span>
-                  <div className="flex items-center gap-1 text-amber-400">
-                    <Star className="w-3.5 h-3.5 fill-current" />
-                    <span className="text-xs font-bold text-white">4.9 / 5.0</span>
+                    {/* Sello HDV */}
+                    <img 
+                      src="/images/sello-hdv.png" 
+                      alt="Sello de Calidad Hoteles de Venezuela" 
+                      className="absolute bottom-2 right-2 w-12 h-12 object-contain z-10 drop-shadow-md hover:scale-110 transition-transform duration-300 pointer-events-none" 
+                    />
+                  </div>
+
+                  {/* Content Section */}
+                  <div className="p-5 flex-1 flex flex-col text-left">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div className="flex-1">
+                        <h3 className="font-black text-base text-white group-hover:text-brand-turquesa transition-colors line-clamp-1 leading-tight">
+                          {hotel ? hotel.name : "Eurobuilding Hotel & Suites"}
+                        </h3>
+                        <div className="flex items-center gap-1 text-xs mt-1">
+                          <MapPin className="w-3.5 h-3.5 text-brand-turquesa shrink-0" />
+                          <span className="truncate text-gray-300">
+                            {hotel ? (hotel.address || `${hotel.city}, ${hotel.state}`) : "Caracas, Distrito Capital"}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest shrink-0 self-center border bg-amber-500/10 border-amber-500/20 text-amber-300">
+                        SELLO HDV
+                      </div>
+                    </div>
+
+                    {/* Rating */}
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg border bg-amber-500/10 border-amber-500/20 text-amber-300">
+                        <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                        <span className="font-extrabold text-xs">{hotel ? (hotel.rating_avg || "4.7") : "4.7"}</span>
+                      </div>
+                      <span className="text-[10px] font-bold text-gray-400">
+                        (142 reseñas)
+                      </span>
+                    </div>
+
+                    {/* Amenities */}
+                    <div className="flex flex-wrap gap-1.5 mb-3">
+                      {[
+                        { label: "Wifi Gratis" },
+                        { label: "Piscina" },
+                        { label: "Estacionamiento" }
+                      ].map((serv, i) => (
+                        <span key={i} className="flex items-center gap-1 px-2.5 py-0.5 text-[9px] rounded-full font-medium bg-white/5 text-white/70 border border-white/10">
+                          <Sparkles className="w-3 h-3 text-brand-magenta" />
+                          <span>{serv.label}</span>
+                        </span>
+                      ))}
+                      <span className="px-2 py-0.5 text-[9px] rounded-full font-bold bg-white/5 text-white/50 border border-white/10">
+                        +13
+                      </span>
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-[11px] leading-relaxed line-clamp-2 text-gray-400">
+                      {hotel ? hotel.description : "El Eurobuilding Hotel & Suites Caracas se erige como un icono de la hospitalidad de lujo en la capital venezolana, combinando altos estándares físicos con servicios de vanguardia."}
+                    </p>
                   </div>
                 </div>
 
-                <h3 className="text-base font-bold text-white font-serif">
-                  {hotel ? hotel.name : "Establecimientos de Alta Gama"}
-                </h3>
-
-                <p className="text-xs text-slate-300 leading-relaxed line-clamp-2">
-                  {hotel ? hotel.description : "Acceso a la vitrina digital exclusiva que conecta directamente a los viajeros premium de Venezuela con su canal oficial de reservas."}
-                </p>
-
-                <div className="border-t border-white/10 pt-4 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
-                    <span className="text-[10px] font-bold text-slate-300 uppercase">Validación Disponible</span>
+                {/* Action Buttons */}
+                <div className="px-5 pb-5">
+                  <div className="flex gap-2.5 pt-4 border-t border-white/10 mt-4">
+                    <div className="flex-1">
+                      <TrackedWhatsAppButton
+                        whatsappNumber={hotel ? (hotel.whatsapp || hotel.phone || "584145069774") : "584145069774"}
+                        establishmentId={hotel ? hotel.id : 9999}
+                        establishmentName={hotel ? hotel.name : "Eurobuilding Hotel & Suites"}
+                        isPriority={true}
+                      />
+                    </div>
+                    
+                    <button 
+                      onClick={() => {
+                        const el = document.getElementById("ficha-distincion");
+                        el?.scrollIntoView({ behavior: "smooth" });
+                      }}
+                      className="flex-1 w-full btn-cyan-gradient text-white text-xs font-extrabold py-2.5 px-4 rounded-xl flex items-center justify-center shadow-md shadow-brand-turquesa/10 hover:scale-102 transition-all cursor-pointer"
+                    >
+                      Ver Ficha
+                    </button>
                   </div>
-                  <span className="text-xs font-bold text-[#00C8D4]">Canal Gratuito</span>
                 </div>
               </div>
             </div>
