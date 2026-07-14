@@ -185,15 +185,28 @@ function Footer() {
       {/* Barra Inferior de Copyright (Púrpura Más Oscuro) */}
       <div style={{ background: "#0e011f" }} className="py-5 px-6 border-t border-white/5">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-gray-400 font-semibold tracking-wide">
-          <span className="flex items-center gap-1.5 flex-wrap justify-center sm:justify-start">
-            <span>
-              © {new Date().getFullYear()} Hoteles de Venezuela LLC<sup className="text-[8px]">®</sup>
+          <div className="flex flex-col gap-1 items-center sm:items-start text-center sm:text-left">
+            <span className="flex items-center gap-1.5 flex-wrap justify-center sm:justify-start">
+              <span>
+                © {new Date().getFullYear()} Hoteles de Venezuela LLC<sup className="text-[8px]">®</sup>
+              </span>
+              <span className="opacity-30">·</span>
+              <span>Todos los derechos reservados</span>
+              <span className="opacity-30">·</span>
+              <span>Hecho con ❤️ en Venezuela</span>
             </span>
-            <span className="opacity-30">·</span>
-            <span>Todos los derechos reservados</span>
-            <span className="opacity-30">·</span>
-            <span>Hecho con ❤️ en Venezuela</span>
-          </span>
+            <span className="text-gray-500 text-[10px] mt-0.5">
+              Desarrollado por{" "}
+              <a 
+                href="https://webmasterpro.us" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-[#00C8D4] hover:text-white font-bold transition-colors"
+              >
+                Webmasterpro Entertainment
+              </a>
+            </span>
+          </div>
           <div className="flex items-center gap-4 flex-wrap justify-center">
             <Link href="/privacidad" className="hover:text-white transition-colors">Política de Privacidad</Link>
             <span className="text-gray-700">|</span>

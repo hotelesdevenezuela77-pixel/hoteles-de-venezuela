@@ -438,21 +438,24 @@ export function Home() {
       url: "https://hotelesdevenezuela.com",
       description: "Catálogo oficial nacional con contacto directo libre de comisiones.",
       gradient: "from-[#FF0096] to-[#9B00CC]",
-      shadow: "shadow-[#FF0096]/25"
+      shadow: "shadow-[#FF0096]/25",
+      inactive: false
     },
     {
       name: "hotelesenmorrocoy.com", 
       url: "https://hotelesenmorrocoy.com",
       description: "Especialistas en posadas y cayos del Parque Nacional Morrocoy.",
       gradient: "from-[#00C8D4] to-[#008ba3]",
-      shadow: "shadow-[#00C8D4]/25"
+      shadow: "shadow-[#00C8D4]/25",
+      inactive: true
     },
     {
       name: "hotelesdevenezuela.online",
       url: "https://hotelesdevenezuela.online",
       description: "Motor de reservas directas y pasarela directa al WhatsApp del hotel.",
       gradient: "from-[#9B00CC] to-[#4f46e5]",
-      shadow: "shadow-[#9B00CC]/25"
+      shadow: "shadow-[#9B00CC]/25",
+      inactive: true
     }
   ];
 
@@ -690,26 +693,46 @@ export function Home() {
             </div>
 
             <div className="grid md:grid-cols-3 gap-6">
-              {websites.map((site) => (
-                <a
-                  key={site.name}
-                  href={site.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`group bg-gradient-to-br ${site.gradient} rounded-2xl p-6 hover:-translate-y-1.5 hover:shadow-2xl ${site.shadow} transition-all duration-300 relative overflow-hidden text-left block border border-white/10`}
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-white border border-white/10">
-                      <Globe className="w-5 h-5" />
+              {websites.map((site) => {
+                const CardComponent = site.inactive ? 'div' : 'a';
+                return (
+                  <CardComponent
+                    key={site.name}
+                    {...(site.inactive ? {} : { href: site.url, target: "_blank", rel: "noopener noreferrer" })}
+                    className={`group bg-gradient-to-br ${site.gradient} rounded-2xl p-6 ${
+                      site.inactive
+                        ? 'opacity-80 cursor-default select-none'
+                        : 'hover:-translate-y-1.5 hover:shadow-2xl transition-all duration-300'
+                    } ${site.shadow} relative overflow-hidden text-left block border border-white/10`}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-white border border-white/10">
+                        <Globe className="w-5 h-5" />
+                      </div>
+                      {site.inactive ? (
+                        <span className="bg-white/20 text-white text-[9px] uppercase font-black tracking-wider px-2.5 py-1 rounded-md flex items-center gap-1.5 animate-pulse">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                          En Migración
+                        </span>
+                      ) : (
+                        <ExternalLink className="w-4 h-4 text-white/60 group-hover:text-white transition-colors" />
+                      )}
                     </div>
-                    <ExternalLink className="w-4 h-4 text-white/60 group-hover:text-white transition-colors" />
-                  </div>
-                  <h3 className="font-extrabold text-base text-white mb-1 drop-shadow-xs">
-                    {site.name}
-                  </h3>
-                  <p className="text-xs text-white/90 leading-relaxed">{site.description}</p>
-                </a>
-              ))}
+                    <h3 className="font-extrabold text-base text-white mb-1 drop-shadow-xs">
+                      {site.name}
+                    </h3>
+                    <p className="text-xs text-white/90 leading-relaxed mb-2">
+                      {site.description}
+                    </p>
+                    {site.inactive && (
+                      <div className="mt-3 pt-3 border-t border-white/10 flex items-center gap-1.5 text-[10px] text-amber-200 font-bold">
+                        <Info className="w-3.5 h-3.5 shrink-0" />
+                        <span>Inactiva temporalmente por migración de servidor</span>
+                      </div>
+                    )}
+                  </CardComponent>
+                );
+              })}
             </div>
           </div>
         </section>
