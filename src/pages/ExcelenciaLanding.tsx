@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { supabase } from "../lib/supabase";
 import { 
   Award, Building2, Check, MapPin, Search, Sparkles, 
@@ -164,6 +164,28 @@ export function ExcelenciaLanding() {
             : "Sincronización abierta: Cupos de distinción digital limitados por región geográfica"}
         </span>
       </div>
+
+      {/* ── CUSTOM MINIMALIST LANDING HEADER ────────────────────────────────── */}
+      <header className="w-full bg-[#0e011f] border-b border-white/5 py-4 px-6 flex items-center justify-between relative z-30">
+        <div className="max-w-6xl mx-auto w-full flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <img 
+              src="/images/logo-hdv-transparent.png" 
+              alt="Hoteles de Venezuela"
+              className="h-9 w-auto object-contain brightness-0 invert"
+            />
+          </Link>
+          
+          <a
+            href={getWhatsAppLink("Hola, deseo más información sobre el Índice de Prestigio 2026.")}
+            target="_blank"
+            rel="noreferrer"
+            className="px-4 py-2 bg-gradient-to-r from-[#00C8D4] to-[#009ba6] text-white font-bold text-xs rounded-xl shadow-md transition-all hover:scale-[1.03] active:scale-[0.98]"
+          >
+            Soporte B2B
+          </a>
+        </div>
+      </header>
 
       {/* ── HERO BANNER PORTADA (NUEVA ESTRATEGIA: SPLIT MODERN HERO) ─────────── */}
       <div className="w-full min-h-[500px] lg:min-h-[580px] relative overflow-hidden bg-[#0e011f] flex items-center pt-10 pb-20 lg:py-0">
@@ -1018,6 +1040,18 @@ export function ExcelenciaLanding() {
           </div>
         </div>
       </div>
+
+      {/* ── SIMPLE LANDING FOOTER ───────────────────────────────────────────── */}
+      <footer className="w-full py-8 text-center text-xs text-slate-400 bg-white border-t border-gray-100 mt-20">
+        <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p>© {new Date().getFullYear()} Hoteles de Venezuela LLC. Todos los derechos reservados.</p>
+          <div className="flex gap-4">
+            <Link href="/privacidad" className="hover:text-[#FF0096] transition-colors">Privacidad</Link>
+            <Link href="/terminos" className="hover:text-[#FF0096] transition-colors">Términos</Link>
+            <Link href="/" className="hover:text-[#FF0096] transition-colors">Volver a Inicio</Link>
+          </div>
+        </div>
+      </footer>
 
     </div>
   );

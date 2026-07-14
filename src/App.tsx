@@ -124,6 +124,10 @@ function App() {
     return <Mantenimiento />;
   }
 
+  if (location === "/prestigio-2026") {
+    return <ExcelenciaLanding />;
+  }
+
   return (
     <MainLayout>
       <Switch>
