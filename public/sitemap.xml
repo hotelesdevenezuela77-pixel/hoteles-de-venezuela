@@ -2,67 +2,97 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://hotelesdevenezuela.com/</loc>
-    <lastmod>2026-07-07</lastmod>
+    <lastmod>2026-07-14</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/establecimientos</loc>
-    <lastmod>2026-07-07</lastmod>
+    <lastmod>2026-07-14</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/destinos</loc>
-    <lastmod>2026-07-07</lastmod>
+    <lastmod>2026-07-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/mapa</loc>
-    <lastmod>2026-07-07</lastmod>
+    <lastmod>2026-07-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/parques</loc>
-    <lastmod>2026-07-07</lastmod>
+    <lastmod>2026-07-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/servicios-b2b</loc>
-    <lastmod>2026-07-07</lastmod>
+    <lastmod>2026-07-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/comparar</loc>
-    <lastmod>2026-07-07</lastmod>
+    <lastmod>2026-07-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/paquetes</loc>
-    <lastmod>2026-07-07</lastmod>
+    <lastmod>2026-07-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/links</loc>
-    <lastmod>2026-07-07</lastmod>
+    <lastmod>2026-07-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/membresias</loc>
-    <lastmod>2026-07-07</lastmod>
+    <lastmod>2026-07-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://hotelesdevenezuela.com/prestigio-2026</loc>
+    <lastmod>2026-07-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/establecimiento/sabbia-by-ld-hoteles</loc>
+    <lastmod>2026-05-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/establecimiento/campamento-canaima-mncg8yt7</loc>
+    <lastmod>2026-03-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/establecimiento/hotel-la-pedregosa</loc>
+    <lastmod>2026-03-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://hotelesdevenezuela.com/establecimiento/aparto-posada-del-mar</loc>
     <lastmod>2026-05-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/establecimiento/posada-alto-viento-mmckvodi</loc>
+    <lastmod>2026-03-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -73,8 +103,44 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://hotelesdevenezuela.com/establecimiento/posada-el-encanto-mmdqfpmw</loc>
+    <lastmod>2026-05-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/establecimiento/posada-la-ardilena</loc>
+    <lastmod>2026-03-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/establecimiento/cala-margarita-boutique-hotel-spa</loc>
+    <lastmod>2026-03-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/establecimiento/hotel-jirahara</loc>
+    <lastmod>2026-03-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/establecimiento/melia-caracas</loc>
+    <lastmod>2026-05-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://hotelesdevenezuela.com/establecimiento/my-campers-mmcl67nb</loc>
     <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/establecimiento/paseo-artesanal-tucacas-sra-yanire-amundaray-mnidpgod</loc>
+    <lastmod>2026-04-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -87,6 +153,18 @@
   <url>
     <loc>https://hotelesdevenezuela.com/establecimiento/oleaje-tucacas</loc>
     <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/establecimiento/sun-gold-restaurante-posada-mnry3fgs</loc>
+    <lastmod>2026-04-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/establecimiento/marriott-maracay-golf-resort-mmck1r8q</loc>
+    <lastmod>2026-05-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -415,12 +493,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://hotelesdevenezuela.com/sitio/no-es-frica-es-los-llanos-venezolanosl</loc>
-    <lastmod>2026-05-20</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://hotelesdevenezuela.com/sitio/-rcord-guinness-relampago-del-catatumbo</loc>
     <lastmod>2026-05-20</lastmod>
     <changefreq>weekly</changefreq>
@@ -446,6 +518,12 @@
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/sitio/no-es-shara-es-los-mdanos-de-coro</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/sitio/no-es-frica-es-los-llanos-venezolanosl</loc>
     <lastmod>2026-05-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>

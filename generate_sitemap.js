@@ -56,6 +56,7 @@ async function run() {
       { path: '/paquetes', priority: '0.7', freq: 'weekly' },
       { path: '/links', priority: '0.5', freq: 'monthly' },
       { path: '/membresias', priority: '0.6', freq: 'monthly' },
+      { path: '/prestigio-2026', priority: '0.8', freq: 'weekly' },
     ];
 
     staticPages.forEach(p => {
