@@ -6,8 +6,9 @@ import {
   Building2, Clock, CheckCircle, XCircle, Plus, 
   MapPin, Loader2, MessageSquare, BarChart3, Calendar, 
   DollarSign, Users, Trash2, X, Phone, Globe, Briefcase, 
-  Eye, Check, ListFilter, Tag
+  Eye, Check, ListFilter, Tag, Sparkles
 } from "lucide-react";
+import { ScriptGenerator } from "../components/ScriptGenerator";
 
 interface Establishment {
   id: number;
@@ -28,6 +29,8 @@ interface Establishment {
   description?: string;
   price_level?: string;
   services?: string;
+  membership_tier?: string;
+  is_circuito_excelencia?: boolean;
 }
 
 interface Reservation {
@@ -60,7 +63,7 @@ export function OwnerDashboard() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [leads, setLeads] = useState<WhatsAppLead[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"resumen" | "establecimientos" | "reservas" | "leads" | "descuentos">("resumen");
+  const [activeTab, setActiveTab] = useState<"resumen" | "establecimientos" | "reservas" | "leads" | "descuentos" | "guiones">("resumen");
 
   const [discountCodes, setDiscountCodes] = useState<any[]>([]);
   const [showAddDiscountModal, setShowAddDiscountModal] = useState(false);
@@ -177,7 +180,9 @@ export function OwnerDashboard() {
         website: e.website,
         description: e.description,
         price_level: e.price_level,
-        services: e.services
+        services: e.services,
+        membership_tier: e.membership_tier || "basico",
+        is_circuito_excelencia: !!e.is_circuito_excelencia
       }));
       setEstablishments(mappedEsts);
 
@@ -586,7 +591,8 @@ export function OwnerDashboard() {
               { id: "establecimientos", label: `Mis Negocios (${establishments.length})`, icon: Building2 },
               { id: "reservas", label: `Reservaciones (${reservations.length})`, icon: Calendar },
               { id: "leads", label: `Leads de WhatsApp (${leads.length})`, icon: MessageSquare },
-              { id: "descuentos", label: `Descuentos (${discountCodes.length})`, icon: Tag }
+              { id: "descuentos", label: `Descuentos (${discountCodes.length})`, icon: Tag },
+              { id: "guiones", label: "Asistente de Guiones", icon: Sparkles }
             ].map(tab => (
               <button
                 key={tab.id}
@@ -948,6 +954,11 @@ export function OwnerDashboard() {
               </div>
             )}
           </div>
+        )}
+
+        {/* GUIONES TAB */}
+        {activeTab === "guiones" && (
+          <ScriptGenerator establishments={establishments} />
         )}
 
       </main>
