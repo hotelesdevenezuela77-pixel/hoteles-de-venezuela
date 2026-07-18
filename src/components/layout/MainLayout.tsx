@@ -113,6 +113,7 @@ function Footer() {
                 { href: "/50-fundadores", label: "50 Fundadores" },
                 { href: "/alianzas-para-agencias", label: "Alianzas para Agencias" },
                 { href: "/membresias",   label: "Membresías" },
+                { href: "/prestigio-2026", label: "Prestigio" },
                 { href: "/reportar-pago", label: "Reportar Pago Local" },
                 { href: "/sobre-nosotros", label: "Publicidad" },
                 { href: "/mis-negocios", label: "Registrar mi negocio" },

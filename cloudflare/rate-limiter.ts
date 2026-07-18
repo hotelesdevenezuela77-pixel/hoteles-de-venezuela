@@ -12,12 +12,108 @@ export interface Env {
   CORE_DOMAIN: string;
   // Clave opcional de la API de Gemini
   GEMINI_API_KEY?: string;
+  // Supabase URL
+  SUPABASE_URL?: string;
+  // Supabase Anon Key (o Service Role Key)
+  SUPABASE_ANON_KEY?: string;
+  // Token de acceso de WhatsApp Business (Meta)
+  WHATSAPP_ACCESS_TOKEN?: string;
+  // Token de verificación de Webhook
+  WHATSAPP_VERIFY_TOKEN?: string;
 }
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     const hostname = url.hostname.toLowerCase();
+
+    // CORS Headers para las peticiones de API
+    const corsHeaders = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "Content-Type, apikey, Authorization",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    };
+
+    if (request.method === "OPTIONS") {
+      if (url.pathname === "/api/chat" || url.pathname === "/api/whatsapp/webhook") {
+        return new Response(null, {
+          status: 204,
+          headers: corsHeaders
+        });
+      }
+    }
+
+    // --- ENDPOINT: WIDGET DE CHAT CENTRAL ---
+    if (url.pathname === "/api/chat" && request.method === "POST") {
+      try {
+        const body: any = await request.json();
+        const { message, lead_phone = "anonymous_web", lead_name = "Turista Web" } = body;
+
+        if (!message) {
+          return new Response(JSON.stringify({ error: "El mensaje es requerido" }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+          });
+        }
+
+        const reply = await processCentralAIChat(message, lead_phone, lead_name, env);
+
+        return new Response(JSON.stringify({ response: reply }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        });
+      } catch (err: any) {
+        return new Response(JSON.stringify({ error: err.message }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        });
+      }
+    }
+
+    // --- ENDPOINT: WEBHOOK DE WHATSAPP ---
+    if (url.pathname === "/api/whatsapp/webhook") {
+      if (request.method === "GET") {
+        const mode = url.searchParams.get("hub.mode");
+        const token = url.searchParams.get("hub.verify_token");
+        const challenge = url.searchParams.get("hub.challenge");
+        const verifyToken = env.WHATSAPP_VERIFY_TOKEN || "verify_token_here";
+
+        if (mode === "subscribe" && token === verifyToken) {
+          return new Response(challenge, { status: 200 });
+        }
+        return new Response("Forbidden", { status: 403 });
+      }
+
+      if (request.method === "POST") {
+        try {
+          const body: any = await request.json();
+          const entry = body.entry?.[0];
+          const change = entry?.changes?.[0];
+          const value = change?.value;
+          const messageObj = value?.messages?.[0];
+
+          if (messageObj && messageObj.type === "text") {
+            const leadPhone = messageObj.from;
+            const customerText = messageObj.text.body;
+            const customerName = value?.contacts?.[0]?.profile?.name || "Turista WhatsApp";
+            const phoneId = value?.metadata?.phone_number_id;
+
+            // Procesar en segundo plano para responderle rápido a Meta (espera <3s)
+            ctx.waitUntil((async () => {
+              try {
+                const replyText = await processCentralAIChat(customerText, leadPhone, customerName, env);
+                await sendWhatsAppMessage(phoneId, leadPhone, replyText, env.WHATSAPP_ACCESS_TOKEN || "");
+              } catch (e) {
+                console.error("Error processing async WhatsApp chat:", e);
+              }
+            })());
+          }
+        } catch (err: any) {
+          console.error("Error receiving WhatsApp webhook event:", err);
+        }
+        return new Response("OK", { status: 200 });
+      }
+    }
 
     // 1. SOPORTE DE PREFLIGHT Y ENDPOINT PARA EL GENERADOR DE GUIONES DE VENTAS (IA / FALLBACK)
     if (url.pathname === "/api/generate-script") {
@@ -307,3 +403,287 @@ function generateFallbackScriptLocal(body: any) {
     sales_note
   };
 }
+
+// --- FUNCIONES AUXILIARES PARA EL ASISTENTE IA CENTRALIZADO ---
+
+async function supabaseFetch(url: string, method: string, body: any, env: Env) {
+  const supabaseUrl = env.SUPABASE_URL || "https://ghgetcznlrilgocwigmj.supabase.co";
+  const supabaseKey = env.SUPABASE_ANON_KEY || "";
+  
+  const headers: any = {
+    "apikey": supabaseKey,
+    "Authorization": `Bearer ${supabaseKey}`,
+    "Content-Type": "application/json",
+  };
+  
+  if (method === "POST" || method === "PATCH") {
+    headers["Prefer"] = "return=representation";
+  }
+
+  const res = await fetch(`${supabaseUrl}${url}`, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined
+  });
+
+  if (!res.ok) {
+    throw new Error(`Supabase API error: ${res.status} ${await res.text()}`);
+  }
+
+  return res.json();
+}
+
+async function processCentralAIChat(
+  message: string,
+  leadPhone: string,
+  leadName: string,
+  env: Env
+): Promise<string> {
+  const geminiKey = env.GEMINI_API_KEY || "";
+  if (!geminiKey || geminiKey === "Hola177*H") {
+    return "Disculpe, el servicio de inteligencia artificial no está configurado actualmente.";
+  }
+
+  // 1. Obtener el agente central activo
+  const agents = await supabaseFetch("/rest/v1/ai_agents?establishment_id=is.null&is_active=eq.true&select=*", "GET", null, env) as any[];
+  if (!agents || agents.length === 0) {
+    return "Disculpe, el asistente virtual no está disponible en este momento.";
+  }
+  const agent = agents[0];
+
+  // 2. Buscar o crear conversación para el lead
+  const convs = await supabaseFetch(`/rest/v1/ai_conversations?agent_id=eq.${agent.id}&lead_phone=eq.${encodeURIComponent(leadPhone)}&select=id`, "GET", null, env) as any[];
+  let conversationId: number;
+  if (convs && convs.length > 0) {
+    conversationId = convs[0].id;
+  } else {
+    const newConv = await supabaseFetch("/rest/v1/ai_conversations", "POST", {
+      agent_id: agent.id,
+      lead_phone: leadPhone,
+      lead_name: leadName,
+      status: "nuevo"
+    }, env) as any[];
+    conversationId = newConv[0].id;
+  }
+
+  // 3. Guardar mensaje entrante
+  await supabaseFetch("/rest/v1/ai_messages", "POST", {
+    conversation_id: conversationId,
+    message,
+    direction: "inbound",
+    is_ai_generated: false
+  }, env);
+
+  // 4. Extraer si el usuario habla de algún hotel
+  const extractedTerm = await extractHotelEntityWorker(message, geminiKey);
+  let hotel: any = null;
+  if (extractedTerm !== "ninguno") {
+    // Limpiar términos comunes de búsqueda
+    const cleaned = extractedTerm.replace(/posada|hotel|complejo|resort/gi, "").trim();
+    if (cleaned.length >= 3) {
+      const hotels = await supabaseFetch(`/rest/v1/establishments?or=(name.ilike.*${encodeURIComponent(cleaned)}*,slug.ilike.*${encodeURIComponent(cleaned)}*)&limit=1&select=id,name,slug,description,membership_tier,is_circuito_excelencia,price_level,city,state`, "GET", null, env) as any[];
+      if (hotels && hotels.length > 0) {
+        hotel = hotels[0];
+      }
+    }
+  }
+
+  // 5. Clasificar intención del mensaje
+  let intent = "general";
+  if (hotel) {
+    intent = await classifyIntentWorker(message, geminiKey);
+  }
+
+  // 6. Obtener plantilla de guion si aplica
+  let template: any = null;
+  if (hotel && intent !== "general") {
+    const templates = await supabaseFetch(`/rest/v1/script_templates?membership_tier=eq.${hotel.membership_tier}&request_type=eq.${intent}&select=template_structure,sales_note`, "GET", null, env) as any[];
+    if (templates && templates.length > 0) {
+      template = templates[0];
+    }
+  }
+
+  // 7. Obtener historial reciente de mensajes
+  const history = await supabaseFetch(`/rest/v1/ai_messages?conversation_id=eq.${conversationId}&order=created_at.desc&limit=6&select=message,direction`, "GET", null, env) as any[];
+  const chatHistory = history ? history.reverse() : [];
+
+  // 8. Generar respuesta con Gemini
+  const replyText = await generateGeminiResponseWorker(agent, hotel, template, intent, leadName, message, chatHistory, geminiKey);
+
+  // 9. Guardar respuesta saliente
+  await supabaseFetch("/rest/v1/ai_messages", "POST", {
+    conversation_id: conversationId,
+    message: replyText,
+    direction: "outbound",
+    is_ai_generated: true
+  }, env);
+
+  return replyText;
+}
+
+async function extractHotelEntityWorker(message: string, apiKey: string): Promise<string> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
+  const prompt = `Analiza el siguiente mensaje de un usuario que busca reservar un hotel en Venezuela.
+Extrae ÚNICAMENTE el nombre comercial o término clave del hotel del que se habla (por ejemplo: "Sabbia", "Perla Negra", "La Ardilena", "Lidotel", "Posada del Mar").
+Si no se menciona ningún hotel específico o el mensaje es general, responde estrictamente: "ninguno".
+
+Mensaje del usuario: "${message}"
+
+Respuesta (solo el término extraído o "ninguno", sin puntuación ni texto adicional):`;
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+    });
+    if (!res.ok) return "ninguno";
+    const json = await res.json() as any;
+    const result = json.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "ninguno";
+    return result.toLowerCase() === "ninguno" ? "ninguno" : result;
+  } catch {
+    return "ninguno";
+  }
+}
+
+async function classifyIntentWorker(message: string, apiKey: string): Promise<string> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
+  const prompt = `Clasifica la consulta de este cliente sobre un hotel en una sola palabra de esta lista:
+["precio", "disponibilidad", "servicios", "fotos", "general"]
+
+Reglas de Clasificación:
+- "precio": Si consulta costos, cotizaciones, tarifas o cuánto cuesta.
+- "disponibilidad": Si consulta fechas, cupos, disponibilidad de habitaciones o si hay espacio.
+- "servicios": Si consulta amenidades, piscina, wifi, comida, paseos, o qué incluye.
+- "fotos": Si pide fotos, galerías, videos o imágenes del hotel.
+- "general": Cualquier otro tema general o saludo.
+
+Mensaje del cliente: "${message}"
+
+Respuesta (solo la palabra en minúsculas):`;
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+    });
+    if (!res.ok) return "general";
+    const json = await res.json() as any;
+    const result = json.candidates?.[0]?.content?.parts?.[0]?.text?.trim()?.toLowerCase() || "general";
+    return ["precio", "disponibilidad", "servicios", "fotos"].includes(result) ? result : "general";
+  } catch {
+    return "general";
+  }
+}
+
+async function generateGeminiResponseWorker(
+  agent: any,
+  hotel: any,
+  template: any,
+  intent: string,
+  customerName: string,
+  latestMessage: string,
+  history: any[],
+  apiKey: string
+): Promise<string> {
+  const modelName = agent.ai_model || "gemini-flash-latest";
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+
+  const contents = history.map(h => ({
+    role: h.direction === 'inbound' ? 'user' : 'model',
+    parts: [{ text: h.message }]
+  }));
+
+  if (contents.length === 0 || contents[contents.length - 1].role !== 'user') {
+    contents.push({
+      role: 'user',
+      parts: [{ text: latestMessage }]
+    });
+  }
+
+  let systemInstruction = `${agent.system_instruction}
+
+Eres el asistente central de la plataforma Hoteles de Venezuela. Tu tono es profesional, formal pero amigable.
+`;
+
+  if (hotel) {
+    systemInstruction += `
+Actualmente estás asistiendo sobre el siguiente hotel afiliado:
+- Nombre: ${hotel.name}
+- Nivel de Membresía: ${hotel.membership_tier}
+- Ciudad/Estado: ${hotel.city}, ${hotel.state}
+- Descripción: ${hotel.description}
+- Circuito de la Excelencia: ${hotel.is_circuito_excelencia ? "Sí (Destacar como miembro de prestigio)" : "No"}
+
+`;
+
+    if (template) {
+      systemInstruction += `
+## Patrón de respuesta obligatorio para esta consulta (Intención: ${intent}):
+Debes adaptar e integrar el siguiente guion de ventas. Reemplaza [Cliente] por "${customerName}" y [Hotel] por "${hotel.name}".
+Estructura a seguir:
+"""
+${template.template_structure}
+"""
+
+Estrategia comercial a cumplir: ${template.sales_note}
+`;
+    }
+  } else {
+    systemInstruction += `
+No se ha identificado ningún hotel específico de la consulta. Ayuda al usuario en términos generales sobre la plataforma, cómo buscar hoteles en el mapa interactivo y registrarse. Recuérdale que reservar de forma directa a través de Hoteles de Venezuela es 100% libre de comisiones para los hoteles y garantiza la mejor tarifa del mercado.
+`;
+  }
+
+  const payload = {
+    contents,
+    systemInstruction: {
+      parts: [{ text: systemInstruction }]
+    },
+    generationConfig: {
+      temperature: 0.7,
+      maxOutputTokens: 2048
+    }
+  };
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`Gemini status ${res.status}`);
+    const json = await res.json() as any;
+    return json.candidates?.[0]?.content?.parts?.[0]?.text || "Disculpe, ¿podría repetir su consulta?";
+  } catch (err: any) {
+    return `Disculpe, tuvimos un inconveniente al procesar su solicitud (${err.message}). Por favor reintente.`;
+  }
+}
+
+async function sendWhatsAppMessage(phoneId: string, toPhone: string, text: string, token: string) {
+  if (!token) {
+    console.error("Missing WHATSAPP_ACCESS_TOKEN, message not sent to Meta.");
+    return;
+  }
+  const url = `https://graph.facebook.com/v20.0/${phoneId}/messages`;
+  try {
+    await fetch(url, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        to: toPhone,
+        type: "text",
+        text: { body: text }
+      })
+    });
+  } catch (e) {
+    console.error("Error calling Meta WhatsApp API:", e);
+  }
+}
+

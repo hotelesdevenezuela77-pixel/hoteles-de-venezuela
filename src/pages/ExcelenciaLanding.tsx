@@ -241,8 +241,8 @@ export function ExcelenciaLanding() {
                   {/* Image Section */}
                   <div className="relative h-48 overflow-hidden bg-slate-800">
                     <img 
-                      src={hotel ? (hotel.primary_image || "/images/landing.png") : "/images/landing.png"} 
-                      alt={hotel ? hotel.name : "Eurobuilding Hotel & Suites"}
+                      src={hotel ? (hotel.primary_image || "/images/landing.png") : "/images/beach_social.png"} 
+                      alt={hotel ? hotel.name : "Hoteles de Venezuela 5 Estrellas"}
                       className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
                     />
                     
@@ -252,7 +252,7 @@ export function ExcelenciaLanding() {
                     {/* Badges */}
                     <div className="absolute top-3.5 left-3.5 flex flex-col gap-2">
                       <span className="px-3.5 py-1.5 bg-white/20 backdrop-blur-md border border-white/20 text-white text-[10px] font-black uppercase tracking-wider rounded-full shadow-md flex items-center">
-                        HOTELES
+                        {hotel ? "HOTELES" : "RECOMENDADO"}
                       </span>
                     </div>
 
@@ -269,17 +269,17 @@ export function ExcelenciaLanding() {
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <div className="flex-1">
                         <h3 className="font-black text-base text-white group-hover:text-brand-turquesa transition-colors line-clamp-1 leading-tight">
-                          {hotel ? hotel.name : "Eurobuilding Hotel & Suites"}
+                          {hotel ? hotel.name : "Hoteles de Venezuela"}
                         </h3>
                         <div className="flex items-center gap-1 text-xs mt-1">
                           <MapPin className="w-3.5 h-3.5 text-brand-turquesa shrink-0" />
                           <span className="truncate text-gray-300">
-                            {hotel ? (hotel.address || `${hotel.city}, ${hotel.state}`) : "Caracas, Distrito Capital"}
+                            {hotel ? (hotel.address || `${hotel.city}, ${hotel.state}`) : "Directorio de Prestigio Nacional"}
                           </span>
                         </div>
                       </div>
                       <div className="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest shrink-0 self-center border bg-amber-500/10 border-amber-500/20 text-amber-300">
-                        SELLO HDV
+                        {hotel ? "SELLO HDV" : "5 ESTRELLAS"}
                       </div>
                     </div>
 
@@ -287,33 +287,39 @@ export function ExcelenciaLanding() {
                     <div className="flex items-center gap-2 mb-3">
                       <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg border bg-amber-500/10 border-amber-500/20 text-amber-300">
                         <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                        <span className="font-extrabold text-xs">{hotel ? (hotel.rating_avg || "4.7") : "4.7"}</span>
+                        <span className="font-extrabold text-xs">{hotel ? (hotel.rating_avg || "4.7") : "5.0"}</span>
                       </div>
                       <span className="text-[10px] font-bold text-gray-400">
-                        (142 reseñas)
+                        {hotel ? "(142 reseñas)" : "(2,500+ opiniones)"}
                       </span>
                     </div>
 
                     {/* Amenities */}
                     <div className="flex flex-wrap gap-1.5 mb-3">
-                      {[
+                      {(hotel ? [
                         { label: "Wifi Gratis" },
                         { label: "Piscina" },
                         { label: "Estacionamiento" }
-                      ].map((serv, i) => (
+                      ] : [
+                        { label: "Reserva Directa" },
+                        { label: "Cero Comisiones" },
+                        { label: "Soporte VIP" }
+                      ]).map((serv, i) => (
                         <span key={i} className="flex items-center gap-1 px-2.5 py-0.5 text-[9px] rounded-full font-medium bg-white/5 text-white/70 border border-white/10">
                           <Sparkles className="w-3 h-3 text-brand-magenta" />
                           <span>{serv.label}</span>
                         </span>
                       ))}
-                      <span className="px-2 py-0.5 text-[9px] rounded-full font-bold bg-white/5 text-white/50 border border-white/10">
-                        +13
-                      </span>
+                      {hotel ? (
+                        <span className="px-2 py-0.5 text-[9px] rounded-full font-bold bg-white/5 text-white/50 border border-white/10">
+                          +13
+                        </span>
+                      ) : null}
                     </div>
 
                     {/* Description */}
                     <p className="text-[11px] leading-relaxed line-clamp-2 text-gray-400">
-                      {hotel ? hotel.description : "El Eurobuilding Hotel & Suites Caracas se erige como un icono de la hospitalidad de lujo en la capital venezolana, combinando altos estándares físicos con servicios de vanguardia."}
+                      {hotel ? hotel.description : "La plataforma de turismo líder de Venezuela. Conectamos directamente a los viajeros con los mejores hoteles, posadas y resorts del país sin intermediarios ni comisiones sorpresa."}
                     </p>
                   </div>
                 </div>
@@ -325,7 +331,7 @@ export function ExcelenciaLanding() {
                       <TrackedWhatsAppButton
                         whatsappNumber={hotel ? (hotel.whatsapp || hotel.phone || "584145069774") : "584145069774"}
                         establishmentId={hotel ? hotel.id : 9999}
-                        establishmentName={hotel ? hotel.name : "Eurobuilding Hotel & Suites"}
+                        establishmentName={hotel ? hotel.name : "Hoteles de Venezuela"}
                         isPriority={true}
                       />
                     </div>
