@@ -4,6 +4,7 @@ import { supabase } from "../lib/supabase";
 import { 
   ArrowLeft, Clock, User, Calendar, Loader2, Compass, MessageSquare 
 } from "lucide-react";
+import { OFFICIAL_WHATSAPP_URL } from "@/config/whatsapp";
 
 interface BlogPost {
   id: number;
@@ -296,7 +297,7 @@ export function BlogDetalle() {
           </p>
           
           <a 
-            href="https://wa.me/584145069774" 
+            href={OFFICIAL_WHATSAPP_URL} 
             target="_blank" 
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-white text-[#FF0096] hover:bg-gray-50 transition-all font-black text-xs px-6 py-3.5 rounded-2xl shadow-lg hover:scale-102 active:scale-98 cursor-pointer relative z-10"

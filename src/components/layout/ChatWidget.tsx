@@ -2,8 +2,10 @@ import { useState, useRef, useEffect } from "react";
 import { X, Send, Phone, User, ChevronDown, MessageCircle, Compass, Building2, Bot } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
+import { OFFICIAL_WHATSAPP_NUMBER } from "@/config/whatsapp";
+
 /* ── config ─────────────────────────────────────────────── */
-const WA_NUMBER = "584145069774";
+const WA_NUMBER = OFFICIAL_WHATSAPP_NUMBER;
 
 /* ── auto-responses per visitor type ────────────────────── */
 const BOT_GREET = {

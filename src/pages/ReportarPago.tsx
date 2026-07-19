@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { supabase } from "../lib/supabase";
+import { OFFICIAL_WHATSAPP_NUMBER } from "@/config/whatsapp";
 import { useMutation } from "@tanstack/react-query";
 import { 
   CreditCard, Upload, CheckCircle2, ChevronRight, AlertCircle, 
@@ -589,7 +590,7 @@ export function ReportarPago() {
                 Si tienes problemas para subir tu comprobante de pago o prefieres reportarlo por atención directa, puedes comunicarte con nuestro equipo soporte VIP vía WhatsApp:
               </p>
               <a 
-                href="https://wa.me/584145069774?text=Hola,%20tengo%20problemas%20para%2520reportar%2520un%2520pago%2520desde%2520la%2520plataforma." 
+                href={`https://wa.me/${OFFICIAL_WHATSAPP_NUMBER}?text=Hola,%20tengo%20problemas%20para%20reportar%20un%20pago%20desde%20la%20plataforma.`} 
                 target="_blank" 
                 rel="noreferrer"
                 className="inline-flex items-center gap-1.5 px-4 py-2 mt-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer shadow-xs"

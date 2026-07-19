@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useRoute } from "wouter";
 import { supabase } from "../lib/supabase";
+import { OFFICIAL_WHATSAPP_NUMBER } from "@/config/whatsapp";
 import { ESTABLISHMENTS_MOCK } from "../lib/establishmentsMock";
 import { EstablishmentCard } from "../components/layout/EstablishmentCard";
 import type { Establishment } from "../components/layout/EstablishmentCard";
@@ -395,7 +396,7 @@ export function SitioDetalle() {
           </p>
           
           <a 
-            href={`https://wa.me/584145069774?text=Hola,%20quisiera%20informacion%20para%20visitar%20${encodeURIComponent(site.name)}`}
+            href={`https://wa.me/${OFFICIAL_WHATSAPP_NUMBER}?text=Hola,%20quisiera%20informacion%20para%20visitar%20${encodeURIComponent(site.name)}`}
             target="_blank" 
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-white text-[#FF0096] hover:bg-gray-50 transition-all font-black text-xs px-6 py-3.5 rounded-2xl shadow-lg hover:scale-102 active:scale-98 cursor-pointer relative z-10"

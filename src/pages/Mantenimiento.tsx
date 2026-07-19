@@ -12,7 +12,9 @@ import {
   Sparkles
 } from "lucide-react";
 
-const PHONE = "+58 414-5069774";
+import { OFFICIAL_WHATSAPP_DISPLAY } from "@/config/whatsapp";
+
+const PHONE = OFFICIAL_WHATSAPP_DISPLAY;
 const EMAIL = "partner@hotelesdevenezuela.com";
 
 export function Mantenimiento() {

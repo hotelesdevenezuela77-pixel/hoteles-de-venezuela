@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
+import { OFFICIAL_WHATSAPP_NUMBER } from "@/config/whatsapp";
 import { 
   Sparkles, Copy, Check, MessageSquare, Mail, 
   RefreshCw, AlertTriangle, ArrowRight, CheckCircle, 
@@ -553,7 +554,7 @@ export function ScriptGenerator({ establishments }: ScriptGeneratorProps) {
           </div>
           
           <a 
-            href="https://wa.me/584242734537?text=Hola,%20quisiera%20recibir%20asesoria%20para%20mejorar%20las%20ventas%20de%20mi%20hotel%20miembro"
+            href={`https://wa.me/${OFFICIAL_WHATSAPP_NUMBER}?text=Hola,%20quisiera%20recibir%20asesoria%20para%20mejorar%20las%20ventas%20de%20mi%20hotel%20miembro`}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full md:w-auto bg-white hover:bg-slate-100 text-[#FF0096] hover:scale-102 transition-all px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-black/10 cursor-pointer"

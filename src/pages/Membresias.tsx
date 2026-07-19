@@ -6,10 +6,12 @@ import {
   Smartphone, ChevronRight, Users, TrendingUp, Award,
 } from "lucide-react";
 
+import { OFFICIAL_WHATSAPP_DISPLAY } from "@/config/whatsapp";
+
 const F = "#FF0096";
 const T = "#00C8D4";
 const P = "#9B00CC";
-const PHONE = "+58 414-5069774";
+const PHONE = OFFICIAL_WHATSAPP_DISPLAY;
 
 const SERVICIOS = [
   {

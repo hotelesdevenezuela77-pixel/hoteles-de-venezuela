@@ -7,6 +7,7 @@ import {
   CheckCircle2, Compass, Phone, Users, Landmark, Globe, CheckCircle
 } from "lucide-react";
 import { TrackedWhatsAppButton } from "../components/layout/TrackedWhatsAppButton";
+import { OFFICIAL_WHATSAPP_NUMBER } from "@/config/whatsapp";
 
 // Paleta de colores oficial
 // Cian: #00C8D4, Magenta: #FF0096, Púrpura: #9B00CC
@@ -147,7 +148,7 @@ export function ExcelenciaLanding() {
     }
   };
 
-  const WHATSAPP_NUMBER = "584145069774";
+  const WHATSAPP_NUMBER = OFFICIAL_WHATSAPP_NUMBER;
   const getWhatsAppLink = (text: string) => {
     return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
   };
@@ -329,7 +330,7 @@ export function ExcelenciaLanding() {
                   <div className="flex gap-2.5 pt-4 border-t border-white/10 mt-4">
                     <div className="flex-1">
                       <TrackedWhatsAppButton
-                        whatsappNumber={hotel ? (hotel.whatsapp || hotel.phone || "584145069774") : "584145069774"}
+                        whatsappNumber={hotel ? (hotel.whatsapp || hotel.phone || OFFICIAL_WHATSAPP_NUMBER) : OFFICIAL_WHATSAPP_NUMBER}
                         establishmentId={hotel ? hotel.id : 9999}
                         establishmentName={hotel ? hotel.name : "Hoteles de Venezuela"}
                         isPriority={true}
