@@ -483,22 +483,28 @@ export function ChatWidget() {
           </button>
         </div>
 
-        {/* Chat button */}
+        {/* Chat button (Agente de Atención en Línea) */}
         <div className="relative flex items-center justify-center">
           {panel !== "chat" && (
             <>
               <span className="absolute w-14 h-14 rounded-full animate-ping opacity-50 hidden md:block"
                 style={{ background: "#FF0096", animationDuration: "1.8s" }} />
               <span className="absolute w-14 h-14 rounded-full animate-ping opacity-25 hidden md:block"
-                style={{ background: "#9B00CC", animationDuration: "1.8s", animationDelay: "0.6s" }} />
+                style={{ background: "#00C8D4", animationDuration: "1.8s", animationDelay: "0.6s" }} />
             </>
           )}
           <button
             onClick={() => panel === "chat" ? setPanel(null) : open("chat")}
-            title="Chat"
-            className="relative w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition-all hover:scale-110 active:scale-95 cursor-pointer"
-            style={{ background: "linear-gradient(135deg, #FF0096, #9B00CC)" }}>
-            {panel === "chat" ? <ChevronDown className="w-7 h-7 text-white" /> : <MessageCircle className="w-7 h-7 text-white" />}
+            title="Atención en Línea - Hoteles de Venezuela"
+            className="relative w-14 h-14 rounded-full shadow-2xl transition-all hover:scale-110 active:scale-95 cursor-pointer border-2 border-white overflow-hidden bg-cover bg-center group"
+            style={{ backgroundImage: `url('/images/agent_avatar.jpg')` }}>
+            {panel === "chat" ? (
+              <div className="absolute inset-0 bg-slate-900/75 backdrop-blur-xs flex items-center justify-center">
+                <ChevronDown className="w-7 h-7 text-white" />
+              </div>
+            ) : (
+              <span className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full shadow-sm" title="En línea" />
+            )}
           </button>
         </div>
       </div>
@@ -707,14 +713,14 @@ function FloatPanel({ title, subtitle, onClose, accent, children }: {
       {/* Header */}
       <div className="px-4 py-3 text-white flex items-center gap-3 shrink-0"
         style={{ background: "linear-gradient(135deg, #1a0533, #2d0d5c)" }}>
-        <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: `${accent}40` }}>
-          <span className="text-sm">🇻🇪</span>
+        <div className="relative w-9 h-9 rounded-full overflow-hidden border-2 border-[#00C8D4] shrink-0 shadow-md">
+          <img src="/images/agent_avatar.jpg" alt="Atención en Línea" className="w-full h-full object-cover" />
         </div>
         <div className="flex-1 min-w-0 text-left">
           <p className="font-semibold text-sm truncate">{title}</p>
-          <p className="text-[10px] text-white/60">{subtitle}</p>
+          <p className="text-[10px] text-[#00C8D4] font-semibold">{subtitle}</p>
         </div>
-        <div className="w-2 h-2 rounded-full bg-green-400 shrink-0" title="En línea" />
+        <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0 animate-pulse" title="En línea" />
         <button onClick={onClose} className="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 transition-all flex items-center justify-center ml-1 cursor-pointer">
           <X className="w-3.5 h-3.5 text-white" />
         </button>
