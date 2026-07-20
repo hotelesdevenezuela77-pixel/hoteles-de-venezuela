@@ -509,8 +509,8 @@ export function AdminEstablecimientoNuevo() {
                 type="button"
                 onClick={handleAiAutoFill}
                 disabled={aiLoading}
-                className="px-5 py-2.5 rounded-xl text-white text-xs font-bold transition-all hover:scale-102 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shrink-0 shadow-md"
-                style={{ background: "linear-gradient(90deg, #00C8D4 0%, #9B00CC 100%)" }}
+                className="px-5 py-2.5 rounded-xl text-white text-xs font-bold transition-transform active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 shrink-0 shadow-md cursor-pointer select-none"
+                style={{ background: "linear-gradient(90deg, #00C8D4 0%, #9B00CC 100%)", cursor: "pointer" }}
               >
                 {aiLoading ? (
                   <>
