@@ -24,6 +24,7 @@ import { B2BMarketplace } from "./pages/B2BMarketplace";
 import { Comparar } from "./pages/Comparar";
 import { Membresias } from "./pages/Membresias";
 import { ReportarPago } from "./pages/ReportarPago";
+import { Privacidad } from "./pages/Privacidad";
 import { AdminPagos } from "./pages/admin/AdminPagos";
 
 // Admin Sub-routed Panels
@@ -148,6 +149,7 @@ function App() {
 
         <Route path="/membresias" component={Membresias} />
         <Route path="/reportar-pago" component={ReportarPago} />
+        <Route path="/privacidad" component={Privacidad} />
         <Route path="/prestigio-2026" component={ExcelenciaLanding} />
 
         {/* Dashboards Propietarios */}
