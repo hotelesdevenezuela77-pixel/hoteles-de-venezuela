@@ -4,8 +4,8 @@ import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AdminTabBar } from "@/components/admin/AdminTabBar";
 import { supabase } from "@/lib/supabase";
+import type { FeaturedReview } from "@/lib/reviewsStore";
 import {
-  FeaturedReview,
   fetchAllFeaturedReviews,
   saveFeaturedReview,
   removeFeaturedReview,

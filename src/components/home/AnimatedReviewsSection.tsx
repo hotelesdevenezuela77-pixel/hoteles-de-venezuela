@@ -1,16 +1,7 @@
 import { useState, useEffect } from "react";
 import { Star, Quote, CheckCircle2, MessageSquare } from "lucide-react";
-import { supabase } from "@/lib/supabase";
-
-export interface FeaturedReview {
-  id: number | string;
-  user_name: string;
-  user_avatar?: string;
-  rating: number;
-  location_tag: string;
-  comment: string;
-  row_position: 1 | 2 | 3;
-}
+import type { FeaturedReview } from "@/lib/reviewsStore";
+import { fetchAllFeaturedReviews, DEFAULT_FEATURED_REVIEWS } from "@/lib/reviewsStore";
 
 const DEFAULT_REVIEWS_ROW1: FeaturedReview[] = [
   {
@@ -179,8 +170,6 @@ function ReviewCard({ review }: { review: FeaturedReview }) {
     </div>
   );
 }
-
-import { fetchAllFeaturedReviews, DEFAULT_FEATURED_REVIEWS } from "@/lib/reviewsStore";
 
 export function AnimatedReviewsSection() {
   const [row1, setRow1] = useState<FeaturedReview[]>([]);
