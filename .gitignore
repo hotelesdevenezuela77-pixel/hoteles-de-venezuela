@@ -31,3 +31,8 @@ ReplitExport-*/
 *.njsproj
 *.sln
 *.sw?
+
+# Scratch & test scripts
+scratch/
+test_*.js
+

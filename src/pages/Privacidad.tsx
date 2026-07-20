@@ -75,6 +75,20 @@ export function Privacidad() {
               Usted tiene derecho a acceder, corregir o solicitar la eliminación de su información personal en cualquier momento escribiendo a nuestro correo corporativo: <strong>partner@hotelesdevenezuela.com</strong>.
             </p>
           </section>
+
+          <section className="p-5 rounded-2xl border border-slate-100 bg-slate-50">
+            <h2 className="text-base font-bold text-slate-900 mb-2 flex items-center gap-2">
+              <Lock className="w-4 h-4 text-[#FF0096]" /> 5. Eliminación de Datos de Usuarios (Meta / Facebook Login)
+            </h2>
+            <p className="mb-2">
+              Conforme a las políticas de la plataforma Meta (Facebook/WhatsApp), los usuarios que inicien sesión o interactúen mediante nuestras integraciones oficiales pueden solicitar la eliminación definitiva de sus datos almacenados siguiendo estos pasos:
+            </p>
+            <ol className="list-decimal pl-5 space-y-1 text-xs text-slate-600">
+              <li>Enviar un correo a <strong>partner@hotelesdevenezuela.com</strong> con el asunto <em>"Solicitud de Eliminación de Datos - Meta"</em>.</li>
+              <li>Indicar su nombre completo y el número telefónico o correo asociado a su cuenta.</li>
+              <li>Nuestro equipo procesará la eliminación completa de sus registros e interacciones en un lapso no mayor a 48 horas hábiles y le enviará una confirmación oficial.</li>
+            </ol>
+          </section>
         </div>
 
         {/* Footer info */}
