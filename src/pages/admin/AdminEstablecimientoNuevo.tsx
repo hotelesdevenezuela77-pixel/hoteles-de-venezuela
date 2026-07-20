@@ -437,7 +437,7 @@ export function AdminEstablecimientoNuevo() {
       )}
 
       <div className="relative overflow-hidden py-8" style={{ background: "linear-gradient(135deg, #0e0120, #1a0533)" }}>
-        <div className="absolute top-0 right-0 w-56 h-56 rounded-full blur-3xl opacity-10" style={{ background: "#FF0096" }} />
+        <div className="absolute top-0 right-0 w-56 h-56 rounded-full blur-3xl opacity-10 pointer-events-none" style={{ background: "#FF0096" }} />
         <div className="max-w-3xl mx-auto px-6 relative z-10">
           <Link href="/admin/establecimientos">
             <button className="flex items-center gap-1.5 text-white/60 text-xs mb-4 hover:text-white transition-colors cursor-pointer font-bold">
@@ -467,9 +467,9 @@ export function AdminEstablecimientoNuevo() {
               borderColor: "#00C8D4"
             }}
           >
-            <div className="absolute top-0 right-0 w-48 h-48 rounded-full blur-3xl opacity-15" style={{ background: "#00C8D4" }} />
+            <div className="absolute top-0 right-0 w-48 h-48 rounded-full blur-3xl opacity-15 pointer-events-none" style={{ background: "#00C8D4" }} />
             
-            <div className="flex items-center justify-between gap-3 mb-3">
+            <div className="flex items-center justify-between gap-3 mb-3 relative z-10">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#00C8D4] text-white shrink-0 shadow-md">
                   <Sparkles className="w-5 h-5 text-white stroke-[2.5]" />
@@ -488,7 +488,7 @@ export function AdminEstablecimientoNuevo() {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-2.5 mt-4">
+            <div className="flex flex-col sm:flex-row gap-2.5 mt-4 relative z-10">
               <div className="relative flex-1">
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
@@ -509,7 +509,7 @@ export function AdminEstablecimientoNuevo() {
                 type="button"
                 onClick={handleAiAutoFill}
                 disabled={aiLoading}
-                className="px-5 py-2.5 rounded-xl text-white text-xs font-bold transition-transform active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 shrink-0 shadow-md cursor-pointer select-none"
+                className="px-5 py-2.5 rounded-xl text-white text-xs font-bold transition-transform hover:scale-102 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 shrink-0 shadow-md cursor-pointer select-none relative z-10"
                 style={{ background: "linear-gradient(90deg, #00C8D4 0%, #9B00CC 100%)", cursor: "pointer" }}
               >
                 {aiLoading ? (
