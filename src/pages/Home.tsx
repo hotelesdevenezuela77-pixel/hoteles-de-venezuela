@@ -505,12 +505,24 @@ export function Home() {
   };
 
   // Determinar el fondo de forma reactiva y limpia para evitar el parpadeo del banner (flicker)
-  const overlay = "linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4))";
+  const overlay = "linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.6))";
+  const isValidLandscapeImage = (url: string) => {
+    if (!url || typeof url !== "string") return false;
+    const lower = url.toLowerCase();
+    if (lower.includes("logo") || lower.includes("brand") || lower.includes("icon") || lower.includes("avatar") || lower.includes("hv_") || lower.includes("svg")) {
+      return false;
+    }
+    return url.startsWith("http://") || url.startsWith("https://");
+  };
+
   const heroStyle = (() => {
-    // Si hay una imagen cargada de la base de datos (personalizada), la mostramos con el overlay oscuro
-    if (!loading && heroSection.imageUrl) {
+    // Si hay una imagen landscape cargada de la base de datos (personalizada), la mostramos con el overlay oscuro
+    if (!loading && isValidLandscapeImage(heroSection.imageUrl)) {
       return {
-        backgroundImage: `${overlay}, url(${heroSection.imageUrl})`
+        backgroundImage: `${overlay}, url(${heroSection.imageUrl})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat"
       };
     }
     // Por defecto (cargando o si no hay imagen personalizada), usamos el degradado morado de membresías
