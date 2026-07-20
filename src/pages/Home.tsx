@@ -5,6 +5,7 @@ import { ESTABLISHMENTS_MOCK } from "../lib/establishmentsMock";
 import { DESTINOS_MOCK } from "../lib/destinosMock";
 import { EstablishmentCard } from "../components/layout/EstablishmentCard";
 import type { Establishment } from "../components/layout/EstablishmentCard";
+import { AnimatedReviewsSection } from "../components/home/AnimatedReviewsSection";
 import { 
   Search, 
   MapPin, 
@@ -675,106 +676,7 @@ export function Home() {
         <span>⚡ Conexión Directa Verificada: El 100% de los establecimientos en nuestro portal han sido auditados en persona.</span>
       </div>
 
-      {/* 2. PROGRAMAS Y OPORTUNIDADES */}
-      {aboutSection.isActive && (() => {
-        const sectionSubtitle = aboutSection.subtitle === "RED DE SITIOS OFICIAL" ? "PROGRAMAS Y ALIANZAS" : aboutSection.subtitle;
-        const sectionTitle = aboutSection.title === "Ecosistema Hoteles de Venezuela" ? "Programas y Oportunidades" : aboutSection.title;
-        const sectionDescription = aboutSection.description === "Nuestra red de portales conecta a miles de turistas cada día directamente con los hoteleros locales." 
-          ? "Únete a nuestras iniciativas oficiales para potenciar tu hospedaje, captar clientes y forjar alianzas de valor." 
-          : aboutSection.description;
-        
-        return (
-          <section className="py-16 bg-gray-50 border-b border-gray-100 px-4">
-            <div className="max-w-7xl mx-auto">
-              <div className="text-center mb-10">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-magenta/10 border border-brand-magenta/20 text-xs font-black text-brand-magenta mb-4">
-                  {sectionSubtitle === "PROGRAMAS Y ALIANZAS" ? <Sparkles className="w-3.5 h-3.5" /> : <Globe className="w-3.5 h-3.5" />}
-                  <span>{sectionSubtitle}</span>
-                </div>
-                <h2 className="text-2xl md:text-3xl font-black text-gray-800 tracking-tight">
-                  {sectionTitle}
-                </h2>
-                <p className="text-gray-400 text-xs mt-2 max-w-lg mx-auto">
-                  {sectionDescription}
-                </p>
-              </div>
-
-              <div className="grid md:grid-cols-3 gap-6">
-                {programs.map((site) => {
-                  const IconComponent = site.icon;
-                  return (
-                    <Link
-                      key={site.name}
-                      href={site.url}
-                      className={`group bg-gradient-to-br ${site.gradient} rounded-2xl p-6 hover:-translate-y-1.5 hover:shadow-2xl ${site.shadow} transition-all duration-300 relative overflow-hidden text-left block border border-white/10`}
-                    >
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-white border border-white/10">
-                          <IconComponent className="w-5 h-5" />
-                        </div>
-                        <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-white group-hover:translate-x-1 transition-all" />
-                      </div>
-                      <h3 className="font-extrabold text-base text-white mb-1 drop-shadow-xs">
-                        {site.name}
-                      </h3>
-                      <p className="text-xs text-white/90 leading-relaxed">{site.description}</p>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-        );
-      })()}
-
-      {/* 3. VENTAJAS / ¿QUÉ HACEMOS? */}
-      {featuresSection.isActive && (
-        <section className="py-16 bg-white border-b border-gray-100 px-4">
-          <div className="max-w-7xl mx-auto">
-            {featuresSection.title !== "Ventajas / ¿Qué hacemos?" && (
-              <div className="text-center mb-10">
-                <h2 className="text-2xl md:text-3xl font-black text-gray-800 tracking-tight">{featuresSection.title}</h2>
-              </div>
-            )}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="flex flex-col gap-3 text-center items-center bg-gradient-to-br from-pink-50/40 to-white border border-pink-100/50 rounded-3xl p-8 hover:shadow-xl hover:shadow-pink-900/5 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
-                <div className="absolute top-0 left-0 w-full h-[4px] bg-[#FF0096]" />
-                <div className="w-12 h-12 rounded-2xl bg-[#FF0096]/10 flex items-center justify-center border border-[#FF0096]/20 shadow-xs group-hover:scale-110 transition-transform">
-                  <Compass className="w-6 h-6 text-[#FF0096]" />
-                </div>
-                <h3 className="text-base font-extrabold text-gray-800">Curaduría Experta</h3>
-                <p className="text-gray-400 text-xs leading-relaxed max-w-xs">
-                  Seleccionamos minuciosamente cada hotel, posada y restaurante para garantizar una hospitalidad de primer nivel en Venezuela.
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-3 text-center items-center bg-gradient-to-br from-purple-50/40 to-white border border-purple-100/50 rounded-3xl p-8 hover:shadow-xl hover:shadow-purple-900/5 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
-                <div className="absolute top-0 left-0 w-full h-[4px] bg-[#9B00CC]" />
-                <div className="w-12 h-12 rounded-2xl bg-[#9B00CC]/10 flex items-center justify-center border border-[#9B00CC]/20 shadow-xs group-hover:scale-110 transition-transform">
-                  <Award className="w-6 h-6 text-[#9B00CC]" />
-                </div>
-                <h3 className="text-base font-extrabold text-gray-800">Sello de Calidad HDV</h3>
-                <p className="text-gray-400 text-xs leading-relaxed max-w-xs">
-                  Nuestros establecimientos con sello de oro representan la máxima garantía de confort, servicio y fiabilidad para tus viajes.
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-3 text-center items-center bg-gradient-to-br from-cyan-50/40 to-white border border-cyan-100/50 rounded-3xl p-8 hover:shadow-xl hover:shadow-cyan-900/5 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
-                <div className="absolute top-0 left-0 w-full h-[4px] bg-[#00C8D4]" />
-                <div className="w-12 h-12 rounded-2xl bg-[#00C8D4]/10 flex items-center justify-center border border-[#00C8D4]/20 shadow-xs group-hover:scale-110 transition-transform">
-                  <ShieldCheck className="w-6 h-6 text-[#00C8D4]" />
-                </div>
-                <h3 className="text-base font-extrabold text-gray-800">Conexión Directa</h3>
-                <p className="text-gray-400 text-xs leading-relaxed max-w-xs">
-                  Te conectamos sin comisiones intermediarias con los propietarios vía WhatsApp para cotizar y reservar de manera segura.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* 4. HOTELES DESTACADOS */}
+      {/* 2. HOTELES DESTACADOS (HOSPEDAJES ÉLITE DE PRIMERO PARA EL TURISTA) */}
       <section className="py-20 px-4 bg-gray-50/30">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
@@ -799,7 +701,7 @@ export function Home() {
             </div>
           ) : (
             <div className={hotels.length < 3 ? "flex flex-wrap justify-center gap-8" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"}>
-              {hotels.map((hotel, index) => (
+              {hotels.map((hotel) => (
                 <div key={hotel.id} className={hotels.length < 3 ? "w-full max-w-sm flex" : ""}>
                   <EstablishmentCard 
                     establishment={hotel} 
@@ -814,43 +716,88 @@ export function Home() {
         </div>
       </section>
 
-      {/* 5. NUESTRO VIDEO */}
-      {videoSection.isActive && (
-        <section 
-          className="py-16 text-white relative overflow-hidden px-4"
-          style={{ background: "linear-gradient(135deg, #0e0120 0%, #1a0533 60%, #0d1a2e 100%)" }}
-        >
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full blur-3xl opacity-20" style={{ background: "#FF0096" }} />
-            <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-15" style={{ background: "#00C8D4" }} />
-          </div>
-          
-          <div className="max-w-5xl mx-auto relative z-10 text-center">
-            <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full text-xs font-bold text-white mb-4">
-              <Play className="w-4 h-4 fill-white text-white" />
-              <span>{videoSection.subtitle || "NUESTRO VIDEO PRESENTACIÓN"}</span>
+      {/* 3. POSADAS DESTACADAS */}
+      <section className="py-20 px-4 bg-white border-t border-gray-100">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+            <div className="text-left">
+              <span className="text-brand-magenta text-xs font-black uppercase tracking-widest block mb-2">Boutique & Encanto</span>
+              <h2 className="text-2xl sm:text-3xl font-black text-gray-800">Posadas Destacadas</h2>
             </div>
-            <h2 className="text-3xl md:text-4xl font-extrabold mb-3 text-white">
-              {videoSection.title}
-            </h2>
-            <p className="text-slate-300 text-xs max-w-xl mx-auto leading-relaxed mb-10">
-              {videoSection.description}
-            </p>
-
-            <div className="max-w-3xl mx-auto bg-black/50 border border-white/15 rounded-3xl overflow-hidden aspect-video shadow-2xl relative">
-              <iframe 
-                src={getEmbedUrl(videoSection.buttonUrl)} 
-                title="Hoteles de Venezuela LLC Video"
-                allowFullScreen
-                className="w-full h-full"
-              />
-            </div>
+            <Link href="/establecimientos?category=posadas" className="text-brand-magenta text-xs font-bold hover:underline flex items-center gap-1">
+              Ver todos las posadas <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
-        </section>
-      )}
 
-      {/* 6. DESTINOS POPULARES */}
-      <section className="py-20 px-4 bg-white relative">
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-72 bg-gray-100 rounded-3xl" />
+              ))}
+            </div>
+          ) : posadas.length === 0 ? (
+            <div className="text-center py-10 bg-white border border-gray-100 rounded-3xl">
+              <p className="text-gray-400 text-xs font-bold">No hay posadas destacadas registradas.</p>
+            </div>
+          ) : (
+            <div className={posadas.length < 3 ? "flex flex-wrap justify-center gap-8" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"}>
+              {posadas.map((posada) => (
+                <div key={posada.id} className={posadas.length < 3 ? "w-full max-w-sm flex" : ""}>
+                  <EstablishmentCard 
+                    establishment={posada} 
+                    isComparing={comparedIds.includes(posada.id)}
+                    onCompareToggle={() => handleCompareToggle(posada.id)}
+                    isPriority={posada.is_featured}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* 4. COMPLEJOS TURÍSTICOS */}
+      <section className="py-20 px-4 bg-gray-50/50 border-t border-gray-150">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+            <div className="text-left">
+              <span className="text-brand-magenta text-xs font-black uppercase tracking-widest block mb-2">Resorts & Multiactividad</span>
+              <h2 className="text-2xl sm:text-3xl font-black text-gray-800">Complejos Turísticos</h2>
+            </div>
+            <Link href="/establecimientos?category=complejos" className="text-brand-magenta text-xs font-bold hover:underline flex items-center gap-1">
+              Ver todos los complejos <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-72 bg-gray-100 rounded-3xl" />
+              ))}
+            </div>
+          ) : complexes.length === 0 ? (
+            <div className="text-center py-10 bg-white border border-gray-100 rounded-3xl">
+              <p className="text-gray-400 text-xs font-bold">No hay complejos turísticos destacados registrados.</p>
+            </div>
+          ) : (
+            <div className={complexes.length < 3 ? "flex flex-wrap justify-center gap-8" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"}>
+              {complexes.map((complex) => (
+                <div key={complex.id} className={complexes.length < 3 ? "w-full max-w-sm flex" : ""}>
+                  <EstablishmentCard 
+                    establishment={complex} 
+                    isComparing={comparedIds.includes(complex.id)}
+                    onCompareToggle={() => handleCompareToggle(complex.id)}
+                    isPriority={complex.is_featured}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* 5. DESTINOS POPULARES */}
+      <section className="py-20 px-4 bg-white relative border-t border-gray-100">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
             <div className="text-left">
@@ -892,103 +839,8 @@ export function Home() {
         </div>
       </section>
 
-      {/* 7. POSADAS DESTACADAS */}
-      <section className="py-20 px-4 bg-gray-50/30">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
-            <div className="text-left">
-              <span className="text-brand-magenta text-xs font-black uppercase tracking-widest block mb-2">Boutique & Encanto</span>
-              <h2 className="text-2xl sm:text-3xl font-black text-gray-800">Posadas Destacadas</h2>
-            </div>
-            <Link href="/establecimientos?category=posadas" className="text-brand-magenta text-xs font-bold hover:underline flex items-center gap-1">
-              Ver todos las posadas <ChevronRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="h-72 bg-gray-100 rounded-3xl" />
-              ))}
-            </div>
-          ) : posadas.length === 0 ? (
-            <div className="text-center py-10 bg-white border border-gray-100 rounded-3xl">
-              <p className="text-gray-400 text-xs font-bold">No hay posadas destacadas registradas.</p>
-            </div>
-          ) : (
-            <div className={posadas.length < 3 ? "flex flex-wrap justify-center gap-8" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"}>
-              {posadas.map((posada, index) => (
-                <div key={posada.id} className={posadas.length < 3 ? "w-full max-w-sm flex" : ""}>
-                  <EstablishmentCard 
-                    establishment={posada} 
-                    isComparing={comparedIds.includes(posada.id)}
-                    onCompareToggle={() => handleCompareToggle(posada.id)}
-                    isPriority={posada.is_featured}
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* 8. REPORTAJES / TIPS DE VIAJE */}
-      <section className="py-20 px-4 bg-white border-y border-gray-100">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-50 border border-cyan-200 text-xs font-black text-brand-turquesa mb-4">
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>TIPS DE VIAJE & REPORTAJES</span>
-            </div>
-            <h2 className="text-2xl md:text-3xl font-black text-gray-800 tracking-tight">
-              Consejos de Turismo & Guías
-            </h2>
-            <p className="text-gray-400 text-xs mt-2 max-w-md mx-auto">
-              Lee los reportajes redactados por nuestro equipo sobre playas secretas, picos andinos y gastronomía.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {blogs.map((blog) => (
-              <article key={blog.id} className="group flex flex-col justify-between bg-white border border-gray-100 rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300 h-full text-left">
-                <div>
-                  <div className="h-44 overflow-hidden relative">
-                    <img 
-                      src={getCleanedImageUrl(blog.featured_image, blog.title)} 
-                      alt={blog.title} 
-                      className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500" 
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800";
-                      }}
-                    />
-                    <div className="absolute top-4 left-4 bg-brand-turquesa text-white text-[9px] font-black uppercase px-2 py-1 rounded-lg">
-                      {blog.reading_time} Min de lectura
-                    </div>
-                  </div>
-                  <div className="p-5">
-                    <h3 className="font-extrabold text-base text-gray-850 line-clamp-2 leading-tight group-hover:text-brand-magenta transition-colors">
-                      {blog.title}
-                    </h3>
-                    <p className="text-xs text-gray-400 mt-2 line-clamp-3 leading-relaxed">
-                      {blog.excerpt}
-                    </p>
-                  </div>
-                </div>
-                <div className="p-5 pt-0">
-                  <Link href={`/blog/${blog.slug}`}>
-                    <span className="text-xs font-bold text-brand-magenta group-hover:underline flex items-center gap-1 cursor-pointer">
-                      Leer reportaje →
-                    </span>
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 9. SITIOS TURÍSTICOS RECOMENDADOS */}
-      <section className="py-20 px-4 bg-gray-50/30">
+      {/* 6. SITIOS TURÍSTICOS RECOMENDADOS */}
+      <section className="py-20 px-4 bg-gray-50/30 border-t border-gray-100">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-brand-purple/10 border border-brand-purple/20 text-xs font-black text-brand-purple mb-4">
@@ -1054,6 +906,198 @@ export function Home() {
           </div>
         </div>
       </section>
+
+      {/* 7. NUEVA SECCIÓN DE RESEÑAS ANIMADAS (3 FILAS MARQUEE INFINITO) */}
+      <AnimatedReviewsSection />
+
+      {/* 8. NUESTRO VIDEO */}
+      {videoSection.isActive && (
+        <section 
+          className="py-16 text-white relative overflow-hidden px-4"
+          style={{ background: "linear-gradient(135deg, #0e0120 0%, #1a0533 60%, #0d1a2e 100%)" }}
+        >
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full blur-3xl opacity-20" style={{ background: "#FF0096" }} />
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-15" style={{ background: "#00C8D4" }} />
+          </div>
+          
+          <div className="max-w-5xl mx-auto relative z-10 text-center">
+            <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full text-xs font-bold text-white mb-4">
+              <Play className="w-4 h-4 fill-white text-white" />
+              <span>{videoSection.subtitle || "NUESTRO VIDEO PRESENTACIÓN"}</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-3 text-white">
+              {videoSection.title}
+            </h2>
+            <p className="text-slate-300 text-xs max-w-xl mx-auto leading-relaxed mb-10">
+              {videoSection.description}
+            </p>
+
+            <div className="max-w-3xl mx-auto bg-black/50 border border-white/15 rounded-3xl overflow-hidden aspect-video shadow-2xl relative">
+              <iframe 
+                src={getEmbedUrl(videoSection.buttonUrl)} 
+                title="Hoteles de Venezuela LLC Video"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 9. REPORTAJES / TIPS DE VIAJE */}
+      <section className="py-20 px-4 bg-white border-y border-gray-100">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-50 border border-cyan-200 text-xs font-black text-brand-turquesa mb-4">
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>TIPS DE VIAJE & REPORTAJES</span>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-black text-gray-800 tracking-tight">
+              Consejos de Turismo & Guías
+            </h2>
+            <p className="text-gray-400 text-xs mt-2 max-w-md mx-auto">
+              Lee los reportajes redactados por nuestro equipo sobre playas secretas, picos andinos y gastronomía.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {blogs.map((blog) => (
+              <article key={blog.id} className="group flex flex-col justify-between bg-white border border-gray-100 rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300 h-full text-left">
+                <div>
+                  <div className="h-44 overflow-hidden relative">
+                    <img 
+                      src={getCleanedImageUrl(blog.featured_image, blog.title)} 
+                      alt={blog.title} 
+                      className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500" 
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800";
+                      }}
+                    />
+                    <div className="absolute top-4 left-4 bg-brand-turquesa text-white text-[9px] font-black uppercase px-2 py-1 rounded-lg">
+                      {blog.reading_time} Min de lectura
+                    </div>
+                  </div>
+                  <div className="p-5">
+                    <h3 className="font-extrabold text-base text-gray-850 line-clamp-2 leading-tight group-hover:text-brand-magenta transition-colors">
+                      {blog.title}
+                    </h3>
+                    <p className="text-xs text-gray-400 mt-2 line-clamp-3 leading-relaxed">
+                      {blog.excerpt}
+                    </p>
+                  </div>
+                </div>
+                <div className="p-5 pt-0">
+                  <Link href={`/blog/${blog.slug}`}>
+                    <span className="text-xs font-bold text-brand-magenta group-hover:underline flex items-center gap-1 cursor-pointer">
+                      Leer reportaje →
+                    </span>
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 10. SECCIÓN B2B: PROGRAMAS Y OPORTUNIDADES (AL FINAL ANTES DEL FOOTER) */}
+      {aboutSection.isActive && (() => {
+        const sectionSubtitle = aboutSection.subtitle === "RED DE SITIOS OFICIAL" ? "PROGRAMAS Y ALIANZAS" : aboutSection.subtitle;
+        const sectionTitle = aboutSection.title === "Ecosistema Hoteles de Venezuela" ? "Programas y Oportunidades" : aboutSection.title;
+        const sectionDescription = aboutSection.description === "Nuestra red de portales conecta a miles de turistas cada día directamente con los hoteleros locales." 
+          ? "Únete a nuestras iniciativas oficiales para potenciar tu hospedaje, captar clientes y forjar alianzas de valor." 
+          : aboutSection.description;
+        
+        return (
+          <section className="py-16 bg-gray-50 border-b border-gray-100 px-4">
+            <div className="max-w-7xl mx-auto">
+              <div className="text-center mb-10">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-magenta/10 border border-brand-magenta/20 text-xs font-black text-brand-magenta mb-4">
+                  {sectionSubtitle === "PROGRAMAS Y ALIANZAS" ? <Sparkles className="w-3.5 h-3.5" /> : <Globe className="w-3.5 h-3.5" />}
+                  <span>{sectionSubtitle}</span>
+                </div>
+                <h2 className="text-2xl md:text-3xl font-black text-gray-800 tracking-tight">
+                  {sectionTitle}
+                </h2>
+                <p className="text-gray-400 text-xs mt-2 max-w-lg mx-auto">
+                  {sectionDescription}
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-6">
+                {programs.map((site) => {
+                  const IconComponent = site.icon;
+                  return (
+                    <Link
+                      key={site.name}
+                      href={site.url}
+                      className={`group bg-gradient-to-br ${site.gradient} rounded-2xl p-6 hover:-translate-y-1.5 hover:shadow-2xl ${site.shadow} transition-all duration-300 relative overflow-hidden text-left block border border-white/10`}
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-white border border-white/10">
+                          <IconComponent className="w-5 h-5" />
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                      </div>
+                      <h3 className="font-extrabold text-base text-white mb-1 drop-shadow-xs">
+                        {site.name}
+                      </h3>
+                      <p className="text-xs text-white/90 leading-relaxed">{site.description}</p>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+        );
+      })()}
+
+      {/* 11. SECCIÓN B2B: VENTAJAS Y SELLO HDV (AL FINAL ANTES DEL FOOTER) */}
+      {featuresSection.isActive && (
+        <section className="py-16 bg-white border-b border-gray-100 px-4">
+          <div className="max-w-7xl mx-auto">
+            {featuresSection.title !== "Ventajas / ¿Qué hacemos?" && (
+              <div className="text-center mb-10">
+                <h2 className="text-2xl md:text-3xl font-black text-gray-800 tracking-tight">{featuresSection.title}</h2>
+              </div>
+            )}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="flex flex-col gap-3 text-center items-center bg-gradient-to-br from-pink-50/40 to-white border border-pink-100/50 rounded-3xl p-8 hover:shadow-xl hover:shadow-pink-900/5 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-full h-[4px] bg-[#FF0096]" />
+                <div className="w-12 h-12 rounded-2xl bg-[#FF0096]/10 flex items-center justify-center border border-[#FF0096]/20 shadow-xs group-hover:scale-110 transition-transform">
+                  <Compass className="w-6 h-6 text-[#FF0096]" />
+                </div>
+                <h3 className="text-base font-extrabold text-gray-800">Curaduría Experta</h3>
+                <p className="text-gray-400 text-xs leading-relaxed max-w-xs">
+                  Seleccionamos minuciosamente cada hotel, posada y restaurante para garantizar una hospitalidad de primer nivel en Venezuela.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3 text-center items-center bg-gradient-to-br from-purple-50/40 to-white border border-purple-100/50 rounded-3xl p-8 hover:shadow-xl hover:shadow-purple-900/5 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-full h-[4px] bg-[#9B00CC]" />
+                <div className="w-12 h-12 rounded-2xl bg-[#9B00CC]/10 flex items-center justify-center border border-[#9B00CC]/20 shadow-xs group-hover:scale-110 transition-transform">
+                  <Award className="w-6 h-6 text-[#9B00CC]" />
+                </div>
+                <h3 className="text-base font-extrabold text-gray-800">Sello de Calidad HDV</h3>
+                <p className="text-gray-400 text-xs leading-relaxed max-w-xs">
+                  Nuestros establecimientos con sello de oro representan la máxima garantía de confort, servicio y fiabilidad para tus viajes.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3 text-center items-center bg-gradient-to-br from-cyan-50/40 to-white border border-cyan-100/50 rounded-3xl p-8 hover:shadow-xl hover:shadow-cyan-900/5 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-full h-[4px] bg-[#00C8D4]" />
+                <div className="w-12 h-12 rounded-2xl bg-[#00C8D4]/10 flex items-center justify-center border border-[#00C8D4]/20 shadow-xs group-hover:scale-110 transition-transform">
+                  <ShieldCheck className="w-6 h-6 text-[#00C8D4]" />
+                </div>
+                <h3 className="text-base font-extrabold text-gray-800">Conexión Directa</h3>
+                <p className="text-gray-400 text-xs leading-relaxed max-w-xs">
+                  Te conectamos sin comisiones intermediarias con los propietarios vía WhatsApp para cotizar y reservar de manera segura.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* 10. COMPLEJOS TURÍSTICOS */}
       <section className="py-20 px-4 bg-gray-50/50 border-t border-gray-150">

@@ -6,7 +6,7 @@ import { AdminTabBar } from "@/components/admin/AdminTabBar";
 import { supabase } from "@/lib/supabase";
 import {
   Star, Trash2, Search, Building2, User, AlertTriangle,
-  ThumbsUp, ThumbsDown, MessageSquare, Loader2
+  ThumbsUp, ThumbsDown, MessageSquare, Loader2, Plus, Sparkles, X
 } from "lucide-react";
 
 function StarRating({ rating }: { rating: number }) {
@@ -32,6 +32,58 @@ export function AdminReseñas() {
   const [search, setSearch] = useState("");
   const [filterRating, setFilterRating] = useState(0);
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newUserName, setNewUserName] = useState("");
+  const [newLocationTag, setNewLocationTag] = useState("");
+  const [newComment, setNewComment] = useState("");
+  const [newRowPos, setNewRowPos] = useState<number>(1);
+  const [toastMsg, setToastMsg] = useState("");
+
+  const triggerToast = (m: string) => {
+    setToastMsg(m);
+    setTimeout(() => setToastMsg(""), 3500);
+  };
+
+  const handleAddFeaturedReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newUserName.trim() || !newComment.trim()) {
+      alert("Por favor completa el nombre del usuario y el comentario.");
+      return;
+    }
+
+    const reviewObj = {
+      id: Date.now(),
+      user_name: newUserName,
+      location_tag: newLocationTag || "Venezuela",
+      comment: newComment,
+      rating: 5,
+      row_position: newRowPos,
+      created_at: new Date().toISOString()
+    };
+
+    try {
+      await supabase.from("customer_reviews").insert({
+        user_name: newUserName,
+        location_tag: newLocationTag || "Venezuela",
+        comment: newComment,
+        rating: 5,
+        row_position: newRowPos
+      });
+    } catch (e) {
+      console.warn("Fallback local para reseña destacada");
+    }
+
+    const localKey = "hdv_featured_reviews_custom";
+    const existing = JSON.parse(localStorage.getItem(localKey) || "[]");
+    localStorage.setItem(localKey, JSON.stringify([reviewObj, ...existing]));
+
+    setShowAddModal(false);
+    setNewUserName("");
+    setNewLocationTag("");
+    setNewComment("");
+    triggerToast("✨ Reseña animada agregada con éxito para la página principal.");
+    qc.invalidateQueries({ queryKey: ["admin-reviews"] });
+  };
 
   useEffect(() => {
     if (!authLoading && (!user || (profile?.role !== "admin" && user?.email?.toLowerCase() !== "hotelesdevenezuela77@gmail.com"))) {
@@ -149,10 +201,18 @@ export function AdminReseñas() {
               <Star className="w-4.5 h-4.5 text-pink-300" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white tracking-tight">Moderación de Reseñas</h1>
+              <h1 className="text-xl font-bold text-white tracking-tight">Gestión de Reseñas</h1>
               <p className="text-white/50 text-xs font-semibold">{reviews.length} reseñas registradas en total</p>
             </div>
           </div>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-xs font-bold transition-all hover:scale-102 cursor-pointer shadow-md"
+            style={{ background: "linear-gradient(90deg, #FF0096, #9B00CC)" }}
+          >
+            <Plus className="w-4 h-4" />
+            <span>+ Agregar Reseña Animada al Home</span>
+          </button>
         </div>
       </div>
 
@@ -330,6 +390,105 @@ export function AdminReseñas() {
           </div>
         )}
       </div>
+
+      {/* Toast Notification */}
+      {toastMsg && (
+        <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-[#00C8D4]" />
+          <span>{toastMsg}</span>
+        </div>
+      )}
+
+      {/* Modal Agregar Reseña Animada */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl relative border border-slate-200 animate-in fade-in zoom-in duration-150">
+            <button
+              onClick={() => setShowAddModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-full hover:bg-slate-100 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-white font-bold bg-[#FF0096]">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900">Agregar Reseña Animada al Home</h3>
+                <p className="text-xs text-slate-400 font-medium">Esta reseña aparecerá en las 3 filas animadas de la página principal.</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleAddFeaturedReview} className="space-y-4">
+              <div>
+                <label className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Nombre del Turista / Usuario *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ej. Mariana Silva"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#FF0096]"
+                  value={newUserName}
+                  onChange={e => setNewUserName(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Hotel o Destino Visitado *</label>
+                <input
+                  type="text"
+                  placeholder="Ej. Posada Galápagos · Los Roques"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#FF0096]"
+                  value={newLocationTag}
+                  onChange={e => setNewLocationTag(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Fila de Animación en la Marquesina</label>
+                <select
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#FF0096] cursor-pointer"
+                  value={newRowPos}
+                  onChange={e => setNewRowPos(Number(e.target.value))}
+                >
+                  <option value={1}>Fila 1 (Movimiento a la DERECHA ➡️)</option>
+                  <option value={2}>Fila 2 (Movimiento a la IZQUIERDA ⬅️)</option>
+                  <option value={3}>Fila 3 (Movimiento a la DERECHA ➡️)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Comentario del Viajero *</label>
+                <textarea
+                  required
+                  rows={3}
+                  placeholder="Escribe la reseña o testimonio..."
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#FF0096] resize-none"
+                  value={newComment}
+                  onChange={e => setNewComment(e.target.value)}
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 rounded-xl text-white text-xs font-bold shadow-md cursor-pointer hover:scale-102 transition-transform"
+                  style={{ background: "linear-gradient(90deg, #FF0096, #9B00CC)" }}
+                >
+                  ✨ Publicar en Marquesina
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
