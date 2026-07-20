@@ -379,32 +379,43 @@ export function Home() {
   }, []);
 
   // ... (El resto de la lógica de renderizado se mantiene intacta)
-  const dbHoteles = establishments.filter(e => e.category_slug === "hoteles" && e.homepage_priority !== null);
-  const dbPosadas = establishments.filter(e => e.category_slug === "posadas" && e.homepage_priority !== null);
+  const dbHoteles = establishments.filter(e => 
+    e.category_slug === "hoteles" || 
+    e.category_name?.toLowerCase().includes("hotel")
+  );
+  const dbPosadas = establishments.filter(e => 
+    e.category_slug === "posadas" || 
+    e.category_name?.toLowerCase().includes("posada")
+  );
   const dbComplexes = establishments.filter(e => 
-    e.category_slug !== "hoteles" && 
-    e.category_slug !== "posadas" && 
-    e.homepage_priority !== null
+    e.category_slug === "complejos" || 
+    e.category_name?.toLowerCase().includes("complejo") || 
+    e.category_name?.toLowerCase().includes("resort")
   );
 
-  const getCategorizedItems = (dbItems: Establishment[], categorySlug: string) => {
-    // Create an array of 6 slots
-    const slots = new Array<Establishment | null>(6).fill(null);
+  const getCategorizedItems = (dbItems: Establishment[]) => {
+    if (!dbItems || dbItems.length === 0) return [];
 
-    // Place DB items in their exact slot (positions 1-6 map to indices 0-5)
-    dbItems.forEach(item => {
-      const pos = item.homepage_priority;
-      if (pos !== null && pos >= 1 && pos <= 6) {
-        slots[pos - 1] = item;
-      }
-    });
+    const prioritized = dbItems.filter(e => e.homepage_priority !== null && e.homepage_priority !== undefined && e.homepage_priority >= 1);
+    
+    if (prioritized.length > 0) {
+      const slots = new Array<Establishment | null>(6).fill(null);
+      prioritized.forEach(item => {
+        const pos = item.homepage_priority;
+        if (pos && pos >= 1 && pos <= 6) {
+          slots[pos - 1] = item;
+        }
+      });
+      const filledSlots = slots.filter((item): item is Establishment => item !== null);
+      if (filledSlots.length > 0) return filledSlots;
+    }
 
-    return slots.filter((item): item is Establishment => item !== null);
+    return dbItems.slice(0, 6);
   };
 
-  const hotels = getCategorizedItems(dbHoteles, "hoteles");
-  const posadas = getCategorizedItems(dbPosadas, "posadas");
-  const complexes = getCategorizedItems(dbComplexes, "complejos");
+  const hotels = getCategorizedItems(dbHoteles);
+  const posadas = getCategorizedItems(dbPosadas);
+  const complexes = getCategorizedItems(dbComplexes);
 
   const featuredDestinations = (destinations.length > 0 ? destinations : DEFAULT_DESTINOS_MOCK)
     .filter(d => d.is_featured !== false)
@@ -903,7 +914,7 @@ export function Home() {
 
                 <div className="p-5 pt-0">
                   <div className="flex flex-wrap gap-1 mb-4 col-span-3">
-                    {site.highlights.split(",").slice(0, 3).map((hl, i) => (
+                    {(site.highlights || "").split(",").filter(Boolean).slice(0, 3).map((hl, i) => (
                       <span key={i} className="px-2 py-0.5 bg-gray-50 border border-gray-100 text-[9px] text-gray-400 rounded-full font-bold">
                         {hl.trim()}
                       </span>
