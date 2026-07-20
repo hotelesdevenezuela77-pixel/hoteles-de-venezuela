@@ -43,9 +43,67 @@ interface ChatbotRule {
   response: string;
 }
 
-function autoReply(
+async function fetchAIResponse(
   text: string,
   tipo: "turista" | "propietario",
+  name: string,
+  dbRules: ChatbotRule[],
+  destinos: any[],
+  hoteles: any[]
+): Promise<string> {
+  const apiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || (import.meta as any).env?.GEMINI_API_KEY || "";
+  
+  // Lista de destinos y hoteles resumidos para el contexto del prompt de IA
+  const destListSummary = destinos.slice(0, 15).map(d => `${d.name} (${d.state || ''})`).join(", ");
+  const hotelListSummary = hoteles.slice(0, 15).map(h => `${h.name} (slug: ${h.slug})`).join(", ");
+
+  const systemInstruction = `Eres el Asistente Oficial e IA Inteligente de la plataforma "Hoteles de Venezuela" (la plataforma líder de turismo y reserva directa del país).
+Tu rol es atender a un visitante de tipo: ${tipo.toUpperCase()} (Nombre: ${name || 'Estimado Huésped'}).
+
+DIRECTRICES CLAVE:
+1. Si el usuario es TURISTA: Ayúdale a encontrar destinos, posadas, hoteles y paquetes turísticos en Venezuela. Resalta que reservar directo ahorra el 100% de comisiones intermedias.
+2. Si el usuario es PROPIETARIO: Explícale cómo registrar su hotel/posada, los planes de membresía (Básico, Premium, 50 Fundadores) y las ventajas de estar en la red oficial.
+3. Si el usuario consulta sobre soporte o reclamos: Indica amablemente que su caso fue remitido al área encargada y se le dará seguimiento en 48 a 72 horas hábiles.
+4. UTILIZA ENLACES MARKDOWN: Cuando menciones un destino o hotel, incluye enlaces navegables como [Nombre Destino](/establecimientos?destination=slug) o [Nombre Hotel](/establecimiento/slug).
+5. DESTINOS DISPONIBLES EN PLATAFORMA: ${destListSummary}.
+6. HOTELES RECOMENDADOS: ${hotelListSummary}.
+
+Sé muy atento, educado, persuasivo y cercano. Responde en español limpio sin rodeos.`;
+
+  // Intentar llamada directa a la API de Gemini si hay API Key disponible y no es placeholder
+  if (apiKey && apiKey !== "Hola177*H" && apiKey.length > 20) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [
+            { role: "user", parts: [{ text: `${systemInstruction}\n\nMensaje del usuario: "${text}"` }] }
+          ]
+        })
+      });
+
+      if (res.ok) {
+        const json = await res.json();
+        const geminiReply = json.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (geminiReply && geminiReply.trim().length > 0) {
+          return geminiReply.trim();
+        }
+      }
+    } catch (err) {
+      console.warn("⚠️ Fallo llamada directa a Gemini en cliente, ejecutando motor de IA de respaldo:", err);
+    }
+  }
+
+  // MOTOR DE IA DE RESPALDO INTELIGENTE (Smart DB AI Engine)
+  return smartFallbackAI(text, tipo, name, dbRules, destinos, hoteles);
+}
+
+function smartFallbackAI(
+  text: string,
+  tipo: "turista" | "propietario",
+  name: string,
   dbRules: ChatbotRule[],
   destinos: any[],
   hoteles: any[]
@@ -53,7 +111,7 @@ function autoReply(
   const lower = text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
   if (tipo === "turista") {
-    // 1. Buscar si menciona algún destino
+    // 1. Coincidencia por Destino
     const matchedDest = destinos.find(d => {
       const destNameNormalized = d.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
       const destSlugNormalized = d.slug.toLowerCase().replace(/-/g, " ");
@@ -61,23 +119,23 @@ function autoReply(
     });
 
     if (matchedDest) {
-      // Buscar hoteles de ese destino
       const destHoteles = hoteles.filter(h => h.destination_id === matchedDest.id);
-      let response = `¡${matchedDest.name} es un destino espectacular en el estado ${matchedDest.state || ""}! 🌴\n\n${matchedDest.description || ""}\n\n`;
+      let response = `¡${matchedDest.name} es uno de los destinos más deslumbrantes de Venezuela! 🌴\n\n${matchedDest.description || 'Disfruta de paisajes inolvidables y la mejor hospitalidad local.'}\n\n`;
       
       if (destHoteles.length > 0) {
-        response += `En esta zona contamos con excelentes opciones de hospedaje recomendadas:\n`;
+        response += `Alojamientos destacados recomendados en ${matchedDest.name}:\n`;
         destHoteles.forEach(h => {
           response += `👉 [${h.name}](/establecimiento/${h.slug})\n`;
         });
         response += `\n`;
       }
       
-      response += `🔗 [Ver todos los alojamientos en ${matchedDest.name}](/establecimientos?destination=${matchedDest.slug})`;
+      response += `🔗 [Ver todos los alojamientos en ${matchedDest.name}](/establecimientos?destination=${matchedDest.slug})\n\n`;
+      response += `¿Te gustaría cotizar fechas específicas o necesitas información de traslados? 😊`;
       return response;
     }
 
-    // 2. Buscar si menciona algún hotel
+    // 2. Coincidencia por Hotel
     const matchedHotel = hoteles.find(h => {
       const hotelNameNormalized = h.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
       return lower.includes(hotelNameNormalized);
@@ -85,39 +143,59 @@ function autoReply(
 
     if (matchedHotel) {
       const dest = destinos.find(d => d.id === matchedHotel.destination_id);
-      let response = `¡Excelente elección! 🏨 **${matchedHotel.name}** es una opción de hospedaje fantástica en nuestro portal.\n\n`;
-      response += `👉 [Ver detalles de ${matchedHotel.name}](/establecimiento/${matchedHotel.slug})\n\n`;
-      
+      let response = `¡Excelente elección! 🏨 **[${matchedHotel.name}](/establecimiento/${matchedHotel.slug})** es una opción de hospedaje destacada en nuestro portal.\n\n`;
+      response += `Reservar a través de Hoteles de Venezuela te garantiza **0% de comisiones intermedias** y trato directo con el establecimiento.\n\n`;
+      response += `👉 [Ver ficha completa de ${matchedHotel.name}](/establecimiento/${matchedHotel.slug})\n`;
       if (dest) {
-        response += `También puedes explorar más hospedajes en la zona:\n🔗 [Ver alojamientos en ${dest.name}](/establecimientos?destination=${dest.slug})`;
+        response += `🔗 [Explorar otros hoteles en ${dest.name}](/establecimientos?destination=${dest.slug})\n`;
       }
       return response;
     }
-  }
 
-  // 3. Intentar buscar en las reglas dinámicas de la base de datos primero
-  const mappedUserType = tipo === "turista" ? "tourist" : "business";
-  const matchedDbRule = dbRules.find(rule => {
-    if (rule.user_type !== mappedUserType) return false;
-    return rule.keywords.some(keyword => {
-      const normalizedKeyword = keyword.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      return lower.includes(normalizedKeyword);
-    });
-  });
+    // 3. Intenciones frecuentes para turistas
+    if (lower.includes("precio") || lower.includes("costo") || lower.includes("cuanto") || lower.includes("tarifa") || lower.includes("cotiz")) {
+      return `Los costos varían según el destino, tipo de habitación y la temporada del viaje 💰.\n\nEn Hoteles de Venezuela garantizamos la **tarifa directa sin sobreprecio de agencias**.\n\nPuedes consultar precios y disponibilidad en línea en nuestra sección de [Alojamientos](/establecimientos) o explorar nuestros [Paquetes Turísticos](/paquetes).\n\n¿Hacia qué ciudad o playa tienes planeado viajar?`;
+    }
 
-  if (matchedDbRule) {
-    return matchedDbRule.response;
-  }
+    if (lower.includes("reserva") || lower.includes("disponib") || lower.includes("cupo") || lower.includes("habitac")) {
+      return `¡Reservar es muy sencillo! 📅\n\n1. Busca tu destino ideal en [Destinos](/destinos) o en [Establecimientos](/establecimientos).\n2. Selecciona la posada u hotel de tu preferencia.\n3. Haz clic en **Reservar Directo** o escríbeles directamente por su botón de WhatsApp sin comisiones.\n\n¿Quieres que te sugiera los destinos más cotizados de la temporada? 🏝️`;
+    }
 
-  // 4. Fallback a las reglas estáticas
-  const rules = tipo === "turista" ? RULES_TURISTA : RULES_PROPIETARIO;
-  for (const rule of rules) {
-    if (rule.k.some(k => lower.includes(k))) return rule.r;
+    if (lower.includes("paquete") || lower.includes("tour") || lower.includes("excursio") || lower.includes("todo incl")) {
+      return `¡Contamos con increíbles [Paquetes Turísticos](/paquetes) con todo incluido! ✈️🌴\n\nTenemos planes ideales para parejas, familias y grupos a destinos como Morrocoy, Los Roques, Margarita y Canaima.\n\n👉 [Explorar Catálogo de Paquetes](/paquetes)`;
+    }
+
+    if (lower.includes("soporte") || lower.includes("queja") || lower.includes("reclamo") || lower.includes("pago") || lower.includes("factura") || lower.includes("problema")) {
+      return `Estimado(a) ${name || 'usuario'}, tu tranquilidad es nuestra prioridad. 🤝\n\nHemos registrado tu consulta para ser remitida formalmente al departamento de Atención y Soporte. Nuestro equipo dará seguimiento a tu caso en un lapso estimado de **48 a 72 horas hábiles**.\n\nTambién puedes contactar directamente a nuestro equipo central haciendo clic en el botón de abajo **"Continuar por WhatsApp"**.`;
+    }
+
+    if (lower.includes("gracias") || lower.includes("excelente") || lower.includes("perfecto")) {
+      return `¡Es un placer atenderte, ${name.split(" ")[0]}! 😊 Estamos aquí para ayudarte a vivir la mejor experiencia en Venezuela. ¿Hay algún otro destino u hotel del que desees información? 🇻🇪`;
+    }
+
+    if (lower.includes("hola") || lower.includes("buenas") || lower.includes("saludo") || lower.includes("hey")) {
+      return `¡Hola ${name.split(" ")[0]}! 👋 Bienvenido a la plataforma oficial de Hoteles de Venezuela.\n\nPuedo ayudarte a descubrir [Destinos](/destinos), consultar [Alojamientos](/establecimientos) o explorar [Paquetes](/paquetes).\n\n¿A qué parte de Venezuela sueñas con viajar en tus próximas vacaciones? 🌴`;
+    }
+
+    return `Entendido, ${name.split(" ")[0]}. 😊 Como asistente oficial de Hoteles de Venezuela, puedo sugerirte los mejores destinos del país como Morrocoy, Los Roques, Canaima o Margarita.\n\n👉 [Explorar Directorio de Posadas y Hoteles](/establecimientos)\n👉 [Ver Todos los Destinos](/destinos)\n\nTambién puedes hacer clic en **"Continuar por WhatsApp"** para atención personalizada de un asesor de viajes.`;
+  } else {
+    // PROPIETARIO
+    if (lower.includes("registr") || lower.includes("publicar") || lower.includes("unir") || lower.includes("afiliar") || lower.includes("anunciar")) {
+      return `¡Bienvenido aliados turísticos! 🏨 Publicar tu posada o complejo hotelero en Hoteles de Venezuela te dará visibilidad directa ante miles de viajeros y reservas 100% libres de comisiones.\n\n👉 [Registrar mi Negocio](/registro-negocio)\n👉 [Ver Planes de Membresía](/membresias)\n\n¿Te gustaría conocer los beneficios del plan 50 Fundadores? 🚀`;
+    }
+
+    if (lower.includes("membresia") || lower.includes("plan") || lower.includes("precio") || lower.includes("costo") || lower.includes("inversio")) {
+      return `Ofrecemos 3 niveles de membresía adaptados a la dimensión de tu establecimiento:\n\n1. **Básico (Gratuito)**: Perfil esencial y contacto directo.\n2. **Premium**: Destacado prioritario, CRM de leads y reservaciones directas.\n3. **50 Fundadores**: Beneficios exclusivos de posicionamiento de por vida.\n\n👉 [Comparar Planes de Membresía](/membresias)`;
+    }
+
+    if (lower.includes("hola") || lower.includes("buenas") || lower.includes("saludo")) {
+      return `¡Hola ${name.split(" ")[0]}! 👋 Qué gusto saludarte. Soy tu asistente corporativo de Hoteles de Venezuela. Puedo orientarte sobre cómo listar tu propiedad, activar tu motor de reservas y potenciar tus ventas directas.\n\n¿En qué puedo apoyarte hoy?`;
+    }
+
+    return `Excelente, ${name.split(" ")[0]}. Te invitamos a conocer todos los beneficios de formar parte de la red hotelera oficial del país.\n\n👉 [Ir a Registro de Negocio](/registro-negocio)\n👉 [Ver Detalles de Membresías](/membresias)\n\nO si prefieres, haz clic abajo en **"Continuar por WhatsApp"** para conversar directamente con nuestro director de ventas.`;
   }
-  return tipo === "turista"
-    ? "Entendido 😊 Para más información puedes ver nuestros destinos en /destinos u escribirnos por WhatsApp."
-    : "Entendido 😊 Para más información sobre cómo listar tu negocio visita /registro-negocio o escríbenos por WhatsApp.";
 }
+
 
 let cachedIp = "";
 async function getClientIp(): Promise<string> {
@@ -434,12 +512,18 @@ export function ChatWidget() {
     setMsgs(p => [...p, userMsg]);
     if (leadId) await saveMessage(leadId, txt, "inbound", false);
     setTyping(true);
-    setTimeout(async () => {
-      const reply = autoReply(txt, tipo, dbRules, destinos, hoteles);
+    
+    try {
+      const reply = await fetchAIResponse(txt, tipo, name, dbRules, destinos, hoteles);
       setTyping(false);
       setMsgs(p => [...p, { role: "bot", text: reply, ts: ts() }]);
       if (leadId) await saveMessage(leadId, reply, "outbound", true);
-    }, 800 + Math.random() * 500);
+    } catch (err) {
+      console.error("Error generating AI reply:", err);
+      setTyping(false);
+      const fallbackMsg = "¡Hola! Tuve un inconveniente al conectar con el servidor. Puedes escribirnos directamente por WhatsApp haciendo clic en el botón de abajo.";
+      setMsgs(p => [...p, { role: "bot", text: fallbackMsg, ts: ts() }]);
+    }
   }
 
   /* ── Continue to WA from chat ── */

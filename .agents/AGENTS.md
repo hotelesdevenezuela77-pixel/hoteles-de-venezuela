@@ -38,3 +38,11 @@ Queda prohibido el uso de negro puro (`#000000`) o gris carbón genérico (`#1a1
 ## 4. Secciones de Cierre (Bottom CTA)
 - Las secciones de cierre para suscripción o contacto de WhatsApp deben presentarse en una tarjeta de fondo gradiente Magenta/Púrpura (`linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)`) con esquinas redondeadas generosas (`rounded-2xl` / `rounded-3xl`).
 - Los botones de acción deben ser blancos con el texto en el color de acento magenta (`#FF0096`), acompañados del icono de WhatsApp.
+
+---
+
+## 5. Metodología de Razonamiento, Coherencia y Observación
+- **Evitar Bucles y Cambiar Estrategia**: Si una prueba o solución choca contra una pared o estado bloqueante, no insistir ciegamente. Analizar inmediatamente una estrategia alternativa.
+- **Observación Minuciosa de Capturas de Pantalla**: Inspeccionar en detalle cada elemento visual que comparta el usuario (estados en blanco, verificaciones pendientes, configuraciones) antes de solicitar pruebas redundantes.
+- **Coherencia y Memoria del Flujo**: Mantener un hilo lógico de las tareas ya completadas y no repetir pruebas sobre módulos cuyo bloqueo proviene de proveedores externos (como la verificación de negocio en Meta).
+
