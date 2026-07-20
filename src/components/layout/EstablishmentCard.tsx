@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { MapPin, Star, Wifi, Car, Waves, Utensils, TreePine, Dumbbell, Sparkles, Phone, BarChart3 } from "lucide-react";
 import { TrackedWhatsAppButton } from "./TrackedWhatsAppButton";
+import { parseServicesList, getAmenityLabel } from "@/lib/amenitiesList";
 
 export interface Establishment {
   id: number;
@@ -45,13 +46,7 @@ const serviceIcons: Record<string, React.ReactNode> = {
 };
 
 function parseServices(services: string | null): string[] {
-  if (!services) return [];
-  try {
-    const parsed = JSON.parse(services);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return services.split(",").map(s => s.trim().toLowerCase());
-  }
+  return parseServicesList(services);
 }
 
 export function EstablishmentCard({ 
@@ -177,7 +172,7 @@ export function EstablishmentCard({
                     className={`flex items-center gap-1 px-2.5 py-0.5 text-[10px] rounded-full font-medium ${isPriority ? "bg-white/5 text-white/70 border border-white/10" : "bg-gray-50 text-gray-500 border border-gray-100"}`}
                   >
                     {serviceIcons[service.toLowerCase()] || <Sparkles className="w-3 h-3 text-brand-magenta" />}
-                    <span className="capitalize">{service}</span>
+                    <span>{getAmenityLabel(service)}</span>
                   </span>
                 ))}
                 {services.length > 3 && (
@@ -342,7 +337,7 @@ export function EstablishmentListItem({
                     className={`flex items-center gap-1 px-2.5 py-0.5 text-[10px] rounded-full font-medium ${isPriority ? "bg-white/5 text-white/70 border border-white/10" : "bg-gray-50 text-gray-500 border border-gray-100"}`}
                   >
                     {serviceIcons[service.toLowerCase()] || <Sparkles className="w-3 h-3 text-brand-magenta" />}
-                    <span className="capitalize">{service}</span>
+                    <span>{getAmenityLabel(service)}</span>
                   </span>
                 ))}
                 {services.length > 5 && (

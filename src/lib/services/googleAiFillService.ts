@@ -14,6 +14,7 @@ export interface EstablishmentAiData {
   description: string;
   latitude: string;
   longitude: string;
+  services?: string[];
 }
 
 const VE_LOCATIONS_MAP: { pattern: RegExp; city: string; state: string; lat: string; lng: string }[] = [
@@ -63,7 +64,8 @@ Devuelve ÚNICAMENTE un objeto JSON válido (sin Markdown adicional) con esta es
   "price_level": "'economico', 'moderado', 'premium', o 'lujo'",
   "description": "Descripción elegante de 2 párrafos resaltando las bondades del hospedaje y sus instalaciones.",
   "latitude": "Latitud geográfica",
-  "longitude": "Longitud geográfica"
+  "longitude": "Longitud geográfica",
+  "services": ["wifi", "piscina", "estacionamiento", "planta_electrica", "tanque_agua", "restaurante", "desayuno", "aire_acondicionado", "playa_privada", "vista_mar", "gimnasio", "spa", "pet_friendly"] (array de claves de servicios/amenidades reales que ofrece)
 }
 `;
 
@@ -100,7 +102,8 @@ Devuelve ÚNICAMENTE un objeto JSON válido (sin Markdown adicional) con esta es
             price_level: validatePriceLevel(parsed.price_level),
             description: parsed.description || "",
             latitude: parsed.latitude ? String(parsed.latitude) : extractLocationFromQuery(cleanQuery).lat,
-            longitude: parsed.longitude ? String(parsed.longitude) : extractLocationFromQuery(cleanQuery).lng
+            longitude: parsed.longitude ? String(parsed.longitude) : extractLocationFromQuery(cleanQuery).lng,
+            services: Array.isArray(parsed.services) ? parsed.services : ["wifi", "estacionamiento", "planta_electrica", "tanque_agua", "restaurante"]
           };
         }
       }

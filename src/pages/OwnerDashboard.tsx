@@ -9,6 +9,7 @@ import {
   Eye, Check, ListFilter, Tag, Sparkles
 } from "lucide-react";
 import { ScriptGenerator } from "../components/ScriptGenerator";
+import { AmenitiesSelector } from "@/components/admin/AmenitiesSelector";
 
 interface Establishment {
   id: number;
@@ -1121,30 +1122,11 @@ export function OwnerDashboard() {
 
               </div>
 
-              {/* Servicios (Checkboxes) */}
-              <div>
-                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-3">Servicios Disponibles</label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {availableServices.map(service => {
-                    const active = formData.services.includes(service.key);
-                    return (
-                      <button
-                        type="button"
-                        key={service.key}
-                        onClick={() => handleServiceChange(service.key)}
-                        className={`px-3 py-2 border rounded-xl font-semibold text-xs flex items-center justify-between cursor-pointer transition-all ${
-                          active 
-                            ? "bg-brand-magenta/5 border-brand-magenta text-brand-magenta shadow-sm" 
-                            : "bg-gray-50 border-gray-100 text-gray-500 hover:bg-gray-100/50"
-                        }`}
-                      >
-                        <span>{service.label}</span>
-                        {active && <Check className="w-3.5 h-3.5" />}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+              {/* Servicios & Amenidades Component */}
+              <AmenitiesSelector
+                selectedServices={formData.services}
+                onChange={(newServices) => setFormData(prev => ({ ...prev, services: newServices }))}
+              />
 
               {/* Action Buttons */}
               <div className="flex gap-3 pt-6 border-t border-gray-50">

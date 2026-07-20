@@ -10,6 +10,8 @@ import {
   Sparkles, Wand2, Search
 } from "lucide-react";
 import { fetchEstablishmentFromGoogleAi } from "@/lib/services/googleAiFillService";
+import { AmenitiesSelector } from "@/components/admin/AmenitiesSelector";
+import { parseServicesList } from "@/lib/amenitiesList";
 
 interface Category { id: number; name: string; }
 interface Destination { id: number; name: string; }
@@ -124,6 +126,7 @@ export function AdminEstablecimientoNuevo() {
   const [description, setDescription] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
+  const [services, setServices] = useState<string[]>([]);
 
   const [gpsLoading, setGpsLoading] = useState(false);
   const [gpsError, setGpsError] = useState("");
@@ -169,6 +172,9 @@ export function AdminEstablecimientoNuevo() {
       if (data.description) setDescription(data.description);
       if (data.latitude) setLatitude(data.latitude);
       if (data.longitude) setLongitude(data.longitude);
+      if (data.services && Array.isArray(data.services) && data.services.length > 0) {
+        setServices(data.services);
+      }
 
       triggerToast(`✨ ¡Formulario autocompletado con éxito para "${data.name}"!`);
     } catch (err: any) {
@@ -224,6 +230,9 @@ export function AdminEstablecimientoNuevo() {
       setDescription(establishment.description || "");
       setLatitude(establishment.latitude ? String(establishment.latitude) : "");
       setLongitude(establishment.longitude ? String(establishment.longitude) : "");
+      if (establishment.services) {
+        setServices(parseServicesList(establishment.services));
+      }
 
       try {
         if (establishment?.establishment_images && Array.isArray(establishment.establishment_images)) {
@@ -351,6 +360,7 @@ export function AdminEstablecimientoNuevo() {
         description,
         latitude: latitude ? parseFloat(latitude) : null,
         longitude: longitude ? parseFloat(longitude) : null,
+        services: JSON.stringify(services),
         status: "approved"
       };
 
@@ -616,6 +626,11 @@ export function AdminEstablecimientoNuevo() {
               </div>
             </div>
           </div>
+
+          <AmenitiesSelector
+            selectedServices={services}
+            onChange={setServices}
+          />
 
           <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-xs space-y-4">
             <h2 className="font-bold text-gray-900 text-sm pb-2 border-b flex items-center gap-2">

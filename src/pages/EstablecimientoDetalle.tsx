@@ -11,6 +11,8 @@ import {
   ArrowLeft, DollarSign, Navigation, Loader2, AlertTriangle, Sparkles
 } from "lucide-react";
 
+import { parseServicesList, getAmenityLabel } from "../lib/amenitiesList";
+
 interface EstablishmentDetail {
   id: number;
   slug: string;
@@ -169,14 +171,7 @@ export function EstablecimientoDetalle() {
   const nextImage = () => setCurrentImageIndex((prev) => (prev + 1) % establishment.images.length);
   const prevImage = () => setCurrentImageIndex((prev) => (prev - 1 + establishment.images.length) % establishment.images.length);
 
-  const servicesList = (() => {
-    try {
-      const parsed = JSON.parse(establishment.services);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return establishment.services ? establishment.services.split(",").map(s => s.trim()) : [];
-    }
-  })();
+  const servicesList = parseServicesList(establishment.services);
 
   const tierColors: Record<string, string> = {
     diamante: "from-purple-600 to-pink-600 text-white",
@@ -345,8 +340,8 @@ export function EstablecimientoDetalle() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {servicesList.map((service, i) => (
                     <div key={i} className="flex items-center gap-2.5 p-3.5 bg-gray-50 border border-gray-100 rounded-xl">
-                      <div className="w-2 h-2 bg-brand-turquesa rounded-full" />
-                      <span className="text-xs font-bold text-gray-600 capitalize">{service}</span>
+                      <div className="w-2 h-2 rounded-full shrink-0" style={{ background: "#00C8D4" }} />
+                      <span className="text-xs font-bold text-slate-700">{getAmenityLabel(service)}</span>
                     </div>
                   ))}
                 </div>
