@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { MASTER_AMENITIES, AMENITY_CATEGORIES, parseServicesList, getAmenityLabel, AmenityItem } from "@/lib/amenitiesList";
+import { MASTER_AMENITIES, AMENITY_CATEGORIES, parseServicesList, getAmenityLabel, type AmenityItem } from "@/lib/amenitiesList";
 import {
   Sparkles, Search, Check, Plus, Trash2, Zap, Droplets, Wifi, Wind, Car,
   ShieldCheck, Clock, Dog, Accessibility, ArrowUpSquare, Waves, Bath, Palmtree,
