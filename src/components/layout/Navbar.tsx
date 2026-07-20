@@ -107,7 +107,7 @@ export function Navbar() {
             href="https://wa.me/584145069774"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:flex items-center gap-1.5 text-xs text-slate-700 font-semibold px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors"
+            className="flex items-center gap-1.5 text-xs text-slate-800 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors"
             title="Contacto oficial WhatsApp"
           >
             <Phone className="w-3.5 h-3.5 text-emerald-600" />
