@@ -5,7 +5,7 @@ import { TickerBar } from "./TickerBar";
 import {
   MapPin, Phone, MessageSquare, Send, X
 } from "lucide-react";
-import { OFFICIAL_WHATSAPP_DISPLAY, OFFICIAL_WHATSAPP_URL } from "@/config/whatsapp";
+import { OFFICIAL_WHATSAPP_DISPLAY, OFFICIAL_WHATSAPP_URL, SECONDARY_WHATSAPP_DISPLAY, SECONDARY_WHATSAPP_URL } from "@/config/whatsapp";
 
 const DESTINATIONS = [
   { name: "Morrocoy",        slug: "morrocoy" },
@@ -147,7 +147,10 @@ function Footer() {
               </li>
               <li className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-green-400 shrink-0" />
-                <a href={OFFICIAL_WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="text-gray-300 text-sm font-light hover:text-[#00C8D4] transition-colors">{OFFICIAL_WHATSAPP_DISPLAY}</a>
+                <div className="flex flex-col text-sm font-light text-gray-300">
+                  <a href={OFFICIAL_WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hover:text-[#00C8D4] transition-colors">{OFFICIAL_WHATSAPP_DISPLAY}</a>
+                  <a href={SECONDARY_WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hover:text-[#00C8D4] transition-colors">{SECONDARY_WHATSAPP_DISPLAY}</a>
+                </div>
               </li>
               <li className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" />
