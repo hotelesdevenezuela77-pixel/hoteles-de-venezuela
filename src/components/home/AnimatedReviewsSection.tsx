@@ -180,46 +180,26 @@ function ReviewCard({ review }: { review: FeaturedReview }) {
   );
 }
 
+import { fetchAllFeaturedReviews, DEFAULT_FEATURED_REVIEWS } from "@/lib/reviewsStore";
+
 export function AnimatedReviewsSection() {
-  const [row1, setRow1] = useState<FeaturedReview[]>(DEFAULT_REVIEWS_ROW1);
-  const [row2, setRow2] = useState<FeaturedReview[]>(DEFAULT_REVIEWS_ROW2);
-  const [row3, setRow3] = useState<FeaturedReview[]>(DEFAULT_REVIEWS_ROW3);
+  const [row1, setRow1] = useState<FeaturedReview[]>([]);
+  const [row2, setRow2] = useState<FeaturedReview[]>([]);
+  const [row3, setRow3] = useState<FeaturedReview[]>([]);
 
   useEffect(() => {
-    async function loadCustomReviews() {
-      try {
-        const localData = localStorage.getItem("hdv_featured_reviews_custom");
-        if (localData) {
-          const parsed: FeaturedReview[] = JSON.parse(localData);
-          if (parsed && parsed.length > 0) {
-            const r1 = parsed.filter(r => r.row_position === 1);
-            const r2 = parsed.filter(r => r.row_position === 2);
-            const r3 = parsed.filter(r => r.row_position === 3);
-            if (r1.length > 0) setRow1(r1);
-            if (r2.length > 0) setRow2(r2);
-            if (r3.length > 0) setRow3(r3);
-          }
-        }
+    async function loadReviews() {
+      const allFeatured = await fetchAllFeaturedReviews();
+      const r1 = allFeatured.filter(r => Number(r.row_position) === 1);
+      const r2 = allFeatured.filter(r => Number(r.row_position) === 2);
+      const r3 = allFeatured.filter(r => Number(r.row_position) === 3);
 
-        const { data, error } = await supabase
-          .from("customer_reviews")
-          .select("*")
-          .order("created_at", { ascending: false });
-
-        if (!error && data && data.length > 0) {
-          const r1 = data.filter((r: any) => r.row_position === 1 || r.row_position === "1");
-          const r2 = data.filter((r: any) => r.row_position === 2 || r.row_position === "2");
-          const r3 = data.filter((r: any) => r.row_position === 3 || r.row_position === "3");
-          if (r1.length > 0) setRow1(r1);
-          if (r2.length > 0) setRow2(r2);
-          if (r3.length > 0) setRow3(r3);
-        }
-      } catch (err) {
-        console.warn("Usando reseñas animadas prediseñadas:", err);
-      }
+      setRow1(r1.length > 0 ? r1 : DEFAULT_FEATURED_REVIEWS.filter(r => r.row_position === 1));
+      setRow2(r2.length > 0 ? r2 : DEFAULT_FEATURED_REVIEWS.filter(r => r.row_position === 2));
+      setRow3(r3.length > 0 ? r3 : DEFAULT_FEATURED_REVIEWS.filter(r => r.row_position === 3));
     }
 
-    loadCustomReviews();
+    loadReviews();
   }, []);
 
   // Duplicamos los elementos para la animación de loop infinito continuo sin saltos
