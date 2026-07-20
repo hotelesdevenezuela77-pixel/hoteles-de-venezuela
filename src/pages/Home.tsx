@@ -728,7 +728,10 @@ export function Home() {
         </div>
       </section>
 
-      {/* 3. POSADAS DESTACADAS */}
+      {/* 3. RESEÑAS ANIMADAS EN 3 FILAS (EN MEDIO DE HOTELES DESTACADOS Y POSADAS DESTACADAS) */}
+      <AnimatedReviewsSection />
+
+      {/* 4. POSADAS DESTACADAS */}
       <section className="py-20 px-4 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">

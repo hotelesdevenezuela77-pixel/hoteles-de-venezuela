@@ -228,26 +228,32 @@ export function AnimatedReviewsSection() {
   const list3 = [...row3, ...row3, ...row3, ...row3];
 
   return (
-    <section className="py-20 bg-[#f8fafc] border-y border-slate-200/80 overflow-hidden relative font-sans">
+    <section className="py-20 text-white overflow-hidden relative font-sans" style={{ background: "linear-gradient(135deg, #0e011f 0%, #1a0533 100%)" }}>
+      {/* Glow Spots */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full blur-3xl opacity-20" style={{ background: "#FF0096" }} />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-15" style={{ background: "#00C8D4" }} />
+      </div>
+
       {/* Header */}
       <div className="max-w-7xl mx-auto px-4 text-center mb-12 relative z-10">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-pink-50 border border-pink-200 text-xs font-black text-[#FF0096] mb-3 shadow-xs">
-          <MessageSquare className="w-3.5 h-3.5" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-xs font-black text-[#00C8D4] mb-3 shadow-xs">
+          <MessageSquare className="w-3.5 h-3.5 text-[#00C8D4]" />
           <span>EXPERIENCIAS REALES DE VIAJEROS</span>
         </div>
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
           Lo que Dicen Nuestros Turistas
         </h2>
-        <p className="text-slate-500 text-xs sm:text-sm font-semibold max-w-xl mx-auto mt-2">
+        <p className="text-white/70 text-xs sm:text-sm font-semibold max-w-xl mx-auto mt-2">
           Más de 50.000 viajeros cotizan y reservan hospedajes en Venezuela sin intermediarios a través de nuestro ecosistema.
         </p>
       </div>
 
       {/* Contenedor de las 3 filas animadas */}
-      <div className="space-y-6 relative">
+      <div className="space-y-6 relative z-10">
         {/* Gradiantes laterales de difuminado para un acabado impecable */}
-        <div className="absolute top-0 bottom-0 left-0 w-24 sm:w-40 bg-gradient-to-r from-[#f8fafc] via-[#f8fafc]/80 to-transparent z-20 pointer-events-none" />
-        <div className="absolute top-0 bottom-0 right-0 w-24 sm:w-40 bg-gradient-to-l from-[#f8fafc] via-[#f8fafc]/80 to-transparent z-20 pointer-events-none" />
+        <div className="absolute top-0 bottom-0 left-0 w-24 sm:w-40 bg-gradient-to-r from-[#0e011f] via-[#0e011f]/80 to-transparent z-20 pointer-events-none" />
+        <div className="absolute top-0 bottom-0 right-0 w-24 sm:w-40 bg-gradient-to-l from-[#0e011f] via-[#0e011f]/80 to-transparent z-20 pointer-events-none" />
 
         {/* FILA 1: Movimiento continuo a la DERECHA */}
         <div className="flex overflow-hidden group">
