@@ -88,6 +88,15 @@ function App() {
   );
   const isEnvTenant = !!import.meta.env.VITE_TENANT_SLUG;
 
+  // Manejador estático inmediato para verificación de Meta/Facebook
+  if (typeof window !== "undefined" && window.location.pathname.includes("ra4gpl4v796c05gwjx9ort6peoysiz")) {
+    return (
+      <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
+        ra4gpl4v796c05gwjx9ort6peoysiz
+      </div>
+    );
+  }
+
   // Desviar a la vista del nodo inquilino si aplica
   if (isEnvTenant || hasTenantParam || (isCustomDomain && hostname !== "localhost" && hostname !== "127.0.0.1")) {
     return <TenantApp />;
