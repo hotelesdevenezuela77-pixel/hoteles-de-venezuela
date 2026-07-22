@@ -21,7 +21,12 @@ import {
   ChevronRight,
   ChevronDown,
   ChevronUp,
-  Info
+  Info,
+  Eye,
+  HeartHandshake,
+  MessageSquare,
+  Waves,
+  Utensils
 } from "lucide-react";
 
 interface BlogPost {
@@ -694,10 +699,105 @@ export function Home() {
         </div>
       </section>
 
-      <div className="bg-amber-50 border-y border-amber-100 py-3 px-4 flex items-center justify-center gap-2 text-xs font-bold text-amber-700">
-        <Info className="w-4 h-4 shrink-0 text-amber-500" />
-        <span>⚡ Conexión Directa Verificada: El 100% de los establecimientos en nuestro portal han sido auditados en persona.</span>
+      {/* 1.5. SELLOS DE GARANTÍA Y CONFIANZA (TRUST BADGES) */}
+      <div className="bg-white border-y border-gray-100 py-6 px-4">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+          
+          <div className="flex items-center gap-4 px-4 py-2">
+            <div className="w-11 h-11 rounded-full bg-[#00C8D4] flex items-center justify-center text-white shrink-0 shadow-md shadow-[#00C8D4]/10">
+              <Eye className="w-5 h-5" />
+            </div>
+            <div className="text-left">
+              <h4 className="text-xs font-black text-gray-900 uppercase tracking-wider">100% Auditados en Persona</h4>
+              <p className="text-[10px] text-gray-400 font-bold mt-0.5 leading-snug">Cada establecimiento ha sido visitado y verificado físicamente por nuestro staff.</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 px-4 py-2 border-t md:border-t-0 md:border-x border-gray-100">
+            <div className="w-11 h-11 rounded-full bg-[#FF0096] flex items-center justify-center text-white shrink-0 shadow-md shadow-[#FF0096]/10">
+              <HeartHandshake className="w-5 h-5" />
+            </div>
+            <div className="text-left">
+              <h4 className="text-xs font-black text-gray-900 uppercase tracking-wider">Reserva Sin Intermediarios</h4>
+              <p className="text-[10px] text-gray-400 font-bold mt-0.5 leading-snug">Comisión cero. Trato directo con el propietario del hotel o posada para el mejor precio.</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 px-4 py-2 border-t md:border-t-0 border-gray-100">
+            <div className="w-11 h-11 rounded-full bg-[#9B00CC] flex items-center justify-center text-white shrink-0 shadow-md shadow-[#9B00CC]/10">
+              <MessageSquare className="w-5 h-5" />
+            </div>
+            <div className="text-left">
+              <h4 className="text-xs font-black text-gray-900 uppercase tracking-wider">Atención Directa y Segura</h4>
+              <p className="text-[10px] text-gray-400 font-bold mt-0.5 leading-snug">Contacto instantáneo por WhatsApp con agentes locales para resolver dudas.</p>
+            </div>
+          </div>
+
+        </div>
       </div>
+
+      {/* 1.8. ACCESO RÁPIDO POR ESTILOS DE VIAJE / EXPERIENCIAS */}
+      <section className="py-16 px-4 bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-10">
+            <span className="text-brand-magenta text-xs font-black uppercase tracking-widest block mb-2">Encuentra tu Inspiración</span>
+            <h2 className="text-2xl sm:text-3xl font-black text-gray-800">Estilos de Viaje & Experiencias</h2>
+            <p className="text-gray-400 text-xs mt-2 max-w-md mx-auto">
+              Elige tu atmósfera ideal y explora los destinos y alojamientos recomendados en todo el territorio nacional.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <Link href="/establecimientos?destination=morrocoy" className="group p-6 rounded-3xl bg-gradient-to-br from-[#00C8D4]/10 to-blue-500/5 border border-cyan-100/50 hover:shadow-xl hover:shadow-cyan-900/5 hover:-translate-y-1.5 transition-all duration-300 text-left block cursor-pointer">
+              <div className="w-10 h-10 rounded-2xl bg-[#00C8D4]/10 flex items-center justify-center border border-[#00C8D4]/20 group-hover:scale-110 transition-transform mb-4">
+                <Waves className="w-5 h-5 text-[#00C8D4]" />
+              </div>
+              <h3 className="font-extrabold text-sm text-gray-800 group-hover:text-brand-turquesa transition-colors mb-1">
+                🏝️ Playas y Cayos
+              </h3>
+              <p className="text-[10px] text-gray-450 leading-relaxed font-bold">
+                Morrocoy, Los Roques y costas de arena blanca.
+              </p>
+            </Link>
+
+            <Link href="/parques" className="group p-6 rounded-3xl bg-gradient-to-br from-[#9B00CC]/10 to-indigo-500/5 border border-purple-100/50 hover:shadow-xl hover:shadow-purple-900/5 hover:-translate-y-1.5 transition-all duration-300 text-left block cursor-pointer">
+              <div className="w-10 h-10 rounded-2xl bg-[#9B00CC]/10 flex items-center justify-center border border-[#9B00CC]/20 group-hover:scale-110 transition-transform mb-4">
+                <Mountain className="w-5 h-5 text-[#9B00CC]" />
+              </div>
+              <h3 className="font-extrabold text-sm text-gray-800 group-hover:text-brand-purple transition-colors mb-1">
+                ⛰️ Aventura y Tepuyes
+              </h3>
+              <p className="text-[10px] text-gray-450 leading-relaxed font-bold">
+                Canaima, el Salto Ángel y selvas milenarias.
+              </p>
+            </Link>
+
+            <Link href="/establecimientos?category=restaurantes" className="group p-6 rounded-3xl bg-gradient-to-br from-amber-500/10 to-rose-500/5 border border-amber-100/50 hover:shadow-xl hover:shadow-amber-900/5 hover:-translate-y-1.5 transition-all duration-300 text-left block cursor-pointer">
+              <div className="w-10 h-10 rounded-2xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20 group-hover:scale-110 transition-transform mb-4">
+                <Utensils className="w-5 h-5 text-amber-600" />
+              </div>
+              <h3 className="font-extrabold text-sm text-gray-800 group-hover:text-amber-600 transition-colors mb-1">
+                🍷 Gastronomía & Sabor
+              </h3>
+              <p className="text-[10px] text-gray-450 leading-relaxed font-bold">
+                Sabores locales, catas y posadas de autor.
+              </p>
+            </Link>
+
+            <Link href="/prestigio-2026" className="group p-6 rounded-3xl bg-gradient-to-br from-[#FF0096]/10 to-[#9B00CC]/5 border border-pink-100/50 hover:shadow-xl hover:shadow-pink-900/5 hover:-translate-y-1.5 transition-all duration-300 text-left block cursor-pointer">
+              <div className="w-10 h-10 rounded-2xl bg-[#FF0096]/10 flex items-center justify-center border border-[#FF0096]/20 group-hover:scale-110 transition-transform mb-4">
+                <Sparkles className="w-5 h-5 text-[#FF0096]" />
+              </div>
+              <h3 className="font-extrabold text-sm text-gray-800 group-hover:text-brand-magenta transition-colors mb-1">
+                ✨ Lujo & Prestigio
+              </h3>
+              <p className="text-[10px] text-gray-450 leading-relaxed font-bold">
+                Hospedajes de alta gama certificados bajo la campaña 2026.
+              </p>
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* 2. HOTELES DESTACADOS (HOSPEDAJES ÉLITE DE PRIMERO PARA EL TURISTA) */}
       <section className="py-20 px-4 bg-gray-50/30">
@@ -819,6 +919,40 @@ export function Home() {
               ))}
             </div>
           )}
+        </div>
+      </section>
+
+      {/* 4.5. CAMPAÑA DE PRESTIGIO 2026 (ALTA GAMA / FULL-BLEED) */}
+      <section className="relative w-full h-[520px] flex items-center justify-center overflow-hidden">
+        {/* Background Image scaling 1.08 to prevent black borders/letterbox */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center scale-[1.08] transition-transform duration-[1500ms] hover:scale-110"
+          style={{ backgroundImage: `url('https://images.unsplash.com/photo-1552083375-1447ce886485?w=1600&auto=format&fit=crop')` }}
+        />
+        
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-black/45 z-10" />
+
+        {/* Bottom white fade overlay to blend invisible with the page background */}
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white via-white/50 to-transparent z-15 pointer-events-none" />
+
+        {/* Centered Content */}
+        <div className="relative z-20 max-w-4xl mx-auto px-6 text-center text-white flex flex-col items-center justify-center h-full">
+          <span className="text-[10px] sm:text-xs font-black uppercase tracking-[0.25em] text-brand-turquesa mb-4 drop-shadow-sm">
+            EL PARAÍSO TE ESPERA
+          </span>
+          <h2 className="text-3xl sm:text-5xl font-black mb-6 leading-tight tracking-tight font-serif drop-shadow-sm">
+            Wakü Lodge & Ara Merú
+          </h2>
+          <p className="text-gray-150 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed mb-8 font-semibold drop-shadow-sm">
+            Descubre los alojamientos exclusivos y de alta gama certificados bajo el Sello de Calidad y Prestigio 2026. Hospitalidad de nivel mundial en el corazón de Canaima.
+          </p>
+          <Link href="/prestigio-2026">
+            <button className="bg-white hover:bg-gray-50 text-[#FF0096] font-extrabold px-8 py-3.5 rounded-full text-xs shadow-lg hover:scale-103 active:scale-97 transition-all cursor-pointer flex items-center gap-1.5 border border-white/20">
+              <Sparkles className="w-4 h-4 text-[#FF0096]" />
+              <span>Explorar Colección Prestigio</span>
+            </button>
+          </Link>
         </div>
       </section>
 
@@ -1132,45 +1266,7 @@ export function Home() {
         </section>
       )}
 
-      {/* 10. COMPLEJOS TURÍSTICOS */}
-      <section className="py-20 px-4 bg-gray-50/50 border-t border-gray-150">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
-            <div className="text-left">
-              <span className="text-brand-magenta text-xs font-black uppercase tracking-widest block mb-2">Resorts & Multiactividad</span>
-              <h2 className="text-2xl sm:text-3xl font-black text-gray-800">Complejos Turísticos</h2>
-            </div>
-            <Link href="/establecimientos?category=complejos" className="text-brand-magenta text-xs font-bold hover:underline flex items-center gap-1">
-              Ver todos los complejos <ChevronRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
 
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="h-72 bg-gray-100 rounded-3xl" />
-              ))}
-            </div>
-          ) : complexes.length === 0 ? (
-            <div className="text-center py-10 bg-white border border-gray-100 rounded-3xl">
-              <p className="text-gray-400 text-xs font-bold">No hay complejos turísticos destacados registrados.</p>
-            </div>
-          ) : (
-            <div className={complexes.length < 3 ? "flex flex-wrap justify-center gap-8" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"}>
-              {complexes.map((complex, index) => (
-                <div key={complex.id} className={complexes.length < 3 ? "w-full max-w-sm flex" : ""}>
-                  <EstablishmentCard 
-                    establishment={complex} 
-                    isComparing={comparedIds.includes(complex.id)}
-                    onCompareToggle={() => handleCompareToggle(complex.id)}
-                    isPriority={complex.is_featured}
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
 
       {/* 11. CTA PROPIETARIOS & MEMBRESÍAS */}
       {ctaSection.isActive && (
