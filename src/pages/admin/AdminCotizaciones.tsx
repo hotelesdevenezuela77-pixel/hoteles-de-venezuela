@@ -48,36 +48,414 @@ function printQuote(q: Quote) {
   const items = parseItems(q.itemsData);
   const win = window.open("", "_blank");
   if (!win) return;
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Cotización ${q.quoteNumber || q.id}</title>
-  <style>body{font-family:sans-serif;max-width:800px;margin:40px auto;color:#111;font-size:14px}
-  h1{color:#FF0096}table{width:100%;border-collapse:collapse;margin:16px 0}
-  th{background:#f3f4f6;padding:8px;text-align:left;font-size:12px}
-  td{padding:8px;border-bottom:1px solid #e5e7eb}
-  .total{font-weight:bold;font-size:18px;color:#FF0096}.meta{color:#666;font-size:12px}
-  .tag{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;background:#f3e8ff;color:#7c3aed}
-  </style></head><body>
-  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:32px">
-    <div><h1>COTIZACIÓN</h1><span class="tag">${q.status}</span></div>
-    <div style="text-align:right"><p class="meta">N° ${q.quoteNumber || q.id}</p><p class="meta">${new Date(q.createdAt).toLocaleDateString("es-VE")}</p></div>
+  win.document.write(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Cotización ${q.quoteNumber || q.id}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,400&display=swap');
+    
+    body {
+      font-family: 'Montserrat', sans-serif;
+      max-width: 850px;
+      margin: 30px auto;
+      color: #0f172a;
+      background-color: #ffffff;
+      padding: 20px;
+    }
+    
+    .quote-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 24px;
+    }
+    
+    .logo-area {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-width: 480px;
+    }
+    
+    .logo-img {
+      height: 52px;
+      object-fit: contain;
+      align-self: flex-start;
+    }
+    
+    .alliance-text {
+      font-size: 9.5px;
+      color: #64748b;
+      line-height: 1.4;
+      font-weight: 600;
+    }
+    
+    .title-area {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+    
+    .title-area h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: #FF0096;
+      margin: 0;
+      line-height: 1;
+    }
+    
+    .quote-number {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 4px 0 0 0;
+    }
+    
+    .quote-date {
+      font-size: 11px;
+      color: #64748b;
+      margin: 2px 0 0 0;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      font-size: 10px;
+      font-weight: 800;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 6px;
+    }
+    
+    .status-draft { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+    .status-sent { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .status-accepted { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+    .status-rejected { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    .status-expired { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+
+    .divider {
+      height: 3px;
+      background: linear-gradient(90deg, #FF0096 0%, #9B00CC 50%, #00C8D4 100%);
+      margin-bottom: 24px;
+      border-radius: 2px;
+    }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+      background: #f8fafc;
+      border: 1px solid #f1f5f9;
+      border-radius: 16px;
+      padding: 16px;
+    }
+    
+    .info-box h3 {
+      font-size: 11px;
+      font-weight: 800;
+      color: #9B00CC;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 0 0 10px 0;
+      border-bottom: 1px dashed #cbd5e1;
+      padding-bottom: 4px;
+    }
+    
+    .info-box p {
+      font-size: 12px;
+      line-height: 1.5;
+      margin: 4px 0;
+      color: #334155;
+    }
+    
+    .info-box strong {
+      color: #0f172a;
+    }
+    
+    .description-box {
+      background: #ffffff;
+      border-left: 3px solid #00C8D4;
+      padding: 12px 16px;
+      border-radius: 0 12px 12px 0;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    
+    .description-box h2 {
+      font-size: 13px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 6px 0;
+    }
+    
+    .description-box p {
+      font-size: 12px;
+      color: #475569;
+      margin: 0;
+      line-height: 1.5;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    
+    th {
+      background: #0e011f;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 12px;
+      text-align: left;
+      border: none;
+    }
+    
+    th:first-child { border-radius: 12px 0 0 12px; }
+    th:last-child { border-radius: 0 12px 12px 0; text-align: right; }
+    
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 12.5px;
+      color: #334155;
+    }
+    
+    td:last-child {
+      text-align: right;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    
+    .totals-area {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      margin-top: 16px;
+      padding-right: 12px;
+    }
+    
+    .totals-area p {
+      font-size: 12px;
+      margin: 2px 0;
+      color: #475569;
+    }
+    
+    .totals-area .total-row {
+      font-size: 18px;
+      font-weight: 900;
+      color: #FF0096;
+      border-top: 2px solid #e2e8f0;
+      padding-top: 6px;
+      margin-top: 4px;
+      display: flex;
+      gap: 8px;
+    }
+    
+    .payment-methods {
+      margin-top: 36px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 18px;
+    }
+    
+    .payment-methods h3 {
+      font-size: 12px;
+      font-weight: 800;
+      color: #FF0096;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 0 0 12px 0;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 6px;
+    }
+    
+    .methods-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    
+    .method-col {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .method-title {
+      font-size: 11px;
+      font-weight: 800;
+      color: #0f172a;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    
+    .method-detail {
+      font-size: 11px;
+      color: #475569;
+      line-height: 1.5;
+    }
+    
+    .notes-section {
+      margin-top: 28px;
+      font-size: 11px;
+      color: #64748b;
+      line-height: 1.5;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 12px;
+    }
+    
+    .notes-section p {
+      margin: 4px 0;
+    }
+
+    @media print {
+      body {
+        margin: 20px auto;
+        padding: 0;
+      }
+      .payment-methods, .info-grid {
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="quote-header">
+    <div class="logo-area">
+      <img src="https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public/site-assets/logo-hdv.png" alt="Logo Hoteles de Venezuela" class="logo-img" />
+      <span class="alliance-text">
+        Hoteles de Venezuela LLC en alianza con Webmasterpro Entertainment Corporation, C.A.<br/>RIF J-405057785
+      </span>
+    </div>
+    <div class="title-area">
+      <h1>COTIZACIÓN</h1>
+      <p class="quote-number">N° ${q.quoteNumber || q.id}</p>
+      <p class="quote-date">Fecha de emisión: ${new Date(q.createdAt).toLocaleDateString("es-VE")}</p>
+      <span class="status-badge status-${q.status}">${
+        q.status === 'draft' ? 'Borrador' :
+        q.status === 'sent' ? 'Enviada' :
+        q.status === 'accepted' ? 'Aceptada' :
+        q.status === 'rejected' ? 'Rechazada' :
+        q.status === 'expired' ? 'Expirada' : q.status
+      }</span>
+    </div>
   </div>
-  <p><strong>Cliente:</strong> ${q.clientName}${q.clientCompany ? ` — ${q.clientCompany}` : ""}</p>
-  ${q.clientEmail ? `<p><strong>Email:</strong> ${q.clientEmail}</p>` : ""}
-  ${q.clientPhone ? `<p><strong>Teléfono:</strong> ${q.clientPhone}</p>` : ""}
-  ${q.travelDates ? `<p><strong>Fechas:</strong> ${q.travelDates} · ${q.numTravelers} viajero(s)</p>` : ""}
-  <h3>${q.title || "Detalle de la Cotización"}</h3>
-  ${q.description ? `<p>${q.description}</p>` : ""}
-  ${items.length > 0 ? `<table><thead><tr><th>Descripción</th><th>Cant.</th><th>Precio Unit.</th><th>Total</th></tr></thead><tbody>
-    ${items.map(it => `<tr><td>${it.description}</td><td>${it.qty}</td><td>${q.currency} ${Number(it.unitPrice).toLocaleString()}</td><td>${q.currency} ${Number(it.total).toLocaleString()}</td></tr>`).join("")}
-  </tbody></table>` : ""}
-  <div style="text-align:right;margin-top:16px">
-    ${q.discountAmount > 0 ? `<p>Descuento: -${q.currency} ${Number(q.discountAmount).toLocaleString()}</p>` : ""}
-    ${q.taxAmount > 0 ? `<p>IVA: +&nbsp;${q.currency} ${Number(q.taxAmount).toLocaleString()}</p>` : ""}
-    <p class="total">TOTAL: ${q.currency} ${Number(q.total).toLocaleString()}</p>
-    <p class="meta">Válida por ${q.validityDays} días</p>
+  
+  <div class="divider"></div>
+  
+  <!-- Info Grid -->
+  <div class="info-grid">
+    <div class="info-box">
+      <h3>Información del Cliente</h3>
+      <p><strong>Cliente:</strong> ${q.clientName}</p>
+      ${q.clientCompany ? `<p><strong>Empresa/Organización:</strong> ${q.clientCompany}</p>` : ""}
+      ${q.clientEmail ? `<p><strong>Correo Electrónico:</strong> ${q.clientEmail}</p>` : ""}
+      ${q.clientPhone ? `<p><strong>Teléfono de Contacto:</strong> ${q.clientPhone}</p>` : ""}
+    </div>
+    
+    <div class="info-box">
+      <h3>Detalles del Servicio</h3>
+      <p><strong>Propuesta / Concepto:</strong> ${q.title || "Servicios Turísticos Especializados"}</p>
+      ${q.travelDates ? `<p><strong>Fechas Estimadas:</strong> ${q.travelDates}</p>` : ""}
+      ${q.numTravelers ? `<p><strong>Número de Viajeros/Pax:</strong> ${q.numTravelers}</p>` : ""}
+      <p><strong>Válida por:</strong> ${q.validityDays} días</p>
+    </div>
   </div>
-  ${q.notes ? `<p style="margin-top:24px;color:#666;font-size:12px">Notas: ${q.notes}</p>` : ""}
-  ${q.terms ? `<p style="color:#666;font-size:12px">Términos: ${q.terms}</p>` : ""}
-  </body></html>`);
+  
+  <!-- Description Box if present -->
+  ${q.description ? `
+  <div class="description-box">
+    <h2>Descripción y Especificaciones</h2>
+    <p>${q.description}</p>
+  </div>
+  ` : ""}
+  
+  <!-- Table -->
+  ${items.length > 0 ? `
+  <table>
+    <thead>
+      <tr>
+        <th>Descripción del Item / Concepto</th>
+        <th style="width: 80px; text-align: center;">Cant.</th>
+        <th style="width: 140px; text-align: right;">Precio Unitario</th>
+        <th style="width: 140px; text-align: right;">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${items.map(it => `
+        <tr>
+          <td>${it.description}</td>
+          <td style="text-align: center;">${it.qty}</td>
+          <td style="text-align: right;">${q.currency} ${Number(it.unitPrice).toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+          <td style="text-align: right;">${q.currency} ${Number(it.total).toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+        </tr>
+      `).join("")}
+    </tbody>
+  </table>
+  ` : ""}
+  
+  <!-- Totals -->
+  <div class="totals-area">
+    <p>Subtotal: <strong>${q.currency} ${Number(q.subtotal).toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></p>
+    ${q.discountAmount > 0 ? `<p>Descuento (${q.discountPercent}%): <strong>-${q.currency} ${Number(q.discountAmount).toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></p>` : ""}
+    ${q.taxAmount > 0 ? `<p>IVA (${q.taxPercent}%): <strong>+${q.currency} ${Number(q.taxAmount).toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></p>` : ""}
+    <div class="total-row">
+      <span>TOTAL:</span>
+      <span>${q.currency} ${Number(q.total).toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+    </div>
+  </div>
+  
+  <!-- Payment Methods Section -->
+  <div class="payment-methods">
+    <h3>Métodos de Pago Autorizados</h3>
+    <div class="methods-grid">
+      <div class="method-col">
+        <span class="method-title">1. Transferencias Internacionales / Divisas</span>
+        <span class="method-detail">
+          <strong>Zelle:</strong> pagos@hotelesdevenezuela.com<br/>
+          <strong>Titular:</strong> Hoteles de Venezuela LLC<br/>
+          <br/>
+          <strong>Efectivo o Custodia:</strong> Coordinar directamente con el asesor comercial asignado.
+        </span>
+      </div>
+      <div class="method-col">
+        <span class="method-title">2. Pago Móvil / Transferencias Nacionales</span>
+        <span class="method-detail">
+          <strong>Pago Móvil Banesco (0134)</strong><br/>
+          <strong>Teléfono:</strong> 0414-5069774<br/>
+          <strong>RIF:</strong> J-405057785<br/>
+          <br/>
+          <strong>Cuenta Corriente Banesco</strong><br/>
+          <strong>Nro:</strong> 0134-0086-53-0861036070<br/>
+          <strong>Beneficiario:</strong> Webmasterpro Entertainment Corporation, C.A.
+        </span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Notes and Terms -->
+  <div class="notes-section">
+    ${q.notes ? `<p><strong>Notas de la Cotización:</strong> ${q.notes}</p>` : ""}
+    ${q.terms ? `<p><strong>Términos y Condiciones:</strong> ${q.terms}</p>` : ""}
+    <p style="margin-top: 12px; font-size: 10px; color: #94a3b8; text-align: center;">
+      Esta cotización está sujeta a cambios tarifarios de los prestadores de servicio si no es confirmada dentro del plazo de validez estipulado.
+    </p>
+  </div>
+</body>
+</html>`);
   win.document.close(); win.print();
 }
 
