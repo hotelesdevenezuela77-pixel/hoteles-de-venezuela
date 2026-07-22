@@ -868,17 +868,22 @@ export function Home() {
       {/* 6. SITIOS TURÍSTICOS RECOMENDADOS */}
       <section className="py-20 px-4 bg-gray-50/30 border-t border-gray-100">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-brand-purple/10 border border-brand-purple/20 text-xs font-black text-brand-purple mb-4">
-              <Mountain className="w-3.5 h-3.5" />
-              <span>LUGARES EMBLEMÁTICOS</span>
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+            <div className="text-left">
+              <div className="inline-flex items-center gap-2 bg-brand-purple/10 border border-brand-purple/20 text-xs font-black text-brand-purple px-3 py-1 rounded-full mb-3">
+                <Mountain className="w-3.5 h-3.5" />
+                <span>LUGARES EMBLEMÁTICOS</span>
+              </div>
+              <h2 className="text-2xl md:text-3xl font-black text-gray-800 tracking-tight">
+                Sitios Turísticos Recomendados
+              </h2>
+              <p className="text-gray-400 text-xs mt-1.5 max-w-xl leading-relaxed">
+                Puntos geográficos icónicos verificados físicamente por nuestro staff en cada una de sus expediciones.
+              </p>
             </div>
-            <h2 className="text-2xl md:text-3xl font-black text-gray-800 tracking-tight">
-              Sitios Turísticos Recomendados
-            </h2>
-            <p className="text-gray-400 text-xs mt-2 max-w-md mx-auto">
-              Puntos geográficos icónicos verificados físicamente por nuestro staff en cada una de sus expediciones.
-            </p>
+            <Link href="/sitios-turisticos" className="text-brand-magenta text-xs font-bold hover:underline flex items-center gap-1 shrink-0">
+              Ver todos los sitios turísticos <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -971,17 +976,22 @@ export function Home() {
       {/* 9. REPORTAJES / TIPS DE VIAJE */}
       <section className="py-20 px-4 bg-white border-y border-gray-100">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-50 border border-cyan-200 text-xs font-black text-brand-turquesa mb-4">
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>TIPS DE VIAJE & REPORTAJES</span>
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+            <div className="text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-50 border border-cyan-200 text-xs font-black text-brand-turquesa mb-3">
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>TIPS DE VIAJE & REPORTAJES</span>
+              </div>
+              <h2 className="text-2xl md:text-3xl font-black text-gray-800 tracking-tight">
+                Consejos de Turismo & Guías
+              </h2>
+              <p className="text-gray-400 text-xs mt-1.5 max-w-xl leading-relaxed">
+                Lee los reportajes redactados por nuestro equipo sobre playas secretas, picos andinos y gastronomía.
+              </p>
             </div>
-            <h2 className="text-2xl md:text-3xl font-black text-gray-800 tracking-tight">
-              Consejos de Turismo & Guías
-            </h2>
-            <p className="text-gray-400 text-xs mt-2 max-w-md mx-auto">
-              Lee los reportajes redactados por nuestro equipo sobre playas secretas, picos andinos y gastronomía.
-            </p>
+            <Link href="/blog" className="text-brand-magenta text-xs font-bold hover:underline flex items-center gap-1 shrink-0 font-semibold">
+              Ver todos los reportajes <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">

@@ -67,6 +67,8 @@ import { LinkHub } from "./pages/LinkHub";
 import { BlogDetalle } from "./pages/BlogDetalle";
 import { SitioDetalle } from "./pages/SitioDetalle";
 import { ExcelenciaLanding } from "./pages/ExcelenciaLanding";
+import { Blog } from "./pages/Blog";
+import { SitiosTuristicos } from "./pages/SitiosTuristicos";
 
 // Importación del Agente IA sin llaves apuntando a la carpeta admin
 import AdminConversacionalIA from "./pages/admin/AdminConversacionalIA";
@@ -155,6 +157,8 @@ function App() {
         <Route path="/comparar" component={Comparar} />
         <Route path="/paquetes" component={Paquetes} />
         <Route path="/links" component={LinkHub} />
+        <Route path="/blog" component={Blog} />
+        <Route path="/sitios-turisticos" component={SitiosTuristicos} />
 
         <Route path="/membresias" component={Membresias} />
         <Route path="/reportar-pago" component={ReportarPago} />
