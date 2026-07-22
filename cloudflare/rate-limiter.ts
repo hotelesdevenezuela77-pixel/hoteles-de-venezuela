@@ -130,39 +130,145 @@ export default {
             "Access-Control-Allow-Methods": "POST, OPTIONS",
           }
         });
-      }
-
-      if (request.method === "POST") {
+          if (request.method === "POST") {
         let body: any;
         try {
           body = await request.json();
           const {
+            is_b2b = false,
+            // B2C params
             hotel_name,
             hotel_category,
             request_type,
             membership_tier,
-            tone,
             is_circuito_excelencia,
-            client_need
+            client_need,
+            // B2B params
+            campana,
+            nombre_negocio,
+            categoria,
+            mensaje_o_necesidad,
+            tono,
+            escenario = "reservas"
           } = body;
           
           // Cargar clave de API de Gemini
           const geminiKey = env.GEMINI_API_KEY || "Hola177*H";
+          const hasRealKey = geminiKey && geminiKey !== "Hola177*H" && geminiKey.length > 10;
           
-          // Si no hay key real o es el placeholder, usar el fallback
-          if (!geminiKey || geminiKey === "Hola177*H") {
-            const responseObj = generateFallbackScriptLocal(body);
-            return new Response(JSON.stringify({ ...responseObj, generated_by: "template_fallback" }), {
-              status: 200,
-              headers: {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
-              }
+          if (is_b2b) {
+            // PROCESAR FLUJO B2B
+            if (!hasRealKey) {
+              const responseObj = generateFallbackScriptB2B(body);
+              return new Response(JSON.stringify({ ...responseObj, generated_by: "template_fallback_b2b" }), {
+                status: 200,
+                headers: {
+                  "Content-Type": "application/json",
+                  "Access-Control-Allow-Origin": "*",
+                }
+              });
+            }
+            
+            const systemPrompt = `Rol: Director Comercial y Especialista en Ventas B2B de "Hoteles de Venezuela" (hotelesdevenezuela.com). Tu único objetivo es funcionar como un Centro de Ventas y Prospección Comercial B2B para el equipo interno, generando guiones y respuestas persuasivas para captar y afiliar nuevos socios comerciales a la plataforma.
+
+Listado Oficial de Categorías Soportadas en la Plataforma:
+- Agencias de Viajes
+- Alquiler de Carros
+- Alquiler de Yates
+- Complejos Turísticos
+- Entertainment Corporation
+- Farmacias
+- Hoteles
+- Marinas
+- Markets
+- Parques Nacionales
+- Posadas
+- Restaurantes
+- Sitios Turísticos
+*COMODÍN DE CATEGORÍA:* Si el operador introduce una categoría personalizada o un sector que no aparece en este listado oficial (ej. Centros de Buceo, Transporte Privado, Guías, etc.), asúmelo automáticamente como un sector válido y adapta el discurso comercial integrándolo como un aliado estratégico complementario para los viajeros de la plataforma.
+
+Contexto de las Campañas Activas:
+1. Campaña Prestigio 2026: Dirigida exclusivamente a alojamientos y campamentos de alta gama (ej. Ara Merú, Wakü Lodge). El argumento central es el prestigio, la exclusividad, el posicionamiento de marca de alto nivel y el efecto tractor. La landing page de esta campaña es: https://hotelesdevenezuela.com/prestigio-2026
+2. Campaña 50 Fundadores: Dirigida a establecimientos generales que buscan posicionamiento inicial con beneficios preferenciales. La landing page de esta campaña es: https://hotelesdevenezuela.com/50-fundadores
+3. Alianzas Comerciales / Prestadores de Servicios: Dirigida a agencias, alquileres, restaurantes, transporte o cualquier otra categoría para integrarlos al ecosistema digital. La landing page es: https://hotelesdevenezuela.com/membresias o https://hotelesdevenezuela.com/alianzas-para-agencias
+
+Instrucciones Operativas para Generar la Respuesta:
+- Escenario A (Canal de Reservas / Atención al Cliente): Si el mensaje/estado del contacto indica que es a través de un canal operativo (ej: contestaron un WhatsApp de reservas general o info@): redacta un saludo cordial de parte de "Hoteles de Venezuela", menciona que el negocio ha sido seleccionado por su destacada calidad en su sector, y solicita de manera amable y profesional el contacto directo (teléfono o correo) del propietario, gerente general o departamento comercial. No presentes toda la propuesta aún, el objetivo en este escenario es únicamente conseguir el contacto del tomador de decisiones.
+- Escenario B (Contacto Directo con el Tomador de Decisiones): Si ya se tiene el contacto directo con el dueño o gerente (o el operador seleccionó contacto directo): presenta la propuesta de valor de la campaña seleccionada, resalta los beneficios de unirse al directorio, justifica por qué su categoría suma valor al portal (incluso si es del comodín, adáptalo para ver cómo se beneficia el viajero de su servicio) e incluye la llamada a la acción (CTA) junto con el enlace de la landing page respectiva para el cierre.
+
+Tono: Adapta la redacción estrictamente al tono seleccionado por el operador: "${tono || 'persuasivo'}". Utiliza un formato limpio y optimizado para WhatsApp o correo electrónico (con negritas estratégicas).
+
+Debes responder ÚNICAMENTE con un objeto JSON válido con la siguiente estructura (no agregues bloques de código markdown \`\`\`json ni texto adicional, responde solo el JSON crudo en texto plano):
+{
+  "script": "[Guion de respuesta estructurado en español, con saltos de línea \\n, usa negritas estratégicas *negrita* para WhatsApp o formato de correo según sea adecuado]",
+  "follow_up": "[Sugerencia de seguimiento específica (día 1, 3 o 7) basada en el método de Aprendamos Marketing]",
+  "sales_note": "[Nota comercial sobre el objetivo a lograr]"
+}`;
+
+            const userPrompt = `Campaña seleccionada: ${campana}
+Nombre del negocio prospecto: ${nombre_negocio}
+Categoría del negocio: ${categoria}
+Escenario de contacto: ${escenario === "reservas" ? "Escenario A (Canal de Reservas / Atención al Cliente)" : "Escenario B (Contacto Directo con el Tomador de Decisiones)"}
+Estado de la conversación / Mensaje o objeción: ${mensaje_o_necesidad || "Contacto inicial"}
+Tono requerido: ${tono}`;
+
+            const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
+            const geminiResponse = await fetch(geminiUrl, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{
+                  parts: [{ text: `${systemPrompt}\n\nDatos de entrada:\n${userPrompt}` }]
+                }]
+              })
             });
-          }
-          
-          // Si hay clave, estructurar el Prompt
-          const systemPrompt = `Rol: Experto en arquitectura de software y estrategia de ventas B2B para la plataforma Hoteles de Venezuela. Tu objetivo es generar respuestas de ventas persuasivas y personalizadas para los hoteles miembros.
+
+            if (!geminiResponse.ok) {
+              throw new Error(`Gemini API returned status ${geminiResponse.status}`);
+            }
+
+            const geminiData = await geminiResponse.json() as any;
+            const textOutput = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+            try {
+              const cleanJson = textOutput.replace(/```json/g, "").replace(/```/g, "").trim();
+              const parsed = JSON.parse(cleanJson);
+              return new Response(JSON.stringify({ ...parsed, generated_by: "ia" }), {
+                status: 200,
+                headers: {
+                  "Content-Type": "application/json",
+                  "Access-Control-Allow-Origin": "*",
+                }
+              });
+            } catch (parseError) {
+              return new Response(JSON.stringify({
+                script: textOutput || "Error al procesar la respuesta de la IA B2B",
+                follow_up: "Día 1: Realizar un contacto de seguimiento por WhatsApp.",
+                sales_note: "Priorizar la llamada o reunión de alineación comercial.",
+                generated_by: "ia_raw"
+              }), {
+                status: 200,
+                headers: {
+                  "Content-Type": "application/json",
+                  "Access-Control-Allow-Origin": "*",
+                }
+              });
+            }
+
+          } else {
+            // PROCESAR FLUJO B2C EXISTENTE
+            if (!hasRealKey) {
+              const responseObj = generateFallbackScriptLocal(body);
+              return new Response(JSON.stringify({ ...responseObj, generated_by: "template_fallback" }), {
+                status: 200,
+                headers: {
+                  "Content-Type": "application/json",
+                  "Access-Control-Allow-Origin": "*",
+                }
+              });
+            }
+            
+            const systemPrompt = `Rol: Experto en arquitectura de software y estrategia de ventas B2B para la plataforma Hoteles de Venezuela. Tu objetivo es generar respuestas de ventas persuasivas y personalizadas para los hoteles miembros.
 Tarea: Diseñar un guion de respuesta estructurado según los lineamientos de conversión de alta gama.
 
 Directrices de Generación:
@@ -183,7 +289,7 @@ Debes responder ÚNICAMENTE con un objeto JSON válido con la siguiente estructu
   "sales_note": "[Nota breve del objetivo de venta a priorizar en esta respuesta]"
 }`;
 
-          const userPrompt = `Hotel: ${hotel_name}
+            const userPrompt = `Hotel: ${hotel_name}
 Categoría: ${hotel_category}
 Tipo de Solicitud del Cliente: ${request_type}
 Membresía Activa: ${membership_tier}
@@ -191,50 +297,53 @@ Tono deseado: ${tone}
 Pertenece al Circuito de la Excelencia: ${is_circuito_excelencia ? "Sí" : "No"}
 Detalle o Necesidad del Cliente: ${client_need || "No especificada (solicitud estándar)"}`;
 
-          const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
-          const geminiResponse = await fetch(geminiUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{
-                parts: [{ text: `${systemPrompt}\n\nDatos de entrada:\n${userPrompt}` }]
-              }]
-            })
-          });
-          
-          if (!geminiResponse.ok) {
-            throw new Error(`Gemini API returned status ${geminiResponse.status}`);
-          }
-          
-          const geminiData = await geminiResponse.json() as any;
-          const textOutput = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "";
-          
-          try {
-            const cleanJson = textOutput.replace(/```json/g, "").replace(/```/g, "").trim();
-            const parsed = JSON.parse(cleanJson);
-            return new Response(JSON.stringify({ ...parsed, generated_by: "ia" }), {
-              status: 200,
-              headers: {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
-              }
+            const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
+            const geminiResponse = await fetch(geminiUrl, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{
+                  parts: [{ text: `${systemPrompt}\n\nDatos de entrada:\n${userPrompt}` }]
+                }]
+              })
             });
-          } catch (parseError) {
-            return new Response(JSON.stringify({
-              script: textOutput || "Error al procesar la respuesta de la IA",
-              follow_up: "Día 1: Realizar un contacto de seguimiento por WhatsApp.",
-              sales_note: "Priorizar la obtención de las fechas y detalles del viaje.",
-              generated_by: "ia_raw"
-            }), {
-              status: 200,
-              headers: {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
-              }
-            });
+            
+            if (!geminiResponse.ok) {
+              throw new Error(`Gemini API returned status ${geminiResponse.status}`);
+            }
+            
+            const geminiData = await geminiResponse.json() as any;
+            const textOutput = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "";
+            
+            try {
+              const cleanJson = textOutput.replace(/```json/g, "").replace(/```/g, "").trim();
+              const parsed = JSON.parse(cleanJson);
+              return new Response(JSON.stringify({ ...parsed, generated_by: "ia" }), {
+                status: 200,
+                headers: {
+                  "Content-Type": "application/json",
+                  "Access-Control-Allow-Origin": "*",
+                }
+              });
+            } catch (parseError) {
+              return new Response(JSON.stringify({
+                script: textOutput || "Error al procesar la respuesta de la IA",
+                follow_up: "Día 1: Realizar un contacto de seguimiento por WhatsApp.",
+                sales_note: "Priorizar la obtención de las fechas y detalles del viaje.",
+                generated_by: "ia_raw"
+              }), {
+                status: 200,
+                headers: {
+                  "Content-Type": "application/json",
+                  "Access-Control-Allow-Origin": "*",
+                }
+              });
+            }
           }
         } catch (error: any) {
-          const fallbackObj = generateFallbackScriptLocal(body || {});
+          const fallbackObj = (body && body.is_b2b) 
+            ? generateFallbackScriptB2B(body || {}) 
+            : generateFallbackScriptLocal(body || {});
           return new Response(JSON.stringify({ ...fallbackObj, error: error.message, generated_by: "error_fallback" }), {
             status: 200,
             headers: {
@@ -401,6 +510,65 @@ function generateFallbackScriptLocal(body: any) {
   
   const script = `${agradecimiento}\n\n${diagnostico}\n\n${solucion}\n\n${cierre}`;
   
+  return {
+    script,
+    follow_up,
+    sales_note
+  };
+}
+
+function generateFallbackScriptB2B(body: any) {
+  const {
+    campana = "prestigio_2026",
+    nombre_negocio = "Establecimiento Prospecto",
+    categoria = "Hoteles",
+    mensaje_o_necesidad = "",
+    tono = "persuasivo",
+    escenario = "reservas"
+  } = body;
+
+  let script = "";
+  let follow_up = "";
+  let sales_note = "";
+
+  if (escenario === "reservas") {
+    // Escenario A: Canal de Reservas / Atención al Cliente
+    if (tono === "elegante") {
+      script = `Estimado equipo de *${nombre_negocio}*,\n\nReciban un saludo de la más alta distinción de parte de la dirección de *Hoteles de Venezuela*.\n\nHemos estado evaluando su trayectoria y destacada presencia en el sector de *${categoria}*. Por este motivo, su establecimiento ha sido preseleccionado para incorporarse a nuestras exclusivas iniciativas de posicionamiento y captación digital.\n\nCon el fin de hacerles llegar la invitación y propuesta comercial correspondiente, ¿serían tan amables de facilitarnos el contacto directo (teléfono o correo electrónico) del propietario, director general o encargado del área comercial?\n\nAgradecemos de antemano su gentil atención y colaboración.\n\nAtentamente,\n*Director Comercial B2B*\nHoteles de Venezuela`;
+    } else if (tono === "corporativo" || tono === "sobrio") {
+      script = `Estimado equipo de *${nombre_negocio}*,\n\nDe parte de la dirección de *Hoteles de Venezuela LLC*, les extendemos un saludo institucional.\n\nSu negocio ha sido seleccionado para participar en el programa de visibilidad digital y reservas directas en la categoría de *${categoria}*, debido a sus altos estándares de calidad.\n\nPara canalizar esta información con la persona adecuada, solicitamos formalmente el contacto directo (teléfono o correo electrónico) del propietario, gerente general o encargado comercial de la empresa.\n\nQuedamos atentos a su respuesta para formalizar el envío de la propuesta.\n\nSaludos cordiales,\n*Dirección Comercial B2B*\nHoteles de Venezuela`;
+    } else { // persuasivo / por defecto
+      script = `¡Hola! Un saludo de parte del equipo de *Hoteles de Venezuela*.\n\nHemos estado siguiendo de cerca el excelente trabajo de *${nombre_negocio}* en el sector de *${categoria}*. Su perfil califica perfectamente para los beneficios de nuestra plataforma nacional de promoción turística.\n\nPara enviarles la invitación formal con los detalles de visibilidad y captación sin comisiones, ¿con quién del equipo directivo o del área comercial podríamos comunicarnos directamente? Si nos facilitan su número de teléfono o correo, nos pondremos en contacto a la brevedad.\n\n¡Muchas gracias y feliz día!\n*Equipo Comercial*\nHoteles de Venezuela`;
+    }
+    follow_up = "Día 1: Enviar un recordatorio por WhatsApp consultando si pudieron leer el mensaje previo o si prefieren que contactemos por correo electrónico.";
+    sales_note = "El objetivo exclusivo es conseguir el contacto directo (teléfono/email) del tomador de decisiones del establecimiento.";
+  } else {
+    // Escenario B: Contacto Directo con el Tomador de Decisiones
+    let propuestaValores = "";
+    let linkLanding = "";
+
+    if (campana === "prestigio_2026") {
+      propuestaValores = "nuestro exclusivo *Índice de Prestigio y Distinción 2026*. Esta iniciativa busca reconocer a los establecimientos de alta gama del país, potenciando su posicionamiento de marca de alto nivel y el efecto tractor para atraer viajeros selectos.";
+      linkLanding = "https://hotelesdevenezuela.com/prestigio-2026";
+    } else if (campana === "50_fundadores") {
+      propuestaValores = "nuestra *Campaña de los 50 Hoteles Fundadores*. Es un programa premium de cupo limitado que otorga a los miembros fundadores una posición VIP destacada de por vida, visibilidad prioritaria y herramientas de automatización exclusivas.";
+      linkLanding = "https://hotelesdevenezuela.com/50-fundadores";
+    } else { // alianzas_comerciales / prestadores
+      propuestaValores = "nuestro programa de *Alianzas Comerciales para Prestadores de Servicios*. Esta iniciativa busca integrar a los mejores actores del sector de *${categoria}* para complementar el ecosistema turístico, permitiéndoles recibir contactos directos y reservas de viajeros 100% libres de comisiones.";
+      linkLanding = "https://hotelesdevenezuela.com/alianzas-para-agencias";
+    }
+
+    if (tono === "elegante") {
+      script = `Estimado(a) director(a) de *${nombre_negocio}*,\n\nEs un honor saludarle de parte de *Hoteles de Venezuela*.\n\nLe contactamos para presentarle formalmente la propuesta de valor de ${propuestaValores}\n\nEstamos convencidos de que la excelencia de sus servicios en la categoría de *${categoria}* añade un valor extraordinario a nuestra guía oficial. Formar parte de esta alianza le permitirá conectar directamente con nuestra audiencia de viajeros, impulsando su canal de reservas directas sin costos de intermediación.\n\nPuede conocer todos los beneficios detallados y formalizar su membresía en el siguiente enlace:\n👉 ${linkLanding}\n\n¿Cuándo dispondría de 5 minutos para una breve conversación sobre los detalles de esta postulación?\n\nAtentamente,\n*Director Comercial B2B*\nHoteles de Venezuela`;
+    } else if (tono === "corporativo" || tono === "sobrio") {
+      script = `Estimado(a) gerente de *${nombre_negocio}*,\n\nDe parte de *Hoteles de Venezuela LLC*, nos comunicamos para presentarle la propuesta comercial de ${propuestaValores}\n\nLa integración de su empresa dentro del sector de *${categoria}* es un paso estratégico para nuestro directorio. Al unirse, accederá a un perfil corporativo verificado, integración con nuestro WhatsApp CRM y captación de clientes de forma directa y sin comisiones.\n\nPuede ver la propuesta técnica y costos en nuestra landing page oficial:\n👉 ${linkLanding}\n\nQuedamos a su disposición para coordinar una llamada de presentación técnica de 5 minutos esta semana.\n\nAtentamente,\n*Dirección Comercial B2B*\nHoteles de Venezuela`;
+    } else { // persuasivo / por defecto
+      script = `¡Hola! Qué gusto saludarte de parte de *Hoteles de Venezuela*.\n\nTe escribo para presentarle una gran oportunidad para *${nombre_negocio}* a través de ${propuestaValores}\n\nAl unirte a nuestra red de prestadores en la categoría de *${categoria}*, tendrás una ficha comercial con prioridad de búsqueda, acceso a leads reales y la posibilidad de potenciar tus ventas sin pagar comisiones por reserva.\n\nPuedes revisar todos los detalles y testimonios de otros aliados en nuestra web oficial:\n👉 ${linkLanding}\n\n¿Te parece si agendamos una llamada de 5 minutos hoy o mañana para explicarte el funcionamiento y activar tu perfil?\n\n¡Un saludo!\n*Equipo Comercial B2B*\nHoteles de Venezuela`;
+    }
+    follow_up = "Día 3: Realizar una llamada o enviar un mensaje consultando si tuvo oportunidad de revisar el enlace de la propuesta y si prefiere coordinar una demo.";
+    sales_note = "Enfocarse en cerrar la llamada o videollamada para demostrar la plataforma y concretar la afiliación.";
+  }
+
   return {
     script,
     follow_up,
