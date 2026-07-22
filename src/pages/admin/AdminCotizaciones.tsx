@@ -335,7 +335,7 @@ function printQuote(q: Quote) {
   <!-- Header -->
   <div class="quote-header">
     <div class="logo-area">
-      <img src="https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public/site-assets/logo-hdv.png" alt="Logo Hoteles de Venezuela" class="logo-img" />
+      <img src="${window.location.origin}/images/logo-hdv-transparent.png" alt="Logo Hoteles de Venezuela" class="logo-img" />
       <span class="alliance-text">
         Hoteles de Venezuela LLC en alianza con Webmasterpro Entertainment Corporation, C.A.<br/>RIF J-405057785
       </span>
@@ -456,7 +456,10 @@ function printQuote(q: Quote) {
   </div>
 </body>
 </html>`);
-  win.document.close(); win.print();
+  win.document.close();
+  setTimeout(() => {
+    win.print();
+  }, 500);
 }
 
 export function AdminCotizaciones() {
