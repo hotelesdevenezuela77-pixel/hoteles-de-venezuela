@@ -519,6 +519,14 @@ export function Home() {
     buttonUrl: "/mis-negocios",
     isActive: true
   };
+  const prestigioSection = sections.find(s => s.sectionKey === "prestigio" || s.sectionKey === "PRESTIGIO_BANNER") || {
+    title: "Wakü Lodge & Ara Merú",
+    subtitle: "EL PARAÍSO TE ESPERA",
+    description: "Descubre los alojamientos exclusivos y de alta gama certificados bajo el Sello de Calidad y Prestigio 2026. Hospitalidad de nivel mundial en el corazón de Canaima.",
+    imageUrl: "https://images.unsplash.com/photo-1552083375-1447ce886485?w=1600&auto=format&fit=crop",
+    isActive: true
+  };
+
 
   // Determinar el fondo de forma reactiva y limpia para evitar el parpadeo del banner (flicker)
   const overlay = "linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.6))";
@@ -753,7 +761,7 @@ export function Home() {
                 <Waves className="w-5 h-5 text-[#00C8D4]" />
               </div>
               <h3 className="font-extrabold text-sm text-gray-800 group-hover:text-brand-turquesa transition-colors mb-1">
-                🏝️ Playas y Cayos
+                Playas y Cayos
               </h3>
               <p className="text-[10px] text-gray-450 leading-relaxed font-bold">
                 Morrocoy, Los Roques y costas de arena blanca.
@@ -765,7 +773,7 @@ export function Home() {
                 <Mountain className="w-5 h-5 text-[#9B00CC]" />
               </div>
               <h3 className="font-extrabold text-sm text-gray-800 group-hover:text-brand-purple transition-colors mb-1">
-                ⛰️ Aventura y Tepuyes
+                Aventura y Tepuyes
               </h3>
               <p className="text-[10px] text-gray-450 leading-relaxed font-bold">
                 Canaima, el Salto Ángel y selvas milenarias.
@@ -777,7 +785,7 @@ export function Home() {
                 <Utensils className="w-5 h-5 text-amber-600" />
               </div>
               <h3 className="font-extrabold text-sm text-gray-800 group-hover:text-amber-600 transition-colors mb-1">
-                🍷 Gastronomía & Sabor
+                Gastronomía & Sabor
               </h3>
               <p className="text-[10px] text-gray-450 leading-relaxed font-bold">
                 Sabores locales, catas y posadas de autor.
@@ -789,7 +797,7 @@ export function Home() {
                 <Sparkles className="w-5 h-5 text-[#FF0096]" />
               </div>
               <h3 className="font-extrabold text-sm text-gray-800 group-hover:text-brand-magenta transition-colors mb-1">
-                ✨ Lujo & Prestigio
+                Lujo & Prestigio
               </h3>
               <p className="text-[10px] text-gray-450 leading-relaxed font-bold">
                 Hospedajes de alta gama certificados bajo la campaña 2026.
@@ -923,38 +931,40 @@ export function Home() {
       </section>
 
       {/* 4.5. CAMPAÑA DE PRESTIGIO 2026 (ALTA GAMA / FULL-BLEED) */}
-      <section className="relative w-full h-[520px] flex items-center justify-center overflow-hidden">
-        {/* Background Image scaling 1.08 to prevent black borders/letterbox */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center scale-[1.08] transition-transform duration-[1500ms] hover:scale-110"
-          style={{ backgroundImage: `url('https://images.unsplash.com/photo-1552083375-1447ce886485?w=1600&auto=format&fit=crop')` }}
-        />
-        
-        {/* Dark overlay for text readability */}
-        <div className="absolute inset-0 bg-black/45 z-10" />
+      {prestigioSection.isActive && (
+        <section className="relative w-full h-[520px] flex items-center justify-center overflow-hidden">
+          {/* Background Image scaling 1.08 to prevent black borders/letterbox */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center scale-[1.08] transition-transform duration-[1500ms] hover:scale-110"
+            style={{ backgroundImage: `url('${prestigioSection.imageUrl || "https://images.unsplash.com/photo-1552083375-1447ce886485?w=1600"}')` }}
+          />
+          
+          {/* Dark overlay for text readability */}
+          <div className="absolute inset-0 bg-black/45 z-10" />
 
-        {/* Bottom white fade overlay to blend invisible with the page background */}
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white via-white/50 to-transparent z-15 pointer-events-none" />
+          {/* Bottom white fade overlay to blend invisible with the page background */}
+          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white via-white/50 to-transparent z-15 pointer-events-none" />
 
-        {/* Centered Content */}
-        <div className="relative z-20 max-w-4xl mx-auto px-6 text-center text-white flex flex-col items-center justify-center h-full">
-          <span className="text-[10px] sm:text-xs font-black uppercase tracking-[0.25em] text-brand-turquesa mb-4 drop-shadow-sm">
-            EL PARAÍSO TE ESPERA
-          </span>
-          <h2 className="text-3xl sm:text-5xl font-black mb-6 leading-tight tracking-tight font-serif drop-shadow-sm">
-            Wakü Lodge & Ara Merú
-          </h2>
-          <p className="text-gray-150 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed mb-8 font-semibold drop-shadow-sm">
-            Descubre los alojamientos exclusivos y de alta gama certificados bajo el Sello de Calidad y Prestigio 2026. Hospitalidad de nivel mundial en el corazón de Canaima.
-          </p>
-          <Link href="/prestigio-2026">
-            <button className="bg-white hover:bg-gray-50 text-[#FF0096] font-extrabold px-8 py-3.5 rounded-full text-xs shadow-lg hover:scale-103 active:scale-97 transition-all cursor-pointer flex items-center gap-1.5 border border-white/20">
-              <Sparkles className="w-4 h-4 text-[#FF0096]" />
-              <span>Explorar Colección Prestigio</span>
-            </button>
-          </Link>
-        </div>
-      </section>
+          {/* Centered Content */}
+          <div className="relative z-20 max-w-4xl mx-auto px-6 text-center text-white flex flex-col items-center justify-center h-full">
+            <span className="text-[10px] sm:text-xs font-black uppercase tracking-[0.25em] text-brand-turquesa mb-4 drop-shadow-sm">
+              {prestigioSection.subtitle || "EL PARAÍSO TE ESPERA"}
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-black text-white mb-6 leading-tight tracking-tight font-serif drop-shadow-sm">
+              {prestigioSection.title}
+            </h2>
+            <p className="text-gray-150 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed mb-8 font-semibold drop-shadow-sm">
+              {prestigioSection.description}
+            </p>
+            <Link href="/prestigio-2026">
+              <button className="bg-white hover:bg-gray-50 text-[#FF0096] font-extrabold px-8 py-3.5 rounded-full text-xs shadow-lg hover:scale-103 active:scale-97 transition-all cursor-pointer flex items-center gap-1.5 border border-white/20">
+                <Sparkles className="w-4 h-4 text-[#FF0096]" />
+                <span>Explorar Colección Prestigio</span>
+              </button>
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* 5. DESTINOS POPULARES */}
       <section className="py-20 px-4 bg-white relative border-t border-gray-100">

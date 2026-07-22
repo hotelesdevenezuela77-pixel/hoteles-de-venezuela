@@ -31,6 +31,7 @@ const SECTION_META: Record<string, { label: string; icon: string; color: string 
   cta:                  { label: "Call to Action",    icon: "🚀", color: "#F59E0B" },
   testimonials:         { label: "Testimonios",       icon: "💬", color: "#10B981" },
   partners:             { label: "Nuestros Aliados",  icon: "🤝", color: "#6366F1" },
+  prestigio:            { label: "Campaña Prestigio (Alta Gama)", icon: "✨", color: "#FF0096" },
 };
 
 const SETTINGS_META: Record<string, { label: string; group: string; type: "text" | "url" | "tel" | "toggle" }> = {
