@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { MapPin, Star, Wifi, Car, Waves, Utensils, TreePine, Dumbbell, Sparkles, Phone, BarChart3 } from "lucide-react";
+import { MapPin, Star, Wifi, Car, Waves, Utensils, TreePine, Dumbbell, Sparkles, Phone, BarChart3, Award, Calendar, Megaphone } from "lucide-react";
 import { TrackedWhatsAppButton } from "./TrackedWhatsAppButton";
 import { parseServicesList, getAmenityLabel } from "@/lib/amenitiesList";
 
@@ -25,6 +25,8 @@ export interface Establishment {
   membership_tier: string;
   has_hdv_seal?: boolean;
   homepage_priority?: number | null;
+  has_reservations_enabled?: boolean;
+  is_ads_enabled?: boolean;
 }
 
 const tierConfig: Record<string, { label: string; color: string; bgColor: string }> = {
@@ -102,7 +104,7 @@ export function EstablishmentCard({
             </div>
 
             {/* Official HDV Seal Image (replaces "desde moderado / noche" button) */}
-            {(establishment.has_hdv_seal || isPriority) && (
+            {establishment.has_hdv_seal && (
               <img 
                 src="/images/sello-hdv.png" 
                 alt="Sello de Calidad Hoteles de Venezuela" 
@@ -130,22 +132,49 @@ export function EstablishmentCard({
           {/* Content Section */}
           <div className="p-5 flex-1 flex flex-col">
             {/* Title & Location with Seal */}
-            <div className="flex items-start justify-between gap-3 mb-2">
-              <div className="flex-1">
-                <h3 className={`font-black text-lg transition-colors line-clamp-1 leading-tight ${isPriority ? "text-white group-hover:text-brand-turquesa" : "text-gray-800 group-hover:text-brand-magenta"}`}>
-                  {establishment.name}
-                </h3>
+            <div className="flex flex-col mb-2">
+              <h3 className={`font-black text-lg transition-colors line-clamp-1 leading-tight ${isPriority ? "text-white group-hover:text-brand-turquesa" : "text-gray-800 group-hover:text-brand-magenta"}`}>
+                {establishment.name}
+              </h3>
 
-                <div className="flex items-center gap-1 text-xs mt-1">
-                  <MapPin className="w-3.5 h-3.5 text-brand-turquesa shrink-0" />
-                  <span className={`truncate ${isPriority ? "text-gray-300" : "text-gray-400"}`}>{establishment.destination_name || establishment.address || "Venezuela"}</span>
-                </div>
+              <div className="flex items-center gap-1 text-xs mt-1">
+                <MapPin className="w-3.5 h-3.5 text-brand-turquesa shrink-0" />
+                <span className={`truncate ${isPriority ? "text-gray-300" : "text-gray-400"}`}>{establishment.destination_name || establishment.address || "Venezuela"}</span>
               </div>
 
-              {/* HDV Seal */}
-              {(establishment.has_hdv_seal || isPriority) && (
-                <div className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest shrink-0 self-center border ${isPriority ? "bg-amber-500/10 border-amber-500/20 text-amber-300" : "bg-yellow-50 border border-yellow-200 text-yellow-600"}`}>
-                  SELLO HDV
+              {/* Status Badges Row (Sello HDV, Reservas, Ads) */}
+              {(establishment.has_hdv_seal || establishment.has_reservations_enabled || establishment.is_ads_enabled) && (
+                <div className="flex flex-wrap gap-1.5 mt-2.5">
+                  {establishment.has_hdv_seal && (
+                    <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider border flex items-center gap-1 shrink-0 ${
+                      isPriority 
+                        ? "bg-[#FF0096]/20 border-[#FF0096]/30 text-white" 
+                        : "bg-[#FF0096]/10 border border-[#FF0096]/25 text-[#FF0096]"
+                    }`}>
+                      <Award className="w-3 h-3 shrink-0" />
+                      SELLO HDV
+                    </span>
+                  )}
+                  {establishment.has_reservations_enabled && (
+                    <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider border flex items-center gap-1 shrink-0 ${
+                      isPriority 
+                        ? "bg-[#00C8D4]/20 border-[#00C8D4]/35 text-[#00C8D4]" 
+                        : "bg-[#00C8D4]/10 border border-[#00C8D4]/25 text-[#00C8D4]"
+                    }`}>
+                      <Calendar className="w-3 h-3 shrink-0" />
+                      Reservas
+                    </span>
+                  )}
+                  {establishment.is_ads_enabled && (
+                    <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider border flex items-center gap-1 shrink-0 ${
+                      isPriority 
+                        ? "bg-[#9B00CC]/20 border-[#9B00CC]/30 text-purple-350" 
+                        : "bg-[#9B00CC]/10 border border-[#9B00CC]/25 text-[#9B00CC]"
+                    }`}>
+                      <Megaphone className="w-3 h-3 shrink-0" />
+                      Ads
+                    </span>
+                  )}
                 </div>
               )}
             </div>
@@ -265,7 +294,7 @@ export function EstablishmentListItem({
           </div>
 
           {/* Official HDV Seal Image (replaces "desde moderado / noche" button) */}
-          {(establishment.has_hdv_seal || isPriority) && (
+          {establishment.has_hdv_seal && (
             <img 
               src="/images/sello-hdv.png" 
               alt="Sello de Calidad Hoteles de Venezuela" 
@@ -301,11 +330,6 @@ export function EstablishmentListItem({
                       {establishment.category_name}
                     </span>
                   )}
-                  {(establishment.has_hdv_seal || isPriority) && (
-                    <span className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border ${isPriority ? "bg-amber-500/10 border-amber-500/20 text-amber-300" : "bg-yellow-50 border border-yellow-200 text-yellow-600"}`}>
-                      Sello HDV
-                    </span>
-                  )}
                 </div>
                 <h3 className={`font-black text-xl transition-colors mt-1 ${isPriority ? "text-white group-hover:text-brand-turquesa" : "text-gray-800 group-hover:text-brand-magenta"}`}>
                   {establishment.name}
@@ -314,6 +338,42 @@ export function EstablishmentListItem({
                   <MapPin className="w-3.5 h-3.5 text-brand-turquesa shrink-0" />
                   <span className={isPriority ? "text-gray-300" : "text-gray-400"}>{establishment.destination_name || establishment.address || "Venezuela"}</span>
                 </div>
+
+                {/* Status Badges Row (Sello HDV, Reservas, Ads) */}
+                {(establishment.has_hdv_seal || establishment.has_reservations_enabled || establishment.is_ads_enabled) && (
+                  <div className="flex flex-wrap gap-1.5 mt-2.5">
+                    {establishment.has_hdv_seal && (
+                      <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider border flex items-center gap-1 shrink-0 ${
+                        isPriority 
+                          ? "bg-[#FF0096]/20 border-[#FF0096]/30 text-white" 
+                          : "bg-[#FF0096]/10 border border-[#FF0096]/25 text-[#FF0096]"
+                      }`}>
+                        <Award className="w-3 h-3 shrink-0" />
+                        SELLO HDV
+                      </span>
+                    )}
+                    {establishment.has_reservations_enabled && (
+                      <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider border flex items-center gap-1 shrink-0 ${
+                        isPriority 
+                          ? "bg-[#00C8D4]/20 border-[#00C8D4]/35 text-[#00C8D4]" 
+                        : "bg-[#00C8D4]/10 border border-[#00C8D4]/25 text-[#00C8D4]"
+                      }`}>
+                        <Calendar className="w-3 h-3 shrink-0" />
+                        Reservas
+                      </span>
+                    )}
+                    {establishment.is_ads_enabled && (
+                      <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider border flex items-center gap-1 shrink-0 ${
+                        isPriority 
+                          ? "bg-[#9B00CC]/20 border-[#9B00CC]/30 text-purple-350" 
+                          : "bg-[#9B00CC]/10 border border-[#9B00CC]/25 text-[#9B00CC]"
+                      }`}>
+                        <Megaphone className="w-3 h-3 shrink-0" />
+                        Ads
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Rating */}

@@ -179,7 +179,9 @@ export function Establecimientos() {
               is_featured: item.is_featured || false,
               services: item.services || "[]",
               membership_tier: item.membership_tier || "basic",
-              has_hdv_seal: item.has_hdv_seal || false
+              has_hdv_seal: item.has_hdv_seal || false,
+              has_reservations_enabled: item.has_reservations_enabled || false,
+              is_ads_enabled: item.is_ads_enabled || false
             };
           });
           setEstablishments(mapped);
@@ -411,6 +413,7 @@ export function Establecimientos() {
                 establishment={est} 
                 isComparing={comparedIds.includes(est.id)}
                 onCompareToggle={() => handleCompareToggle(est.id)}
+                isPriority={est.is_featured}
               />
             ))}
           </div>
@@ -422,6 +425,7 @@ export function Establecimientos() {
                 establishment={est} 
                 isComparing={comparedIds.includes(est.id)}
                 onCompareToggle={() => handleCompareToggle(est.id)}
+                isPriority={est.is_featured}
               />
             ))}
           </div>
