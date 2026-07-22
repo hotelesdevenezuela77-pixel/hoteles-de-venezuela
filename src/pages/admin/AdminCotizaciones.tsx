@@ -423,24 +423,24 @@ function printQuote(q: Quote) {
     <h3>Métodos de Pago Autorizados</h3>
     <div class="methods-grid">
       <div class="method-col">
-        <span class="method-title">1. Transferencias Internacionales / Divisas</span>
+        <span class="method-title">1. Divisas / Cuentas Internacionales (USD)</span>
         <span class="method-detail">
-          <strong>Zelle:</strong> pagos@hotelesdevenezuela.com<br/>
-          <strong>Titular:</strong> Hoteles de Venezuela LLC<br/>
+          <strong>Zelle:</strong><br/>
+          <strong>Correo:</strong> carlos01082001@gmail.com<br/>
+          <strong>Titular:</strong> Carlos Rodriguez<br/>
           <br/>
-          <strong>Efectivo o Custodia:</strong> Coordinar directamente con el asesor comercial asignado.
+          <strong>PayPal:</strong><br/>
+          <strong>Correo:</strong> webmasterpro177@gmail.com
         </span>
       </div>
       <div class="method-col">
-        <span class="method-title">2. Pago Móvil / Transferencias Nacionales</span>
+        <span class="method-title">2. Pago Móvil Nacional (VES)</span>
         <span class="method-detail">
-          <strong>Pago Móvil Banesco (0134)</strong><br/>
+          <strong>Banco:</strong> Banco Exterior<br/>
           <strong>Teléfono:</strong> 0414-5069774<br/>
-          <strong>RIF:</strong> J-405057785<br/>
+          <strong>Cédula de Identidad (C.I.):</strong> V-13035959<br/>
           <br/>
-          <strong>Cuenta Corriente Banesco</strong><br/>
-          <strong>Nro:</strong> 0134-0086-53-0861036070<br/>
-          <strong>Beneficiario:</strong> Webmasterpro Entertainment Corporation, C.A.
+          <strong>Moneda de Cambio:</strong> Tasa oficial BCV del día de la transacción.
         </span>
       </div>
     </div>
