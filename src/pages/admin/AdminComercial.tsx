@@ -33,22 +33,50 @@ interface Prospect {
   visitDate: string; nextFollowupDate: string; contractUrl: string; createdAt: string;
 }
 
-const LEAD_STATUS: Record<string, { bg: string; text: string; label: string }> = {
-  nuevo:       { bg: "bg-blue-50",   text: "text-blue-700",   label: "Nuevo" },
-  contactado:  { bg: "bg-yellow-50", text: "text-yellow-700", label: "Contactado" },
-  interesado:  { bg: "bg-green-50",  text: "text-green-700",  label: "Interesado" },
-  negociando:  { bg: "bg-purple-50", text: "text-purple-700", label: "Negociando" },
-  cerrado:     { bg: "bg-gray-100",  text: "text-gray-600",   label: "Cerrado" },
-  perdido:     { bg: "bg-red-50",    text: "text-red-700",    label: "Perdido" },
+const OFFICIAL_STATUSES = [
+  { key: "nuevo_ia_meta",      label: "Nuevo (IA/Meta)" },
+  { key: "contactado_digital", label: "Contactado Digital" },
+  { key: "negociacion_online", label: "Negociación Online" },
+  { key: "pendiente_visita",   label: "Pendiente Visita" },
+  { key: "visitado_campo",     label: "Visitado en Campo" },
+  { key: "propuesta_enviada",  label: "Propuesta Enviada" },
+  { key: "afiliado",           label: "Cierre Exitoso" },
+  { key: "pausado",            label: "Pausado" },
+];
+
+const HYBRID_STATUS: Record<string, { bg: string; text: string; label: string }> = {
+  nuevo_ia_meta:      { bg: "bg-blue-50 border-blue-100",       text: "text-blue-700",       label: "Nuevo (IA/Meta)" },
+  contactado_digital: { bg: "bg-cyan-50 border-cyan-100",       text: "text-cyan-700",       label: "Contactado Digital" },
+  negociacion_online: { bg: "bg-purple-50 border-purple-100",   text: "text-purple-700",     label: "Negociación Online" },
+  pendiente_visita:   { bg: "bg-indigo-50 border-indigo-100",   text: "text-indigo-700",     label: "Pendiente Visita" },
+  visitado_campo:     { bg: "bg-amber-50 border-amber-100",     text: "text-amber-700",      label: "Visitado en Campo" },
+  propuesta_enviada:  { bg: "bg-orange-50 border-orange-100",   text: "text-orange-700",     label: "Propuesta Enviada" },
+  afiliado:           { bg: "bg-emerald-50 border-emerald-100", text: "text-emerald-700",    label: "Cierre Exitoso / Afiliado" },
+  pausado:            { bg: "bg-slate-100 border-slate-200",    text: "text-slate-600",      label: "Pausado" },
+  
+  // legacy compatibility
+  nuevo:              { bg: "bg-blue-50 border-blue-100",       text: "text-blue-700",       label: "Nuevo (IA/Meta)" },
+  contactado:         { bg: "bg-cyan-50 border-cyan-100",       text: "text-cyan-700",       label: "Contactado Digital" },
+  interesado:         { bg: "bg-purple-50 border-purple-100",   text: "text-purple-700",     label: "Negociación Online" },
+  negociando:         { bg: "bg-purple-50 border-purple-100",   text: "text-purple-700",     label: "Negociación Online" },
+  cerrado:            { bg: "bg-emerald-50 border-emerald-100", text: "text-emerald-700",    label: "Cierre Exitoso / Afiliado" },
+  contratado:         { bg: "bg-emerald-50 border-emerald-100", text: "text-emerald-700",    label: "Cierre Exitoso / Afiliado" },
+  perdido:            { bg: "bg-slate-100 border-slate-200",    text: "text-slate-600",      label: "Pausado" },
+  rechazado:          { bg: "bg-slate-100 border-slate-200",    text: "text-slate-600",      label: "Pausado" },
+  por_visitar:        { bg: "bg-indigo-50 border-indigo-100",   text: "text-indigo-700",     label: "Pendiente Visita" },
+  visitado:           { bg: "bg-amber-50 border-amber-100",     text: "text-amber-700",      label: "Visitado en Campo" },
 };
 
-const PROSPECT_STATUS: Record<string, { bg: string; text: string; label: string }> = {
-  por_visitar: { bg: "bg-indigo-50",  text: "text-indigo-700",  label: "Por visitar" },
-  visitado:    { bg: "bg-blue-50",    text: "text-blue-700",    label: "Visitado" },
-  interesado:  { bg: "bg-green-50",   text: "text-green-700",   label: "Interesado" },
-  negociando:  { bg: "bg-yellow-50",  text: "text-yellow-700",  label: "Negociando" },
-  contratado:  { bg: "bg-emerald-50", text: "text-emerald-700", label: "Contratado" },
-  rechazado:   { bg: "bg-red-50",     text: "text-red-700",     label: "Rechazado" },
+const getNormalizedStatus = (s: string): string => {
+  const clean = (s || "").toLowerCase().trim();
+  if (clean === "nuevo" || clean === "nuevo_ia_meta") return "nuevo_ia_meta";
+  if (clean === "contactado" || clean === "contactado_digital") return "contactado_digital";
+  if (clean === "negociando" || clean === "interesado" || clean === "negociacion_online") return "negociacion_online";
+  if (clean === "por_visitar" || clean === "pendiente_visita") return "pendiente_visita";
+  if (clean === "visitado" || clean === "visitado_campo") return "visitado_campo";
+  if (clean === "propuesta_enviada") return "propuesta_enviada";
+  if (clean === "cerrado" || clean === "contratado" || clean === "afiliado") return "afiliado";
+  return "pausado";
 };
 
 const PRIORITY_STYLE: Record<string, string> = {
@@ -66,7 +94,7 @@ const TIPO_STYLE: Record<string, string> = {
 const EMPTY_PROSPECT = {
   establishmentName: "", contactName: "", phone: "", email: "",
   destinationName: "", zone: "", address: "", category: "",
-  status: "por_visitar", notes: "", priority: "normal",
+  status: "nuevo_ia_meta", notes: "", priority: "normal",
   visitDate: "", nextFollowupDate: "", contractUrl: "",
 };
 
@@ -318,8 +346,8 @@ export function AdminComercial() {
   const leads = rawLeads;
   const prospects = rawProspects;
 
-  const newLeads = leads.filter(l => l.status === "nuevo").length;
-  const newProspects = prospects.filter(p => p.status === "por_visitar").length;
+  const newLeads = leads.filter(l => getNormalizedStatus(l.status) === "nuevo_ia_meta").length;
+  const newProspects = prospects.filter(p => getNormalizedStatus(p.status) === "pendiente_visita" || getNormalizedStatus(p.status) === "nuevo_ia_meta").length;
 
   if (authLoading) {
     return (
@@ -383,7 +411,8 @@ export function AdminComercial() {
               </div>
             ) : (
               leads.map((l: Lead) => {
-                const st = LEAD_STATUS[l.status] ?? LEAD_STATUS.nuevo;
+                const normalizedKey = getNormalizedStatus(l.status);
+                const st = HYBRID_STATUS[normalizedKey] ?? HYBRID_STATUS.nuevo_ia_meta;
                 const tipo = TIPO_STYLE[l.leadType] ?? TIPO_STYLE.other;
                 const expanded = expandedLead === l.id;
                 return (
@@ -415,13 +444,18 @@ export function AdminComercial() {
                         <div className="flex items-center gap-3 flex-wrap">
                           <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Cambiar estado del lead:</span>
                           <div className="flex gap-1.5 flex-wrap">
-                            {Object.entries(LEAD_STATUS).map(([k, v]) => (
-                              <button key={k} onClick={() => updateLead.mutate({ id: l.id, data: { status: k } })}
-                                disabled={l.status === k || updateLead.isPending}
-                                className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border transition-all cursor-pointer ${l.status === k ? `${v.bg} ${v.text} border-current` : "bg-white text-gray-400 border-gray-200 hover:border-gray-300 disabled:opacity-50"}`}>
-                                {v.label}
-                              </button>
-                            ))}
+                            {OFFICIAL_STATUSES.map(v => {
+                              const normalizedLStatus = getNormalizedStatus(l.status);
+                              const isCurrent = normalizedLStatus === v.key;
+                              const statusStyle = HYBRID_STATUS[v.key];
+                              return (
+                                <button key={v.key} onClick={() => updateLead.mutate({ id: l.id, data: { status: v.key } })}
+                                  disabled={isCurrent || updateLead.isPending}
+                                  className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border transition-all cursor-pointer ${isCurrent ? `${statusStyle.bg} ${statusStyle.text} border-current` : "bg-white text-gray-400 border-gray-200 hover:border-gray-300 disabled:opacity-50"}`}>
+                                  {statusStyle.label}
+                                </button>
+                              );
+                            })}
                           </div>
                         </div>
 
@@ -479,7 +513,8 @@ export function AdminComercial() {
               </div>
             ) : (
               prospects.map((p: Prospect) => {
-                const st = PROSPECT_STATUS[p.status] ?? PROSPECT_STATUS.por_visitar;
+                const normalizedKey = getNormalizedStatus(p.status);
+                const st = HYBRID_STATUS[normalizedKey] ?? HYBRID_STATUS.nuevo_ia_meta;
                 const prio = PRIORITY_STYLE[p.priority] ?? PRIORITY_STYLE.normal;
                 return (
                   <div key={p.id} className="bg-white rounded-2xl border border-gray-200 p-4 shadow-xs hover:shadow-sm transition-all">
@@ -628,7 +663,7 @@ export function AdminComercial() {
                   <label className="text-[10px] font-bold text-gray-500 mb-1 block">Estado del Lead</label>
                   <select value={form.status} onChange={e => setF("status", e.target.value)}
                     className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-pink-400 bg-white">
-                    {Object.entries(PROSPECT_STATUS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+                    {OFFICIAL_STATUSES.map(v => <option key={v.key} value={v.key}>{v.label}</option>)}
                   </select>
                 </div>
                 <div>

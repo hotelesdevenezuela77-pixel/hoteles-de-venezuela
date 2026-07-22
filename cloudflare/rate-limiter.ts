@@ -149,7 +149,10 @@ export default {
             categoria,
             mensaje_o_necesidad,
             tono,
-            escenario = "reservas"
+            escenario = "reservas",
+            // Hybrid params
+            canal = "digital",
+            estado_lead
           } = body;
           
           // Cargar clave de API de Gemini
@@ -157,7 +160,7 @@ export default {
           const hasRealKey = geminiKey && geminiKey !== "Hola177*H" && geminiKey.length > 10;
           
           if (is_b2b) {
-            // PROCESAR FLUJO B2B
+            // PROCESAR FLUJO B2B HÍBRIDO
             if (!hasRealKey) {
               const responseObj = generateFallbackScriptB2B(body);
               return new Response(JSON.stringify({ ...responseObj, generated_by: "template_fallback_b2b" }), {
@@ -169,7 +172,7 @@ export default {
               });
             }
             
-            const systemPrompt = `Rol: Director Comercial y Especialista en Ventas B2B de "Hoteles de Venezuela" (hotelesdevenezuela.com). Tu único objetivo es funcionar como un Centro de Ventas y Prospección Comercial B2B para el equipo interno, generando guiones y respuestas persuasivas para captar y afiliar nuevos socios comerciales a la plataforma.
+            const systemPrompt = `Rol: Director Comercial y Estratega de Ventas Híbridas B2B de "Hoteles de Venezuela" (hotelesdevenezuela.com). Tu único objetivo es funcionar como un Centro de Ventas y Prospección Comercial B2B para el equipo interno, generando guiones y respuestas persuasivas para captar y afiliar nuevos socios comerciales a la plataforma. El modelo de ventas es híbrido, combinando prospección digital online (asistida por IA y campañas de Meta) con prospección presencial de campo (durante expediciones de validación turística).
 
 Listado Oficial de Categorías Soportadas en la Plataforma:
 - Agencias de Viajes
@@ -192,9 +195,20 @@ Contexto de las Campañas Activas:
 2. Campaña 50 Fundadores: Dirigida a establecimientos generales que buscan posicionamiento inicial con beneficios preferenciales. La landing page de esta campaña es: https://hotelesdevenezuela.com/50-fundadores
 3. Alianzas Comerciales / Prestadores de Servicios: Dirigida a agencias, alquileres, restaurantes, transporte o cualquier otra categoría para integrarlos al ecosistema digital. La landing page es: https://hotelesdevenezuela.com/membresias o https://hotelesdevenezuela.com/alianzas-para-agencias
 
-Instrucciones Operativas para Generar la Respuesta:
-- Escenario A (Canal de Reservas / Atención al Cliente): Si el mensaje/estado del contacto indica que es a través de un canal operativo (ej: contestaron un WhatsApp de reservas general o info@): redacta un saludo cordial de parte de "Hoteles de Venezuela", menciona que el negocio ha sido seleccionado por su destacada calidad en su sector, y solicita de manera amable y profesional el contacto directo (teléfono o correo) del propietario, gerente general o departamento comercial. No presentes toda la propuesta aún, el objetivo en este escenario es únicamente conseguir el contacto del tomador de decisiones.
-- Escenario B (Contacto Directo con el Tomador de Decisiones): Si ya se tiene el contacto directo con el dueño o gerente (o el operador seleccionó contacto directo): presenta la propuesta de valor de la campaña seleccionada, resalta los beneficios de unirse al directorio, justifica por qué su categoría suma valor al portal (incluso si es del comodín, adáptalo para ver cómo se beneficia el viajero de su servicio) e incluye la llamada a la acción (CTA) junto con el enlace de la landing page respectiva para el cierre.
+Instrucciones Operativas según el Canal de Captación:
+- Canal Digital: Si el canal de captación es online (redes, WhatsApp, web), genera respuestas persuasivas pidiendo el contacto del tomador de decisiones (si es Escenario A) o enviando las landings de las campañas (si es Escenario B).
+- Canal Presencial / Expedición: Si el lead proviene de una visita de campo/expedición realizada en persona por nuestro equipo directivo, el guion o nota debe apelar a dicha validación en persona, el reconocimiento de la excelente infraestructura del hotel constatada durante la expedición, y la invitación directa y exclusiva a formar parte del directorio de prestigio.
+
+Estructura del Embudo y Estados del Lead (Pipeline Híbrido):
+- Nuevo Lead / Ingresado por IA (Meta)
+- Contactado Digital (Primer mensaje online enviado)
+- En Conversación / Negociación Online
+- Pendiente de Visita en Expedición (Para inspección física en terreno)
+- Visita Realizada / Evaluado en Campo
+- Propuesta / Membresía Enviada
+- Cierre Exitoso / Afiliado
+- No interesado / Pausado
+Ten en cuenta el estado actual del Lead en el Pipeline Híbrido: "${estado_lead || 'Nuevo Lead'}" para que el guion sea coherente con la fase de la negociación comercial.
 
 Tono: Adapta la redacción estrictamente al tono seleccionado por el operador: "${tono || 'persuasivo'}". Utiliza un formato limpio y optimizado para WhatsApp o correo electrónico (con negritas estratégicas).
 
@@ -208,6 +222,8 @@ Debes responder ÚNICAMENTE con un objeto JSON válido con la siguiente estructu
             const userPrompt = `Campaña seleccionada: ${campana}
 Nombre del negocio prospecto: ${nombre_negocio}
 Categoría del negocio: ${categoria}
+Canal de captación: ${canal === "presencial" ? "Canal Presencial / Expedición de Campo" : "Canal Digital (Redes/WhatsApp/Web)"}
+Estado actual del Lead: ${estado_lead || "Nuevo Lead"}
 Escenario de contacto: ${escenario === "reservas" ? "Escenario A (Canal de Reservas / Atención al Cliente)" : "Escenario B (Contacto Directo con el Tomador de Decisiones)"}
 Estado de la conversación / Mensaje o objeción: ${mensaje_o_necesidad || "Contacto inicial"}
 Tono requerido: ${tono}`;
@@ -524,49 +540,80 @@ function generateFallbackScriptB2B(body: any) {
     categoria = "Hoteles",
     mensaje_o_necesidad = "",
     tono = "persuasivo",
-    escenario = "reservas"
+    escenario = "reservas",
+    canal = "digital",
+    estado_lead = "nuevo"
   } = body;
 
   let script = "";
   let follow_up = "";
   let sales_note = "";
 
-  if (escenario === "reservas") {
-    // Escenario A: Canal de Reservas / Atención al Cliente
-    if (tono === "elegante") {
-      script = `Estimado equipo de *${nombre_negocio}*,\n\nReciban un saludo de la más alta distinción de parte de la dirección de *Hoteles de Venezuela*.\n\nHemos estado evaluando su trayectoria y destacada presencia en el sector de *${categoria}*. Por este motivo, su establecimiento ha sido preseleccionado para incorporarse a nuestras exclusivas iniciativas de posicionamiento y captación digital.\n\nCon el fin de hacerles llegar la invitación y propuesta comercial correspondiente, ¿serían tan amables de facilitarnos el contacto directo (teléfono o correo electrónico) del propietario, director general o encargado del área comercial?\n\nAgradecemos de antemano su gentil atención y colaboración.\n\nAtentamente,\n*Director Comercial B2B*\nHoteles de Venezuela`;
-    } else if (tono === "corporativo" || tono === "sobrio") {
-      script = `Estimado equipo de *${nombre_negocio}*,\n\nDe parte de la dirección de *Hoteles de Venezuela LLC*, les extendemos un saludo institucional.\n\nSu negocio ha sido seleccionado para participar en el programa de visibilidad digital y reservas directas en la categoría de *${categoria}*, debido a sus altos estándares de calidad.\n\nPara canalizar esta información con la persona adecuada, solicitamos formalmente el contacto directo (teléfono o correo electrónico) del propietario, gerente general o encargado comercial de la empresa.\n\nQuedamos atentos a su respuesta para formalizar el envío de la propuesta.\n\nSaludos cordiales,\n*Dirección Comercial B2B*\nHoteles de Venezuela`;
-    } else { // persuasivo / por defecto
-      script = `¡Hola! Un saludo de parte del equipo de *Hoteles de Venezuela*.\n\nHemos estado siguiendo de cerca el excelente trabajo de *${nombre_negocio}* en el sector de *${categoria}*. Su perfil califica perfectamente para los beneficios de nuestra plataforma nacional de promoción turística.\n\nPara enviarles la invitación formal con los detalles de visibilidad y captación sin comisiones, ¿con quién del equipo directivo o del área comercial podríamos comunicarnos directamente? Si nos facilitan su número de teléfono o correo, nos pondremos en contacto a la brevedad.\n\n¡Muchas gracias y feliz día!\n*Equipo Comercial*\nHoteles de Venezuela`;
-    }
-    follow_up = "Día 1: Enviar un recordatorio por WhatsApp consultando si pudieron leer el mensaje previo o si prefieren que contactemos por correo electrónico.";
-    sales_note = "El objetivo exclusivo es conseguir el contacto directo (teléfono/email) del tomador de decisiones del establecimiento.";
-  } else {
-    // Escenario B: Contacto Directo con el Tomador de Decisiones
-    let propuestaValores = "";
-    let linkLanding = "";
+  const cleanCategory = categoria || "establecimiento";
+  const linkLanding = campana === "prestigio_2026" 
+    ? "https://hotelesdevenezuela.com/prestigio-2026"
+    : campana === "50_fundadores"
+    ? "https://hotelesdevenezuela.com/50-fundadores"
+    : "https://hotelesdevenezuela.com/alianzas-para-agencias";
 
+  if (canal === "presencial") {
+    // Prospección presencial de campo / Expedición
     if (campana === "prestigio_2026") {
-      propuestaValores = "nuestro exclusivo *Índice de Prestigio y Distinción 2026*. Esta iniciativa busca reconocer a los establecimientos de alta gama del país, potenciando su posicionamiento de marca de alto nivel y el efecto tractor para atraer viajeros selectos.";
-      linkLanding = "https://hotelesdevenezuela.com/prestigio-2026";
+      if (tono === "elegante") {
+        script = `Estimado(a) director(a) de *${nombre_negocio}*,\n\nEs un verdadero honor saludarle de parte de *Hoteles de Venezuela*.\n\nLe escribimos tras nuestra grata visita presencial a su establecimiento en la reciente expedición de validación de campo de nuestro equipo directivo. Haber constatado de primera mano la majestuosidad de su infraestructura y el impecable nivel de hospitalidad nos confirma que su marca es un pilar fundamental de la alta gama nacional.\n\nPor ello, le extendemos la postulación formal y directa para incorporarse al *Índice de Prestigio y Distinción 2026*, nuestro selecto directorio de establecimientos verificados.\n\nPuede consultar los detalles y beneficios de la campaña en:\n👉 ${linkLanding}\n\n¿Dispondría de 5 minutos hoy o mañana para una breve llamada y definir los detalles de su insignia digital de prestigio?\n\nAtentamente,\n*Director Comercial B2B*\nHoteles de Venezuela`;
+      } else {
+        script = `¡Hola! Qué gusto saludarte luego de nuestra visita en persona a las instalaciones de *${nombre_negocio}* durante la reciente expedición de campo de *Hoteles de Venezuela*.\n\nNos encantó conocer su excelente infraestructura. Es por esto que los hemos seleccionado directamente para formar parte del *Índice de Prestigio y Distinción 2026* sin pasar por filtros previos.\n\nPuedes revisar todos los detalles de la membresía en nuestra web oficial:\n👉 ${linkLanding}\n\n¿Cuándo te vendría bien que hablemos 5 minutos por teléfono para activar tu perfil en el directorio?\n\n¡Un saludo!\n*Equipo de Expediciones B2B*\nHoteles de Venezuela`;
+      }
+      follow_up = "Día 1: Enviar mensaje de WhatsApp de seguimiento consultando si pudieron ver la invitación exclusiva del Índice de Prestigio.";
+      sales_note = "Aprovechar la validación en persona durante la expedición para acelerar la confianza en el cierre.";
     } else if (campana === "50_fundadores") {
-      propuestaValores = "nuestra *Campaña de los 50 Hoteles Fundadores*. Es un programa premium de cupo limitado que otorga a los miembros fundadores una posición VIP destacada de por vida, visibilidad prioritaria y herramientas de automatización exclusivas.";
-      linkLanding = "https://hotelesdevenezuela.com/50-fundadores";
-    } else { // alianzas_comerciales / prestadores
-      propuestaValores = "nuestro programa de *Alianzas Comerciales para Prestadores de Servicios*. Esta iniciativa busca integrar a los mejores actores del sector de *${categoria}* para complementar el ecosistema turístico, permitiéndoles recibir contactos directos y reservas de viajeros 100% libres de comisiones.";
-      linkLanding = "https://hotelesdevenezuela.com/alianzas-para-agencias";
+      if (tono === "elegante") {
+        script = `Estimado(a) director(a) de *${nombre_negocio}*,\n\nReciba un atento saludo de parte del equipo comercial de *Hoteles de Venezuela*.\n\nHabiendo apreciado personalmente la excelente calidad de sus servicios en la reciente expedición, es un honor extenderle la invitación para unirse a la selecta *Campaña de los 50 Hoteles Fundadores*.\n\nEste programa preferencial de lanzamiento le asegurará posicionamiento VIP destacado de por vida en nuestro portal nacional.\n\nToda la información está disponible en:\n👉 ${linkLanding}\n\nQuedamos atentos para coordinar una llamada corta de 5 minutos esta semana.\n\nAtentamente,\n*Director Comercial B2B*\nHoteles de Venezuela`;
+      } else {
+        script = `¡Hola! Qué gusto saludarte luego de visitarlos en la expedición presencial de *Hoteles de Venezuela*.\n\nTras ver de primera mano el potencial de *${nombre_negocio}*, queremos invitarles a formar parte de los *50 Hoteles Fundadores*, una oportunidad exclusiva con tarifas de lanzamiento y posicionamiento VIP de por vida.\n\nPuedes leer la propuesta en el siguiente enlace:\n👉 ${linkLanding}\n\n¿Te parece si hacemos una llamada rápida de 5 minutos hoy para activar tu registro comercial?\n\n¡Saludos!\n*Equipo Comercial B2B*\nHoteles de Venezuela`;
+      }
+      follow_up = "Día 3: Realizar seguimiento para ver si leyeron el enlace y explicarles la consola administrativa Andromeda.";
+      sales_note = "Enfocarse en cerrar el cupo limitado de fundador apelando a la escasez.";
+    } else {
+      // alianzas
+      script = `¡Hola! Un saludo de parte de *Hoteles de Venezuela*.\n\nUn placer saludarte luego de nuestra grata visita a sus instalaciones en la expedición de campo. Constatamos de primera mano la calidad de sus servicios en la categoría de *${cleanCategory}* y consideramos que es el aliado estratégico ideal para integrar a nuestra plataforma.\n\nFormar parte de nuestro ecosistema B2B como aliado les permitirá recibir contactos y reservas de viajeros 100% libres de comisiones.\n\nPuedes ver las condiciones en:\n👉 ${linkLanding}\n\n¿Cuándo podríamos hablar 5 minutos esta semana?\n\n¡Un saludo!\n*Alianzas Comerciales B2B*\nHoteles de Venezuela`;
+      follow_up = "Día 3: Enviar mensaje consultando si tienen dudas con el proceso de integración.";
+      sales_note = "El objetivo es la integración como prestador de servicios complementario.";
     }
+  } else {
+    // Canal Digital
+    if (escenario === "reservas") {
+      // Escenario A: Canal de Reservas / Atención al Cliente
+      if (tono === "elegante") {
+        script = `Estimado equipo de *${nombre_negocio}*,\n\nReciban un saludo de la más alta distinción de parte de la dirección de *Hoteles de Venezuela*.\n\nHemos estado evaluando su trayectoria y destacada presencia en el sector de *${categoria}*. Por este motivo, su establecimiento ha sido preseleccionado para incorporarse a nuestras exclusivas iniciativas de posicionamiento y captación digital.\n\nCon el fin de hacerles llegar la invitación y propuesta comercial correspondiente, ¿serían tan amables de facilitarnos el contacto directo (teléfono o correo electrónico) del propietario, director general o encargado del área comercial?\n\nAgradecemos de antemano su gentil atención y colaboración.\n\nAtentamente,\n*Director Comercial B2B*\nHoteles de Venezuela`;
+      } else if (tono === "corporativo" || tono === "sobrio") {
+        script = `Estimado equipo de *${nombre_negocio}*,\n\nDe parte de la dirección de *Hoteles de Venezuela LLC*, les extendemos un saludo institucional.\n\nSu negocio ha sido seleccionado para participar en el programa de visibilidad digital y reservas directas en la categoría de *${categoria}*, debido a sus altos estándares de calidad.\n\nPara canalizar esta información con la persona adecuada, solicitamos formalmente el contacto directo (teléfono o correo electrónico) del propietario, gerente general o encargado comercial de la empresa.\n\nQuedamos atentos a su respuesta para formalizar el envío de la propuesta.\n\nSaludos cordiales,\n*Dirección Comercial B2B*\nHoteles de Venezuela`;
+      } else { // persuasivo / por defecto
+        script = `¡Hola! Un saludo de parte del equipo de *Hoteles de Venezuela*.\n\nHemos estado siguiendo de cerca el excelente trabajo de *${nombre_negocio}* en el sector de *${categoria}*. Su perfil califica perfectamente para los beneficios de nuestra plataforma nacional de promoción turística.\n\nPara enviarles la invitación formal con los detalles de visibilidad y captación sin comisiones, ¿con quién del equipo directivo o del área comercial podríamos comunicarnos directamente? Si nos facilitan su número de teléfono o correo, nos pondremos en contacto a la brevedad.\n\n¡Muchas gracias y feliz día!\n*Equipo Comercial B2B*\nHoteles de Venezuela`;
+      }
+      follow_up = "Día 1: Enviar un recordatorio por WhatsApp consultando si pudieron leer el mensaje previo o si prefieren que contactemos por correo electrónico.";
+      sales_note = "El objetivo exclusivo es conseguir el contacto directo (teléfono/email) del tomador de decisiones del establecimiento.";
+    } else {
+      // Escenario B: Contacto Directo con el Tomador de Decisiones
+      let propuestaValores = "";
+      if (campana === "prestigio_2026") {
+        propuestaValores = "nuestro exclusivo *Índice de Prestigio y Distinción 2026*. Esta iniciativa busca reconocer a los establecimientos de alta gama del país, potenciando su posicionamiento de marca de alto nivel y el efecto tractor para atraer viajeros selectos.";
+      } else if (campana === "50_fundadores") {
+        propuestaValores = "nuestra *Campaña de los 50 Hoteles Fundadores*. Es un programa premium de cupo limitado que otorga a los miembros fundadores una posición VIP destacada de por vida, visibilidad prioritaria y herramientas de automatización exclusivas.";
+      } else { // alianzas_comerciales / prestadores
+        propuestaValores = "nuestro programa de *Alianzas Comerciales para Prestadores de Servicios*. Esta iniciativa busca integrar a los mejores actores del sector de *${categoria}* para complementar el ecosistema turístico, permitiéndoles recibir contactos directos y reservas de viajeros 100% libres de comisiones.";
+      }
 
-    if (tono === "elegante") {
-      script = `Estimado(a) director(a) de *${nombre_negocio}*,\n\nEs un honor saludarle de parte de *Hoteles de Venezuela*.\n\nLe contactamos para presentarle formalmente la propuesta de valor de ${propuestaValores}\n\nEstamos convencidos de que la excelencia de sus servicios en la categoría de *${categoria}* añade un valor extraordinario a nuestra guía oficial. Formar parte de esta alianza le permitirá conectar directamente con nuestra audiencia de viajeros, impulsando su canal de reservas directas sin costos de intermediación.\n\nPuede conocer todos los beneficios detallados y formalizar su membresía en el siguiente enlace:\n👉 ${linkLanding}\n\n¿Cuándo dispondría de 5 minutos para una breve conversación sobre los detalles de esta postulación?\n\nAtentamente,\n*Director Comercial B2B*\nHoteles de Venezuela`;
-    } else if (tono === "corporativo" || tono === "sobrio") {
-      script = `Estimado(a) gerente de *${nombre_negocio}*,\n\nDe parte de *Hoteles de Venezuela LLC*, nos comunicamos para presentarle la propuesta comercial de ${propuestaValores}\n\nLa integración de su empresa dentro del sector de *${categoria}* es un paso estratégico para nuestro directorio. Al unirse, accederá a un perfil corporativo verificado, integración con nuestro WhatsApp CRM y captación de clientes de forma directa y sin comisiones.\n\nPuede ver la propuesta técnica y costos en nuestra landing page oficial:\n👉 ${linkLanding}\n\nQuedamos a su disposición para coordinar una llamada de presentación técnica de 5 minutos esta semana.\n\nAtentamente,\n*Dirección Comercial B2B*\nHoteles de Venezuela`;
-    } else { // persuasivo / por defecto
-      script = `¡Hola! Qué gusto saludarte de parte de *Hoteles de Venezuela*.\n\nTe escribo para presentarle una gran oportunidad para *${nombre_negocio}* a través de ${propuestaValores}\n\nAl unirte a nuestra red de prestadores en la categoría de *${categoria}*, tendrás una ficha comercial con prioridad de búsqueda, acceso a leads reales y la posibilidad de potenciar tus ventas sin pagar comisiones por reserva.\n\nPuedes revisar todos los detalles y testimonios de otros aliados en nuestra web oficial:\n👉 ${linkLanding}\n\n¿Te parece si agendamos una llamada de 5 minutos hoy o mañana para explicarte el funcionamiento y activar tu perfil?\n\n¡Un saludo!\n*Equipo Comercial B2B*\nHoteles de Venezuela`;
+      if (tono === "elegante") {
+        script = `Estimado(a) director(a) de *${nombre_negocio}*,\n\nEs un honor saludarle de parte de *Hoteles de Venezuela*.\n\nLe contactamos para presentarle formalmente la propuesta de valor de ${propuestaValores}\n\nEstamos convencidos de que la excelencia de sus servicios en la categoría de *${categoria}* añade un valor extraordinario a nuestra guía oficial. Formar parte de esta alianza le permitirá conectar directamente con nuestra audiencia de viajeros, impulsando su canal de reservas directas sin costos de intermediación.\n\nPuede conocer todos los beneficios detallados y formalizar su membresía en el siguiente enlace:\n👉 ${linkLanding}\n\n¿Cuándo dispondría de 5 minutos para una breve conversación sobre los detalles de esta postulación?\n\nAtentamente,\n*Director Comercial B2B*\nHoteles de Venezuela`;
+      } else if (tono === "corporativo" || tono === "sobrio") {
+        script = `Estimado(a) gerente de *${nombre_negocio}*,\n\nDe parte de *Hoteles de Venezuela LLC*, nos comunicamos para presentarle la propuesta comercial de ${propuestaValores}\n\nLa integración de su empresa dentro del sector de *${categoria}* es un paso estratégico para nuestro directorio. Al unirse, accederá a un perfil corporativo verificado, integración con nuestro WhatsApp CRM y captación de clientes de forma directa y sin comisiones.\n\nPuede ver la propuesta técnica y costos en nuestra landing page oficial:\n👉 ${linkLanding}\n\nQuedamos a su disposición para coordinar una llamada de presentación técnica de 5 minutos esta semana.\n\nAtentamente,\n*Dirección Comercial B2B*\nHoteles de Venezuela`;
+      } else { // persuasivo / por defecto
+        script = `¡Hola! Qué gusto saludarte de parte de *Hoteles de Venezuela*.\n\nTe escribo para presentarle una gran oportunidad para *${nombre_negocio}* a través de ${propuestaValores}\n\nAl unirte a nuestra red de prestadores en la categoría de *${categoria}*, tendrás una ficha comercial con prioridad de búsqueda, acceso a leads reales y la posibilidad de potenciar tus ventas sin pagar comisiones por reserva.\n\nPuedes revisar todos los detalles y testimonios de otros aliados en nuestra web oficial:\n👉 ${linkLanding}\n\n¿Te parece si agendamos una llamada de 5 minutos hoy o mañana para explicarte el funcionamiento y activar tu perfil?\n\n¡Un saludo!\n*Equipo Comercial B2B*\nHoteles de Venezuela`;
+      }
+      follow_up = "Día 3: Realizar una llamada o enviar un mensaje consultando si tuvo oportunidad de revisar el enlace de la propuesta y si prefiere coordinar una demo.";
+      sales_note = `Enfocarse en cerrar la llamada o videollamada. Estado del lead actual: ${estado_lead}.`;
     }
-    follow_up = "Día 3: Realizar una llamada o enviar un mensaje consultando si tuvo oportunidad de revisar el enlace de la propuesta y si prefiere coordinar una demo.";
-    sales_note = "Enfocarse en cerrar la llamada o videollamada para demostrar la plataforma y concretar la afiliación.";
   }
 
   return {
