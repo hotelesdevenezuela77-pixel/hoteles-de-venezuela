@@ -933,9 +933,6 @@ export function Home() {
         </div>
       </section>
 
-      {/* 7. NUEVA SECCIÓN DE RESEÑAS ANIMADAS (3 FILAS MARQUEE INFINITO) */}
-      <AnimatedReviewsSection />
-
       {/* 8. NUESTRO VIDEO */}
       {videoSection.isActive && (
         <section 
