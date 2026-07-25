@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { MapPin, Star, Wifi, Car, Waves, Utensils, TreePine, Dumbbell, Sparkles, Phone, BarChart3, Award, Calendar, Megaphone } from "lucide-react";
 import { TrackedWhatsAppButton } from "./TrackedWhatsAppButton";
 import { parseServicesList, getAmenityLabel } from "@/lib/amenitiesList";
+import { optimizeImageUrl } from "@/lib/utils";
 
 export interface Establishment {
   id: number;
@@ -77,9 +78,12 @@ export function EstablishmentCard({
           {/* Image Section */}
           <div className="relative h-52 overflow-hidden bg-gray-100">
             <img
-              src={establishment.primary_image || placeholderImage}
+              src={optimizeImageUrl(establishment.primary_image || placeholderImage, 600)}
               alt={establishment.name}
               className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
+              loading="lazy"
+              width="600"
+              height="208"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = placeholderImage;
               }}
@@ -109,6 +113,9 @@ export function EstablishmentCard({
                 src="/images/sello-hdv.png" 
                 alt="Sello de Calidad Hoteles de Venezuela" 
                 className="absolute bottom-2.5 right-2.5 w-14 h-14 object-contain z-10 drop-shadow-md hover:scale-110 transition-transform duration-300 pointer-events-none" 
+                loading="lazy"
+                width="56"
+                height="56"
               />
             )}
 
@@ -272,9 +279,12 @@ export function EstablishmentListItem({
         {/* Image Section */}
         <div className="relative w-full md:w-64 h-48 md:h-auto shrink-0 rounded-2xl overflow-hidden bg-gray-100">
           <img
-            src={establishment.primary_image || placeholderImage}
+            src={optimizeImageUrl(establishment.primary_image || placeholderImage, 600)}
             alt={establishment.name}
             className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
+            loading="lazy"
+            width="600"
+            height="192"
             onError={(e) => {
               (e.target as HTMLImageElement).src = placeholderImage;
             }}
@@ -299,6 +309,9 @@ export function EstablishmentListItem({
               src="/images/sello-hdv.png" 
               alt="Sello de Calidad Hoteles de Venezuela" 
               className="absolute bottom-2 right-2 w-12 h-12 object-contain z-10 drop-shadow-md hover:scale-110 transition-transform duration-300 pointer-events-none" 
+              loading="lazy"
+              width="48"
+              height="48"
             />
           )}
 

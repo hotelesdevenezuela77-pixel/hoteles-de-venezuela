@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "./lib/auth";
@@ -6,76 +6,86 @@ import { supabase } from "./lib/supabase";
 import { Mantenimiento } from "./pages/Mantenimiento";
 import { MainLayout } from "./components/layout/MainLayout";
 import { Home } from "./pages/Home";
-import { NotFound } from "./pages/NotFound";
-import { Login } from "./pages/Login";
-import { Registro } from "./pages/Registro";
-import { Perfil } from "./pages/Perfil";
-import { AdminLogin } from "./pages/AdminLogin";
-import { Destinos } from "./pages/Destinos";
-import { DestinoDetalle } from "./pages/DestinoDetalle";
-import { Establecimientos } from "./pages/Establecimientos";
-import { EstablecimientoDetalle } from "./pages/EstablecimientoDetalle";
-import { OwnerDashboard } from "./pages/OwnerDashboard";
-import { AndromedaPanel } from "./pages/AndromedaPanel";
-import { InteractiveMap } from "./pages/InteractiveMap";
-import { NationalParks } from "./pages/NationalParks";
-import { NationalParkDetail } from "./pages/NationalParkDetail";
-import { B2BMarketplace } from "./pages/B2BMarketplace";
-import { Comparar } from "./pages/Comparar";
-import { Membresias } from "./pages/Membresias";
-import { ReportarPago } from "./pages/ReportarPago";
-import { Privacidad } from "./pages/Privacidad";
-import { AdminPagos } from "./pages/admin/AdminPagos";
+import { TENANTS_REGISTRY } from "./tenants/tenantContext";
+
+// Helper para importaciones dinámicas de exportaciones nombradas (named exports)
+function lazyNamed<T extends Record<string, any>>(
+  importFn: () => Promise<T>,
+  exportName: keyof T
+) {
+  return lazy(() => importFn().then((module) => ({ default: module[exportName] })));
+}
+
+// Importaciones dinámicas (React.lazy) para optimización masiva de rendimiento
+const NotFound = lazyNamed(() => import("./pages/NotFound"), "NotFound");
+const Login = lazyNamed(() => import("./pages/Login"), "Login");
+const Registro = lazyNamed(() => import("./pages/Registro"), "Registro");
+const Perfil = lazyNamed(() => import("./pages/Perfil"), "Perfil");
+const AdminLogin = lazyNamed(() => import("./pages/AdminLogin"), "AdminLogin");
+const Destinos = lazyNamed(() => import("./pages/Destinos"), "Destinos");
+const DestinoDetalle = lazyNamed(() => import("./pages/DestinoDetalle"), "DestinoDetalle");
+const Establecimientos = lazyNamed(() => import("./pages/Establecimientos"), "Establecimientos");
+const EstablecimientoDetalle = lazyNamed(() => import("./pages/EstablecimientoDetalle"), "EstablecimientoDetalle");
+const OwnerDashboard = lazyNamed(() => import("./pages/OwnerDashboard"), "OwnerDashboard");
+const AndromedaPanel = lazyNamed(() => import("./pages/AndromedaPanel"), "AndromedaPanel");
+const InteractiveMap = lazyNamed(() => import("./pages/InteractiveMap"), "InteractiveMap");
+const NationalParks = lazyNamed(() => import("./pages/NationalParks"), "NationalParks");
+const NationalParkDetail = lazyNamed(() => import("./pages/NationalParkDetail"), "NationalParkDetail");
+const B2BMarketplace = lazyNamed(() => import("./pages/B2BMarketplace"), "B2BMarketplace");
+const Comparar = lazyNamed(() => import("./pages/Comparar"), "Comparar");
+const Membresias = lazyNamed(() => import("./pages/Membresias"), "Membresias");
+const ReportarPago = lazyNamed(() => import("./pages/ReportarPago"), "ReportarPago");
+const Privacidad = lazyNamed(() => import("./pages/Privacidad"), "Privacidad");
+const AdminPagos = lazyNamed(() => import("./pages/admin/AdminPagos"), "AdminPagos");
 
 // Admin Sub-routed Panels
-import { AdminDashboard } from "./pages/admin/AdminDashboard";
-import { AdminAprobaciones } from "./pages/admin/AdminAprobaciones";
-import { AdminEstablecimientos } from "./pages/admin/AdminEstablecimientos";
-import { AdminEstablecimientoNuevo } from "./pages/admin/AdminEstablecimientoNuevo";
-import { AdminPrioridades } from "./pages/admin/AdminPrioridades";
-import { AdminUsuarios } from "./pages/admin/AdminUsuarios";
-import { AdminCategorias } from "./pages/admin/AdminCategorias";
-import { AdminDestinos } from "./pages/admin/AdminDestinos";
-import { AdminReservas } from "./pages/admin/AdminReservas";
-import { AdminBlog } from "./pages/admin/AdminBlog";
-import { AdminPaquetes } from "./pages/admin/AdminPaquetes";
-import { AdminParques } from "./pages/admin/AdminParques";
-import { AdminSitios } from "./pages/admin/AdminSitios";
-import { AdminTips } from "./pages/admin/AdminTips";
-import { AdminCotizaciones } from "./pages/admin/AdminCotizaciones";
-import { AdminTasas } from "./pages/admin/AdminTasas";
-import { AdminContenido } from "./pages/admin/AdminContenido";
-import { AdminSeoHome } from "./pages/admin/AdminSeoHome";
-import { AdminB2B } from "./pages/admin/AdminB2B";
-import { AdminComercial } from "./pages/admin/AdminComercial";
-import { AdminAnaliticas } from "./pages/admin/AdminAnaliticas";
-import { AdminLinkHub } from "./pages/admin/AdminLinkHub";
-import { AdminConfig } from "./pages/admin/AdminConfig";
-import { AdminCorreos } from "./pages/admin/AdminCorreos";
-import { AdminFinanzas } from "./pages/admin/AdminFinanzas";
-import { AdminSolicitudes } from "./pages/admin/AdminSolicitudes";
-import { AdminReservasPaquetes } from "./pages/admin/AdminReservasPaquetes";
-import { AdminReseñas } from "./pages/admin/AdminReseñas";
-import { AdminClientes } from "./pages/admin/AdminClientes";
-import { AdminSaaS } from "./pages/admin/AdminSaaS";
-import { AdminLogs } from "./pages/admin/AdminLogs";
-import { AdminGuiones } from "./pages/admin/AdminGuiones";
-import { Centauros } from "./pages/Centauros";
-import { CustomPageViewer } from "./pages/CustomPageViewer";
-import { Paquetes } from "./pages/Paquetes";
-import { LinkHub } from "./pages/LinkHub";
-import { BlogDetalle } from "./pages/BlogDetalle";
-import { SitioDetalle } from "./pages/SitioDetalle";
-import { ExcelenciaLanding } from "./pages/ExcelenciaLanding";
-import { Blog } from "./pages/Blog";
-import { SitiosTuristicos } from "./pages/SitiosTuristicos";
+const AdminDashboard = lazyNamed(() => import("./pages/admin/AdminDashboard"), "AdminDashboard");
+const AdminAprobaciones = lazyNamed(() => import("./pages/admin/AdminAprobaciones"), "AdminAprobaciones");
+const AdminEstablecimientos = lazyNamed(() => import("./pages/admin/AdminEstablecimientos"), "AdminEstablecimientos");
+const AdminEstablecimientoNuevo = lazyNamed(() => import("./pages/admin/AdminEstablecimientoNuevo"), "AdminEstablecimientoNuevo");
+const AdminPrioridades = lazyNamed(() => import("./pages/admin/AdminPrioridades"), "AdminPrioridades");
+const AdminUsuarios = lazyNamed(() => import("./pages/admin/AdminUsuarios"), "AdminUsuarios");
+const AdminCategorias = lazyNamed(() => import("./pages/admin/AdminCategorias"), "AdminCategorias");
+const AdminDestinos = lazyNamed(() => import("./pages/admin/AdminDestinos"), "AdminDestinos");
+const AdminReservas = lazyNamed(() => import("./pages/admin/AdminReservas"), "AdminReservas");
+const AdminBlog = lazyNamed(() => import("./pages/admin/AdminBlog"), "AdminBlog");
+const AdminPaquetes = lazyNamed(() => import("./pages/admin/AdminPaquetes"), "AdminPaquetes");
+const AdminParques = lazyNamed(() => import("./pages/admin/AdminParques"), "AdminParques");
+const AdminSitios = lazyNamed(() => import("./pages/admin/AdminSitios"), "AdminSitios");
+const AdminTips = lazyNamed(() => import("./pages/admin/AdminTips"), "AdminTips");
+const AdminCotizaciones = lazyNamed(() => import("./pages/admin/AdminCotizaciones"), "AdminCotizaciones");
+const AdminTasas = lazyNamed(() => import("./pages/admin/AdminTasas"), "AdminTasas");
+const AdminContenido = lazyNamed(() => import("./pages/admin/AdminContenido"), "AdminContenido");
+const AdminSeoHome = lazyNamed(() => import("./pages/admin/AdminSeoHome"), "AdminSeoHome");
+const AdminB2B = lazyNamed(() => import("./pages/admin/AdminB2B"), "AdminB2B");
+const AdminComercial = lazyNamed(() => import("./pages/admin/AdminComercial"), "AdminComercial");
+const AdminAnaliticas = lazyNamed(() => import("./pages/admin/AdminAnaliticas"), "AdminAnaliticas");
+const AdminLinkHub = lazyNamed(() => import("./pages/admin/AdminLinkHub"), "AdminLinkHub");
+const AdminConfig = lazyNamed(() => import("./pages/admin/AdminConfig"), "AdminConfig");
+const AdminCorreos = lazyNamed(() => import("./pages/admin/AdminCorreos"), "AdminCorreos");
+const AdminFinanzas = lazyNamed(() => import("./pages/admin/AdminFinanzas"), "AdminFinanzas");
+const AdminSolicitudes = lazyNamed(() => import("./pages/admin/AdminSolicitudes"), "AdminSolicitudes");
+const AdminReservasPaquetes = lazyNamed(() => import("./pages/admin/AdminReservasPaquetes"), "AdminReservasPaquetes");
+const AdminReseñas = lazyNamed(() => import("./pages/admin/AdminReseñas"), "AdminReseñas");
+const AdminClientes = lazyNamed(() => import("./pages/admin/AdminClientes"), "AdminClientes");
+const AdminSaaS = lazyNamed(() => import("./pages/admin/AdminSaaS"), "AdminSaaS");
+const AdminLogs = lazyNamed(() => import("./pages/admin/AdminLogs"), "AdminLogs");
+const AdminGuiones = lazyNamed(() => import("./pages/admin/AdminGuiones"), "AdminGuiones");
+const Centauros = lazyNamed(() => import("./pages/Centauros"), "Centauros");
+const CustomPageViewer = lazyNamed(() => import("./pages/CustomPageViewer"), "CustomPageViewer");
+const Paquetes = lazyNamed(() => import("./pages/Paquetes"), "Paquetes");
+const LinkHub = lazyNamed(() => import("./pages/LinkHub"), "LinkHub");
+const BlogDetalle = lazyNamed(() => import("./pages/BlogDetalle"), "BlogDetalle");
+const SitioDetalle = lazyNamed(() => import("./pages/SitioDetalle"), "SitioDetalle");
+const ExcelenciaLanding = lazyNamed(() => import("./pages/ExcelenciaLanding"), "ExcelenciaLanding");
+const Blog = lazyNamed(() => import("./pages/Blog"), "Blog");
+const SitiosTuristicos = lazyNamed(() => import("./pages/SitiosTuristicos"), "SitiosTuristicos");
 
 // Importación del Agente IA sin llaves apuntando a la carpeta admin
-import AdminConversacionalIA from "./pages/admin/AdminConversacionalIA";
+const AdminConversacionalIA = lazy(() => import("./pages/admin/AdminConversacionalIA"));
 
 // Importación de la arquitectura multi-tenant de los Nodos Cliente
-import TenantApp from "./tenants/TenantApp";
-import { TENANTS_REGISTRY } from "./tenants/tenantContext";
+const TenantApp = lazy(() => import("./tenants/TenantApp"));
 
 function App() {
   const [location] = useLocation();
@@ -139,82 +149,95 @@ function App() {
 
   return (
     <MainLayout>
-      <Switch>
-        {/* Rutas Públicas */}
-        <Route path="/" component={Home} />
-        <Route path="/login" component={Login} />
-        <Route path="/registro" component={Registro} />
-        <Route path="/perfil" component={Perfil} />
-        <Route path="/hdv-acceso-llc2027" component={AdminLogin} />
-        <Route path="/establecimientos" component={Establecimientos} />
-        <Route path="/establecimiento/:slug" component={EstablecimientoDetalle} />
-        <Route path="/destinos" component={Destinos} />
-        <Route path="/destinos/:slug" component={DestinoDetalle} />
-        <Route path="/mapa" component={InteractiveMap} />
-        <Route path="/parques" component={NationalParks} />
-        <Route path="/parque/:slug" component={NationalParkDetail} />
-        <Route path="/servicios-b2b" component={B2BMarketplace} />
-        <Route path="/comparar" component={Comparar} />
-        <Route path="/paquetes" component={Paquetes} />
-        <Route path="/links" component={LinkHub} />
-        <Route path="/blog" component={Blog} />
-        <Route path="/sitios-turisticos" component={SitiosTuristicos} />
+      <Suspense fallback={
+        <div className="min-h-[60vh] flex flex-col items-center justify-center bg-transparent">
+          {/* Subtle loading spinner using official colors */}
+          <div className="relative w-12 h-12">
+            <div className="absolute inset-0 rounded-full border-4 border-[#1a0533] opacity-30" />
+            <div className="absolute inset-0 rounded-full border-4 border-t-[#00C8D4] border-r-[#FF0096] animate-spin" />
+          </div>
+          <p className="text-[10px] uppercase font-black text-gray-400 tracking-[0.2em] mt-4 animate-pulse">
+            Cargando Experiencia...
+          </p>
+        </div>
+      }>
+        <Switch>
+          {/* Rutas Públicas */}
+          <Route path="/" component={Home} />
+          <Route path="/login" component={Login} />
+          <Route path="/registro" component={Registro} />
+          <Route path="/perfil" component={Perfil} />
+          <Route path="/hdv-acceso-llc2027" component={AdminLogin} />
+          <Route path="/establecimientos" component={Establecimientos} />
+          <Route path="/establecimiento/:slug" component={EstablecimientoDetalle} />
+          <Route path="/destinos" component={Destinos} />
+          <Route path="/destinos/:slug" component={DestinoDetalle} />
+          <Route path="/mapa" component={InteractiveMap} />
+          <Route path="/parques" component={NationalParks} />
+          <Route path="/parque/:slug" component={NationalParkDetail} />
+          <Route path="/servicios-b2b" component={B2BMarketplace} />
+          <Route path="/comparar" component={Comparar} />
+          <Route path="/paquetes" component={Paquetes} />
+          <Route path="/links" component={LinkHub} />
+          <Route path="/blog" component={Blog} />
+          <Route path="/sitios-turisticos" component={SitiosTuristicos} />
 
-        <Route path="/membresias" component={Membresias} />
-        <Route path="/reportar-pago" component={ReportarPago} />
-        <Route path="/privacidad" component={Privacidad} />
-        <Route path="/prestigio-2026" component={ExcelenciaLanding} />
+          <Route path="/membresias" component={Membresias} />
+          <Route path="/reportar-pago" component={ReportarPago} />
+          <Route path="/privacidad" component={Privacidad} />
+          <Route path="/prestigio-2026" component={ExcelenciaLanding} />
 
-        {/* Dashboards Propietarios */}
-        <Route path="/mis-negocios" component={OwnerDashboard} />
-        <Route path="/andromeda" component={AndromedaPanel} />
-        
-        {/* Rutas del Panel Administrativo */}
-        <Route path="/admin" component={AdminDashboard} />
-        <Route path="/admin/aprobaciones" component={AdminAprobaciones} />
-        <Route path="/admin/establecimientos" component={AdminEstablecimientos} />
-        <Route path="/admin/establecimientos/nuevo" component={AdminEstablecimientoNuevo} />
-        <Route path="/admin/establecimientos/:id/editar" component={AdminEstablecimientoNuevo} />
-        <Route path="/admin/prioridades" component={AdminPrioridades} />
-        <Route path="/admin/usuarios" component={AdminUsuarios} />
-        <Route path="/admin/categorias" component={AdminCategorias} />
-        <Route path="/admin/destinos" component={AdminDestinos} />
-        <Route path="/admin/reservas" component={AdminReservas} />
-        <Route path="/admin/blog" component={AdminBlog} />
-        <Route path="/admin/paquetes" component={AdminPaquetes} />
-        <Route path="/admin/parques" component={AdminParques} />
-        <Route path="/admin/sitios" component={AdminSitios} />
-        <Route path="/admin/tips" component={AdminTips} />
-        <Route path="/admin/cotizaciones" component={AdminCotizaciones} />
-        <Route path="/admin/tasas" component={AdminTasas} />
-        <Route path="/admin/contenido" component={AdminContenido} />
-        <Route path="/admin/seo" component={AdminSeoHome} />
-        <Route path="/admin/seo-home" component={AdminSeoHome} />
-        <Route path="/admin/b2b" component={AdminB2B} />
-        <Route path="/admin/comercial" component={AdminComercial} />
-        <Route path="/admin/analiticas" component={AdminAnaliticas} />
-        <Route path="/admin/linkhub" component={AdminLinkHub} />
-        <Route path="/admin/config" component={AdminConfig} />
-        <Route path="/admin/correos" component={AdminCorreos} />
-        <Route path="/admin/finanzas" component={AdminFinanzas} />
-        <Route path="/admin/pagos" component={AdminPagos} />
-        <Route path="/admin/solicitudes" component={AdminSolicitudes} />
-        <Route path="/admin/reservas-paquetes" component={AdminReservasPaquetes} />
-        <Route path="/admin/reseñas" component={AdminReseñas} />
-        <Route path="/admin/ia-conversacional" component={AdminConversacionalIA} />
-        <Route path="/admin/asistente-guiones" component={AdminGuiones} />
-        <Route path="/admin/clientes" component={AdminClientes} />
-        <Route path="/admin/saas" component={AdminSaaS} />
-        <Route path="/admin/logs" component={AdminLogs} />
+          {/* Dashboards Propietarios */}
+          <Route path="/mis-negocios" component={OwnerDashboard} />
+          <Route path="/andromeda" component={AndromedaPanel} />
+          
+          {/* Rutas del Panel Administrativo */}
+          <Route path="/admin" component={AdminDashboard} />
+          <Route path="/admin/aprobaciones" component={AdminAprobaciones} />
+          <Route path="/admin/establecimientos" component={AdminEstablecimientos} />
+          <Route path="/admin/establecimientos/nuevo" component={AdminEstablecimientoNuevo} />
+          <Route path="/admin/establecimientos/:id/editar" component={AdminEstablecimientoNuevo} />
+          <Route path="/admin/prioridades" component={AdminPrioridades} />
+          <Route path="/admin/usuarios" component={AdminUsuarios} />
+          <Route path="/admin/categorias" component={AdminCategorias} />
+          <Route path="/admin/destinos" component={AdminDestinos} />
+          <Route path="/admin/reservas" component={AdminReservas} />
+          <Route path="/admin/blog" component={AdminBlog} />
+          <Route path="/admin/paquetes" component={AdminPaquetes} />
+          <Route path="/admin/parques" component={AdminParques} />
+          <Route path="/admin/sitios" component={AdminSitios} />
+          <Route path="/admin/tips" component={AdminTips} />
+          <Route path="/admin/cotizaciones" component={AdminCotizaciones} />
+          <Route path="/admin/tasas" component={AdminTasas} />
+          <Route path="/admin/contenido" component={AdminContenido} />
+          <Route path="/admin/seo" component={AdminSeoHome} />
+          <Route path="/admin/seo-home" component={AdminSeoHome} />
+          <Route path="/admin/b2b" component={AdminB2B} />
+          <Route path="/admin/comercial" component={AdminComercial} />
+          <Route path="/admin/analiticas" component={AdminAnaliticas} />
+          <Route path="/admin/linkhub" component={AdminLinkHub} />
+          <Route path="/admin/config" component={AdminConfig} />
+          <Route path="/admin/correos" component={AdminCorreos} />
+          <Route path="/admin/finanzas" component={AdminFinanzas} />
+          <Route path="/admin/pagos" component={AdminPagos} />
+          <Route path="/admin/solicitudes" component={AdminSolicitudes} />
+          <Route path="/admin/reservas-paquetes" component={AdminReservasPaquetes} />
+          <Route path="/admin/reseñas" component={AdminReseñas} />
+          <Route path="/admin/ia-conversacional" component={AdminConversacionalIA} />
+          <Route path="/admin/asistente-guiones" component={AdminGuiones} />
+          <Route path="/admin/clientes" component={AdminClientes} />
+          <Route path="/admin/saas" component={AdminSaaS} />
+          <Route path="/admin/logs" component={AdminLogs} />
 
-        {/* Atajos y Catch-all */}
-        <Route path="/blog/:slug" component={BlogDetalle} />
-        <Route path="/sitio/:slug" component={SitioDetalle} />
-        <Route path="/crm" component={AdminComercial} />
-        <Route path="/centaurus" component={Centauros} />
-        <Route path="/:slug" component={CustomPageViewer} />
-        <Route component={NotFound} />
-      </Switch>
+          {/* Atajos y Catch-all */}
+          <Route path="/blog/:slug" component={BlogDetalle} />
+          <Route path="/sitio/:slug" component={SitioDetalle} />
+          <Route path="/crm" component={AdminComercial} />
+          <Route path="/centaurus" component={Centauros} />
+          <Route path="/:slug" component={CustomPageViewer} />
+          <Route component={NotFound} />
+        </Switch>
+      </Suspense>
     </MainLayout>
   );
 }

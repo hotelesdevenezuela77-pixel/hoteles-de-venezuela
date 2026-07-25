@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { supabase } from "../lib/supabase";
 import { ESTABLISHMENTS_MOCK } from "../lib/establishmentsMock";
+import { optimizeImageUrl } from "../lib/utils";
 import { DESTINOS_MOCK } from "../lib/destinosMock";
 import { EstablishmentCard } from "../components/layout/EstablishmentCard";
 import type { Establishment } from "../components/layout/EstablishmentCard";
@@ -540,19 +541,13 @@ export function Home() {
   };
 
   const heroStyle = (() => {
-    // Si hay una imagen landscape cargada de la base de datos (personalizada), la mostramos con el overlay oscuro
-    if (!loading && isValidLandscapeImage(heroSection.imageUrl)) {
+    // Si no hay imagen personalizada o está cargando, usamos el degradado morado por defecto
+    if (loading || !isValidLandscapeImage(heroSection.imageUrl)) {
       return {
-        backgroundImage: `${overlay}, url(${heroSection.imageUrl})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat"
+        background: "linear-gradient(135deg, #0e0120 0%, #1a0533 60%, #0d1a2e 100%)"
       };
     }
-    // Por defecto (cargando o si no hay imagen personalizada), usamos el degradado morado de membresías
-    return {
-      background: "linear-gradient(135deg, #0e0120 0%, #1a0533 60%, #0d1a2e 100%)"
-    };
+    return {};
   })();
 
   return (
@@ -563,12 +558,27 @@ export function Home() {
         className="relative pt-24 pb-28 md:pt-32 md:pb-36 px-4 hero-banner-bg flex flex-col items-center justify-center text-center overflow-hidden"
         style={heroStyle}
       >
-        {/* Bottom white fade overlay to blend with the white page background */}
-        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none z-10" />
+        {/* Render hero image using normal img tag if imageUrl is set */}
+        {!loading && isValidLandscapeImage(heroSection.imageUrl) && (
+          <img
+            src={optimizeImageUrl(heroSection.imageUrl, 1200)}
+            alt={heroSection.title}
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none scale-[1.08] z-0"
+            fetchPriority="high"
+            loading="eager"
+            width="1200"
+            height="600"
+          />
+        )}
+        
+        {/* Dark overlay for readability, only when image is present */}
+        {!loading && isValidLandscapeImage(heroSection.imageUrl) && (
+          <div className="absolute inset-0 bg-black/45 z-0" />
+        )}
 
         {/* Glow Spots (sólo visibles cuando se usa el degradado morado de fondo) */}
         {(!heroSection.imageUrl || loading) && (
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
             <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full blur-3xl opacity-25" style={{ background: "#FF0096" }} />
             <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-20" style={{ background: "#00C8D4" }} />
           </div>
@@ -934,9 +944,13 @@ export function Home() {
       {prestigioSection.isActive && (
         <section className="relative w-full h-[520px] flex items-center justify-center overflow-hidden">
           {/* Background Image scaling 1.08 to prevent black borders/letterbox */}
-          <div 
-            className="absolute inset-0 bg-cover bg-center scale-[1.08] transition-transform duration-[1500ms] hover:scale-110"
-            style={{ backgroundImage: `url('${prestigioSection.imageUrl || "https://images.unsplash.com/photo-1552083375-1447ce886485?w=1600"}')` }}
+          <img
+            src={optimizeImageUrl(prestigioSection.imageUrl || "https://images.unsplash.com/photo-1552083375-1447ce886485", 1200)}
+            alt={prestigioSection.title}
+            className="absolute inset-0 w-full h-full object-cover scale-[1.08] transition-transform duration-[1500ms] hover:scale-110 pointer-events-none z-0"
+            loading="lazy"
+            width="1200"
+            height="520"
           />
           
           {/* Dark overlay for text readability */}
@@ -986,9 +1000,13 @@ export function Home() {
                 href={`/destinos/${dest.slug}`}
                 className="group rounded-3xl p-6 flex flex-col justify-between h-64 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer relative overflow-hidden block shadow-md border border-white/10"
               >
-                <div 
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                  style={{ backgroundImage: `url(${dest.img})` }}
+                <img
+                  src={optimizeImageUrl(dest.img, 500)}
+                  alt={dest.name}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 pointer-events-none z-0"
+                  loading="lazy"
+                  width="500"
+                  height="256"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/25 z-10" />
                 
@@ -1037,11 +1055,14 @@ export function Home() {
                   <Link href={`/sitio/${site.slug}`}>
                     <div className="h-44 overflow-hidden relative cursor-pointer">
                       <img 
-                        src={getCleanedImageUrl(site.image_url, site.name)} 
+                        src={optimizeImageUrl(getCleanedImageUrl(site.image_url, site.name), 600)} 
                         alt={site.name} 
                         className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500" 
+                        loading="lazy"
+                        width="600"
+                        height="176"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800";
+                          (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600";
                         }}
                       />
                       <span className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm text-gray-700 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-lg">
@@ -1144,11 +1165,14 @@ export function Home() {
                 <div>
                   <div className="h-44 overflow-hidden relative">
                     <img 
-                      src={getCleanedImageUrl(blog.featured_image, blog.title)} 
+                      src={optimizeImageUrl(getCleanedImageUrl(blog.featured_image, blog.title), 600)} 
                       alt={blog.title} 
                       className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500" 
+                      loading="lazy"
+                      width="600"
+                      height="176"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800";
+                        (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600";
                       }}
                     />
                     <div className="absolute top-4 left-4 bg-brand-turquesa text-white text-[9px] font-black uppercase px-2 py-1 rounded-lg">
@@ -1320,10 +1344,13 @@ export function Home() {
                 return (
                   <img
                     key={id}
-                    src={hotel.primary_image || "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=100"}
+                    src={optimizeImageUrl(hotel.primary_image || "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa", 100)}
                     alt={hotel.name}
                     className="w-7 h-7 rounded-full border-2 border-slate-900 object-cover shrink-0"
                     title={hotel.name}
+                    loading="lazy"
+                    width="28"
+                    height="28"
                   />
                 );
               })}

@@ -798,7 +798,14 @@ function FloatPanel({ title, subtitle, onClose, accent, children }: {
       <div className="px-4 py-3 text-white flex items-center gap-3 shrink-0"
         style={{ background: "linear-gradient(135deg, #1a0533, #2d0d5c)" }}>
         <div className="relative w-9 h-9 rounded-full overflow-hidden border-2 border-[#00C8D4] shrink-0 shadow-md">
-          <img src="/images/agent_avatar.jpg" alt="Atención en Línea" className="w-full h-full object-cover" />
+          <img 
+            src="/images/agent_avatar.jpg" 
+            alt="Atención en Línea" 
+            className="w-full h-full object-cover" 
+            loading="lazy"
+            width="36"
+            height="36"
+          />
         </div>
         <div className="flex-1 min-w-0 text-left">
           <p className="font-semibold text-sm truncate">{title}</p>

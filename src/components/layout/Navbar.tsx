@@ -79,7 +79,9 @@ export function Navbar() {
           <img
             src="/images/logo-hdv-transparent.png"
             alt="Hoteles de Venezuela"
-            className="h-10 w-auto object-contain"
+            className="h-10 w-[133px] object-contain"
+            width="133"
+            height="40"
           />
         </Link>
 

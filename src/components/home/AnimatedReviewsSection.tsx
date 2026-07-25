@@ -133,6 +133,9 @@ function ReviewCard({ review }: { review: FeaturedReview }) {
                 src={review.user_avatar}
                 alt={review.user_name}
                 className="w-10 h-10 rounded-full object-cover border-2 border-pink-100"
+                loading="lazy"
+                width="40"
+                height="40"
               />
             ) : (
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#FF0096] to-[#9B00CC] text-white font-bold flex items-center justify-center text-sm shadow-xs">

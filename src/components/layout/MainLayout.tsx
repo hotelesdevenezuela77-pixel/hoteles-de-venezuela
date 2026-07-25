@@ -49,8 +49,11 @@ function Footer() {
               <img
                 src="/images/logo-hdv-transparent.png"
                 alt="Hoteles de Venezuela"
-                className="h-12 w-auto object-contain"
+                className="h-12 w-[160px] object-contain"
                 style={{ filter: "brightness(0) invert(1)" }}
+                loading="lazy"
+                width="160"
+                height="48"
               />
             </div>
             <p className="text-gray-300 text-sm leading-relaxed max-w-xs font-light">
