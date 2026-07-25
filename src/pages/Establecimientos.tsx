@@ -561,6 +561,8 @@ export function Establecimientos() {
               )}
             </div>
           )}
+        </div>
+      </div>
 
       {/* Main Results Body */}
       <div className="max-w-7xl mx-auto px-6 mt-12">
