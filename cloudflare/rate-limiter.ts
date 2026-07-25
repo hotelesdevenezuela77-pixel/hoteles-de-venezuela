@@ -130,7 +130,8 @@ export default {
             "Access-Control-Allow-Methods": "POST, OPTIONS",
           }
         });
-          if (request.method === "POST") {
+      }
+      if (request.method === "POST") {
         let body: any;
         try {
           body = await request.json();
