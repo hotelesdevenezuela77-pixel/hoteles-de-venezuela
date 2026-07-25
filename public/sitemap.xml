@@ -121,12 +121,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://hotelesdevenezuela.com/establecimiento/hoteles-de-venezuela-mms6ywba</loc>
-    <lastmod>2026-05-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://hotelesdevenezuela.com/establecimiento/hotel-jirahara</loc>
     <lastmod>2026-03-08</lastmod>
     <changefreq>weekly</changefreq>
@@ -135,6 +129,12 @@
   <url>
     <loc>https://hotelesdevenezuela.com/establecimiento/el-mundo-de-los-ninos-barquisimeto</loc>
     <lastmod>2026-07-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/establecimiento/hoteles-de-venezuela-mms6ywba</loc>
+    <lastmod>2026-05-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>

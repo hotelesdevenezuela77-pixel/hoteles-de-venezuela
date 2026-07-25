@@ -394,9 +394,10 @@ export function Home() {
     e.category_name?.toLowerCase().includes("posada")
   );
   const dbComplexes = establishments.filter(e => 
-    e.category_slug === "complejos" || 
-    e.category_name?.toLowerCase().includes("complejo") || 
-    e.category_name?.toLowerCase().includes("resort")
+    e.category_slug !== "hoteles" && 
+    !e.category_name?.toLowerCase().includes("hotel") &&
+    e.category_slug !== "posadas" && 
+    !e.category_name?.toLowerCase().includes("posada")
   );
 
   const getCategorizedItems = (dbItems: Establishment[]) => {
