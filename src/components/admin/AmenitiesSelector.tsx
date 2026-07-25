@@ -153,7 +153,7 @@ export function AmenitiesSelector({ selectedServices, onChange }: AmenitiesSelec
         </div>
 
         {/* Category Pill Tabs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+        <div className="flex flex-wrap items-center gap-1.5 pb-1">
           {AMENITY_CATEGORIES.map((cat) => {
             const isActive = activeTab === cat.id;
             return (
@@ -225,7 +225,7 @@ export function AmenitiesSelector({ selectedServices, onChange }: AmenitiesSelec
 
       {/* Add Custom Amenity Input */}
       <div className="pt-4 border-t border-gray-100 space-y-3">
-        <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">
+        <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block pt-1.5 leading-normal">
           ¿No encuentras una amenidad? Agrégala manualmente:
         </label>
         <div className="flex gap-2">
