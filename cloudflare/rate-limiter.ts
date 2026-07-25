@@ -98,7 +98,7 @@ export default {
             const customerText = messageObj.text?.body || messageObj.caption || "Hola, deseo información de hospedaje.";
             const customerName = value?.contacts?.[0]?.profile?.name || "Turista WhatsApp";
             const phoneId = value?.metadata?.phone_number_id || "1270198682836116";
-            const waToken = env.WHATSAPP_ACCESS_TOKEN || "EAGICGQyrt9MBSIKbTmIZB2hjK1q2FPPIcoJQ4nvkSw12EmpFP1hNjeVe5sRpKwwhgvq6vklGnJ9frJEXHj8jx80Dsx7oYTHikLL6IdhXAnkez0GYRoayV9FcF7Aq80ZBDmphArdPyqlIOVBxpCiGQQCk8arZAUZBrpNhXWGs2WysEOLMglWbxqDsDIWcNzNT3WUVvtZCfNDXEcH4m8SdDTvgqssGOn2MW9ZCTNTPJ18b0j9d072kJWmorYdPzQmKkLxI6m8j5jKiLA48lGLz1HJiH1Q43G9DIZD";
+            const waToken = env.WHATSAPP_ACCESS_TOKEN || "EAGICGQyrt9MBSBHG7Ghzn4NthwSKz6QGg2pkruZCrqkfD1ugTAEl0LIRk1cVifRDYpi1AyZADAftoVrCZBMt5GKuq4HTUwIU3kedrkCZCH0MkwtJnbFdPd3RpVVVtHp2b9nB3ymDpuZC732iIOIlHMGhTiv51EwQDgHFKjYZBIQUJF1PSZBNWyuiKxtmoIpATE9jVXoHhzTWRknn3vs9T7QvegGZA6COE8JRidn4wFgV4ZAJSFz1PdZCBu1XOtZCLdBpfFS7fBCQsXi4QaxdEbUEeZBkSSpMCZAS0XsLP";
 
             // Ejecución asíncrona sin bloquear la respuesta HTTP 200 de Meta
             ctx.waitUntil(
