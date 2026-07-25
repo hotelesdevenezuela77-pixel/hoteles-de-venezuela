@@ -7,6 +7,7 @@ import { Mantenimiento } from "./pages/Mantenimiento";
 import { MainLayout } from "./components/layout/MainLayout";
 import { Home } from "./pages/Home";
 import { TENANTS_REGISTRY } from "./tenants/tenantContext";
+import { AdminLayout } from "./components/admin/AdminLayout";
 
 // Helper para importaciones dinámicas de exportaciones nombradas (named exports)
 function lazyNamed<T extends Record<string, any>>(
@@ -198,58 +199,72 @@ function App() {
 
           {/* Dashboards Propietarios */}
           <Route path="/mis-negocios" component={OwnerDashboard} />
-          <Route path="/andromeda" component={AndromedaPanel} />
+          <Route path="/andromeda">
+            {() => <AdminLayout><AndromedaPanel /></AdminLayout>}
+          </Route>
           
-          {/* Rutas del Panel Administrativo */}
-          <Route path="/admin" component={AdminDashboard} />
-          <Route path="/admin/aprobaciones" component={AdminAprobaciones} />
-          <Route path="/admin/establecimientos" component={AdminEstablecimientos} />
-          <Route path="/admin/establecimientos/nuevo" component={AdminEstablecimientoNuevo} />
-          <Route path="/admin/establecimientos/:id/editar" component={AdminEstablecimientoNuevo} />
-          <Route path="/admin/prioridades" component={AdminPrioridades} />
-          <Route path="/admin/usuarios" component={AdminUsuarios} />
-          <Route path="/admin/categorias" component={AdminCategorias} />
-          <Route path="/admin/destinos" component={AdminDestinos} />
-          <Route path="/admin/reservas" component={AdminReservas} />
-          <Route path="/admin/blog" component={AdminBlog} />
-          <Route path="/admin/paquetes" component={AdminPaquetes} />
-          <Route path="/admin/parques" component={AdminParques} />
-          <Route path="/admin/sitios" component={AdminSitios} />
-          <Route path="/admin/tips" component={AdminTips} />
-          <Route path="/admin/cotizaciones" component={AdminCotizaciones} />
-          <Route path="/admin/tasas" component={AdminTasas} />
-          <Route path="/admin/contenido" component={AdminContenido} />
-          <Route path="/admin/seo" component={AdminSeoHome} />
-          <Route path="/admin/seo-home" component={AdminSeoHome} />
-          <Route path="/admin/b2b" component={AdminB2B} />
-          <Route path="/admin/comercial" component={AdminComercial} />
-          <Route path="/admin/analiticas" component={AdminAnaliticas} />
-          <Route path="/admin/linkhub" component={AdminLinkHub} />
-          <Route path="/admin/config" component={AdminConfig} />
-          <Route path="/admin/correos" component={AdminCorreos} />
-          <Route path="/admin/finanzas" component={AdminFinanzas} />
-          <Route path="/admin/pagos" component={AdminPagos} />
-          <Route path="/admin/solicitudes" component={AdminSolicitudes} />
-          <Route path="/admin/reservas-paquetes" component={AdminReservasPaquetes} />
-          <Route path="/admin/reseñas" component={AdminReseñas} />
-          <Route path="/admin/ia-conversacional" component={AdminConversacionalIA} />
-          <Route path="/admin/asistente-guiones" component={AdminGuiones} />
-          <Route path="/admin/clientes" component={AdminClientes} />
-          <Route path="/admin/saas" component={AdminSaaS} />
-          <Route path="/admin/logs" component={AdminLogs} />
-          <Route path="/admin/channel-manager" component={AdminChannelManager} />
-          <Route path="/admin/kyc" component={AdminKYC} />
-          <Route path="/admin/transfers" component={AdminTransfers} />
-          <Route path="/admin/experiences" component={AdminExperiences} />
-          <Route path="/admin/alerts" component={AdminAlerts} />
-          <Route path="/admin/loyalty-coupons" component={AdminLoyaltyCoupons} />
-          <Route path="/admin/dynamic-pricing" component={AdminDynamicPricing} />
+          {/* Rutas del Panel Administrativo Envolvente */}
+          <Route path="/admin/:wildcard*">
+            {() => (
+              <AdminLayout>
+                <Switch>
+                  <Route path="/admin" component={AdminDashboard} />
+                  <Route path="/admin/aprobaciones" component={AdminAprobaciones} />
+                  <Route path="/admin/establecimientos" component={AdminEstablecimientos} />
+                  <Route path="/admin/establecimientos/nuevo" component={AdminEstablecimientoNuevo} />
+                  <Route path="/admin/establecimientos/:id/editar" component={AdminEstablecimientoNuevo} />
+                  <Route path="/admin/prioridades" component={AdminPrioridades} />
+                  <Route path="/admin/usuarios" component={AdminUsuarios} />
+                  <Route path="/admin/categorias" component={AdminCategorias} />
+                  <Route path="/admin/destinos" component={AdminDestinos} />
+                  <Route path="/admin/reservas" component={AdminReservas} />
+                  <Route path="/admin/blog" component={AdminBlog} />
+                  <Route path="/admin/paquetes" component={AdminPaquetes} />
+                  <Route path="/admin/parques" component={AdminParques} />
+                  <Route path="/admin/sitios" component={AdminSitios} />
+                  <Route path="/admin/tips" component={AdminTips} />
+                  <Route path="/admin/cotizaciones" component={AdminCotizaciones} />
+                  <Route path="/admin/tasas" component={AdminTasas} />
+                  <Route path="/admin/contenido" component={AdminContenido} />
+                  <Route path="/admin/seo" component={AdminSeoHome} />
+                  <Route path="/admin/seo-home" component={AdminSeoHome} />
+                  <Route path="/admin/b2b" component={AdminB2B} />
+                  <Route path="/admin/comercial" component={AdminComercial} />
+                  <Route path="/admin/analiticas" component={AdminAnaliticas} />
+                  <Route path="/admin/linkhub" component={AdminLinkHub} />
+                  <Route path="/admin/config" component={AdminConfig} />
+                  <Route path="/admin/correos" component={AdminCorreos} />
+                  <Route path="/admin/finanzas" component={AdminFinanzas} />
+                  <Route path="/admin/pagos" component={AdminPagos} />
+                  <Route path="/admin/solicitudes" component={AdminSolicitudes} />
+                  <Route path="/admin/reservas-paquetes" component={AdminReservasPaquetes} />
+                  <Route path="/admin/reseñas" component={AdminReseñas} />
+                  <Route path="/admin/ia-conversacional" component={AdminConversacionalIA} />
+                  <Route path="/admin/asistente-guiones" component={AdminGuiones} />
+                  <Route path="/admin/clientes" component={AdminClientes} />
+                  <Route path="/admin/saas" component={AdminSaaS} />
+                  <Route path="/admin/logs" component={AdminLogs} />
+                  <Route path="/admin/channel-manager" component={AdminChannelManager} />
+                  <Route path="/admin/kyc" component={AdminKYC} />
+                  <Route path="/admin/transfers" component={AdminTransfers} />
+                  <Route path="/admin/experiences" component={AdminExperiences} />
+                  <Route path="/admin/alerts" component={AdminAlerts} />
+                  <Route path="/admin/loyalty-coupons" component={AdminLoyaltyCoupons} />
+                  <Route path="/admin/dynamic-pricing" component={AdminDynamicPricing} />
+                </Switch>
+              </AdminLayout>
+            )}
+          </Route>
 
           {/* Atajos y Catch-all */}
           <Route path="/blog/:slug" component={BlogDetalle} />
           <Route path="/sitio/:slug" component={SitioDetalle} />
-          <Route path="/crm" component={AdminComercial} />
-          <Route path="/centaurus" component={Centauros} />
+          <Route path="/crm">
+            {() => <AdminLayout><AdminComercial /></AdminLayout>}
+          </Route>
+          <Route path="/centaurus">
+            {() => <AdminLayout><Centauros /></AdminLayout>}
+          </Route>
           <Route path="/:slug" component={CustomPageViewer} />
           <Route component={NotFound} />
         </Switch>
