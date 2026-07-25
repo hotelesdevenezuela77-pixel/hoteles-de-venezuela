@@ -7,7 +7,7 @@ import {
   Sparkles, Bot, Network, Shield, Car, Compass, AlertTriangle, Ticket, LayoutDashboard,
   Search, Bell, ChevronLeft, ChevronRight, X, ShieldAlert,
   ArrowUpDown, Receipt, MessageSquare, Star, Mail, Link2, LogOut, ChevronDown,
-  Calendar, TrendingUp, Activity, Edit3
+  Calendar, TrendingUp, Activity, Edit3, Briefcase
 } from "lucide-react";
 
 // Colores Oficiales (Sistemas de Contraste)
@@ -105,7 +105,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         { label: "Resumen", href: "/admin", icon: LayoutDashboard },
         { label: "Establecimientos", href: "/admin/establecimientos", icon: Building2 },
         { label: "Aprobaciones", href: "/admin/aprobaciones", icon: ShieldCheck },
-        { label: "Reservas", href: "/admin/reservas", icon: Calendar },
+        { label: "Reservas de Hoteles", href: "/admin/reservas", icon: Calendar },
+        { label: "Reservas de Paquetes", href: "/admin/reservas-paquetes", icon: Receipt },
         { label: "Solicitudes", href: "/admin/solicitudes", icon: ClipboardList },
         { label: "Channel Manager", href: "/admin/channel-manager", icon: Network },
         { label: "Verificación KYC", href: "/admin/kyc", icon: ShieldAlert },
@@ -116,10 +117,12 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     {
       name: "Marketing y Ventas",
       items: [
+        { label: "Gestión Comercial", href: "/admin/comercial", icon: Briefcase },
         { label: "Paquetes Turísticos", href: "/admin/paquetes", icon: Package },
         { label: "WhatsApp CRM", href: "/crm", icon: MessageSquare },
         { label: "Base de Clientes", href: "/admin/clientes", icon: Users },
         { label: "Club y Cupones", href: "/admin/loyalty-coupons", icon: Ticket },
+        { label: "Reseñas y Opiniones", href: "/admin/reseñas", icon: Star },
         { label: "Tips de Turismo", href: "/admin/tips", icon: Compass },
         { label: "Sitios Turísticos", href: "/admin/sitios", icon: MapPin },
         { label: "Parques Nacionales", href: "/admin/parques", icon: Globe },
@@ -136,6 +139,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         { label: "Tasas de Cambio", href: "/admin/tasas", icon: TrendingUp },
         { label: "Transacciones B2B", href: "/admin/b2b", icon: ArrowUpDown },
         { label: "Precios BI Dinámicos", href: "/admin/dynamic-pricing", icon: TrendingUp },
+        { label: "Gestión de Planes SaaS", href: "/admin/saas", icon: Building2 },
       ]
     },
     {
@@ -157,6 +161,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         { label: "Editar Home y Portada", href: "/admin/contenido", icon: Edit3 },
         { label: "Páginas SEO", href: "/admin/seo", icon: Globe },
         { label: "SEO Home Editor", href: "/admin/seo-home", icon: Search },
+        { label: "Gestión de Usuarios", href: "/admin/usuarios", icon: Users },
+        { label: "Categorías de Negocios", href: "/admin/categorias", icon: Tag },
+        { label: "Destinos y Regiones", href: "/admin/destinos", icon: MapPin },
+        { label: "Plantillas de Correos", href: "/admin/correos", icon: Mail },
         { label: "Alertas del Sistema", href: "/admin/alerts", icon: AlertTriangle },
         { label: "Prioridades de Carga", href: "/admin/prioridades", icon: ArrowUpDown },
       ]
