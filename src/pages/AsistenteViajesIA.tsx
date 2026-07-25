@@ -56,6 +56,8 @@ export function AsistenteViajesIA() {
   const [, setLocation] = useLocation();
   const { user, profile } = useAuth();
   const [establishmentsList, setEstablishmentsList] = useState<any[]>([]);
+  const [touristSitesList, setTouristSitesList] = useState<any[]>([]);
+  const [nationalParksList, setNationalParksList] = useState<any[]>([]);
 
   useEffect(() => {
     async function loadRealHotels() {
@@ -90,7 +92,43 @@ export function AsistenteViajesIA() {
         console.error("Error loading approved hotels from DB:", e);
       }
     }
+
+    async function loadSitesAndParks() {
+      try {
+        const [sitesRes, parksRes] = await Promise.all([
+          supabase.from("tourist_sites").select("name, short_description, category, highlights"),
+          supabase.from("national_parks").select("name, short_description, destination_name, highlights")
+        ]);
+
+        const sites = sitesRes.data && sitesRes.data.length > 0 
+          ? sitesRes.data.map((s: any) => ({ name: s.name, description: s.short_description, category: s.category, highlights: s.highlights }))
+          : [
+              { name: "Laguna de Mucubají", category: "naturaleza", highlights: "Senderismo, truchas, vistas al páramo" },
+              { name: "Cayo de Agua", category: "playas", highlights: "Istmo de arena blanca, aguas cristalinas" },
+              { name: "Monumento a la Loca Luz Caraballo", category: "cultura", highlights: "Apartaderos, tradición andina" },
+              { name: "Santuario de Dos Mosquises", category: "naturaleza", highlights: "Conservación de tortugas marinas" },
+              { name: "Laguna de La Restinga", category: "naturaleza", highlights: "Paseo en bote por manglares" },
+              { name: "Cayo Sombrero", category: "playas", highlights: "Snorkel, arrecifes de coral, cocoteros" }
+            ];
+
+        const parks = parksRes.data && parksRes.data.length > 0
+          ? parksRes.data.map((p: any) => ({ name: p.name, description: p.short_description, destination: p.destination_name, highlights: p.highlights }))
+          : [
+              { name: "Parque Nacional Sierra Nevada", destination: "Mérida", highlights: "Pico Bolívar, Teleférico Mukumbarí, páramos" },
+              { name: "Parque Nacional Archipiélago de Los Roques", destination: "Los Roques", highlights: "Barrera de coral, cayos de arena, windsurf" },
+              { name: "Parque Nacional Canaima", destination: "Bolívar", highlights: "Tepuyes, Salto Ángel, Laguna de Canaima" },
+              { name: "Parque Nacional Morrocoy", destination: "Falcón", highlights: "Cayos, manglares, avistamiento de aves" }
+            ];
+
+        setTouristSitesList(sites);
+        setNationalParksList(parks);
+      } catch (e) {
+        console.error("Error loading sites and parks context:", e);
+      }
+    }
+
     loadRealHotels();
+    loadSitesAndParks();
   }, []);
 
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -251,30 +289,43 @@ export function AsistenteViajesIA() {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.GEMINI_API_KEY || "";
       const currentInventory = establishmentsList.length > 0 ? establishmentsList : HDV_HOTELS_INVENTORY;
       const promptText = `
-Eres el Planificador de Viajes Inteligente de "Hoteles de Venezuela".
+Eres el Planificador de Viajes Inteligente oficial de la plataforma "Hoteles de Venezuela".
 Procesa la siguiente solicitud de viaje del usuario en Venezuela:
 "${query}"
 
-A partir del catálogo de hoteles autorizados que te doy abajo, selecciona el que MEJOR se adapte geográficamente a cada día del viaje:
+A partir de los siguientes catálogos reales de nuestra base de datos, selecciona los elementos adecuados:
+
+1. CATÁLOGO DE HOTELES Y ALOJAMIENTOS AUTORIZADOS:
 ${JSON.stringify(currentInventory)}
+
+2. CATÁLOGO DE ATRACTIVOS Y SITIOS TURÍSTICOS DISPONIBLES:
+${JSON.stringify(touristSitesList.slice(0, 15))}
+
+3. CATÁLOGO DE PARQUES NACIONALES DE VENEZUELA:
+${JSON.stringify(nationalParksList.slice(0, 15))}
+
+Instrucciones para generar el itinerario:
+- Selecciona de forma realista un hotel del catálogo de alojamientos que mejor se adapte geográficamente a cada día.
+- En la lista de actividades de cada día, incorpora de manera natural e interactiva los sitios turísticos o parques nacionales reales provistos en los catálogos anteriores correspondientes a la zona/destino sugerido.
+- Evita inventar nombres de atractivos o posadas que no figuren en los listados anteriores.
 
 Devuelve ÚNICAMENTE un objeto JSON válido (sin formato Markdown adicional, sin envoltorios de código como \`\`\`json, solo las llaves JSON) que responda a esta estructura:
 {
   "destination": "Nombre de la ciudad o zona recomendada (ej. Los Roques, Mérida)",
-  "days": 3, (número de días del itinerario)
-  "total_cost": 360, (costo estimado total sumando noches de hotel y tours)
+  "days": 3,
+  "total_cost": 360,
   "itinerary": [
     {
       "dia": 1,
-      "hotel_id": 101, (id del hotel seleccionado del catálogo que te pasé)
+      "hotel_id": 101,
       "hotel_name": "Nombre oficial del hotel seleccionado",
       "actividades": [
         "Llegada y check-in",
-        "Paseo por el pueblo o atractivo cercano",
+        "Visita al atractivo turístico seleccionado",
         "Cena sugerida en restaurante local"
       ],
-      "coordenadas_lat_lng": [11.9525, -66.6719], (coordenadas GPS lat/lng reales de ese destino o del hotel seleccionado)
-      "costo_estimado": 150 (costo en USD de la noche del hotel y actividades)
+      "coordenadas_lat_lng": [11.9525, -66.6719],
+      "costo_estimado": 150
     }
   ]
 }
