@@ -208,7 +208,7 @@ function App() {
           </Route>
           
           {/* Rutas del Panel Administrativo Envolvente */}
-          <Route path="/admin/*">
+          <Route path="/admin*">
             {() => (
               <AdminLayout>
                 <Switch>
