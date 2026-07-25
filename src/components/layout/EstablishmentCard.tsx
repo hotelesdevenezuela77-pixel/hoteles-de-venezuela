@@ -52,6 +52,15 @@ function parseServices(services: string | null): string[] {
   return parseServicesList(services);
 }
 
+export function getVirtualPrice(est: { id: number; price_level?: string }) {
+  const level = est.price_level || "$$";
+  if (level === "$") return 30 + (est.id % 15);
+  if (level === "$$") return 75 + (est.id % 45);
+  if (level === "$$$") return 160 + (est.id % 90);
+  if (level === "$$$$") return 350 + (est.id % 150);
+  return 100;
+}
+
 export function EstablishmentCard({ 
   establishment, 
   isComparing = false, 
@@ -91,6 +100,11 @@ export function EstablishmentCard({
 
             {/* Gradient Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+
+            {/* Price Tag */}
+            <div className="absolute bottom-3 left-4 bg-slate-900/80 backdrop-blur-md border border-white/10 text-white px-3 py-1.5 rounded-xl text-[11px] font-black shadow-md flex items-center gap-1 z-10 select-none">
+              Desde <span className="text-[#00C8D4] text-xs font-black">${getVirtualPrice(establishment)}</span> / noche
+            </div>
 
             {/* Top Badges */}
             <div className="absolute top-4 left-4 flex flex-col gap-2">
@@ -389,15 +403,20 @@ export function EstablishmentListItem({
                 )}
               </div>
 
-              {/* Rating */}
-              <div className={`flex items-center gap-1.5 px-3 py-1 rounded-xl border self-start ${isPriority ? "bg-amber-500/10 border-amber-500/20 text-amber-300" : "bg-amber-50 text-amber-700 border border-amber-100"}`}>
-                <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                <span className="font-black text-sm">{establishment.rating_avg > 0 ? establishment.rating_avg.toFixed(1) : "Nuevo"}</span>
-                {establishment.review_count > 0 && (
-                  <span className={`text-[10px] font-bold ml-1 ${isPriority ? "text-amber-400" : "text-amber-600"}`}>
-                    ({establishment.review_count})
-                  </span>
-                )}
+              {/* Rating & Price */}
+              <div className="flex flex-col items-end gap-1.5 shrink-0 self-start">
+                <div className={`flex items-center gap-1.5 px-3 py-1 rounded-xl border ${isPriority ? "bg-amber-500/10 border-amber-500/20 text-amber-300" : "bg-amber-50 text-amber-700 border border-amber-100"}`}>
+                  <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  <span className="font-black text-sm">{establishment.rating_avg > 0 ? establishment.rating_avg.toFixed(1) : "Nuevo"}</span>
+                  {establishment.review_count > 0 && (
+                    <span className={`text-[10px] font-bold ml-1 ${isPriority ? "text-amber-400" : "text-amber-600"}`}>
+                      ({establishment.review_count})
+                    </span>
+                  )}
+                </div>
+                <div className={`text-[10px] font-bold ${isPriority ? "text-gray-300" : "text-gray-500"}`}>
+                  Desde <span className={`text-xs font-black ${isPriority ? "text-[#00C8D4]" : "text-brand-magenta"}`}>${getVirtualPrice(establishment)}</span> / noche
+                </div>
               </div>
             </div>
 

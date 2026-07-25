@@ -3,8 +3,8 @@ import { Link } from "wouter";
 import { supabase } from "../lib/supabase";
 import { ESTABLISHMENTS_MOCK } from "../lib/establishmentsMock";
 import type { Establishment } from "../components/layout/EstablishmentCard";
-import { EstablishmentCard, EstablishmentListItem } from "../components/layout/EstablishmentCard";
-import { Search, MapPin, ChevronDown, X, Filter, Grid, List, Compass, Loader2 } from "lucide-react";
+import { EstablishmentCard, EstablishmentListItem, getVirtualPrice } from "../components/layout/EstablishmentCard";
+import { Search, MapPin, ChevronDown, X, Filter, Grid, List, Compass, Loader2, Wifi, Car, Waves, Wind, Palmtree, Zap, Droplets, Dog, Star, Sparkles } from "lucide-react";
 
 interface Category {
   id: number;
@@ -29,6 +29,46 @@ export function Establecimientos() {
   const [showFilters, setShowFilters] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<"category" | "destination" | null>(null);
   const [comparedIds, setComparedIds] = useState<number[]>([]);
+
+  // Advanced Filter States
+  const [minPrice, setMinPrice] = useState<number>(0);
+  const [maxPrice, setMaxPrice] = useState<number>(1000);
+  const [minRating, setMinRating] = useState<number>(0);
+  const [adults, setAdults] = useState<number>(1);
+  const [children, setChildren] = useState<number>(0);
+  const [selectedSubtype, setSelectedSubtype] = useState<string>("");
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+
+  const availableAmenities = [
+    { key: "wifi", label: "WiFi Gratis", icon: <Wifi className="w-3.5 h-3.5" /> },
+    { key: "piscina", label: "Piscina", icon: <Waves className="w-3.5 h-3.5" /> },
+    { key: "estacionamiento", label: "Estacionamiento", icon: <Car className="w-3.5 h-3.5" /> },
+    { key: "aire_acondicionado", label: "Aire Acondicionado", icon: <Wind className="w-3.5 h-3.5" /> },
+    { key: "playa_privada", label: "Playa Privada", icon: <Palmtree className="w-3.5 h-3.5" /> },
+    { key: "planta_electrica", label: "Planta Eléctrica", icon: <Zap className="w-3.5 h-3.5" /> },
+    { key: "tanque_agua", label: "Tanque de Agua", icon: <Droplets className="w-3.5 h-3.5" /> },
+    { key: "pet_friendly", label: "Mascotas", icon: <Dog className="w-3.5 h-3.5" /> },
+  ];
+
+  const getSubtype = (est: Establishment) => {
+    const nameLower = est.name.toLowerCase();
+    if (nameLower.includes("posada") || nameLower.includes("boutique")) return "posada_boutique";
+    if (nameLower.includes("resort") || nameLower.includes("complex") || nameLower.includes("hesperia")) return "resort";
+    if (nameLower.includes("hotel") || nameLower.includes("suites")) return "hotel_familiar";
+    return "otros";
+  };
+
+  const getVirtualCapacity = (est: Establishment) => {
+    const category = est.category_slug || "";
+    if (category === "restaurantes") return 20;
+    return category === "posadas" ? 2 + (est.id % 4) : 4 + (est.id % 6);
+  };
+
+  const toggleAmenityFilter = (key: string) => {
+    setSelectedAmenities(prev =>
+      prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
+    );
+  };
 
   // Load compared hotels on mount
   useEffect(() => {
@@ -115,6 +155,13 @@ export function Establecimientos() {
     setSelectedCategory("");
     setSelectedDestination("");
     setSearchQuery("");
+    setMinPrice(0);
+    setMaxPrice(1000);
+    setMinRating(0);
+    setAdults(1);
+    setChildren(0);
+    setSelectedSubtype("");
+    setSelectedAmenities([]);
     updateURLParams("", "", "");
   };
 
@@ -204,13 +251,53 @@ export function Establecimientos() {
       est.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       est.address.toLowerCase().includes(searchQuery.toLowerCase());
 
-    return matchesCategory && matchesDestination && matchesQuery;
+    // Advanced filters logic
+    const price = getVirtualPrice(est);
+    const matchesPrice = price >= minPrice && price <= maxPrice;
+    const matchesRating = est.rating_avg >= minRating;
+    const matchesCapacity = (adults + children) <= getVirtualCapacity(est);
+    const matchesSubtype = !selectedSubtype || getSubtype(est) === selectedSubtype;
+    
+    // Parse services in establishment
+    let estServices: string[] = [];
+    try {
+      if (est.services) {
+        if (Array.isArray(est.services)) {
+          estServices = est.services.map(s => String(s).toLowerCase().trim());
+        } else if (typeof est.services === "string") {
+          const trimmed = est.services.trim();
+          if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+            estServices = JSON.parse(trimmed).map((s: any) => String(s).toLowerCase().trim());
+          } else {
+            estServices = trimmed.split(",").map(s => s.toLowerCase().trim());
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("Error parsing services for filtering:", e);
+    }
+    
+    const matchesAmenities = selectedAmenities.every(amenity => 
+      estServices.includes(amenity.toLowerCase())
+    );
+
+    return matchesCategory && matchesDestination && matchesQuery && matchesPrice && matchesRating && matchesCapacity && matchesSubtype && matchesAmenities;
   });
 
   const getCategoryName = (slug: string) => categories.find(c => c.slug === slug)?.name || slug;
   const getDestinationName = (slug: string) => destinations.find(d => d.slug === slug)?.name || slug;
 
-  const hasActiveFilters = selectedCategory || selectedDestination || searchQuery;
+  const activeFiltersCount = 
+    (selectedCategory ? 1 : 0) + 
+    (selectedDestination ? 1 : 0) + 
+    (minPrice > 0 ? 1 : 0) + 
+    (maxPrice < 1000 ? 1 : 0) + 
+    (minRating > 0 ? 1 : 0) + 
+    (adults > 1 || children > 0 ? 1 : 0) + 
+    (selectedSubtype ? 1 : 0) + 
+    (selectedAmenities.length);
+
+  const hasActiveFilters = activeFiltersCount > 0;
 
   return (
     <div className="min-h-screen bg-gray-50/30 pb-20">
@@ -233,12 +320,12 @@ export function Establecimientos() {
         </div>
       </div>
 
-      {/* Control Panel: Search & Desktop filters */}
+      {/* Control Panel: Search & Advanced Filters */}
       <div className="max-w-7xl mx-auto px-6 -mt-8 relative z-20">
         <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-xl shadow-gray-200/40 space-y-4">
           
-          {/* Main Search Input */}
-          <div className="flex flex-col md:flex-row gap-4">
+          {/* Main Search Input & Top Action Controls */}
+          <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-4 top-3.5 text-gray-400 w-5 h-5" />
               <input
@@ -246,134 +333,234 @@ export function Establecimientos() {
                 placeholder="Buscar por nombre del hotel, servicios, palabras clave..."
                 value={searchQuery}
                 onChange={e => handleSearchChange(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-100 rounded-2xl pl-12 pr-4 py-3 text-xs md:text-sm text-gray-700 placeholder-gray-400 outline-none focus:border-brand-magenta focus:bg-white transition-colors"
+                className="w-full bg-gray-50 border border-gray-100 rounded-2xl pl-12 pr-4 py-3 text-xs md:text-sm text-gray-700 placeholder-gray-400 outline-none focus:border-brand-magenta focus:bg-white transition-colors font-semibold"
               />
             </div>
 
-            {/* Mobile Filter Toggle */}
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="md:hidden flex items-center justify-center gap-2 border border-gray-100 bg-gray-50 rounded-2xl px-4 py-3 text-xs font-bold text-gray-600 hover:bg-gray-100 transition-all cursor-pointer"
-            >
-              <Filter className="w-4 h-4" />
-              <span>Filtros</span>
-              {hasActiveFilters && (
-                <span className="w-2 h-2 bg-brand-magenta rounded-full" />
-              )}
-            </button>
-          </div>
-
-          {/* Filters Row */}
-          <div className={`pt-2 flex-wrap items-center gap-3 ${showFilters ? "flex" : "hidden md:flex"}`}>
-            
-            {/* Category Dropdown */}
-            <div className="relative group dropdown-container">
+            <div className="flex items-center gap-2.5">
+              {/* Universal Filters Toggle Button */}
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setActiveDropdown(activeDropdown === "category" ? null : "category");
-                }}
-                className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 hover:bg-gray-100/80 border border-gray-100 rounded-2xl text-xs font-bold text-gray-600 transition-all cursor-pointer"
+                onClick={() => setShowFilters(!showFilters)}
+                className={`flex items-center justify-center gap-2 border rounded-2xl px-5 py-3 text-xs font-bold transition-all cursor-pointer shadow-xs shrink-0 select-none ${
+                  showFilters
+                    ? "bg-slate-900 border-slate-900 text-white"
+                    : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+                }`}
               >
-                <span>Categoría: {selectedCategory ? getCategoryName(selectedCategory) : "Todas"}</span>
-                <ChevronDown className="w-4 h-4 text-gray-400" />
+                <Filter className={`w-4 h-4 ${showFilters ? "text-[#00C8D4]" : "text-brand-magenta"}`} />
+                <span>Filtros Avanzados</span>
+                {activeFiltersCount > 0 && (
+                  <span className="w-5 h-5 rounded-full bg-brand-magenta text-white text-[10px] font-black flex items-center justify-center leading-none">
+                    {activeFiltersCount}
+                  </span>
+                )}
               </button>
-              
-              <div className={`absolute top-full left-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-50 p-2 z-30 min-w-[200px] origin-top-left transition-all duration-200 before:absolute before:content-[''] before:w-full before:h-2 before:-top-2 before:left-0 ${
-                activeDropdown === "category"
-                  ? "opacity-100 scale-100 pointer-events-auto"
-                  : "opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto"
-              }`}>
+
+              {/* Layout Mode Toggle */}
+              <div className="hidden md:flex items-center gap-1 bg-gray-50 border border-gray-150 rounded-2xl p-1 shrink-0">
                 <button
-                  onClick={() => handleCategoryChange("")}
-                  className={`w-full text-left px-3 py-2 text-xs rounded-xl hover:bg-gray-50 font-bold ${!selectedCategory ? "text-brand-magenta bg-magenta-50/10" : "text-gray-500"}`}
+                  onClick={() => setViewMode("grid")}
+                  className={`p-2 rounded-xl transition-all cursor-pointer ${viewMode === "grid" ? "bg-white text-brand-magenta shadow-xs font-bold" : "text-gray-400 hover:text-gray-600"}`}
+                  title="Vista Cuadrícula"
                 >
-                  Todas las categorías
+                  <Grid className="w-4 h-4" />
                 </button>
-                {categories.map((cat) => (
-                  <button
-                    key={cat.id}
-                    onClick={() => handleCategoryChange(cat.slug)}
-                    className={`w-full text-left px-3 py-2 text-xs rounded-xl hover:bg-gray-50 font-bold ${selectedCategory === cat.slug ? "text-brand-magenta bg-magenta-50/10" : "text-gray-500"}`}
-                  >
-                    {cat.name}
-                  </button>
-                ))}
+                <button
+                  onClick={() => setViewMode("list")}
+                  className={`p-2 rounded-xl transition-all cursor-pointer ${viewMode === "list" ? "bg-white text-brand-magenta shadow-xs font-bold" : "text-gray-400 hover:text-gray-600"}`}
+                  title="Vista Lista"
+                >
+                  <List className="w-4 h-4" />
+                </button>
               </div>
             </div>
-
-            {/* Destination Dropdown */}
-            <div className="relative group dropdown-container">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setActiveDropdown(activeDropdown === "destination" ? null : "destination");
-                }}
-                className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 hover:bg-gray-100/80 border border-gray-100 rounded-2xl text-xs font-bold text-gray-600 transition-all cursor-pointer"
-              >
-                <MapPin className="w-4 h-4 text-brand-turquesa" />
-                <span>Destino: {selectedDestination ? getDestinationName(selectedDestination) : "Todos"}</span>
-                <ChevronDown className="w-4 h-4 text-gray-400" />
-              </button>
-              
-              <div className={`absolute top-full left-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-50 p-2 z-30 min-w-[220px] origin-top-left transition-all duration-200 before:absolute before:content-[''] before:w-full before:h-2 before:-top-2 before:left-0 ${
-                activeDropdown === "destination"
-                  ? "opacity-100 scale-100 pointer-events-auto"
-                  : "opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto"
-              }`}>
-                <div className="max-h-60 overflow-y-auto custom-scrollbar">
-                  <button
-                    onClick={() => handleDestinationChange("")}
-                    className={`w-full text-left px-3 py-2 text-xs rounded-xl hover:bg-gray-50 font-bold ${!selectedDestination ? "text-brand-magenta bg-magenta-50/10" : "text-gray-500"}`}
-                  >
-                    Todos los destinos
-                  </button>
-                  {destinations.map((dest) => (
-                    <button
-                      key={dest.id}
-                      onClick={() => handleDestinationChange(dest.slug)}
-                      className={`w-full text-left px-3 py-2 text-xs rounded-xl hover:bg-gray-50 font-bold ${selectedDestination === dest.slug ? "text-brand-magenta bg-magenta-50/10" : "text-gray-500"}`}
-                    >
-                      <span>{dest.name}</span>
-                      <span className="text-[10px] text-gray-400 font-normal ml-1.5">{dest.state}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Clear Filters Button */}
-            {hasActiveFilters && (
-              <button
-                onClick={clearFilters}
-                className="flex items-center gap-1.5 px-4 py-2.5 bg-red-50 hover:bg-red-100/80 border border-red-100/50 rounded-2xl text-xs font-black text-red-600 transition-colors cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-                <span>Limpiar filtros</span>
-              </button>
-            )}
-
-            {/* Layout Mode Toggle */}
-            <div className="ml-auto hidden md:flex items-center gap-1 bg-gray-50 border border-gray-100 rounded-2xl p-1 shrink-0">
-              <button
-                onClick={() => setViewMode("grid")}
-                className={`p-2 rounded-xl transition-all cursor-pointer ${viewMode === "grid" ? "bg-white text-brand-magenta shadow-sm font-bold" : "text-gray-400 hover:text-gray-600"}`}
-                title="Vista Cuadrícula"
-              >
-                <Grid className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setViewMode("list")}
-                className={`p-2 rounded-xl transition-all cursor-pointer ${viewMode === "list" ? "bg-white text-brand-magenta shadow-sm font-bold" : "text-gray-400 hover:text-gray-600"}`}
-                title="Vista Lista"
-              >
-                <List className="w-4 h-4" />
-              </button>
-            </div>
-
           </div>
-        </div>
-      </div>
+
+          {/* Expandable Advanced Filters Panel */}
+          {showFilters && (
+            <div className="pt-5 border-t border-gray-100 space-y-5 animate-in slide-in-from-top-4 duration-200 text-left">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                
+                {/* 1. Categoría y Destino */}
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Ubicación y Tipo</label>
+                  <div className="flex flex-col gap-2">
+                    <select
+                      value={selectedCategory}
+                      onChange={(e) => handleCategoryChange(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-gray-600 outline-none focus:border-brand-magenta cursor-pointer"
+                    >
+                      <option value="">Todas las Categorías</option>
+                      {categories.map((cat) => (
+                        <option key={cat.id} value={cat.slug}>{cat.name}</option>
+                      ))}
+                    </select>
+
+                    <select
+                      value={selectedDestination}
+                      onChange={(e) => handleDestinationChange(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-gray-600 outline-none focus:border-brand-magenta cursor-pointer"
+                    >
+                      <option value="">Todos los Destinos</option>
+                      {destinations.map((dest) => (
+                        <option key={dest.id} value={dest.slug}>{dest.name} ({dest.state})</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* 2. Rango de Precios */}
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Rango de Precios por Noche (USD)</label>
+                  <div className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                      <span className="absolute left-3.5 top-2.5 text-gray-400 text-xs font-bold">$</span>
+                      <input
+                        type="number"
+                        placeholder="Mín"
+                        value={minPrice || ""}
+                        onChange={(e) => setMinPrice(Math.max(0, Number(e.target.value)))}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-7 pr-3 py-2 text-xs font-semibold text-gray-700 outline-none focus:border-[#00C8D4]"
+                      />
+                    </div>
+                    <span className="text-gray-400 text-xs">—</span>
+                    <div className="relative flex-1">
+                      <span className="absolute left-3.5 top-2.5 text-gray-400 text-xs font-bold">$</span>
+                      <input
+                        type="number"
+                        placeholder="Máx"
+                        value={maxPrice || ""}
+                        onChange={(e) => setMaxPrice(Math.max(0, Number(e.target.value)))}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-7 pr-3 py-2 text-xs font-semibold text-gray-700 outline-none focus:border-[#00C8D4]"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Calificación */}
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Calificación Mínima</label>
+                  <select
+                    value={minRating}
+                    onChange={(e) => setMinRating(Number(e.target.value))}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-gray-600 outline-none focus:border-[#00C8D4] cursor-pointer"
+                  >
+                    <option value="0">Cualquier Puntuación</option>
+                    <option value="4.5">★ 4.5+ Excelente</option>
+                    <option value="4.0">★ 4.0+ Muy Bueno</option>
+                    <option value="3.5">★ 3.5+ Bueno</option>
+                  </select>
+                </div>
+
+                {/* 4. Capacidad / Huéspedes */}
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Huéspedes / Capacidad</label>
+                  <div className="flex gap-2">
+                    <div className="flex-1 flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
+                      <span className="text-[11px] text-gray-500 font-bold">Adultos</span>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          disabled={adults <= 1}
+                          onClick={() => setAdults(adults - 1)}
+                          className="w-5 h-5 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs font-black text-gray-500 hover:bg-gray-50 disabled:opacity-40 select-none cursor-pointer"
+                        >
+                          -
+                        </button>
+                        <span className="text-xs font-bold text-gray-700 min-w-[12px] text-center">{adults}</span>
+                        <button
+                          type="button"
+                          onClick={() => setAdults(adults + 1)}
+                          className="w-5 h-5 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs font-black text-gray-500 hover:bg-gray-50 select-none cursor-pointer"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex-1 flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
+                      <span className="text-[11px] text-gray-500 font-bold">Niños</span>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          disabled={children <= 0}
+                          onClick={() => setChildren(children - 1)}
+                          className="w-5 h-5 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs font-black text-gray-500 hover:bg-gray-50 disabled:opacity-40 select-none cursor-pointer"
+                        >
+                          -
+                        </button>
+                        <span className="text-xs font-bold text-gray-700 min-w-[12px] text-center">{children}</span>
+                        <button
+                          type="button"
+                          onClick={() => setChildren(children + 1)}
+                          className="w-5 h-5 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs font-black text-gray-500 hover:bg-gray-50 select-none cursor-pointer"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 5. Subtipo de Alojamiento */}
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Subtipo de Alojamiento</label>
+                  <select
+                    value={selectedSubtype}
+                    onChange={(e) => setSelectedSubtype(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-gray-600 outline-none focus:border-[#00C8D4] cursor-pointer"
+                  >
+                    <option value="">Cualquier subtipo</option>
+                    <option value="posada_boutique">Posada Boutique / Encanto</option>
+                    <option value="resort">Resort / Complejo Vacacional</option>
+                    <option value="hotel_familiar">Hotel Familiar o de Ciudad</option>
+                    <option value="otros">Otros tipos de hospedaje</option>
+                  </select>
+                </div>
+
+                {/* 6. Servicios y Amenidades Clave (Spans 3 columns on large screens) */}
+                <div className="space-y-2 lg:col-span-3">
+                  <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Servicios y Amenidades Clave</label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {availableAmenities.map((amenity) => {
+                      const isSelected = selectedAmenities.includes(amenity.key);
+                      return (
+                        <button
+                          key={amenity.key}
+                          type="button"
+                          onClick={() => toggleAmenityFilter(amenity.key)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer select-none ${
+                            isSelected
+                              ? "bg-cyan-50 border-[#00C8D4] text-[#00C8D4] shadow-xs"
+                              : "bg-white border-gray-150 text-gray-600 hover:bg-gray-50"
+                          }`}
+                        >
+                          <span className={isSelected ? "text-[#00C8D4]" : "text-gray-400"}>
+                            {amenity.icon}
+                          </span>
+                          <span>{amenity.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Restore Button Inside Panel */}
+              {activeFiltersCount > 0 && (
+                <div className="flex justify-end pt-3 border-t border-gray-50">
+                  <button
+                    onClick={clearFilters}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-650 border border-red-100 rounded-xl text-xs font-black transition-colors cursor-pointer select-none"
+                  >
+                    <X className="w-4 h-4" />
+                    <span>Restablecer Filtros</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
       {/* Main Results Body */}
       <div className="max-w-7xl mx-auto px-6 mt-12">
