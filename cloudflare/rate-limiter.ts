@@ -98,7 +98,7 @@ export default {
             const customerText = messageObj.text?.body || messageObj.caption || "Hola, deseo información de hospedaje.";
             const customerName = value?.contacts?.[0]?.profile?.name || "Turista WhatsApp";
             const phoneId = value?.metadata?.phone_number_id || "1270198682836116";
-            const waToken = env.WHATSAPP_ACCESS_TOKEN || "EAGICGQyrt9MBSOMiX2WKR00TunJoPlzNXu2L8ZAAaaJY7TOvRyQZAnWsAlwVEQj2QHWW6ciPEvM1MDqhWBmwK1uspZCVTGI02a400N0ZBkZBZAZC5MZAy0PZA0NNJIeN1bMrOD2J4Xuh97W9Pj4V4jCUDSHimtbM4BoWGLOIwN46XmxwXDdq5aIMBJKsiOMdffAZDZD";
+            const waToken = env.WHATSAPP_ACCESS_TOKEN || "EAGICGQyrt9MBSIKbTmIZB2hjK1q2FPPIcoJQ4nvkSw12EmpFP1hNjeVe5sRpKwwhgvq6vklGnJ9frJEXHj8jx80Dsx7oYTHikLL6IdhXAnkez0GYRoayV9FcF7Aq80ZBDmphArdPyqlIOVBxpCiGQQCk8arZAUZBrpNhXWGs2WysEOLMglWbxqDsDIWcNzNT3WUVvtZCfNDXEcH4m8SdDTvgqssGOn2MW9ZCTNTPJ18b0j9d072kJWmorYdPzQmKkLxI6m8j5jKiLA48lGLz1HJiH1Q43G9DIZD";
 
             // Ejecución asíncrona sin bloquear la respuesta HTTP 200 de Meta
             ctx.waitUntil(
