@@ -44,12 +44,12 @@ interface ChatMessage {
 
 // Catálogo de Hoteles del Inventario HDV con Coordenadas Reales
 const HDV_HOTELS_INVENTORY = [
-  { id: 101, name: "Posada La Gotera (Los Roques)", lat: 11.9525, lng: -66.6719, price: 150, image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=400&q=80", destination: "Los Roques" },
-  { id: 102, name: "Campamento Canaima (Salto Ángel)", lat: 6.2417, lng: -62.8528, price: 280, image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80", destination: "Canaima" },
-  { id: 103, name: "Hotel Hesperia Isla Margarita (Pedro González)", lat: 11.0805, lng: -63.8895, price: 120, image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=400&q=80", destination: "Margarita" },
-  { id: 104, name: "Posada Rancho Grande (Choroní)", lat: 10.5050, lng: -67.6100, price: 85, image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=400&q=80", destination: "Choroní" },
-  { id: 105, name: "Cabañas Mucuambí (Apartaderos, Mérida)", lat: 8.7983, lng: -70.8450, price: 90, image: "https://images.unsplash.com/photo-1470165301023-58dab8118cc9?auto=format&fit=crop&w=400&q=80", destination: "Mérida" },
-  { id: 106, name: "Posada La Gotera (Morrocoy/Tucacas)", lat: 10.7950, lng: -68.3242, price: 110, image: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&w=400&q=80", destination: "Morrocoy" },
+  { id: 6, name: "Sabbia By LD Hoteles (Los Roques)", lat: 11.9525, lng: -66.6719, price: 150, image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=400&q=80", destination: "Los Roques" },
+  { id: 49, name: "Campamento Canaima (Canaima)", lat: 6.2417, lng: -62.8528, price: 280, image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80", destination: "Canaima" },
+  { id: 4, name: "Cala Margarita Boutique Hotel & Spa (Margarita)", lat: 11.0805, lng: -63.8895, price: 120, image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=400&q=80", destination: "Margarita" },
+  { id: 25, name: "Marriott Maracay Golf Resort (Maracay)", lat: 10.2500, lng: -67.6000, price: 135, image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=400&q=80", destination: "Maracay" },
+  { id: 27, name: "Posada Alto Viento (Cubiro)", lat: 9.7917, lng: -69.5833, price: 80, image: "https://images.unsplash.com/photo-1470165301023-58dab8118cc9?auto=format&fit=crop&w=400&q=80", destination: "Mérida" },
+  { id: 7, name: "Posada La Ardileña (Morrocoy)", lat: 10.7950, lng: -68.3242, price: 110, image: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&w=400&q=80", destination: "Morrocoy" },
 ];
 
 export function AsistenteViajesIA() {
