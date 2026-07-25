@@ -112,6 +112,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         { label: "Verificación KYC", href: "/admin/kyc", icon: ShieldAlert },
         { label: "Traslados y Flota", href: "/admin/transfers", icon: Car },
         { label: "Experiencias", href: "/admin/experiences", icon: Compass },
+        { label: "Agenda y Calendario", href: "/admin/agenda", icon: Calendar },
       ]
     },
     {

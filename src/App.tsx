@@ -79,6 +79,7 @@ const AdminExperiences = lazyNamed(() => import("./pages/admin/AdminExperiences"
 const AdminAlerts = lazyNamed(() => import("./pages/admin/AdminAlerts"), "AdminAlerts");
 const AdminLoyaltyCoupons = lazyNamed(() => import("./pages/admin/AdminLoyaltyCoupons"), "AdminLoyaltyCoupons");
 const AdminDynamicPricing = lazyNamed(() => import("./pages/admin/AdminDynamicPricing"), "AdminDynamicPricing");
+const AdminAgenda = lazyNamed(() => import("./pages/admin/AdminAgenda"), "AdminAgenda");
 const Centauros = lazyNamed(() => import("./pages/Centauros"), "Centauros");
 const CustomPageViewer = lazyNamed(() => import("./pages/CustomPageViewer"), "CustomPageViewer");
 const Paquetes = lazyNamed(() => import("./pages/Paquetes"), "Paquetes");
@@ -258,6 +259,7 @@ function App() {
                   <Route path="/admin/loyalty-coupons" component={AdminLoyaltyCoupons} />
                   <Route path="/admin/dynamic-pricing" component={AdminDynamicPricing} />
                   <Route path="/admin/ia-viajes" component={AdminIaViajes} />
+                  <Route path="/admin/agenda" component={AdminAgenda} />
                 </Switch>
               </AdminLayout>
             )}
