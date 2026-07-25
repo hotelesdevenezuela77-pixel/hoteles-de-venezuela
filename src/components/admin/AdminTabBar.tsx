@@ -6,7 +6,7 @@ import {
   Tag, MapPin, FileText, Globe, Star, MessageSquare, Leaf,
   Map, TreePine, Repeat2, Sparkles, Receipt, Briefcase,
   BarChart3, Mail, Newspaper, Search, Link2, Settings, CalendarDays, Package, DollarSign,
-  ClipboardList, Bot, Network, Shield
+  ClipboardList, Bot, Network, Shield, Car, Compass, AlertTriangle, Ticket, TrendingUp
 } from "lucide-react";
 
 interface TabCounts {
@@ -55,6 +55,12 @@ const TABS = [
   { href: "/admin/saas",               label: "Gestión SaaS",      icon: Network,         countKey: undefined         },
   { href: "/admin/logs",               label: "Auditoría Logs",    icon: Shield,          countKey: undefined         },
   { href: "/admin/channel-manager",    label: "Channel Manager",   icon: CalendarDays,    countKey: undefined         },
+  { href: "/admin/kyc",                label: "Verificación KYC",  icon: Shield,          countKey: undefined         },
+  { href: "/admin/transfers",          label: "Traslados y Flota", icon: Car,             countKey: undefined         },
+  { href: "/admin/experiences",        label: "Experiencias",      icon: Compass,         countKey: undefined         },
+  { href: "/admin/alerts",             label: "Gestor Alertas",    icon: AlertTriangle,   countKey: undefined         },
+  { href: "/admin/loyalty-coupons",    label: "Club y Cupones",    icon: Ticket,          countKey: undefined         },
+  { href: "/admin/dynamic-pricing",    label: "Precios BI",        icon: TrendingUp,      countKey: undefined         },
 ];
 
 const FUCSIA = "#FF0096";

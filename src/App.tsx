@@ -72,6 +72,12 @@ const AdminSaaS = lazyNamed(() => import("./pages/admin/AdminSaaS"), "AdminSaaS"
 const AdminLogs = lazyNamed(() => import("./pages/admin/AdminLogs"), "AdminLogs");
 const AdminGuiones = lazyNamed(() => import("./pages/admin/AdminGuiones"), "AdminGuiones");
 const AdminChannelManager = lazyNamed(() => import("./pages/admin/AdminChannelManager"), "AdminChannelManager");
+const AdminKYC = lazyNamed(() => import("./pages/admin/AdminKYC"), "AdminKYC");
+const AdminTransfers = lazyNamed(() => import("./pages/admin/AdminTransfers"), "AdminTransfers");
+const AdminExperiences = lazyNamed(() => import("./pages/admin/AdminExperiences"), "AdminExperiences");
+const AdminAlerts = lazyNamed(() => import("./pages/admin/AdminAlerts"), "AdminAlerts");
+const AdminLoyaltyCoupons = lazyNamed(() => import("./pages/admin/AdminLoyaltyCoupons"), "AdminLoyaltyCoupons");
+const AdminDynamicPricing = lazyNamed(() => import("./pages/admin/AdminDynamicPricing"), "AdminDynamicPricing");
 const Centauros = lazyNamed(() => import("./pages/Centauros"), "Centauros");
 const CustomPageViewer = lazyNamed(() => import("./pages/CustomPageViewer"), "CustomPageViewer");
 const Paquetes = lazyNamed(() => import("./pages/Paquetes"), "Paquetes");
@@ -232,6 +238,12 @@ function App() {
           <Route path="/admin/saas" component={AdminSaaS} />
           <Route path="/admin/logs" component={AdminLogs} />
           <Route path="/admin/channel-manager" component={AdminChannelManager} />
+          <Route path="/admin/kyc" component={AdminKYC} />
+          <Route path="/admin/transfers" component={AdminTransfers} />
+          <Route path="/admin/experiences" component={AdminExperiences} />
+          <Route path="/admin/alerts" component={AdminAlerts} />
+          <Route path="/admin/loyalty-coupons" component={AdminLoyaltyCoupons} />
+          <Route path="/admin/dynamic-pricing" component={AdminDynamicPricing} />
 
           {/* Atajos y Catch-all */}
           <Route path="/blog/:slug" component={BlogDetalle} />
