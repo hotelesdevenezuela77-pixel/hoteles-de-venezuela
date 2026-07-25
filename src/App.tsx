@@ -208,14 +208,12 @@ function App() {
           </Route>
           
           {/* Rutas del Panel Administrativo Envolvente */}
-          <Route path="/admin">
-            {() => <AdminLayout><AdminDashboard /></AdminLayout>}
-          </Route>
           <Route path="/admin/:wildcard*">
             {() => (
               <AdminLayout>
                 <Switch>
                   <Route path="/admin" component={AdminDashboard} />
+                  <Route path="/admin/" component={AdminDashboard} />
                   <Route path="/admin/aprobaciones" component={AdminAprobaciones} />
                   <Route path="/admin/establecimientos" component={AdminEstablecimientos} />
                   <Route path="/admin/establecimientos/nuevo" component={AdminEstablecimientoNuevo} />
