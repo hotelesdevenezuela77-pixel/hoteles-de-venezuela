@@ -7,7 +7,7 @@ import {
   Sparkles, Bot, Network, Shield, Car, Compass, AlertTriangle, Ticket, LayoutDashboard,
   Search, Bell, ChevronLeft, ChevronRight, X, ShieldAlert,
   ArrowUpDown, Receipt, MessageSquare, Star, Mail, Link2, LogOut, ChevronDown,
-  Calendar, TrendingUp
+  Calendar, TrendingUp, Activity
 } from "lucide-react";
 
 // Colores Oficiales (Sistemas de Contraste)
@@ -147,6 +147,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         { label: "Asistente Guiones", href: "/admin/asistente-guiones", icon: Sparkles },
         { label: "Reportes Analíticos", href: "/admin/analiticas", icon: BarChart3 },
         { label: "Auditoría de Logs", href: "/admin/logs", icon: Shield },
+        { label: "Monitoreo IA Viajes", href: "/admin/ia-viajes", icon: Activity },
       ]
     },
     {

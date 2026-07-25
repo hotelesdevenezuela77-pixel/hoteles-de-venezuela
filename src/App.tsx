@@ -89,6 +89,8 @@ const ExcelenciaLanding = lazyNamed(() => import("./pages/ExcelenciaLanding"), "
 const Blog = lazyNamed(() => import("./pages/Blog"), "Blog");
 const SitiosTuristicos = lazyNamed(() => import("./pages/SitiosTuristicos"), "SitiosTuristicos");
 const PerfilKYC = lazyNamed(() => import("./pages/PerfilKYC"), "PerfilKYC");
+const AsistenteViajesIA = lazyNamed(() => import("./pages/AsistenteViajesIA"), "AsistenteViajesIA");
+const AdminIaViajes = lazyNamed(() => import("./pages/admin/AdminIaViajes"), "AdminIaViajes");
 
 // Importación del Agente IA sin llaves apuntando a la carpeta admin
 const AdminConversacionalIA = lazy(() => import("./pages/admin/AdminConversacionalIA"));
@@ -196,6 +198,7 @@ function App() {
           <Route path="/reportar-pago" component={ReportarPago} />
           <Route path="/privacidad" component={Privacidad} />
           <Route path="/prestigio-2026" component={ExcelenciaLanding} />
+          <Route path="/viaje-ia" component={AsistenteViajesIA} />
 
           {/* Dashboards Propietarios */}
           <Route path="/mis-negocios" component={OwnerDashboard} />
@@ -254,6 +257,7 @@ function App() {
                   <Route path="/admin/alerts" component={AdminAlerts} />
                   <Route path="/admin/loyalty-coupons" component={AdminLoyaltyCoupons} />
                   <Route path="/admin/dynamic-pricing" component={AdminDynamicPricing} />
+                  <Route path="/admin/ia-viajes" component={AdminIaViajes} />
                 </Switch>
               </AdminLayout>
             )}
