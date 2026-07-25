@@ -19,6 +19,7 @@ interface Quote {
   discountPercent: number; discountAmount: number; taxPercent: number; taxAmount: number;
   total: number; currency: string; validityDays: number; notes: string; terms: string;
   status: string; createdAt: string;
+  selectedMembership?: string;
 }
 
 const STATUS_CONFIG: Record<string, { bg: string; text: string; border: string; label: string; Icon: any }> = {
@@ -29,12 +30,141 @@ const STATUS_CONFIG: Record<string, { bg: string; text: string; border: string; 
   expired:  { bg: "bg-orange-50",   text: "text-orange-700", border: "border-orange-200",label: "Expirada",  Icon: AlertCircle},
 };
 
+export const MEMBERSHIPS = [
+  {
+    id: "espacio",
+    name: "Espacio Publicitario",
+    price: "$20 - $35",
+    period: "/mes",
+    features: [
+      "Foto de perfil publicada",
+      "Datos de contacto visibles",
+      "Enlace a redes sociales",
+      "Aparece en búsquedas generales",
+      "Panel de gestión básico",
+      "Reseñas de clientes"
+    ]
+  },
+  {
+    id: "geo",
+    name: "Geolocalización",
+    price: "$15 - $25",
+    period: "/mes",
+    features: [
+      "Ubicación en mapa interactivo",
+      "Posición en ciudad/destino",
+      "Pin personalizado en mapa",
+      "Integración Google Maps",
+      "Coordenadas exactas",
+      "Visible en búsquedas por zona"
+    ]
+  },
+  {
+    id: "imagen",
+    name: "Imagen Corporativa",
+    price: "$50 - $100",
+    period: "/mes",
+    features: [
+      "Galería ilimitada de fotos",
+      "Video de presentación",
+      "Logo y branding en perfil",
+      "Diseño de identidad visual",
+      "Publicaciones en redes HDV",
+      "Reporte de imagen mensual"
+    ]
+  },
+  {
+    id: "app-hotel",
+    name: "Aplicación Web Hotel",
+    price: "$50 - $70",
+    period: "/mes",
+    features: [
+      "App web personalizada",
+      "Gestión de habitaciones",
+      "Panel de administración",
+      "Sistema de reservas propio",
+      "Pasarela de pagos integrada",
+      "Soporte técnico incluido"
+    ]
+  },
+  {
+    id: "reservas",
+    name: "Sistema de Reservas",
+    price: "$30 - $60",
+    period: "/mes",
+    features: [
+      "Calendario de disponibilidad",
+      "Reservas en línea 24/7",
+      "Confirmaciones automáticas",
+      "Gestión de pagos online",
+      "Panel de control de reservas",
+      "Notificaciones por WhatsApp"
+    ]
+  },
+  {
+    id: "premium",
+    name: "Membresía Premium",
+    price: "$80 - $120",
+    period: "/mes",
+    features: [
+      "Todo lo anterior incluido",
+      "Primera posición en búsquedas",
+      "Badge verificado ✓",
+      "CRM de leads WhatsApp",
+      "Panel de analíticas completo",
+      "Soporte prioritario 24/7"
+    ]
+  },
+  {
+    id: "complejos",
+    name: "Complejos Turísticos",
+    price: "$150 - $250",
+    period: "/mes",
+    features: [
+      "Perfil premium de complejo",
+      "Múltiples instalaciones",
+      "Galería profesional completa",
+      "Tours virtuales 360°",
+      "Gestión multi-usuario",
+      "Reporte ejecutivo mensual"
+    ]
+  },
+  {
+    id: "promo",
+    name: "Promociona Tus Servicios",
+    price: "$70 - $80",
+    period: "/mes",
+    features: [
+      "Campañas en redes sociales",
+      "Email marketing mensual",
+      "Publicaciones HDV blog",
+      "Banners en Home",
+      "Promociones especiales",
+      "Reportes de campaña"
+    ]
+  },
+  {
+    id: "gold",
+    name: "Membresía Gold + App Web",
+    price: "$80 - $110",
+    period: "/mes",
+    features: [
+      "App web propia personalizada",
+      "Membresía Gold completa",
+      "Primera posición en todo",
+      "Badge Gold exclusivo 🌟",
+      "Soporte dedicado VIP",
+      "Consultor de onboarding"
+    ]
+  }
+];
+
 const EMPTY_FORM = {
   clientName: "", clientEmail: "", clientPhone: "", clientCompany: "",
   title: "", description: "", travelDates: "", numTravelers: 1,
   subtotal: 0, discountPercent: 0, discountAmount: 0, taxPercent: 0, taxAmount: 0,
   total: 0, currency: "USD", validityDays: 15, notes: "", terms: "", status: "draft",
-  itemsData: "[]",
+  itemsData: "[]", selectedMembership: "",
 };
 
 const EMPTY_ITEM: QuoteItem = { description: "", qty: 1, unitPrice: 0, total: 0 };
@@ -320,12 +450,118 @@ function printQuote(q: Quote) {
       margin: 4px 0;
     }
 
+    .contracted-service-box {
+      margin-top: 20px;
+      background: linear-gradient(135deg, #0e011f 0%, #1a0533 100%);
+      color: #ffffff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(155, 0, 204, 0.15);
+      border: 1px solid rgba(0, 200, 212, 0.3);
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    
+    .service-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 12px;
+    }
+    
+    .service-icon-box {
+      width: 40px;
+      height: 40px;
+      background: #00C8D4;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      flex-shrink: 0;
+    }
+    
+    .service-icon {
+      width: 22px;
+      height: 22px;
+      stroke: #ffffff;
+    }
+    
+    .service-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      color: #00C8D4;
+      margin: 0;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    
+    .service-price {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+      margin: 3px 0 0 0;
+      font-weight: 650;
+    }
+    
+    .service-features {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .features-label {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #FF0096;
+      letter-spacing: 0.05em;
+      margin: 0 0 4px 0;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .check-box {
+      width: 16px;
+      height: 16px;
+      background: #FF0096;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .check-svg {
+      width: 10px;
+      height: 10px;
+      stroke: #ffffff;
+    }
+    
+    .feature-text {
+      font-size: 11.5px;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 500;
+    }
+
     @media print {
       body {
         margin: 20px auto;
         padding: 0;
       }
-      .payment-methods, .info-grid {
+      .payment-methods, .info-grid, .contracted-service-box {
         break-inside: avoid;
       }
     }
@@ -454,6 +690,38 @@ function printQuote(q: Quote) {
       Esta cotización está sujeta a cambios tarifarios de los prestadores de servicio si no es confirmada dentro del plazo de validez estipulado.
     </p>
   </div>
+
+  <!-- Servicio Contratado -->
+  ${q.selectedMembership ? (() => {
+    const m = MEMBERSHIPS.find(x => x.id === q.selectedMembership);
+    if (!m) return "";
+    return `
+    <div class="contracted-service-box">
+      <div class="service-header">
+        <div class="service-icon-box">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="service-icon"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/></svg>
+        </div>
+        <div>
+          <h4 class="service-title">SERVICIO CONTRATADO: ${m.name}</h4>
+          <p class="service-price">Precio de referencia: ${m.price}${m.period}</p>
+        </div>
+      </div>
+      <div class="service-features">
+        <p class="features-label">Características del Servicio:</p>
+        <div class="features-grid">
+          ${m.features.map(f => `
+            <div class="feature-item">
+              <span class="check-box">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="check-svg"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <span class="feature-text">${f}</span>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    </div>
+    `;
+  })() : ""}
 </body>
 </html>`);
   win.document.close();
@@ -520,7 +788,8 @@ export function AdminCotizaciones() {
         notes: q.notes ?? "",
         terms: q.terms ?? "",
         status: q.status ?? "draft",
-        createdAt: q.created_at ?? q.createdAt ?? new Date().toISOString()
+        createdAt: q.created_at ?? q.createdAt ?? new Date().toISOString(),
+        selectedMembership: q.selected_membership ?? q.selectedMembership ?? ""
       }));
     }
   });
@@ -553,7 +822,8 @@ export function AdminCotizaciones() {
         validity_days: d.validityDays,
         notes: d.notes,
         terms: d.terms,
-        status: d.status
+        status: d.status,
+        selected_membership: d.selectedMembership
       };
 
       const localQuotesKey = "hdv_mock_quotes";
@@ -690,7 +960,8 @@ export function AdminCotizaciones() {
       validityDays: q.validityDays,
       notes: q.notes,
       terms: q.terms,
-      status: q.status
+      status: q.status,
+      selectedMembership: q.selectedMembership || ""
     });
     setItems(parseItems(q.itemsData));
     setEditId(q.id);
@@ -818,6 +1089,21 @@ export function AdminCotizaciones() {
                         {q.clientPhone && <span className="flex items-center gap-1.5"><Phone className="w-4 h-4 text-slate-300" />{q.clientPhone}</span>}
                       </div>
                       {q.description && <p className="text-xs text-gray-450 font-semibold leading-relaxed">{q.description}</p>}
+
+                      {q.selectedMembership && (() => {
+                        const m = MEMBERSHIPS.find(x => x.id === q.selectedMembership);
+                        if (!m) return null;
+                        return (
+                          <div className="bg-[#0e011f] text-white rounded-xl p-3 border border-[#00C8D4]/20 flex items-center justify-between gap-3 text-xs">
+                            <div>
+                              <p className="font-extrabold text-[#00C8D4] text-[9px] tracking-wider uppercase">Membresía Asociada</p>
+                              <p className="font-bold text-sm text-white">{m.name}</p>
+                              <p className="text-white/60 text-[10px] mt-1">{m.features.join(" • ")}</p>
+                            </div>
+                            <span className="bg-[#FF0096] text-white px-2.5 py-1 rounded-full text-[10px] font-black shrink-0">{m.price}{m.period}</span>
+                          </div>
+                        );
+                      })()}
 
                       {items_list.length > 0 && (
                         <div className="bg-gray-50 rounded-xl overflow-hidden border">
@@ -1032,11 +1318,20 @@ export function AdminCotizaciones() {
                 </div>
               </div>
 
-              {/* Notes + Status */}
-              <div className="grid grid-cols-2 gap-4">
+              {/* Notes + Status + Membership */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="text-[10px] font-bold text-gray-500 mb-1 block">Notas internas</label>
-                  <textarea value={form.notes} onChange={e => setF("notes", e.target.value)} rows={2} placeholder="Comentarios para uso interno del equipo..." className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-cyan-400 resize-none bg-white" />
+                  <label className="text-[10px] font-bold text-gray-500 mb-1 block">Notas de la Cotización</label>
+                  <textarea value={form.notes} onChange={e => setF("notes", e.target.value)} rows={2} placeholder="Notas visibles en la cotización..." className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-cyan-400 resize-none bg-white" />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-gray-500 mb-1 block">Membresía Contratada (Servicio)</label>
+                  <select value={form.selectedMembership} onChange={e => setF("selectedMembership", e.target.value)} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-xs font-bold focus:outline-none focus:border-cyan-400 bg-white">
+                    <option value="">-- Sin membresía --</option>
+                    {MEMBERSHIPS.map(m => (
+                      <option key={m.id} value={m.id}>{m.name} ({m.price}{m.period})</option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="text-[10px] font-bold text-gray-500 mb-1 block">Estado inicial</label>
