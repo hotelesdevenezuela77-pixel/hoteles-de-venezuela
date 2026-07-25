@@ -204,6 +204,9 @@ function App() {
           </Route>
           
           {/* Rutas del Panel Administrativo Envolvente */}
+          <Route path="/admin">
+            {() => <AdminLayout><AdminDashboard /></AdminLayout>}
+          </Route>
           <Route path="/admin/:wildcard*">
             {() => (
               <AdminLayout>
