@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "wouter";
 import { Navbar } from "./Navbar";
 import { TickerBar } from "./TickerBar";
+import { RouteAlertsBanner } from "../alerts/RouteAlertsBanner";
 import {
   MapPin, Phone, MessageSquare, Send, X
 } from "lucide-react";
@@ -243,6 +244,7 @@ export function MainLayout({ children }: MainLayoutProps) {
     <div className="min-h-screen flex flex-col bg-white text-gray-800 font-sans">
       <Navbar />
       <TickerBar />
+      <RouteAlertsBanner />
       <main className="flex-1">
         {children}
       </main>

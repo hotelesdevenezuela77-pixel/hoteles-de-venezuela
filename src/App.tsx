@@ -71,6 +71,7 @@ const AdminClientes = lazyNamed(() => import("./pages/admin/AdminClientes"), "Ad
 const AdminSaaS = lazyNamed(() => import("./pages/admin/AdminSaaS"), "AdminSaaS");
 const AdminLogs = lazyNamed(() => import("./pages/admin/AdminLogs"), "AdminLogs");
 const AdminGuiones = lazyNamed(() => import("./pages/admin/AdminGuiones"), "AdminGuiones");
+const AdminChannelManager = lazyNamed(() => import("./pages/admin/AdminChannelManager"), "AdminChannelManager");
 const Centauros = lazyNamed(() => import("./pages/Centauros"), "Centauros");
 const CustomPageViewer = lazyNamed(() => import("./pages/CustomPageViewer"), "CustomPageViewer");
 const Paquetes = lazyNamed(() => import("./pages/Paquetes"), "Paquetes");
@@ -80,6 +81,7 @@ const SitioDetalle = lazyNamed(() => import("./pages/SitioDetalle"), "SitioDetal
 const ExcelenciaLanding = lazyNamed(() => import("./pages/ExcelenciaLanding"), "ExcelenciaLanding");
 const Blog = lazyNamed(() => import("./pages/Blog"), "Blog");
 const SitiosTuristicos = lazyNamed(() => import("./pages/SitiosTuristicos"), "SitiosTuristicos");
+const PerfilKYC = lazyNamed(() => import("./pages/PerfilKYC"), "PerfilKYC");
 
 // Importación del Agente IA sin llaves apuntando a la carpeta admin
 const AdminConversacionalIA = lazy(() => import("./pages/admin/AdminConversacionalIA"));
@@ -167,6 +169,7 @@ function App() {
           <Route path="/login" component={Login} />
           <Route path="/registro" component={Registro} />
           <Route path="/perfil" component={Perfil} />
+          <Route path="/perfil/kyc" component={PerfilKYC} />
           <Route path="/hdv-acceso-llc2027" component={AdminLogin} />
           <Route path="/establecimientos" component={Establecimientos} />
           <Route path="/establecimiento/:slug" component={EstablecimientoDetalle} />
@@ -228,6 +231,7 @@ function App() {
           <Route path="/admin/clientes" component={AdminClientes} />
           <Route path="/admin/saas" component={AdminSaaS} />
           <Route path="/admin/logs" component={AdminLogs} />
+          <Route path="/admin/channel-manager" component={AdminChannelManager} />
 
           {/* Atajos y Catch-all */}
           <Route path="/blog/:slug" component={BlogDetalle} />
