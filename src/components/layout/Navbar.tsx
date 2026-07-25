@@ -41,6 +41,7 @@ export function Navbar() {
     { href: "/destinos", label: "Destinos" },
     { href: "/mapa", label: "Mapa", icon: <Map className="w-3.5 h-3.5 inline-block mr-1 -mt-0.5" /> },
     { href: "/parques", label: "Parques" },
+    { href: "/viaje-ia", label: "Planear con IA ✨" },
     { href: "/servicios-b2b", label: "Servicios B2B" },
     { href: "/paquetes", label: "Paquetes" },
     { href: "/membresias", label: "Membresías" },
