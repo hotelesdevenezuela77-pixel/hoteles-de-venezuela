@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import L from "leaflet";
 import { useAuth } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
 import "leaflet/dist/leaflet.css";
 import { 
   Sparkles, Send, Calendar, MapPin, DollarSign, Hotel, 
@@ -54,6 +55,43 @@ const HDV_HOTELS_INVENTORY = [
 export function AsistenteViajesIA() {
   const [, setLocation] = useLocation();
   const { user, profile } = useAuth();
+  const [establishmentsList, setEstablishmentsList] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function loadRealHotels() {
+      try {
+        const { data, error } = await supabase
+          .from("establishments")
+          .select(`
+            id,
+            name,
+            latitude,
+            longitude,
+            primary_image,
+            price_level,
+            destinations (name)
+          `)
+          .eq("status", "approved");
+        
+        if (error) throw error;
+        if (data && data.length > 0) {
+          const mapped = data.map((h: any) => ({
+            id: h.id,
+            name: h.name,
+            lat: h.latitude || 10.5,
+            lng: h.longitude || -66.9,
+            price: h.price_level === "$$$" ? 180 : h.price_level === "$$" ? 110 : 65,
+            image: h.primary_image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80",
+            destination: h.destinations?.name || ""
+          }));
+          setEstablishmentsList(mapped);
+        }
+      } catch (e) {
+        console.error("Error loading approved hotels from DB:", e);
+      }
+    }
+    loadRealHotels();
+  }, []);
 
   const [messages, setMessages] = useState<ChatMessage[]>([
     { sender: "ai", text: "¡Hola! Soy el planificador inteligente de Hoteles de Venezuela. Escribe adónde te gustaría viajar en Venezuela, cuántos días y tus gustos de viaje (ej: 'Quiero un viaje de 3 días a Mérida enfocado en aventura'). Diseñaré tu ruta en tiempo real." }
@@ -211,13 +249,14 @@ export function AsistenteViajesIA() {
     setMessages(prev => [...prev, { sender: "ai", text: "Analizando tu itinerario y mapeando rutas con IA...", isGenerating: true }]);
 
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.GEMINI_API_KEY || "";
+    const currentInventory = establishmentsList.length > 0 ? establishmentsList : HDV_HOTELS_INVENTORY;
     const promptText = `
 Eres el Planificador de Viajes Inteligente de "Hoteles de Venezuela".
 Procesa la siguiente solicitud de viaje del usuario en Venezuela:
 "${query}"
 
 A partir del catálogo de hoteles autorizados que te doy abajo, selecciona el que MEJOR se adapte geográficamente a cada día del viaje:
-${JSON.stringify(HDV_HOTELS_INVENTORY)}
+${JSON.stringify(currentInventory)}
 
 Devuelve ÚNICAMENTE un objeto JSON válido (sin formato Markdown adicional, sin envoltorios de código como \`\`\`json, solo las llaves JSON) que responda a esta estructura:
 {
@@ -328,9 +367,10 @@ Asegúrate de que las coordenadas correspondan a zonas geográficas reales dentr
     const isCanaima = /canaima|salto|angel|tepuy|bolivar/i.test(query);
     const isMargarita = /margarita|playa|esparta|pampatar/i.test(query);
 
+    const currentInventory = establishmentsList.length > 0 ? establishmentsList : HDV_HOTELS_INVENTORY;
     let dest = "Morrocoy";
-    let hotel = HDV_HOTELS_INVENTORY[5]; // Morrocoy
-    let coords: [number, number] = [10.7950, -68.3242];
+    let hotel = currentInventory.find((h: any) => h.destination.toLowerCase().includes("morrocoy") || h.name.toLowerCase().includes("morrocoy") || h.destination.toLowerCase().includes("tucacas")) || currentInventory[currentInventory.length - 1];
+    let coords: [number, number] = [hotel.lat, hotel.lng];
     let activitiesDays = [
       ["Llegada a Tucacas y check-in", "Paseo en lancha privada a Cayo Sombrero", "Cena de mariscos a la orilla del mar"],
       ["Desayuno en posada", "Excursión a Cayo Pescadores para snorkel", "Puesta de sol en el velero"],
@@ -339,8 +379,8 @@ Asegúrate de que las coordenadas correspondan a zonas geográficas reales dentr
 
     if (isMérida) {
       dest = "Mérida (Páramos)";
-      hotel = HDV_HOTELS_INVENTORY[4];
-      coords = [8.7983, -70.8450];
+      hotel = currentInventory.find((h: any) => h.destination.toLowerCase().includes("merida") || h.destination.toLowerCase().includes("mérida") || h.name.toLowerCase().includes("mucu") || h.name.toLowerCase().includes("merida")) || currentInventory[4 % currentInventory.length];
+      coords = [hotel.lat, hotel.lng];
       activitiesDays = [
         ["Llegada a Mérida y check-in en Apartaderos", "Paseo a caballo en Laguna de Mucubají", "Cena con chocolate caliente andino"],
         ["Visita al Teleférico Mukumbarí", "Senderismo por el bosque de frailejones", "Visita al monumento de la Loca Luz Caraballo"],
@@ -348,8 +388,8 @@ Asegúrate de que las coordenadas correspondan a zonas geográficas reales dentr
       ];
     } else if (isRoques) {
       dest = "Archipiélago de Los Roques";
-      hotel = HDV_HOTELS_INVENTORY[0];
-      coords = [11.9525, -66.6719];
+      hotel = currentInventory.find((h: any) => h.destination.toLowerCase().includes("roque") || h.name.toLowerCase().includes("roque")) || currentInventory[0];
+      coords = [hotel.lat, hotel.lng];
       activitiesDays = [
         ["Llegada en avioneta a Gran Roque y check-in", "Navegación en catamarán a Cayo Francisquí", "Snorkel en la piscina natural"],
         ["Desayuno a bordo", "Visita a Cayo de Agua (istmo de arena único)", "Observación de tortugas en el santuario de Dos Mosquises"],
@@ -357,8 +397,8 @@ Asegúrate de que las coordenadas correspondan a zonas geográficas reales dentr
       ];
     } else if (isCanaima) {
       dest = "Parque Nacional Canaima";
-      hotel = HDV_HOTELS_INVENTORY[1];
-      coords = [6.2417, -62.8528];
+      hotel = currentInventory.find((h: any) => h.destination.toLowerCase().includes("canaima") || h.name.toLowerCase().includes("canaima") || h.name.toLowerCase().includes("salto")) || currentInventory[1 % currentInventory.length];
+      coords = [hotel.lat, hotel.lng];
       activitiesDays = [
         ["Vuelo panorámico e ingreso al campamento", "Navegación en curiara por la Laguna de Canaima", "Caminata bajo el Salto El Hacha"],
         ["Excursión de día completo al Salto Ángel", "Almuerzo tipo picnic frente al Auyantepuy", "Cena tradicional y pernocta en hamaca frente al salto"],
@@ -366,8 +406,8 @@ Asegúrate de que las coordenadas correspondan a zonas geográficas reales dentr
       ];
     } else if (isMargarita) {
       dest = "Isla de Margarita";
-      hotel = HDV_HOTELS_INVENTORY[2];
-      coords = [11.0805, -63.8895];
+      hotel = currentInventory.find((h: any) => h.destination.toLowerCase().includes("margarita") || h.name.toLowerCase().includes("hesperia") || h.name.toLowerCase().includes("margarita")) || currentInventory[2 % currentInventory.length];
+      coords = [hotel.lat, hotel.lng];
       activitiesDays = [
         ["Llegada al Aeropuerto de Santiago Mariño y check-in", "Tarde de relax en Playa El Agua", "Cena buffet internacional"],
         ["Excursión en bote por el Parque Nacional Laguna de La Restinga", "Paseo de compras por Porlamar (Puerto Libre)", "Cena y show en vivo"],
