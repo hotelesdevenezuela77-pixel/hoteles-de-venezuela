@@ -56,30 +56,42 @@ export function AdminAprobaciones() {
       const emailMap = new Map((profilesData || []).map(p => [p.user_id, p.email]));
 
       const mapped: PendingEst[] = (estData || []).map(est => {
-        const catName = est.categories ? (est.categories as any).name : null;
-        const dest = est.destinations ? (est.destinations as any) : null;
+        // Handle both single-object and array-based relations gracefully
+        let catName = null;
+        if (est.categories) {
+          catName = Array.isArray(est.categories)
+            ? est.categories[0]?.name
+            : (est.categories as any).name;
+        }
+
+        let dest = null;
+        if (est.destinations) {
+          dest = Array.isArray(est.destinations)
+            ? est.destinations[0]
+            : est.destinations;
+        }
 
         return {
           id: est.id,
-          name: est.name,
-          slug: est.slug,
-          status: est.status,
+          name: est.name || "Establecimiento sin nombre",
+          slug: est.slug || "",
+          status: est.status || "pending",
           city: dest?.name || null,
           state: dest?.state || null,
-          ownerEmail: emailMap.get(est.owner_user_id) || est.owner_user_id || "Propietario",
-          categoryName: catName,
+          ownerEmail: (est.owner_user_id ? emailMap.get(est.owner_user_id) : null) || est.owner_user_id || "Propietario",
+          categoryName: catName || null,
           phone: null,
-          createdAt: est.created_at
+          createdAt: est.created_at || null
         };
       });
 
-      // Filter on search
+      // Safe search filtering (null-resistant string operations)
       if (!search) return mapped;
       const lower = search.toLowerCase();
       return mapped.filter(e => 
-        e.name.toLowerCase().includes(lower) || 
+        (e.name && e.name.toLowerCase().includes(lower)) || 
         (e.categoryName && e.categoryName.toLowerCase().includes(lower)) || 
-        e.ownerEmail.toLowerCase().includes(lower)
+        (e.ownerEmail && e.ownerEmail.toLowerCase().includes(lower))
       );
     }
   });
@@ -183,7 +195,10 @@ export function AdminAprobaciones() {
                     </div>
                     {est.createdAt && (
                       <div className="text-[10px] text-gray-400 font-semibold mt-1.5">
-                        Registrado: {new Date(est.createdAt).toLocaleDateString("es-VE")}
+                        Registrado: {(() => {
+                          const d = new Date(est.createdAt);
+                          return isNaN(d.getTime()) ? "Fecha desconocida" : d.toLocaleDateString("es-VE");
+                        })()}
                       </div>
                     )}
                   </div>
