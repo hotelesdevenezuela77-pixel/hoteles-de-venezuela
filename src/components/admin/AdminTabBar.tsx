@@ -54,6 +54,7 @@ const TABS = [
   { href: "/admin/reseñas",            label: "Reseñas",           icon: Star,            countKey: undefined         },
   { href: "/admin/saas",               label: "Gestión SaaS",      icon: Network,         countKey: undefined         },
   { href: "/admin/logs",               label: "Auditoría Logs",    icon: Shield,          countKey: undefined         },
+  { href: "/admin/channel-manager",    label: "Channel Manager",   icon: CalendarDays,    countKey: undefined         },
 ];
 
 const FUCSIA = "#FF0096";
