@@ -44,12 +44,12 @@ interface ChatMessage {
 
 // Catálogo de Hoteles del Inventario HDV con Coordenadas Reales
 const HDV_HOTELS_INVENTORY = [
-  { id: 101, name: "Posada La Gotera (Los Roques)", lat: 11.9525, lng: -66.6719, price: 150, image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=400&q=80" },
-  { id: 102, name: "Campamento Canaima (Salto Ángel)", lat: 6.2417, lng: -62.8528, price: 280, image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80" },
-  { id: 103, name: "Hotel Hesperia Isla Margarita (Pedro González)", lat: 11.0805, lng: -63.8895, price: 120, image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=400&q=80" },
-  { id: 104, name: "Posada Rancho Grande (Choroní)", lat: 10.5050, lng: -67.6100, price: 85, image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=400&q=80" },
-  { id: 105, name: "Cabañas Mucuambí (Apartaderos, Mérida)", lat: 8.7983, lng: -70.8450, price: 90, image: "https://images.unsplash.com/photo-1470165301023-58dab8118cc9?auto=format&fit=crop&w=400&q=80" },
-  { id: 106, name: "Posada La Gotera (Morrocoy/Tucacas)", lat: 10.7950, lng: -68.3242, price: 110, image: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&w=400&q=80" },
+  { id: 101, name: "Posada La Gotera (Los Roques)", lat: 11.9525, lng: -66.6719, price: 150, image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=400&q=80", destination: "Los Roques" },
+  { id: 102, name: "Campamento Canaima (Salto Ángel)", lat: 6.2417, lng: -62.8528, price: 280, image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80", destination: "Canaima" },
+  { id: 103, name: "Hotel Hesperia Isla Margarita (Pedro González)", lat: 11.0805, lng: -63.8895, price: 120, image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=400&q=80", destination: "Margarita" },
+  { id: 104, name: "Posada Rancho Grande (Choroní)", lat: 10.5050, lng: -67.6100, price: 85, image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=400&q=80", destination: "Choroní" },
+  { id: 105, name: "Cabañas Mucuambí (Apartaderos, Mérida)", lat: 8.7983, lng: -70.8450, price: 90, image: "https://images.unsplash.com/photo-1470165301023-58dab8118cc9?auto=format&fit=crop&w=400&q=80", destination: "Mérida" },
+  { id: 106, name: "Posada La Gotera (Morrocoy/Tucacas)", lat: 10.7950, lng: -68.3242, price: 110, image: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&w=400&q=80", destination: "Morrocoy" },
 ];
 
 export function AsistenteViajesIA() {
@@ -235,7 +235,6 @@ export function AsistenteViajesIA() {
     }
   };
 
-  // ── Integración real con Google Gemini Pro (1.5 Flash) ──
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!userInput.trim() || loading) return;
@@ -248,9 +247,10 @@ export function AsistenteViajesIA() {
     const loaderMessageIndex = messages.length + 1;
     setMessages(prev => [...prev, { sender: "ai", text: "Analizando tu itinerario y mapeando rutas con IA...", isGenerating: true }]);
 
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.GEMINI_API_KEY || "";
-    const currentInventory = establishmentsList.length > 0 ? establishmentsList : HDV_HOTELS_INVENTORY;
-    const promptText = `
+    try {
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.GEMINI_API_KEY || "";
+      const currentInventory = establishmentsList.length > 0 ? establishmentsList : HDV_HOTELS_INVENTORY;
+      const promptText = `
 Eres el Planificador de Viajes Inteligente de "Hoteles de Venezuela".
 Procesa la siguiente solicitud de viaje del usuario en Venezuela:
 "${query}"
@@ -282,82 +282,92 @@ Devuelve ÚNICAMENTE un objeto JSON válido (sin formato Markdown adicional, sin
 Asegúrate de que las coordenadas correspondan a zonas geográficas reales dentro del estado o localidad en Venezuela sugerida.
 `;
 
-    let dataSuccess = false;
-    let itineraryJson: TravelItinerary | null = null;
-    let tokens = 0;
+      let dataSuccess = false;
+      let itineraryJson: TravelItinerary | null = null;
+      let tokens = 0;
 
-    if (apiKey) {
-      try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
-        const response = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: promptText }] }],
-            generationConfig: {
-              temperature: 0.2,
-              responseMimeType: "application/json"
+      if (apiKey) {
+        try {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+          const response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: promptText }] }],
+              generationConfig: {
+                temperature: 0.2,
+                responseMimeType: "application/json"
+              }
+            })
+          });
+
+          if (response.ok) {
+            const resBody = await response.json();
+            const candidateText = resBody?.candidates?.[0]?.content?.parts?.[0]?.text;
+            
+            if (candidateText) {
+              const rawText = candidateText.trim();
+              // Limpieza de posibles envoltorios markdown que ponga Gemini a pesar de pedirle JSON
+              const jsonText = rawText.startsWith("```") 
+                ? rawText.replace(/^```json\s*/, "").replace(/\s*```$/, "")
+                : rawText;
+
+              itineraryJson = JSON.parse(jsonText);
+              dataSuccess = true;
+
+              // Telemetría de tokens estimados
+              tokens = (query.length + promptText.length) * 0.35 + (candidateText.length * 0.35);
             }
-          })
+          }
+        } catch (err) {
+          console.error("Gemini call failed, calling fallback local generator:", err);
+        }
+      }
+
+      // Fallback generador inteligente si la API Key falla o no existe
+      if (!dataSuccess) {
+        itineraryJson = generateLocalFallbackItinerary(query);
+        tokens = 250; // valor representativo
+      }
+
+      if (itineraryJson) {
+        setItineraryData(itineraryJson);
+        
+        // Actualizar mensajes quitando la burbuja de cargando
+        setMessages(prev => {
+          const copy = [...prev];
+          copy.splice(loaderMessageIndex, 1); // Remover loader
+          return [
+            ...copy,
+            { 
+              sender: "ai", 
+              text: `He preparado un itinerario de ${itineraryJson!.days} días en **${itineraryJson!.destination}**. He mapeado la ruta en el mapa a tu derecha y sugerido los mejores alojamientos. Puedes revisar el cronograma en el panel central.` 
+            }
+          ];
         });
 
-        if (response.ok) {
-          const resBody = await response.json();
-          const candidateText = resBody?.candidates?.[0]?.content?.parts?.[0]?.text;
-          
-          if (candidateText) {
-            const rawText = candidateText.trim();
-            // Limpieza de posibles envoltorios markdown que ponga Gemini a pesar de pedirle JSON
-            const jsonText = rawText.startsWith("```") 
-              ? rawText.replace(/^```json\s*/, "").replace(/\s*```$/, "")
-              : rawText;
+        // Guardar logs de telemetría de IA en localStorage para alimentar el backoffice en tiempo real
+        saveTelemetryLog(query, itineraryJson, tokens);
 
-            itineraryJson = JSON.parse(jsonText);
-            dataSuccess = true;
-
-            // Telemetría de tokens estimados
-            tokens = (query.length + promptText.length) * 0.35 + (candidateText.length * 0.35);
-          }
-        }
-      } catch (err) {
-        console.error("Gemini call failed, calling fallback local generator:", err);
+      } else {
+        setMessages(prev => {
+          const copy = [...prev];
+          copy.splice(loaderMessageIndex, 1);
+          return [...copy, { sender: "ai", text: "Disculpa, tuve un problema al procesar la ruta en este momento. Por favor reescribe tu solicitud." }];
+        });
       }
-    }
-
-    // Fallback generador inteligente si la API Key falla o no existe
-    if (!dataSuccess) {
-      itineraryJson = generateLocalFallbackItinerary(query);
-      tokens = 250; // valor representativo
-    }
-
-    if (itineraryJson) {
-      setItineraryData(itineraryJson);
-      
-      // Actualizar mensajes quitando la burbuja de cargando
+    } catch (error) {
+      console.error("Error in AI Travel Assistant handler:", error);
       setMessages(prev => {
         const copy = [...prev];
-        copy.splice(loaderMessageIndex, 1); // Remover loader
-        return [
-          ...copy,
-          { 
-            sender: "ai", 
-            text: `He preparado un itinerario de ${itineraryJson.days} días en **${itineraryJson.destination}**. He mapeado la ruta en el mapa a tu derecha y sugerido los mejores alojamientos. Puedes revisar el cronograma en el panel central.` 
-          }
-        ];
+        if (copy.length > loaderMessageIndex) {
+          copy.splice(loaderMessageIndex, 1);
+        }
+        return [...copy, { sender: "ai", text: "Disculpa, ocurrió un error inesperado al procesar tu solicitud. Por favor intenta de nuevo con otros términos o intenta más tarde." }];
       });
-
-      // Guardar logs de telemetría de IA en localStorage para alimentar el backoffice en tiempo real
-      saveTelemetryLog(query, itineraryJson, tokens);
-
-    } else {
-      setMessages(prev => {
-        const copy = [...prev];
-        copy.splice(loaderMessageIndex, 1);
-        return [...copy, { sender: "ai", text: "Disculpa, tuve un problema al procesar la ruta en este momento. Por favor reescribe tu solicitud." }];
-      });
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   // Generador local de respaldo para itinerarios basados en palabras clave
