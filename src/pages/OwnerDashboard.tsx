@@ -967,7 +967,7 @@ export function OwnerDashboard() {
       {/* Add Establishment Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200 my-8">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl lg:max-w-5xl overflow-hidden animate-in zoom-in-95 duration-200 my-8">
             
             {/* Modal Header */}
             <div className="bg-gradient-to-r from-brand-purple-dark to-brand-purple-deep px-6 py-5 flex items-center justify-between text-white">
@@ -989,10 +989,10 @@ export function OwnerDashboard() {
             {/* Modal Form */}
             <form onSubmit={handleAddSubmit} className="p-6 max-h-[75vh] overflow-y-auto space-y-4 text-left">
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 
                 {/* Name */}
-                <div>
+                <div className="lg:col-span-2">
                   <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5">Nombre del Establecimiento *</label>
                   <input
                     type="text"
@@ -1005,7 +1005,7 @@ export function OwnerDashboard() {
                 </div>
 
                 {/* Categoría */}
-                <div>
+                <div className="lg:col-span-1">
                   <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5">Categoría *</label>
                   <select
                     required
@@ -1021,7 +1021,7 @@ export function OwnerDashboard() {
                 </div>
 
                 {/* Destino */}
-                <div>
+                <div className="lg:col-span-1">
                   <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5">Destino *</label>
                   <select
                     required
@@ -1037,7 +1037,7 @@ export function OwnerDashboard() {
                 </div>
 
                 {/* Precio Promedio */}
-                <div>
+                <div className="lg:col-span-1">
                   <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5">Rango de Precios</label>
                   <select
                     value={formData.price_level}
@@ -1052,7 +1052,7 @@ export function OwnerDashboard() {
                 </div>
 
                 {/* Teléfono */}
-                <div>
+                <div className="lg:col-span-1">
                   <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5">Teléfono de Reservas</label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
@@ -1067,7 +1067,7 @@ export function OwnerDashboard() {
                 </div>
 
                 {/* WhatsApp */}
-                <div>
+                <div className="lg:col-span-1">
                   <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5">WhatsApp Directo</label>
                   <div className="relative">
                     <MessageSquare className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
@@ -1082,7 +1082,7 @@ export function OwnerDashboard() {
                 </div>
 
                 {/* Sitio Web */}
-                <div className="sm:col-span-2">
+                <div className="sm:col-span-2 lg:col-span-2">
                   <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5">Sitio Web / Enlace a Red Social</label>
                   <div className="relative">
                     <Globe className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
@@ -1097,7 +1097,7 @@ export function OwnerDashboard() {
                 </div>
 
                 {/* Dirección */}
-                <div className="sm:col-span-2">
+                <div className="sm:col-span-2 lg:col-span-3">
                   <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5">Dirección Física Completa</label>
                   <input
                     type="text"
@@ -1109,7 +1109,7 @@ export function OwnerDashboard() {
                 </div>
 
                 {/* Descripción */}
-                <div className="sm:col-span-2">
+                <div className="sm:col-span-2 lg:col-span-3">
                   <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5">Descripción o Reseña Comercial</label>
                   <textarea
                     rows={4}

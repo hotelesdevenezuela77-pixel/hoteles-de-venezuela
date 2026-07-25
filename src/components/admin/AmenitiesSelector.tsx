@@ -175,7 +175,7 @@ export function AmenitiesSelector({ selectedServices, onChange }: AmenitiesSelec
       </div>
 
       {/* Master Amenities Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 max-h-80 overflow-y-auto pr-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 max-h-96 overflow-y-auto pr-1">
         {filteredAmenities.map((item) => {
           const isSelected = standardKeysSet.has(item.key.toLowerCase());
           const IconComp = ICON_MAP[item.iconName] || Sparkles;
@@ -198,7 +198,9 @@ export function AmenitiesSelector({ selectedServices, onChange }: AmenitiesSelec
                 >
                   <IconComp className="w-3.5 h-3.5" />
                 </div>
-                <span className="truncate">{item.label}</span>
+                <span className="leading-tight text-[11px] sm:text-xs text-slate-850 break-words font-semibold flex-1 select-none">
+                  {item.label}
+                </span>
               </div>
 
               <div className="shrink-0">
@@ -243,7 +245,7 @@ export function AmenitiesSelector({ selectedServices, onChange }: AmenitiesSelec
           <button
             type="button"
             onClick={addCustomService}
-            className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shrink-0 hover:opacity-90 active:scale-95 transition-all cursor-pointer"
+            className="px-4 py-2 bg-gradient-to-r from-[#FF0096] to-[#9B00CC] text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shrink-0 hover:opacity-90 active:scale-95 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Agregar</span>
