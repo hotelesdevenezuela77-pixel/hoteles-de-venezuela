@@ -113,6 +113,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         { label: "Traslados y Flota", href: "/admin/transfers", icon: Car },
         { label: "Experiencias", href: "/admin/experiences", icon: Compass },
         { label: "Agenda y Calendario", href: "/admin/agenda", icon: Calendar },
+        { label: "Expedición de Rutas", href: "/admin/expedicion-rutas", icon: MapPin },
       ]
     },
     {

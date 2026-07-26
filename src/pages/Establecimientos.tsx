@@ -302,323 +302,345 @@ export function Establecimientos() {
   return (
     <div className="min-h-screen bg-gray-50/30 pb-20">
       {/* Hero Header */}
-      <div className="relative overflow-hidden py-16 bg-gradient-to-br from-brand-purple-dark via-brand-purple-deep to-black text-white text-center">
-        <div className="absolute top-0 left-1/4 w-[500px] h-[300px] bg-brand-magenta/10 rounded-full blur-[120px] pointer-events-none"></div>
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[300px] bg-brand-turquesa/10 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="relative overflow-hidden py-20 md:py-28 w-full text-white text-center flex items-center justify-center">
+        {/* Imagen del Banner con clase scale-[1.08] */}
+        <img
+          src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80"
+          alt="Explora Establecimientos"
+          className="absolute inset-0 w-full h-full object-cover scale-[1.08] pointer-events-none"
+        />
+        
+        {/* Capa de contraste oscuro (sin negro puro, usando los morados profundos oficiales) */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0e011f]/85 via-[#1a0533]/80 to-transparent z-10" />
 
-        <div className="max-w-4xl mx-auto px-6 relative z-10">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-brand-magenta/10 text-brand-magenta border border-brand-magenta/25 mb-4 animate-pulse">
+        {/* Degradado inferior blanco para fundir con el fondo de la página */}
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-gray-50/30 via-gray-50/15 to-transparent z-15" />
+
+        <div className="max-w-4xl mx-auto px-6 relative z-20 flex flex-col items-center justify-center">
+          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[10px] font-black bg-brand-magenta/25 text-brand-magenta border border-brand-magenta/40 mb-4 tracking-widest uppercase animate-pulse">
             <Compass className="w-3.5 h-3.5" />
-            <span>GUÍA EXCLUSIVA</span>
+            <span>EL PARAÍSO TE ESPERA</span>
           </span>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
+          <h1 className="text-4xl md:text-5xl font-display font-black tracking-tight mb-4 text-white drop-shadow-md">
             Explora Hoteles y <span className="text-gradient-brand">Hospedajes</span>
           </h1>
-          <p className="text-gray-300 text-xs md:text-sm max-w-2xl mx-auto leading-relaxed">
+          <p className="text-gray-150 text-xs md:text-sm font-sans max-w-2xl mx-auto leading-relaxed opacity-95 drop-shadow-xs">
             Descubre los mejores hospedajes, posadas boutique y restaurantes en toda Venezuela. Comunícate directamente con los dueños sin pagar cargos por intermediación.
           </p>
         </div>
       </div>
 
-      {/* Control Panel: Search & Advanced Filters */}
+      {/* Contenedor Principal con Diseño de 2 Columnas (Sidebar Filtros Izquierdo + Resultados Derecho) */}
       <div className="max-w-7xl mx-auto px-6 -mt-8 relative z-20">
-        <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-xl shadow-gray-200/40 space-y-4">
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
           
-          {/* Main Search Input & Top Action Controls */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-3.5 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Buscar por nombre del hotel, servicios, palabras clave..."
-                value={searchQuery}
-                onChange={e => handleSearchChange(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-100 rounded-2xl pl-12 pr-4 py-3 text-xs md:text-sm text-gray-700 placeholder-gray-400 outline-none focus:border-brand-magenta focus:bg-white transition-colors font-semibold"
-              />
-            </div>
-
-            <div className="flex items-center gap-2.5">
-              {/* Universal Filters Toggle Button */}
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className={`flex items-center justify-center gap-2 border rounded-2xl px-5 py-3 text-xs font-bold transition-all cursor-pointer shadow-xs shrink-0 select-none ${
-                  showFilters
-                    ? "bg-slate-900 border-slate-900 text-white"
-                    : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
-                }`}
+          {/* COLUMNA IZQUIERDA: Filtros (Fijo en desktop, colapsable en móvil) */}
+          <aside className={`w-full lg:w-80 shrink-0 bg-white border border-gray-100 rounded-3xl p-6 shadow-xl shadow-gray-200/40 lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto transition-all duration-300 ${showFilters ? 'block' : 'hidden lg:block'}`}>
+            <div className="flex items-center justify-between pb-4 mb-4 border-b border-gray-100">
+              <h3 className="text-sm font-black text-gray-800 tracking-tight flex items-center gap-2">
+                <Filter className="w-4 h-4 text-brand-magenta" />
+                <span>Filtros de Búsqueda</span>
+              </h3>
+              {/* Botón para cerrar filtros en móvil */}
+              <button 
+                onClick={() => setShowFilters(false)}
+                className="lg:hidden p-1.5 rounded-xl hover:bg-gray-50 text-gray-500 cursor-pointer"
               >
-                <Filter className={`w-4 h-4 ${showFilters ? "text-[#00C8D4]" : "text-brand-magenta"}`} />
-                <span>Filtros Avanzados</span>
-                {activeFiltersCount > 0 && (
-                  <span className="w-5 h-5 rounded-full bg-brand-magenta text-white text-[10px] font-black flex items-center justify-center leading-none">
-                    {activeFiltersCount}
-                  </span>
-                )}
+                <X className="w-4 h-4" />
               </button>
+            </div>
 
-              {/* Layout Mode Toggle */}
-              <div className="hidden md:flex items-center gap-1 bg-gray-50 border border-gray-150 rounded-2xl p-1 shrink-0">
-                <button
-                  onClick={() => setViewMode("grid")}
-                  className={`p-2 rounded-xl transition-all cursor-pointer ${viewMode === "grid" ? "bg-white text-brand-magenta shadow-xs font-bold" : "text-gray-400 hover:text-gray-600"}`}
-                  title="Vista Cuadrícula"
+            <div className="space-y-6 text-left">
+              {/* 1. Categoría */}
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Categoría</label>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => handleCategoryChange(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-gray-700 outline-none focus:border-brand-magenta cursor-pointer"
                 >
-                  <Grid className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode("list")}
-                  className={`p-2 rounded-xl transition-all cursor-pointer ${viewMode === "list" ? "bg-white text-brand-magenta shadow-xs font-bold" : "text-gray-400 hover:text-gray-600"}`}
-                  title="Vista Lista"
+                  <option value="">Todas las Categorías</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.slug}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 2. Destino */}
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Destino</label>
+                <select
+                  value={selectedDestination}
+                  onChange={(e) => handleDestinationChange(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-gray-700 outline-none focus:border-brand-magenta cursor-pointer"
                 >
-                  <List className="w-4 h-4" />
+                  <option value="">Todos los Destinos</option>
+                  {destinations.map((dest) => (
+                    <option key={dest.id} value={dest.slug}>{dest.name} ({dest.state})</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 3. Rango de Precios */}
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Precio por Noche (USD)</label>
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <span className="absolute left-3 top-2 text-gray-400 text-xs font-bold">$</span>
+                    <input
+                      type="number"
+                      placeholder="Mín"
+                      value={minPrice || ""}
+                      onChange={(e) => setMinPrice(Math.max(0, Number(e.target.value)))}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-6 pr-2 py-2.5 text-xs font-semibold text-gray-700 outline-none focus:border-[#00C8D4]"
+                    />
+                  </div>
+                  <span className="text-gray-450 text-xs">—</span>
+                  <div className="relative flex-1">
+                    <span className="absolute left-3 top-2 text-gray-400 text-xs font-bold">$</span>
+                    <input
+                      type="number"
+                      placeholder="Máx"
+                      value={maxPrice || ""}
+                      onChange={(e) => setMaxPrice(Math.max(0, Number(e.target.value)))}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-6 pr-2 py-2.5 text-xs font-semibold text-gray-700 outline-none focus:border-[#00C8D4]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 4. Calificación Mínima */}
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Calificación Mínima</label>
+                <select
+                  value={minRating}
+                  onChange={(e) => setMinRating(Number(e.target.value))}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-gray-750 outline-none focus:border-[#00C8D4] cursor-pointer"
+                >
+                  <option value="0">Cualquier Puntuación</option>
+                  <option value="4.5">★ 4.5+ Excelente</option>
+                  <option value="4.0">★ 4.0+ Muy Bueno</option>
+                  <option value="3.5">★ 3.5+ Bueno</option>
+                </select>
+              </div>
+
+              {/* 5. Huéspedes / Capacidad */}
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Huéspedes / Capacidad</label>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
+                    <span className="text-[11px] text-gray-500 font-bold">Adultos</span>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        disabled={adults <= 1}
+                        onClick={() => setAdults(adults - 1)}
+                        className="w-5 h-5 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs font-black text-gray-550 hover:bg-gray-50 disabled:opacity-40 select-none cursor-pointer"
+                      >
+                        -
+                      </button>
+                      <span className="text-xs font-bold text-gray-750 min-w-[12px] text-center">{adults}</span>
+                      <button
+                        type="button"
+                        onClick={() => setAdults(adults + 1)}
+                        className="w-5 h-5 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs font-black text-gray-550 hover:bg-gray-50 select-none cursor-pointer"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
+                    <span className="text-[11px] text-gray-500 font-bold">Niños</span>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        disabled={children <= 0}
+                        onClick={() => setChildren(children - 1)}
+                        className="w-5 h-5 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs font-black text-gray-550 hover:bg-gray-50 disabled:opacity-40 select-none cursor-pointer"
+                      >
+                        -
+                      </button>
+                      <span className="text-xs font-bold text-gray-755 min-w-[12px] text-center">{children}</span>
+                      <button
+                        type="button"
+                        onClick={() => setChildren(children + 1)}
+                        className="w-5 h-5 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs font-black text-gray-550 hover:bg-gray-50 select-none cursor-pointer"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 6. Subtipo de Alojamiento */}
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Subtipo de Alojamiento</label>
+                <select
+                  value={selectedSubtype}
+                  onChange={(e) => setSelectedSubtype(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-gray-750 outline-none focus:border-[#00C8D4] cursor-pointer"
+                >
+                  <option value="">Cualquier subtipo</option>
+                  <option value="posada_boutique">Posada Boutique / Encanto</option>
+                  <option value="resort">Resort / Complejo Vacacional</option>
+                  <option value="hotel_familiar">Hotel Familiar o de Ciudad</option>
+                  <option value="otros">Otros tipos de hospedaje</option>
+                </select>
+              </div>
+
+              {/* 7. Servicios y Amenidades Clave */}
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Servicios Clave</label>
+                <div className="grid grid-cols-2 lg:grid-cols-1 gap-1.5">
+                  {availableAmenities.map((amenity) => {
+                    const isSelected = selectedAmenities.includes(amenity.key);
+                    return (
+                      <button
+                        key={amenity.key}
+                        type="button"
+                        onClick={() => toggleAmenityFilter(amenity.key)}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all border cursor-pointer select-none justify-start ${
+                          isSelected
+                            ? "bg-cyan-50 border-[#00C8D4] text-[#00C8D4] shadow-xs"
+                            : "bg-white border-gray-150 text-gray-600 hover:bg-gray-50"
+                        }`}
+                      >
+                        <span className={isSelected ? "text-[#00C8D4]" : "text-gray-400"}>
+                          {amenity.icon}
+                        </span>
+                        <span className="truncate">{amenity.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Restablecer Filtros */}
+              {activeFiltersCount > 0 && (
+                <button
+                  onClick={clearFilters}
+                  className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-650 border border-red-100 rounded-xl text-xs font-black transition-colors cursor-pointer select-none mt-2"
+                >
+                  <X className="w-4 h-4" />
+                  <span>Limpiar Filtros</span>
                 </button>
+              )}
+            </div>
+          </aside>
+
+          {/* COLUMNA DERECHA: Buscador superior y resultados reactivos */}
+          <div className="flex-1 w-full space-y-6">
+            
+            {/* Panel de Control de Búsqueda y Visualización */}
+            <div className="bg-white border border-gray-100 rounded-3xl p-4 shadow-xl shadow-gray-200/40 flex flex-col md:flex-row items-center gap-4">
+              
+              {/* Input principal de búsqueda */}
+              <div className="relative flex-1 w-full">
+                <Search className="absolute left-4 top-3.5 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Buscar por nombre, servicios o palabras clave..."
+                  value={searchQuery}
+                  onChange={e => handleSearchChange(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-100 rounded-2xl pl-12 pr-4 py-3 text-xs md:text-sm text-gray-700 placeholder-gray-400 outline-none focus:border-brand-magenta focus:bg-white transition-colors font-semibold"
+                />
+              </div>
+
+              {/* Controles para Móviles y Visualización */}
+              <div className="flex items-center gap-2.5 w-full md:w-auto justify-between md:justify-end">
+                
+                {/* Botón para abrir filtros en móvil */}
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="lg:hidden flex items-center justify-center gap-2 border border-gray-200 rounded-2xl px-4 py-3 text-xs font-bold bg-white text-gray-700 hover:bg-gray-50 transition-all cursor-pointer shadow-xs shrink-0 select-none"
+                >
+                  <Filter className="w-4 h-4 text-brand-magenta" />
+                  <span>Filtros</span>
+                  {activeFiltersCount > 0 && (
+                    <span className="w-5 h-5 rounded-full bg-brand-magenta text-white text-[10px] font-black flex items-center justify-center leading-none">
+                      {activeFiltersCount}
+                    </span>
+                  )}
+                </button>
+
+                {/* Info de resultados encontrados */}
+                <div className="text-xs font-bold text-gray-500 whitespace-nowrap px-1">
+                  Encontrados: <span className="text-brand-magenta font-black">{filtered.length}</span>
+                </div>
+
+                {/* Selector de modo de vista */}
+                <div className="flex items-center gap-1 bg-gray-50 border border-gray-150 rounded-2xl p-1 shrink-0">
+                  <button
+                    onClick={() => setViewMode("grid")}
+                    className={`p-2 rounded-xl transition-all cursor-pointer ${viewMode === "grid" ? "bg-white text-brand-magenta shadow-xs font-bold" : "text-gray-400 hover:text-gray-600"}`}
+                    title="Vista Cuadrícula"
+                  >
+                    <Grid className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode("list")}
+                    className={`p-2 rounded-xl transition-all cursor-pointer ${viewMode === "list" ? "bg-white text-brand-magenta shadow-xs font-bold" : "text-gray-400 hover:text-gray-600"}`}
+                    title="Vista Lista"
+                  >
+                    <List className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Expandable Advanced Filters Panel */}
-          {showFilters && (
-            <div className="pt-5 border-t border-gray-100 space-y-5 animate-in slide-in-from-top-4 duration-200 text-left">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                
-                {/* 1. Categoría y Destino */}
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Ubicación y Tipo</label>
-                  <div className="flex flex-col gap-2">
-                    <select
-                      value={selectedCategory}
-                      onChange={(e) => handleCategoryChange(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-gray-600 outline-none focus:border-brand-magenta cursor-pointer"
-                    >
-                      <option value="">Todas las Categorías</option>
-                      {categories.map((cat) => (
-                        <option key={cat.id} value={cat.slug}>{cat.name}</option>
-                      ))}
-                    </select>
-
-                    <select
-                      value={selectedDestination}
-                      onChange={(e) => handleDestinationChange(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-gray-600 outline-none focus:border-brand-magenta cursor-pointer"
-                    >
-                      <option value="">Todos los Destinos</option>
-                      {destinations.map((dest) => (
-                        <option key={dest.id} value={dest.slug}>{dest.name} ({dest.state})</option>
-                      ))}
-                    </select>
-                  </div>
+            {/* Listado de Resultados */}
+            <div>
+              {loading ? (
+                <div className="flex flex-col items-center justify-center py-20 gap-3">
+                  <Loader2 className="w-10 h-10 text-brand-magenta animate-spin" />
+                  <p className="text-gray-400 text-xs font-bold">Cargando establecimientos premium...</p>
                 </div>
-
-                {/* 2. Rango de Precios */}
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Rango de Precios por Noche (USD)</label>
-                  <div className="flex items-center gap-2">
-                    <div className="relative flex-1">
-                      <span className="absolute left-3.5 top-2.5 text-gray-400 text-xs font-bold">$</span>
-                      <input
-                        type="number"
-                        placeholder="Mín"
-                        value={minPrice || ""}
-                        onChange={(e) => setMinPrice(Math.max(0, Number(e.target.value)))}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-7 pr-3 py-2 text-xs font-semibold text-gray-700 outline-none focus:border-[#00C8D4]"
-                      />
-                    </div>
-                    <span className="text-gray-400 text-xs">—</span>
-                    <div className="relative flex-1">
-                      <span className="absolute left-3.5 top-2.5 text-gray-400 text-xs font-bold">$</span>
-                      <input
-                        type="number"
-                        placeholder="Máx"
-                        value={maxPrice || ""}
-                        onChange={(e) => setMaxPrice(Math.max(0, Number(e.target.value)))}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-7 pr-3 py-2 text-xs font-semibold text-gray-700 outline-none focus:border-[#00C8D4]"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* 3. Calificación */}
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Calificación Mínima</label>
-                  <select
-                    value={minRating}
-                    onChange={(e) => setMinRating(Number(e.target.value))}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-gray-600 outline-none focus:border-[#00C8D4] cursor-pointer"
-                  >
-                    <option value="0">Cualquier Puntuación</option>
-                    <option value="4.5">★ 4.5+ Excelente</option>
-                    <option value="4.0">★ 4.0+ Muy Bueno</option>
-                    <option value="3.5">★ 3.5+ Bueno</option>
-                  </select>
-                </div>
-
-                {/* 4. Capacidad / Huéspedes */}
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Huéspedes / Capacidad</label>
-                  <div className="flex gap-2">
-                    <div className="flex-1 flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
-                      <span className="text-[11px] text-gray-500 font-bold">Adultos</span>
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          disabled={adults <= 1}
-                          onClick={() => setAdults(adults - 1)}
-                          className="w-5 h-5 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs font-black text-gray-500 hover:bg-gray-50 disabled:opacity-40 select-none cursor-pointer"
-                        >
-                          -
-                        </button>
-                        <span className="text-xs font-bold text-gray-700 min-w-[12px] text-center">{adults}</span>
-                        <button
-                          type="button"
-                          onClick={() => setAdults(adults + 1)}
-                          className="w-5 h-5 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs font-black text-gray-500 hover:bg-gray-50 select-none cursor-pointer"
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="flex-1 flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
-                      <span className="text-[11px] text-gray-500 font-bold">Niños</span>
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          disabled={children <= 0}
-                          onClick={() => setChildren(children - 1)}
-                          className="w-5 h-5 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs font-black text-gray-500 hover:bg-gray-50 disabled:opacity-40 select-none cursor-pointer"
-                        >
-                          -
-                        </button>
-                        <span className="text-xs font-bold text-gray-700 min-w-[12px] text-center">{children}</span>
-                        <button
-                          type="button"
-                          onClick={() => setChildren(children + 1)}
-                          className="w-5 h-5 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs font-black text-gray-500 hover:bg-gray-50 select-none cursor-pointer"
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 5. Subtipo de Alojamiento */}
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Subtipo de Alojamiento</label>
-                  <select
-                    value={selectedSubtype}
-                    onChange={(e) => setSelectedSubtype(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-gray-600 outline-none focus:border-[#00C8D4] cursor-pointer"
-                  >
-                    <option value="">Cualquier subtipo</option>
-                    <option value="posada_boutique">Posada Boutique / Encanto</option>
-                    <option value="resort">Resort / Complejo Vacacional</option>
-                    <option value="hotel_familiar">Hotel Familiar o de Ciudad</option>
-                    <option value="otros">Otros tipos de hospedaje</option>
-                  </select>
-                </div>
-
-                {/* 6. Servicios y Amenidades Clave (Spans 3 columns on large screens) */}
-                <div className="space-y-2 lg:col-span-3">
-                  <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Servicios y Amenidades Clave</label>
-                  <div className="flex flex-wrap gap-1.5">
-                    {availableAmenities.map((amenity) => {
-                      const isSelected = selectedAmenities.includes(amenity.key);
-                      return (
-                        <button
-                          key={amenity.key}
-                          type="button"
-                          onClick={() => toggleAmenityFilter(amenity.key)}
-                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer select-none ${
-                            isSelected
-                              ? "bg-cyan-50 border-[#00C8D4] text-[#00C8D4] shadow-xs"
-                              : "bg-white border-gray-150 text-gray-600 hover:bg-gray-50"
-                          }`}
-                        >
-                          <span className={isSelected ? "text-[#00C8D4]" : "text-gray-400"}>
-                            {amenity.icon}
-                          </span>
-                          <span>{amenity.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Restore Button Inside Panel */}
-              {activeFiltersCount > 0 && (
-                <div className="flex justify-end pt-3 border-t border-gray-50">
+              ) : filtered.length === 0 ? (
+                <div className="text-center py-20 bg-white rounded-3xl border border-gray-100 p-8 shadow-sm">
+                  <Compass className="w-16 h-16 text-gray-200 mx-auto mb-4" />
+                  <h3 className="text-lg font-bold text-gray-750 mb-1">No se encontraron establecimientos</h3>
+                  <p className="text-gray-450 text-xs max-w-sm mx-auto leading-relaxed">
+                    Prueba modificando la búsqueda o quitando los filtros aplicados en el panel izquierdo.
+                  </p>
                   <button
                     onClick={clearFilters}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-650 border border-red-100 rounded-xl text-xs font-black transition-colors cursor-pointer select-none"
+                    className="mt-6 btn-magenta-gradient px-6 py-2.5 rounded-xl text-xs font-bold hover:scale-102 transition-all cursor-pointer shadow-md shadow-brand-magenta/10"
                   >
-                    <X className="w-4 h-4" />
-                    <span>Restablecer Filtros</span>
+                    Restablecer Búsqueda
                   </button>
+                </div>
+              ) : viewMode === "grid" ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {filtered.map((est) => (
+                    <EstablishmentCard 
+                      key={est.id} 
+                      establishment={est} 
+                      isComparing={comparedIds.includes(est.id)}
+                      onCompareToggle={() => handleCompareToggle(est.id)}
+                      isPriority={est.is_featured}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {filtered.map((est) => (
+                    <EstablishmentListItem 
+                      key={est.id} 
+                      establishment={est} 
+                      isComparing={comparedIds.includes(est.id)}
+                      onCompareToggle={() => handleCompareToggle(est.id)}
+                      isPriority={est.is_featured}
+                    />
+                  ))}
                 </div>
               )}
             </div>
-          )}
-        </div>
-      </div>
 
-      {/* Main Results Body */}
-      <div className="max-w-7xl mx-auto px-6 mt-12">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-lg font-black text-gray-800 tracking-tight flex items-center gap-2">
-            <span>Establecimientos</span>
-            <span className="bg-brand-magenta/10 text-brand-magenta text-[10px] px-2.5 py-0.5 rounded-full font-black">
-              {filtered.length}
-            </span>
-          </h2>
-        </div>
+          </div>
 
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3">
-            <Loader2 className="w-10 h-10 text-brand-magenta animate-spin" />
-            <p className="text-gray-400 text-xs font-bold">Cargando establecimientos premium...</p>
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-3xl border border-gray-100 p-8 shadow-sm">
-            <Compass className="w-16 h-16 text-gray-200 mx-auto mb-4" />
-            <h3 className="text-lg font-bold text-gray-700 mb-1">No se encontraron establecimientos</h3>
-            <p className="text-gray-400 text-xs max-w-sm mx-auto leading-relaxed">
-              Prueba modificando la búsqueda o quitando los filtros aplicados.
-            </p>
-            <button
-              onClick={clearFilters}
-              className="mt-6 btn-magenta-gradient px-6 py-2.5 rounded-xl text-xs font-bold hover:scale-102 transition-all cursor-pointer shadow-md shadow-brand-magenta/10"
-            >
-              Restablecer Búsqueda
-            </button>
-          </div>
-        ) : viewMode === "grid" ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filtered.map((est) => (
-              <EstablishmentCard 
-                key={est.id} 
-                establishment={est} 
-                isComparing={comparedIds.includes(est.id)}
-                onCompareToggle={() => handleCompareToggle(est.id)}
-                isPriority={est.is_featured}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {filtered.map((est) => (
-              <EstablishmentListItem 
-                key={est.id} 
-                establishment={est} 
-                isComparing={comparedIds.includes(est.id)}
-                onCompareToggle={() => handleCompareToggle(est.id)}
-                isPriority={est.is_featured}
-              />
-            ))}
-          </div>
-        )}
+        </div>
       </div>
 
       {/* Floating Compare Bar */}

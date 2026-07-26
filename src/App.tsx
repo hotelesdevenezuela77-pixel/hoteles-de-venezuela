@@ -92,6 +92,7 @@ const SitiosTuristicos = lazyNamed(() => import("./pages/SitiosTuristicos"), "Si
 const PerfilKYC = lazyNamed(() => import("./pages/PerfilKYC"), "PerfilKYC");
 const AsistenteViajesIA = lazyNamed(() => import("./pages/AsistenteViajesIA"), "AsistenteViajesIA");
 const AdminIaViajes = lazyNamed(() => import("./pages/admin/AdminIaViajes"), "AdminIaViajes");
+const AdminExpedicionRutas = lazyNamed(() => import("./pages/admin/AdminExpedicionRutas"), "AdminExpedicionRutas");
 
 // Importación del Agente IA sin llaves apuntando a la carpeta admin
 const AdminConversacionalIA = lazy(() => import("./pages/admin/AdminConversacionalIA"));
@@ -149,6 +150,7 @@ function AdminShell() {
         <Route path="/admin/dynamic-pricing" component={AdminDynamicPricing} />
         <Route path="/admin/ia-viajes" component={AdminIaViajes} />
         <Route path="/admin/agenda" component={AdminAgenda} />
+        <Route path="/admin/expedicion-rutas" component={AdminExpedicionRutas} />
       </Switch>
     </AdminLayout>
   );
