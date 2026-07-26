@@ -672,15 +672,99 @@ export function AdminContenido() {
 
       {pageModal && editPage && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-[#100921] border border-slate-800 rounded-2xl w-full max-w-xl p-6 shadow-2xl relative overflow-hidden">
+          <div className="bg-[#100921] border border-slate-800 rounded-2xl w-full max-w-2xl p-6 shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]">
             <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#9B00CC] to-[#FF0096]" />
-            <h2 className="text-xs font-black uppercase tracking-widest text-white mb-5">{pageModal === "create" ? "Nueva Entrada Custom" : "Modificar Entrada"}</h2>
-            <div className="space-y-4">
-              <input placeholder="Título de la Página" value={editPage.title || ""} onChange={e => setEditPage({ ...editPage, title: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] p-3 rounded-xl text-xs font-bold text-white outline-none" />
-              <input placeholder="Slug Enlace" value={editPage.slug || ""} onChange={e => setEditPage({ ...editPage, slug: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] p-3 rounded-xl text-xs font-mono text-white outline-none" />
-              <textarea placeholder="Contenido HTML o Texto Pleno" rows={6} value={editPage.content || ""} onChange={e => setEditPage({ ...editPage, content: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] p-3 rounded-xl text-xs font-mono text-white outline-none resize-y" />
+            
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xs font-black uppercase tracking-widest text-white">{pageModal === "create" ? "Nueva Entrada Custom" : "Modificar Entrada"}</h2>
+              <button type="button" onClick={() => setPageModal(null)} className="text-slate-400 hover:text-white transition-colors cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
             </div>
-            <div className="mt-6 flex justify-end gap-3">
+
+            {editPage.slug === "los-10-mejores-hoteles" && (
+              <div className="mb-4 p-3 bg-purple-950/20 border border-purple-500/25 rounded-xl text-[10px] text-purple-300 leading-relaxed font-semibold">
+                💡 <strong>Plantilla Premium Detectada:</strong> Esta página utiliza el diseño especial de tarjetas. El campo "Contenido" no alterará el diseño de los 10 hoteles, pero puedes cambiar el Título/SEO aquí y subir las fotos en la pestaña "Top 10 Hoteles".
+              </div>
+            )}
+
+            <div className="space-y-4 overflow-y-auto pr-2 flex-1 scrollbar-thin scrollbar-thumb-purple-900 scrollbar-track-transparent">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] uppercase font-black text-slate-400 block mb-1 tracking-widest">Título de la Página</label>
+                  <input placeholder="Ej: Los 10 Mejores Hoteles" value={editPage.title || ""} onChange={e => setEditPage({ ...editPage, title: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] p-3 rounded-xl text-xs font-bold text-white outline-none" />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase font-black text-slate-400 block mb-1 tracking-widest">Slug Enlace</label>
+                  <input placeholder="Ej: los-10-mejores-hoteles" value={editPage.slug || ""} onChange={e => setEditPage({ ...editPage, slug: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] p-3 rounded-xl text-xs font-mono text-white outline-none" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] uppercase font-black text-slate-400 block mb-1 tracking-widest">Título H1 (Encabezado)</label>
+                  <input placeholder="Título principal en banner" value={editPage.h1Title || ""} onChange={e => setEditPage({ ...editPage, h1Title: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] p-3 rounded-xl text-xs font-bold text-white outline-none" />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase font-black text-slate-400 block mb-1 tracking-widest">Video URL (YouTube/Vimeo)</label>
+                  <input placeholder="Ej: https://www.youtube.com/watch?v=..." value={editPage.videoUrl || ""} onChange={e => setEditPage({ ...editPage, videoUrl: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] p-3 rounded-xl text-xs font-mono text-white outline-none" />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[10px] uppercase font-black text-slate-400 block mb-1 tracking-widest">Imagen de Cabecera (Banner Principal)</label>
+                <div className="flex gap-2">
+                  <input placeholder="URL de la imagen o sube un archivo" value={editPage.featuredImage || ""} onChange={e => setEditPage({ ...editPage, featuredImage: e.target.value })} className="flex-1 bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] p-3 rounded-xl text-xs font-mono text-white outline-none" />
+                  <label className="flex items-center justify-center px-4 py-3 border border-dashed border-purple-500/40 bg-[#1e123a] hover:bg-[#251747] rounded-xl text-xs font-black uppercase text-white tracking-wider cursor-pointer transition-colors shrink-0">
+                    <Upload className="w-4 h-4 text-[#FF0096] mr-1" /> Subir
+                    <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                      const file = e.target.files?.[0]; if (!file) return;
+                      const r = new FileReader(); r.onload = () => setEditPage({ ...editPage, featuredImage: r.result as string }); r.readAsDataURL(file);
+                    }} />
+                  </label>
+                </div>
+                {editPage.featuredImage && (
+                  <img src={editPage.featuredImage} alt="Cabecera Preview" className="h-16 w-auto object-cover rounded-xl mt-2 border border-slate-800" />
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] uppercase font-black text-slate-400 block mb-1 tracking-widest">Meta Descripción (SEO)</label>
+                  <textarea placeholder="Descripción para buscadores" rows={2} value={editPage.metaDescription || ""} onChange={e => setEditPage({ ...editPage, metaDescription: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] p-3 rounded-xl text-xs font-bold text-white outline-none resize-none animate-none" />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase font-black text-slate-400 block mb-1 tracking-widest">Meta Keywords (SEO, separadas por coma)</label>
+                  <textarea placeholder="Ej: hoteles, lujo, turismo" rows={2} value={editPage.metaKeywords || ""} onChange={e => setEditPage({ ...editPage, metaKeywords: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] p-3 rounded-xl text-xs font-bold text-white outline-none resize-none animate-none" />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[10px] uppercase font-black text-slate-400 block mb-1 tracking-widest">Contenido Principal (HTML o Texto Pleno)</label>
+                <textarea placeholder="Contenido de la página..." rows={4} value={editPage.content || ""} onChange={e => setEditPage({ ...editPage, content: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] p-3 rounded-xl text-xs font-mono text-white outline-none resize-y" />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] uppercase font-black text-slate-400 block mb-1 tracking-widest">Establecimientos Relacionados (IDs separados por coma)</label>
+                  <input placeholder="Ej: 8,10,12" value={editPage.relatedEstablishments || ""} onChange={e => setEditPage({ ...editPage, relatedEstablishments: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] p-3 rounded-xl text-xs font-mono text-white outline-none" />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase font-black text-slate-400 block mb-1 tracking-widest">Galería de Imágenes (URLs separadas por coma o línea)</label>
+                  <textarea placeholder="URLs de la galería..." rows={2} value={editPage.galleryImages || ""} onChange={e => setEditPage({ ...editPage, galleryImages: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] p-3 rounded-xl text-xs font-mono text-white outline-none resize-y" />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between py-2.5 border-t border-slate-800/40">
+                <div>
+                  <span className="text-[10px] uppercase font-black text-white tracking-widest block">Publicar Página</span>
+                  <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wider mt-0.5 font-sans">Hacerla visible públicamente</span>
+                </div>
+                <ToggleSwitch checked={editPage.isPublished ?? false} onChange={v => setEditPage({ ...editPage, isPublished: v })} />
+              </div>
+            </div>
+            
+            <div className="mt-6 flex justify-end gap-3 border-t border-slate-800/40 pt-4">
               <button type="button" onClick={() => setPageModal(null)} className="px-4 py-2 bg-[#170e2e] rounded-xl text-xs font-black uppercase text-slate-400 cursor-pointer">Abortar</button>
               <button type="button" onClick={() => savePage.mutate(editPage)} className="px-5 py-2 text-white rounded-xl text-xs font-black uppercase bg-gradient-to-r from-[#9B00CC] to-[#FF0096] tracking-wider cursor-pointer">Guardar Nodo</button>
             </div>
