@@ -127,13 +127,29 @@ export function AdminContenido() {
     mutationFn: async (s: SiteSection) => {
       let finalImageUrl = s.imageUrl;
       if (finalImageUrl && finalImageUrl.startsWith("data:")) {
-        const response = await fetch(finalImageUrl);
-        const blob = await response.blob();
-        const fileName = `contenido/${Date.now()}.jpg`;
-        const { error: uploadError } = await supabase.storage.from("establecimientos").upload(fileName, blob, { contentType: "image/jpeg", upsert: true });
-        if (uploadError) throw uploadError;
-        const { data: { publicUrl } } = supabase.storage.from("establecimientos").getPublicUrl(fileName);
-        finalImageUrl = publicUrl;
+        try {
+          const parts = finalImageUrl.split(',');
+          const mime = parts[0].match(/:(.*?);/)?.[1] || "image/jpeg";
+          const bstr = atob(parts[1]);
+          let n = bstr.length;
+          const u8arr = new Uint8Array(n);
+          while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+          }
+          const blob = new Blob([u8arr], { type: mime });
+          const extension = mime.split('/')[1] || 'jpg';
+          const fileName = `contenido/${Date.now()}.${extension}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from("establecimientos")
+            .upload(fileName, blob, { contentType: mime, upsert: true });
+            
+          if (uploadError) throw uploadError;
+          const { data: { publicUrl } } = supabase.storage.from("establecimientos").getPublicUrl(fileName);
+          finalImageUrl = publicUrl;
+        } catch (uploadException: any) {
+          throw new Error(`Fallo al procesar o subir la imagen: ${uploadException.message}`);
+        }
       }
       const payload = {
         section_key: s.sectionKey, title: s.title, subtitle: s.subtitle, description: s.description,
@@ -283,8 +299,17 @@ export function AdminContenido() {
                   )}
                 </div>
                 <div className="flex gap-3 pt-3">
-                  <button type="button" onClick={() => setEditSection(null)} className="flex-1 py-3 bg-[#170e2e] hover:bg-[#221544] border border-slate-800 rounded-xl text-xs font-black uppercase text-slate-300 tracking-wider transition-colors cursor-pointer">Cancelar</button>
-                  <button type="button" onClick={() => updateSection.mutate(editSection)} className="flex-1 py-3 text-white rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-[#9B00CC] to-[#FF0096] cursor-pointer">Sincronizar Cambios</button>
+                  <button type="button" disabled={updateSection.isPending} onClick={() => setEditSection(null)} className="flex-1 py-3 bg-[#170e2e] hover:bg-[#221544] border border-slate-800 rounded-xl text-xs font-black uppercase text-slate-300 tracking-wider transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">Cancelar</button>
+                  <button type="button" disabled={updateSection.isPending} onClick={() => updateSection.mutate(editSection)} className="flex-1 py-3 text-white rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-[#9B00CC] to-[#FF0096] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                    {updateSection.isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin text-white" />
+                        <span>Sincronizando...</span>
+                      </>
+                    ) : (
+                      <span>Sincronizar Cambios</span>
+                    )}
+                  </button>
                 </div>
               </div>
             ) : heroSection ? (
@@ -425,8 +450,17 @@ export function AdminContenido() {
                       )}
 
                       <div className="flex gap-3 pt-2">
-                        <button type="button" onClick={() => setEditSection(null)} className="flex-1 py-3 bg-[#170e2e] hover:bg-[#221544] border border-slate-800 rounded-xl text-xs font-black uppercase text-slate-300 tracking-wider transition-colors cursor-pointer">Cancelar</button>
-                        <button type="button" onClick={() => updateSection.mutate(editSection)} className="flex-1 py-3 text-white rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-[#FF0096] to-[#9B00CC] cursor-pointer">Sincronizar</button>
+                        <button type="button" disabled={updateSection.isPending} onClick={() => setEditSection(null)} className="flex-1 py-3 bg-[#170e2e] hover:bg-[#221544] border border-slate-800 rounded-xl text-xs font-black uppercase text-slate-300 tracking-wider transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">Cancelar</button>
+                        <button type="button" disabled={updateSection.isPending} onClick={() => updateSection.mutate(editSection)} className="flex-1 py-3 text-white rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-[#FF0096] to-[#9B00CC] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                          {updateSection.isPending ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin text-white" />
+                              <span>Sincronizando...</span>
+                            </>
+                          ) : (
+                            <span>Sincronizar</span>
+                          )}
+                        </button>
                       </div>
                     </div>
                   ) : (
