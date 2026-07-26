@@ -89,7 +89,7 @@ export function AdminExpedicionRutas() {
   const pointsGroupRef = useRef<L.FeatureGroup | null>(null);
   const establishmentsGroupRef = useRef<L.FeatureGroup | null>(null);
   const watchIdRef = useRef<number | null>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 1. Validar autorización de administrador
   useEffect(() => {
