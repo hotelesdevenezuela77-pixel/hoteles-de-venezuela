@@ -6,8 +6,9 @@ import { supabase } from "@/lib/supabase";
 import { AdminTabBar } from "@/components/admin/AdminTabBar";
 import {
   FileText, Globe, Layers, Settings, Image, Edit2, X, Check,
-  Plus, Trash2, Eye, Save, ExternalLink, ToggleLeft, ToggleRight, Loader2, Upload
+  Plus, Trash2, Eye, Save, ExternalLink, ToggleLeft, ToggleRight, Loader2, Upload, Star
 } from "lucide-react";
+import { TOP10_HOTELS_STATIC_DATA } from "@/config/top10Hoteles";
 
 interface SiteSection {
   id?: number; sectionKey: string; title: string | null; subtitle: string | null;
@@ -50,7 +51,7 @@ const GROUP_LABELS: Record<string, string> = {
   general: "General", contact: "Contacto", social: "Redes Sociales", features: "Funcionalidades", system: "Sistema"
 };
 
-type Tab = "site" | "hero" | "sections" | "pages";
+type Tab = "site" | "hero" | "sections" | "pages" | "top10";
 
 function ToggleSwitch({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
   return (
@@ -223,7 +224,8 @@ export function AdminContenido() {
     { id: "hero",      label: "Héroe Principal",         icon: <Image className="w-4 h-4" /> },
     { id: "sections", label: "Secciones Core",       icon: <Layers className="w-4 h-4" /> },
     { id: "site",      label: "Configuración Core",    icon: <Settings className="w-4 h-4" /> },
-    { id: "pages",    label: "Páginas Personalizadas",icon: <Globe className="w-4 h-4" /> }
+    { id: "pages",    label: "Páginas Personalizadas",icon: <Globe className="w-4 h-4" /> },
+    { id: "top10",    label: "Top 10 Hoteles",          icon: <Star className="w-4 h-4" /> }
   ];
 
   if (authLoading || loadingSections || loadingSettings || loadingPages) {
@@ -523,6 +525,107 @@ export function AdminContenido() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 5: TOP 10 HOTELES */}
+        {tab === "top10" && (
+          <div className="space-y-6 max-w-3xl">
+            <div className="bg-[#100921] rounded-2xl p-6 border border-slate-800/80 shadow-md relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#9B00CC] to-[#FF0096]" />
+              <h2 className="font-black text-white text-xs uppercase tracking-widest mb-6 flex items-center gap-2">
+                <Star className="w-4 h-4 text-[#FF0096]" /> 
+                Gestionar Fotos del Top 10 de Hoteles en Venezuela
+              </h2>
+              <p className="text-slate-400 text-xs mb-6">
+                Sube o edita las fotos reales de cada uno de los 10 mejores hoteles de la landing page.
+                Estas imágenes se guardarán bajo la clave de configuración <code className="text-purple-400 font-mono">top_10_hotels_images</code> en la base de datos.
+              </p>
+
+              <div className="space-y-6">
+                {TOP10_HOTELS_STATIC_DATA.map((h) => {
+                  const currentImages = JSON.parse(settingsDraft["top_10_hotels_images"] || "{}");
+                  const currentImageUrl = currentImages[h.id] || "";
+
+                  return (
+                    <div key={h.id} className="p-4 bg-[#0a0418] border border-slate-900 rounded-xl flex flex-col md:flex-row gap-4 items-start md:items-center">
+                      <div className="w-full md:w-32 h-20 bg-slate-950 rounded-lg overflow-hidden flex-shrink-0 border border-slate-800 flex items-center justify-center relative">
+                        {currentImageUrl ? (
+                          <img src={currentImageUrl} alt={h.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Sin Foto Real</span>
+                        )}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[10px] text-[#00C8D4] uppercase font-black tracking-wider">{h.location}</div>
+                        <h3 className="text-white text-xs font-black uppercase tracking-wide truncate mt-0.5">{h.id}. {h.name}</h3>
+                        <p className="text-[10px] text-slate-400 truncate mt-1">{h.category}</p>
+                      </div>
+
+                      <div className="w-full md:w-auto flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={currentImageUrl}
+                          onChange={(e) => {
+                            const updated = { ...currentImages, [h.id]: e.target.value };
+                            const val = JSON.stringify(updated);
+                            setSettingsDraft(d => ({ ...d, "top_10_hotels_images": val }));
+                            saveSetting.mutate({ key: "top_10_hotels_images", value: val });
+                          }}
+                          className="flex-1 md:w-60 bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] rounded-xl px-3 py-2 text-[10px] font-mono text-white outline-none"
+                          placeholder="URL de la imagen"
+                        />
+                        <label className="flex-shrink-0 flex items-center justify-center p-2.5 border border-dashed border-purple-500/40 bg-[#1e123a] hover:bg-[#251747] rounded-xl text-white cursor-pointer transition-colors">
+                          <Upload className="w-4 h-4 text-[#FF0096]" />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0]; if (!file) return;
+                              const r = new FileReader();
+                              r.onload = async () => {
+                                const base64Data = r.result as string;
+                                try {
+                                  const parts = base64Data.split(',');
+                                  const mime = parts[0].match(/:(.*?);/)?.[1] || "image/jpeg";
+                                  const bstr = atob(parts[1]);
+                                  let n = bstr.length;
+                                  const u8arr = new Uint8Array(n);
+                                  while (n--) {
+                                    u8arr[n] = bstr.charCodeAt(n);
+                                  }
+                                  const blob = new Blob([u8arr], { type: mime });
+                                  const extension = mime.split('/')[1] || 'jpg';
+                                  const fileName = `contenido/top10-${h.id}-${Date.now()}.${extension}`;
+
+                                  const { error: uploadError } = await supabase.storage
+                                    .from("establecimientos")
+                                    .upload(fileName, blob, { contentType: mime, upsert: true });
+
+                                  if (uploadError) throw uploadError;
+                                  const { data: { publicUrl } } = supabase.storage.from("establecimientos").getPublicUrl(fileName);
+
+                                  const updated = { ...currentImages, [h.id]: publicUrl };
+                                  const val = JSON.stringify(updated);
+                                  setSettingsDraft(d => ({ ...d, "top_10_hotels_images": val }));
+                                  saveSetting.mutate({ key: "top_10_hotels_images", value: val });
+                                  alert(`¡Foto de ${h.name} subida exitosamente!`);
+                                } catch (uploadException: any) {
+                                  alert(`Error al subir la imagen: ${uploadException.message}`);
+                                }
+                              };
+                              r.readAsDataURL(file);
+                            }}
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}

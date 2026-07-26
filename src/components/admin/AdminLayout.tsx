@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
-import { 
-  Building2, MapPin, Users, FileText, Package, BarChart3, Tag, 
-  Newspaper, Settings, Globe, ShieldCheck, DollarSign, ClipboardList, 
+import {
+  Building2, MapPin, Users, FileText, Package, BarChart3, Tag,
+  Newspaper, Settings, Globe, ShieldCheck, DollarSign, ClipboardList,
   Sparkles, Bot, Network, Shield, Car, Compass, AlertTriangle, Ticket, LayoutDashboard,
   Search, Bell, ChevronLeft, ChevronRight, X, ShieldAlert,
   ArrowUpDown, Receipt, MessageSquare, Star, Mail, Link2, LogOut, ChevronDown,
@@ -174,13 +174,13 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   ];
 
   // Aplanar todos los subenlaces para el buscador global Ctrl+K
-  const flatMenuItems = menuCategories.flatMap(cat => 
+  const flatMenuItems = menuCategories.flatMap(cat =>
     cat.items.map(item => ({ ...item, category: cat.name }))
   );
 
   // Filtrado reactivo en el buscador
-  const filteredMenuItems = flatMenuItems.filter(item => 
-    item.label.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  const filteredMenuItems = flatMenuItems.filter(item =>
+    item.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -219,21 +219,21 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen text-slate-100 flex font-sans overflow-hidden"
-         style={{ background: "linear-gradient(135deg, #0e011f 0%, #17032d 50%, #081124 100%)" }}>
-      
+      style={{ background: "linear-gradient(135deg, #0e011f 0%, #17032d 50%, #081124 100%)" }}>
+
       {/* ── SIDEBAR LATERAL RETRÁCTIL ── */}
-      <aside 
+      <aside
         className="transition-all duration-300 ease-in-out shrink-0 flex flex-col border-r border-white/5 relative z-30 shadow-2xl"
-        style={{ 
-          width: sidebarOpen ? "270px" : "78px", 
-          backgroundColor: "#1a0533" 
+        style={{
+          width: sidebarOpen ? "270px" : "78px",
+          backgroundColor: "#1a0533"
         }}
       >
         {/* Cabecera del Sidebar */}
         <div className="p-4 flex items-center justify-between border-b border-white/5">
           <div className="flex items-center gap-2.5 overflow-hidden">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg"
-                 style={{ background: `linear-gradient(135deg, ${FUCSIA}, ${PURPURA})` }}>
+              style={{ background: `linear-gradient(135deg, ${FUCSIA}, ${PURPURA})` }}>
               <Building2 className="w-4.5 h-4.5" />
             </div>
             {sidebarOpen && (
@@ -243,7 +243,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               </div>
             )}
           </div>
-          <button 
+          <button
             onClick={toggleSidebar}
             className="p-1 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-white cursor-pointer transition-colors"
           >
@@ -253,7 +253,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
         {/* Atajo de Buscador Lateral */}
         <div className="p-3">
-          <button 
+          <button
             onClick={() => setSearchOpen(true)}
             className="w-full py-2 px-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 text-left text-slate-400 flex items-center justify-between text-xs transition-all cursor-pointer"
           >
@@ -280,22 +280,21 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 return (
                   <Link key={itemIdx} href={item.href}>
                     <button
-                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold transition-all text-left cursor-pointer group relative ${
-                        active 
-                          ? "text-white" 
+                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold transition-all text-left cursor-pointer group relative ${active
+                          ? "text-white"
                           : "text-slate-400 hover:text-slate-100 hover:bg-white/5"
-                      }`}
+                        }`}
                       style={{
                         background: active ? `linear-gradient(90deg, rgba(255,0,150,0.15), rgba(155,0,204,0.15))` : "transparent",
                         border: active ? `1px solid rgba(255,0,150,0.2)` : "1px solid transparent",
                       }}
                     >
                       <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-all border"
-                           style={{ 
-                             backgroundColor: active ? FUCSIA : "rgba(255, 255, 255, 0.05)",
-                             borderColor: active ? FUCSIA : "rgba(255, 255, 255, 0.08)",
-                             color: "white"
-                           }}>
+                        style={{
+                          backgroundColor: active ? FUCSIA : "rgba(255, 255, 255, 0.05)",
+                          borderColor: active ? FUCSIA : "rgba(255, 255, 255, 0.08)",
+                          color: "white"
+                        }}>
                         <item.icon className="w-3.5 h-3.5" />
                       </div>
                       {sidebarOpen && <span className="truncate">{item.label}</span>}
@@ -313,8 +312,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         <div className="p-4 border-t border-white/5 flex items-center justify-between gap-2 bg-[#14022a]/40">
           <div className="flex items-center gap-3 overflow-hidden">
             <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-white text-xs font-black"
-                 style={{ borderLeft: `3px solid ${CIAN}` }}>
-              {profile?.name ? profile.name.substring(0,2).toUpperCase() : "AD"}
+              style={{ borderLeft: `3px solid ${CIAN}` }}>
+              {profile?.name ? profile.name.substring(0, 2).toUpperCase() : "AD"}
             </div>
             {sidebarOpen && (
               <div className="flex flex-col min-w-0">
@@ -324,7 +323,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             )}
           </div>
           {sidebarOpen && (
-            <button 
+            <button
               onClick={handleLogout}
               className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-white/5 cursor-pointer transition-colors"
               title="Cerrar Sesión"
@@ -337,7 +336,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
       {/* ── CONTENIDO PRINCIPAL ENVOLVENTE ── */}
       <div className="flex-1 flex flex-col overflow-hidden relative">
-        
+
         {/* Cabecera Superior (Top Header) */}
         <header className="h-16 border-b border-white/5 flex items-center justify-between px-6 shrink-0 bg-[#0e011f]/90 backdrop-blur-md relative z-20">
           <div className="flex items-center gap-2">
@@ -350,7 +349,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
           <div className="flex items-center gap-4">
             {/* Buscador de Cabecera */}
-            <button 
+            <button
               onClick={() => setSearchOpen(true)}
               className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/5 transition-all cursor-pointer flex items-center justify-center"
               title="Buscar Módulo (Ctrl+K)"
@@ -360,14 +359,14 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
             {/* Centro de Notificaciones Flotante */}
             <div className="relative" ref={notificationRef}>
-              <button 
+              <button
                 onClick={() => setNotificationsOpen(!notificationsOpen)}
                 className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/5 transition-all relative cursor-pointer flex items-center justify-center"
               >
                 <Bell className="w-4 h-4" style={{ color: FUCSIA }} />
                 {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full animate-pulse border border-[#0e011f]"
-                        style={{ backgroundColor: CIAN }} />
+                    style={{ backgroundColor: CIAN }} />
                 )}
               </button>
 
@@ -379,7 +378,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                       <Bell className="w-3.5 h-3.5" style={{ color: FUCSIA }} /> Alertas en Vivo
                     </span>
                     {unreadCount > 0 && (
-                      <button 
+                      <button
                         onClick={markAllRead}
                         className="text-[10px] font-bold hover:underline cursor-pointer"
                         style={{ color: CIAN }}
@@ -390,16 +389,15 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                   </div>
                   <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
                     {notifications.map(n => (
-                      <div key={n.id} className={`p-2.5 rounded-xl border text-[11px] leading-relaxed transition-all ${
-                        n.read ? "bg-black/10 border-white/5 text-slate-400" : "bg-gradient-to-r from-pink-500/5 to-purple-500/5 border-pink-500/20 text-white"
-                      }`}>
+                      <div key={n.id} className={`p-2.5 rounded-xl border text-[11px] leading-relaxed transition-all ${n.read ? "bg-black/10 border-white/5 text-slate-400" : "bg-gradient-to-r from-pink-500/5 to-purple-500/5 border-pink-500/20 text-white"
+                        }`}>
                         <div className="flex justify-between items-start gap-2">
                           <span className="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider shrink-0"
-                                style={{ 
-                                  backgroundColor: n.type === "channel" ? `${CIAN}15` : `${FUCSIA}15`, 
-                                  color: n.type === "channel" ? CIAN : FUCSIA,
-                                  border: `1px solid ${n.type === "channel" ? CIAN : FUCSIA}25`
-                                }}>
+                            style={{
+                              backgroundColor: n.type === "channel" ? `${CIAN}15` : `${FUCSIA}15`,
+                              color: n.type === "channel" ? CIAN : FUCSIA,
+                              border: `1px solid ${n.type === "channel" ? CIAN : FUCSIA}25`
+                            }}>
                             {n.type === "channel" ? "Channel" : "Pago"}
                           </span>
                           <span className="text-[9px] text-slate-500 font-bold shrink-0">{n.time}</span>
@@ -419,7 +417,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 <span className="text-xs font-bold text-white block leading-none mt-0.5">{profile?.name || user?.email}</span>
               </div>
               <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs text-white"
-                   style={{ background: `linear-gradient(135deg, ${FUCSIA}, ${PURPURA})` }}>
+                style={{ background: `linear-gradient(135deg, ${FUCSIA}, ${PURPURA})` }}>
                 {profile?.name ? profile.name.substring(0, 1).toUpperCase() : "A"}
               </div>
             </div>
@@ -436,11 +434,11 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       {searchOpen && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
           <div className="w-full max-w-lg rounded-2xl border border-white/10 shadow-2xl overflow-hidden p-4 space-y-4 bg-[#1a0533]">
-            
+
             {/* Header del buscador */}
             <div className="flex items-center gap-3 border-b border-white/5 pb-2.5">
               <Search className="w-4.5 h-4.5" style={{ color: CIAN }} />
-              <input 
+              <input
                 ref={searchInputRef}
                 type="text"
                 placeholder="Escribe para buscar un módulo administrativo (ej: reservas, kyc)..."
@@ -452,7 +450,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 onKeyDown={handleSearchKeyDown}
                 className="flex-1 bg-transparent text-white placeholder-slate-500 text-xs focus:outline-none border-none ring-0 focus:ring-0 focus:border-none"
               />
-              <button 
+              <button
                 onClick={() => setSearchOpen(false)}
                 className="p-1 rounded bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white cursor-pointer"
               >
@@ -473,18 +471,17 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                     <button
                       key={idx}
                       onClick={() => handleNavigate(item.href)}
-                      className={`w-full flex items-center justify-between p-2.5 rounded-xl border transition-all text-left cursor-pointer text-xs ${
-                        selected 
-                          ? "bg-white/10 border-white/20 text-white" 
+                      className={`w-full flex items-center justify-between p-2.5 rounded-xl border transition-all text-left cursor-pointer text-xs ${selected
+                          ? "bg-white/10 border-white/20 text-white"
                           : "bg-transparent border-transparent text-slate-400"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border border-white/10"
-                             style={{ 
-                               backgroundColor: selected ? FUCSIA : "rgba(255,255,255,0.05)",
-                               color: "white" 
-                             }}>
+                          style={{
+                            backgroundColor: selected ? FUCSIA : "rgba(255,255,255,0.05)",
+                            color: "white"
+                          }}>
                           <item.icon className="w-3.5 h-3.5" />
                         </div>
                         <div>
@@ -498,7 +495,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 })
               )}
             </div>
-            
+
             {/* Pie de página con atajos del buscador */}
             <div className="flex items-center justify-between text-[9px] text-slate-500 font-semibold border-t border-white/5 pt-2.5">
               <span>Usa <kbd className="px-1 py-0.5 rounded bg-white/5 font-mono">↑↓</kbd> para navegar y <kbd className="px-1 py-0.5 rounded bg-white/5 font-mono">Enter</kbd> para seleccionar</span>
