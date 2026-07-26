@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { AdminTabBar } from "@/components/admin/AdminTabBar";
 import {
   FileText, Globe, Layers, Settings, Image, Edit2, X, Check,
-  Plus, Trash2, Eye, Save, ExternalLink, ToggleLeft, ToggleRight, Loader2, Upload, Star
+  Plus, Trash2, Eye, Save, ExternalLink, ToggleLeft, ToggleRight, Loader2, Upload, Star, Search
 } from "lucide-react";
 import { TOP10_HOTELS_STATIC_DATA } from "@/config/top10Hoteles";
 
@@ -72,6 +72,7 @@ export function AdminContenido() {
   const [pageModal, setPageModal] = useState<"create" | "edit" | null>(null);
   const [settingsDraft, setSettingsDraft] = useState<Record<string, string>>({});
   const [savedKeys, setSavedKeys] = useState<Record<string, boolean>>({});
+  const [pagesSearchQuery, setPagesSearchQuery] = useState("");
 
   useEffect(() => {
     if (!authLoading && (!user || (profile?.role !== "admin" && user?.email?.toLowerCase() !== "hotelesdevenezuela77@gmail.com"))) {
@@ -509,28 +510,63 @@ export function AdminContenido() {
         )}
 
         {/* TAB 4: CUSTOM PAGES */}
-        {tab === "pages" && (
-          <div className="max-w-3xl">
-            <div className="flex justify-between items-center mb-6">
-              <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">{pages.length} Páginas Registradas</div>
-              <button type="button" onClick={() => { setEditPage({ slug: "", title: "", h1Title: "", metaDescription: "", content: "", isPublished: false }); setPageModal("create"); }} className="px-4 py-2.5 bg-gradient-to-r from-[#9B00CC] to-[#FF0096] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md cursor-pointer"><Plus className="w-4 h-4 inline mr-1" /> Añadir Entrada</button>
-            </div>
-            <div className="space-y-3">
-              {pages.map(p => (
-                <div key={p.id} className="bg-[#100921] rounded-2xl p-4 border border-slate-800/80 shadow-sm flex justify-between items-center transition-all hover:border-purple-900/40">
-                  <div><div className="font-black text-xs text-white uppercase tracking-wider">{p.title}</div><div className="text-[10px] text-purple-400 font-mono mt-0.5">/{p.slug}</div></div>
-                  <div className="flex gap-2">
-                    <a href={`/${p.slug}`} target="_blank" rel="noopener noreferrer" className="p-2 bg-[#170e2e] hover:bg-purple-950/40 border border-slate-800 rounded-xl text-[#00C8D4] cursor-pointer flex items-center justify-center" title="Previsualizar Página">
-                      <Eye className="w-3.5 h-3.5" />
-                    </a>
-                    <button type="button" onClick={() => { setEditPage({ ...p }); setPageModal("edit"); }} className="p-2 bg-[#170e2e] hover:bg-purple-950/40 border border-slate-800 rounded-xl text-purple-400 cursor-pointer"><Edit2 className="w-3.5 h-3.5" /></button>
-                    <button type="button" onClick={() => deletePage.mutate(p.id!)} className="p-2 bg-[#170e2e] hover:bg-red-950/40 border border-slate-800 rounded-xl text-red-400 cursor-pointer"><Trash2 className="w-3.5 h-3.5" /></button>
-                  </div>
+        {tab === "pages" && (() => {
+          const filteredPages = pages.filter(p => 
+            p.title.toLowerCase().includes(pagesSearchQuery.toLowerCase()) || 
+            p.slug.toLowerCase().includes(pagesSearchQuery.toLowerCase())
+          );
+          return (
+            <div className="max-w-3xl">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">{filteredPages.length} de {pages.length} Páginas Registradas</div>
+                <button type="button" onClick={() => { setEditPage({ slug: "", title: "", h1Title: "", metaDescription: "", content: "", isPublished: false }); setPageModal("create"); }} className="px-4 py-2.5 bg-gradient-to-r from-[#9B00CC] to-[#FF0096] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md cursor-pointer"><Plus className="w-4 h-4 inline mr-1" /> Añadir Entrada</button>
+              </div>
+
+              {/* Buscador de Páginas */}
+              <div className="mb-6 relative">
+                <input
+                  type="text"
+                  value={pagesSearchQuery}
+                  onChange={e => setPagesSearchQuery(e.target.value)}
+                  placeholder="Buscar página por título o slug..."
+                  className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] rounded-xl pl-10 pr-10 py-3 text-xs font-bold text-white outline-none"
+                />
+                <div className="absolute left-3.5 top-3.5 flex items-center justify-center">
+                  <Search className="w-4 h-4 text-slate-500" />
                 </div>
-              ))}
+                {pagesSearchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setPagesSearchQuery("")}
+                    className="absolute right-3.5 top-3.5 text-slate-500 hover:text-white cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                {filteredPages.map(p => (
+                  <div key={p.id} className="bg-[#100921] rounded-2xl p-4 border border-slate-800/80 shadow-sm flex justify-between items-center transition-all hover:border-purple-900/40">
+                    <div><div className="font-black text-xs text-white uppercase tracking-wider">{p.title}</div><div className="text-[10px] text-purple-400 font-mono mt-0.5">/{p.slug}</div></div>
+                    <div className="flex gap-2">
+                      <a href={`/${p.slug}`} target="_blank" rel="noopener noreferrer" className="p-2 bg-[#170e2e] hover:bg-purple-950/40 border border-slate-800 rounded-xl text-[#00C8D4] cursor-pointer flex items-center justify-center" title="Previsualizar Página">
+                        <Eye className="w-3.5 h-3.5" />
+                      </a>
+                      <button type="button" onClick={() => { setEditPage({ ...p }); setPageModal("edit"); }} className="p-2 bg-[#170e2e] hover:bg-purple-950/40 border border-slate-800 rounded-xl text-purple-400 cursor-pointer"><Edit2 className="w-3.5 h-3.5" /></button>
+                      <button type="button" onClick={() => deletePage.mutate(p.id!)} className="p-2 bg-[#170e2e] hover:bg-red-950/40 border border-slate-800 rounded-xl text-red-400 cursor-pointer"><Trash2 className="w-3.5 h-3.5" /></button>
+                    </div>
+                  </div>
+                ))}
+                {filteredPages.length === 0 && (
+                  <div className="text-center py-10 bg-[#0a0418] rounded-xl border border-slate-900/60 p-6">
+                    <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">No se encontraron páginas que coincidan con la búsqueda.</p>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* TAB 5: TOP 10 HOTELES */}
         {tab === "top10" && (
