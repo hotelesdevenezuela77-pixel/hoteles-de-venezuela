@@ -511,10 +511,12 @@ export function AdminContenido() {
 
         {/* TAB 4: CUSTOM PAGES */}
         {tab === "pages" && (() => {
-          const filteredPages = pages.filter(p => 
-            p.title.toLowerCase().includes(pagesSearchQuery.toLowerCase()) || 
-            p.slug.toLowerCase().includes(pagesSearchQuery.toLowerCase())
-          );
+          const filteredPages = pages.filter(p => {
+            const title = (p.title || "").toLowerCase();
+            const slug = (p.slug || "").toLowerCase();
+            const query = (pagesSearchQuery || "").toLowerCase();
+            return title.includes(query) || slug.includes(query);
+          });
           return (
             <div className="max-w-3xl">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -584,8 +586,13 @@ export function AdminContenido() {
 
               <div className="space-y-6">
                 {TOP10_HOTELS_STATIC_DATA.map((h) => {
-                  const currentImages = JSON.parse(settingsDraft["top_10_hotels_images"] || "{}");
-                  const currentImageUrl = currentImages[h.id] || "";
+                  let currentImages: Record<string, string> = {};
+                  try {
+                    currentImages = JSON.parse(settingsDraft["top_10_hotels_images"] || "{}") || {};
+                  } catch (e) {
+                    console.error("Error parsing top_10_hotels_images JSON:", e);
+                  }
+                  const currentImageUrl = (currentImages && typeof currentImages === 'object') ? (currentImages[h.id] || "") : "";
 
                   return (
                     <div key={h.id} className="p-4 bg-[#0a0418] border border-slate-900 rounded-xl flex flex-col md:flex-row gap-4 items-start md:items-center">
