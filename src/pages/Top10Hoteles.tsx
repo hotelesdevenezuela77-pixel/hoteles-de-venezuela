@@ -7,10 +7,30 @@ import { MapPin, Award, Shield, Sparkles, Phone, ArrowLeft, Star, Compass } from
 import { OFFICIAL_WHATSAPP_NUMBER } from "@/config/whatsapp";
 
 export function Top10Hoteles() {
+  // Fetch custom page data for title, H1 and header image
+  const { data: pageData } = useQuery<any>({
+    queryKey: ["top-10-page-data"],
+    queryFn: async () => {
+      try {
+        const { data, error } = await supabase
+          .from("custom_pages")
+          .select("*")
+          .eq("slug", "los-10-mejores-hoteles")
+          .maybeSingle();
+        if (error) throw error;
+        return data;
+      } catch (e) {
+        console.warn("Error cargando página custom los-10-mejores-hoteles:", e);
+        return null;
+      }
+    }
+  });
+
   // SEO Metadata dynamic inject
   useEffect(() => {
     const originalTitle = document.title;
-    document.title = "Los 10 Mejores Hoteles de Venezuela 2026 | Ranking Oficial";
+    const pageTitle = pageData?.title || "Los 10 Mejores Hoteles de Venezuela 2026 | Ranking Oficial";
+    document.title = pageTitle;
 
     const updateMetaTag = (name: string, content: string) => {
       let element = document.querySelector(`meta[name="${name}"]`);
@@ -22,19 +42,16 @@ export function Top10Hoteles() {
       element.setAttribute("content", content);
     };
 
-    updateMetaTag(
-      "description",
-      "Reportaje exhaustivo y guía turística oficial con los 10 mejores hoteles en Venezuela para 2026. Del lujo histórico en Caracas al confort boutique caribeño y andino."
-    );
-    updateMetaTag(
-      "keywords",
-      "mejores hoteles venezuela, hoteles de lujo venezuela, ranking hoteles 2026, posadas de lujo venezuela, hotel humboldt caracas, eurobuilding caracas, jw marriott caracas, lidotel barquisimeto, hesperia valencia, tibisay margarita, venetur maracaibo, wyndham margarita, parador merida"
-    );
+    const desc = pageData?.meta_description || pageData?.metaDescription || "Reportaje exhaustivo y guía turística oficial con los 10 mejores hoteles en Venezuela para 2026. Del lujo histórico en Caracas al confort boutique caribeño y andino.";
+    const keywords = pageData?.meta_keywords || pageData?.metaKeywords || "mejores hoteles venezuela, hoteles de lujo venezuela, ranking hoteles 2026, posadas de lujo venezuela, hotel humboldt caracas, eurobuilding caracas, jw marriott caracas, lidotel barquisimeto, hesperia valencia, tibisay margarita, venetur maracaibo, wyndham margarita, parador merida";
+
+    updateMetaTag("description", desc);
+    updateMetaTag("keywords", keywords);
 
     return () => {
       document.title = originalTitle;
     };
-  }, []);
+  }, [pageData]);
 
   // Fetch site settings to get custom images if uploaded
   const { data: settings = [], isLoading } = useQuery<any[]>({
@@ -60,12 +77,15 @@ export function Top10Hoteles() {
   const cleanPhone = OFFICIAL_WHATSAPP_NUMBER.replace(/\D/g, "");
   const whatsappUrl = `https://wa.me/${cleanPhone}?text=Hola,%20deseo%20obtener%20informaci%C3%B3n%20y%20tarifas%20de%20los%20mejores%20hoteles%20de%20Venezuela.`;
 
+  const bannerImage = pageData?.featured_image || pageData?.featuredImage || "https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public/establecimientos/contenido/banner-top10-1785105138866.jpg";
+  const bannerH1 = pageData?.h1_title || pageData?.h1Title || "Los 10 Mejores Hoteles en Venezuela";
+
   return (
     <div className="min-h-screen bg-gray-50/30 pb-24 font-sans text-slate-800">
       {/* Banner de Portada (Full-Bleed) */}
       <div className="w-full relative h-[450px] md:h-[550px] overflow-hidden bg-[#0e011f]">
         <img
-          src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1600&q=80"
+          src={bannerImage}
           alt="Paraíso en Venezuela"
           className="w-full h-full object-cover scale-[1.08] opacity-85"
         />
@@ -82,7 +102,7 @@ export function Top10Hoteles() {
             INFORME DE AUTORIDAD TURÍSTICA
           </p>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tight drop-shadow-2xl leading-none max-w-5xl playfair">
-            Los 10 Mejores Hoteles en Venezuela
+            {bannerH1}
           </h1>
           <p className="text-white/95 text-sm md:text-lg font-bold tracking-wide uppercase mt-4 max-w-2xl drop-shadow-md font-sans">
             Guía Exclusiva y Reportaje Especializado 2026
