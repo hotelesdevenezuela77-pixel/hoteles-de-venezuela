@@ -520,6 +520,9 @@ export function AdminContenido() {
                 <div key={p.id} className="bg-[#100921] rounded-2xl p-4 border border-slate-800/80 shadow-sm flex justify-between items-center transition-all hover:border-purple-900/40">
                   <div><div className="font-black text-xs text-white uppercase tracking-wider">{p.title}</div><div className="text-[10px] text-purple-400 font-mono mt-0.5">/{p.slug}</div></div>
                   <div className="flex gap-2">
+                    <a href={`/${p.slug}`} target="_blank" rel="noopener noreferrer" className="p-2 bg-[#170e2e] hover:bg-purple-950/40 border border-slate-800 rounded-xl text-[#00C8D4] cursor-pointer flex items-center justify-center" title="Previsualizar Página">
+                      <Eye className="w-3.5 h-3.5" />
+                    </a>
                     <button type="button" onClick={() => { setEditPage({ ...p }); setPageModal("edit"); }} className="p-2 bg-[#170e2e] hover:bg-purple-950/40 border border-slate-800 rounded-xl text-purple-400 cursor-pointer"><Edit2 className="w-3.5 h-3.5" /></button>
                     <button type="button" onClick={() => deletePage.mutate(p.id!)} className="p-2 bg-[#170e2e] hover:bg-red-950/40 border border-slate-800 rounded-xl text-red-400 cursor-pointer"><Trash2 className="w-3.5 h-3.5" /></button>
                   </div>
