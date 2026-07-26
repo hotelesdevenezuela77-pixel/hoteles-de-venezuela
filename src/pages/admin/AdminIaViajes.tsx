@@ -61,21 +61,7 @@ export function AdminIaViajes() {
       setLoading(true);
       const key = "hdv_ai_travel_logs";
       const localLogs = JSON.parse(localStorage.getItem(key) || "[]");
-
-      // Carga base de logs mock si está vacío para ilustrar datos históricos al administrador
-      if (localLogs.length === 0) {
-        const mockLogs: TelemetryLog[] = [
-          { id: 10001, query: "Viaje de 3 días a Los Roques con buceo", destination: "Archipiélago de Los Roques", days: 3, cost_usd: 480, tokens_consumed: 1420, cost_tokens_usd: 0.00284, status: "reservado_pagado", created_at: new Date(Date.now() - 5 * 60 * 1000).toISOString() },
-          { id: 10002, query: "Itinerario de 5 días en Mérida para senderismo", destination: "Mérida (Páramos)", days: 5, cost_usd: 575, tokens_consumed: 1680, cost_tokens_usd: 0.00336, status: "generado", created_at: new Date(Date.now() - 40 * 60 * 1000).toISOString() },
-          { id: 10003, query: "Quiero ir 4 días a Canaima y ver el Salto Ángel", destination: "Parque Nacional Canaima", days: 4, cost_usd: 1120, tokens_consumed: 2150, cost_tokens_usd: 0.00430, status: "reservado_pagado", created_at: new Date(Date.now() - 3 * 3600 * 1000).toISOString() },
-          { id: 10004, query: "Fin de semana de relax en Morrocoy en posada premium", destination: "Morrocoy", days: 2, cost_usd: 250, tokens_consumed: 1180, cost_tokens_usd: 0.00236, status: "generado", created_at: new Date(Date.now() - 12 * 3600 * 1000).toISOString() },
-          { id: 10005, query: "Vacaciones de 6 días en Playa El Agua, Margarita", destination: "Isla de Margarita", days: 6, cost_usd: 720, tokens_consumed: 1850, cost_tokens_usd: 0.00370, status: "generado", created_at: new Date(Date.now() - 28 * 3600 * 1000).toISOString() },
-        ];
-        localStorage.setItem(key, JSON.stringify(mockLogs));
-        setLogs(mockLogs);
-      } else {
-        setLogs(localLogs);
-      }
+      setLogs(localLogs);
     } catch (e) {
       console.error("Failed to load AI logs:", e);
     } finally {
@@ -100,28 +86,25 @@ export function AdminIaViajes() {
 
   // --- Módulos de Cálculo y Analítica ---
   
-  // 1. Embudo de conversión acumulativo (Base Mock + Historial Real)
+  // 1. Embudo de conversión acumulativo (Historial Real)
   const funnelData = useMemo(() => {
-    const totalChats = 1480 + logs.length;
-    const itineraries = 1006 + logs.filter(l => l.status === "generado" || l.status === "reservado_pagado").length;
-    const reservedAndPaid = 178 + logs.filter(l => l.status === "reservado_pagado").length;
+    const totalChats = logs.length;
+    const itineraries = logs.filter(l => l.status === "generado" || l.status === "reservado_pagado").length;
+    const reservedAndPaid = logs.filter(l => l.status === "reservado_pagado").length;
+
+    const conversionRateItineraries = totalChats > 0 ? Math.round((itineraries / totalChats) * 100) : 0;
+    const conversionRatePaid = totalChats > 0 ? Math.round((reservedAndPaid / totalChats) * 100) : 0;
 
     return [
       { name: "1. Chats Iniciados", valor: totalChats, porcentaje: "100%", fill: C.teal },
-      { name: "2. Itinerarios Creados", valor: itineraries, porcentaje: `${Math.round((itineraries / totalChats) * 100)}%`, fill: C.purple },
-      { name: "3. Reservas Pagadas", valor: reservedAndPaid, porcentaje: `${Math.round((reservedAndPaid / totalChats) * 100)}%`, fill: C.fucsia }
+      { name: "2. Itinerarios Creados", valor: itineraries, porcentaje: `${conversionRateItineraries}%`, fill: C.purple },
+      { name: "3. Reservas Pagadas", valor: reservedAndPaid, porcentaje: `${conversionRatePaid}%`, fill: C.fucsia }
     ];
   }, [logs]);
 
   // 2. Destinos más sugeridos por la IA
   const destinationData = useMemo(() => {
-    const counts: Record<string, number> = {
-      "Los Roques": 240,
-      "Mérida": 185,
-      "Canaima": 150,
-      "Morrocoy": 124,
-      "Margarita": 98
-    };
+    const counts: Record<string, number> = {};
 
     logs.forEach(l => {
       let d = l.destination;
@@ -141,7 +124,7 @@ export function AdminIaViajes() {
 
   // 3. Telemetría Financiera y Consumo de Tokens de Google Gemini Pro
   const costTelemetry = useMemo(() => {
-    const baseTokens = 9845000;
+    const baseTokens = 0;
     const addedTokens = logs.reduce((sum, l) => sum + l.tokens_consumed, 0);
     const totalTokens = baseTokens + addedTokens;
     
@@ -149,14 +132,14 @@ export function AdminIaViajes() {
     const costPerMillion = 0.50; 
     const costUSD = (totalTokens / 1000000) * costPerMillion;
 
-    const baseRevenue = 15480; // Reservas previas
+    const baseRevenue = 0; // Reservas previas
     const addedRevenue = logs.filter(l => l.status === "reservado_pagado").reduce((sum, l) => sum + l.cost_usd, 0);
     const totalRevenue = baseRevenue + addedRevenue;
     const saasCommission = totalRevenue * (rules.commissionRate / 100);
 
     return {
       tokens: totalTokens.toLocaleString("es-VE"),
-      costUSD: costUSD.toFixed(2),
+      costUSD: costUSD < 0.01 && costUSD > 0 ? costUSD.toFixed(4) : costUSD.toFixed(2),
       revenueUSD: totalRevenue.toLocaleString("es-VE"),
       commissionUSD: saasCommission.toLocaleString("es-VE"),
     };
@@ -399,36 +382,44 @@ export function AdminIaViajes() {
                 </tr>
               </thead>
               <tbody>
-                {logs.map((log) => (
-                  <tr key={log.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                    <td className="p-3">
-                      <div className="flex flex-col">
-                        <span className="text-white font-bold">{log.destination}</span>
-                        <span className="text-[9px] text-slate-500 truncate max-w-[200px] mt-0.5" title={log.query}>
-                          "{log.query}"
-                        </span>
-                      </div>
-                    </td>
-                    <td className="p-3 text-center text-[10px] text-slate-400 font-mono">
-                      {log.tokens_consumed}
-                    </td>
-                    <td className="p-3 text-white font-bold">
-                      ${log.cost_usd} USD
-                    </td>
-                    <td className="p-3">
-                      <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${
-                        log.status === "reservado_pagado" 
-                          ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" 
-                          : "bg-cyan-500/10 text-cyan-500 border border-cyan-500/20"
-                      }`}>
-                        {log.status === "reservado_pagado" ? "Pagado" : "Generado"}
-                      </span>
-                    </td>
-                    <td className="p-3 text-right text-[10px] text-slate-500">
-                      {new Date(log.created_at).toLocaleTimeString("es-VE")}
+                {logs.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="p-8 text-center text-slate-500 font-bold uppercase text-[10px]">
+                      Ninguna consulta de IA registrada todavía
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  logs.map((log) => (
+                    <tr key={log.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                      <td className="p-3">
+                        <div className="flex flex-col">
+                          <span className="text-white font-bold">{log.destination}</span>
+                          <span className="text-[9px] text-slate-500 truncate max-w-[200px] mt-0.5" title={log.query}>
+                            "{log.query}"
+                          </span>
+                        </div>
+                      </td>
+                      <td className="p-3 text-center text-[10px] text-slate-400 font-mono">
+                        {log.tokens_consumed}
+                      </td>
+                      <td className="p-3 text-white font-bold">
+                        ${log.cost_usd} USD
+                      </td>
+                      <td className="p-3">
+                        <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${
+                          log.status === "reservado_pagado" 
+                            ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" 
+                            : "bg-cyan-500/10 text-cyan-500 border border-cyan-500/20"
+                        }`}>
+                          {log.status === "reservado_pagado" ? "Pagado" : "Generado"}
+                        </span>
+                      </td>
+                      <td className="p-3 text-right text-[10px] text-slate-500">
+                        {new Date(log.created_at).toLocaleTimeString("es-VE")}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
