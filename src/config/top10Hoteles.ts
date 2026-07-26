@@ -125,30 +125,31 @@ export const TOP10_HOTELS_STATIC_DATA: Top10Hotel[] = [
   },
   {
     id: 9,
-    name: "Parador Turístico & Hotel de Montaña (Mérida)",
-    location: "Cordillera de los Andes, Estado Mérida",
+    name: "Tibisay Hotel Boutique Mérida",
+    location: "Ciudad de Mérida, Cordillera Andina",
     state: "Mérida / Estado Mérida",
-    category: "Ecoturismo Andino y Cabañas de Lujo",
-    description: "Para los amantes del ecoturismo de montaña y el turismo contemplativo, la oferta de alta gama en el estado Mérida destaca a través de posadas de montaña y paradores turísticos que emulan la arquitectura tradicional andina a base de piedra y madera noble.\n\nEstos refugios serranos ofrecen chimeneas centrales, vistas prestigiosas hacia los majestuosos picos nevados de la Sierra Nevada, gastronomía típica andina de altura (pizca andina, trucha fresca) y un ambiente de paz absoluta ideal para el descanso y la desconexión.",
+    category: "Lujo Andino y Confort Exclusivo",
+    description: "El Tibisay Hotel Boutique Mérida representa la cúspide de la hotelería de alta gama en los Andes venezolanos. Situado estratégicamente en la ciudad de Mérida, fusiona la elegancia arquitectónica contemporánea con la majestuosidad de la cordillera andina.\n\nOfrece instalaciones de primer nivel, amplias suites con vistas panorámicas a las montañas, una gastronomía refinada que integra productos locales con alta cocina, y un servicio impecable diseñado para el viajero más exigente que busca explorar los encantos de Mérida sin renunciar al máximo confort.",
     seoAttributes: [
-      "Hoteles en Mérida Venezuela",
-      "Turismo andino",
-      "Cabañas de montaña Los Andes"
+      "Tibisay Mérida",
+      "hotel de lujo Andes venezolanos",
+      "hospedaje exclusivo Mérida"
     ],
-    defaultImage: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80"
+    defaultImage: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1200&q=80"
   },
   {
     id: 10,
-    name: "Posada Boutique & Ecotodge Costa de Aragua (Choroní / Ocumare)",
-    location: "Parque Nacional Henri Pittier / Costa Aragüeña",
-    state: "Costa de Aragua / Estado Aragua",
-    category: "Ecoturismo Costero y Exclusividad",
-    description: "Cierra este selecto listado el modelo de posadas boutique de alta gama ubicadas en la franja costera del estado Aragua, inmersas en la exuberante vegetación tropical del Parque Nacional Henri Pittier y a pasos de playas caribeñas vírgenes.\n\nEstas instalaciones combinan el concepto de casonas coloniales restauradas con comodidades modernas de lujo, piscinas internas rodeadas de palmeras, gastronomía basada en frutos del mar y cacao histórico de Chuao, ofreciendo una experiencia íntima e inolvidable.",
+    name: "Waku Lodge Canaima",
+    location: "Laguna de Canaima, Estado Bolívar",
+    state: "Parque Nacional Canaima / Estado Bolívar",
+    category: "Ecoturismo de Lujo y Aventura",
+    description: "Waku Lodge en Canaima ofrece una de las experiencias de ecoturismo de lujo más exclusivas del mundo. Ubicado privilegiadamente frente a la impresionante Laguna de Canaima y con vistas directas a los majestuosos saltos de agua, este lodge combina la inmersión absoluta en la Gran Sabana con un confort excepcional.\n\nSus instalaciones están diseñadas con maderas nobles y detalles artesanales que respetan el entorno natural circundante, ofreciendo habitaciones acogedoras, energía sostenible, gastronomía regional de alta calidad y un acceso inigualable a las excursiones hacia el Salto Ángel y los tepuyes ancestrales.",
     seoAttributes: [
-      "Posadas boutique Choroní",
-      "Ecoturismo costa Aragua",
-      "Hoteles playa Venezuela"
+      "Waku Lodge Canaima",
+      "hotel en Canaima",
+      "ecoturismo de lujo Venezuela",
+      "hospedaje Salto Ángel"
     ],
-    defaultImage: "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=1200&q=80"
+    defaultImage: "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80"
   }
 ];
