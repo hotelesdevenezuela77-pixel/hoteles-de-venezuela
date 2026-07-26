@@ -283,8 +283,8 @@ export function AdminContenido() {
                   )}
                 </div>
                 <div className="flex gap-3 pt-3">
-                  <button type="button" onClick={() => setEditSection(null)} className="flex-1 py-3 bg-[#170e2e] hover:bg-[#221544] border border-slate-800 rounded-xl text-xs font-black uppercase text-slate-300 tracking-wider transition-colors">Cancelar</button>
-                  <button type="button" onClick={() => updateSection.mutate(editSection)} className="flex-1 py-3 text-white rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-[#9B00CC] to-[#FF0096]">Sincronizar Cambios</button>
+                  <button type="button" onClick={() => setEditSection(null)} className="flex-1 py-3 bg-[#170e2e] hover:bg-[#221544] border border-slate-800 rounded-xl text-xs font-black uppercase text-slate-300 tracking-wider transition-colors cursor-pointer">Cancelar</button>
+                  <button type="button" onClick={() => updateSection.mutate(editSection)} className="flex-1 py-3 text-white rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-[#9B00CC] to-[#FF0096] cursor-pointer">Sincronizar Cambios</button>
                 </div>
               </div>
             ) : heroSection ? (
@@ -324,7 +324,7 @@ export function AdminContenido() {
         {/* TAB 2: CORE SECTIONS */}
         {tab === "sections" && (
           <div className="space-y-5 max-w-3xl">
-            {sections.filter(s => s.sectionKey !== "hero" && s.sectionKey !== "HERO_BANNER").map(s => {
+            {sections.filter(s => s.sectionKey !== "hero" && s.sectionKey !== "HERO_BANNER" && s.sectionKey !== "hero_banner").map(s => {
               const meta = SECTION_META[s.sectionKey] ?? { label: s.sectionKey, icon: "📄", color: "#6B7280" };
               const isEditing = editSection?.sectionKey === s.sectionKey;
               return (
@@ -335,7 +335,7 @@ export function AdminContenido() {
                       <span className="text-lg">{meta.icon}</span>
                       <h3 className="font-black text-xs text-white uppercase tracking-widest">{meta.label}</h3>
                     </div>
-                    {!isEditing && <button type="button" onClick={() => setEditSection({ ...s })} className="px-3.5 py-1.5 bg-[#170e2e] hover:bg-[#251747] border border-slate-800 rounded-xl text-[10px] font-black uppercase text-purple-400 tracking-wider">Modificar</button>}
+                    {!isEditing && <button type="button" onClick={() => setEditSection({ ...s })} className="px-3.5 py-1.5 bg-[#170e2e] hover:bg-[#251747] border border-slate-800 rounded-xl text-[10px] font-black uppercase text-purple-400 tracking-wider cursor-pointer">Modificar</button>}
                   </div>
                   {isEditing && editSection ? (
                     <div className="space-y-4 mt-3 bg-[#0a0418] p-5 rounded-xl border border-slate-900">
@@ -425,8 +425,8 @@ export function AdminContenido() {
                       )}
 
                       <div className="flex gap-3 pt-2">
-                        <button type="button" onClick={() => setEditSection(null)} className="flex-1 py-3 bg-[#170e2e] hover:bg-[#221544] border border-slate-800 rounded-xl text-xs font-black uppercase text-slate-300 tracking-wider transition-colors">Cancelar</button>
-                        <button type="button" onClick={() => updateSection.mutate(editSection)} className="flex-1 py-3 text-white rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-pink-500 to-purple-600">Sincronizar</button>
+                        <button type="button" onClick={() => setEditSection(null)} className="flex-1 py-3 bg-[#170e2e] hover:bg-[#221544] border border-slate-800 rounded-xl text-xs font-black uppercase text-slate-300 tracking-wider transition-colors cursor-pointer">Cancelar</button>
+                        <button type="button" onClick={() => updateSection.mutate(editSection)} className="flex-1 py-3 text-white rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-[#FF0096] to-[#9B00CC] cursor-pointer">Sincronizar</button>
                       </div>
                     </div>
                   ) : (
@@ -462,7 +462,7 @@ export function AdminContenido() {
                           <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5 block">{meta.label}</label>
                           <input type={meta.type} value={currentVal} onChange={e => setSettingsDraft(d => ({ ...d, [key]: e.target.value }))} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] rounded-xl px-4 py-2.5 text-xs font-bold text-white outline-none" />
                         </div>
-                        <button type="button" onClick={() => saveSetting.mutate({ key, value: currentVal })} className="px-5 py-3 bg-gradient-to-r from-[#9B00CC] to-[#FF0096] text-white text-xs font-black uppercase tracking-wider rounded-xl transition-transform active:scale-95">Salvar</button>
+                        <button type="button" onClick={() => saveSetting.mutate({ key, value: currentVal })} className="px-5 py-3 bg-gradient-to-r from-[#9B00CC] to-[#FF0096] text-white text-xs font-black uppercase tracking-wider rounded-xl transition-transform active:scale-95 cursor-pointer">Salvar</button>
                       </div>
                     );
                   })}
@@ -477,15 +477,15 @@ export function AdminContenido() {
           <div className="max-w-3xl">
             <div className="flex justify-between items-center mb-6">
               <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">{pages.length} Páginas Registradas</div>
-              <button type="button" onClick={() => { setEditPage({ slug: "", title: "", h1Title: "", metaDescription: "", content: "", isPublished: false }); setPageModal("create"); }} className="px-4 py-2.5 bg-gradient-to-r from-[#9B00CC] to-[#FF0096] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md"><Plus className="w-4 h-4 inline mr-1" /> Añadir Entrada</button>
+              <button type="button" onClick={() => { setEditPage({ slug: "", title: "", h1Title: "", metaDescription: "", content: "", isPublished: false }); setPageModal("create"); }} className="px-4 py-2.5 bg-gradient-to-r from-[#9B00CC] to-[#FF0096] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md cursor-pointer"><Plus className="w-4 h-4 inline mr-1" /> Añadir Entrada</button>
             </div>
             <div className="space-y-3">
               {pages.map(p => (
                 <div key={p.id} className="bg-[#100921] rounded-2xl p-4 border border-slate-800/80 shadow-sm flex justify-between items-center transition-all hover:border-purple-900/40">
                   <div><div className="font-black text-xs text-white uppercase tracking-wider">{p.title}</div><div className="text-[10px] text-purple-400 font-mono mt-0.5">/{p.slug}</div></div>
                   <div className="flex gap-2">
-                    <button type="button" onClick={() => { setEditPage({ ...p }); setPageModal("edit"); }} className="p-2 bg-[#170e2e] hover:bg-purple-950/40 border border-slate-800 rounded-xl text-purple-400"><Edit2 className="w-3.5 h-3.5" /></button>
-                    <button type="button" onClick={() => deletePage.mutate(p.id!)} className="p-2 bg-[#170e2e] hover:bg-red-950/40 border border-slate-800 rounded-xl text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
+                    <button type="button" onClick={() => { setEditPage({ ...p }); setPageModal("edit"); }} className="p-2 bg-[#170e2e] hover:bg-purple-950/40 border border-slate-800 rounded-xl text-purple-400 cursor-pointer"><Edit2 className="w-3.5 h-3.5" /></button>
+                    <button type="button" onClick={() => deletePage.mutate(p.id!)} className="p-2 bg-[#170e2e] hover:bg-red-950/40 border border-slate-800 rounded-xl text-red-400 cursor-pointer"><Trash2 className="w-3.5 h-3.5" /></button>
                   </div>
                 </div>
               ))}
@@ -505,8 +505,8 @@ export function AdminContenido() {
               <textarea placeholder="Contenido HTML o Texto Pleno" rows={6} value={editPage.content || ""} onChange={e => setEditPage({ ...editPage, content: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] p-3 rounded-xl text-xs font-mono text-white outline-none resize-y" />
             </div>
             <div className="mt-6 flex justify-end gap-3">
-              <button type="button" onClick={() => setPageModal(null)} className="px-4 py-2 bg-[#170e2e] rounded-xl text-xs font-black uppercase text-slate-400">Abortar</button>
-              <button type="button" onClick={() => savePage.mutate(editPage)} className="px-5 py-2 text-white rounded-xl text-xs font-black uppercase bg-gradient-to-r from-[#9B00CC] to-[#FF0096] tracking-wider">Guardar Nodo</button>
+              <button type="button" onClick={() => setPageModal(null)} className="px-4 py-2 bg-[#170e2e] rounded-xl text-xs font-black uppercase text-slate-400 cursor-pointer">Abortar</button>
+              <button type="button" onClick={() => savePage.mutate(editPage)} className="px-5 py-2 text-white rounded-xl text-xs font-black uppercase bg-gradient-to-r from-[#9B00CC] to-[#FF0096] tracking-wider cursor-pointer">Guardar Nodo</button>
             </div>
           </div>
         </div>
