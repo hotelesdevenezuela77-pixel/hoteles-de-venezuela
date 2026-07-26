@@ -82,13 +82,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // 1. Obtener sesión activa al cargar
     const storedBypass = localStorage.getItem("hdv_admin_bypass");
     if (storedBypass) {
-      try {
-        const parsed = JSON.parse(storedBypass);
-        setUser(parsed.user);
-        setProfile(parsed.profile);
-        setLoading(false);
-      } catch {
+      const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+      if (!isLocal) {
         localStorage.removeItem("hdv_admin_bypass");
+      } else {
+        try {
+          const parsed = JSON.parse(storedBypass);
+          setUser(parsed.user);
+          setProfile(parsed.profile);
+          setLoading(false);
+        } catch {
+          localStorage.removeItem("hdv_admin_bypass");
+        }
       }
     }
 
@@ -144,7 +149,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Función de Login
   const login = async (email: string, password: string) => {
-    if (email.toLowerCase() === "hotelesdevenezuela77@gmail.com" && password === "admin2027") {
+    const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    if (isLocal && email.toLowerCase() === "hotelesdevenezuela77@gmail.com" && password === "admin2027") {
       const mockUser = {
         id: "admin-bypass-id-7777",
         email: "hotelesdevenezuela77@gmail.com",
