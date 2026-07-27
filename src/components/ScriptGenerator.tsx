@@ -64,6 +64,24 @@ export function ScriptGenerator({ establishments }: ScriptGeneratorProps) {
     loadTemplates();
   }, []);
 
+  // Cargar datos de respuesta a lead si existen
+  useEffect(() => {
+    const handleLeadLoaded = () => {
+      const name = localStorage.getItem("hdv_reply_lead_name");
+      const need = localStorage.getItem("hdv_reply_lead_need");
+      if (name) setClientName(name);
+      if (need) setClientNeed(need);
+      
+      // Clean up after loading
+      localStorage.removeItem("hdv_reply_lead_name");
+      localStorage.removeItem("hdv_reply_lead_need");
+    };
+
+    handleLeadLoaded(); // check on mount
+    window.addEventListener("hdv_reply_lead_loaded", handleLeadLoaded);
+    return () => window.removeEventListener("hdv_reply_lead_loaded", handleLeadLoaded);
+  }, []);
+
   // Seleccionar automáticamente el primer hotel si está disponible
   useEffect(() => {
     if (establishments.length > 0 && !selectedEstId) {
