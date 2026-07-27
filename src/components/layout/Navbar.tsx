@@ -72,7 +72,7 @@ export function Navbar() {
     : user?.email?.slice(0, 2).toUpperCase() || "U";
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-100 shadow-sm">
+    <header className="sticky top-0 w-full bg-white border-b border-gray-100 shadow-sm" style={{ zIndex: 9999 }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[60px] flex items-center justify-between gap-4">
         
         {/* Logotipo Oficial */}
@@ -128,7 +128,7 @@ export function Navbar() {
               <ChevronDown className="w-3 h-3 text-gray-400" />
             </button>
             {langOpen && (
-              <div className="absolute right-0 top-full mt-1.5 w-36 bg-white rounded-xl shadow-xl py-1 z-50 border border-gray-100">
+              <div className="absolute right-0 top-full mt-1.5 w-36 bg-white rounded-xl shadow-xl py-1 border border-gray-100" style={{ zIndex: 10000 }}>
                 <button
                   className="w-full flex items-center gap-2 px-3 py-2 text-xs text-gray-700 bg-pink-50 text-brand-magenta font-bold"
                   onClick={() => setLangOpen(false)}
@@ -175,7 +175,7 @@ export function Navbar() {
               </button>
 
               {userMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-52 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 z-50">
+                <div className="absolute right-0 top-full mt-2 w-52 bg-white border border-gray-100 rounded-2xl shadow-xl py-2" style={{ zIndex: 10000 }}>
                   <div className="px-4 py-2 border-b border-gray-50">
                     <p className="text-xs text-gray-800 truncate font-mono font-bold">{user.email}</p>
                     <p className="text-[10px] text-brand-magenta font-black uppercase tracking-wider mt-0.5">
