@@ -9,12 +9,35 @@ import { Home } from "./pages/Home";
 import { TENANTS_REGISTRY } from "./tenants/tenantContext";
 import { AdminLayout } from "./components/admin/AdminLayout";
 
-// Helper para importaciones dinámicas de exportaciones nombradas (named exports)
+// Helper para importaciones dinámicas de exportaciones nombradas (named exports) con autorecuperación
 function lazyNamed<T extends Record<string, any>>(
   importFn: () => Promise<T>,
   exportName: keyof T
 ) {
-  return lazy(() => importFn().then((module) => ({ default: module[exportName] })));
+  return lazy(() => 
+    importFn()
+      .then((module) => ({ default: module[exportName] }))
+      .catch((error) => {
+        console.error("Chunk load error en lazyNamed, recargando...", error);
+        if (typeof window !== "undefined") {
+          window.location.reload();
+        }
+        return new Promise(() => {});
+      })
+  );
+}
+
+// Wrapper para lazy import con autorecuperación en caso de nuevo despliegue
+function lazyWithRetry(importFn: () => Promise<any>) {
+  return lazy(() =>
+    importFn().catch((error) => {
+      console.error("Chunk load error en lazy, recargando...", error);
+      if (typeof window !== "undefined") {
+        window.location.reload();
+      }
+      return new Promise(() => {});
+    })
+  );
 }
 
 // Importaciones dinámicas (React.lazy) para optimización masiva de rendimiento
@@ -94,14 +117,14 @@ const PerfilKYC = lazyNamed(() => import("./pages/PerfilKYC"), "PerfilKYC");
 const AsistenteViajesIA = lazyNamed(() => import("./pages/AsistenteViajesIA"), "AsistenteViajesIA");
 const AdminIaViajes = lazyNamed(() => import("./pages/admin/AdminIaViajes"), "AdminIaViajes");
 const AdminExpedicionRutas = lazyNamed(() => import("./pages/admin/AdminExpedicionRutas"), "AdminExpedicionRutas");
-const AdminAsistencia = lazy(() => import("./pages/admin/AdminAsistencia"));
-const AdminContabilidad = lazy(() => import("./pages/admin/AdminContabilidad"));
+const AdminAsistencia = lazyWithRetry(() => import("./pages/admin/AdminAsistencia"));
+const AdminContabilidad = lazyWithRetry(() => import("./pages/admin/AdminContabilidad"));
 
 // Importación del Agente IA sin llaves apuntando a la carpeta admin
-const AdminConversacionalIA = lazy(() => import("./pages/admin/AdminConversacionalIA"));
+const AdminConversacionalIA = lazyWithRetry(() => import("./pages/admin/AdminConversacionalIA"));
 
 // Importación de la arquitectura multi-tenant de los Nodos Cliente
-const TenantApp = lazy(() => import("./tenants/TenantApp"));
+const TenantApp = lazyWithRetry(() => import("./tenants/TenantApp"));
 
 function AdminShell() {
   return (
