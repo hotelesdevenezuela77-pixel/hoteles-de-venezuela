@@ -500,7 +500,9 @@ export function OwnerDashboard() {
         address: formData.address,
         phone: formData.phone,
         whatsapp: formData.whatsapp,
-        website: formData.website,
+        website: formData.website.trim() && !/^https?:\/\//i.test(formData.website.trim())
+          ? `https://${formData.website.trim()}`
+          : formData.website.trim(),
         price_level: formData.price_level,
         category_id: parseInt(formData.category_id),
         destination_id: parseInt(formData.destination_id),
@@ -1125,7 +1127,7 @@ export function OwnerDashboard() {
                   <div className="relative">
                     <Globe className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
                     <input
-                      type="url"
+                      type="text"
                       placeholder="https://ejemplo.com o link de instagram"
                       value={formData.website}
                       onChange={e => setFormData(prev => ({ ...prev, website: e.target.value }))}
