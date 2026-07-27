@@ -7,7 +7,7 @@ import {
   Sparkles, Bot, Network, Shield, Car, Compass, AlertTriangle, Ticket, LayoutDashboard,
   Search, Bell, ChevronLeft, ChevronRight, X, ShieldAlert,
   ArrowUpDown, Receipt, MessageSquare, Star, Mail, Link2, LogOut, ChevronDown,
-  Calendar, TrendingUp, Activity, Edit3, Briefcase
+  Calendar, TrendingUp, Activity, Edit3, Briefcase, HelpCircle, BookOpen
 } from "lucide-react";
 
 // Colores Oficiales (Sistemas de Contraste)
@@ -104,6 +104,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       items: [
         { label: "Resumen", href: "/admin", icon: LayoutDashboard },
         { label: "Establecimientos", href: "/admin/establecimientos", icon: Building2 },
+        { label: "Asistencia Propietario", href: "/admin/asistencia", icon: HelpCircle },
         { label: "Aprobaciones", href: "/admin/aprobaciones", icon: ShieldCheck },
         { label: "Reservas de Hoteles", href: "/admin/reservas", icon: Calendar },
         { label: "Reservas de Paquetes", href: "/admin/reservas-paquetes", icon: Receipt },
@@ -136,6 +137,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       name: "Finanzas",
       items: [
         { label: "Libro de Finanzas", href: "/admin/finanzas", icon: DollarSign },
+        { label: "Libro Contable", href: "/admin/contabilidad", icon: BookOpen },
         { label: "Verificar Pagos", href: "/admin/pagos", icon: Receipt },
         { label: "Cotizaciones", href: "/admin/cotizaciones", icon: FileText },
         { label: "Tasas de Cambio", href: "/admin/tasas", icon: TrendingUp },

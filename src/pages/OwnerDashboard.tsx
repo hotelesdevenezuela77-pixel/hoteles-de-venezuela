@@ -60,6 +60,24 @@ export function OwnerDashboard() {
   const { user, profile, loading: authLoading } = useAuth();
   const [, setLocation] = useLocation();
   
+  const isAdmin = profile?.role === 'admin' || user?.email?.toLowerCase() === "hotelesdevenezuela77@gmail.com";
+  
+  const [impersonateId, setImpersonateId] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("hdv_impersonate_owner_user_id");
+    }
+    return null;
+  });
+  
+  const [impersonateName, setImpersonateName] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("hdv_impersonate_owner_user_name");
+    }
+    return null;
+  });
+
+  const activeOwnerId = (isAdmin && impersonateId) ? impersonateId : user?.id;
+  
   const [establishments, setEstablishments] = useState<Establishment[]>([]);
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [leads, setLeads] = useState<WhatsAppLead[]>([]);
@@ -140,14 +158,14 @@ export function OwnerDashboard() {
         console.error("Error loading categories or destinations:", e);
       }
     }
-    if (user) {
+    if (activeOwnerId) {
       fetchFormOptions();
     }
-  }, [user]);
+  }, [activeOwnerId]);
 
   // Fetch dashboard data
   const fetchDashboardData = async () => {
-    if (!user) return;
+    if (!activeOwnerId) return;
     try {
       setLoading(true);
       
@@ -159,7 +177,7 @@ export function OwnerDashboard() {
           categories (name),
           destinations (name)
         `)
-        .eq("owner_user_id", user.id);
+        .eq("owner_user_id", activeOwnerId);
 
       if (estError) throw estError;
 
@@ -314,10 +332,10 @@ export function OwnerDashboard() {
   };
 
   useEffect(() => {
-    if (user) {
+    if (activeOwnerId) {
       fetchDashboardData();
     }
-  }, [user]);
+  }, [activeOwnerId]);
 
   const handleAddDiscountSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -461,7 +479,7 @@ export function OwnerDashboard() {
   // Submit new establishment
   const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!activeOwnerId) return;
     if (!formData.name || !formData.category_id || !formData.destination_id) {
       alert("Por favor completa los campos requeridos.");
       return;
@@ -475,7 +493,7 @@ export function OwnerDashboard() {
         .replace(/(^-|-$)+/g, "");
 
       const payload = {
-        owner_user_id: user.id,
+        owner_user_id: activeOwnerId,
         name: formData.name,
         slug,
         description: formData.description,
@@ -556,6 +574,26 @@ export function OwnerDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50/30 pb-20">
+      {isAdmin && impersonateId && (
+        <div className="bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] p-3 text-center text-xs font-bold text-white flex items-center justify-between gap-3 shadow-md relative z-50">
+          <div className="flex items-center gap-2 mx-auto">
+            <span className="w-2.5 h-2.5 rounded-full bg-white animate-ping shrink-0" />
+            <span>⚠️ <strong>MODO ASISTENCIA ACTIVO:</strong> Estás administrando el panel de <strong className="underline">{impersonateName || "Establecimiento"}</strong> (Propietario ID: {impersonateId})</span>
+          </div>
+          <button
+            onClick={() => {
+              localStorage.removeItem("hdv_impersonate_owner_user_id");
+              localStorage.removeItem("hdv_impersonate_owner_user_name");
+              setImpersonateId(null);
+              setImpersonateName(null);
+              setLocation("/admin/asistencia");
+            }}
+            className="bg-white text-[#FF0096] hover:bg-white/95 px-3 py-1 rounded-lg text-[10px] font-black tracking-wider uppercase transition-all shadow-sm cursor-pointer shrink-0"
+          >
+            Salir y Volver a la Matrix
+          </button>
+        </div>
+      )}
       
       {/* Header Banner */}
       <div className="relative overflow-hidden py-12 bg-gradient-to-br from-brand-purple-dark via-brand-purple-deep to-black text-white">
@@ -569,7 +607,7 @@ export function OwnerDashboard() {
               <span>PORTAL DE PROPIETARIOS</span>
             </span>
             <h1 className="text-3xl font-black tracking-tight">
-              Panel de Control de {profile?.name || user?.email?.split("@")[0]}
+              Panel de Control de {(isAdmin && impersonateName) ? impersonateName : (profile?.name || user?.email?.split("@")[0])}
             </h1>
           </div>
           
