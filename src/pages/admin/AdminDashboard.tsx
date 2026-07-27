@@ -152,8 +152,8 @@ export function ConstellationBackground() {
       ctx.clearRect(0, 0, width, height);
 
       // Draw connections
-      ctx.strokeStyle = "rgba(0, 200, 212, 0.18)";
-      ctx.lineWidth = 1.0;
+      ctx.strokeStyle = "rgba(0, 250, 255, 0.35)";
+      ctx.lineWidth = 1.2;
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
@@ -170,7 +170,7 @@ export function ConstellationBackground() {
       }
 
       // Draw and update particles
-      ctx.fillStyle = "rgba(255, 0, 150, 0.65)";
+      ctx.fillStyle = "rgba(255, 0, 150, 0.8)";
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         ctx.beginPath();
@@ -199,7 +199,8 @@ export function ConstellationBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none z-0"
+      className="absolute inset-0 w-full h-full pointer-events-none"
+      style={{ display: "block", zIndex: 1 }}
     />
   );
 }
@@ -495,7 +496,7 @@ export function AdminDashboard() {
   return (
     <div className="min-h-screen pb-24 text-gray-800" style={{ background: "linear-gradient(135deg, #0e0120 0%, #1a0533 60%, #0d1a2e 100%)" }}>
       {/* ── Header ── */}
-      <header className="relative overflow-hidden py-10 bg-transparent">
+      <header className="relative overflow-hidden py-20 bg-transparent">
         <ConstellationBackground />
         <div className="absolute top-0 right-0 w-72 h-72 rounded-full blur-3xl opacity-10" style={{ background: C.fucsia }} />
         <div className="absolute bottom-0 left-0 w-56 h-56 rounded-full blur-3xl opacity-10" style={{ background: C.teal }} />
