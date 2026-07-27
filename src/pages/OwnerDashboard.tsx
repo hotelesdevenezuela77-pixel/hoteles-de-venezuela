@@ -61,6 +61,93 @@ interface WhatsAppLead {
   created_at: string;
 }
 
+const ROOM_AMENITIES_CATEGORIES = [
+  {
+    id: "banio",
+    label: "Baño",
+    items: [
+      { key: "toallas", label: "Toallas" },
+      { key: "banio_privado", label: "Baño Privado" },
+      { key: "articulos_aseo", label: "Artículos de Aseo Gratis" },
+      { key: "secador_pelo", label: "Secador de Pelo" },
+      { key: "ducha", label: "Ducha" }
+    ]
+  },
+  {
+    id: "habitacion",
+    label: "Habitación",
+    items: [
+      { key: "aire_acondicionado", label: "Aire Acondicionado" },
+      { key: "ropa_cama", label: "Ropa de Cama" },
+      { key: "armario", label: "Armario / Vestier" },
+      { key: "caja_fuerte", label: "Caja Fuerte Digital" },
+      { key: "calefaccion", label: "Calefacción" }
+    ]
+  },
+  {
+    id: "instalaciones",
+    label: "Instalaciones y Confort",
+    items: [
+      { key: "escritorio", label: "Zona de Trabajo / Escritorio" },
+      { key: "enchufe_cerca", label: "Enchufe cerca de la cama" },
+      { key: "tv_cable", label: "TV por Cable / Streaming" },
+      { key: "balcon", label: "Balcón / Terraza Privada" },
+      { key: "vista_mar", label: "Vista al Mar / Panorámica" }
+    ]
+  },
+  {
+    id: "cocina",
+    label: "Cocina",
+    items: [
+      { key: "cafetera", label: "Cafetera" },
+      { key: "nevera", label: "Nevera / Frigobar" },
+      { key: "cocina_equipada", label: "Cocina / Kitchenette Equipada" },
+      { key: "limpieza_productos", label: "Productos de Limpieza" }
+    ]
+  },
+  {
+    id: "seguridad",
+    label: "Seguridad",
+    items: [
+      { key: "extintores", label: "Extintores" },
+      { key: "detector_humo", label: "Detectores de Humo" },
+      { key: "tarjeta_acceso", label: "Tarjeta de Acceso" },
+      { key: "camaras_seguridad", label: "Cámaras de Seguridad" }
+    ]
+  }
+];
+
+const ROOM_AMENITIES_MAP: Record<string, string> = {
+  toallas: "Toallas",
+  banio_privado: "Baño Privado",
+  articulos_aseo: "Artículos de Aseo Gratis",
+  secador_pelo: "Secador de Pelo",
+  ducha: "Ducha",
+  aire_acondicionado: "Aire Acondicionado",
+  ropa_cama: "Ropa de Cama",
+  armario: "Armario / Vestier",
+  caja_fuerte: "Caja Fuerte Digital",
+  calefaccion: "Calefacción",
+  escritorio: "Escritorio / Zona de Trabajo",
+  enchufe_cerca: "Enchufe cerca de la cama",
+  tv_cable: "TV por Cable / Streaming",
+  balcon: "Balcón / Terraza Privada",
+  vista_mar: "Vista al Mar",
+  cafetera: "Cafetera",
+  nevera: "Nevera / Frigobar",
+  cocina_equipada: "Cocina Equipada",
+  limpieza_productos: "Productos de Limpieza",
+  extintores: "Extintores",
+  detector_humo: "Detector de Humo",
+  tarjeta_acceso: "Tarjeta de Acceso",
+  camaras_seguridad: "Cámaras de Seguridad"
+};
+
+function getRoomAmenityLabel(key: string) {
+  const normalized = key.toLowerCase().trim();
+  return ROOM_AMENITIES_MAP[normalized] || key.charAt(0).toUpperCase() + key.slice(1);
+}
+
 export function OwnerDashboard() {
   const { user, profile, loading: authLoading } = useAuth();
   const [, setLocation] = useLocation();
@@ -476,6 +563,18 @@ export function OwnerDashboard() {
       fetchRooms(Number(selectedCalendarEst));
     }
   }, [selectedCalendarEst]);
+
+  const handleToggleRoomAmenity = (key: string) => {
+    const current = roomFormData.amenities ? roomFormData.amenities.split(",").map(s => s.trim()).filter(Boolean) : [];
+    const idx = current.indexOf(key);
+    let updated: string[];
+    if (idx >= 0) {
+      updated = current.filter(s => s !== key);
+    } else {
+      updated = [...current, key];
+    }
+    setRoomFormData(prev => ({ ...prev, amenities: updated.join(",") }));
+  };
 
   // Create Room type handler
   const handleCreateRoom = async (e: React.FormEvent) => {
@@ -1597,11 +1696,15 @@ export function OwnerDashboard() {
                           <div>
                             <span className="text-[9px] uppercase font-bold text-gray-400 tracking-wider block mb-1">Comodidades</span>
                             <div className="flex gap-1.5 flex-wrap">
-                              {room.amenities.split(",").map((am: string) => (
-                                <span key={am} className="px-2 py-0.5 bg-brand-turquesa/10 text-brand-turquesa border border-brand-turquesa/10 rounded-full text-[9px] font-black uppercase">
-                                  {am.trim()}
-                                </span>
-                              ))}
+                              {room.amenities.split(",").map((am: string) => {
+                                const trimmed = am.trim();
+                                if (!trimmed) return null;
+                                return (
+                                  <span key={trimmed} className="px-2 py-0.5 bg-brand-turquesa/10 text-brand-turquesa border border-brand-turquesa/10 rounded-full text-[9px] font-black uppercase">
+                                    {getRoomAmenityLabel(trimmed)}
+                                  </span>
+                                );
+                              })}
                             </div>
                           </div>
                         )}
@@ -2354,14 +2457,30 @@ export function OwnerDashboard() {
               </div>
 
               <div>
-                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold font-bold">Comodidades (Separadas por Comas)</label>
-                <input
-                  type="text"
-                  placeholder="Ej: wifi, aire, tv, jacuzzi"
-                  value={roomFormData.amenities}
-                  onChange={e => setRoomFormData(prev => ({ ...prev, amenities: e.target.value }))}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700"
-                />
+                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-2 font-bold font-bold">Servicios y Amenities (Estilo Booking.com)</label>
+                <div className="space-y-4 max-h-60 overflow-y-auto p-4 bg-gray-50 border border-gray-150 rounded-2xl">
+                  {ROOM_AMENITIES_CATEGORIES.map(cat => (
+                    <div key={cat.id} className="space-y-1.5">
+                      <span className="text-[10px] font-black text-brand-turquesa uppercase tracking-wider block">{cat.label}</span>
+                      <div className="grid grid-cols-2 gap-2">
+                        {cat.items.map(item => {
+                          const active = roomFormData.amenities.split(",").map(s => s.trim()).includes(item.key);
+                          return (
+                            <label key={item.key} className="flex items-center gap-2 text-[11px] font-semibold text-gray-600 cursor-pointer select-none">
+                              <input
+                                type="checkbox"
+                                checked={active}
+                                onChange={() => handleToggleRoomAmenity(item.key)}
+                                className="accent-brand-magenta w-3.5 h-3.5"
+                              />
+                              <span>{item.label}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <div className="flex gap-3 pt-6 border-t border-gray-100">
