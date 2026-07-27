@@ -177,7 +177,8 @@ export function OwnerDashboard() {
           categories (name),
           destinations (name)
         `)
-        .eq("owner_user_id", activeOwnerId);
+        .eq("owner_user_id", activeOwnerId)
+        .order("created_at", { ascending: false });
 
       if (estError) throw estError;
 
