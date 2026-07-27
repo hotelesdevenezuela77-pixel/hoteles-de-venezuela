@@ -8,7 +8,8 @@ import { BookingWidget } from "../components/BookingWidget";
 import { 
   MapPin, Phone, Globe, Mail, Clock, Star, 
   ChevronLeft, ChevronRight, Share2, Heart,
-  ArrowLeft, DollarSign, Navigation, Loader2, AlertTriangle, Sparkles
+  ArrowLeft, DollarSign, Navigation, Loader2, AlertTriangle, Sparkles,
+  Coffee, Compass, Utensils, Plane, Car, Building2
 } from "lucide-react";
 
 import { parseServicesList, getAmenityLabel } from "../lib/amenitiesList";
@@ -52,6 +53,34 @@ export function EstablecimientoDetalle() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
   const [hasTrackedView, setHasTrackedView] = useState(false);
+  const [surroundings, setSurroundings] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (establishment?.id) {
+      const key = `hdv_surroundings_${establishment.id}`;
+      const saved = localStorage.getItem(key);
+      if (saved) {
+        setSurroundings(JSON.parse(saved));
+      } else {
+        const defaults = [
+          { category: "cerca", name: "Plaza del Ayuntamiento", distance: "100 m" },
+          { category: "cerca", name: "Parque de la Rambleta", distance: "100 m" },
+          { category: "cerca", name: "Museo Nacional de Cerámica", distance: "450 m" },
+          { category: "cerca", name: "Lonja de la Seda", distance: "550 m" },
+          { category: "gastronomia", name: "Restaurante Homenaje Taberna Gourmet", distance: "50 m" },
+          { category: "gastronomia", name: "Cafetería/bar McLub", distance: "80 m" },
+          { category: "atracciones", name: "Jardín del Turia", distance: "1.3 km" },
+          { category: "atracciones", name: "Museo de Ciencias Naturales", distance: "1.6 km" },
+          { category: "playas", name: "Playa de las Arenas", distance: "5 km" },
+          { category: "playas", name: "Playa de la Malvarrosa", distance: "5 km" },
+          { category: "transporte", name: "Metro - Estación de Metro Xàtiva", distance: "400 m" },
+          { category: "transporte", name: "Tren - Estación de tren del Norte", distance: "500 m" },
+          { category: "aeropuertos", name: "Aeropuerto de Valencia", distance: "8 km" }
+        ];
+        setSurroundings(defaults);
+      }
+    }
+  }, [establishment]);
 
   // Track profile view when loaded
   useEffect(() => {
@@ -345,6 +374,167 @@ export function EstablecimientoDetalle() {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Alrededores del Hotel Card */}
+            {surroundings.length > 0 && (
+              <div className="bg-white rounded-3xl border border-gray-100 p-6 md:p-8 shadow-sm text-left space-y-6">
+                <div className="border-b border-gray-100 pb-4">
+                  <h2 className="text-xl font-serif font-black text-gray-800 tracking-tight flex items-center gap-2">
+                    <Building2 className="w-5 h-5 text-brand-magenta" />
+                    Alrededores del hotel
+                  </h2>
+                  <p className="text-[11px] text-gray-400 font-semibold mt-1">¡A los clientes les encantó pasear por el barrio! Ubicación excelente</p>
+                </div>
+
+                {/* Centro Histórico Alert-like Box */}
+                <div className="flex items-start gap-3 p-4 bg-gray-50 border border-gray-150 rounded-2xl relative">
+                  <div className="w-8 h-8 rounded-lg bg-brand-turquesa flex items-center justify-center text-[#0e011f] shrink-0">
+                    <MapPin className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <span className="block text-xs font-black text-gray-700 uppercase tracking-wider">Está en el centro histórico</span>
+                    <p className="text-[11px] text-gray-500 mt-1 leading-normal font-medium">
+                      En el centro histórico podrás visitar un sinfín de iglesias, palacios y plazas, todo ello rodeado de una atmósfera colonial y sutil.
+                    </p>
+                  </div>
+                </div>
+
+                {/* 3 Column Categories Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  
+                  {/* Column 1: ¿Qué hay cerca? & Restaurantes */}
+                  <div className="space-y-6">
+                    {/* ¿Qué hay cerca? */}
+                    {surroundings.filter(s => s.category === "cerca").length > 0 && (
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 text-xs font-black uppercase text-gray-700 tracking-wider">
+                          <div className="w-6 h-6 bg-brand-turquesa rounded-lg flex items-center justify-center shrink-0">
+                            <MapPin className="w-3.5 h-3.5 text-white" />
+                          </div>
+                          <span>¿Qué hay cerca?</span>
+                        </div>
+                        <div className="space-y-2 pl-8">
+                          {surroundings.filter(s => s.category === "cerca").map((poi, idx) => (
+                            <div key={idx} className="flex justify-between items-center text-xs text-gray-600 font-semibold">
+                              <span className="truncate max-w-[150px]">{poi.name}</span>
+                              <span className="text-gray-400 shrink-0 font-bold">{poi.distance}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Restaurantes y Cafeterías */}
+                    {surroundings.filter(s => s.category === "gastronomia").length > 0 && (
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 text-xs font-black uppercase text-gray-700 tracking-wider">
+                          <div className="w-6 h-6 bg-brand-magenta rounded-lg flex items-center justify-center shrink-0">
+                            <Utensils className="w-3.5 h-3.5 text-white" />
+                          </div>
+                          <span>Restaurantes y café</span>
+                        </div>
+                        <div className="space-y-2 pl-8">
+                          {surroundings.filter(s => s.category === "gastronomia").map((poi, idx) => (
+                            <div key={idx} className="flex justify-between items-center text-xs text-gray-600 font-semibold">
+                              <span className="truncate max-w-[150px]">{poi.name}</span>
+                              <span className="text-gray-400 shrink-0 font-bold">{poi.distance}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Column 2: Atracciones & Playas */}
+                  <div className="space-y-6">
+                    {/* Atracciones destacadas */}
+                    {surroundings.filter(s => s.category === "atracciones").length > 0 && (
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 text-xs font-black uppercase text-gray-700 tracking-wider">
+                          <div className="w-6 h-6 bg-[#9B00CC] rounded-lg flex items-center justify-center shrink-0">
+                            <Compass className="w-3.5 h-3.5 text-white" />
+                          </div>
+                          <span>Atracciones</span>
+                        </div>
+                        <div className="space-y-2 pl-8">
+                          {surroundings.filter(s => s.category === "atracciones").map((poi, idx) => (
+                            <div key={idx} className="flex justify-between items-center text-xs text-gray-600 font-semibold">
+                              <span className="truncate max-w-[150px]">{poi.name}</span>
+                              <span className="text-gray-400 shrink-0 font-bold">{poi.distance}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Playas en la zona */}
+                    {surroundings.filter(s => s.category === "playas").length > 0 && (
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 text-xs font-black uppercase text-gray-700 tracking-wider">
+                          <div className="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center shrink-0">
+                            <Sparkles className="w-3.5 h-3.5 text-white" />
+                          </div>
+                          <span>Playas en la zona</span>
+                        </div>
+                        <div className="space-y-2 pl-8">
+                          {surroundings.filter(s => s.category === "playas").map((poi, idx) => (
+                            <div key={idx} className="flex justify-between items-center text-xs text-gray-600 font-semibold">
+                              <span className="truncate max-w-[150px]">{poi.name}</span>
+                              <span className="text-gray-400 shrink-0 font-bold">{poi.distance}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Column 3: Transporte & Aeropuertos */}
+                  <div className="space-y-6">
+                    {/* Transporte público */}
+                    {surroundings.filter(s => s.category === "transporte").length > 0 && (
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 text-xs font-black uppercase text-gray-700 tracking-wider">
+                          <div className="w-6 h-6 bg-blue-600 rounded-lg flex items-center justify-center shrink-0">
+                            <Car className="w-3.5 h-3.5 text-white" />
+                          </div>
+                          <span>Transporte público</span>
+                        </div>
+                        <div className="space-y-2 pl-8">
+                          {surroundings.filter(s => s.category === "transporte").map((poi, idx) => (
+                            <div key={idx} className="flex justify-between items-center text-xs text-gray-600 font-semibold">
+                              <span className="truncate max-w-[150px]">{poi.name}</span>
+                              <span className="text-gray-400 shrink-0 font-bold">{poi.distance}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Aeropuertos más cercanos */}
+                    {surroundings.filter(s => s.category === "aeropuertos").length > 0 && (
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 text-xs font-black uppercase text-gray-700 tracking-wider">
+                          <div className="w-6 h-6 bg-sky-500 rounded-lg flex items-center justify-center shrink-0">
+                            <Plane className="w-3.5 h-3.5 text-white" />
+                          </div>
+                          <span>Aeropuertos</span>
+                        </div>
+                        <div className="space-y-2 pl-8">
+                          {surroundings.filter(s => s.category === "aeropuertos").map((poi, idx) => (
+                            <div key={idx} className="flex justify-between items-center text-xs text-gray-600 font-semibold">
+                              <span className="truncate max-w-[150px]">{poi.name}</span>
+                              <span className="text-gray-400 shrink-0 font-bold">{poi.distance}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                </div>
+
               </div>
             )}
 

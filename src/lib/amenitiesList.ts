@@ -15,52 +15,104 @@ export const AMENITY_CATEGORIES = [
 ];
 
 export const MASTER_AMENITIES: AmenityItem[] = [
-  // General & Confort
-  { key: "wifi", label: "WiFi Gratis de Alta Velocidad", category: "general", iconName: "Wifi" },
-  { key: "aire_acondicionado", label: "Aire Acondicionado", category: "general", iconName: "Wind" },
-  { key: "estacionamiento", label: "Estacionamiento Gratuito / Privado", category: "general", iconName: "Car" },
-  { key: "planta_electrica", label: "Planta Eléctrica / Generador 100%", category: "general", iconName: "Zap" },
-  { key: "tanque_agua", label: "Tanque de Agua Continuo 24/7", category: "general", iconName: "Droplets" },
-  { key: "seguridad", label: "Seguridad Privada 24/7", category: "general", iconName: "ShieldCheck" },
-  { key: "recepcion_24h", label: "Recepción 24 Horas", category: "general", iconName: "Clock" },
-  { key: "pet_friendly", label: "Pet Friendly (Mascotas Permitidas)", category: "general", iconName: "Dog" },
-  { key: "accesible", label: "Acceso para Personas con Movilidad Reducida", category: "general", iconName: "Accessibility" },
+  // I. Amenidades Populares e Imprescindibles (Quick-view)
+  { key: "habitaciones_sin_humo", label: "Habitaciones sin humo", category: "general", iconName: "Ban" },
+  { key: "traslado_aeropuerto", label: "Traslado al aeropuerto (Gratis/Pago)", category: "servicios", iconName: "Plane" },
+  { key: "adaptado_personas_movilidad_reducida", label: "Adaptado para movilidad reducida", category: "general", iconName: "Accessibility" },
+  { key: "wifi", label: "Wi-Fi gratuito (Alta velocidad)", category: "general", iconName: "Wifi" },
+  { key: "habitaciones_familiares", label: "Habitaciones familiares", category: "general", iconName: "Users" },
   { key: "ascensor", label: "Ascensor", category: "general", iconName: "ArrowUpSquare" },
+  { key: "calefaccion", label: "Calefacción", category: "general", iconName: "Flame" },
+  { key: "aire_acondicionado", label: "Aire acondicionado", category: "general", iconName: "Wind" },
 
-  // Recreación & Bienestar
-  { key: "piscina", label: "Piscina principal / Infinity Pool", category: "recreacion", iconName: "Waves" },
-  { key: "piscina_infantil", label: "Piscina Infantil", category: "recreacion", iconName: "Waves" },
-  { key: "jacuzzi", label: "Jacuzzi / Hidromasaje", category: "recreacion", iconName: "Bath" },
-  { key: "playa_privada", label: "Frente al Mar / Playa Privada", category: "recreacion", iconName: "Palmtree" },
-  { key: "spa", label: "Spa & Centro de Masajes", category: "recreacion", iconName: "Sparkles" },
-  { key: "gimnasio", label: "Gimnasio Equipado / Fitness Center", category: "recreacion", iconName: "Dumbbell" },
-  { key: "sauna", label: "Sauna / Baño Turco", category: "recreacion", iconName: "Flame" },
-  { key: "jardin", label: "Jardines & Áreas Verdes", category: "recreacion", iconName: "TreePine" },
-  { key: "parque_infantil", label: "Zona Infantil / Parque de Juegos", category: "recreacion", iconName: "Smile" },
-  { key: "cancha_padel", label: "Cancha de Pádel / Tenis", category: "recreacion", iconName: "Trophy" },
+  // II. Amenidades de la Habitación y Apartamento (Room Amenities)
+  // A. Salud e Higiene (Baño):
+  { key: "papel_higienico", label: "Papel higiénico", category: "habitacion", iconName: "FileText" },
+  { key: "toallas", label: "Toallas", category: "habitacion", iconName: "Droplets" },
+  { key: "ducha", label: "Ducha / Bañera con lluvia premium", category: "habitacion", iconName: "Droplets" },
+  { key: "articulos_aseo", label: "Artículos de aseo gratis", category: "habitacion", iconName: "Sparkles" },
+  { key: "aseo", label: "Aseo", category: "habitacion", iconName: "Check" },
+  { key: "secador_pelo", label: "Secador de pelo profesional", category: "habitacion", iconName: "Wind" },
+  { key: "wc_elevado", label: "WC elevado con barras de apoyo", category: "general", iconName: "Accessibility" },
 
-  // Gastronomía & Bares
-  { key: "restaurante", label: "Restaurante Gourmet", category: "gastronomia", iconName: "Utensils" },
-  { key: "desayuno", label: "Desayuno Incluido", category: "gastronomia", iconName: "Coffee" },
-  { key: "bar", label: "Bar / Lounge Nocturno", category: "gastronomia", iconName: "Wine" },
-  { key: "pool_bar", label: "Bar en la Piscina (Pool Bar)", category: "gastronomia", iconName: "GlassWater" },
-  { key: "room_service", label: "Servicio a la Habitación (Room Service)", category: "gastronomia", iconName: "ConciergeBell" },
-  { key: "parrillera", label: "Área de Parrillera / Barbacoa", category: "gastronomia", iconName: "Flame" },
+  // B. Equipamiento y Confort (Habitación):
+  { key: "ropa_cama", label: "Ropa de cama de algodón egipcio", category: "habitacion", iconName: "Bed" },
+  { key: "armario", label: "Armario / Vestidor", category: "habitacion", iconName: "Archive" },
+  { key: "zona_estar", label: "Zona de estar / Sofá cama", category: "habitacion", iconName: "Smile" },
+  { key: "escritorio", label: "Escritorio / Mesa de trabajo", category: "habitacion", iconName: "Briefcase" },
+  { key: "enchufe_cerca", label: "Enchufe cerca de la cama", category: "habitacion", iconName: "Zap" },
+  { key: "adaptadores_corriente", label: "Adaptadores de corriente internacionales", category: "habitacion", iconName: "Zap" },
+  { key: "espejo_cuerpo", label: "Espejo de cuerpo entero", category: "habitacion", iconName: "Eye" },
+  { key: "insonorizacion", label: "Insonorización premium", category: "habitacion", iconName: "VolumeX" },
+  { key: "purificador_aire", label: "Purificador de aire / Ventilador", category: "habitacion", iconName: "Wind" },
+  { key: "cortinas_blackout", label: "Cortinas opacas (Blackout)", category: "habitacion", iconName: "EyeOff" },
 
-  // Servicios & Experiencias
-  { key: "traslado", label: "Traslado Aeropuerto / Transfer Privado", category: "servicios", iconName: "Plane" },
-  { key: "excursiones", label: "Excursiones / Paseos en Lancha", category: "servicios", iconName: "Compass" },
-  { key: "toldos_playa", label: "Toldos y Sillas de Playa Incluidos", category: "servicios", iconName: "Sun" },
-  { key: "eventos", label: "Salón de Eventos & Conferencias", category: "servicios", iconName: "Briefcase" },
-  { key: "lavanderia", label: "Servicio de Lavandería", category: "servicios", iconName: "Shirt" },
+  // C. Cocina y Comedor:
+  { key: "cafetera", label: "Cafetera Nespresso / Tetera", category: "habitacion", iconName: "Coffee" },
+  { key: "productos_limpieza", label: "Productos de limpieza", category: "habitacion", iconName: "Sparkles" },
+  { key: "nevera", label: "Nevera / Minibar", category: "habitacion", iconName: "IceCream" },
+  { key: "utensilios_cocina", label: "Utensilios de cocina completos", category: "habitacion", iconName: "ChefHat" },
+  { key: "microondas", label: "Microondas / Horno", category: "habitacion", iconName: "ChefHat" },
+  { key: "lavavajillas", label: "Lavavajillas", category: "habitacion", iconName: "Droplets" },
+  { key: "tostadora", label: "Tostadora / Hervidor", category: "habitacion", iconName: "Coffee" },
+  { key: "mesa_comedor", label: "Mesa de comedor", category: "habitacion", iconName: "Utensils" },
 
-  // Habitación & Confort
-  { key: "vista_mar", label: "Vista al Mar / Vista Panorámica", category: "habitacion", iconName: "Eye" },
-  { key: "balcon", label: "Balcón / Terraza Privada", category: "habitacion", iconName: "Sun" },
-  { key: "tv_cable", label: "TV por Cable / Streaming (Netflix)", category: "habitacion", iconName: "Tv" },
-  { key: "cocina", label: "Cocina / Kitchenette Equipada", category: "habitacion", iconName: "ChefHat" },
-  { key: "agua_caliente", label: "Agua Caliente", category: "habitacion", iconName: "ThermometerSun" },
-  { key: "caja_fuerte", label: "Caja Fuerte Digital", category: "habitacion", iconName: "Lock" },
+  // D. Equipamiento Tecnológico:
+  { key: "tv_cable", label: "Smart TV con Netflix & Cable", category: "habitacion", iconName: "Tv" },
+  { key: "sistema_sonido", label: "Sistema de sonido Bluetooth", category: "habitacion", iconName: "Music" },
+  { key: "consola_juegos", label: "Consola de videojuegos", category: "habitacion", iconName: "Trophy" },
+
+  // E. Extras de Lujo:
+  { key: "vino_bienvenida", label: "Vino / Champán de bienvenida", category: "habitacion", iconName: "GlassWater" },
+  { key: "fruta_cortesia", label: "Fruta fresca de cortesía", category: "habitacion", iconName: "Apple" },
+  { key: "menu_almohadas", label: "Menú de almohadas", category: "habitacion", iconName: "Bed" },
+  { key: "albornoces_lujo", label: "Albornoces y zapatillas de lujo", category: "habitacion", iconName: "Shirt" },
+
+  // III. Servicios y Atención al Cliente:
+  { key: "registro_privado", label: "Registro de entrada/salida privado", category: "servicios", iconName: "Key" },
+  { key: "registro_expres", label: "Registro de entrada/salida exprés", category: "servicios", iconName: "Clock" },
+  { key: "recepcion_24h", label: "Recepción 24 horas", category: "general", iconName: "Clock" },
+  { key: "consigna_equipaje", label: "Consigna de equipaje / Maletero", category: "servicios", iconName: "Briefcase" },
+  { key: "taquillas", label: "Taquillas de seguridad", category: "servicios", iconName: "Lock" },
+  { key: "servicio_limpieza", label: "Servicio de limpieza diario", category: "servicios", iconName: "Sparkles" },
+  { key: "lavanderia", label: "Servicio de lavandería express", category: "servicios", iconName: "Shirt" },
+  { key: "asistente_guiones", label: "Asistente de guiones inteligentes", category: "servicios", iconName: "Sparkles" },
+  { key: "cambio_divisa", label: "Cambio de divisa / ATM", category: "servicios", iconName: "DollarSign" },
+
+  // IV. Comida y Bebida:
+  { key: "restaurante", label: "Restaurante a la carta / Buffet", category: "gastronomia", iconName: "Utensils" },
+  { key: "cafeteria", label: "Cafetería", category: "gastronomia", iconName: "Coffee" },
+  { key: "bar", label: "Bar / Lounge nocturno", category: "gastronomia", iconName: "Wine" },
+  { key: "room_service", label: "Servicio a la habitación 24 horas", category: "gastronomia", iconName: "ConciergeBell" },
+  { key: "menu_infantil", label: "Menú infantil y familiar", category: "gastronomia", iconName: "Smile" },
+
+  // V. Salud, Bienestar y Deportes:
+  { key: "piscina", label: "Piscina climatizada (Aire/Cubierta)", category: "recreacion", iconName: "Waves" },
+  { key: "spa", label: "Spa & Centro de masajes", category: "recreacion", iconName: "Sparkles" },
+  { key: "jacuzzi", label: "Jacuzzi / Tina de hidromasaje", category: "recreacion", iconName: "Bath" },
+  { key: "sauna", label: "Sauna / Baño turco (Hamam)", category: "recreacion", iconName: "Flame" },
+  { key: "gimnasio", label: "Gimnasio equipado / Fitness Center", category: "recreacion", iconName: "Dumbbell" },
+  { key: "cancha_padel", label: "Pistas de tenis y pádel", category: "recreacion", iconName: "Trophy" },
+
+  // VI. Entretenimiento:
+  { key: "sala_juegos", label: "Sala de juegos (Billar/Ping-pong)", category: "recreacion", iconName: "Trophy" },
+  { key: "parque_infantil", label: "Parque infantil & Club de niños", category: "recreacion", iconName: "Smile" },
+  { key: "tiendas", label: "Tiendas en el establecimiento", category: "general", iconName: "Briefcase" },
+  { key: "jardin", label: "Jardín / Zona de picnic", category: "recreacion", iconName: "TreePine" },
+
+  // VII. Seguridad y Transporte:
+  { key: "extintores", label: "Extintores de incendios", category: "general", iconName: "Flame" },
+  { key: "camaras_seguridad", label: "Cámaras de seguridad en zonas comunes", category: "general", iconName: "Eye" },
+  { key: "detectores_humo", label: "Detectores de humo / Alarmas", category: "general", iconName: "AlertTriangle" },
+  { key: "caja_fuerte", label: "Caja fuerte digital", category: "general", iconName: "Lock" },
+  { key: "aparcamiento", label: "Aparcamiento vigilado / Garaje", category: "general", iconName: "Car" },
+
+  // VIII. Accesibilidad:
+  { key: "ducha_ras_suelo", label: "Ducha a ras de suelo (Walk-in)", category: "general", iconName: "Droplets" },
+  { key: "wc_barras_apoyo", label: "WC con barras de apoyo", category: "general", iconName: "Accessibility" },
+
+  // IX. Idiomas:
+  { key: "personal_multilingue", label: "Personal multilingüe (Español/Inglés)", category: "general", iconName: "Globe" },
 ];
 
 /**

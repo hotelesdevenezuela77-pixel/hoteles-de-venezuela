@@ -295,6 +295,67 @@ export function OwnerDashboard() {
   const [bulkRoom, setBulkRoom] = useState("");
   const [bulkAction, setBulkAction] = useState<"rate" | "lock" | "unlock">("rate");
 
+  // Surroundings states & handlers
+  const [showSurroundingsModal, setShowSurroundingsModal] = useState(false);
+  const [surroundings, setSurroundings] = useState<any[]>([]);
+  const [newPOI, setNewPOI] = useState({ category: "cerca", name: "", distance: "" });
+
+  const POI_CATEGORIES = [
+    { id: "cerca", label: "¿Qué hay cerca?" },
+    { id: "gastronomia", label: "Restaurantes y cafeterías" },
+    { id: "atracciones", label: "Atracciones turísticas destacadas" },
+    { id: "playas", label: "Playas en la zona" },
+    { id: "transporte", label: "Transporte público" },
+    { id: "aeropuertos", label: "Aeropuertos más cercanos" }
+  ];
+
+  useEffect(() => {
+    if (selectedCalendarEst) {
+      const key = `hdv_surroundings_${selectedCalendarEst}`;
+      const saved = localStorage.getItem(key);
+      if (saved) {
+        setSurroundings(JSON.parse(saved));
+      } else {
+        const defaults = [
+          { category: "cerca", name: "Plaza del Ayuntamiento", distance: "100 m" },
+          { category: "cerca", name: "Parque de la Rambleta", distance: "100 m" },
+          { category: "cerca", name: "Museo Nacional de Cerámica", distance: "450 m" },
+          { category: "cerca", name: "Lonja de la Seda", distance: "550 m" },
+          { category: "gastronomia", name: "Restaurante Homenaje Taberna Gourmet", distance: "50 m" },
+          { category: "gastronomia", name: "Cafetería/bar McLub", distance: "80 m" },
+          { category: "atracciones", name: "Jardín del Turia", distance: "1.3 km" },
+          { category: "atracciones", name: "Museo de Ciencias Naturales", distance: "1.6 km" },
+          { category: "playas", name: "Playa de las Arenas", distance: "5 km" },
+          { category: "playas", name: "Playa de la Malvarrosa", distance: "5 km" },
+          { category: "transporte", name: "Metro - Estación de Metro Xàtiva", distance: "400 m" },
+          { category: "transporte", name: "Tren - Estación de tren del Norte", distance: "500 m" },
+          { category: "aeropuertos", name: "Aeropuerto de Valencia", distance: "8 km" }
+        ];
+        setSurroundings(defaults);
+        localStorage.setItem(key, JSON.stringify(defaults));
+      }
+    }
+  }, [selectedCalendarEst]);
+
+  const handleAddPOI = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPOI.name || !newPOI.distance) return;
+    const updated = [...surroundings, newPOI];
+    setSurroundings(updated);
+    if (selectedCalendarEst) {
+      localStorage.setItem(`hdv_surroundings_${selectedCalendarEst}`, JSON.stringify(updated));
+    }
+    setNewPOI({ category: newPOI.category, name: "", distance: "" });
+  };
+
+  const handleRemovePOI = (index: number) => {
+    const updated = surroundings.filter((_, idx) => idx !== index);
+    setSurroundings(updated);
+    if (selectedCalendarEst) {
+      localStorage.setItem(`hdv_surroundings_${selectedCalendarEst}`, JSON.stringify(updated));
+    }
+  };
+
   // Redirect if not logged in
   useEffect(() => {
     if (!authLoading && !user) {
@@ -1149,7 +1210,7 @@ export function OwnerDashboard() {
 
           {/* Active Establishment Selector Dropdown */}
           {establishments.length > 0 && (
-            <div className="hidden lg:flex items-center gap-2 shrink-0 py-2">
+            <div className="hidden lg:flex items-center gap-3 shrink-0 py-2">
               <span className="text-[10px] font-black uppercase text-gray-400">Hotel Activo:</span>
               <select
                 value={selectedCalendarEst}
@@ -1160,6 +1221,13 @@ export function OwnerDashboard() {
                   <option key={est.id} value={est.id}>{est.name}</option>
                 ))}
               </select>
+              <button
+                onClick={() => setShowSurroundingsModal(true)}
+                className="px-3 py-1.5 bg-brand-turquesa/10 hover:bg-brand-turquesa/20 text-brand-turquesa border border-brand-turquesa/20 rounded-xl text-[10px] font-black uppercase tracking-wider cursor-pointer transition-all flex items-center gap-1"
+              >
+                <MapPin className="w-3.5 h-3.5" />
+                <span>Alrededores</span>
+              </button>
             </div>
           )}
         </div>
@@ -1173,17 +1241,25 @@ export function OwnerDashboard() {
           <div className="space-y-8">
             
             {/* Header info selector mobile */}
-            <div className="lg:hidden flex flex-col gap-2 p-4 bg-white border border-gray-150 rounded-2xl">
+            <div className="lg:hidden flex flex-col gap-2 p-4 bg-white border border-gray-150 rounded-2xl text-left">
               <span className="text-[10px] font-black uppercase text-gray-400">Establecimiento Seleccionado:</span>
-              <select
-                value={selectedCalendarEst}
-                onChange={(e) => setSelectedCalendarEst(Number(e.target.value))}
-                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-bold text-gray-700"
-              >
-                {establishments.map(est => (
-                  <option key={est.id} value={est.id}>{est.name}</option>
-                ))}
-              </select>
+              <div className="flex gap-2">
+                <select
+                  value={selectedCalendarEst}
+                  onChange={(e) => setSelectedCalendarEst(Number(e.target.value))}
+                  className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-bold text-gray-700"
+                >
+                  {establishments.map(est => (
+                    <option key={est.id} value={est.id}>{est.name}</option>
+                  ))}
+                </select>
+                <button
+                  onClick={() => setShowSurroundingsModal(true)}
+                  className="px-3 bg-brand-turquesa/10 text-brand-turquesa border border-brand-turquesa/20 rounded-xl flex items-center justify-center cursor-pointer"
+                >
+                  <MapPin className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
             {/* Title & Stats */}
@@ -2597,6 +2673,132 @@ export function OwnerDashboard() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+        </div>
+      )}
+
+      {/* Surroundings Manager Modal */}
+      {showSurroundingsModal && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200 my-8">
+            <div className="bg-gradient-to-r from-brand-purple-dark to-brand-purple-deep px-6 py-5 flex items-center justify-between text-white text-left">
+              <div className="flex items-center gap-3">
+                <MapPin className="w-6 h-6 text-brand-magenta" />
+                <div>
+                  <h3 className="font-extrabold text-sm tracking-wide">Configurar Alrededores del Hotel</h3>
+                  <p className="text-white/70 text-[10px] mt-0.5 font-bold">Añade lugares de interés, distancias y transporte cercano</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowSurroundingsModal(false)}
+                className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6 text-left max-h-[70vh] overflow-y-auto">
+              
+              {/* Form to add POI */}
+              <form onSubmit={handleAddPOI} className="bg-gray-50 border border-gray-150 rounded-2xl p-4 space-y-4">
+                <span className="text-[10px] font-black text-brand-turquesa uppercase tracking-wider block">Registrar Punto de Interés</span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider mb-1">Categoría</label>
+                    <select
+                      value={newPOI.category}
+                      onChange={e => setNewPOI(prev => ({ ...prev, category: e.target.value }))}
+                      className="w-full px-3 py-2 bg-white border border-gray-250 rounded-xl text-xs text-gray-600 focus:outline-none focus:ring-1 focus:ring-brand-turquesa cursor-pointer"
+                    >
+                      {POI_CATEGORIES.map(cat => (
+                        <option key={cat.id} value={cat.id}>{cat.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider mb-1">Nombre del Lugar</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Ej: Jardín del Turia"
+                      value={newPOI.name}
+                      onChange={e => setNewPOI(prev => ({ ...prev, name: e.target.value }))}
+                      className="w-full px-3 py-2 bg-white border border-gray-250 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-1 focus:ring-brand-turquesa"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider mb-1">Distancia / Tiempo</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Ej: 100 m o 1.3 km"
+                      value={newPOI.distance}
+                      onChange={e => setNewPOI(prev => ({ ...prev, distance: e.target.value }))}
+                      className="w-full px-3 py-2 bg-white border border-gray-250 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-1 focus:ring-brand-turquesa"
+                    />
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  className="w-full py-2 bg-brand-turquesa hover:bg-brand-turquesa/90 text-[#0e011f] font-black text-[10px] uppercase tracking-wider rounded-xl cursor-pointer transition-colors"
+                >
+                  Agregar Lugar
+                </button>
+              </form>
+
+              {/* Listed POIs by category */}
+              <div className="space-y-4">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Lugares de Interés Registrados</span>
+                
+                {POI_CATEGORIES.map(cat => {
+                  const items = surroundings.filter(s => s.category === cat.id);
+                  return (
+                    <div key={cat.id} className="space-y-1.5">
+                      <span className="text-[10px] font-black text-slate-800 uppercase tracking-wider block border-b border-gray-100 pb-1">{cat.label}</span>
+                      {items.length === 0 ? (
+                        <p className="text-[10px] text-gray-400 italic">No hay lugares registrados en esta categoría.</p>
+                      ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {items.map((item, idx) => {
+                            const globalIndex = surroundings.findIndex(s => s.name === item.name && s.category === item.category);
+                            return (
+                              <div key={idx} className="flex justify-between items-center bg-gray-50 border border-gray-150 p-2.5 rounded-xl text-xs text-left">
+                                <div>
+                                  <span className="font-bold text-gray-700 block">{item.name}</span>
+                                  <span className="text-[10px] text-gray-400 font-semibold">{item.distance}</span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemovePOI(globalIndex)}
+                                  className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded-lg transition-colors cursor-pointer"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+            </div>
+
+            <div className="bg-gray-50 p-4 border-t border-gray-100 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowSurroundingsModal(false)}
+                className="bg-gradient-to-r from-brand-purple-dark to-brand-purple-deep text-white text-xs font-bold px-6 py-2.5 rounded-xl shadow-md cursor-pointer hover:opacity-95"
+              >
+                Listo / Guardar
+              </button>
+            </div>
+
           </div>
         </div>
       )}
