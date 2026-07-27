@@ -240,9 +240,9 @@ export function AvailabilityCalendar({ establishmentId }: AvailabilityCalendarPr
   }
 
   return (
-    <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm text-left">
+    <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-sm text-left">
       {/* Header */}
-      <div className="bg-gray-50/50 p-5 border-b border-gray-100">
+      <div className="bg-gray-50/50 p-5 border-b border-gray-200">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-xl bg-brand-magenta/10 flex items-center justify-center border border-brand-magenta/5">
@@ -303,7 +303,7 @@ export function AvailabilityCalendar({ establishmentId }: AvailabilityCalendarPr
             {/* Day headers */}
             <div className="grid grid-cols-7 gap-1.5 mb-2">
               {dayNames.map(day => (
-                <div key={day} className="text-center text-[10px] font-black uppercase text-gray-400 py-1">
+                <div key={day} className="text-center text-[10px] font-black uppercase text-brand-turquesa py-1">
                   {day}
                 </div>
               ))}
@@ -328,12 +328,12 @@ export function AvailabilityCalendar({ establishmentId }: AvailabilityCalendarPr
                       isPast 
                         ? "bg-gray-100/50 border-transparent opacity-40 select-none" 
                         : hasAvailability
-                          ? "bg-emerald-50/40 border-emerald-100/50 hover:bg-emerald-50"
-                          : "bg-red-50/40 border-red-100/50 hover:bg-red-50"
+                          ? "bg-emerald-50/70 border-emerald-200 hover:bg-emerald-50"
+                          : "bg-red-50/70 border-red-200 hover:bg-red-50"
                     } ${isToday ? "ring-2 ring-brand-magenta bg-white border-brand-magenta" : ""}`}
                   >
                     <div className="h-full flex flex-col justify-between text-left">
-                      <span className={`text-[10px] font-black ${isToday ? "text-brand-magenta" : isPast ? "text-gray-400" : "text-gray-500"}`}>
+                      <span className={`text-[10px] font-black ${isToday ? "text-brand-magenta" : isPast ? "text-gray-400" : "text-brand-turquesa"}`}>
                         {parseInt(day.date.split("-")[2])}
                       </span>
                       {!isPast && roomData && (
@@ -351,7 +351,7 @@ export function AvailabilityCalendar({ establishmentId }: AvailabilityCalendarPr
                               <span className="text-[9px] text-red-500 font-extrabold">Agotado</span>
                             </>
                           )}
-                          <span className="text-[9px] text-gray-500 font-black mt-0.5">
+                          <span className="text-[9px] text-gray-700 font-black mt-0.5">
                             ${roomData.price}
                           </span>
                         </div>
