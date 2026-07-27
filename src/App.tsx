@@ -94,8 +94,8 @@ const PerfilKYC = lazyNamed(() => import("./pages/PerfilKYC"), "PerfilKYC");
 const AsistenteViajesIA = lazyNamed(() => import("./pages/AsistenteViajesIA"), "AsistenteViajesIA");
 const AdminIaViajes = lazyNamed(() => import("./pages/admin/AdminIaViajes"), "AdminIaViajes");
 const AdminExpedicionRutas = lazyNamed(() => import("./pages/admin/AdminExpedicionRutas"), "AdminExpedicionRutas");
-const AdminAsistencia = lazyNamed(() => import("./pages/admin/AdminAsistencia"), "AdminAsistencia");
-const AdminContabilidad = lazyNamed(() => import("./pages/admin/AdminContabilidad"), "AdminContabilidad");
+const AdminAsistencia = lazy(() => import("./pages/admin/AdminAsistencia"));
+const AdminContabilidad = lazy(() => import("./pages/admin/AdminContabilidad"));
 
 // Importación del Agente IA sin llaves apuntando a la carpeta admin
 const AdminConversacionalIA = lazy(() => import("./pages/admin/AdminConversacionalIA"));

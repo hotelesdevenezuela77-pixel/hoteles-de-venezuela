@@ -44,7 +44,7 @@ const CATEGORIES_INGRESO = [
   "Venta B2B Directa", "Otros Ingresos"
 ];
 
-export function AdminContabilidad() {
+export default function AdminContabilidad() {
   const { user, profile, loading: authLoading } = useAuth();
   const [, setLocation] = useLocation();
   const qc = useQueryClient();
@@ -132,7 +132,8 @@ export function AdminContabilidad() {
     const list: LedgerEntry[] = [];
 
     // Process payments (inflows)
-    payments.forEach((p: any) => {
+    // Process payments (inflows)
+    (payments || []).filter(Boolean).forEach((p: any) => {
       list.push({
         id: `in-${p.id}`,
         date: p.payment_date || new Date().toISOString().slice(0, 10),
@@ -147,7 +148,7 @@ export function AdminContabilidad() {
     });
 
     // Process expenses (outflows)
-    expenses.forEach((e: any) => {
+    (expenses || []).filter(Boolean).forEach((e: any) => {
       list.push({
         id: `out-${e.id}`,
         date: e.expense_date || new Date().toISOString().slice(0, 10),
@@ -167,15 +168,21 @@ export function AdminContabilidad() {
 
   // Filters logic
   const filteredLedger = useMemo(() => {
-    return consolidatedLedger.filter(entry => {
+    return (consolidatedLedger || []).filter(entry => {
+      if (!entry) return false;
       // 1. Search text filter
       if (search) {
         const query = search.toLowerCase();
+        const desc = entry.description ? String(entry.description).toLowerCase() : "";
+        const cat = entry.category ? String(entry.category).toLowerCase() : "";
+        const ref = entry.reference ? String(entry.reference).toLowerCase() : "";
+        const notes = entry.notes ? String(entry.notes).toLowerCase() : "";
+
         const matchesText =
-          entry.description.toLowerCase().includes(query) ||
-          entry.category.toLowerCase().includes(query) ||
-          entry.reference.toLowerCase().includes(query) ||
-          (entry.notes && entry.notes.toLowerCase().includes(query));
+          desc.includes(query) ||
+          cat.includes(query) ||
+          ref.includes(query) ||
+          notes.includes(query);
         if (!matchesText) return false;
       }
 

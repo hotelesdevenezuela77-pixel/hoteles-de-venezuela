@@ -24,7 +24,7 @@ const FUCSIA = "#FF0096";
 const CIAN = "#00C8D4";
 const PURPURA = "#9B00CC";
 
-export function AdminAsistencia() {
+export default function AdminAsistencia() {
   const { user, profile, loading: authLoading } = useAuth();
   const [, setLocation] = useLocation();
   const [search, setSearch] = useState("");
@@ -91,13 +91,19 @@ export function AdminAsistencia() {
     setLocation("/mis-negocios");
   };
 
-  const filteredRows = rows.filter(r => {
+  const filteredRows = (rows || []).filter(r => {
+    if (!r) return false;
     const query = search.toLowerCase();
+    const name = r.name ? String(r.name).toLowerCase() : "";
+    const ownerName = r.owner_name ? String(r.owner_name).toLowerCase() : "";
+    const ownerEmail = r.owner_email ? String(r.owner_email).toLowerCase() : "";
+    const destination = r.destination ? String(r.destination).toLowerCase() : "";
+    
     return (
-      r.name.toLowerCase().includes(query) ||
-      r.owner_name.toLowerCase().includes(query) ||
-      r.owner_email.toLowerCase().includes(query) ||
-      r.destination.toLowerCase().includes(query)
+      name.includes(query) ||
+      ownerName.includes(query) ||
+      ownerEmail.includes(query) ||
+      destination.includes(query)
     );
   });
 
