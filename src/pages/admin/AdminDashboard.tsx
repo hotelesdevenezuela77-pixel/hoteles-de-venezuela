@@ -108,8 +108,8 @@ export function ConstellationBackground() {
     if (!ctx) return;
 
     let animationFrameId: number;
-    let width = (canvas.width = canvas.offsetWidth);
-    let height = (canvas.height = canvas.offsetHeight);
+    let width = 800;
+    let height = 300;
 
     const particles: Array<{
       x: number;
@@ -119,21 +119,32 @@ export function ConstellationBackground() {
       radius: number;
     }> = [];
 
-    const particleCount = 45;
-    for (let i = 0; i < particleCount; i++) {
-      particles.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        radius: Math.random() * 1.5 + 1
-      });
-    }
+    const updateSize = () => {
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      width = canvas.width = rect.width || canvas.offsetWidth || 800;
+      height = canvas.height = rect.height || canvas.offsetHeight || 300;
+      
+      // Re-populate if empty
+      if (particles.length === 0) {
+        const particleCount = 65;
+        for (let i = 0; i < particleCount; i++) {
+          particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: (Math.random() - 0.5) * 0.5,
+            radius: Math.random() * 2 + 1.5
+          });
+        }
+      }
+    };
+
+    updateSize();
+    const timer = setTimeout(updateSize, 150);
 
     const handleResize = () => {
-      if (!canvas) return;
-      width = canvas.width = canvas.offsetWidth;
-      height = canvas.height = canvas.offsetHeight;
+      updateSize();
     };
     window.addEventListener("resize", handleResize);
 
@@ -141,15 +152,15 @@ export function ConstellationBackground() {
       ctx.clearRect(0, 0, width, height);
 
       // Draw connections
-      ctx.strokeStyle = "rgba(0, 200, 212, 0.06)";
-      ctx.lineWidth = 0.6;
+      ctx.strokeStyle = "rgba(0, 200, 212, 0.18)";
+      ctx.lineWidth = 1.0;
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < 120) {
+          if (dist < 130) {
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
@@ -159,7 +170,7 @@ export function ConstellationBackground() {
       }
 
       // Draw and update particles
-      ctx.fillStyle = "rgba(255, 0, 150, 0.25)";
+      ctx.fillStyle = "rgba(255, 0, 150, 0.65)";
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         ctx.beginPath();
@@ -179,6 +190,7 @@ export function ConstellationBackground() {
     draw();
 
     return () => {
+      clearTimeout(timer);
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener("resize", handleResize);
     };
