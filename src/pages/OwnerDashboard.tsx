@@ -183,7 +183,7 @@ export function OwnerDashboard() {
   const [leads, setLeads] = useState<WhatsAppLead[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"resumen" | "portafolio" | "operaciones" | "inventario" | "finanzas" | "marketing" | "guiones">("resumen");
-  const [operacionesSubTab, setOperacionesSubTab] = useState<"reservas" | "disponibilidad">("reservas");
+  const [operacionesSubTab, setOperacionesSubTab] = useState<"reservas" | "disponibilidad" | "timeline">("reservas");
   const [marketingSubTab, setMarketingSubTab] = useState<"descuentos" | "leads" | "reviews" | "channel-manager">("leads");
   
   const [selectedCalendarEst, setSelectedCalendarEst] = useState<number | "">("");
@@ -353,6 +353,92 @@ export function OwnerDashboard() {
     setSurroundings(updated);
     if (selectedCalendarEst) {
       localStorage.setItem(`hdv_surroundings_${selectedCalendarEst}`, JSON.stringify(updated));
+    }
+  };
+
+  // Timeline states & Drag and Drop handlers
+  const [timelineMonth, setTimelineMonth] = useState(new Date());
+
+  const getTimelineDays = () => {
+    const year = timelineMonth.getFullYear();
+    const month = timelineMonth.getMonth();
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    const list = [];
+    for (let i = 1; i <= totalDays; i++) {
+      list.push(new Date(year, month, i));
+    }
+    return list;
+  };
+
+  const handleDropReservation = async (e: React.DragEvent, targetRoomId: number, targetDateStr: string) => {
+    e.preventDefault();
+    const resIdStr = e.dataTransfer.getData("text/plain");
+    if (!resIdStr) return;
+    const resId = Number(resIdStr);
+    
+    // Find reservation
+    const res = reservations.find(r => r.id === resId);
+    if (!res) return;
+
+    // Calculate nights count
+    const checkIn = new Date(res.check_in_date);
+    const checkOut = new Date(res.check_out_date);
+    const nights = Math.max(1, Math.round((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)));
+
+    // Compute new dates
+    const newCheckInDate = new Date(targetDateStr);
+    const newCheckOutDate = new Date(newCheckInDate);
+    newCheckOutDate.setDate(newCheckInDate.getDate() + nights);
+
+    const checkInStr = newCheckInDate.toISOString().split("T")[0];
+    const checkOutStr = newCheckOutDate.toISOString().split("T")[0];
+
+    // Check for overlap / overbooking
+    const hasOverlap = reservations.some(r => {
+      if (r.id === resId) return false;
+      if (r.status !== "confirmed") return false;
+      
+      const sameRoom = (r as any).room_id === targetRoomId || r.room_type === rooms.find(rm => rm.id === targetRoomId)?.name;
+      if (!sameRoom) return false;
+      
+      const overlap = checkInStr < r.check_out_date && checkOutStr > r.check_in_date;
+      return overlap;
+    });
+
+    if (hasOverlap) {
+      alert(`⚠️ Conflicto de Sobreventa: La habitación ya está ocupada en ese periodo por otra reservación activa.`);
+      return;
+    }
+
+    // Optimistic Update
+    setReservations(prev => prev.map(r => r.id === resId ? { ...r, check_in_date: checkInStr, check_out_date: checkOutStr, room_id: targetRoomId } : r));
+
+    // Update DB
+    try {
+      if (resId >= 10000) {
+        // Mock reservation update
+        const localResKey = "hdv_mock_reservations";
+        const localRes = JSON.parse(localStorage.getItem(localResKey) || "[]");
+        const updated = localRes.map((r: any) => r.id === resId ? { ...r, check_in_date: checkInStr, check_out_date: checkOutStr, room_id: targetRoomId } : r);
+        localStorage.setItem(localResKey, JSON.stringify(updated));
+      } else {
+        const { error } = await supabase
+          .from("reservations")
+          .update({
+            check_in_date: checkInStr,
+            check_out_date: checkOutStr,
+            room_id: targetRoomId
+          })
+          .eq("id", resId);
+        if (error) throw error;
+      }
+      
+      alert(`🎉 Reservación de ${res.guest_name} reasignada con éxito del ${checkInStr} al ${checkOutStr}.`);
+      await fetchDashboardData();
+    } catch (err) {
+      console.error("Error updating reservation drag-drop:", err);
+      await fetchDashboardData();
+      alert("Error al actualizar la reservación en Supabase.");
     }
   };
 
@@ -1507,6 +1593,16 @@ export function OwnerDashboard() {
               >
                 Calendario Pro & Tarifas
               </button>
+              <button
+                onClick={() => setOperacionesSubTab("timeline")}
+                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
+                  operacionesSubTab === "timeline"
+                    ? "bg-brand-magenta text-white shadow-sm"
+                    : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                }`}
+              >
+                Timeline PMS (Drag & Drop)
+              </button>
             </div>
 
             {/* RESERVAS SUB-TAB */}
@@ -1698,6 +1794,151 @@ export function OwnerDashboard() {
                   </div>
 
                 </div>
+              </div>
+            )}
+
+            {/* TIMELINE PMS DRAG & DROP SUB-TAB */}
+            {operacionesSubTab === "timeline" && (
+              <div className="space-y-6 text-left animate-in fade-in duration-200">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-md font-black text-gray-800 tracking-tight font-serif">Calendario Timeline PMS & Asignador</h3>
+                    <p className="text-xs text-gray-400 mt-1">Arrastra y suelta reservaciones horizontalmente para cambiar fechas, o verticalmente para reasignar habitaciones.</p>
+                  </div>
+                  
+                  {/* Month navigation controls */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setTimelineMonth(new Date(timelineMonth.getFullYear(), timelineMonth.getMonth() - 1, 1))}
+                      className="p-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                    >
+                      ← Anterior
+                    </button>
+                    <span className="text-xs font-black uppercase text-gray-700 min-w-[120px] text-center">
+                      {timelineMonth.toLocaleDateString("es-VE", { month: "long", year: "numeric" })}
+                    </span>
+                    <button
+                      onClick={() => setTimelineMonth(new Date(timelineMonth.getFullYear(), timelineMonth.getMonth() + 1, 1))}
+                      className="p-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                    >
+                      Siguiente →
+                    </button>
+                  </div>
+                </div>
+
+                {rooms.length === 0 ? (
+                  <div className="text-center py-20 bg-white border border-gray-200 rounded-3xl p-6">
+                    <p className="text-xs text-gray-400 font-bold">Por favor configura las tipologías de habitación en la pestaña "Inventario" para usar el timeline.</p>
+                  </div>
+                ) : (
+                  <div className="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden p-6">
+                    <div className="overflow-x-auto">
+                      <div className="relative min-w-[1400px]">
+                        
+                        {/* Timeline Grid Header */}
+                        <div className="grid border-b border-gray-200 pb-2" style={{ gridTemplateColumns: `180px repeat(${getTimelineDays().length}, minmax(45px, 1fr))` }}>
+                          <div className="text-[10px] font-black uppercase text-gray-400 select-none">Habitaciones / Unidades</div>
+                          {getTimelineDays().map((day, idx) => (
+                            <div key={idx} className="text-center select-none font-bold text-[9px] text-gray-400 border-l border-gray-100 pb-1">
+                              <span className="block text-[8px] font-medium text-gray-300">{day.toLocaleDateString("es-VE", { weekday: "short" })}</span>
+                              <span>{day.getDate()}</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Room Rows */}
+                        <div className="divide-y divide-gray-100 mt-2">
+                          {rooms.map(room => {
+                            const days = getTimelineDays();
+                            // Get active month limits
+                            const monthStartStr = days[0].toISOString().split("T")[0];
+                            const monthEndStr = days[days.length - 1].toISOString().split("T")[0];
+                            
+                            // Find active reservations for this room type within this month
+                            const roomReservations = reservations.filter(r => {
+                              const sameRoom = (r as any).room_id === room.id || r.room_type === room.name;
+                              const matchesDates = r.check_in_date <= monthEndStr && r.check_out_date >= monthStartStr;
+                              return sameRoom && matchesDates && r.status === "confirmed";
+                            });
+
+                            return (
+                              <div key={room.id} className="grid relative min-h-[56px] items-center" style={{ gridTemplateColumns: `180px repeat(${days.length}, minmax(45px, 1fr))` }}>
+                                
+                                {/* Room Label Left */}
+                                <div className="pr-4 py-2 border-r border-gray-100 min-h-[56px] flex flex-col justify-center bg-gray-50/30">
+                                  <span className="font-extrabold text-xs text-gray-700 block truncate">{room.name}</span>
+                                  <span className="text-[9px] text-gray-400 font-bold font-mono">${room.price_per_night} USD</span>
+                                </div>
+
+                                {/* Drag over Drop cells */}
+                                {days.map((day, dIdx) => {
+                                  const dateStr = day.toISOString().split("T")[0];
+                                  return (
+                                    <div
+                                      key={dIdx}
+                                      onDragOver={e => e.preventDefault()}
+                                      onDrop={e => handleDropReservation(e, room.id, dateStr)}
+                                      className="border-r border-gray-100 hover:bg-slate-50/50 min-h-[56px] transition-colors relative"
+                                    />
+                                  );
+                                })}
+
+                                {/* Absolute placed draggable reservations blocks */}
+                                {roomReservations.map(res => {
+                                  // Compute positioning
+                                  const resCheckIn = new Date(res.check_in_date);
+                                  const resCheckOut = new Date(res.check_out_date);
+                                  
+                                  // Find start day index relative to this month's days
+                                  let startIdx = days.findIndex(d => d.toISOString().split("T")[0] === res.check_in_date);
+                                  // Fallback if check_in is in previous month
+                                  if (startIdx === -1) {
+                                    if (res.check_in_date < monthStartStr) {
+                                      startIdx = 0;
+                                    } else {
+                                      return null; // out of bounds
+                                    }
+                                  }
+                                  
+                                  // Calculate span length of reservation within the month
+                                  const checkInDateClamped = res.check_in_date < monthStartStr ? new Date(monthStartStr) : resCheckIn;
+                                  const checkOutDateClamped = res.check_out_date > monthEndStr ? new Date(monthEndStr) : resCheckOut;
+                                  const spanDays = Math.max(1, Math.round((checkOutDateClamped.getTime() - checkInDateClamped.getTime()) / (1000 * 60 * 60 * 24)));
+
+                                  const nights = Math.max(1, Math.round((resCheckOut.getTime() - resCheckIn.getTime()) / (1000 * 60 * 60 * 24)));
+
+                                  return (
+                                    <div
+                                      key={res.id}
+                                      draggable
+                                      onDragStart={e => {
+                                        e.dataTransfer.setData("text/plain", res.id.toString());
+                                        e.dataTransfer.effectAllowed = "move";
+                                      }}
+                                      className="absolute bg-brand-magenta hover:bg-brand-magenta/95 text-white text-[9px] font-black p-1.5 rounded-xl truncate shadow-md hover:shadow-lg cursor-grab active:cursor-grabbing hover:scale-[1.01] transition-all flex flex-col justify-center z-20 border border-white/10"
+                                      style={{
+                                        left: `calc(180px + ${startIdx * 100 / days.length}% + 2px)`,
+                                        width: `calc(${spanDays * 100 / days.length}% - 4px)`,
+                                        height: "42px",
+                                        top: "7px"
+                                      }}
+                                      title={`Huésped: ${res.guest_name}\nHabitación: ${room.name}\nEntrada: ${res.check_in_date}\nSalida: ${res.check_out_date}\nTotal: ${nights} noches - $${res.total_price} USD`}
+                                    >
+                                      <span className="truncate font-serif font-black block">{res.guest_name}</span>
+                                      <span className="text-[8px] text-white/80 font-bold block">{nights} noches • ${res.total_price}</span>
+                                    </div>
+                                  );
+                                })}
+
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
