@@ -87,6 +87,7 @@ export default function AdminAsistencia() {
     // Set local storage variables
     localStorage.setItem("hdv_impersonate_owner_user_id", row.owner_user_id);
     localStorage.setItem("hdv_impersonate_owner_user_name", row.name);
+    localStorage.setItem("hdv_impersonate_establishment_id", String(row.id));
     // Redirect to Owner Dashboard (mapped as /mis-negocios)
     setLocation("/mis-negocios");
   };

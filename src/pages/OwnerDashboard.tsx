@@ -77,6 +77,14 @@ export function OwnerDashboard() {
     return null;
   });
 
+  const [impersonateEstablishmentId, setImpersonateEstablishmentId] = useState<number | null>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("hdv_impersonate_establishment_id");
+      return saved ? Number(saved) : null;
+    }
+    return null;
+  });
+
   const activeOwnerId = (isAdmin && impersonateId) ? impersonateId : user?.id;
   
   const [establishments, setEstablishments] = useState<Establishment[]>([]);
@@ -184,7 +192,7 @@ export function OwnerDashboard() {
 
       if (estError) throw estError;
 
-      const mappedEsts: Establishment[] = (estData || []).map((e: any) => ({
+      let mappedEsts: Establishment[] = (estData || []).map((e: any) => ({
         id: e.id,
         name: e.name,
         slug: e.slug,
@@ -206,6 +214,11 @@ export function OwnerDashboard() {
         membership_tier: e.membership_tier || "basico",
         is_circuito_excelencia: !!e.is_circuito_excelencia
       }));
+
+      if (isAdmin && impersonateEstablishmentId) {
+        mappedEsts = mappedEsts.filter(e => e.id === impersonateEstablishmentId);
+      }
+
       setEstablishments(mappedEsts);
       if (mappedEsts.length > 0) {
         setSelectedCalendarEst(prev => prev || mappedEsts[0].id);
@@ -616,8 +629,10 @@ export function OwnerDashboard() {
             onClick={() => {
               localStorage.removeItem("hdv_impersonate_owner_user_id");
               localStorage.removeItem("hdv_impersonate_owner_user_name");
+              localStorage.removeItem("hdv_impersonate_establishment_id");
               setImpersonateId(null);
               setImpersonateName(null);
+              setImpersonateEstablishmentId(null);
               setLocation("/admin/asistencia");
             }}
             className="bg-white text-[#FF0096] hover:bg-white/95 px-3 py-1 rounded-lg text-[10px] font-black tracking-wider uppercase transition-all shadow-sm cursor-pointer shrink-0"
