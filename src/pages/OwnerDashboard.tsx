@@ -6,10 +6,11 @@ import {
   Building2, Clock, CheckCircle, XCircle, Plus, 
   MapPin, Loader2, MessageSquare, BarChart3, Calendar, 
   DollarSign, Users, Trash2, X, Phone, Globe, Briefcase, 
-  Eye, Check, ListFilter, Tag, Sparkles
+  Eye, Check, ListFilter, Tag, Sparkles, CalendarRange
 } from "lucide-react";
 import { ScriptGenerator } from "../components/ScriptGenerator";
 import { AmenitiesSelector } from "@/components/admin/AmenitiesSelector";
+import { AvailabilityCalendar } from "../components/AvailabilityCalendar";
 
 interface Establishment {
   id: number;
@@ -82,7 +83,8 @@ export function OwnerDashboard() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [leads, setLeads] = useState<WhatsAppLead[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"resumen" | "establecimientos" | "reservas" | "leads" | "descuentos" | "guiones">("resumen");
+  const [activeTab, setActiveTab] = useState<"resumen" | "establecimientos" | "reservas" | "leads" | "descuentos" | "guiones" | "disponibilidad">("resumen");
+  const [selectedCalendarEst, setSelectedCalendarEst] = useState<number | "">("");
 
   const [discountCodes, setDiscountCodes] = useState<any[]>([]);
   const [showAddDiscountModal, setShowAddDiscountModal] = useState(false);
@@ -205,6 +207,9 @@ export function OwnerDashboard() {
         is_circuito_excelencia: !!e.is_circuito_excelencia
       }));
       setEstablishments(mappedEsts);
+      if (mappedEsts.length > 0) {
+        setSelectedCalendarEst(prev => prev || mappedEsts[0].id);
+      }
 
       if (mappedEsts.length === 0) {
         setLoading(false);
@@ -540,6 +545,30 @@ export function OwnerDashboard() {
     }
   };
 
+  // Update reservation status
+  const handleUpdateReservationStatus = async (id: number, status: 'confirmed' | 'cancelled') => {
+    try {
+      if (id >= 10000) {
+        // Mock reservation update
+        const localResKey = "hdv_mock_reservations";
+        const localRes = JSON.parse(localStorage.getItem(localResKey) || "[]");
+        const updated = localRes.map((r: any) => r.id === id ? { ...r, status } : r);
+        localStorage.setItem(localResKey, JSON.stringify(updated));
+      } else {
+        const { error } = await supabase
+          .from("reservations")
+          .update({ status })
+          .eq("id", id);
+        if (error) throw error;
+      }
+      // Reload
+      await fetchDashboardData();
+    } catch (err) {
+      console.error("Error updating reservation status:", err);
+      alert("No se pudo actualizar el estado de la reservación.");
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "approved":
@@ -632,6 +661,7 @@ export function OwnerDashboard() {
               { id: "resumen", label: "Resumen General", icon: BarChart3 },
               { id: "establecimientos", label: `Mis Negocios (${establishments.length})`, icon: Building2 },
               { id: "reservas", label: `Reservaciones (${reservations.length})`, icon: Calendar },
+              { id: "disponibilidad", label: "Disponibilidad", icon: CalendarRange },
               { id: "leads", label: `Leads de WhatsApp (${leads.length})`, icon: MessageSquare },
               { id: "descuentos", label: `Descuentos (${discountCodes.length})`, icon: Tag },
               { id: "guiones", label: "Asistente de Guiones", icon: Sparkles }
@@ -850,19 +880,75 @@ export function OwnerDashboard() {
                           <td className="p-4 font-extrabold text-gray-600">{res.guests_count}</td>
                           <td className="p-4 font-black text-brand-magenta">${res.total_price}</td>
                           <td className="p-4 pr-6">
-                            <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                              res.status === "confirmed" ? "bg-green-50 text-green-700 border border-green-100" :
-                              res.status === "cancelled" ? "bg-red-50 text-red-700 border border-red-100" :
-                              "bg-yellow-50 text-yellow-700 border border-yellow-100"
-                            }`}>
-                              {res.status === "confirmed" ? "Confirmado" : res.status === "cancelled" ? "Cancelado" : "Pendiente"}
-                            </span>
+                            <div className="flex flex-col gap-2">
+                              <span className={`inline-block w-fit px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                                res.status === "confirmed" ? "bg-green-50 text-green-700 border border-green-100" :
+                                res.status === "cancelled" ? "bg-red-50 text-red-700 border border-red-100" :
+                                "bg-yellow-50 text-yellow-700 border border-yellow-100"
+                              }`}>
+                                {res.status === "confirmed" ? "Confirmado" : res.status === "cancelled" ? "Cancelado" : "Pendiente"}
+                              </span>
+                              {res.status === "pending" && (
+                                <div className="flex gap-1.5 mt-1">
+                                  <button
+                                    onClick={() => handleUpdateReservationStatus(res.id, 'confirmed')}
+                                    className="px-2 py-1 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded-lg text-[9px] font-black uppercase tracking-wider cursor-pointer transition-colors"
+                                  >
+                                    Confirmar
+                                  </button>
+                                  <button
+                                    onClick={() => handleUpdateReservationStatus(res.id, 'cancelled')}
+                                    className="px-2 py-1 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-lg text-[9px] font-black uppercase tracking-wider cursor-pointer transition-colors"
+                                  >
+                                    Cancelar
+                                  </button>
+                                </div>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* DISPONIBILIDAD TAB */}
+        {activeTab === "disponibilidad" && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <h3 className="text-md font-black text-gray-800 tracking-tight">Calendario de Disponibilidad</h3>
+                <p className="text-gray-400 text-xs mt-1">Monitorea y visualiza la disponibilidad de habitaciones día a día.</p>
+              </div>
+              
+              {establishments.length > 0 && (
+                <div className="w-full sm:max-w-xs text-left">
+                  <label className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider mb-1">Seleccionar Establecimiento</label>
+                  <select
+                    value={selectedCalendarEst}
+                    onChange={(e) => setSelectedCalendarEst(Number(e.target.value))}
+                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-magenta/20 focus:border-brand-magenta cursor-pointer"
+                  >
+                    {establishments.map(est => (
+                      <option key={est.id} value={est.id}>{est.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+
+            {selectedCalendarEst ? (
+              <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm">
+                <AvailabilityCalendar establishmentId={Number(selectedCalendarEst)} />
+              </div>
+            ) : (
+              <div className="text-center py-20 bg-white border border-gray-100 rounded-3xl p-6 shadow-sm">
+                <Building2 className="w-16 h-16 text-gray-200 mx-auto mb-3" />
+                <p className="text-xs text-gray-400">Registra un establecimiento primero para ver su disponibilidad.</p>
               </div>
             )}
           </div>
