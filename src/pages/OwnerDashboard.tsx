@@ -1213,7 +1213,7 @@ export function OwnerDashboard() {
     <div className="min-h-screen bg-gray-50/30 pb-20">
       {/* Impersonate Assistance Bar */}
       {isAdmin && impersonateId && (
-        <div className="bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] p-3 text-center text-xs font-bold text-white flex items-center justify-between gap-3 shadow-md relative z-50">
+        <div className="bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] p-3 text-center text-xs font-bold text-white flex items-center justify-between gap-3 shadow-md relative z-30">
           <div className="flex items-center gap-2 mx-auto">
             <span className="w-2.5 h-2.5 rounded-full bg-white animate-ping shrink-0" />
             <span>⚠️ <strong>MODO ASISTENCIA ACTIVO:</strong> Estás asistiendo a <strong className="underline">{impersonateName || "Establecimiento"}</strong> (Propietario ID: {impersonateId})</span>
