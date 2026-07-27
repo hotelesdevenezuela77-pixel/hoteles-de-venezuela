@@ -87,8 +87,8 @@ export function AdminAsistencia() {
     // Set local storage variables
     localStorage.setItem("hdv_impersonate_owner_user_id", row.owner_user_id);
     localStorage.setItem("hdv_impersonate_owner_user_name", row.name);
-    // Redirect to Owner Dashboard
-    setLocation("/owner-dashboard");
+    // Redirect to Owner Dashboard (mapped as /mis-negocios)
+    setLocation("/mis-negocios");
   };
 
   const filteredRows = rows.filter(r => {
