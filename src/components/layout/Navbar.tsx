@@ -53,20 +53,23 @@ export function Navbar() {
   }, []);
 
   const NAV_LINKS = [
-    { href: "/establecimientos", label: "Explorar", settingKey: "menu_show_establecimientos" },
-    { href: "/destinos", label: "Destinos", settingKey: "menu_show_destinos" },
-    { href: "/mapa", label: "Mapa", icon: <Map className="w-3.5 h-3.5 inline-block mr-1 -mt-0.5" />, settingKey: "menu_show_mapa" },
-    { href: "/parques", label: "Parques", settingKey: "menu_show_parques" },
-    { href: "/viaje-ia", label: "Planear con IA ✨", settingKey: "menu_show_viaje_ia" },
-    { href: "/servicios-b2b", label: "Marketplace B2B", settingKey: "menu_show_servicios_b2b" },
-    { href: "/paquetes", label: "Paquetes", settingKey: "menu_show_paquetes" },
-    { href: "/membresias", label: "Membresías", settingKey: "menu_show_membresias" },
-    { href: "/comparar", label: compareCount > 0 ? `Comparar (${compareCount})` : "Comparar", settingKey: "menu_show_comparar" }
+    { href: "/establecimientos", label: "Explorar", settingKey: "MENU_SHOW_ESTABLECIMIENTOS" },
+    { href: "/destinos", label: "Destinos", settingKey: "MENU_SHOW_DESTINOS" },
+    { href: "/mapa", label: "Mapa", icon: <Map className="w-3.5 h-3.5 inline-block mr-1 -mt-0.5" />, settingKey: "MENU_SHOW_MAPA" },
+    { href: "/parques", label: "Parques", settingKey: "MENU_SHOW_PARQUES" },
+    { href: "/viaje-ia", label: "Planear con IA ✨", settingKey: "MENU_SHOW_VIAJE_IA" },
+    { href: "/servicios-b2b", label: "Marketplace B2B", settingKey: "MENU_SHOW_SERVICIOS_B2B" },
+    { href: "/paquetes", label: "Paquetes", settingKey: "MENU_SHOW_PAQUETES" },
+    { href: "/membresias", label: "Membresías", settingKey: "MENU_SHOW_MEMBRESIAS" },
+    { href: "/comparar", label: compareCount > 0 ? `Comparar (${compareCount})` : "Comparar", settingKey: "MENU_SHOW_COMPARAR" }
   ];
 
   const visibleLinks = NAV_LINKS.filter(link => {
     if (!link.settingKey) return true;
-    const config = settings.find(s => s.setting_key === link.settingKey || s.settingKey === link.settingKey);
+    const config = settings.find(s => {
+      const key = s.setting_key || s.settingKey;
+      return key && key.toUpperCase() === link.settingKey.toUpperCase();
+    });
     if (!config) return true;
     return config.setting_value !== "false";
   });

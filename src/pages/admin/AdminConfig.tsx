@@ -40,14 +40,14 @@ const SETTING_LABELS: Record<string, string> = {
 };
 
 const MENU_SECTIONS = [
-  { key: "menu_show_viaje_ia", label: "Planear con IA ✨", description: "Planificador inteligente basado en IA (consume tokens)", icon: Sparkles, color: "#FF0096" },
-  { key: "menu_show_establecimientos", label: "Explorar", description: "Buscador y explorador de hoteles y posadas", icon: Building2, color: "#00C8D4" },
-  { key: "menu_show_destinos", label: "Destinos", description: "Guía de destinos y regiones turísticas", icon: MapPin, color: "#9B00CC" },
-  { key: "menu_show_mapa", label: "Mapa Interactivo", description: "Mapa de geolocalización de hoteles y servicios", icon: Map, color: "#10B981" },
-  { key: "menu_show_parques", label: "Parques Nacionales", description: "Guía y detalles de parques nacionales", icon: Globe, color: "#3B82F6" },
-  { key: "menu_show_servicios_b2b", label: "Marketplace B2B", description: "Directorio de servicios y negocios B2B", icon: Briefcase, color: "#F59E0B" },
-  { key: "menu_show_paquetes", label: "Paquetes Turísticos", description: "Promociones y planes todo incluido", icon: Package, color: "#EF4444" },
-  { key: "menu_show_membresias", label: "Membresías", description: "Información del club y planes de membresía", icon: Ticket, color: "#EC4899" },
+  { key: "MENU_SHOW_VIAJE_IA", label: "Planear con IA ✨", description: "Planificador inteligente basado en IA (consume tokens)", icon: Sparkles, color: "#FF0096" },
+  { key: "MENU_SHOW_ESTABLECIMIENTOS", label: "Explorar", description: "Buscador y explorador de hoteles y posadas", icon: Building2, color: "#00C8D4" },
+  { key: "MENU_SHOW_DESTINOS", label: "Destinos", description: "Guía de destinos y regiones turísticas", icon: MapPin, color: "#9B00CC" },
+  { key: "MENU_SHOW_MAPA", label: "Mapa Interactivo", description: "Mapa de geolocalización de hoteles y servicios", icon: Map, color: "#10B981" },
+  { key: "MENU_SHOW_PARQUES", label: "Parques Nacionales", description: "Guía y detalles de parques nacionales", icon: Globe, color: "#3B82F6" },
+  { key: "MENU_SHOW_SERVICIOS_B2B", label: "Marketplace B2B", description: "Directorio de servicios y negocios B2B", icon: Briefcase, color: "#F59E0B" },
+  { key: "MENU_SHOW_PAQUETES", label: "Paquetes Turísticos", description: "Promociones y planes todo incluido", icon: Package, color: "#EF4444" },
+  { key: "MENU_SHOW_MEMBRESIAS", label: "Membresías", description: "Información del club y planes de membresía", icon: Ticket, color: "#EC4899" },
 ];
 
 export function AdminConfig() {
@@ -160,7 +160,7 @@ export function AdminConfig() {
           <div className="px-6 py-4 border-b border-slate-100 bg-slate-50"><h2 className="font-bold text-gray-700 text-xs uppercase tracking-wider">Ajustes Generales</h2></div>
           {loadingSettings ? <div className="p-6 text-center text-gray-400 text-xs font-bold">Cargando configuraciones...</div> : (
             <div className="divide-y divide-slate-100">
-              {settings.filter(s => s && s.key && !s.key.startsWith("menu_show_")).map(s => (
+              {settings.filter(s => s && s.key && !s.key.toUpperCase().startsWith("MENU_SHOW_")).map(s => (
                 <div key={s.key} className="px-6 py-4 flex items-center gap-4 hover:bg-slate-50/50 transition-colors">
                   <div className="flex-1 min-w-0">
                     <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">{SETTING_LABELS[s.key] || s.key}</div>
@@ -180,7 +180,7 @@ export function AdminConfig() {
                   )}
                 </div>
               ))}
-              {settings.filter(s => s && s.key && !s.key.startsWith("menu_show_")).length === 0 && <div className="p-6 text-center text-gray-500 text-xs font-bold">No hay configuraciones registradas</div>}
+              {settings.filter(s => s && s.key && !s.key.toUpperCase().startsWith("MENU_SHOW_")).length === 0 && <div className="p-6 text-center text-gray-500 text-xs font-bold">No hay configuraciones registradas</div>}
             </div>
           )}
         </div>
@@ -196,7 +196,7 @@ export function AdminConfig() {
           
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
             {MENU_SECTIONS.map((item) => {
-              const config = settings.find(s => s.key === item.key);
+              const config = settings.find(s => s && s.key && s.key.toUpperCase() === item.key.toUpperCase());
               const isActive = config ? config.value !== "false" : true;
               const IconComponent = item.icon;
 
@@ -213,7 +213,7 @@ export function AdminConfig() {
                     <div className="min-w-0">
                       <div className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
                         {item.label}
-                        {item.key === "menu_show_viaje_ia" && (
+                        {item.key.toUpperCase() === "MENU_SHOW_VIAJE_IA" && (
                           <span className="text-[8px] bg-pink-100 text-[#FF0096] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider animate-pulse">
                             IA Tokens
                           </span>
