@@ -87,12 +87,12 @@ export function Navbar() {
         </Link>
 
         {/* Navegación para Escritorio */}
-        <nav className="hidden xl:flex items-center gap-1 text-xs font-semibold text-gray-600">
+        <nav className="hidden xl:flex items-center gap-0.5 2xl:gap-1 text-xs font-semibold text-gray-600">
           {NAV_LINKS.filter(l => l.href !== "/comparar").map((l) => (
             <Link
               key={l.href}
               href={l.href}
-              className={`px-2 py-1.5 rounded-md transition-colors whitespace-nowrap hover:text-brand-magenta hover:bg-magenta-50/10 ${
+              className={`px-1.5 2xl:px-2 py-1.5 rounded-md transition-colors whitespace-nowrap hover:text-brand-magenta hover:bg-magenta-50/10 ${
                 location === l.href ? "text-brand-magenta font-bold" : ""
               }`}
             >
@@ -114,7 +114,7 @@ export function Navbar() {
             title="Contacto oficial WhatsApp"
           >
             <Phone className="w-3.5 h-3.5 text-emerald-600" />
-            <span>+58 414-5069774</span>
+            <span className="hidden 2xl:inline">+58 414-5069774</span>
           </a>
 
           {/* Selector de Idioma */}
@@ -148,7 +148,7 @@ export function Navbar() {
           {/* Botón de Enlaces Bio */}
           <Link
             href="/links"
-            className="hidden sm:flex w-8 h-8 rounded-full items-center justify-center shrink-0 transition-all duration-300 hover:scale-105"
+            className="hidden sm:flex xl:hidden 2xl:flex w-8 h-8 rounded-full items-center justify-center shrink-0 transition-all duration-300 hover:scale-105"
             style={{ background: "linear-gradient(135deg, #00C8D4, #0099AA)" }}
             title="Enlaces de Redes"
           >
@@ -215,16 +215,16 @@ export function Navbar() {
               )}
             </div>
           ) : (
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1 2xl:gap-1.5">
               <Link
                 href="/login"
-                className="hidden sm:block text-xs font-bold text-gray-600 hover:text-gray-900 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-all"
+                className="hidden sm:block text-xs font-bold text-gray-600 hover:text-gray-900 px-2.5 xl:px-1.5 2xl:px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-all"
               >
                 Iniciar Sesión
               </Link>
               <Link
                 href="/registro"
-                className="hidden sm:block btn-magenta-gradient text-xs font-bold px-4 py-1.5 rounded-full shadow-sm hover:scale-103 active:scale-97 transition-all"
+                className="hidden sm:block btn-magenta-gradient text-xs font-bold px-3.5 xl:px-2.5 2xl:px-4 py-1.5 rounded-full shadow-sm hover:scale-103 active:scale-97 transition-all"
               >
                 Registrarse
               </Link>
