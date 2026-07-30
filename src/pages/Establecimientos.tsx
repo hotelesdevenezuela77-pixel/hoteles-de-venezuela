@@ -65,7 +65,6 @@ export function Establecimientos() {
 
   const availableActivities = [
     { key: "solo_adultos", label: "Solo para adultos" },
-    { key: "lgbt_friendly", label: "Travel Proud (LGBTQ+ friendly)" },
     { key: "tours_pie", label: "Tours a pie" },
     { key: "tours_bici", label: "Tours en bicicleta" },
     { key: "alquiler_bici", label: "Alquiler de bicicletas" },
@@ -247,7 +246,6 @@ export function Establecimientos() {
     // Detección de actividades/tipo de grupo
     const newAct: string[] = [];
     if (phraseLower.includes("adulto") || phraseLower.includes("adults")) newAct.push("solo_adultos");
-    if (phraseLower.includes("lgbt") || phraseLower.includes("gay") || phraseLower.includes("friendly") || phraseLower.includes("proud")) newAct.push("lgbt_friendly");
     if (phraseLower.includes("tour") || phraseLower.includes("paseo") || phraseLower.includes("caminar")) newAct.push("tours_pie");
     if (phraseLower.includes("bicicleta") || phraseLower.includes("bici")) newAct.push("tours_bici");
     if (phraseLower.includes("bar") || phraseLower.includes("bares") || phraseLower.includes("bebidas") || phraseLower.includes("tragos")) newAct.push("ruta_bares");
@@ -392,9 +390,7 @@ export function Establecimientos() {
     if ((nameLower.includes("adult") || nameLower.includes("humboldt") || est.id % 4 === 0) && !estServices.includes("solo_adultos")) {
       estServices.push("solo_adultos");
     }
-    if (est.id % 3 === 1 && !estServices.includes("lgbt_friendly")) {
-      estServices.push("lgbt_friendly");
-    }
+
     if ((nameLower.includes("posada") || est.destination_slug === "los-roques") && !estServices.includes("tours_pie")) {
       estServices.push("tours_pie");
     }
