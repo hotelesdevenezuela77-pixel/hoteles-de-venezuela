@@ -50,6 +50,9 @@ const HDV_HOTELS_INVENTORY = [
   { id: 25, name: "Marriott Maracay Golf Resort (Maracay)", lat: 10.2500, lng: -67.6000, price: 135, image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=400&q=80", destination: "Maracay" },
   { id: 27, name: "Posada Alto Viento (Cubiro)", lat: 9.7917, lng: -69.5833, price: 80, image: "https://images.unsplash.com/photo-1470165301023-58dab8118cc9?auto=format&fit=crop&w=400&q=80", destination: "Mérida" },
   { id: 7, name: "Posada La Ardileña (Morrocoy)", lat: 10.7950, lng: -68.3242, price: 110, image: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&w=400&q=80", destination: "Morrocoy" },
+  { id: 1, name: "Hotel Tamanaco InterContinental (Caracas)", lat: 10.4851, lng: -66.8601, price: 150, image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80", destination: "Caracas" },
+  { id: 8, name: "Eurobuilding Hotel & Suites (Caracas)", lat: 10.4820, lng: -66.8522, price: 145, image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=400&q=80", destination: "Caracas" },
+  { id: 9, name: "Hotel Humboldt (Caracas)", lat: 10.5405, lng: -66.8837, price: 220, image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=400&q=80", destination: "Caracas" },
 ];
 
 export function AsistenteViajesIA() {
@@ -427,6 +430,7 @@ Asegúrate de que las coordenadas correspondan a zonas geográficas reales dentr
     const isRoques = /roque|cayo|coral|mar|isla/i.test(query);
     const isCanaima = /canaima|salto|angel|tepuy|bolivar/i.test(query);
     const isMargarita = /margarita|playa|esparta|pampatar/i.test(query);
+    const isCaracas = /caracas|ccs|capital|avila|ávila|humboldt|eurobuilding/i.test(query);
 
     const currentInventory = establishmentsList.length > 0 ? establishmentsList : HDV_HOTELS_INVENTORY;
     let dest = "Morrocoy";
@@ -474,20 +478,38 @@ Asegúrate de que las coordenadas correspondan a zonas geográficas reales dentr
         ["Excursión en bote por el Parque Nacional Laguna de La Restinga", "Paseo de compras por Porlamar (Puerto Libre)", "Cena y show en vivo"],
         ["Mañana deportiva en Playa El Yaque (Windsurf)", "Check-out y traslado de salida"]
       ];
+    } else if (isCaracas) {
+      dest = "Caracas";
+      hotel = currentInventory.find((h: any) => h.destination.toLowerCase().includes("caracas") || h.name.toLowerCase().includes("tamanaco") || h.name.toLowerCase().includes("eurobuilding") || h.name.toLowerCase().includes("humboldt")) || currentInventory[3 % currentInventory.length];
+      coords = [hotel.lat, hotel.lng];
+      activitiesDays = [
+        ["Llegada a Caracas, traslado privado y check-in", "Paseo por el Casco Histórico y la Plaza Bolívar", "Cena de bienvenida en Las Mercedes"],
+        ["Ascenso en Teleférico al Parque Nacional El Ávila (Warairarepano)", "Recorrido por el pueblo de Galipán y almuerzo típico", "Visita guiada al histórico Hotel Humboldt"],
+        ["Visita a la Plaza Altamira y centros culturales de Chacao", "Check-out y traslado al Aeropuerto de Maiquetía"]
+      ];
     }
 
+    // Filtrar todos los hoteles disponibles para este destino
+    const destHotels = currentInventory.filter((h: any) => 
+      h.destination.toLowerCase().includes(dest.toLowerCase()) || 
+      h.name.toLowerCase().includes(dest.toLowerCase())
+    );
+    const defaultHotel = destHotels.length > 0 ? destHotels[0] : hotel;
+
     const items: Activity[] = activitiesDays.map((act, i) => {
-      // Dispersar ligeramente las coordenadas de los días para que no se superpongan
-      const dispLat = coords[0] + (i * 0.015 - 0.015);
-      const dispLng = coords[1] + (i * 0.015 - 0.015);
+      // Intentar asignar un hotel diferente por día si hay disponibles
+      const hotelForDay = destHotels[i % destHotels.length] || defaultHotel;
+      // Dispersar ligeramente las coordenadas
+      const dispLat = hotelForDay.lat + (i * 0.005 - 0.005);
+      const dispLng = hotelForDay.lng + (i * 0.005 - 0.005);
       
       return {
         dia: i + 1,
-        hotel_id: hotel.id,
-        hotel_name: hotel.name,
+        hotel_id: hotelForDay.id,
+        hotel_name: hotelForDay.name,
         actividades: act,
         coordenadas_lat_lng: [dispLat, dispLng],
-        costo_estimado: hotel.price + 35 // costo hotel + paseos
+        costo_estimado: hotelForDay.price + 35 // costo hotel + paseos
       };
     });
 
