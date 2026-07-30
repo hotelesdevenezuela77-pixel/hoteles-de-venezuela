@@ -42,7 +42,7 @@ export function Navbar() {
     { href: "/mapa", label: "Mapa", icon: <Map className="w-3.5 h-3.5 inline-block mr-1 -mt-0.5" /> },
     { href: "/parques", label: "Parques" },
     { href: "/viaje-ia", label: "Planear con IA ✨" },
-    { href: "/servicios-b2b", label: "Servicios B2B" },
+    { href: "/servicios-b2b", label: "Marketplace B2B" },
     { href: "/paquetes", label: "Paquetes" },
     { href: "/membresias", label: "Membresías" },
     { href: "/comparar", label: compareCount > 0 ? `Comparar (${compareCount})` : "Comparar" }
@@ -88,7 +88,7 @@ export function Navbar() {
 
         {/* Navegación para Escritorio */}
         <nav className="hidden xl:flex items-center gap-1 text-xs font-semibold text-gray-600">
-          {NAV_LINKS.filter(l => l.href !== "/comparar" && l.href !== "/servicios-b2b").map((l) => (
+          {NAV_LINKS.filter(l => l.href !== "/comparar").map((l) => (
             <Link
               key={l.href}
               href={l.href}
