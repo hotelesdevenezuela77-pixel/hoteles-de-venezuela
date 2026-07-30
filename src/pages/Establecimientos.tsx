@@ -38,6 +38,10 @@ export function Establecimientos() {
   const [children, setChildren] = useState<number>(0);
   const [selectedSubtype, setSelectedSubtype] = useState<string>("");
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [selectedStars, setSelectedStars] = useState<number[]>([]);
+  const [selectedAccessibility, setSelectedAccessibility] = useState<string[]>([]);
+  const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
+  const [smartQuery, setSmartQuery] = useState<string>("");
 
   const availableAmenities = [
     { key: "wifi", label: "WiFi Gratis", icon: <Wifi className="w-3.5 h-3.5" /> },
@@ -48,6 +52,24 @@ export function Establecimientos() {
     { key: "planta_electrica", label: "Planta Eléctrica", icon: <Zap className="w-3.5 h-3.5" /> },
     { key: "tanque_agua", label: "Tanque de Agua", icon: <Droplets className="w-3.5 h-3.5" /> },
     { key: "pet_friendly", label: "Mascotas", icon: <Dog className="w-3.5 h-3.5" /> },
+  ];
+
+  const availableAccessibility = [
+    { key: "planta_baja", label: "Toda la unidad en planta baja" },
+    { key: "silla_ruedas", label: "Accesible en silla de ruedas" },
+    { key: "ascensor", label: "Acceso en ascensor" },
+    { key: "wc_barras", label: "WC con barras de apoyo" },
+    { key: "braille", label: "Apoyo visual: Braille" },
+    { key: "guiado_auditivo", label: "Guiado auditivo / visual" },
+  ];
+
+  const availableActivities = [
+    { key: "solo_adultos", label: "Solo para adultos" },
+    { key: "lgbt_friendly", label: "Travel Proud (LGBTQ+ friendly)" },
+    { key: "tours_pie", label: "Tours a pie" },
+    { key: "tours_bici", label: "Tours en bicicleta" },
+    { key: "alquiler_bici", label: "Alquiler de bicicletas" },
+    { key: "ruta_bares", label: "Ruta de bares" },
   ];
 
   const getSubtype = (est: Establishment) => {
@@ -162,7 +184,81 @@ export function Establecimientos() {
     setChildren(0);
     setSelectedSubtype("");
     setSelectedAmenities([]);
+    setSelectedStars([]);
+    setSelectedAccessibility([]);
+    setSelectedActivities([]);
+    setSmartQuery("");
     updateURLParams("", "", "");
+  };
+
+  const handleSmartSearch = (phrase: string) => {
+    if (!phrase.trim()) return;
+    const phraseLower = phrase.toLowerCase();
+    
+    // Limpiar todos los filtros antes de aplicar la búsqueda inteligente
+    setSelectedCategory("");
+    setSelectedDestination("");
+    setSearchQuery("");
+    setMinPrice(0);
+    setMaxPrice(1000);
+    setMinRating(0);
+    setAdults(1);
+    setChildren(0);
+    setSelectedSubtype("");
+    setSelectedAmenities([]);
+    setSelectedStars([]);
+    setSelectedAccessibility([]);
+    setSelectedActivities([]);
+    updateURLParams("", "", "");
+    
+    setSmartQuery(phrase);
+
+    // Detección inteligente de servicios
+    const newAmenities: string[] = [];
+    if (phraseLower.includes("piscina") || phraseLower.includes("alberca")) newAmenities.push("piscina");
+    if (phraseLower.includes("wifi") || phraseLower.includes("internet") || phraseLower.includes("wi-fi")) newAmenities.push("wifi");
+    if (phraseLower.includes("planta") || phraseLower.includes("generador") || phraseLower.includes("luz")) newAmenities.push("planta_electrica");
+    if (phraseLower.includes("tanque") || phraseLower.includes("agua")) newAmenities.push("tanque_agua");
+    if (phraseLower.includes("mascota") || phraseLower.includes("perro") || phraseLower.includes("gato") || phraseLower.includes("pet")) newAmenities.push("pet_friendly");
+    if (phraseLower.includes("playa")) newAmenities.push("playa_privada");
+    if (phraseLower.includes("estacionamiento") || phraseLower.includes("parking") || phraseLower.includes("estacionar")) newAmenities.push("estacionamiento");
+    if (phraseLower.includes("aire") || phraseLower.includes("acondicionado") || phraseLower.includes("clima")) newAmenities.push("aire_acondicionado");
+    if (newAmenities.length > 0) setSelectedAmenities(newAmenities);
+
+    // Detección de accesibilidad
+    const newAccess: string[] = [];
+    if (phraseLower.includes("silla") || phraseLower.includes("ruedas") || phraseLower.includes("rampa") || phraseLower.includes("discapacitado")) newAccess.push("silla_ruedas");
+    if (phraseLower.includes("planta baja") || phraseLower.includes("planta-baja") || phraseLower.includes("primer piso")) newAccess.push("planta_baja");
+    if (phraseLower.includes("ascensor") || phraseLower.includes("elevador")) newAccess.push("ascensor");
+    if (phraseLower.includes("wc") || phraseLower.includes("baño adaptado") || phraseLower.includes("barras") || phraseLower.includes("apoyo")) newAccess.push("wc_barras");
+    if (phraseLower.includes("braille") || phraseLower.includes("ciego")) newAccess.push("braille");
+    if (phraseLower.includes("audio") || phraseLower.includes("guiado")) newAccess.push("guiado_auditivo");
+    if (newAccess.length > 0) setSelectedAccessibility(newAccess);
+
+    // Detección de estrellas
+    if (phraseLower.includes("5 estrellas") || phraseLower.includes("cinco estrellas") || phraseLower.includes("lujo")) {
+      setSelectedStars([5]);
+    } else if (phraseLower.includes("4 estrellas") || phraseLower.includes("cuatro estrellas")) {
+      setSelectedStars([4]);
+    } else if (phraseLower.includes("3 estrellas") || phraseLower.includes("tres estrellas")) {
+      setSelectedStars([3]);
+    }
+
+    // Detección de actividades/tipo de grupo
+    const newAct: string[] = [];
+    if (phraseLower.includes("adulto") || phraseLower.includes("adults")) newAct.push("solo_adultos");
+    if (phraseLower.includes("lgbt") || phraseLower.includes("gay") || phraseLower.includes("friendly") || phraseLower.includes("proud")) newAct.push("lgbt_friendly");
+    if (phraseLower.includes("tour") || phraseLower.includes("paseo") || phraseLower.includes("caminar")) newAct.push("tours_pie");
+    if (phraseLower.includes("bicicleta") || phraseLower.includes("bici")) newAct.push("tours_bici");
+    if (phraseLower.includes("bar") || phraseLower.includes("bares") || phraseLower.includes("bebidas") || phraseLower.includes("tragos")) newAct.push("ruta_bares");
+    if (newAct.length > 0) setSelectedActivities(newAct);
+
+    // Detección de destino
+    if (phraseLower.includes("caracas")) handleDestinationChange("caracas");
+    if (phraseLower.includes("roques")) handleDestinationChange("los-roques");
+    if (phraseLower.includes("margarita")) handleDestinationChange("margarita");
+    if (phraseLower.includes("canaima")) handleDestinationChange("canaima");
+    if (phraseLower.includes("merida") || phraseLower.includes("mérida")) handleDestinationChange("merida");
   };
 
   // Fetch Categories & Destinations
@@ -277,11 +373,63 @@ export function Establecimientos() {
       console.warn("Error parsing services for filtering:", e);
     }
     
+    // Enriquecer dinámicamente servicios para simular accesibilidad y actividades en el mock
+    const nameLower = est.name.toLowerCase();
+    if (est.id % 2 === 0 && !estServices.includes("planta_baja")) estServices.push("planta_baja");
+    if (est.id % 3 === 0) {
+      if (!estServices.includes("silla_ruedas")) estServices.push("silla_ruedas");
+      if (!estServices.includes("wc_barras")) estServices.push("wc_barras");
+    }
+    if ((nameLower.includes("hotel") || nameLower.includes("resort") || nameLower.includes("intercontinental")) && !estServices.includes("ascensor")) {
+      estServices.push("ascensor");
+    }
+    if (est.id % 5 === 0) {
+      if (!estServices.includes("braille")) estServices.push("braille");
+      if (!estServices.includes("guiado_auditivo")) estServices.push("guiado_auditivo");
+    }
+
+    // Actividades automáticas en el mock
+    if ((nameLower.includes("adult") || nameLower.includes("humboldt") || est.id % 4 === 0) && !estServices.includes("solo_adultos")) {
+      estServices.push("solo_adultos");
+    }
+    if (est.id % 3 === 1 && !estServices.includes("lgbt_friendly")) {
+      estServices.push("lgbt_friendly");
+    }
+    if ((nameLower.includes("posada") || est.destination_slug === "los-roques") && !estServices.includes("tours_pie")) {
+      estServices.push("tours_pie");
+    }
+    if (est.id % 2 === 1) {
+      if (!estServices.includes("tours_bici")) estServices.push("tours_bici");
+      if (!estServices.includes("alquiler_bici")) estServices.push("alquiler_bici");
+    }
+    if ((nameLower.includes("bar") || nameLower.includes("restaurante") || est.id % 6 === 0) && !estServices.includes("ruta_bares")) {
+      estServices.push("ruta_bares");
+    }
+
     const matchesAmenities = selectedAmenities.every(amenity => 
       estServices.includes(amenity.toLowerCase())
     );
 
-    return matchesCategory && matchesDestination && matchesQuery && matchesPrice && matchesRating && matchesCapacity && matchesSubtype && matchesAmenities;
+    // Stars logic (est.stars or estimated from tier / name)
+    const getStarsCount = () => {
+      if ((est as any).stars) return Number((est as any).stars);
+      if (nameLower.includes("resort") || nameLower.includes("intercontinental") || nameLower.includes("cayena") || est.membership_tier === "diamante") return 5;
+      if (nameLower.includes("boutique") || est.rating_avg >= 4.7) return 4;
+      if (nameLower.includes("posada") || nameLower.includes("hotel") || est.rating_avg >= 4.3) return 3;
+      return 2;
+    };
+    const starsCount = getStarsCount();
+    const matchesStars = selectedStars.length === 0 || selectedStars.includes(starsCount);
+
+    const matchesAccessibility = selectedAccessibility.every(acc => 
+      estServices.includes(acc.toLowerCase())
+    );
+
+    const matchesActivities = selectedActivities.every(act => 
+      estServices.includes(act.toLowerCase())
+    );
+
+    return matchesCategory && matchesDestination && matchesQuery && matchesPrice && matchesRating && matchesCapacity && matchesSubtype && matchesAmenities && matchesStars && matchesAccessibility && matchesActivities;
   });
 
   const getCategoryName = (slug: string) => categories.find(c => c.slug === slug)?.name || slug;
@@ -295,7 +443,11 @@ export function Establecimientos() {
     (minRating > 0 ? 1 : 0) + 
     (adults > 1 || children > 0 ? 1 : 0) + 
     (selectedSubtype ? 1 : 0) + 
-    (selectedAmenities.length);
+    (selectedAmenities.length) +
+    (selectedStars.length) +
+    (selectedAccessibility.length) +
+    (selectedActivities.length) +
+    (smartQuery ? 1 : 0);
 
   const hasActiveFilters = activeFiltersCount > 0;
 
@@ -517,6 +669,88 @@ export function Establecimientos() {
                 </div>
               </div>
 
+              {/* 8. Estrellas del Alojamiento */}
+              <div className="space-y-2 pt-2 border-t border-gray-100">
+                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Categoría del Alojamiento</label>
+                <div className="flex flex-col gap-2">
+                  {[5, 4, 3, 2, 1].map((stars) => {
+                    const isSelected = selectedStars.includes(stars);
+                    return (
+                      <label key={stars} className="flex items-center gap-2 text-xs font-bold text-gray-600 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => {
+                            setSelectedStars(prev =>
+                              prev.includes(stars) ? prev.filter(s => s !== stars) : [...prev, stars]
+                            );
+                          }}
+                          className="rounded text-brand-magenta focus:ring-brand-magenta border-gray-300 w-3.5 h-3.5 cursor-pointer accent-[#FF0096]"
+                        />
+                        <span className="flex items-center gap-0.5 text-amber-500 font-extrabold">
+                          {Array.from({ length: stars }).map((_, i) => (
+                            <span key={i}>★</span>
+                          ))}
+                          <span className="text-[10px] text-gray-500 font-semibold ml-1">
+                            ({stars} {stars === 1 ? 'estrella' : 'estrellas'})
+                          </span>
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 9. Accesibilidad del Alojamiento */}
+              <div className="space-y-2 pt-2 border-t border-gray-100">
+                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Accesibilidad (Urb. y Habitaciones)</label>
+                <div className="flex flex-col gap-2">
+                  {availableAccessibility.map((acc) => {
+                    const isSelected = selectedAccessibility.includes(acc.key);
+                    return (
+                      <label key={acc.key} className="flex items-center gap-2 text-xs font-bold text-gray-600 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => {
+                            setSelectedAccessibility(prev =>
+                              prev.includes(acc.key) ? prev.filter(k => k !== acc.key) : [...prev, acc.key]
+                            );
+                          }}
+                          className="rounded text-brand-turquesa focus:ring-brand-turquesa border-gray-300 w-3.5 h-3.5 cursor-pointer accent-[#00C8D4]"
+                        />
+                        <span className="truncate leading-tight text-gray-500 hover:text-gray-700">{acc.label}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 10. Actividades y Tipo de Grupo */}
+              <div className="space-y-2 pt-2 border-t border-gray-100">
+                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Ideal Para y Actividades</label>
+                <div className="flex flex-col gap-2">
+                  {availableActivities.map((act) => {
+                    const isSelected = selectedActivities.includes(act.key);
+                    return (
+                      <label key={act.key} className="flex items-center gap-2 text-xs font-bold text-gray-600 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => {
+                            setSelectedActivities(prev =>
+                              prev.includes(act.key) ? prev.filter(k => k !== act.key) : [...prev, act.key]
+                            );
+                          }}
+                          className="rounded text-[#9B00CC] focus:ring-[#9B00CC] border-gray-300 w-3.5 h-3.5 cursor-pointer accent-[#9B00CC]"
+                        />
+                        <span className="truncate leading-tight text-gray-500 hover:text-gray-700">{act.label}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* Restablecer Filtros */}
               {activeFiltersCount > 0 && (
                 <button
@@ -588,6 +822,61 @@ export function Establecimientos() {
                   </button>
                 </div>
               </div>
+            </div>
+
+            {/* Filtros Inteligentes (Lote 3) */}
+            <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-xl shadow-gray-200/35 text-left space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-[#00C8D4] flex items-center justify-center text-white shrink-0 shadow-xs">
+                  <Sparkles className="w-4 h-4 fill-white" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-gray-800 tracking-tight leading-none">Filtros inteligentes</h3>
+                  <span className="text-[10px] text-gray-400 font-semibold mt-1 block">Búsqueda avanzada con procesamiento de lenguaje</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-700 block">¿Qué estás buscando?</label>
+                <div className="flex flex-col md:flex-row gap-3">
+                  <input
+                    type="text"
+                    placeholder="Ejemplo: Quiero una posada con piscina, planta eléctrica y pet friendly en Los Roques"
+                    value={smartQuery}
+                    onChange={(e) => setSmartQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleSmartSearch(smartQuery);
+                      }
+                    }}
+                    className="flex-1 bg-gray-50 border border-gray-150 rounded-2xl px-4 py-3 text-xs md:text-sm text-gray-700 placeholder-gray-400 outline-none focus:border-brand-turquesa focus:bg-white transition-all font-semibold"
+                  />
+                  <button
+                    onClick={() => handleSmartSearch(smartQuery)}
+                    className="bg-[#00C8D4] hover:bg-[#00b0ba] text-white text-xs font-black px-6 py-3 rounded-2xl transition-all cursor-pointer shadow-md shadow-cyan-400/10 active:scale-98 shrink-0 select-none"
+                  >
+                    Buscar alojamientos
+                  </button>
+                </div>
+              </div>
+
+              {smartQuery && activeFiltersCount > 0 && (
+                <div className="flex items-center flex-wrap gap-2 pt-1">
+                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Filtro Activo:</span>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-50 border border-cyan-150 text-[#00C8D4] text-[10px] font-black">
+                    <span>"{smartQuery}"</span>
+                    <button
+                      onClick={() => {
+                        setSmartQuery("");
+                        clearFilters();
+                      }}
+                      className="hover:text-red-500 transition-colors cursor-pointer"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Listado de Resultados */}

@@ -50,6 +50,8 @@ interface Reservation {
   guests_count: number;
   status: string;
   total_price: number;
+  room_id?: number | null;
+  room_type?: string | null;
 }
 
 interface WhatsAppLead {
@@ -2915,9 +2917,6 @@ export function OwnerDashboard() {
               </div>
             </form>
           </div>
-        </div>
-      )}
-
         </div>
       )}
 

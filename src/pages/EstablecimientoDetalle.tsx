@@ -62,21 +62,126 @@ export function EstablecimientoDetalle() {
       if (saved) {
         setSurroundings(JSON.parse(saved));
       } else {
-        const defaults = [
-          { category: "cerca", name: "Plaza del Ayuntamiento", distance: "100 m" },
-          { category: "cerca", name: "Parque de la Rambleta", distance: "100 m" },
-          { category: "cerca", name: "Museo Nacional de Cerámica", distance: "450 m" },
-          { category: "cerca", name: "Lonja de la Seda", distance: "550 m" },
-          { category: "gastronomia", name: "Restaurante Homenaje Taberna Gourmet", distance: "50 m" },
-          { category: "gastronomia", name: "Cafetería/bar McLub", distance: "80 m" },
-          { category: "atracciones", name: "Jardín del Turia", distance: "1.3 km" },
-          { category: "atracciones", name: "Museo de Ciencias Naturales", distance: "1.6 km" },
-          { category: "playas", name: "Playa de las Arenas", distance: "5 km" },
-          { category: "playas", name: "Playa de la Malvarrosa", distance: "5 km" },
-          { category: "transporte", name: "Metro - Estación de Metro Xàtiva", distance: "400 m" },
-          { category: "transporte", name: "Tren - Estación de tren del Norte", distance: "500 m" },
-          { category: "aeropuertos", name: "Aeropuerto de Valencia", distance: "8 km" }
-        ];
+        const destSlug = establishment.destination_slug?.toLowerCase() || "";
+        let defaults = [];
+
+        if (destSlug.includes("caracas")) {
+          defaults = [
+            { category: "cerca", name: "Plaza Bolívar de Chacao", distance: "300 m" },
+            { category: "cerca", name: "Centro Comercial Sambil Caracas", distance: "600 m" },
+            { category: "cerca", name: "Parque Generalísimo Francisco de Miranda", distance: "1.2 km" },
+            { category: "cerca", name: "Centro Comercial El Recreo", distance: "2.4 km" },
+            { category: "gastronomia", name: "Restaurante El Alazán (Las Mercedes)", distance: "400 m" },
+            { category: "gastronomia", name: "Café Kakao (Altamira)", distance: "150 m" },
+            { category: "atracciones", name: "Teleférico Warairarepano (Ávila)", distance: "2.5 km" },
+            { category: "atracciones", name: "Casa Natal del Libertador Simón Bolívar", distance: "4.8 km" },
+            { category: "playas", name: "Playa Los Ángeles (La Guaira)", distance: "32 km" },
+            { category: "playas", name: "Playa Camurí Chico (La Guaira)", distance: "35 km" },
+            { category: "transporte", name: "Metro - Estación Chacao", distance: "400 m" },
+            { category: "transporte", name: "Terminal La Bandera", distance: "6.5 km" },
+            { category: "aeropuertos", name: "Aeropuerto Int. Simón Bolívar de Maiquetía", distance: "24 km" }
+          ];
+        } else if (destSlug.includes("roques")) {
+          defaults = [
+            { category: "cerca", name: "Plaza Bolívar de Gran Roque", distance: "150 m" },
+            { category: "cerca", name: "Faro Holandés del Gran Roque", distance: "800 m" },
+            { category: "cerca", name: "Muelle de Embarque Principal", distance: "200 m" },
+            { category: "cerca", name: "Centro de Visitantes Inparques", distance: "350 m" },
+            { category: "gastronomia", name: "Restaurante Aki Cabana", distance: "120 m" },
+            { category: "gastronomia", name: "Pizzería La Gotera", distance: "250 m" },
+            { category: "atracciones", name: "Cayo Madrisquí", distance: "1.5 km" },
+            { category: "atracciones", name: "Cayo Francisquí", distance: "2.8 km" },
+            { category: "playas", name: "Cayo de Agua", distance: "16 km" },
+            { category: "playas", name: "Playa de Crasquí", distance: "9 km" },
+            { category: "transporte", name: "Muelle de lanchas cooperativas", distance: "220 m" },
+            { category: "aeropuertos", name: "Aeropuerto de Los Roques (Gran Roque)", distance: "300 m" }
+          ];
+        } else if (destSlug.includes("margarita")) {
+          defaults = [
+            { category: "cerca", name: "Plaza Bolívar de La Asunción", distance: "5 km" },
+            { category: "cerca", name: "Castillo San Carlos Borromeo", distance: "8 km" },
+            { category: "cerca", name: "Centro Comercial Sambil Margarita", distance: "3.5 km" },
+            { category: "cerca", name: "Basílica de la Virgen del Valle", distance: "7.2 km" },
+            { category: "gastronomia", name: "Restaurante Dolphin (Playa El Yaque)", distance: "200 m" },
+            { category: "gastronomia", name: "Café Guacuco", distance: "800 m" },
+            { category: "atracciones", name: "Parque Nacional Laguna de La Restinga", distance: "22 km" },
+            { category: "atracciones", name: "Fortín de La Galera", distance: "14 km" },
+            { category: "playas", name: "Playa El Yaque", distance: "50 m" },
+            { category: "playas", name: "Playa El Agua", distance: "18 km" },
+            { category: "transporte", name: "Terminal de Ferrys de Punta de Piedras", distance: "25 km" },
+            { category: "aeropuertos", name: "Aeropuerto Internacional Santiago Mariño", distance: "8 km" }
+          ];
+        } else if (destSlug.includes("canaima")) {
+          defaults = [
+            { category: "cerca", name: "Laguna de Canaima", distance: "50 m" },
+            { category: "cerca", name: "Mirador Salto Hacha", distance: "450 m" },
+            { category: "cerca", name: "Comunidad Indígena Kamarata", distance: "1.2 km" },
+            { category: "cerca", name: "Campamento Ucaima", distance: "2.0 km" },
+            { category: "gastronomia", name: "Comedor Ecológico Tepuy", distance: "100 m" },
+            { category: "gastronomia", name: "Bar de Canaima Lodge", distance: "150 m" },
+            { category: "atracciones", name: "Salto Ángel (Kerepakupai Vená)", distance: "48 km" },
+            { category: "atracciones", name: "Salto Sapo", distance: "1.8 km" },
+            { category: "playas", name: "Playa de la Laguna de Canaima", distance: "60 m" },
+            { category: "transporte", name: "Puerto de Curiaras de la Laguna", distance: "300 m" },
+            { category: "aeropuertos", name: "Aeropuerto de Canaima", distance: "800 m" }
+          ];
+        } else if (destSlug.includes("merida") || destSlug.includes("mérida")) {
+          defaults = [
+            { category: "cerca", name: "Plaza Bolívar de Mérida", distance: "800 m" },
+            { category: "cerca", name: "Mercado Principal de Mérida", distance: "1.5 km" },
+            { category: "cerca", name: "Plaza Las Heroínas", distance: "400 m" },
+            { category: "cerca", name: "Parque Chorros de Milla", distance: "3.2 km" },
+            { category: "gastronomia", name: "Heladería Coromoto (Récord Guinness)", distance: "600 m" },
+            { category: "gastronomia", name: "Café La Parroquia", distance: "750 m" },
+            { category: "atracciones", name: "Sistema de Teleféricos Mukumbarí", distance: "400 m" },
+            { category: "atracciones", name: "Pico Espejo", distance: "12 km" },
+            { category: "playas", name: "Laguna de Mucubají (Sierra Nevada)", distance: "45 km" },
+            { category: "transporte", name: "Estación de Trolebús Mérida", distance: "1.1 km" },
+            { category: "aeropuertos", name: "Aeropuerto Alberto Carnevalli", distance: "3.5 km" }
+          ];
+        } else if (destSlug.includes("morrocoy")) {
+          defaults = [
+            { category: "cerca", name: "Embarcadero de Tucacas", distance: "800 m" },
+            { category: "cerca", name: "Pueblo de Tucacas", distance: "1.2 km" },
+            { category: "cerca", name: "Plaza Bolívar de Chichiriviche", distance: "12 km" },
+            { category: "gastronomia", name: "Restaurante El Faro", distance: "300 m" },
+            { category: "gastronomia", name: "Parrillera El Marino", distance: "500 m" },
+            { category: "atracciones", name: "Cayo Sombrero", distance: "5.5 km" },
+            { category: "atracciones", name: "Cayo Muerto", distance: "4.2 km" },
+            { category: "playas", name: "Playa Varadero", distance: "3.0 km" },
+            { category: "playas", name: "Cayo Sal", distance: "4.8 km" },
+            { category: "transporte", name: "Muelle de Peñeros de Tucacas", distance: "850 m" },
+            { category: "aeropuertos", name: "Aeropuerto de Puerto Cabello (Bartolomé Salom)", distance: "45 km" }
+          ];
+        } else if (destSlug.includes("tovar")) {
+          defaults = [
+            { category: "cerca", name: "Plaza Bolívar de la Colonia Tovar", distance: "200 m" },
+            { category: "cerca", name: "Iglesia de San Martín de Tours", distance: "220 m" },
+            { category: "cerca", name: "Fábrica de Cerveza Artesanal", distance: "600 m" },
+            { category: "gastronomia", name: "Restaurante El Molino", distance: "150 m" },
+            { category: "gastronomia", name: "Café y Fresas con Crema La Gulin", distance: "100 m" },
+            { category: "atracciones", name: "Pico Codazzi", distance: "4.5 km" },
+            { category: "atracciones", name: "Museo de Historia de la Colonia Tovar", distance: "300 m" },
+            { category: "playas", name: "Puerto Cruz (Playa caribeña)", distance: "28 km" },
+            { category: "transporte", name: "Parada de Autobuses Colonia Tovar", distance: "350 m" },
+            { category: "aeropuertos", name: "Aeropuerto de Caracas (Óscar Machado Zuloaga)", distance: "55 km" }
+          ];
+        } else {
+          // Destino general en Venezuela
+          defaults = [
+            { category: "cerca", name: "Plaza Bolívar Local", distance: "400 m" },
+            { category: "cerca", name: "Alcaldía y Centro Histórico", distance: "600 m" },
+            { category: "cerca", name: "Centro Comercial de la Zona", distance: "1.5 km" },
+            { category: "gastronomia", name: "Restaurante de Comida Típica", distance: "200 m" },
+            { category: "gastronomia", name: "Cafetería y Panadería Local", distance: "150 m" },
+            { category: "atracciones", name: "Parque Nacional / Atracción Natural", distance: "3.5 km" },
+            { category: "atracciones", name: "Museo Histórico de la Ciudad", distance: "1.2 km" },
+            { category: "playas", name: "Playa o Balneario de Río cercano", distance: "4.0 km" },
+            { category: "transporte", name: "Parada de Transporte Público / Autobús", distance: "300 m" },
+            { category: "aeropuertos", name: "Aeropuerto Nacional más cercano", distance: "15 km" }
+          ];
+        }
+
         setSurroundings(defaults);
       }
     }
@@ -385,7 +490,7 @@ export function EstablecimientoDetalle() {
                     <Building2 className="w-5 h-5 text-brand-magenta" />
                     Alrededores del hotel
                   </h2>
-                  <p className="text-[11px] text-gray-400 font-semibold mt-1">¡A los clientes les encantó pasear por el barrio! Ubicación excelente</p>
+                  <p className="text-[11px] text-gray-400 font-semibold mt-1">¡A los clientes les encantó pasear por la urbanización! Ubicación excelente</p>
                 </div>
 
                 {/* Centro Histórico Alert-like Box */}

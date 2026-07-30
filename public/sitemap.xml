@@ -2,67 +2,67 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://hotelesdevenezuela.com/</loc>
-    <lastmod>2026-07-26</lastmod>
+    <lastmod>2026-07-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/establecimientos</loc>
-    <lastmod>2026-07-26</lastmod>
+    <lastmod>2026-07-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/destinos</loc>
-    <lastmod>2026-07-26</lastmod>
+    <lastmod>2026-07-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/mapa</loc>
-    <lastmod>2026-07-26</lastmod>
+    <lastmod>2026-07-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/parques</loc>
-    <lastmod>2026-07-26</lastmod>
+    <lastmod>2026-07-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/servicios-b2b</loc>
-    <lastmod>2026-07-26</lastmod>
+    <lastmod>2026-07-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/comparar</loc>
-    <lastmod>2026-07-26</lastmod>
+    <lastmod>2026-07-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/paquetes</loc>
-    <lastmod>2026-07-26</lastmod>
+    <lastmod>2026-07-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/links</loc>
-    <lastmod>2026-07-26</lastmod>
+    <lastmod>2026-07-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/membresias</loc>
-    <lastmod>2026-07-26</lastmod>
+    <lastmod>2026-07-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/prestigio-2026</loc>
-    <lastmod>2026-07-26</lastmod>
+    <lastmod>2026-07-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -121,6 +121,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://hotelesdevenezuela.com/establecimiento/waku-lodge</loc>
+    <lastmod>2026-05-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://hotelesdevenezuela.com/establecimiento/hotel-jirahara</loc>
     <lastmod>2026-03-08</lastmod>
     <changefreq>weekly</changefreq>
@@ -135,6 +141,12 @@
   <url>
     <loc>https://hotelesdevenezuela.com/establecimiento/hoteles-de-venezuela-mms6ywba</loc>
     <lastmod>2026-05-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/establecimiento/waka-wena-mncgxj8j</loc>
+    <lastmod>2026-05-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -403,19 +415,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://hotelesdevenezuela.com/blog/el-gigante-que-despierta-venezuela-y-la-ltima-frontera-del-turismo-global</loc>
-    <lastmod>2026-05-12</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://hotelesdevenezuela.com/blog/el-renacer-del-lujo-descalzo-por-qu-venezuela-es-el-destino-elite-de-2026</loc>
-    <lastmod>2026-05-12</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://hotelesdevenezuela.com/blog/glamping-el-idilio-entre-el-lujo-silvestre-y-la-geografa-nacional</loc>
+    <loc>https://hotelesdevenezuela.com/blog/guia-salto-angel-canaima</loc>
     <lastmod>2026-05-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -427,7 +427,19 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://hotelesdevenezuela.com/blog/guia-salto-angel-canaima</loc>
+    <loc>https://hotelesdevenezuela.com/blog/glamping-el-idilio-entre-el-lujo-silvestre-y-la-geografa-nacional</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/el-renacer-del-lujo-descalzo-por-qu-venezuela-es-el-destino-elite-de-2026</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/el-gigante-que-despierta-venezuela-y-la-ltima-frontera-del-turismo-global</loc>
     <lastmod>2026-05-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -457,8 +469,8 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://hotelesdevenezuela.com/blog/el-vergonzoso-legado-de-tu-rumbita</loc>
-    <lastmod>2026-05-12</lastmod>
+    <loc>https://hotelesdevenezuela.com/blog/the-best-kept-secret-in-the-americas-why-venezuela-is-the-ultimate-eco-luxury-and-wilderness-destination</loc>
+    <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -469,8 +481,8 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://hotelesdevenezuela.com/blog/the-best-kept-secret-in-the-americas-why-venezuela-is-the-ultimate-eco-luxury-and-wilderness-destination</loc>
-    <lastmod>2026-05-22</lastmod>
+    <loc>https://hotelesdevenezuela.com/blog/el-vergonzoso-legado-de-tu-rumbita</loc>
+    <lastmod>2026-05-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -543,6 +555,78 @@
   <url>
     <loc>https://hotelesdevenezuela.com/blog/guia-para-viajar-a-los-llanos-venezolanos-hatos-safaris-y-rutas-via-maiquetia</loc>
     <lastmod>2026-07-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/el-senor-de-la-selva-ecologia-territorio-y-el-turismo-de-conservacion-del-jaguar-en-venezuela</loc>
+    <lastmod>2026-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/el-gigante-rosado-de-los-rios-ecologia-habitat-y-el-ecoturismo-del-delfin-de-rio-en-venezuela</loc>
+    <lastmod>2026-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/alas-del-neotropico-guia-integral-de-la-avifauna-venezolana-ecosistemas-y-su-impacto-en-el-turismo-cientifico-y-sostenible</loc>
+    <lastmod>2026-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/adrenalina-y-naturaleza-extrema-guia-del-turismo-de-aventura-en-venezuela</loc>
+    <lastmod>2026-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/destinos-inagotables-las-maravillas-y-el-auge-del-turismo-en-venezuela</loc>
+    <lastmod>2026-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/el-gran-circuito-venezolano-cuando-la-ruta-se-convierte-en-el-mejor-destino</loc>
+    <lastmod>2026-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/las-cumbres-andinas-se-visten-de-blanco-imponente-nevada-sorprende-al-estado-merida</loc>
+    <lastmod>2026-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/el-lago-de-maracaibo-corazon-energetico-desafio-ecologico-y-espejo-de-contrastes</loc>
+    <lastmod>2026-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/puentes-en-el-mar-el-pulso-actual-del-sistema-de-ferrys-hacia-la-isla-de-margarita</loc>
+    <lastmod>2026-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/el-guardian-de-las-alturas-realidad-ecorregion-y-desafios-del-oso-frontino-en-venezuela</loc>
+    <lastmod>2026-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/el-vuelo-silencioso-de-la-esperanza-el-condor-andino-en-los-cielos-y-refugios-de-merida</loc>
+    <lastmod>2026-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/venezuela-un-universo-de-todos-los-climas-y-paisajes-en-un-solo-lugar</loc>
+    <lastmod>2026-07-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -933,6 +1017,12 @@
   <url>
     <loc>https://hotelesdevenezuela.com/50-fundadores</loc>
     <lastmod>2026-07-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/los-10-mejores-hoteles</loc>
+    <lastmod>2026-07-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
