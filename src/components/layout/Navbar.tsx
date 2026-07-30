@@ -4,6 +4,8 @@ import {
   Map, Menu, X, ChevronDown, Sparkles, Briefcase, LogOut, Heart, User, Globe, ShieldAlert, Receipt, Phone
 } from "lucide-react";
 import { useAuth } from "../../lib/auth";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "../../lib/supabase";
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -15,6 +17,20 @@ export function Navbar() {
   const [compareCount, setCompareCount] = useState(0);
 
   const { user, profile, logout } = useAuth();
+
+  const { data: settings = [] } = useQuery<any[]>({
+    queryKey: ["site-settings"],
+    queryFn: async () => {
+      try {
+        const { data, error } = await supabase.from("site_settings").select("*");
+        if (error) throw error;
+        return data || [];
+      } catch (e) {
+        console.warn("Error cargando settings en Navbar:", e);
+        return [];
+      }
+    }
+  });
 
   useEffect(() => {
     const updateCompareCount = () => {
@@ -37,16 +53,24 @@ export function Navbar() {
   }, []);
 
   const NAV_LINKS = [
-    { href: "/establecimientos", label: "Explorar" },
-    { href: "/destinos", label: "Destinos" },
-    { href: "/mapa", label: "Mapa", icon: <Map className="w-3.5 h-3.5 inline-block mr-1 -mt-0.5" /> },
-    { href: "/parques", label: "Parques" },
-    { href: "/viaje-ia", label: "Planear con IA ✨" },
-    { href: "/servicios-b2b", label: "Marketplace B2B" },
-    { href: "/paquetes", label: "Paquetes" },
-    { href: "/membresias", label: "Membresías" },
-    { href: "/comparar", label: compareCount > 0 ? `Comparar (${compareCount})` : "Comparar" }
+    { href: "/establecimientos", label: "Explorar", settingKey: "menu_show_establecimientos" },
+    { href: "/destinos", label: "Destinos", settingKey: "menu_show_destinos" },
+    { href: "/mapa", label: "Mapa", icon: <Map className="w-3.5 h-3.5 inline-block mr-1 -mt-0.5" />, settingKey: "menu_show_mapa" },
+    { href: "/parques", label: "Parques", settingKey: "menu_show_parques" },
+    { href: "/viaje-ia", label: "Planear con IA ✨", settingKey: "menu_show_viaje_ia" },
+    { href: "/servicios-b2b", label: "Marketplace B2B", settingKey: "menu_show_servicios_b2b" },
+    { href: "/paquetes", label: "Paquetes", settingKey: "menu_show_paquetes" },
+    { href: "/membresias", label: "Membresías", settingKey: "menu_show_membresias" },
+    { href: "/comparar", label: compareCount > 0 ? `Comparar (${compareCount})` : "Comparar", settingKey: "menu_show_comparar" }
   ];
+
+  const visibleLinks = NAV_LINKS.filter(link => {
+    if (!link.settingKey) return true;
+    const config = settings.find(s => s.setting_key === link.settingKey || s.settingKey === link.settingKey);
+    if (!config) return true;
+    return config.setting_value !== "false";
+  });
+
 
   useEffect(() => {
     setMobileOpen(false);
@@ -88,7 +112,7 @@ export function Navbar() {
 
         {/* Navegación para Escritorio */}
         <nav className="hidden xl:flex items-center gap-0.5 2xl:gap-1 text-xs font-semibold text-gray-600">
-          {NAV_LINKS.filter(l => l.href !== "/comparar").map((l) => (
+          {visibleLinks.filter(l => l.href !== "/comparar").map((l) => (
             <Link
               key={l.href}
               href={l.href}
@@ -244,7 +268,7 @@ export function Navbar() {
       {/* Menú Móvil */}
       {mobileOpen && (
         <div className="xl:hidden bg-white border-t border-gray-100 px-4 py-3 flex flex-col gap-1 shadow-lg animate-in fade-in slide-in-from-top-2 duration-150">
-          {NAV_LINKS.map((l) => (
+          {visibleLinks.map((l) => (
             <Link
               key={l.href}
               href={l.href}

@@ -4,7 +4,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { AdminTabBar } from "@/components/admin/AdminTabBar";
-import { Settings, Check, Plus, Loader2 } from "lucide-react";
+import { 
+  Settings, Check, Plus, Loader2, 
+  Sparkles, Building2, MapPin, Map, 
+  Globe, Briefcase, Package, Ticket 
+} from "lucide-react";
 
 interface Setting {
   key: string;
@@ -34,6 +38,17 @@ const SETTING_LABELS: Record<string, string> = {
   payment_paypal_note: "PayPal - Nota",
   payment_stripe_info: "Stripe - Información / Instrucciones",
 };
+
+const MENU_SECTIONS = [
+  { key: "menu_show_viaje_ia", label: "Planear con IA ✨", description: "Planificador inteligente basado en IA (consume tokens)", icon: Sparkles, color: "#FF0096" },
+  { key: "menu_show_establecimientos", label: "Explorar", description: "Buscador y explorador de hoteles y posadas", icon: Building2, color: "#00C8D4" },
+  { key: "menu_show_destinos", label: "Destinos", description: "Guía de destinos y regiones turísticas", icon: MapPin, color: "#9B00CC" },
+  { key: "menu_show_mapa", label: "Mapa Interactivo", description: "Mapa de geolocalización de hoteles y servicios", icon: Map, color: "#10B981" },
+  { key: "menu_show_parques", label: "Parques Nacionales", description: "Guía y detalles de parques nacionales", icon: Globe, color: "#3B82F6" },
+  { key: "menu_show_servicios_b2b", label: "Marketplace B2B", description: "Directorio de servicios y negocios B2B", icon: Briefcase, color: "#F59E0B" },
+  { key: "menu_show_paquetes", label: "Paquetes Turísticos", description: "Promociones y planes todo incluido", icon: Package, color: "#EF4444" },
+  { key: "menu_show_membresias", label: "Membresías", description: "Información del club y planes de membresía", icon: Ticket, color: "#EC4899" },
+];
 
 export function AdminConfig() {
   const { user, profile, loading: authLoading } = navAuth();
@@ -145,7 +160,7 @@ export function AdminConfig() {
           <div className="px-6 py-4 border-b border-slate-100 bg-slate-50"><h2 className="font-bold text-gray-700 text-xs uppercase tracking-wider">Ajustes Generales</h2></div>
           {loadingSettings ? <div className="p-6 text-center text-gray-400 text-xs font-bold">Cargando configuraciones...</div> : (
             <div className="divide-y divide-slate-100">
-              {settings.map(s => (
+              {settings.filter(s => s && s.key && !s.key.startsWith("menu_show_")).map(s => (
                 <div key={s.key} className="px-6 py-4 flex items-center gap-4 hover:bg-slate-50/50 transition-colors">
                   <div className="flex-1 min-w-0">
                     <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">{SETTING_LABELS[s.key] || s.key}</div>
@@ -165,9 +180,70 @@ export function AdminConfig() {
                   )}
                 </div>
               ))}
-              {settings.length === 0 && <div className="p-6 text-center text-gray-500 text-xs font-bold">No hay configuraciones registradas</div>}
+              {settings.filter(s => s && s.key && !s.key.startsWith("menu_show_")).length === 0 && <div className="p-6 text-center text-gray-500 text-xs font-bold">No hay configuraciones registradas</div>}
             </div>
           )}
+        </div>
+
+        {/* Secciones del Menú Principal (Configuración Premium de Visibilidad) */}
+        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden mb-6 shadow-xs">
+          <div className="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+            <div>
+              <h2 className="font-bold text-gray-700 text-xs uppercase tracking-wider">Visibilidad del Menú Principal</h2>
+              <p className="text-[10px] text-gray-400 font-semibold mt-0.5">Controla la visualización de botones en la barra superior para optimizar tokens y navegación</p>
+            </div>
+          </div>
+          
+          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {MENU_SECTIONS.map((item) => {
+              const config = settings.find(s => s.key === item.key);
+              const isActive = config ? config.value !== "false" : true;
+              const IconComponent = item.icon;
+
+              return (
+                <div key={item.key} className="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:border-slate-200/80 hover:bg-slate-50/20 transition-all">
+                  <div className="flex items-center gap-3 min-w-0">
+                    {/* Caja de icono con fondo sólido y vector blanco */}
+                    <div 
+                      className="w-9 h-9 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm"
+                      style={{ backgroundColor: item.color }}
+                    >
+                      <IconComponent className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
+                        {item.label}
+                        {item.key === "menu_show_viaje_ia" && (
+                          <span className="text-[8px] bg-pink-100 text-[#FF0096] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider animate-pulse">
+                            IA Tokens
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[10px] text-gray-400 font-semibold truncate max-w-[160px] sm:max-w-[200px]">{item.description}</div>
+                    </div>
+                  </div>
+                  
+                  {/* Switch Toggle iOS */}
+                  <button
+                    onClick={() => {
+                      const nextValue = isActive ? "false" : "true";
+                      updateSetting.mutate({ key: item.key, value: nextValue });
+                    }}
+                    disabled={updateSetting.isPending}
+                    className={`w-10 h-5.5 flex items-center rounded-full p-0.5 cursor-pointer transition-all duration-300 ${
+                      isActive ? "bg-[#FF0096]" : "bg-slate-200"
+                    }`}
+                  >
+                    <div
+                      className={`bg-white w-4.5 h-4.5 rounded-full shadow-md transform transition-all duration-300 ${
+                        isActive ? "translate-x-4.5" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* Add new setting */}
