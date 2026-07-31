@@ -294,6 +294,7 @@ function App() {
 
           {/* Dashboards Propietarios */}
           <Route path="/mis-negocios" component={OwnerDashboard} />
+          <Route path="/panel-propietario" component={OwnerDashboard} />
           <Route path="/andromeda">
             {() => <AdminLayout><AndromedaPanel /></AdminLayout>}
           </Route>

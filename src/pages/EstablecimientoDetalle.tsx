@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "wouter";
 import { supabase } from "../lib/supabase";
+import { useAuth } from "../lib/auth";
 import { ESTABLISHMENTS_MOCK } from "../lib/establishmentsMock";
 import { TrackedWhatsAppButton, trackEvent } from "../components/layout/TrackedWhatsAppButton";
 import { AvailabilityCalendar } from "../components/AvailabilityCalendar";
@@ -48,6 +49,7 @@ interface EstablishmentDetail {
 
 export function EstablecimientoDetalle() {
   const { slug } = useParams() as any;
+  const { user, profile } = useAuth();
   const [establishment, setEstablishment] = useState<EstablishmentDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -369,11 +371,17 @@ export function EstablecimientoDetalle() {
                 <p className="text-[11px] text-white/90 font-semibold mt-0.5">Esta Ficha se encuentra en proceso de auditoría y verificación por el equipo de Hoteles de Venezuela LLC. Solo tú y el equipo administrativo pueden visualizar esta vista previa.</p>
               </div>
             </div>
-            <Link href="/panel-propietario">
-              <button className="px-4 py-2 bg-white text-gray-900 font-bold text-xs rounded-xl shadow-xs hover:bg-gray-100 transition-all shrink-0 cursor-pointer">
-                Volver al Panel
-              </button>
-            </Link>
+            {(() => {
+              const isAdmin = user?.email?.toLowerCase() === "hotelesdevenezuela77@gmail.com" || profile?.role === "admin";
+              const backTarget = isAdmin ? "/admin/aprobaciones" : "/mis-negocios";
+              return (
+                <Link href={backTarget}>
+                  <button className="px-4 py-2 bg-white text-gray-900 font-bold text-xs rounded-xl shadow-xs hover:bg-gray-100 transition-all shrink-0 cursor-pointer">
+                    {isAdmin ? "Volver a Aprobaciones" : "Volver a Mi Panel"}
+                  </button>
+                </Link>
+              );
+            })()}
           </div>
         </div>
       )}
