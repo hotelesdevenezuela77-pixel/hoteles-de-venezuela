@@ -325,13 +325,45 @@ export function Establecimientos() {
               is_ads_enabled: item.is_ads_enabled || false
             };
           });
-          setEstablishments(mapped);
+          // Merge local establishments created by owners
+          const localEstsKey = "hdv_mock_establishments";
+          const localEsts = JSON.parse(localStorage.getItem(localEstsKey) || "[]");
+          const mappedLocal: Establishment[] = localEsts.map((item: any) => ({
+            id: item.id,
+            slug: item.slug,
+            name: item.name,
+            description: item.description || "",
+            address: item.address || "",
+            phone: item.phone || "",
+            whatsapp: item.whatsapp || "",
+            website: item.website || "",
+            category_name: item.category_name || "Establecimiento",
+            category_slug: item.category_slug || "",
+            destination_name: item.destination_name || "Venezuela",
+            destination_slug: item.destination_slug || "",
+            primary_image: item.primary_image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
+            rating_avg: item.rating_avg || 5.0,
+            review_count: item.review_count || 1,
+            price_level: item.price_level || "$$",
+            is_featured: item.is_featured || false,
+            services: item.services || "[]",
+            membership_tier: item.membership_tier || "basic",
+            has_hdv_seal: item.has_hdv_seal || false,
+            has_reservations_enabled: item.has_reservations_enabled || false,
+            is_ads_enabled: item.is_ads_enabled || false
+          }));
+
+          setEstablishments([...mapped, ...mappedLocal]);
         } else {
-          setEstablishments(ESTABLISHMENTS_MOCK);
+          const localEstsKey = "hdv_mock_establishments";
+          const localEsts = JSON.parse(localStorage.getItem(localEstsKey) || "[]");
+          setEstablishments([...ESTABLISHMENTS_MOCK, ...localEsts]);
         }
       } catch (err) {
         console.warn("Error consultando Supabase para establecimientos, usando datos de demostración:", err);
-        setEstablishments(ESTABLISHMENTS_MOCK);
+        const localEstsKey = "hdv_mock_establishments";
+        const localEsts = JSON.parse(localStorage.getItem(localEstsKey) || "[]");
+        setEstablishments([...ESTABLISHMENTS_MOCK, ...localEsts]);
       } finally {
         setLoading(false);
       }
