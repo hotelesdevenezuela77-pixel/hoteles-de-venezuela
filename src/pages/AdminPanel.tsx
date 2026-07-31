@@ -1126,10 +1126,12 @@ export function AdminPanel() {
         {!loadingData && activeTab === "aprobaciones" && (
           <div className="space-y-6">
             <div className="flex justify-between items-center bg-white border border-gray-200 rounded-2xl p-4 shadow-xs">
-              <span className="text-xs font-bold text-gray-500">{establishments.filter(e => e.status === "pending").length} solicitudes pendientes de revisión</span>
+              <span className="text-xs font-bold text-gray-500">
+                {establishments.filter(e => e.status === "pending" || e.status === "under_review").length} solicitudes en revisión y auditoría comercial
+              </span>
             </div>
 
-            {establishments.filter(e => e.status === "pending").length === 0 ? (
+            {establishments.filter(e => e.status === "pending" || e.status === "under_review").length === 0 ? (
               <div className="text-center py-20 bg-white border border-gray-200 rounded-3xl shadow-xs">
                 <CheckIcon className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
                 <h4 className="text-sm font-black text-gray-700">¡Al día con las aprobaciones!</h4>
@@ -1137,13 +1139,17 @@ export function AdminPanel() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {establishments.filter(e => e.status === "pending").map(est => (
-                  <div key={est.id} className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                {establishments.filter(e => e.status === "pending" || e.status === "under_review").map(est => (
+                  <div key={est.id} className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between text-left">
                     <div>
                       <div className="flex justify-between items-start gap-4 mb-2">
                         <h4 className="font-black text-gray-800 text-md leading-tight">{est.name}</h4>
-                        <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-yellow-50 text-yellow-600 border border-yellow-200">
-                          Pendiente
+                        <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                          est.status === "under_review"
+                            ? "bg-blue-50 text-blue-700 border border-blue-200"
+                            : "bg-yellow-50 text-yellow-600 border border-yellow-200"
+                        }`}>
+                          {est.status === "under_review" ? "Docs Consignados" : "Pre-Aprobado"}
                         </span>
                       </div>
                       <p className="text-[10px] font-bold text-brand-magenta uppercase tracking-wider mb-4">
@@ -1151,9 +1157,14 @@ export function AdminPanel() {
                       </p>
 
                       <div className="space-y-1.5 text-xs text-gray-500 mb-6 bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                        <p><span className="font-bold text-gray-400">Propietario ID:</span> <span className="font-mono text-[10px]">{est.owner_user_id}</span></p>
+                        <p><span className="font-bold text-gray-400">Propietario ID:</span> <span className="font-mono text-[10px]">{est.owner_user_id || "Sin ID"}</span></p>
                         <p><span className="font-bold text-gray-400">Registrado el:</span> {new Date(est.created_at).toLocaleDateString("es-VE")}</p>
-                        <p><span className="font-bold text-gray-400">Enlace:</span> <span className="font-mono">/establecimiento/{est.slug}</span></p>
+                        {(est as any).rif && <p><span className="font-bold text-gray-400">RIF Comercial:</span> <span className="font-mono text-gray-800 font-bold">{(est as any).rif}</span></p>}
+                        {(est as any).razon_social && <p><span className="font-bold text-gray-400">Razón Social:</span> <span className="text-gray-800 font-bold">{(est as any).razon_social}</span></p>}
+                        {(est as any).rtn_licencia && <p><span className="font-bold text-gray-400">RTN / Licencia:</span> <span className="font-mono">{(est as any).rtn_licencia}</span></p>}
+                        {(est as any).cedula_representante && <p><span className="font-bold text-gray-400">Cédula Rep. Legal:</span> <span className="font-mono">{(est as any).cedula_representante}</span></p>}
+                        {(est as any).document_notes && <p className="pt-1"><span className="font-bold text-gray-400 block text-[9px] uppercase">Enlace / Notas de Documentación:</span> <span className="text-brand-turquesa font-mono text-[10px] break-all">{(est as any).document_notes}</span></p>}
+                        <p><span className="font-bold text-gray-400">Enlace Ficha:</span> <span className="font-mono text-brand-magenta">/establecimiento/{est.slug}</span></p>
                       </div>
                     </div>
 
@@ -1173,9 +1184,9 @@ export function AdminPanel() {
                       <button
                         onClick={() => handleApproveEstablishment(est.id)}
                         disabled={actionLoading === est.id}
-                        className="bg-brand-magenta text-white font-bold text-xs px-4 py-2.5 rounded-xl hover:opacity-90 transition-all cursor-pointer disabled:opacity-50"
+                        className="btn-cyan-gradient text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer disabled:opacity-50 uppercase"
                       >
-                        Aprobar
+                        Aprobar & Verificar
                       </button>
                     </div>
                   </div>

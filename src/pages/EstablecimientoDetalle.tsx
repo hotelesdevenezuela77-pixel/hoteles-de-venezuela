@@ -43,6 +43,7 @@ interface EstablishmentDetail {
   hours?: string;
   whatsapp?: string;
   has_reservations_enabled?: boolean;
+  status?: string;
 }
 
 export function EstablecimientoDetalle() {
@@ -139,9 +140,8 @@ export function EstablecimientoDetalle() {
             { category: "transporte", name: "Estación de Trolebús Mérida", distance: "1.1 km" },
             { category: "aeropuertos", name: "Aeropuerto Alberto Carnevalli", distance: "3.5 km" }
           ];
-        } else if (destSlug.includes("morrocoy")) {
+        } else if (destSlug.includes("morrocoy") || destSlug.includes("tucacas")) {
           defaults = [
-            { category: "cerca", name: "Embarcadero de Tucacas", distance: "800 m" },
             { category: "cerca", name: "Pueblo de Tucacas", distance: "1.2 km" },
             { category: "cerca", name: "Plaza Bolívar de Chichiriviche", distance: "12 km" },
             { category: "gastronomia", name: "Restaurante El Faro", distance: "300 m" },
@@ -167,7 +167,6 @@ export function EstablecimientoDetalle() {
             { category: "aeropuertos", name: "Aeropuerto de Caracas (Óscar Machado Zuloaga)", distance: "55 km" }
           ];
         } else {
-          // Destino general en Venezuela
           defaults = [
             { category: "cerca", name: "Plaza Bolívar Local", distance: "400 m" },
             { category: "cerca", name: "Alcaldía y Centro Histórico", distance: "600 m" },
@@ -201,59 +200,100 @@ export function EstablecimientoDetalle() {
       try {
         setLoading(true);
         setError(false);
-        const { data, error } = await supabase
-          .from("establishments")
-          .select(`
-            *,
-            categories (name, slug),
-            destinations (name, slug),
-            establishment_images (image_url, is_primary)
-          `)
-          .eq("slug", slug)
-          .eq("status", "approved")
-          .maybeSingle();
 
-        if (error) throw error;
+        // 1. Try Supabase DB lookup
+        let dbData: any = null;
+        try {
+          const { data, error: dbErr } = await supabase
+            .from("establishments")
+            .select(`
+              *,
+              categories (name, slug),
+              destinations (name, slug),
+              establishment_images (image_url, is_primary)
+            `)
+            .eq("slug", slug)
+            .maybeSingle();
 
-        if (data) {
-          const primaryImg = data.establishment_images?.find((img: any) => img.is_primary)?.image_url 
-            || data.establishment_images?.[0]?.image_url 
-            || "";
+          if (!dbErr && data) {
+            dbData = data;
+          }
+        } catch (e) {
+          console.warn("Error querying Supabase for detail:", e);
+        }
 
-          const allImages = data.establishment_images?.map((img: any) => img.image_url) || [];
+        // 2. Fallback to localStorage mock establishments if not found in DB
+        if (!dbData) {
+          const localEstsKey = "hdv_mock_establishments";
+          const localEsts = JSON.parse(localStorage.getItem(localEstsKey) || "[]");
+          const foundLocal = localEsts.find((e: any) => 
+            e.slug === slug || 
+            e.name?.toLowerCase().replace(/[^a-z0-9]+/g, "-") === slug
+          );
+          if (foundLocal) {
+            dbData = {
+              ...foundLocal,
+              categories: { name: foundLocal.category_name || "Posadas", slug: "posadas" },
+              destinations: { name: foundLocal.destination_name || "Barquisimeto", slug: "barquisimeto" },
+              establishment_images: []
+            };
+          }
+        }
+
+        // 3. Fallback to static ESTABLISHMENTS_MOCK
+        if (!dbData) {
+          const staticFound = ESTABLISHMENTS_MOCK.find(e => e.slug === slug);
+          if (staticFound) {
+            dbData = {
+              ...staticFound,
+              categories: { name: staticFound.category, slug: staticFound.category.toLowerCase() },
+              destinations: { name: staticFound.destination, slug: staticFound.destination.toLowerCase() },
+              establishment_images: [{ image_url: staticFound.image, is_primary: true }]
+            };
+          }
+        }
+
+        if (dbData) {
+          const primaryImg = dbData.establishment_images?.find((img: any) => img.is_primary)?.image_url 
+            || dbData.establishment_images?.[0]?.image_url 
+            || dbData.image 
+            || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80";
+
+          const allImages = dbData.establishment_images?.map((img: any) => img.image_url) || [];
           if (allImages.length === 0 && primaryImg) {
             allImages.push(primaryImg);
           }
 
           const mapped: EstablishmentDetail = {
-            id: data.id,
-            slug: data.slug,
-            name: data.name,
-            description: data.description || "",
-            address: data.address || "",
-            city: data.city || "",
-            state: data.state || "",
-            phone: data.phone || "",
-            email: data.email || "",
-            website: data.website || "",
-            category_name: data.categories?.name || "Establecimiento",
-            category_slug: data.categories?.slug || "",
-            destination_name: data.destinations?.name || "",
-            destination_slug: data.destinations?.slug || "",
+            id: dbData.id,
+            slug: dbData.slug,
+            name: dbData.name,
+            description: dbData.description || "",
+            address: dbData.address || "",
+            city: dbData.city || "",
+            state: dbData.state || "",
+            phone: dbData.phone || "",
+            email: dbData.email || "",
+            website: dbData.website || "",
+            category_name: dbData.categories?.name || dbData.category_name || "Establecimiento",
+            category_slug: dbData.categories?.slug || "posadas",
+            destination_name: dbData.destinations?.name || dbData.destination_name || "Venezuela",
+            destination_slug: dbData.destinations?.slug || "venezuela",
             primary_image: primaryImg,
-            rating_avg: data.rating_avg || 0,
-            review_count: data.review_count || 0,
-            price_level: data.price_level || "",
-            is_featured: data.is_featured || false,
-            services: data.services || "[]",
-            membership_tier: data.membership_tier || "basic",
-            has_hdv_seal: data.has_hdv_seal || false,
-            has_reservations_enabled: data.has_reservations_enabled || false,
+            rating_avg: dbData.rating_avg || 4.8,
+            review_count: dbData.review_count || 12,
+            price_level: dbData.price_level || "$$",
+            is_featured: dbData.is_featured || false,
+            services: dbData.services || "[]",
+            membership_tier: dbData.membership_tier || "basic",
+            has_hdv_seal: dbData.has_hdv_seal || false,
+            has_reservations_enabled: dbData.has_reservations_enabled || false,
             images: allImages,
-            latitude: data.latitude,
-            longitude: data.longitude,
-            hours: data.hours,
-            whatsapp: data.whatsapp
+            latitude: dbData.latitude,
+            longitude: dbData.longitude,
+            hours: dbData.hours,
+            whatsapp: dbData.whatsapp,
+            status: dbData.status || "approved"
           };
 
           setEstablishment(mapped);
@@ -262,7 +302,7 @@ export function EstablecimientoDetalle() {
           setError(true);
         }
       } catch (err) {
-        console.error("Error al cargar detalles de Supabase:", err);
+        console.error("Error al cargar detalles:", err);
         setError(true);
       } finally {
         setLoading(false);
@@ -317,16 +357,25 @@ export function EstablecimientoDetalle() {
   return (
     <div className="min-h-screen bg-gray-50/30 pb-20">
       
-      {/* Breadcrumb Navigation */}
-      <div className="max-w-7xl mx-auto px-6 py-4">
-        <div className="flex items-center gap-2 text-xs font-semibold text-gray-400">
-          <Link href="/" className="hover:text-brand-magenta transition-colors">Inicio</Link>
-          <span>/</span>
-          <Link href="/establecimientos" className="hover:text-brand-magenta transition-colors">Explorar</Link>
-          <span>/</span>
-          <span className="text-gray-600 truncate max-w-[200px]">{establishment.name}</span>
+      {/* Status Notice Banner if establishment is preapproved / pending */}
+      {establishment.status !== "approved" && (
+        <div className="max-w-7xl mx-auto px-6 mb-6">
+          <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-brand-magenta text-white p-4 rounded-2xl shadow-md flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="w-5 h-5 text-white shrink-0" />
+              <div>
+                <h4 className="text-xs font-black uppercase tracking-wider">Vista Previa de Ficha Pública — Estado: {establishment.status?.toUpperCase() || "PRE-APROBADO / EN REVISIÓN"}</h4>
+                <p className="text-[11px] text-white/90 font-semibold mt-0.5">Esta Ficha se encuentra en proceso de auditoría y verificación por el equipo de Hoteles de Venezuela LLC. Solo tú y el equipo administrativo pueden visualizar esta vista previa.</p>
+              </div>
+            </div>
+            <Link href="/panel-propietario">
+              <button className="px-4 py-2 bg-white text-gray-900 font-bold text-xs rounded-xl shadow-xs hover:bg-gray-100 transition-all shrink-0 cursor-pointer">
+                Volver al Panel
+              </button>
+            </Link>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Image Gallery Showcase */}
       <div className="max-w-7xl mx-auto px-6 mb-10">

@@ -274,6 +274,57 @@ export function OwnerDashboard() {
   });
   const [dragActive, setDragActive] = useState<Record<number, boolean>>({});
 
+  // Verification & Document Consignment Modal State
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [verifyingEst, setVerifyingEst] = useState<any>(null);
+  const [verificationForm, setVerificationForm] = useState({
+    rif: "",
+    razon_social: "",
+    rtn_licencia: "",
+    cedula_representante: "",
+    telefono_verificacion: "",
+    document_notes: ""
+  });
+
+  const handleOpenVerificationModal = (est: any) => {
+    setVerifyingEst(est);
+    setVerificationForm({
+      rif: est.rif || "",
+      razon_social: est.razon_social || est.name || "",
+      rtn_licencia: est.rtn_licencia || "",
+      cedula_representante: est.cedula_representante || "",
+      telefono_verificacion: est.phone || "",
+      document_notes: est.document_notes || ""
+    });
+    setShowVerificationModal(true);
+  };
+
+  const handleSubmitVerificationDocs = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!verifyingEst) return;
+
+    const payload = {
+      status: "under_review",
+      ...verificationForm
+    };
+
+    try {
+      await supabase.from("establishments").update(payload).eq("id", verifyingEst.id);
+    } catch (err) {
+      console.warn("DB update verification status failed:", err);
+    }
+
+    // Also update in localStorage if mock
+    const localEstsKey = "hdv_mock_establishments";
+    const existing = JSON.parse(localStorage.getItem(localEstsKey) || "[]");
+    const updated = existing.map((e: any) => e.id === verifyingEst.id ? { ...e, ...payload } : e);
+    localStorage.setItem(localEstsKey, JSON.stringify(updated));
+
+    setEstablishments(prev => prev.map(e => e.id === verifyingEst.id ? { ...e, ...payload } : e));
+    setShowVerificationModal(false);
+    alert("📑 ¡Documentación consignada con éxito! Tus recaudos han sido enviados al equipo legal y comercial de Hoteles de Venezuela LLC para auditoría y verificación.");
+  };
+
   // Invoices & Liquidation lists state
   const [invoices, setInvoices] = useState<any[]>([]);
   const [liquidations, setLiquidations] = useState<any[]>([]);
@@ -1327,21 +1378,28 @@ export function OwnerDashboard() {
         return (
           <span className="inline-flex items-center gap-1 bg-green-50 border border-green-200 text-green-700 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm">
             <CheckCircle className="w-3.5 h-3.5" />
-            Aprobado
+            Verificado & Aprobado
+          </span>
+        );
+      case "under_review":
+        return (
+          <span className="inline-flex items-center gap-1 bg-blue-50 border border-blue-200 text-blue-700 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm">
+            <Clock className="w-3.5 h-3.5 animate-pulse" />
+            En Revisión Legal
           </span>
         );
       case "rejected":
         return (
           <span className="inline-flex items-center gap-1 bg-red-50 border border-red-200 text-red-700 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm">
             <XCircle className="w-3.5 h-3.5" />
-            Rechazado
+            Documentación Requerida
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 bg-yellow-50 border border-yellow-200 text-yellow-700 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm">
-            <Clock className="w-3.5 h-3.5 animate-pulse" />
-            Pendiente
+          <span className="inline-flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-800 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm">
+            <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
+            Pre-Aprobado (Pendiente Verificación)
           </span>
         );
     }
@@ -1725,24 +1783,77 @@ export function OwnerDashboard() {
                       </div>
                       <p className="text-[11px] font-bold text-brand-magenta uppercase tracking-wider mb-4">{est.category_name} • {est.destination_name}</p>
                       
-                      <div className="space-y-2 text-xs text-gray-500 mb-6">
+                      <div className="space-y-2 text-xs text-gray-500 mb-4">
                         {est.address && <p><span className="font-bold text-gray-400 uppercase text-[9px] tracking-wider block">Dirección:</span> {est.address}</p>}
                         {est.phone && <p><span className="font-bold text-gray-400 uppercase text-[9px] tracking-wider block">Contacto:</span> {est.phone}</p>}
                         {est.website && <p><span className="font-bold text-gray-400 uppercase text-[9px] tracking-wider block">Sitio Web:</span> <a href={est.website} target="_blank" className="text-brand-turquesa underline">{est.website}</a></p>}
                       </div>
+
+                      {/* Verification Status & Action Box */}
+                      {est.status === "approved" ? (
+                        <div className="bg-green-50 border border-green-200 rounded-2xl p-3.5 mb-5 flex items-center justify-between gap-3">
+                          <div className="text-left">
+                            <span className="text-[10px] font-black text-green-900 uppercase block flex items-center gap-1">
+                              <CheckCircle className="w-3.5 h-3.5 text-green-600" />
+                              Verificación Comercial Completa
+                            </span>
+                            <span className="text-[9px] text-green-700 block font-semibold mt-0.5">Sello de garantía y ficha pública activos en plataforma.</span>
+                          </div>
+                          <span className="text-[9px] font-black uppercase text-green-700 bg-green-200/60 px-2 py-1 rounded-lg">Oficial</span>
+                        </div>
+                      ) : est.status === "under_review" ? (
+                        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3.5 mb-5 flex items-center justify-between gap-3">
+                          <div className="text-left">
+                            <span className="text-[10px] font-black text-blue-900 uppercase block flex items-center gap-1">
+                              <Clock className="w-3.5 h-3.5 text-blue-600 animate-pulse" />
+                              Documentos en Auditoría Legal
+                            </span>
+                            <span className="text-[9px] text-blue-700 block font-semibold mt-0.5">El equipo comercial está validando RIF y Licencia consignados.</span>
+                          </div>
+                          <button
+                            onClick={() => handleOpenVerificationModal(est)}
+                            className="text-[9px] font-black uppercase text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-xl cursor-pointer transition-all shrink-0"
+                          >
+                            Actualizar Recaudos
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 mb-5 flex items-center justify-between gap-3">
+                          <div className="text-left">
+                            <span className="text-[10px] font-black text-amber-900 uppercase block flex items-center gap-1">
+                              <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
+                              Proceso Pre-Aprobado (Pendiente Documentación)
+                            </span>
+                            <span className="text-[9px] text-amber-700 block font-semibold mt-0.5">Consigna tu RIF y Registro Mercantil para validación oficial.</span>
+                          </div>
+                          <button
+                            onClick={() => handleOpenVerificationModal(est)}
+                            className="text-[9px] font-black uppercase text-white bg-amber-600 hover:bg-amber-700 px-3 py-1.5 rounded-xl cursor-pointer transition-all shrink-0 shadow-xs"
+                          >
+                            Consignar Documentos
+                          </button>
+                        </div>
+                      )}
                     </div>
 
-                    <div className="flex gap-3 pt-4 border-t border-gray-100">
-                      <Link href={`/establecimiento/${est.slug}`} className="flex-1">
+                    <div className="flex gap-2 pt-4 border-t border-gray-100 flex-wrap">
+                      <Link href={`/establecimiento/${est.slug}`} className="flex-1 min-w-[120px]">
                         <button className="w-full bg-white border border-gray-200 text-gray-600 font-bold text-xs py-2.5 rounded-xl hover:bg-gray-50 cursor-pointer">
                           Ver Ficha Pública
                         </button>
                       </Link>
                       <button 
                         onClick={() => { setSelectedCalendarEst(est.id); setActiveTab("inventario"); }}
-                        className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold text-xs py-2.5 rounded-xl border border-gray-250 cursor-pointer"
+                        className="flex-1 min-w-[120px] bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold text-xs py-2.5 rounded-xl border border-gray-250 cursor-pointer"
                       >
                         Gestionar Inventario
+                      </button>
+                      <button 
+                        onClick={() => handleOpenVerificationModal(est)}
+                        className="px-3 bg-brand-magenta/10 hover:bg-brand-magenta/20 text-brand-magenta border border-brand-magenta/20 font-bold text-xs py-2.5 rounded-xl cursor-pointer"
+                        title="Consignación de Documentos y Verificación"
+                      >
+                        <FileText className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
@@ -3198,12 +3309,108 @@ export function OwnerDashboard() {
                 </button>
               </div>
 
+      {/* Document Consignment & Verification Modal */}
+      {showVerificationModal && verifyingEst && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 my-8">
+            <div className="bg-gradient-to-r from-brand-purple-dark to-brand-purple-deep px-6 py-5 flex items-center justify-between text-white text-left">
+              <div className="flex items-center gap-3">
+                <FileText className="w-6 h-6 text-brand-turquesa" />
+                <div>
+                  <h3 className="font-extrabold text-sm tracking-wide">Consignar Documentos de Verificación</h3>
+                  <p className="text-white/70 text-[10px] mt-0.5 font-bold">Valida legalmente tu establecimiento para la publicación oficial</p>
+                </div>
+              </div>
+              <button onClick={() => setShowVerificationModal(false)} className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors cursor-pointer">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmitVerificationDocs} className="p-6 space-y-4 text-left">
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 flex items-start gap-3">
+                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <p className="text-[10px] text-amber-800 font-semibold leading-relaxed">
+                  Establecimiento: <strong>{verifyingEst.name}</strong>. Al consignar tus recaudos mercantiles, el equipo legal de Hoteles de Venezuela auditorá la información y otorgará el sello oficial de garantía.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">RIF Comercial (J-XXXXXXXX-X) *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ej: J-12345678-9"
+                  value={verificationForm.rif}
+                  onChange={e => setVerificationForm(prev => ({ ...prev, rif: e.target.value }))}
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700 font-mono focus:outline-none focus:ring-2 focus:ring-brand-turquesa/20"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Razón Social / Nombre Legal *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ej: Inversiones Turísticas 2 Aguas, C.A."
+                  value={verificationForm.razon_social}
+                  onChange={e => setVerificationForm(prev => ({ ...prev, razon_social: e.target.value }))}
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-turquesa/20"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Nº Registro Turístico (RTN)</label>
+                  <input
+                    type="text"
+                    placeholder="Ej: RTN-09823"
+                    value={verificationForm.rtn_licencia}
+                    onChange={e => setVerificationForm(prev => ({ ...prev, rtn_licencia: e.target.value }))}
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Cédula del Rep. Legal *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ej: V-14234567"
+                    value={verificationForm.cedula_representante}
+                    onChange={e => setVerificationForm(prev => ({ ...prev, cedula_representante: e.target.value }))}
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Teléfono de Verificación Operativa *</label>
+                <input
+                  type="tel"
+                  required
+                  placeholder="Ej: +58 414 1234567"
+                  value={verificationForm.telefono_verificacion}
+                  onChange={e => setVerificationForm(prev => ({ ...prev, telefono_verificacion: e.target.value }))}
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Observaciones o Enlace de Documentación Digital (PDF / Drive)</label>
+                <textarea
+                  placeholder="Pegue aquí el enlace de Google Drive o Dropbox con la copia digital del RIF, Registro y Cédula..."
+                  value={verificationForm.document_notes}
+                  onChange={e => setVerificationForm(prev => ({ ...prev, document_notes: e.target.value }))}
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700 resize-none font-sans"
+                  rows={3}
+                />
+              </div>
+
               <div className="flex gap-3 pt-4 border-t border-gray-100">
-                <button type="button" onClick={() => setEditingRoomModalOpen(false)} className="flex-1 bg-white border border-gray-250 hover:bg-gray-50 text-gray-600 text-xs font-bold py-3.5 rounded-xl cursor-pointer">
+                <button type="button" onClick={() => setShowVerificationModal(false)} className="flex-1 bg-white border border-gray-250 hover:bg-gray-50 text-gray-600 text-xs font-bold py-3.5 rounded-xl cursor-pointer">
                   Cancelar
                 </button>
-                <button type="submit" className="flex-1 btn-magenta-gradient text-white text-xs font-bold py-3.5 rounded-xl cursor-pointer shadow-md uppercase">
-                  Guardar Cambios
+                <button type="submit" className="flex-1 btn-cyan-gradient text-white text-xs font-bold py-3.5 rounded-xl cursor-pointer shadow-md uppercase">
+                  Enviar Recaudos a Revisión
                 </button>
               </div>
             </form>
