@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "../lib/auth";
 import { supabase } from "../lib/supabase";
-import { 
-  Building2, Calendar, DollarSign, Users, Mail, 
-  Trash2, Check, X, Clock, ChevronRight, AlertCircle, 
-  CheckCircle2, Loader2, ShieldAlert, Send, ArrowLeft, 
+import {
+  Building2, Calendar, DollarSign, Users, Mail,
+  Trash2, Check, X, Clock, ChevronRight, AlertCircle,
+  CheckCircle2, Loader2, ShieldAlert, Send, ArrowLeft,
   Tag, Filter, Search, RefreshCw, BarChart3, TrendingUp,
   Inbox, HelpCircle, Map, FolderOpen, Edit2, FileText,
   Lightbulb, Settings, Plus, Key, ChevronDown, CheckCircle2 as CheckIcon
@@ -86,7 +86,7 @@ export function AdminPanel() {
 
   const [loadingData, setLoadingData] = useState(true);
   const [activeTab, setActiveTab] = useState<"resumen" | "aprobaciones" | "abandonadas" | "reservas" | "establecimientos" | "usuarios" | "categorias" | "destinos" | "configuracion">("resumen");
-  
+
   // Lists data
   const [establishments, setEstablishments] = useState<Establishment[]>([]);
   const [abandonedBookings, setAbandonedBookings] = useState<AbandonedBooking[]>([]);
@@ -99,7 +99,7 @@ export function AdminPanel() {
   // Modal forms states
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [categoryForm, setCategoryForm] = useState({ name: "", slug: "", icon: "FolderOpen" });
-  
+
   const [showDestinationModal, setShowDestinationModal] = useState(false);
   const [destinationForm, setDestinationForm] = useState({ name: "", slug: "", state: "", description: "" });
 
@@ -128,7 +128,7 @@ export function AdminPanel() {
   const fetchData = async () => {
     try {
       setLoadingData(true);
-      
+
       // 1. Fetch establishments
       const { data: estData, error: estErr } = await supabase
         .from("establishments")
@@ -197,7 +197,7 @@ export function AdminPanel() {
       const { count: promoCount } = await supabase
         .from("discount_codes")
         .select("id", { count: "exact", head: true });
-      
+
       const localDiscountsKey = "hdv_mock_discount_codes";
       const localDiscounts = JSON.parse(localStorage.getItem(localDiscountsKey) || "[]");
       setDiscountCodesCount((promoCount || 0) + localDiscounts.length);
@@ -207,7 +207,7 @@ export function AdminPanel() {
         .from("categories")
         .select("*")
         .order("name");
-      
+
       // Fallback categories if empty in db
       let finalCats = catData || [];
       const localCatsKey = "hdv_mock_categories";
@@ -229,7 +229,7 @@ export function AdminPanel() {
         .from("destinations")
         .select("*")
         .order("name");
-      
+
       let finalDests = destData || [];
       const localDestsKey = "hdv_mock_destinations";
       const localDests = JSON.parse(localStorage.getItem(localDestsKey) || "[]");
@@ -250,7 +250,7 @@ export function AdminPanel() {
         .from("profiles")
         .select("*")
         .order("created_at", { ascending: false });
-      
+
       let finalUsers = profilesData || [];
       const localUsersKey = "hdv_mock_users";
       const localUsers = JSON.parse(localStorage.getItem(localUsersKey) || "[]");
@@ -277,7 +277,7 @@ export function AdminPanel() {
     if (!authLoading) {
       const isOwnerAdmin = user?.email?.toLowerCase() === "hotelesdevenezuela77@gmail.com";
       const isRoleAdmin = profile?.role === "admin";
-      
+
       if (!user || (!isOwnerAdmin && !isRoleAdmin)) {
         // Redirect or block handled below in render
       } else {
@@ -331,7 +331,7 @@ export function AdminPanel() {
     try {
       setActionLoading(booking.id);
       const nowStr = new Date().toISOString();
-      
+
       // Try to update in database first
       const { error: dbError } = await supabase
         .from("abandoned_bookings")
@@ -344,14 +344,14 @@ export function AdminPanel() {
       const isMock = existingAb.some((b: any) => b.id === booking.id);
 
       if (isMock) {
-        const updatedAb = existingAb.map((b: any) => 
+        const updatedAb = existingAb.map((b: any) =>
           b.id === booking.id ? { ...b, recovery_email_sent_at: nowStr } : b
         );
         localStorage.setItem(localAbKey, JSON.stringify(updatedAb));
       } else if (dbError) {
         throw dbError;
       }
-      
+
       triggerToast(`📧 Correo enviado a ${booking.guest_email} (${booking.establishment_name})`);
       await fetchData();
     } catch (err) {
@@ -389,7 +389,7 @@ export function AdminPanel() {
 
       for (const booking of targetBookings) {
         const isMock = existingAb.some((b: any) => b.id === booking.id);
-        
+
         if (isMock) {
           existingAb.forEach((b: any) => {
             if (b.id === booking.id) {
@@ -404,7 +404,7 @@ export function AdminPanel() {
             .from("abandoned_bookings")
             .update({ recovery_email_sent_at: nowStr })
             .eq("id", booking.id);
-          
+
           if (!error) {
             successCount++;
             triggerToast(`📧 [Masivo] Correo simulado para ${booking.guest_email}`);
@@ -437,7 +437,7 @@ export function AdminPanel() {
         .from("categories")
         .insert([categoryForm]);
       if (!error) dbSuccess = true;
-    } catch (e) {}
+    } catch (e) { }
 
     if (!dbSuccess) {
       const localCatsKey = "hdv_mock_categories";
@@ -466,7 +466,7 @@ export function AdminPanel() {
         .from("destinations")
         .insert([destinationForm]);
       if (!error) dbSuccess = true;
-    } catch (e) {}
+    } catch (e) { }
 
     if (!dbSuccess) {
       const localDestsKey = "hdv_mock_destinations";
@@ -494,12 +494,12 @@ export function AdminPanel() {
         .update({ role: newRole })
         .eq("id", userId);
       if (!error) dbSuccess = true;
-    } catch(e){}
+    } catch (e) { }
 
     if (!dbSuccess) {
       const localUsersKey = "hdv_mock_users";
       const existingUsers = JSON.parse(localStorage.getItem(localUsersKey) || "[]");
-      const updatedUsers = existingUsers.map((u: any) => 
+      const updatedUsers = existingUsers.map((u: any) =>
         u.id === userId ? { ...u, role: newRole } : u
       );
       localStorage.setItem(localUsersKey, JSON.stringify(updatedUsers));
@@ -558,7 +558,7 @@ export function AdminPanel() {
   const totalRevenue = reservations
     .filter(r => r.status === "confirmed")
     .reduce((sum, r) => sum + (r.total_price || 0), 0);
-  
+
   const pendingApprovalsCount = establishments.filter(e => e.status === "pending").length;
   const abandonedCount = abandonedBookings.length;
 
@@ -638,29 +638,29 @@ export function AdminPanel() {
   // Filters logic
   const filteredEsts = establishments.filter(e => {
     const matchesFilter = estFilter === "all" || e.status === estFilter;
-    const matchesSearch = e.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          (e.categories?.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          (e.destinations?.name || "").toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (e.categories?.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (e.destinations?.name || "").toLowerCase().includes(searchQuery.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
   const filteredAbandoned = abandonedBookings.filter(b => {
     const isRecovered = b.recovery_email_sent_at !== null;
-    const matchesFilter = 
-      abandonedFilter === "all" || 
-      (abandonedFilter === "pending" && !isRecovered) || 
+    const matchesFilter =
+      abandonedFilter === "all" ||
+      (abandonedFilter === "pending" && !isRecovered) ||
       (abandonedFilter === "recovered" && isRecovered);
 
-    const matchesSearch = 
-      b.establishment_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      b.room_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    const matchesSearch =
+      b.establishment_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      b.room_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (b.guest_email?.toLowerCase() || "").includes(searchQuery.toLowerCase());
 
     return matchesFilter && matchesSearch;
   });
 
   const filteredReservations = reservations.filter(r => {
-    const matchesSearch = 
+    const matchesSearch =
       r.guest_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (r.guest_email?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
       (r.establishments?.name?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
@@ -670,8 +670,8 @@ export function AdminPanel() {
 
   const filteredUsers = users.filter(u => {
     return u.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-           (u.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-           u.role.toLowerCase().includes(searchQuery.toLowerCase());
+      (u.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.role.toLowerCase().includes(searchQuery.toLowerCase());
   });
 
   const mainTabsList = [
@@ -691,17 +691,16 @@ export function AdminPanel() {
       {/* Toast Notification Container */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2 max-w-sm w-full">
         {toasts.map(toast => (
-          <div 
-            key={toast.id} 
-            className={`border rounded-2xl p-4 shadow-lg flex items-start gap-3 bg-white animate-slide-in-right ${
-              toast.type === "error" ? "border-red-200 text-red-700" : 
+          <div
+            key={toast.id}
+            className={`border rounded-2xl p-4 shadow-lg flex items-start gap-3 bg-white animate-slide-in-right ${toast.type === "error" ? "border-red-200 text-red-700" :
               toast.type === "info" ? "border-cyan-200 text-cyan-700" :
-              "border-green-200 text-green-700"
-            }`}
+                "border-green-200 text-green-700"
+              }`}
           >
             {toast.type === "error" ? <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" /> :
-             toast.type === "info" ? <HelpCircle className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" /> :
-             <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />}
+              toast.type === "info" ? <HelpCircle className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" /> :
+                <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />}
             <div>
               <p className="text-xs font-bold leading-normal">{toast.message}</p>
             </div>
@@ -722,28 +721,28 @@ export function AdminPanel() {
                 <span className="flex items-center gap-1.5 shrink-0">
                   {/* USA Flag */}
                   <svg className="w-7 h-4.5 rounded-xs shadow-md inline-block object-cover border border-gray-200 align-middle" viewBox="0 0 7410 3900" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="7410" height="3900" fill="#b22234"/>
-                    <path d="M0,300h7410M0,900h7410M0,1500h7410M0,2100h7410M0,2700h7410M0,3300h7410" stroke="#fff" stroke-width="300"/>
-                    <rect width="2964" height="2100" fill="#3c3b6e"/>
+                    <rect width="7410" height="3900" fill="#b22234" />
+                    <path d="M0,300h7410M0,900h7410M0,1500h7410M0,2100h7410M0,2700h7410M0,3300h7410" stroke="#fff" stroke-width="300" />
+                    <rect width="2964" height="2100" fill="#3c3b6e" />
                     <g fill="#fff">
-                      <circle cx="296" cy="175" r="45"/><circle cx="889" cy="175" r="45"/><circle cx="1482" cy="175" r="45"/><circle cx="2075" cy="175" r="45"/><circle cx="2668" cy="175" r="45"/>
-                      <circle cx="593" cy="350" r="45"/><circle cx="1186" cy="350" r="45"/><circle cx="1778" cy="350" r="45"/><circle cx="2371" cy="350" r="45"/>
-                      <circle cx="296" cy="525" r="45"/><circle cx="889" cy="525" r="45"/><circle cx="1482" cy="525" r="45"/><circle cx="2075" cy="525" r="45"/><circle cx="2668" cy="525" r="45"/>
-                      <circle cx="593" cy="700" r="45"/><circle cx="1186" cy="700" r="45"/><circle cx="1778" cy="700" r="45"/><circle cx="2371" cy="700" r="45"/>
-                      <circle cx="296" cy="875" r="45"/><circle cx="889" cy="875" r="45"/><circle cx="1482" cy="875" r="45"/><circle cx="2075" cy="875" r="45"/><circle cx="2668" cy="875" r="45"/>
-                      <circle cx="593" cy="1050" r="45"/><circle cx="1186" cy="1050" r="45"/><circle cx="1778" cy="1050" r="45"/><circle cx="2371" cy="1050" r="45"/>
-                      <circle cx="296" cy="1225" r="45"/><circle cx="889" cy="1225" r="45"/><circle cx="1482" cy="1225" r="45"/><circle cx="2075" cy="1225" r="45"/><circle cx="2668" cy="1225" r="45"/>
-                      <circle cx="593" cy="1400" r="45"/><circle cx="1186" cy="1400" r="45"/><circle cx="1778" cy="1400" r="45"/><circle cx="2371" cy="1400" r="45"/>
-                      <circle cx="296" cy="1575" r="45"/><circle cx="889" cy="1575" r="45"/><circle cx="1482" cy="1575" r="45"/><circle cx="2075" cy="1575" r="45"/><circle cx="2668" cy="1575" r="45"/>
-                      <circle cx="593" cy="1750" r="45"/><circle cx="1186" cy="1750" r="45"/><circle cx="1778" cy="1750" r="45"/><circle cx="2371" cy="1750" r="45"/>
-                      <circle cx="296" cy="1925" r="45"/><circle cx="889" cy="1925" r="45"/><circle cx="1482" cy="1925" r="45"/><circle cx="2075" cy="1925" r="45"/><circle cx="2668" cy="1925" r="45"/>
+                      <circle cx="296" cy="175" r="45" /><circle cx="889" cy="175" r="45" /><circle cx="1482" cy="175" r="45" /><circle cx="2075" cy="175" r="45" /><circle cx="2668" cy="175" r="45" />
+                      <circle cx="593" cy="350" r="45" /><circle cx="1186" cy="350" r="45" /><circle cx="1778" cy="350" r="45" /><circle cx="2371" cy="350" r="45" />
+                      <circle cx="296" cy="525" r="45" /><circle cx="889" cy="525" r="45" /><circle cx="1482" cy="525" r="45" /><circle cx="2075" cy="525" r="45" /><circle cx="2668" cy="525" r="45" />
+                      <circle cx="593" cy="700" r="45" /><circle cx="1186" cy="700" r="45" /><circle cx="1778" cy="700" r="45" /><circle cx="2371" cy="700" r="45" />
+                      <circle cx="296" cy="875" r="45" /><circle cx="889" cy="875" r="45" /><circle cx="1482" cy="875" r="45" /><circle cx="2075" cy="875" r="45" /><circle cx="2668" cy="875" r="45" />
+                      <circle cx="593" cy="1050" r="45" /><circle cx="1186" cy="1050" r="45" /><circle cx="1778" cy="1050" r="45" /><circle cx="2371" cy="1050" r="45" />
+                      <circle cx="296" cy="1225" r="45" /><circle cx="889" cy="1225" r="45" /><circle cx="1482" cy="1225" r="45" /><circle cx="2075" cy="1225" r="45" /><circle cx="2668" cy="1225" r="45" />
+                      <circle cx="593" cy="1400" r="45" /><circle cx="1186" cy="1400" r="45" /><circle cx="1778" cy="1400" r="45" /><circle cx="2371" cy="1400" r="45" />
+                      <circle cx="296" cy="1575" r="45" /><circle cx="889" cy="1575" r="45" /><circle cx="1482" cy="1575" r="45" /><circle cx="2075" cy="1575" r="45" /><circle cx="2668" cy="1575" r="45" />
+                      <circle cx="593" cy="1750" r="45" /><circle cx="1186" cy="1750" r="45" /><circle cx="1778" cy="1750" r="45" /><circle cx="2371" cy="1750" r="45" />
+                      <circle cx="296" cy="1925" r="45" /><circle cx="889" cy="1925" r="45" /><circle cx="1482" cy="1925" r="45" /><circle cx="2075" cy="1925" r="45" /><circle cx="2668" cy="1925" r="45" />
                     </g>
                   </svg>
                   {/* Venezuela Flag */}
                   <svg className="w-7 h-4.5 rounded-xs shadow-md inline-block object-cover border border-gray-200 align-middle" viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="900" height="200" fill="#ffcc00"/>
-                    <rect y="200" width="900" height="200" fill="#00247d"/>
-                    <rect y="400" width="900" height="200" fill="#cf142b"/>
+                    <rect width="900" height="200" fill="#ffcc00" />
+                    <rect y="200" width="900" height="200" fill="#00247d" />
+                    <rect y="400" width="900" height="200" fill="#cf142b" />
                     <g fill="#fff" transform="translate(450, 310)">
                       <circle cx="-100" cy="20" r="10" />
                       <circle cx="-73" cy="-10" r="10" />
@@ -777,7 +776,7 @@ export function AdminPanel() {
       </header>
 
       <div className="max-w-7xl mx-auto px-6 mt-8">
-        
+
         {/* Submenu of pills (matching the user's screenshot exactly!) */}
         <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-8 shadow-xs flex flex-col gap-4">
           <div className="flex flex-wrap gap-2">
@@ -790,11 +789,10 @@ export function AdminPanel() {
                     setActiveTab(tab.id as any);
                     setSearchQuery("");
                   }}
-                  className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    active
-                      ? "bg-brand-magenta text-white font-black shadow-md shadow-brand-magenta/15 hover:opacity-95"
-                      : "text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-100"
-                  }`}
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${active
+                    ? "bg-brand-magenta text-white font-black shadow-md shadow-brand-magenta/15 hover:opacity-95"
+                    : "text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-100"
+                    }`}
                 >
                   <tab.icon className="w-3.5 h-3.5" />
                   <span>{tab.label}</span>
@@ -837,10 +835,10 @@ export function AdminPanel() {
         {/* 1. RESUMEN TAB */}
         {!loadingData && activeTab === "resumen" && (
           <div className="space-y-8">
-            
+
             {/* KPI Cards (Matches the original 6 cards!) */}
             <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
-              
+
               <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-xs">
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Establecimientos</span>
@@ -911,7 +909,7 @@ export function AdminPanel() {
 
             {/* Fused Advanced Charts (2 columns grid) */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              
+
               {/* Chart 1: Monthly Growth */}
               <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-xs">
                 <h3 className="text-xs font-black uppercase tracking-wider text-gray-400 mb-4 flex items-center gap-1.5">
@@ -922,12 +920,12 @@ export function AdminPanel() {
                   <AreaChart data={monthlyData} margin={{ top: 10, right: 30, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorEst" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#EC4899" stopOpacity={0.2}/>
-                        <stop offset="95%" stopColor="#EC4899" stopOpacity={0.0}/>
+                        <stop offset="5%" stopColor="#EC4899" stopOpacity={0.2} />
+                        <stop offset="95%" stopColor="#EC4899" stopOpacity={0.0} />
                       </linearGradient>
                       <linearGradient id="colorUsr" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#06B6D4" stopOpacity={0.2}/>
-                        <stop offset="95%" stopColor="#06B6D4" stopOpacity={0.0}/>
+                        <stop offset="5%" stopColor="#06B6D4" stopOpacity={0.2} />
+                        <stop offset="95%" stopColor="#06B6D4" stopOpacity={0.0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
@@ -1044,7 +1042,7 @@ export function AdminPanel() {
                     <TrendingUp className="w-4 h-4 text-brand-magenta" />
                     Rendimiento Comercial & Cupones
                   </h3>
-                  
+
                   <div className="space-y-4">
                     <div className="flex justify-between items-center text-xs">
                       <span className="font-bold text-gray-500">Ingresos Totales (Simulados)</span>
@@ -1124,14 +1122,14 @@ export function AdminPanel() {
                           Inspeccionar Ficha
                         </button>
                       </Link>
-                      <button 
+                      <button
                         onClick={() => handleRejectEstablishment(est.id)}
                         disabled={actionLoading === est.id}
                         className="bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 font-bold text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer disabled:opacity-50"
                       >
                         Rechazar
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleApproveEstablishment(est.id)}
                         disabled={actionLoading === est.id}
                         className="bg-brand-magenta text-white font-bold text-xs px-4 py-2.5 rounded-xl hover:opacity-90 transition-all cursor-pointer disabled:opacity-50"
@@ -1162,11 +1160,10 @@ export function AdminPanel() {
                     <button
                       key={opt.id}
                       onClick={() => setAbandonedFilter(opt.id as any)}
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold cursor-pointer transition-all ${
-                        abandonedFilter === opt.id 
-                          ? "bg-brand-magenta/10 text-brand-magenta border border-brand-magenta/20" 
-                          : "text-gray-500 hover:text-gray-700 bg-gray-50 border border-gray-100"
-                      }`}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold cursor-pointer transition-all ${abandonedFilter === opt.id
+                        ? "bg-brand-magenta/10 text-brand-magenta border border-brand-magenta/20"
+                        : "text-gray-500 hover:text-gray-700 bg-gray-50 border border-gray-100"
+                        }`}
                     >
                       {opt.label}
                     </button>
@@ -1329,11 +1326,10 @@ export function AdminPanel() {
                           <td className="p-4 text-gray-600 font-semibold">{new Date(res.check_out_date).toLocaleDateString("es-VE")}</td>
                           <td className="p-4 font-black text-brand-magenta">${res.total_price}</td>
                           <td className="p-4 pr-6">
-                            <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                              res.status === "confirmed" ? "bg-green-50 text-green-700 border border-green-200" :
+                            <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${res.status === "confirmed" ? "bg-green-50 text-green-700 border border-green-200" :
                               res.status === "cancelled" ? "bg-red-50 text-red-700 border border-red-200" :
-                              "bg-yellow-50 text-yellow-700 border border-yellow-200"
-                            }`}>
+                                "bg-yellow-50 text-yellow-700 border border-yellow-200"
+                              }`}>
                               {res.status === "confirmed" ? "Confirmado" : res.status === "cancelled" ? "Cancelado" : "Pendiente"}
                             </span>
                           </td>
@@ -1364,11 +1360,10 @@ export function AdminPanel() {
                     <button
                       key={opt.id}
                       onClick={() => setEstFilter(opt.id as any)}
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold cursor-pointer transition-all ${
-                        estFilter === opt.id 
-                          ? "bg-brand-magenta/10 text-brand-magenta border border-brand-magenta/20" 
-                          : "text-gray-500 hover:text-gray-700 bg-gray-50 border border-gray-100"
-                      }`}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold cursor-pointer transition-all ${estFilter === opt.id
+                        ? "bg-brand-magenta/10 text-brand-magenta border border-brand-magenta/20"
+                        : "text-gray-500 hover:text-gray-700 bg-gray-50 border border-gray-100"
+                        }`}
                     >
                       {opt.label}
                     </button>
@@ -1400,11 +1395,10 @@ export function AdminPanel() {
                         <td className="p-4 font-mono text-gray-400 text-[10px]">{est.owner_user_id}</td>
                         <td className="p-4 text-gray-500">{new Date(est.created_at).toLocaleDateString("es-VE")}</td>
                         <td className="p-4 pr-6">
-                          <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                            est.status === "approved" ? "bg-green-50 text-green-700 border border-green-200" :
+                          <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${est.status === "approved" ? "bg-green-50 text-green-700 border border-green-200" :
                             est.status === "rejected" ? "bg-red-50 text-red-700 border border-red-200" :
-                            "bg-yellow-50 text-yellow-700 border border-yellow-200"
-                          }`}>
+                              "bg-yellow-50 text-yellow-700 border border-yellow-200"
+                            }`}>
                             {est.status === "approved" ? "Aprobado" : est.status === "rejected" ? "Rechazado" : "Pendiente"}
                           </span>
                         </td>
@@ -1442,11 +1436,10 @@ export function AdminPanel() {
                         <td className="p-4 font-mono text-[10px] text-gray-400">{usr.id}</td>
                         <td className="p-4 text-gray-500">{new Date(usr.created_at).toLocaleDateString("es-VE")}</td>
                         <td className="p-4">
-                          <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                            usr.role === "admin" ? "bg-purple-50 text-purple-700 border border-purple-200" :
+                          <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${usr.role === "admin" ? "bg-purple-50 text-purple-700 border border-purple-200" :
                             usr.role === "business_owner" ? "bg-blue-50 text-blue-700 border border-blue-200" :
-                            "bg-gray-50 text-gray-600 border border-gray-200"
-                          }`}>
+                              "bg-gray-50 text-gray-600 border border-gray-200"
+                            }`}>
                             {usr.role === "admin" ? "Administrador" : usr.role === "business_owner" ? "Propietario" : "Usuario"}
                           </span>
                         </td>
@@ -1612,8 +1605,8 @@ export function AdminPanel() {
                   required
                   placeholder="Ej: Posadas Boutique"
                   value={categoryForm.name}
-                  onChange={e => setCategoryForm(prev => ({ 
-                    ...prev, 
+                  onChange={e => setCategoryForm(prev => ({
+                    ...prev,
                     name: e.target.value,
                     slug: e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "")
                   }))}
@@ -1691,8 +1684,8 @@ export function AdminPanel() {
                   required
                   placeholder="Ej: Isla de Coche"
                   value={destinationForm.name}
-                  onChange={e => setDestinationForm(prev => ({ 
-                    ...prev, 
+                  onChange={e => setDestinationForm(prev => ({
+                    ...prev,
                     name: e.target.value,
                     slug: e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "")
                   }))}

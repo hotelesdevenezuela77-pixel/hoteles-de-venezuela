@@ -67,11 +67,12 @@ export function Navbar() {
   const visibleLinks = NAV_LINKS.filter(link => {
     if (!link.settingKey) return true;
     const config = settings.find(s => {
-      const key = s.setting_key || s.settingKey;
+      const key = s?.setting_key || s?.settingKey || s?.key;
       return key && key.toUpperCase() === link.settingKey.toUpperCase();
     });
     if (!config) return true;
-    return config.setting_value !== "false";
+    const val = config.setting_value ?? config.settingValue ?? config.value;
+    return val !== "false" && val !== false && val !== "0" && String(val).toLowerCase() !== "false";
   });
 
 

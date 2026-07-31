@@ -236,7 +236,11 @@ function App() {
     }
   });
 
-  const isMaintenanceMode = settings.find(s => s.setting_key === "maintenance_mode" || s.settingKey === "maintenance_mode")?.setting_value === "true";
+  const maintenanceConfig = settings.find(s => {
+    const k = s?.setting_key || s?.settingKey || s?.key;
+    return k === "maintenance_mode";
+  });
+  const isMaintenanceMode = (maintenanceConfig?.setting_value ?? maintenanceConfig?.settingValue ?? maintenanceConfig?.value) === "true";
   const isBypassed = user?.email?.toLowerCase() === "hotelesdevenezuela77@gmail.com" || profile?.role === "admin";
   const isAdminRoute = location.startsWith("/admin") || location === "/hdv-acceso-llc2027" || location === "/login";
 

@@ -96,7 +96,7 @@ export function AdminConfig() {
   }, [user, profile, authLoading]);
 
   // Query to fetch settings
-  const { data: settings = [], isLoading: loadingSettings } = useQuery<Setting[]>({
+  const { data: settings = [], isLoading: loadingSettings } = useQuery<any[]>({
     queryKey: ["site-settings"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -107,22 +107,30 @@ export function AdminConfig() {
       const dbSettings = data || [];
       const dbMap = new Map<string, string>();
       dbSettings.forEach((s: any) => {
-        dbMap.set(s.setting_key, s.setting_value);
+        if (s.setting_key) {
+          dbMap.set(s.setting_key, s.setting_value);
+        }
       });
 
-      // Ensure all predefined keys in SETTING_LABELS exist in the returned array
-      const allKeys = Object.keys(SETTING_LABELS);
-      const result = allKeys.map(key => ({
+      const allKeysSet = new Set([
+        ...Object.keys(SETTING_LABELS),
+        ...MENU_SECTIONS.map(m => m.key)
+      ]);
+
+      const result: any[] = Array.from(allKeysSet).map(key => ({
         key,
-        value: dbMap.has(key) ? dbMap.get(key)! : ""
+        setting_key: key,
+        value: dbMap.has(key) ? dbMap.get(key)! : "",
+        setting_value: dbMap.has(key) ? dbMap.get(key)! : ""
       }));
 
-      // Add any other custom keys that are in the database but not in SETTING_LABELS
       dbSettings.forEach((s: any) => {
-        if (!SETTING_LABELS[s.setting_key]) {
+        if (s.setting_key && !allKeysSet.has(s.setting_key)) {
           result.push({
             key: s.setting_key,
-            value: s.setting_value
+            setting_key: s.setting_key,
+            value: s.setting_value,
+            setting_value: s.setting_value
           });
         }
       });
@@ -135,8 +143,12 @@ export function AdminConfig() {
     if (settings && settings.length > 0) {
       const vis: Record<string, boolean> = {};
       MENU_SECTIONS.forEach(item => {
-        const config = settings.find(s => s && s.key && s.key.toUpperCase() === item.key.toUpperCase());
-        vis[item.key] = config ? config.value !== "false" : true;
+        const config = settings.find(s => {
+          const k = s?.setting_key || s?.settingKey || s?.key;
+          return k && k.toUpperCase() === item.key.toUpperCase();
+        });
+        const val = config ? (config.setting_value ?? config.settingValue ?? config.value) : undefined;
+        vis[item.key] = val !== undefined ? (val !== "false" && val !== false && val !== "0") : true;
       });
       setLocalVisibilities(vis);
     }
