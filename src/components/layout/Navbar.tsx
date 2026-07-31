@@ -218,11 +218,11 @@ export function Navbar() {
                         <ShieldAlert className="w-3.5 h-3.5 text-brand-turquesa animate-pulse" /> Panel de Administración
                       </Link>
                     )}
-                    <Link href="/perfil" className="flex items-center gap-2 px-4 py-2 text-xs text-gray-700 hover:bg-pink-50 hover:text-brand-magenta transition-colors">
-                      <Heart className="w-3.5 h-3.5 text-brand-magenta" /> Mi Perfil / Favoritos
+                    <Link href="/mis-negocios" className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-brand-magenta hover:bg-pink-50 transition-colors">
+                      <Briefcase className="w-3.5 h-3.5 text-brand-magenta" /> Mis Establecimientos / Panel
                     </Link>
-                    <Link href="/mis-negocios" className="flex items-center gap-2 px-4 py-2 text-xs text-gray-700 hover:bg-pink-50 hover:text-brand-magenta transition-colors">
-                      <Briefcase className="w-3.5 h-3.5 text-brand-turquesa" /> Mis Establecimientos
+                    <Link href="/perfil?tab=perfil" className="flex items-center gap-2 px-4 py-2 text-xs text-gray-700 hover:bg-pink-50 hover:text-brand-magenta transition-colors">
+                      <User className="w-3.5 h-3.5 text-brand-turquesa" /> Mi Perfil & Seguridad
                     </Link>
                     <Link href="/andromeda" className="flex items-center gap-2 px-4 py-2 text-xs text-gray-700 hover:bg-pink-50 hover:text-brand-magenta transition-colors">
                       <Sparkles className="w-3.5 h-3.5 text-brand-purple" /> Panel Andromeda

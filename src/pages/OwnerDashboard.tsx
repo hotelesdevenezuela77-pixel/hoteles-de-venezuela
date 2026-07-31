@@ -5,7 +5,7 @@ import { supabase } from "../lib/supabase";
 import { 
   Building2, Clock, CheckCircle, XCircle, Plus, 
   MapPin, Loader2, MessageSquare, BarChart3, Calendar, 
-  DollarSign, Users, Trash2, X, Phone, Globe, Briefcase, 
+  DollarSign, Users, Trash2, X, Phone, Globe, Briefcase, User,
   Eye, Check, ListFilter, Tag, Sparkles, CalendarRange,
   Upload, Trash, FileText, ChevronRight, AlertCircle, RefreshCw,
   TrendingUp, Star, ShieldCheck, ArrowRight, Clipboard, Award, ShieldAlert
@@ -1262,7 +1262,14 @@ export function OwnerDashboard() {
             </p>
           </div>
           
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/perfil?tab=perfil"
+              className="bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-bold px-4 py-3 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer font-sans uppercase"
+            >
+              <User className="w-4 h-4 text-brand-turquesa" />
+              <span>Mi Perfil & Seguridad</span>
+            </Link>
             <button
               onClick={() => setShowAddModal(true)}
               className="btn-cyan-gradient text-xs font-bold px-6 py-3 rounded-xl flex items-center gap-1.5 shadow-md shadow-brand-turquesa/10 cursor-pointer active:scale-97 hover:scale-102 transition-all font-sans uppercase"
