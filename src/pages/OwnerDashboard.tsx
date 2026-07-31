@@ -247,6 +247,8 @@ export function OwnerDashboard() {
   const [rooms, setRooms] = useState<any[]>([]);
   const [loadingRooms, setLoadingRooms] = useState(false);
   const [newRoomModalOpen, setNewRoomModalOpen] = useState(false);
+  const [editingRoomModalOpen, setEditingRoomModalOpen] = useState(false);
+  const [editingRoomId, setEditingRoomId] = useState<number | null>(null);
   const [roomFormData, setRoomFormData] = useState({
     name: "",
     description: "",
@@ -254,7 +256,7 @@ export function OwnerDashboard() {
     price_per_night: 100,
     quantity: 5,
     amenities: "",
-    is_active: true,
+    is_active: false, // 4. Por defecto desactivado al crear
     room_number: ""
   });
   
@@ -702,10 +704,19 @@ export function OwnerDashboard() {
       if (!error && data && data.length > 0) {
         setRooms(data);
       } else {
+        // 2. Solo 1 sola unidad de ejemplo que no se pueda editar
         const mockRooms = [
-          { id: 101, name: "Habitación Matrimonial Standard", price_per_night: 80, capacity: 2, quantity: 5, description: "Habitación cómoda con cama matrimonial y baño privado.", amenities: "wifi,aire,tv", is_active: true },
-          { id: 102, name: "Suite Premium Vista al Mar", price_per_night: 150, capacity: 3, quantity: 3, description: "Espaciosa suite con balcón y hermosa vista al mar caribe.", amenities: "wifi,aire,tv,piscina,jacuzzi", is_active: true },
-          { id: 103, name: "Presidential Suite Familiar", price_per_night: 250, capacity: 6, quantity: 2, description: "La máxima comodidad para la familia con múltiples habitaciones.", amenities: "wifi,aire,tv,restaurante,jacuzzi", is_active: true }
+          { 
+            id: 101, 
+            name: "Habitación Matrimonial Standard", 
+            price_per_night: 80, 
+            capacity: 2, 
+            quantity: 5, 
+            description: "Habitación cómoda con cama matrimonial y baño privado (Unidad Demostrativa de Referencia).", 
+            amenities: "wifi,aire,tv", 
+            is_active: true,
+            is_example: true 
+          }
         ];
         setRooms(mockRooms);
       }
@@ -747,14 +758,13 @@ export function OwnerDashboard() {
         price_per_night: Number(roomFormData.price_per_night),
         quantity: Number(roomFormData.quantity),
         amenities: roomFormData.amenities,
-        is_active: roomFormData.is_active,
+        is_active: roomFormData.is_active, // 4. Desactivado por defecto
         room_number: roomFormData.room_number
       };
 
       const { data, error } = await supabase.from("rooms").insert([payload]).select();
       if (error) throw error;
       
-      alert("Tipología de Habitación creada con éxito en la base de datos.");
       setNewRoomModalOpen(false);
       setRoomFormData({
         name: "",
@@ -763,10 +773,12 @@ export function OwnerDashboard() {
         price_per_night: 100,
         quantity: 5,
         amenities: "",
-        is_active: true,
+        is_active: false,
         room_number: ""
       });
       fetchRooms(Number(selectedCalendarEst));
+      // 5. Notificación obligatoria al crear
+      alert("🎉 ¡Unidad Operativa creada con éxito! Recuerda activar la unidad OPERATIVA para que se refleje públicamente.");
     } catch (err) {
       console.warn("Error insertando habitación a Supabase, guardando localmente:", err);
       const newRoom = {
@@ -774,12 +786,77 @@ export function OwnerDashboard() {
         ...roomFormData,
         price_per_night: Number(roomFormData.price_per_night),
         capacity: Number(roomFormData.capacity),
-        quantity: Number(roomFormData.quantity)
+        quantity: Number(roomFormData.quantity),
+        is_example: false
       };
       setRooms(prev => [...prev, newRoom]);
       setNewRoomModalOpen(false);
-      alert("Habitación creada localmente con éxito.");
+      // 5. Notificación obligatoria al crear
+      alert("🎉 ¡Unidad Operativa creada con éxito! Recuerda activar la unidad OPERATIVA para que se refleje públicamente.");
     }
+  };
+
+  // 3. Abrir modal para Editar Unidad Operativa
+  const handleOpenEditRoomModal = (room: any) => {
+    if (room.is_example) {
+      alert("Esta es una unidad de ejemplo de solo lectura.");
+      return;
+    }
+    setEditingRoomId(room.id);
+    setRoomFormData({
+      name: room.name,
+      description: room.description || "",
+      capacity: room.capacity || 2,
+      price_per_night: room.price_per_night || 100,
+      quantity: room.quantity || 1,
+      amenities: room.amenities || "",
+      is_active: room.is_active ?? false,
+      room_number: room.room_number || ""
+    });
+    setEditingRoomModalOpen(true);
+  };
+
+  // 3. Guardar cambios de edición
+  const handleSaveEditRoom = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingRoomId) return;
+
+    const payload = {
+      name: roomFormData.name,
+      description: roomFormData.description,
+      capacity: Number(roomFormData.capacity),
+      price_per_night: Number(roomFormData.price_per_night),
+      quantity: Number(roomFormData.quantity),
+      amenities: roomFormData.amenities,
+      is_active: roomFormData.is_active,
+      room_number: roomFormData.room_number
+    };
+
+    try {
+      await supabase.from("rooms").update(payload).eq("id", editingRoomId);
+    } catch (err) {
+      console.warn("Error editando unidad en Supabase:", err);
+    }
+
+    setRooms(prev => prev.map(r => r.id === editingRoomId ? { ...r, ...payload } : r));
+    setEditingRoomModalOpen(false);
+    setEditingRoomId(null);
+    alert("🎉 Unidad Operativa actualizada correctamente.");
+  };
+
+  // 4. Alternar Activar / Desactivar Unidad
+  const handleToggleRoomActive = async (room: any) => {
+    if (room.is_example) {
+      alert("La unidad de ejemplo es de solo lectura.");
+      return;
+    }
+    const newStatus = !room.is_active;
+    try {
+      await supabase.from("rooms").update({ is_active: newStatus }).eq("id", room.id);
+    } catch (err) {
+      console.warn("Error cambiando estado activo:", err);
+    }
+    setRooms(prev => prev.map(r => r.id === room.id ? { ...r, is_active: newStatus } : r));
   };
 
   // Delete Room type handler
@@ -2019,46 +2096,87 @@ export function OwnerDashboard() {
         {/* INVENTARIO DE HABITACIONES TAB */}
         {activeTab === "inventario" && (
           <div className="space-y-6 text-left">
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="text-md font-black text-gray-800 tracking-tight font-serif">Tipologías y Catálogo de Habitaciones</h3>
-                <p className="text-xs text-gray-400 mt-1">Crea, edita y gestiona las especificaciones y galerías fotográficas por habitación.</p>
+            
+            {/* 5. Notificación obligatoria */}
+            <div className="bg-gradient-to-r from-[#00C8D4]/10 via-pink-500/10 to-purple-500/10 border border-[#00C8D4]/30 rounded-2xl p-4 flex items-center justify-between gap-4 shadow-xs">
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-[#00C8D4] text-white flex items-center justify-center shrink-0 font-bold shadow-md">
+                  <AlertCircle className="w-5 h-5 animate-pulse" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-black text-gray-800 uppercase tracking-wider">Aviso de Operatividad y Publicación</h4>
+                  <p className="text-xs font-extrabold text-brand-magenta mt-0.5">
+                    Recuerda activar la unidad OPERATIVA para que se refleje públicamente.
+                  </p>
+                </div>
               </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="text-md font-black text-gray-800 tracking-tight font-serif">Unidades Operativas y Catálogo de Habitaciones</h3>
+                <p className="text-xs text-gray-400 mt-1">Crea, activa/desactiva y gestiona las especificaciones y galerías fotográficas por unidad.</p>
+              </div>
+              {/* 1. Botón modificado a "+ Agregar Unidad Operativa" */}
               <button
-                onClick={() => setNewRoomModalOpen(true)}
-                className="btn-cyan-gradient text-xs font-bold px-5 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer uppercase font-sans tracking-wide"
+                onClick={() => {
+                  setRoomFormData({
+                    name: "",
+                    description: "",
+                    capacity: 2,
+                    price_per_night: 100,
+                    quantity: 5,
+                    amenities: "",
+                    is_active: false, // 4. Por defecto desactivado al crear
+                    room_number: ""
+                  });
+                  setNewRoomModalOpen(true);
+                }}
+                className="btn-cyan-gradient text-xs font-bold px-5 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer uppercase font-sans tracking-wide shadow-md hover:scale-102 transition-all shrink-0"
               >
                 <Plus className="w-4 h-4" />
-                <span>Agregar Tipología</span>
+                <span>+ Agregar Unidad Operativa</span>
               </button>
             </div>
 
             {loadingRooms ? (
               <div className="text-center py-20">
                 <Loader2 className="w-10 h-10 animate-spin text-brand-magenta mx-auto mb-2" />
-                <p className="text-xs text-gray-400 font-bold">Obteniendo tipologías de habitación...</p>
+                <p className="text-xs text-gray-400 font-bold">Obteniendo unidades operativas...</p>
               </div>
             ) : rooms.length === 0 ? (
               <div className="text-center py-20 bg-white border border-gray-200 rounded-3xl p-6">
                 <Building2 className="w-16 h-16 text-gray-200 mx-auto mb-3" />
-                <p className="text-xs text-gray-400">Aún no se han configurado habitaciones para este establecimiento.</p>
+                <p className="text-xs text-gray-400 font-bold">Aún no se han configurado unidades operativas para este establecimiento.</p>
               </div>
             ) : (
               <div className="space-y-8">
                 {rooms.map(room => {
                   const photos = roomPhotos[room.id] || [];
                   const isDragOver = dragActive[room.id] || false;
+                  const isExample = !!room.is_example;
+
                   return (
                     <div key={room.id} className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm grid grid-cols-1 lg:grid-cols-3 gap-8">
                       
                       {/* Room properties details */}
                       <div className="lg:col-span-1 space-y-4">
-                        <div className="flex justify-between items-start">
-                          <h4 className="font-black text-gray-800 text-lg leading-tight font-serif">{room.name}</h4>
-                          <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${room.is_active ? "bg-green-50 text-green-700 border border-green-100" : "bg-gray-50 text-gray-400 border border-gray-100"}`}>
-                            {room.is_active ? "Activo" : "Inactivo"}
+                        <div className="flex justify-between items-start gap-2">
+                          <div>
+                            <h4 className="font-black text-gray-800 text-lg leading-tight font-serif">{room.name}</h4>
+                            {isExample && (
+                              <span className="inline-block mt-1 text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-purple-100 text-purple-700 border border-purple-200">
+                                Unidad de Ejemplo (Solo Lectura)
+                              </span>
+                            )}
+                          </div>
+
+                          {/* 4. Estado de Activo o Desactivado */}
+                          <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider shrink-0 ${room.is_active ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-600 border border-red-200"}`}>
+                            {room.is_active ? "Activa" : "Desactivada"}
                           </span>
                         </div>
+
                         <p className="text-xs text-gray-500 font-medium leading-relaxed">{room.description}</p>
                         
                         <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-gray-600">
@@ -2097,14 +2215,55 @@ export function OwnerDashboard() {
                           </div>
                         )}
 
-                        <div className="pt-4 border-t border-gray-100 flex gap-2">
-                          <button
-                            onClick={() => handleDeleteRoom(room.id)}
-                            className="flex-1 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-red-200"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                            <span>Eliminar</span>
-                          </button>
+                        {/* Botones de acción según el tipo de unidad */}
+                        <div className="pt-4 border-t border-gray-100 flex flex-wrap gap-2">
+                          {!isExample ? (
+                            <>
+                              {/* 4. Botón Activar / Desactivar */}
+                              <button
+                                onClick={() => handleToggleRoomActive(room)}
+                                className={`flex-1 min-w-[120px] px-3 py-2.5 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer border ${
+                                  room.is_active
+                                    ? "bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-200"
+                                    : "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-300 shadow-xs"
+                                }`}
+                              >
+                                {room.is_active ? (
+                                  <>
+                                    <XCircle className="w-3.5 h-3.5" />
+                                    <span>Desactivar</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                                    <span>Activar Unidad</span>
+                                  </>
+                                )}
+                              </button>
+
+                              {/* 3. Botón Editar (Solo para unidades creadas por el propietario) */}
+                              <button
+                                onClick={() => handleOpenEditRoomModal(room)}
+                                className="px-3.5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-gray-200"
+                              >
+                                <FileText className="w-3.5 h-3.5 text-brand-turquesa" />
+                                <span>Editar</span>
+                              </button>
+
+                              {/* Botón Eliminar */}
+                              <button
+                                onClick={() => handleDeleteRoom(room.id)}
+                                className="px-3 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-red-200"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                <span>Eliminar</span>
+                              </button>
+                            </>
+                          ) : (
+                            <span className="text-[10px] text-gray-400 font-bold italic py-2">
+                              📌 2. Unidad de Ejemplo (Solo Lectura - Inmutable).
+                            </span>
+                          )}
                         </div>
                       </div>
 
@@ -2757,7 +2916,7 @@ export function OwnerDashboard() {
         </div>
       )}
 
-      {/* Add Room Modal */}
+      {/* Add Room Modal / Agregar Unidad Operativa */}
       {newRoomModalOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 my-8">
@@ -2765,8 +2924,8 @@ export function OwnerDashboard() {
               <div className="flex items-center gap-3">
                 <Building2 className="w-6 h-6 text-brand-magenta" />
                 <div>
-                  <h3 className="font-extrabold text-sm tracking-wide">Crear Tipología de Habitación</h3>
-                  <p className="text-white/70 text-[10px] mt-0.5 font-bold">Añade especificaciones del tipo de habitación en base de datos</p>
+                  <h3 className="font-extrabold text-sm tracking-wide">Agregar Nueva Unidad Operativa</h3>
+                  <p className="text-white/70 text-[10px] mt-0.5 font-bold">Configura las especificaciones de la nueva unidad operativa</p>
                 </div>
               </div>
               <button onClick={() => setNewRoomModalOpen(false)} className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors cursor-pointer">
@@ -2776,7 +2935,7 @@ export function OwnerDashboard() {
 
             <form onSubmit={handleCreateRoom} className="p-6 space-y-4 text-left">
               <div>
-                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Nombre de la Habitación *</label>
+                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Nombre de la Unidad / Habitación *</label>
                 <input
                   type="text"
                   required
@@ -2845,8 +3004,8 @@ export function OwnerDashboard() {
               </div>
 
               <div>
-                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-2 font-bold font-bold">Servicios y Amenities (Estilo Booking.com)</label>
-                <div className="space-y-4 max-h-60 overflow-y-auto p-4 bg-gray-50 border border-gray-150 rounded-2xl">
+                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-2 font-bold font-bold">Servicios y Amenities</label>
+                <div className="space-y-4 max-h-48 overflow-y-auto p-4 bg-gray-50 border border-gray-150 rounded-2xl">
                   {ROOM_AMENITIES_CATEGORIES.map(cat => (
                     <div key={cat.id} className="space-y-1.5">
                       <span className="text-[10px] font-black text-brand-turquesa uppercase tracking-wider block">{cat.label}</span>
@@ -2871,12 +3030,143 @@ export function OwnerDashboard() {
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-6 border-t border-gray-100">
+              {/* 4. Notificación y toggle de estado de activación inicial */}
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 flex items-center justify-between gap-3">
+                <div className="text-left">
+                  <span className="text-[10px] font-black text-amber-900 uppercase block">Estado Inicial: {roomFormData.is_active ? "Activa" : "Desactivada (Recomendado)"}</span>
+                  <span className="text-[9px] text-amber-700 block font-semibold">Recuerda activar la unidad para hacerla pública.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setRoomFormData(prev => ({ ...prev, is_active: !prev.is_active }))}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase transition-all cursor-pointer ${
+                    roomFormData.is_active
+                      ? "bg-green-600 text-white"
+                      : "bg-gray-200 text-gray-700"
+                  }`}
+                >
+                  {roomFormData.is_active ? "Activa" : "Desactivada"}
+                </button>
+              </div>
+
+              <div className="flex gap-3 pt-4 border-t border-gray-100">
                 <button type="button" onClick={() => setNewRoomModalOpen(false)} className="flex-1 bg-white border border-gray-250 hover:bg-gray-50 text-gray-600 text-xs font-bold py-3.5 rounded-xl cursor-pointer">
                   Cancelar
                 </button>
-                <button type="submit" className="flex-1 bg-gradient-to-r from-brand-purple-dark to-brand-purple-deep text-white text-xs font-bold py-3.5 rounded-xl cursor-pointer shadow-md">
-                  Crear Habitación
+                <button type="submit" className="flex-1 btn-cyan-gradient text-white text-xs font-bold py-3.5 rounded-xl cursor-pointer shadow-md uppercase">
+                  Crear Unidad Operativa
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 3. Modal Editar Unidad Operativa */}
+      {editingRoomModalOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 my-8">
+            <div className="bg-gradient-to-r from-brand-purple-dark to-brand-purple-deep px-6 py-5 flex items-center justify-between text-white text-left">
+              <div className="flex items-center gap-3">
+                <FileText className="w-6 h-6 text-brand-turquesa" />
+                <div>
+                  <h3 className="font-extrabold text-sm tracking-wide">Editar Unidad Operativa</h3>
+                  <p className="text-white/70 text-[10px] mt-0.5 font-bold">Modifica las tarifas, capacidades y detalles de esta unidad</p>
+                </div>
+              </div>
+              <button onClick={() => setEditingRoomModalOpen(false)} className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors cursor-pointer">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEditRoom} className="p-6 space-y-4 text-left">
+              <div>
+                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Nombre de la Unidad *</label>
+                <input
+                  type="text"
+                  required
+                  value={roomFormData.name}
+                  onChange={e => setRoomFormData(prev => ({ ...prev, name: e.target.value }))}
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-turquesa/20"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Precio Noche (USD) *</label>
+                  <input
+                    type="number"
+                    required
+                    value={roomFormData.price_per_night}
+                    onChange={e => setRoomFormData(prev => ({ ...prev, price_per_night: Number(e.target.value) }))}
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Capacidad Máxima *</label>
+                  <input
+                    type="number"
+                    required
+                    value={roomFormData.capacity}
+                    onChange={e => setRoomFormData(prev => ({ ...prev, capacity: Number(e.target.value) }))}
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Cantidad Total *</label>
+                  <input
+                    type="number"
+                    required
+                    value={roomFormData.quantity}
+                    onChange={e => setRoomFormData(prev => ({ ...prev, quantity: Number(e.target.value) }))}
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Código / Números</label>
+                  <input
+                    type="text"
+                    value={roomFormData.room_number}
+                    onChange={e => setRoomFormData(prev => ({ ...prev, room_number: e.target.value }))}
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Descripción Corta</label>
+                <textarea
+                  value={roomFormData.description}
+                  onChange={e => setRoomFormData(prev => ({ ...prev, description: e.target.value }))}
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700 resize-none font-sans"
+                  rows={3}
+                />
+              </div>
+
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 flex items-center justify-between gap-3">
+                <div className="text-left">
+                  <span className="text-[10px] font-black text-slate-800 uppercase block">Estado de Publicación: {roomFormData.is_active ? "Activa" : "Desactivada"}</span>
+                  <span className="text-[9px] text-slate-500 block font-semibold">Las unidades activas son visibles públicamente.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setRoomFormData(prev => ({ ...prev, is_active: !prev.is_active }))}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase transition-all cursor-pointer ${
+                    roomFormData.is_active
+                      ? "bg-green-600 text-white"
+                      : "bg-gray-300 text-gray-700"
+                  }`}
+                >
+                  {roomFormData.is_active ? "Activa" : "Desactivada"}
+                </button>
+              </div>
+
+              <div className="flex gap-3 pt-4 border-t border-gray-100">
+                <button type="button" onClick={() => setEditingRoomModalOpen(false)} className="flex-1 bg-white border border-gray-250 hover:bg-gray-50 text-gray-600 text-xs font-bold py-3.5 rounded-xl cursor-pointer">
+                  Cancelar
+                </button>
+                <button type="submit" className="flex-1 btn-magenta-gradient text-white text-xs font-bold py-3.5 rounded-xl cursor-pointer shadow-md uppercase">
+                  Guardar Cambios
                 </button>
               </div>
             </form>
