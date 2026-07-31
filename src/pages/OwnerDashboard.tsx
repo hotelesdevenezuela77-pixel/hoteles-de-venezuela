@@ -20,7 +20,7 @@ interface Establishment {
   id: number;
   name: string;
   slug: string;
-  status: "pending" | "approved" | "rejected";
+  status: "pending" | "approved" | "rejected" | "under_review" | string;
   category_name?: string;
   category_id?: number;
   destination_name?: string;
@@ -37,6 +37,12 @@ interface Establishment {
   services?: string;
   membership_tier?: string;
   is_circuito_excelencia?: boolean;
+  rif?: string;
+  razon_social?: string;
+  rtn_licencia?: string;
+  cedula_representante?: string;
+  telefono_verificacion?: string;
+  document_notes?: string;
 }
 
 interface Reservation {
@@ -3308,6 +3314,18 @@ export function OwnerDashboard() {
                   {roomFormData.is_active ? "Activa" : "Desactivada"}
                 </button>
               </div>
+              <div className="flex gap-3 pt-4 border-t border-gray-100">
+                <button type="button" onClick={() => setEditingRoomModalOpen(false)} className="flex-1 bg-white border border-gray-250 hover:bg-gray-50 text-gray-600 text-xs font-bold py-3.5 rounded-xl cursor-pointer">
+                  Cancelar
+                </button>
+                <button type="submit" className="flex-1 btn-magenta-gradient text-white text-xs font-bold py-3.5 rounded-xl cursor-pointer shadow-md uppercase">
+                  Guardar Cambios
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Document Consignment & Verification Modal */}
       {showVerificationModal && verifyingEst && (

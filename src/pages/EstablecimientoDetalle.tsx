@@ -242,13 +242,14 @@ export function EstablecimientoDetalle() {
 
         // 3. Fallback to static ESTABLISHMENTS_MOCK
         if (!dbData) {
-          const staticFound = ESTABLISHMENTS_MOCK.find(e => e.slug === slug);
+          const staticFound = ESTABLISHMENTS_MOCK.find((e: any) => e.slug === slug);
           if (staticFound) {
+            const sf = staticFound as any;
             dbData = {
-              ...staticFound,
-              categories: { name: staticFound.category, slug: staticFound.category.toLowerCase() },
-              destinations: { name: staticFound.destination, slug: staticFound.destination.toLowerCase() },
-              establishment_images: [{ image_url: staticFound.image, is_primary: true }]
+              ...sf,
+              categories: { name: sf.category || sf.category_name || "Posadas", slug: (sf.category || "posadas").toLowerCase() },
+              destinations: { name: sf.destination || sf.destination_name || "Venezuela", slug: (sf.destination || "venezuela").toLowerCase() },
+              establishment_images: [{ image_url: sf.image || sf.primary_image || "", is_primary: true }]
             };
           }
         }

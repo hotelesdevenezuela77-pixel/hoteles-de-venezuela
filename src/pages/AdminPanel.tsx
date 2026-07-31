@@ -16,13 +16,19 @@ interface Establishment {
   id: number;
   name: string;
   slug: string;
-  status: "pending" | "approved" | "rejected";
+  status: "pending" | "approved" | "rejected" | "under_review" | string;
   created_at: string;
   owner_user_id: string;
   categories?: { name: string };
   destinations?: { name: string };
   category_name?: string;
   destination_name?: string;
+  rif?: string;
+  razon_social?: string;
+  rtn_licencia?: string;
+  cedula_representante?: string;
+  telefono_verificacion?: string;
+  document_notes?: string;
 }
 
 interface AbandonedBooking {

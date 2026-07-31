@@ -11,7 +11,7 @@ interface Establishment {
   id: number;
   name: string;
   slug: string;
-  status: "pending" | "approved" | "rejected";
+  status: "pending" | "approved" | "rejected" | "under_review" | string;
   category_name?: string;
   category_id?: number;
   destination_name?: string;
