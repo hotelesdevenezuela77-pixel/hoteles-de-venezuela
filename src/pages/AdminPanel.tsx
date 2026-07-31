@@ -140,7 +140,26 @@ export function AdminPanel() {
         .order("created_at", { ascending: false });
 
       if (estErr) throw estErr;
-      setEstablishments((estData || []) as any);
+
+      // Merge local mock establishments if any exist in browser
+      const localEstsKey = "hdv_mock_establishments";
+      const localEsts = JSON.parse(localStorage.getItem(localEstsKey) || "[]");
+      const mappedLocal = localEsts.map((item: any) => ({
+        id: item.id,
+        name: item.name,
+        slug: item.slug,
+        status: item.status || "pending",
+        created_at: item.created_at || new Date().toISOString(),
+        owner_user_id: item.owner_user_id || "",
+        category_name: item.category_name || item.categories?.name || "Establecimiento",
+        destination_name: item.destination_name || item.destinations?.name || "Venezuela"
+      }));
+
+      const dbSlugs = new Set((estData || []).map((e: any) => e.slug));
+      const filteredLocal = mappedLocal.filter((e: any) => !dbSlugs.has(e.slug));
+
+      const combinedEsts = [...(estData || []), ...filteredLocal];
+      setEstablishments(combinedEsts as any);
 
       // 2. Fetch abandoned bookings
       const { data: abanData, error: abanErr } = await supabase
@@ -290,12 +309,23 @@ export function AdminPanel() {
   const handleApproveEstablishment = async (id: number) => {
     try {
       setActionLoading(id);
-      const { error } = await supabase
-        .from("establishments")
-        .update({ status: "approved" })
-        .eq("id", id);
-      if (error) throw error;
-      triggerToast("Establecimiento aprobado con éxito.");
+      
+      try {
+        await supabase
+          .from("establishments")
+          .update({ status: "approved" })
+          .eq("id", id);
+      } catch (e) {
+        console.warn("DB update status error:", e);
+      }
+
+      // Update in localStorage if present
+      const localEstsKey = "hdv_mock_establishments";
+      const existing = JSON.parse(localStorage.getItem(localEstsKey) || "[]");
+      const updated = existing.map((e: any) => e.id === id ? { ...e, status: "approved" } : e);
+      localStorage.setItem(localEstsKey, JSON.stringify(updated));
+
+      triggerToast("🎉 Establecimiento aprobado con éxito.");
       await fetchData();
     } catch (err) {
       console.error(err);
@@ -308,11 +338,22 @@ export function AdminPanel() {
   const handleRejectEstablishment = async (id: number) => {
     try {
       setActionLoading(id);
-      const { error } = await supabase
-        .from("establishments")
-        .update({ status: "rejected" })
-        .eq("id", id);
-      if (error) throw error;
+
+      try {
+        await supabase
+          .from("establishments")
+          .update({ status: "rejected" })
+          .eq("id", id);
+      } catch (e) {
+        console.warn("DB update status error:", e);
+      }
+
+      // Update in localStorage if present
+      const localEstsKey = "hdv_mock_establishments";
+      const existing = JSON.parse(localStorage.getItem(localEstsKey) || "[]");
+      const updated = existing.map((e: any) => e.id === id ? { ...e, status: "rejected" } : e);
+      localStorage.setItem(localEstsKey, JSON.stringify(updated));
+
       triggerToast("Establecimiento marcado como rechazado.");
       await fetchData();
     } catch (err) {

@@ -137,6 +137,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             `Inicio de sesión exitoso. Proveedor: ${session.user.app_metadata?.provider || "OAuth"}.`
           );
         }
+        // Auto-sync any pending local establishments to DB now that RLS is enabled
+        syncPendingLocalEstablishments(session.user.id);
       } else {
         setUser(null);
         setProfile(null);
@@ -146,6 +148,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Sync pending establishments created locally during offline/RLS fallback
+  const syncPendingLocalEstablishments = async (userId: string) => {
+    if (typeof window === "undefined") return;
+    const localEstsKey = "hdv_mock_establishments";
+    const localEsts = JSON.parse(localStorage.getItem(localEstsKey) || "[]");
+    if (!localEsts || localEsts.length === 0) return;
+
+    const remainingLocal: any[] = [];
+
+    for (const est of localEsts) {
+      try {
+        const payload = {
+          name: est.name,
+          slug: est.slug || est.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, ""),
+          description: est.description || "",
+          address: est.address || "",
+          phone: est.phone || "",
+          whatsapp: est.whatsapp || "",
+          website: est.website || "",
+          price_level: est.price_level || "$$",
+          category_id: est.category_id || 1,
+          destination_id: est.destination_id || 1,
+          services: typeof est.services === "string" ? est.services : JSON.stringify(est.services || []),
+          status: est.status || "pending",
+          owner_user_id: est.owner_user_id || userId,
+          has_reservations_enabled: false
+        };
+
+        const { data, error } = await supabase
+          .from("establishments")
+          .insert([payload])
+          .select();
+
+        if (error) {
+          console.warn("Could not sync local establishment to DB:", error.message);
+          remainingLocal.push(est);
+        } else {
+          console.log("Successfully synced local establishment to Supabase DB:", data);
+        }
+      } catch (err) {
+        remainingLocal.push(est);
+      }
+    }
+
+    localStorage.setItem(localEstsKey, JSON.stringify(remainingLocal));
+  };
 
   // Función de Login
   const login = async (email: string, password: string) => {
