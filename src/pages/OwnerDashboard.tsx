@@ -701,8 +701,17 @@ export function OwnerDashboard() {
         .select("*")
         .eq("establishment_id", estId);
       
-      if (!error && data && data.length > 0) {
-        setRooms(data);
+      const dbRooms = (!error && data) ? data : [];
+
+      // Combine with local rooms in localStorage
+      const localRoomsKey = "hdv_custom_rooms";
+      const localRooms = JSON.parse(localStorage.getItem(localRoomsKey) || "[]")
+        .filter((r: any) => Number(r.establishment_id) === Number(estId));
+
+      const combined = [...dbRooms, ...localRooms];
+
+      if (combined.length > 0) {
+        setRooms(combined);
       } else {
         // 2. Solo 1 sola unidad de ejemplo que no se pueda editar
         const mockRooms = [
@@ -762,9 +771,29 @@ export function OwnerDashboard() {
         room_number: roomFormData.room_number
       };
 
-      const { data, error } = await supabase.from("rooms").insert([payload]).select();
-      if (error) throw error;
-      
+      let insertedRoom = null;
+      try {
+        const { data, error } = await supabase.from("rooms").insert([payload]).select();
+        if (!error && data && data.length > 0) {
+          insertedRoom = data[0];
+        }
+      } catch (err) {
+        console.warn("Supabase room insert error, saving to local custom rooms:", err);
+      }
+
+      if (!insertedRoom) {
+        insertedRoom = {
+          id: Date.now(),
+          ...payload,
+          is_example: false
+        };
+      }
+
+      // Persist locally so it never disappears on area/tab change
+      const localRoomsKey = "hdv_custom_rooms";
+      const existing = JSON.parse(localStorage.getItem(localRoomsKey) || "[]");
+      localStorage.setItem(localRoomsKey, JSON.stringify([insertedRoom, ...existing]));
+
       setNewRoomModalOpen(false);
       setRoomFormData({
         name: "",
@@ -776,23 +805,12 @@ export function OwnerDashboard() {
         is_active: false,
         room_number: ""
       });
+
       fetchRooms(Number(selectedCalendarEst));
       // 5. Notificación obligatoria al crear
       alert("🎉 ¡Unidad Operativa creada con éxito! Recuerda activar la unidad OPERATIVA para que se refleje públicamente.");
     } catch (err) {
-      console.warn("Error insertando habitación a Supabase, guardando localmente:", err);
-      const newRoom = {
-        id: Math.floor(Math.random() * 9999) + 200,
-        ...roomFormData,
-        price_per_night: Number(roomFormData.price_per_night),
-        capacity: Number(roomFormData.capacity),
-        quantity: Number(roomFormData.quantity),
-        is_example: false
-      };
-      setRooms(prev => [...prev, newRoom]);
-      setNewRoomModalOpen(false);
-      // 5. Notificación obligatoria al crear
-      alert("🎉 ¡Unidad Operativa creada con éxito! Recuerda activar la unidad OPERATIVA para que se refleje públicamente.");
+      console.warn("Error creando habitación:", err);
     }
   };
 
@@ -838,6 +856,12 @@ export function OwnerDashboard() {
       console.warn("Error editando unidad en Supabase:", err);
     }
 
+    // Persist edits locally
+    const localRoomsKey = "hdv_custom_rooms";
+    const existing = JSON.parse(localStorage.getItem(localRoomsKey) || "[]");
+    const updated = existing.map((r: any) => r.id === editingRoomId ? { ...r, ...payload } : r);
+    localStorage.setItem(localRoomsKey, JSON.stringify(updated));
+
     setRooms(prev => prev.map(r => r.id === editingRoomId ? { ...r, ...payload } : r));
     setEditingRoomModalOpen(false);
     setEditingRoomId(null);
@@ -856,6 +880,13 @@ export function OwnerDashboard() {
     } catch (err) {
       console.warn("Error cambiando estado activo:", err);
     }
+
+    // Persist toggle status locally
+    const localRoomsKey = "hdv_custom_rooms";
+    const existing = JSON.parse(localStorage.getItem(localRoomsKey) || "[]");
+    const updated = existing.map((r: any) => r.id === room.id ? { ...r, is_active: newStatus } : r);
+    localStorage.setItem(localRoomsKey, JSON.stringify(updated));
+
     setRooms(prev => prev.map(r => r.id === room.id ? { ...r, is_active: newStatus } : r));
   };
 
@@ -863,14 +894,20 @@ export function OwnerDashboard() {
   const handleDeleteRoom = async (id: number) => {
     if (!confirm("¿Estás seguro de que deseas eliminar este tipo de habitación?")) return;
     try {
-      const { error } = await supabase.from("rooms").delete().eq("id", id);
-      if (error) throw error;
-      alert("Habitación eliminada correctamente.");
-      fetchRooms(Number(selectedCalendarEst));
+      await supabase.from("rooms").delete().eq("id", id);
     } catch (err) {
       console.warn("DB delete failed, filtering local state:", err);
-      setRooms(prev => prev.filter(r => r.id !== id));
     }
+
+    // Delete from localStorage as well
+    const localRoomsKey = "hdv_custom_rooms";
+    const existing = JSON.parse(localStorage.getItem(localRoomsKey) || "[]");
+    localStorage.setItem(localRoomsKey, JSON.stringify(existing.filter((r: any) => r.id !== id)));
+
+    if (selectedCalendarEst) {
+      fetchRooms(Number(selectedCalendarEst));
+    }
+    alert("Habitación eliminada correctamente.");
   };
 
   // Drag & Drop Image Handlers
