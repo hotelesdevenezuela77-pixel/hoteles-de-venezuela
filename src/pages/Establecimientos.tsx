@@ -294,7 +294,7 @@ export function Establecimientos() {
 
         if (error) throw error;
 
-        if (data) {
+        if (data && data.length > 0) {
           const mapped: Establishment[] = data.map((item: any) => {
             const primaryImg = item.establishment_images?.find((img: any) => img.is_primary)?.image_url 
               || item.establishment_images?.[0]?.image_url 
@@ -326,9 +326,12 @@ export function Establecimientos() {
             };
           });
           setEstablishments(mapped);
+        } else {
+          setEstablishments(ESTABLISHMENTS_MOCK);
         }
       } catch (err) {
-        console.warn("Error consultando Supabase para establecimientos en segundo plano:", err);
+        console.warn("Error consultando Supabase para establecimientos, usando datos de demostración:", err);
+        setEstablishments(ESTABLISHMENTS_MOCK);
       } finally {
         setLoading(false);
       }

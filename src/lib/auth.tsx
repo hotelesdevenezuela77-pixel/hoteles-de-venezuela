@@ -219,9 +219,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Función de Logout
   const logout = async () => {
     localStorage.removeItem("hdv_admin_bypass");
-    await supabase.auth.signOut();
+    localStorage.removeItem("hdv_impersonate_owner_user_id");
+    localStorage.removeItem("hdv_impersonate_owner_user_name");
+    localStorage.removeItem("hdv_impersonate_establishment_id");
     setUser(null);
     setProfile(null);
+    setLoading(false);
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.warn("Advertencia al cerrar sesión en Supabase:", err);
+    }
   };
 
   // Función de Login con Google OAuth

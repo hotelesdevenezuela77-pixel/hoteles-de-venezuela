@@ -171,8 +171,10 @@ export function AndromedaPanel() {
   useEffect(() => {
     if (user) {
       fetchData();
+    } else if (!authLoading) {
+      setLoading(false);
     }
-  }, [user]);
+  }, [user, authLoading]);
 
   // Request withdrawal payout
   const handleWithdrawSubmit = async (e: React.FormEvent) => {

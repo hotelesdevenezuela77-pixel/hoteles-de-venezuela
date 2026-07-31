@@ -678,8 +678,10 @@ export function OwnerDashboard() {
   useEffect(() => {
     if (activeOwnerId) {
       fetchDashboardData();
+    } else if (!authLoading) {
+      setLoading(false);
     }
-  }, [activeOwnerId]);
+  }, [activeOwnerId, authLoading]);
 
   // Fetch Rooms
   const fetchRooms = async (estId: number) => {
@@ -1174,6 +1176,10 @@ export function OwnerDashboard() {
         );
     }
   };
+
+  if (!authLoading && !user) {
+    return null;
+  }
 
   if (authLoading || loading) {
     return (
