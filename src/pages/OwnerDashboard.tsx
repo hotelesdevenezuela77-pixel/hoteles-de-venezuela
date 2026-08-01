@@ -15,6 +15,7 @@ import { AmenitiesSelector } from "@/components/admin/AmenitiesSelector";
 import { AvailabilityCalendar } from "../components/AvailabilityCalendar";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area, Legend } from "recharts";
 import { jsPDF } from "jspdf";
+import { ConstellationBackground } from "../components/ConstellationBackground";
 
 interface Establishment {
   id: number;
@@ -1478,39 +1479,110 @@ export function OwnerDashboard() {
       )}
       
       {/* Header Banner - Full Bleed */}
-      <div className="relative overflow-hidden py-16 bg-gradient-to-br from-[#1a0533] via-[#0e011f] to-black text-white w-full">
-        <div className="absolute top-0 left-1/4 w-[500px] h-[300px] bg-[#FF0096]/10 rounded-full blur-[120px] pointer-events-none"></div>
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[300px] bg-[#00C8D4]/10 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="relative overflow-hidden py-10 bg-gradient-to-br from-[#1a0533] via-[#0e011f] to-black text-white w-full">
+        {/* Interactive Constellation Mesh Animated Background */}
+        <ConstellationBackground />
 
-        <div className="max-w-7xl mx-auto px-6 relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black bg-[#FF0096]/20 text-[#FF0096] border border-[#FF0096]/30 mb-2 tracking-widest uppercase">
-              <Briefcase className="w-3.5 h-3.5" />
-              <span>Portal de Socios Hoteleros</span>
-            </span>
-            <h1 className="text-3xl md:text-4xl font-serif font-black tracking-tight">
-              Panel de Control Ejecutivo
-            </h1>
-            <p className="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
-              Administra tarifas, inventario de habitaciones, facturas de membresía y comunicación directa de leads para tu cartera comercial.
-            </p>
+        {/* Ambient Glows */}
+        <div className="absolute top-0 left-1/4 w-[500px] h-[300px] bg-[#FF0096]/15 rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[300px] bg-[#00C8D4]/15 rounded-full blur-[120px] pointer-events-none"></div>
+
+        <div className="max-w-7xl mx-auto px-6 relative z-10 flex flex-col gap-6">
+          {/* Top Brand Title: PANEL ADMINISTRATIVO DE HOTELES DE VENEZUELA LLC */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5">
+            <div>
+              <div className="flex items-center gap-3 mb-1">
+                <div className="w-8 h-8 rounded-lg bg-[#00C8D4]/20 border border-[#00C8D4]/40 flex items-center justify-center text-[#00C8D4] shrink-0">
+                  <BarChart3 className="w-4 h-4" />
+                </div>
+                <h1 className="text-xl md:text-2xl font-black text-white tracking-tight flex items-center gap-2.5 flex-wrap font-sans uppercase">
+                  <span>PANEL ADMINISTRATIVO DE HOTELES DE VENEZUELA LLC</span>
+                  <span className="flex items-center gap-1.5 shrink-0">
+                    {/* USA Flag */}
+                    <svg className="w-7 h-4.5 rounded-xs shadow-md inline-block object-cover border border-white/20 align-middle" viewBox="0 0 7410 3900" xmlns="http://www.w3.org/2000/svg">
+                      <rect width="7410" height="3900" fill="#b22234"/>
+                      <path d="M0,300h7410M0,900h7410M0,1500h7410M0,2100h7410M0,2700h7410M0,3300h7410" stroke="#fff" strokeWidth="300"/>
+                      <rect width="2964" height="2100" fill="#3c3b6e"/>
+                      <g fill="#fff">
+                        <circle cx="296" cy="175" r="45"/><circle cx="889" cy="175" r="45"/><circle cx="1482" cy="175" r="45"/><circle cx="2075" cy="175" r="45"/><circle cx="2668" cy="175" r="45"/>
+                        <circle cx="593" cy="350" r="45"/><circle cx="1186" cy="350" r="45"/><circle cx="1778" cy="350" r="45"/><circle cx="2371" cy="350" r="45"/>
+                        <circle cx="296" cy="525" r="45"/><circle cx="889" cy="525" r="45"/><circle cx="1482" cy="525" r="45"/><circle cx="2075" cy="525" r="45"/><circle cx="2668" cy="525" r="45"/>
+                        <circle cx="593" cy="700" r="45"/><circle cx="1186" cy="700" r="45"/><circle cx="1778" cy="700" r="45"/><circle cx="2371" cy="700" r="45"/>
+                        <circle cx="296" cy="875" r="45"/><circle cx="889" cy="875" r="45"/><circle cx="1482" cy="875" r="45"/><circle cx="2075" cy="875" r="45"/><circle cx="2668" cy="875" r="45"/>
+                        <circle cx="593" cy="1050" r="45"/><circle cx="1186" cy="1050" r="45"/><circle cx="1778" cy="1050" r="45"/><circle cx="2371" cy="1050" r="45"/>
+                        <circle cx="296" cy="1225" r="45"/><circle cx="889" cy="1225" r="45"/><circle cx="1482" cy="1225" r="45"/><circle cx="2075" cy="1225" r="45"/><circle cx="2668" cy="1225" r="45"/>
+                        <circle cx="593" cy="1400" r="45"/><circle cx="1186" cy="1400" r="45"/><circle cx="1778" cy="1400" r="45"/><circle cx="2371" cy="1400" r="45"/>
+                        <circle cx="296" cy="1575" r="45"/><circle cx="889" cy="1575" r="45"/><circle cx="1482" cy="1575" r="45"/><circle cx="2075" cy="1575" r="45"/><circle cx="2668" cy="1575" r="45"/>
+                        <circle cx="593" cy="1750" r="45"/><circle cx="1186" cy="1750" r="45"/><circle cx="1778" cy="1750" r="45"/><circle cx="2371" cy="1750" r="45"/>
+                        <circle cx="296" cy="1925" r="45"/><circle cx="889" cy="1925" r="45"/><circle cx="1482" cy="1925" r="45"/><circle cx="2075" cy="1925" r="45"/><circle cx="2668" cy="1925" r="45"/>
+                      </g>
+                    </svg>
+                    {/* Venezuela Flag */}
+                    <svg className="w-7 h-4.5 rounded-xs shadow-md inline-block object-cover border border-white/20 align-middle" viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
+                      <rect width="900" height="200" fill="#ffcc00"/>
+                      <rect y="200" width="900" height="200" fill="#00247d"/>
+                      <rect y="400" width="900" height="200" fill="#cf142b"/>
+                      <g fill="#fff" transform="translate(450, 310)">
+                        <circle cx="-100" cy="20" r="10" />
+                        <circle cx="-73" cy="-10" r="10" />
+                        <circle cx="-40" cy="-30" r="10" />
+                        <circle cx="-13" cy="-40" r="10" />
+                        <circle cx="13" cy="-40" r="10" />
+                        <circle cx="40" cy="-30" r="10" />
+                        <circle cx="73" cy="-10" r="10" />
+                        <circle cx="100" cy="20" r="10" />
+                      </g>
+                    </svg>
+                  </span>
+                </h1>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-[#00C8D4] font-medium tracking-wide">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+                <span>Consola de Propietarios · Conexión Encriptada SSL · {user?.email || "Propietario Verificado"}</span>
+              </div>
+            </div>
+
+            {/* Impersonate or Account Status Badge */}
+            <div className="flex items-center gap-3 bg-white/5 border border-white/10 backdrop-blur-md rounded-xl px-4 py-2.5 text-xs text-white shrink-0">
+              <ShieldCheck className="w-4 h-4 text-[#00C8D4] shrink-0" />
+              <div>
+                <p className="text-[10px] uppercase font-bold text-slate-400">Estado de Cuenta</p>
+                <p className="font-bold text-white text-xs">Socio Comercial Activo</p>
+              </div>
+            </div>
           </div>
-          
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/perfil?tab=perfil"
-              className="bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-bold px-4 py-3 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer font-sans uppercase"
-            >
-              <User className="w-4 h-4 text-brand-turquesa" />
-              <span>Mi Perfil & Seguridad</span>
-            </Link>
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="btn-cyan-gradient text-xs font-bold px-6 py-3 rounded-xl flex items-center gap-1.5 shadow-md shadow-brand-turquesa/10 cursor-pointer active:scale-97 hover:scale-102 transition-all font-sans uppercase"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Registrar Establecimiento</span>
-            </button>
+
+          {/* Owner Dashboard Header Info */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black bg-[#FF0096]/20 text-[#FF0096] border border-[#FF0096]/30 mb-2 tracking-widest uppercase shadow-sm">
+                <Briefcase className="w-3.5 h-3.5" />
+                <span>Portal de Socios Hoteleros</span>
+              </span>
+              <h2 className="text-3xl md:text-4xl font-serif font-black tracking-tight text-white">
+                Panel de Control Ejecutivo
+              </h2>
+              <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
+                Administra tarifas, inventario de habitaciones, facturas de membresía y comunicación directa de leads para tu cartera comercial.
+              </p>
+            </div>
+            
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/perfil?tab=perfil"
+                className="bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-bold px-4 py-3 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer font-sans uppercase backdrop-blur-xs"
+              >
+                <User className="w-4 h-4 text-brand-turquesa" />
+                <span>Mi Perfil & Seguridad</span>
+              </Link>
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="btn-cyan-gradient text-xs font-bold px-6 py-3 rounded-xl flex items-center gap-1.5 shadow-md shadow-brand-turquesa/10 cursor-pointer active:scale-97 hover:scale-102 transition-all font-sans uppercase"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Registrar Establecimiento</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>

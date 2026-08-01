@@ -315,7 +315,7 @@ export function AdminPanel() {
   const handleApproveEstablishment = async (id: number) => {
     try {
       setActionLoading(id);
-      
+
       try {
         await supabase
           .from("establishments")
@@ -1150,11 +1150,10 @@ export function AdminPanel() {
                     <div>
                       <div className="flex justify-between items-start gap-4 mb-2">
                         <h4 className="font-black text-gray-800 text-md leading-tight">{est.name}</h4>
-                        <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                          est.status === "under_review"
-                            ? "bg-blue-50 text-blue-700 border border-blue-200"
-                            : "bg-yellow-50 text-yellow-600 border border-yellow-200"
-                        }`}>
+                        <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${est.status === "under_review"
+                          ? "bg-blue-50 text-blue-700 border border-blue-200"
+                          : "bg-yellow-50 text-yellow-600 border border-yellow-200"
+                          }`}>
                           {est.status === "under_review" ? "Docs Consignados" : "Pre-Aprobado"}
                         </span>
                       </div>
