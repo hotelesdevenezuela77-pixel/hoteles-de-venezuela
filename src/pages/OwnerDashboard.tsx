@@ -1551,8 +1551,8 @@ export function OwnerDashboard() {
         </div>
       )}
       
-      {/* Top Animated Header Banner - Idéntico al Panel Administrativo Principal (Print 1) */}
-      <div className="relative overflow-hidden py-8 bg-gradient-to-r from-[#0e0120] via-[#1a0533] to-[#0d1a2e] text-white w-full border-b border-white/10">
+      {/* Top Animated Header Banner - Altura py-20 Idéntica al Panel Administrativo Principal (Print 1) */}
+      <div className="relative overflow-hidden py-20 bg-gradient-to-r from-[#0e0120] via-[#1a0533] to-[#0d1a2e] text-white w-full border-b border-white/10">
         <ConstellationBackground />
         <div className="absolute top-0 right-0 w-72 h-72 rounded-full blur-3xl opacity-10 bg-[#FF0096]" />
         <div className="absolute bottom-0 left-0 w-56 h-56 rounded-full blur-3xl opacity-10 bg-[#00C8D4]" />
