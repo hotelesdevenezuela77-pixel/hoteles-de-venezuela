@@ -4,7 +4,12 @@ import { supabase } from "../lib/supabase";
 import { ESTABLISHMENTS_MOCK } from "../lib/establishmentsMock";
 import type { Establishment } from "../components/layout/EstablishmentCard";
 import { EstablishmentCard, EstablishmentListItem, getVirtualPrice } from "../components/layout/EstablishmentCard";
-import { Search, MapPin, ChevronDown, X, Filter, Grid, List, Compass, Loader2, Wifi, Car, Waves, Wind, Palmtree, Zap, Droplets, Dog, Star, Sparkles } from "lucide-react";
+import { 
+  Search, MapPin, ChevronDown, ChevronUp, X, Filter, Grid, List, Compass, Loader2, 
+  Wifi, Car, Waves, Wind, Palmtree, Zap, Droplets, Dog, Star, Sparkles,
+  ShieldCheck, Award, CreditCard, Coffee, Utensils, Bed, Users, Accessibility,
+  Sun, Tv, Bath, Flame, Wine, Heart, Smile, Check, DollarSign, Building2
+} from "lucide-react";
 
 interface Category {
   id: number;
@@ -30,18 +35,51 @@ export function Establecimientos() {
   const [activeDropdown, setActiveDropdown] = useState<"category" | "destination" | null>(null);
   const [comparedIds, setComparedIds] = useState<number[]>([]);
 
-  // Advanced Filter States
+  // 12-Block Advanced Search Filter States (Inspirado en Booking.com + Ecosistema Venezuela)
   const [minPrice, setMinPrice] = useState<number>(0);
   const [maxPrice, setMaxPrice] = useState<number>(1000);
   const [minRating, setMinRating] = useState<number>(0);
   const [adults, setAdults] = useState<number>(1);
   const [children, setChildren] = useState<number>(0);
   const [selectedSubtype, setSelectedSubtype] = useState<string>("");
-  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [selectedStars, setSelectedStars] = useState<number[]>([]);
-  const [selectedAccessibility, setSelectedAccessibility] = useState<string[]>([]);
+
+  // Categorías avanzadas en arreglos
+  const [selectedCertifications, setSelectedCertifications] = useState<string[]>([]);
+  const [selectedInfra, setSelectedInfra] = useState<string[]>([]);
+  const [selectedPaymentMethods, setSelectedPaymentMethods] = useState<string[]>([]);
+  const [selectedMeals, setSelectedMeals] = useState<string[]>([]);
+  const [selectedFacilities, setSelectedFacilities] = useState<string[]>([]);
+  const [selectedRoomFeatures, setSelectedRoomFeatures] = useState<string[]>([]);
   const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
+  const [selectedGroupTypes, setSelectedGroupTypes] = useState<string[]>([]);
+  const [selectedAccessibility, setSelectedAccessibility] = useState<string[]>([]);
+  const [selectedLocationDistances, setSelectedLocationDistances] = useState<string[]>([]);
   const [smartQuery, setSmartQuery] = useState<string>("");
+
+  // Acordeones colapsables para los 12 bloques
+  const [expandedBlocks, setExpandedBlocks] = useState<Record<string, boolean>>({
+    garantia: true,
+    puntuacion: true,
+    subtipo: true,
+    infra: true,
+    pago: true,
+    comidas: true,
+    instalaciones: false,
+    habitacion: false,
+    experiencias: false,
+    grupo: false,
+    accesibilidad: false,
+    ubicacion: false
+  });
+
+  const toggleBlock = (blockKey: string) => {
+    setExpandedBlocks(prev => ({ ...prev, [blockKey]: !prev[blockKey] }));
+  };
+
+  const toggleArrayFilter = (setter: React.Dispatch<React.SetStateAction<string[]>>, key: string) => {
+    setter(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
+  };
 
   const availableAmenities = [
     { key: "wifi", label: "WiFi Gratis", icon: <Wifi className="w-3.5 h-3.5" /> },
@@ -182,10 +220,17 @@ export function Establecimientos() {
     setAdults(1);
     setChildren(0);
     setSelectedSubtype("");
-    setSelectedAmenities([]);
     setSelectedStars([]);
-    setSelectedAccessibility([]);
+    setSelectedCertifications([]);
+    setSelectedInfra([]);
+    setSelectedPaymentMethods([]);
+    setSelectedMeals([]);
+    setSelectedFacilities([]);
+    setSelectedRoomFeatures([]);
     setSelectedActivities([]);
+    setSelectedGroupTypes([]);
+    setSelectedAccessibility([]);
+    setSelectedLocationDistances([]);
     setSmartQuery("");
     updateURLParams("", "", "");
   };
@@ -195,34 +240,29 @@ export function Establecimientos() {
     const phraseLower = phrase.toLowerCase();
     
     // Limpiar todos los filtros antes de aplicar la búsqueda inteligente
-    setSelectedCategory("");
-    setSelectedDestination("");
-    setSearchQuery("");
-    setMinPrice(0);
-    setMaxPrice(1000);
-    setMinRating(0);
-    setAdults(1);
-    setChildren(0);
-    setSelectedSubtype("");
-    setSelectedAmenities([]);
-    setSelectedStars([]);
-    setSelectedAccessibility([]);
-    setSelectedActivities([]);
-    updateURLParams("", "", "");
-    
+    clearFilters();
     setSmartQuery(phrase);
 
-    // Detección inteligente de servicios
-    const newAmenities: string[] = [];
-    if (phraseLower.includes("piscina") || phraseLower.includes("alberca")) newAmenities.push("piscina");
-    if (phraseLower.includes("wifi") || phraseLower.includes("internet") || phraseLower.includes("wi-fi")) newAmenities.push("wifi");
-    if (phraseLower.includes("planta") || phraseLower.includes("generador") || phraseLower.includes("luz")) newAmenities.push("planta_electrica");
-    if (phraseLower.includes("tanque") || phraseLower.includes("agua")) newAmenities.push("tanque_agua");
-    if (phraseLower.includes("mascota") || phraseLower.includes("perro") || phraseLower.includes("gato") || phraseLower.includes("pet")) newAmenities.push("pet_friendly");
-    if (phraseLower.includes("playa")) newAmenities.push("playa_privada");
-    if (phraseLower.includes("estacionamiento") || phraseLower.includes("parking") || phraseLower.includes("estacionar")) newAmenities.push("estacionamiento");
-    if (phraseLower.includes("aire") || phraseLower.includes("acondicionado") || phraseLower.includes("clima")) newAmenities.push("aire_acondicionado");
-    if (newAmenities.length > 0) setSelectedAmenities(newAmenities);
+    // Detección inteligente de infraestructura
+    const newInfra: string[] = [];
+    if (phraseLower.includes("wifi") || phraseLower.includes("internet") || phraseLower.includes("wi-fi")) newInfra.push("wifi_fibra");
+    if (phraseLower.includes("planta") || phraseLower.includes("generador") || phraseLower.includes("luz")) newInfra.push("planta_electrica");
+    if (phraseLower.includes("tanque") || phraseLower.includes("agua")) newInfra.push("tanque_agua");
+    if (phraseLower.includes("estacionamiento") || phraseLower.includes("parking") || phraseLower.includes("estacionar")) newInfra.push("estacionamiento");
+    if (newInfra.length > 0) setSelectedInfra(newInfra);
+
+    // Detección inteligente de instalaciones
+    const newFac: string[] = [];
+    if (phraseLower.includes("piscina") || phraseLower.includes("alberca")) newFac.push("piscina");
+    if (phraseLower.includes("spa") || phraseLower.includes("sauna")) newFac.push("spa");
+    if (phraseLower.includes("jacuzzi") || phraseLower.includes("hidromasaje")) newFac.push("jacuzzi");
+    if (newFac.length > 0) setSelectedFacilities(newFac);
+
+    // Detección de grupo y mascotas
+    const newGroup: string[] = [];
+    if (phraseLower.includes("mascota") || phraseLower.includes("perro") || phraseLower.includes("gato") || phraseLower.includes("pet")) newGroup.push("pet_friendly");
+    if (phraseLower.includes("adultos") || phraseLower.includes("parejas")) newGroup.push("solo_adultos");
+    if (newGroup.length > 0) setSelectedGroupTypes(newGroup);
 
     // Detección de accesibilidad
     const newAccess: string[] = [];
@@ -371,7 +411,7 @@ export function Establecimientos() {
     fetchData();
   }, []);
 
-  // Filter in-memory
+  // Filter in-memory with 12-block logic
   const filtered = establishments.filter(est => {
     const matchesCategory = !selectedCategory || est.category_slug === selectedCategory;
     const matchesDestination = !selectedDestination || est.destination_slug === selectedDestination;
@@ -406,42 +446,92 @@ export function Establecimientos() {
       console.warn("Error parsing services for filtering:", e);
     }
     
-    // Enriquecer dinámicamente servicios para simular accesibilidad y actividades en el mock
+    // Enriquecer dinámicamente servicios para simular todas las características en los 12 bloques
     const nameLower = est.name.toLowerCase();
-    if (est.id % 2 === 0 && !estServices.includes("planta_baja")) estServices.push("planta_baja");
-    if (est.id % 3 === 0) {
-      if (!estServices.includes("silla_ruedas")) estServices.push("silla_ruedas");
-      if (!estServices.includes("wc_barras")) estServices.push("wc_barras");
-    }
-    if ((nameLower.includes("hotel") || nameLower.includes("resort") || nameLower.includes("intercontinental")) && !estServices.includes("ascensor")) {
-      estServices.push("ascensor");
-    }
-    if (est.id % 5 === 0) {
-      if (!estServices.includes("braille")) estServices.push("braille");
-      if (!estServices.includes("guiado_auditivo")) estServices.push("guiado_auditivo");
-    }
 
-    // Actividades automáticas en el mock
-    if ((nameLower.includes("adult") || nameLower.includes("humboldt") || est.id % 4 === 0) && !estServices.includes("solo_adultos")) {
-      estServices.push("solo_adultos");
-    }
+    // 1. Garantía & Certificaciones
+    if (est.has_hdv_seal || est.membership_tier === "diamante" || est.id % 2 === 0) estServices.push("sello_hdv");
+    if (est.is_circuito_excelencia || nameLower.includes("boutique") || est.id % 3 === 0) estServices.push("circuito_excelencia");
+    if (est.id % 2 === 1) estServices.push("sostenibilidad");
+    if (est.has_reservations_enabled || est.id % 2 === 0) estServices.push("reserva_inmediata");
 
-    if ((nameLower.includes("posada") || est.destination_slug === "los-roques") && !estServices.includes("tours_pie")) {
-      estServices.push("tours_pie");
-    }
-    if (est.id % 2 === 1) {
-      if (!estServices.includes("tours_bici")) estServices.push("tours_bici");
-      if (!estServices.includes("alquiler_bici")) estServices.push("alquiler_bici");
-    }
-    if ((nameLower.includes("bar") || nameLower.includes("restaurante") || est.id % 6 === 0) && !estServices.includes("ruta_bares")) {
-      estServices.push("ruta_bares");
-    }
+    // 4. Infraestructura Crítica Venezuela
+    if (nameLower.includes("resort") || nameLower.includes("hotel") || est.id % 2 === 0) estServices.push("planta_electrica");
+    if (est.id % 2 === 0 || est.id % 3 === 0) estServices.push("tanque_agua");
+    if (est.id % 4 === 0) estServices.push("ev_charge");
+    estServices.push("wifi_fibra");
+    estServices.push("estacionamiento");
 
-    const matchesAmenities = selectedAmenities.every(amenity => 
-      estServices.includes(amenity.toLowerCase())
-    );
+    // 5. Métodos de Pago & Condiciones
+    estServices.push("pago_movil");
+    estServices.push("zelle");
+    if (est.id % 2 === 0) estServices.push("usdt_crypto");
+    if (est.id % 3 === 0) estServices.push("tarjeta_int");
+    if (est.id % 2 === 0) estServices.push("cancelacion_gratis");
+    if (est.id % 3 !== 0) estServices.push("sin_tarjeta");
 
-    // Stars logic (est.stars or estimated from tier / name)
+    // 6. Comidas & Gastronomía
+    if (nameLower.includes("posada") || est.id % 2 === 0) estServices.push("desayuno_incluido");
+    if (nameLower.includes("resort") || nameLower.includes("complex")) estServices.push("all_inclusive");
+    if (est.id % 3 === 0) estServices.push("media_pension");
+    if (nameLower.includes("hotel") || nameLower.includes("resort") || est.id % 2 === 0) estServices.push("restaurante");
+    if (nameLower.includes("apart") || nameLower.includes("villa") || est.id % 3 === 0) estServices.push("cocina");
+
+    // 7. Instalaciones & Bienestar
+    if (nameLower.includes("resort") || nameLower.includes("posada") || est.id % 2 === 0) estServices.push("piscina");
+    if (est.id % 3 === 0) estServices.push("spa");
+    if (est.id % 4 === 0) estServices.push("jacuzzi");
+    if (nameLower.includes("hotel") || est.id % 3 === 0) estServices.push("gimnasio");
+    if (est.id % 2 === 0) estServices.push("solarium");
+    if (nameLower.includes("hotel") || est.id % 2 === 0) estServices.push("recepcion_24h");
+
+    // 8. Habitación & Camas
+    if (est.id % 2 === 0) estServices.push("cama_king");
+    if (est.id % 2 === 1) estServices.push("camas_indiv");
+    if (est.id % 3 === 0) estServices.push("cuna");
+    if (nameLower.includes("posada") || nameLower.includes("resort") || est.id % 2 === 0) estServices.push("balcon");
+    estServices.push("aire_acondicionado");
+    estServices.push("tv");
+    estServices.push("bano_privado");
+
+    // 9. Experiencias & Entretenimiento
+    if (nameLower.includes("posada") || est.destination_slug === "los-roques" || est.id % 2 === 0) estServices.push("tours_guiados");
+    if (est.destination_slug === "los-roques" || est.destination_slug === "margarita" || est.id % 3 === 0) estServices.push("paseos_lancha");
+    if (est.id % 3 === 0) estServices.push("ciclismo");
+    if (est.id % 4 === 0) estServices.push("musica_envivo");
+    if (est.id % 5 === 0) estServices.push("rutas_catas");
+
+    // 10. Tipo de Grupo
+    estServices.push("familiar");
+    if (nameLower.includes("adult") || nameLower.includes("boutique") || est.id % 3 === 0) estServices.push("solo_adultos");
+    if (est.id % 2 === 0) estServices.push("pet_friendly");
+    if (est.id % 3 === 0) estServices.push("travel_proud");
+
+    // 11. Accesibilidad
+    if (est.id % 2 === 0) estServices.push("planta_baja");
+    if (est.id % 3 === 0) estServices.push("silla_ruedas");
+    if (nameLower.includes("hotel") || nameLower.includes("resort")) estServices.push("ascensor");
+    if (est.id % 3 === 0) estServices.push("wc_barras");
+    if (est.id % 5 === 0) estServices.push("braille_audio");
+
+    // 12. Ubicación & Distancias
+    if (est.destination_slug === "los-roques" || est.destination_slug === "margarita" || est.destination_slug === "mochima" || est.id % 2 === 0) estServices.push("cerca_mar");
+    if (est.destination_slug === "caracas" || est.destination_slug === "valencia" || est.id % 2 === 1) estServices.push("cerca_centro");
+    if (est.id % 3 === 0) estServices.push("cerca_aeropuerto");
+
+    // Evaluation across all 12 blocks
+    const matchesCertifications = selectedCertifications.every(k => estServices.includes(k));
+    const matchesInfra = selectedInfra.every(k => estServices.includes(k));
+    const matchesPaymentMethods = selectedPaymentMethods.every(k => estServices.includes(k));
+    const matchesMeals = selectedMeals.every(k => estServices.includes(k));
+    const matchesFacilities = selectedFacilities.every(k => estServices.includes(k));
+    const matchesRoomFeatures = selectedRoomFeatures.every(k => estServices.includes(k));
+    const matchesActivities = selectedActivities.every(k => estServices.includes(k));
+    const matchesGroupTypes = selectedGroupTypes.every(k => estServices.includes(k));
+    const matchesAccessibility = selectedAccessibility.every(k => estServices.includes(k));
+    const matchesLocationDistances = selectedLocationDistances.every(k => estServices.includes(k));
+
+    // Stars logic
     const getStarsCount = () => {
       if ((est as any).stars) return Number((est as any).stars);
       if (nameLower.includes("resort") || nameLower.includes("intercontinental") || nameLower.includes("cayena") || est.membership_tier === "diamante") return 5;
@@ -452,15 +542,8 @@ export function Establecimientos() {
     const starsCount = getStarsCount();
     const matchesStars = selectedStars.length === 0 || selectedStars.includes(starsCount);
 
-    const matchesAccessibility = selectedAccessibility.every(acc => 
-      estServices.includes(acc.toLowerCase())
-    );
-
-    const matchesActivities = selectedActivities.every(act => 
-      estServices.includes(act.toLowerCase())
-    );
-
-    return matchesCategory && matchesDestination && matchesQuery && matchesPrice && matchesRating && matchesCapacity && matchesSubtype && matchesAmenities && matchesStars && matchesAccessibility && matchesActivities;
+    return matchesCategory && matchesDestination && matchesQuery && matchesPrice && matchesRating && matchesCapacity && matchesSubtype && matchesStars &&
+      matchesCertifications && matchesInfra && matchesPaymentMethods && matchesMeals && matchesFacilities && matchesRoomFeatures && matchesActivities && matchesGroupTypes && matchesAccessibility && matchesLocationDistances;
   });
 
   const getCategoryName = (slug: string) => categories.find(c => c.slug === slug)?.name || slug;
@@ -474,10 +557,17 @@ export function Establecimientos() {
     (minRating > 0 ? 1 : 0) + 
     (adults > 1 || children > 0 ? 1 : 0) + 
     (selectedSubtype ? 1 : 0) + 
-    (selectedAmenities.length) +
     (selectedStars.length) +
-    (selectedAccessibility.length) +
+    (selectedCertifications.length) +
+    (selectedInfra.length) +
+    (selectedPaymentMethods.length) +
+    (selectedMeals.length) +
+    (selectedFacilities.length) +
+    (selectedRoomFeatures.length) +
     (selectedActivities.length) +
+    (selectedGroupTypes.length) +
+    (selectedAccessibility.length) +
+    (selectedLocationDistances.length) +
     (smartQuery ? 1 : 0);
 
   const hasActiveFilters = activeFiltersCount > 0;
@@ -533,264 +623,697 @@ export function Establecimientos() {
               </button>
             </div>
 
-            <div className="space-y-6 text-left">
-              {/* 1. Categoría */}
-              <div className="space-y-2">
-                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Categoría</label>
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => handleCategoryChange(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-gray-700 outline-none focus:border-brand-magenta cursor-pointer"
-                >
-                  <option value="">Todas las Categorías</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.slug}>{cat.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* 2. Destino */}
-              <div className="space-y-2">
-                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Destino</label>
-                <select
-                  value={selectedDestination}
-                  onChange={(e) => handleDestinationChange(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-gray-700 outline-none focus:border-brand-magenta cursor-pointer"
-                >
-                  <option value="">Todos los Destinos</option>
-                  {destinations.map((dest) => (
-                    <option key={dest.id} value={dest.slug}>{dest.name} ({dest.state})</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* 3. Rango de Precios */}
-              <div className="space-y-2">
-                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Precio por Noche (USD)</label>
-                <div className="flex items-center gap-2">
-                  <div className="relative flex-1">
-                    <span className="absolute left-3 top-2 text-gray-400 text-xs font-bold">$</span>
-                    <input
-                      type="number"
-                      placeholder="Mín"
-                      value={minPrice || ""}
-                      onChange={(e) => setMinPrice(Math.max(0, Number(e.target.value)))}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-6 pr-2 py-2.5 text-xs font-semibold text-gray-700 outline-none focus:border-[#00C8D4]"
-                    />
-                  </div>
-                  <span className="text-gray-450 text-xs">—</span>
-                  <div className="relative flex-1">
-                    <span className="absolute left-3 top-2 text-gray-400 text-xs font-bold">$</span>
-                    <input
-                      type="number"
-                      placeholder="Máx"
-                      value={maxPrice || ""}
-                      onChange={(e) => setMaxPrice(Math.max(0, Number(e.target.value)))}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-6 pr-2 py-2.5 text-xs font-semibold text-gray-700 outline-none focus:border-[#00C8D4]"
-                    />
-                  </div>
+            <div className="space-y-4 text-left divide-y divide-gray-100">
+              
+              {/* Filtros Básicos de Categoría, Destino y Rango de Precios */}
+              <div className="space-y-4 pb-4">
+                {/* Categoría */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Categoría de Negocio</label>
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => handleCategoryChange(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-gray-700 outline-none focus:border-brand-magenta cursor-pointer"
+                  >
+                    <option value="">Todas las Categorías</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.slug}>{cat.name}</option>
+                    ))}
+                  </select>
                 </div>
-              </div>
 
-              {/* 4. Calificación Mínima */}
-              <div className="space-y-2">
-                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Calificación Mínima</label>
-                <select
-                  value={minRating}
-                  onChange={(e) => setMinRating(Number(e.target.value))}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-gray-750 outline-none focus:border-[#00C8D4] cursor-pointer"
-                >
-                  <option value="0">Cualquier Puntuación</option>
-                  <option value="4.5">★ 4.5+ Excelente</option>
-                  <option value="4.0">★ 4.0+ Muy Bueno</option>
-                  <option value="3.5">★ 3.5+ Bueno</option>
-                </select>
-              </div>
+                {/* Destino */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Destino Turístico / Estado</label>
+                  <select
+                    value={selectedDestination}
+                    onChange={(e) => handleDestinationChange(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-gray-700 outline-none focus:border-brand-magenta cursor-pointer"
+                  >
+                    <option value="">Todos los Destinos</option>
+                    {destinations.map((dest) => (
+                      <option key={dest.id} value={dest.slug}>{dest.name} ({dest.state})</option>
+                    ))}
+                  </select>
+                </div>
 
-              {/* 5. Huéspedes / Capacidad */}
-              <div className="space-y-2">
-                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Huéspedes / Capacidad</label>
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
-                    <span className="text-[11px] text-gray-500 font-bold">Adultos</span>
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        disabled={adults <= 1}
-                        onClick={() => setAdults(adults - 1)}
-                        className="w-5 h-5 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs font-black text-gray-550 hover:bg-gray-50 disabled:opacity-40 select-none cursor-pointer"
-                      >
-                        -
-                      </button>
-                      <span className="text-xs font-bold text-gray-750 min-w-[12px] text-center">{adults}</span>
-                      <button
-                        type="button"
-                        onClick={() => setAdults(adults + 1)}
-                        className="w-5 h-5 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs font-black text-gray-550 hover:bg-gray-50 select-none cursor-pointer"
-                      >
-                        +
-                      </button>
+                {/* Rango de Precios */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Rango de Tarifa (USD / Noche)</label>
+                  <div className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                      <span className="absolute left-3 top-2 text-gray-400 text-xs font-bold">$</span>
+                      <input
+                        type="number"
+                        placeholder="Mín"
+                        value={minPrice || ""}
+                        onChange={(e) => setMinPrice(Math.max(0, Number(e.target.value)))}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-6 pr-2 py-2 text-xs font-semibold text-gray-700 outline-none focus:border-[#00C8D4]"
+                      />
+                    </div>
+                    <span className="text-gray-400 text-xs">—</span>
+                    <div className="relative flex-1">
+                      <span className="absolute left-3 top-2 text-gray-400 text-xs font-bold">$</span>
+                      <input
+                        type="number"
+                        placeholder="Máx"
+                        value={maxPrice || ""}
+                        onChange={(e) => setMaxPrice(Math.max(0, Number(e.target.value)))}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-6 pr-2 py-2 text-xs font-semibold text-gray-700 outline-none focus:border-[#00C8D4]"
+                      />
                     </div>
                   </div>
+                </div>
 
-                  <div className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
-                    <span className="text-[11px] text-gray-500 font-bold">Niños</span>
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        disabled={children <= 0}
-                        onClick={() => setChildren(children - 1)}
-                        className="w-5 h-5 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs font-black text-gray-550 hover:bg-gray-50 disabled:opacity-40 select-none cursor-pointer"
-                      >
-                        -
-                      </button>
-                      <span className="text-xs font-bold text-gray-755 min-w-[12px] text-center">{children}</span>
-                      <button
-                        type="button"
-                        onClick={() => setChildren(children + 1)}
-                        className="w-5 h-5 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs font-black text-gray-550 hover:bg-gray-50 select-none cursor-pointer"
-                      >
-                        +
-                      </button>
+                {/* Capacidad de Huéspedes */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Huéspedes / Capacidad</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl px-2.5 py-1.5">
+                      <span className="text-[10px] text-gray-500 font-bold">Adultos</span>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          disabled={adults <= 1}
+                          onClick={() => setAdults(adults - 1)}
+                          className="w-4 h-4 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[10px] font-black text-gray-600 hover:bg-gray-50 disabled:opacity-40 cursor-pointer"
+                        >
+                          -
+                        </button>
+                        <span className="text-xs font-bold text-gray-800 min-w-[10px] text-center">{adults}</span>
+                        <button
+                          type="button"
+                          onClick={() => setAdults(adults + 1)}
+                          className="w-4 h-4 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[10px] font-black text-gray-600 hover:bg-gray-50 cursor-pointer"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl px-2.5 py-1.5">
+                      <span className="text-[10px] text-gray-500 font-bold">Niños</span>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          disabled={children <= 0}
+                          onClick={() => setChildren(children - 1)}
+                          className="w-4 h-4 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[10px] font-black text-gray-600 hover:bg-gray-50 disabled:opacity-40 cursor-pointer"
+                        >
+                          -
+                        </button>
+                        <span className="text-xs font-bold text-gray-800 min-w-[10px] text-center">{children}</span>
+                        <button
+                          type="button"
+                          onClick={() => setChildren(children + 1)}
+                          className="w-4 h-4 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[10px] font-black text-gray-600 hover:bg-gray-50 cursor-pointer"
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* 6. Subtipo de Alojamiento */}
-              <div className="space-y-2">
-                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Subtipo de Alojamiento</label>
-                <select
-                  value={selectedSubtype}
-                  onChange={(e) => setSelectedSubtype(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-gray-750 outline-none focus:border-[#00C8D4] cursor-pointer"
+              {/* BLOQUE 1: Garantía & Verificación Oficial */}
+              <div className="pt-3">
+                <button
+                  type="button"
+                  onClick={() => toggleBlock("garantia")}
+                  className="w-full flex items-center justify-between py-1 text-left cursor-pointer group"
                 >
-                  <option value="">Cualquier subtipo</option>
-                  <option value="posada_boutique">Posada Boutique / Encanto</option>
-                  <option value="resort">Resort / Complejo Vacacional</option>
-                  <option value="hotel_familiar">Hotel Familiar o de Ciudad</option>
-                  <option value="otros">Otros tipos de hospedaje</option>
-                </select>
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-md bg-[#00C8D4]/15 text-[#00C8D4] flex items-center justify-center shrink-0">
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-black text-gray-800 tracking-tight">Garantía & Sellos</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {selectedCertifications.length > 0 && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-[#00C8D4] text-slate-950">
+                        {selectedCertifications.length}
+                      </span>
+                    )}
+                    {expandedBlocks.garantia ? <ChevronUp className="w-3.5 h-3.5 text-gray-400" /> : <ChevronDown className="w-3.5 h-3.5 text-gray-400" />}
+                  </div>
+                </button>
+
+                {expandedBlocks.garantia && (
+                  <div className="mt-2 space-y-1.5 pl-7">
+                    {[
+                      { key: "sello_hdv", label: "Sello de Garantía Legal HDV" },
+                      { key: "circuito_excelencia", label: "Circuito de Excelencia" },
+                      { key: "sostenibilidad", label: "Certificación Ecológica" },
+                      { key: "reserva_inmediata", label: "Reserva / Confirmación Inmediata" }
+                    ].map(item => (
+                      <label key={item.key} className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={selectedCertifications.includes(item.key)}
+                          onChange={() => toggleArrayFilter(setSelectedCertifications, item.key)}
+                          className="rounded text-[#00C8D4] focus:ring-[#00C8D4] border-gray-300 w-3.5 h-3.5 accent-[#00C8D4]"
+                        />
+                        <span className="truncate">{item.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {/* 7. Servicios y Amenidades Clave */}
-              <div className="space-y-2">
-                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Servicios Clave</label>
-                <div className="grid grid-cols-2 lg:grid-cols-1 gap-1.5">
-                  {availableAmenities.map((amenity) => {
-                    const isSelected = selectedAmenities.includes(amenity.key);
-                    return (
+              {/* BLOQUE 2: Puntuación & Reseñas */}
+              <div className="pt-3">
+                <button
+                  type="button"
+                  onClick={() => toggleBlock("puntuacion")}
+                  className="w-full flex items-center justify-between py-1 text-left cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-md bg-amber-500/15 text-amber-500 flex items-center justify-center shrink-0">
+                      <Star className="w-3.5 h-3.5 fill-amber-500" />
+                    </div>
+                    <span className="text-xs font-black text-gray-800 tracking-tight">Puntuación & Experiencia</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {minRating > 0 && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-amber-500 text-white">
+                        {minRating}+
+                      </span>
+                    )}
+                    {expandedBlocks.puntuacion ? <ChevronUp className="w-3.5 h-3.5 text-gray-400" /> : <ChevronDown className="w-3.5 h-3.5 text-gray-400" />}
+                  </div>
+                </button>
+
+                {expandedBlocks.puntuacion && (
+                  <div className="mt-2 space-y-1.5 pl-7">
+                    {[
+                      { rating: 4.8, label: "9.0+ Inolvidable / Excepcional" },
+                      { rating: 4.5, label: "8.0+ Excelente Elección" },
+                      { rating: 4.0, label: "7.0+ Muy Acogedor" },
+                      { rating: 3.5, label: "6.0+ Sencillo y Funcional" }
+                    ].map(item => (
                       <button
-                        key={amenity.key}
+                        key={item.rating}
                         type="button"
-                        onClick={() => toggleAmenityFilter(amenity.key)}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all border cursor-pointer select-none justify-start ${
-                          isSelected
-                            ? "bg-cyan-50 border-[#00C8D4] text-[#00C8D4] shadow-xs"
-                            : "bg-white border-gray-150 text-gray-600 hover:bg-gray-50"
+                        onClick={() => setMinRating(minRating === item.rating ? 0 : item.rating)}
+                        className={`w-full text-left px-2.5 py-1 rounded-lg text-xs font-bold transition-all border ${
+                          minRating === item.rating
+                            ? "bg-amber-50 border-amber-300 text-amber-900 shadow-xs"
+                            : "bg-white border-transparent text-gray-600 hover:bg-gray-50"
                         }`}
                       >
-                        <span className={isSelected ? "text-[#00C8D4]" : "text-gray-400"}>
-                          {amenity.icon}
-                        </span>
-                        <span className="truncate">{amenity.label}</span>
+                        {item.label}
                       </button>
-                    );
-                  })}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {/* 8. Estrellas del Alojamiento */}
-              <div className="space-y-2 pt-2 border-t border-gray-100">
-                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Categoría del Alojamiento</label>
-                <div className="flex flex-col gap-2">
-                  {[5, 4, 3, 2, 1].map((stars) => {
-                    const isSelected = selectedStars.includes(stars);
-                    return (
-                      <label key={stars} className="flex items-center gap-2 text-xs font-bold text-gray-600 cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={() => {
-                            setSelectedStars(prev =>
-                              prev.includes(stars) ? prev.filter(s => s !== stars) : [...prev, stars]
-                            );
-                          }}
-                          className="rounded text-brand-magenta focus:ring-brand-magenta border-gray-300 w-3.5 h-3.5 cursor-pointer accent-[#FF0096]"
-                        />
-                        <span className="flex items-center gap-0.5 text-amber-500 font-extrabold">
-                          {Array.from({ length: stars }).map((_, i) => (
-                            <span key={i}>★</span>
-                          ))}
-                          <span className="text-[10px] text-gray-500 font-semibold ml-1">
-                            ({stars} {stars === 1 ? 'estrella' : 'estrellas'})
-                          </span>
-                        </span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* 9. Accesibilidad del Alojamiento */}
-              <div className="space-y-2 pt-2 border-t border-gray-100">
-                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Accesibilidad (Urb. y Habitaciones)</label>
-                <div className="flex flex-col gap-2">
-                  {availableAccessibility.map((acc) => {
-                    const isSelected = selectedAccessibility.includes(acc.key);
-                    return (
-                      <label key={acc.key} className="flex items-center gap-2 text-xs font-bold text-gray-600 cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={() => {
-                            setSelectedAccessibility(prev =>
-                              prev.includes(acc.key) ? prev.filter(k => k !== acc.key) : [...prev, acc.key]
-                            );
-                          }}
-                          className="rounded text-brand-turquesa focus:ring-brand-turquesa border-gray-300 w-3.5 h-3.5 cursor-pointer accent-[#00C8D4]"
-                        />
-                        <span className="truncate leading-tight text-gray-500 hover:text-gray-700">{acc.label}</span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* 10. Actividades y Tipo de Grupo */}
-              <div className="space-y-2 pt-2 border-t border-gray-100">
-                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Ideal Para y Actividades</label>
-                <div className="flex flex-col gap-2">
-                  {availableActivities.map((act) => {
-                    const isSelected = selectedActivities.includes(act.key);
-                    return (
-                      <label key={act.key} className="flex items-center gap-2 text-xs font-bold text-gray-600 cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={() => {
-                            setSelectedActivities(prev =>
-                              prev.includes(act.key) ? prev.filter(k => k !== act.key) : [...prev, act.key]
-                            );
-                          }}
-                          className="rounded text-[#9B00CC] focus:ring-[#9B00CC] border-gray-300 w-3.5 h-3.5 cursor-pointer accent-[#9B00CC]"
-                        />
-                        <span className="truncate leading-tight text-gray-500 hover:text-gray-700">{act.label}</span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Restablecer Filtros */}
-              {activeFiltersCount > 0 && (
+              {/* BLOQUE 3: Subtipo de Alojamiento & Estrellas */}
+              <div className="pt-3">
                 <button
-                  onClick={clearFilters}
-                  className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-650 border border-red-100 rounded-xl text-xs font-black transition-colors cursor-pointer select-none mt-2"
+                  type="button"
+                  onClick={() => toggleBlock("subtipo")}
+                  className="w-full flex items-center justify-between py-1 text-left cursor-pointer group"
                 >
-                  <X className="w-4 h-4" />
-                  <span>Limpiar Filtros</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-md bg-purple-500/15 text-[#9B00CC] flex items-center justify-center shrink-0">
+                      <Building2 className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-black text-gray-800 tracking-tight">Tipo & Categoría Estrellas</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {(selectedSubtype || selectedStars.length > 0) && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-[#9B00CC] text-white">
+                        {(selectedSubtype ? 1 : 0) + selectedStars.length}
+                      </span>
+                    )}
+                    {expandedBlocks.subtipo ? <ChevronUp className="w-3.5 h-3.5 text-gray-400" /> : <ChevronDown className="w-3.5 h-3.5 text-gray-400" />}
+                  </div>
                 </button>
+
+                {expandedBlocks.subtipo && (
+                  <div className="mt-2 space-y-2.5 pl-7">
+                    <select
+                      value={selectedSubtype}
+                      onChange={(e) => setSelectedSubtype(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-gray-700 outline-none focus:border-[#9B00CC] cursor-pointer"
+                    >
+                      <option value="">Cualquier Subtipo</option>
+                      <option value="posada_boutique">Posada Boutique / Encanto</option>
+                      <option value="hotel_familiar">Hotel Urbano / Ejecutivo</option>
+                      <option value="resort">Resort & Complejo Vacacional</option>
+                      <option value="otros">Villas, Casas & Glamping</option>
+                    </select>
+
+                    <div className="space-y-1">
+                      <span className="text-[9px] uppercase font-bold text-gray-400 tracking-wider block">Estrellas</span>
+                      {[5, 4, 3, 2].map(stars => (
+                        <label key={stars} className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={selectedStars.includes(stars)}
+                            onChange={() => toggleArrayFilter(setSelectedStars as any, stars as any)}
+                            className="rounded text-[#9B00CC] focus:ring-[#9B00CC] border-gray-300 w-3.5 h-3.5 accent-[#9B00CC]"
+                          />
+                          <span className="flex items-center gap-0.5 text-amber-500 font-black">
+                            {Array.from({ length: stars }).map((_, i) => <span key={i}>★</span>)}
+                            <span className="text-[10px] text-gray-500 font-bold ml-1">({stars} Estrellas)</span>
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* BLOQUE 4: Infraestructura Crítica (Venezuela Power & Water) */}
+              <div className="pt-3">
+                <button
+                  type="button"
+                  onClick={() => toggleBlock("infra")}
+                  className="w-full flex items-center justify-between py-1 text-left cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-md bg-[#FF0096]/15 text-[#FF0096] flex items-center justify-center shrink-0">
+                      <Zap className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-black text-gray-800 tracking-tight">Infraestructura Venezuela</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {selectedInfra.length > 0 && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-[#FF0096] text-white">
+                        {selectedInfra.length}
+                      </span>
+                    )}
+                    {expandedBlocks.infra ? <ChevronUp className="w-3.5 h-3.5 text-gray-400" /> : <ChevronDown className="w-3.5 h-3.5 text-gray-400" />}
+                  </div>
+                </button>
+
+                {expandedBlocks.infra && (
+                  <div className="mt-2 space-y-1.5 pl-7">
+                    {[
+                      { key: "planta_electrica", label: "Planta Eléctrica 24/7 (Full Power)" },
+                      { key: "tanque_agua", label: "Tanque de Agua Continuo" },
+                      { key: "wifi_fibra", label: "WiFi Fibra Óptica Alta Velocidad" },
+                      { key: "estacionamiento", label: "Estacionamiento Privado Vigilado" },
+                      { key: "ev_charge", label: "Carga Vehículos Eléctricos (EV)" }
+                    ].map(item => (
+                      <label key={item.key} className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={selectedInfra.includes(item.key)}
+                          onChange={() => toggleArrayFilter(setSelectedInfra, item.key)}
+                          className="rounded text-[#FF0096] focus:ring-[#FF0096] border-gray-300 w-3.5 h-3.5 accent-[#FF0096]"
+                        />
+                        <span className="truncate">{item.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* BLOQUE 5: Métodos de Pago & Condiciones */}
+              <div className="pt-3">
+                <button
+                  type="button"
+                  onClick={() => toggleBlock("pago")}
+                  className="w-full flex items-center justify-between py-1 text-left cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-md bg-emerald-500/15 text-emerald-600 flex items-center justify-center shrink-0">
+                      <CreditCard className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-black text-gray-800 tracking-tight">Pago & Condiciones</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {selectedPaymentMethods.length > 0 && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-emerald-600 text-white">
+                        {selectedPaymentMethods.length}
+                      </span>
+                    )}
+                    {expandedBlocks.pago ? <ChevronUp className="w-3.5 h-3.5 text-gray-400" /> : <ChevronDown className="w-3.5 h-3.5 text-gray-400" />}
+                  </div>
+                </button>
+
+                {expandedBlocks.pago && (
+                  <div className="mt-2 space-y-1.5 pl-7">
+                    {[
+                      { key: "pago_movil", label: "Pago Móvil (Bs. VES)" },
+                      { key: "zelle", label: "Zelle (USD)" },
+                      { key: "usdt_crypto", label: "Binance USDT / Crypto" },
+                      { key: "tarjeta_int", label: "Tarjeta Internacional (Visa/MC)" },
+                      { key: "cancelacion_gratis", label: "Cancelación Gratuita" },
+                      { key: "sin_tarjeta", label: "Sin Tarjeta de Crédito Requerida" }
+                    ].map(item => (
+                      <label key={item.key} className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={selectedPaymentMethods.includes(item.key)}
+                          onChange={() => toggleArrayFilter(setSelectedPaymentMethods, item.key)}
+                          className="rounded text-emerald-600 focus:ring-emerald-600 border-gray-300 w-3.5 h-3.5 accent-emerald-600"
+                        />
+                        <span className="truncate">{item.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* BLOQUE 6: Régimen de Comidas */}
+              <div className="pt-3">
+                <button
+                  type="button"
+                  onClick={() => toggleBlock("comidas")}
+                  className="w-full flex items-center justify-between py-1 text-left cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-md bg-orange-500/15 text-orange-600 flex items-center justify-center shrink-0">
+                      <Utensils className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-black text-gray-800 tracking-tight">Régimen de Comidas</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {selectedMeals.length > 0 && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-orange-600 text-white">
+                        {selectedMeals.length}
+                      </span>
+                    )}
+                    {expandedBlocks.comidas ? <ChevronUp className="w-3.5 h-3.5 text-gray-400" /> : <ChevronDown className="w-3.5 h-3.5 text-gray-400" />}
+                  </div>
+                </button>
+
+                {expandedBlocks.comidas && (
+                  <div className="mt-2 space-y-1.5 pl-7">
+                    {[
+                      { key: "desayuno_incluido", label: "Desayuno Incluido (Criollo / Cont.)" },
+                      { key: "all_inclusive", label: "All Inclusive (Todo Incluido)" },
+                      { key: "media_pension", label: "Media Pensión (Desayuno y Cena)" },
+                      { key: "restaurante", label: "Restaurante en la Propiedad" },
+                      { key: "cocina", label: "Cocina / Kitchinette en Habitación" }
+                    ].map(item => (
+                      <label key={item.key} className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={selectedMeals.includes(item.key)}
+                          onChange={() => toggleArrayFilter(setSelectedMeals, item.key)}
+                          className="rounded text-orange-600 focus:ring-orange-600 border-gray-300 w-3.5 h-3.5 accent-orange-600"
+                        />
+                        <span className="truncate">{item.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* BLOQUE 7: Instalaciones & Bienestar */}
+              <div className="pt-3">
+                <button
+                  type="button"
+                  onClick={() => toggleBlock("instalaciones")}
+                  className="w-full flex items-center justify-between py-1 text-left cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-md bg-cyan-500/15 text-[#00C8D4] flex items-center justify-center shrink-0">
+                      <Waves className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-black text-gray-800 tracking-tight">Instalaciones & Bienestar</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {selectedFacilities.length > 0 && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-[#00C8D4] text-slate-950">
+                        {selectedFacilities.length}
+                      </span>
+                    )}
+                    {expandedBlocks.instalaciones ? <ChevronUp className="w-3.5 h-3.5 text-gray-400" /> : <ChevronDown className="w-3.5 h-3.5 text-gray-400" />}
+                  </div>
+                </button>
+
+                {expandedBlocks.instalaciones && (
+                  <div className="mt-2 space-y-1.5 pl-7">
+                    {[
+                      { key: "piscina", label: "Piscina al Aire Libre / Climatizada" },
+                      { key: "spa", label: "Spa & Centro de Bienestar" },
+                      { key: "jacuzzi", label: "Bañera de Hidromasaje / Jacuzzi" },
+                      { key: "gimnasio", label: "Gimnasio Equipado" },
+                      { key: "solarium", label: "Solárium / Terraza Panorámica" },
+                      { key: "recepcion_24h", label: "Recepción 24 Horas" }
+                    ].map(item => (
+                      <label key={item.key} className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={selectedFacilities.includes(item.key)}
+                          onChange={() => toggleArrayFilter(setSelectedFacilities, item.key)}
+                          className="rounded text-[#00C8D4] focus:ring-[#00C8D4] border-gray-300 w-3.5 h-3.5 accent-[#00C8D4]"
+                        />
+                        <span className="truncate">{item.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* BLOQUE 8: Confort de Habitación & Camas */}
+              <div className="pt-3">
+                <button
+                  type="button"
+                  onClick={() => toggleBlock("habitacion")}
+                  className="w-full flex items-center justify-between py-1 text-left cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-md bg-blue-500/15 text-blue-600 flex items-center justify-center shrink-0">
+                      <Bed className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-black text-gray-800 tracking-tight">Confort de Habitación</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {selectedRoomFeatures.length > 0 && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-blue-600 text-white">
+                        {selectedRoomFeatures.length}
+                      </span>
+                    )}
+                    {expandedBlocks.habitacion ? <ChevronUp className="w-3.5 h-3.5 text-gray-400" /> : <ChevronDown className="w-3.5 h-3.5 text-gray-400" />}
+                  </div>
+                </button>
+
+                {expandedBlocks.habitacion && (
+                  <div className="mt-2 space-y-1.5 pl-7">
+                    {[
+                      { key: "cama_king", label: "Cama King / Queen Size" },
+                      { key: "camas_indiv", label: "Camas Individuales / Dobles" },
+                      { key: "cuna", label: "Cuna Adicional Disponible" },
+                      { key: "balcon", label: "Balcón o Terraza con Vista" },
+                      { key: "aire_acondicionado", label: "Aire Acondicionado" },
+                      { key: "tv", label: "TV Pantalla Plana & Cable" },
+                      { key: "bano_privado", label: "Baño Privado con Agua Caliente" }
+                    ].map(item => (
+                      <label key={item.key} className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={selectedRoomFeatures.includes(item.key)}
+                          onChange={() => toggleArrayFilter(setSelectedRoomFeatures, item.key)}
+                          className="rounded text-blue-600 focus:ring-blue-600 border-gray-300 w-3.5 h-3.5 accent-blue-600"
+                        />
+                        <span className="truncate">{item.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* BLOQUE 9: Experiencias & Entretenimiento */}
+              <div className="pt-3">
+                <button
+                  type="button"
+                  onClick={() => toggleBlock("experiencias")}
+                  className="w-full flex items-center justify-between py-1 text-left cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-md bg-indigo-500/15 text-indigo-600 flex items-center justify-center shrink-0">
+                      <Sparkles className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-black text-gray-800 tracking-tight">Experiencias & Tours</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {selectedActivities.length > 0 && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-indigo-600 text-white">
+                        {selectedActivities.length}
+                      </span>
+                    )}
+                    {expandedBlocks.experiencias ? <ChevronUp className="w-3.5 h-3.5 text-gray-400" /> : <ChevronDown className="w-3.5 h-3.5 text-gray-400" />}
+                  </div>
+                </button>
+
+                {expandedBlocks.experiencias && (
+                  <div className="mt-2 space-y-1.5 pl-7">
+                    {[
+                      { key: "tours_guiados", label: "Tours & Excursiones Guiadas" },
+                      { key: "paseos_lancha", label: "Paseos en Lancha / Snorkel" },
+                      { key: "ciclismo", label: "Rutas en Bicicleta" },
+                      { key: "musica_envivo", label: "Música / Espectáculos en Vivo" },
+                      { key: "rutas_catas", label: "Ruta Gastronómica & Catas" }
+                    ].map(item => (
+                      <label key={item.key} className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={selectedActivities.includes(item.key)}
+                          onChange={() => toggleArrayFilter(setSelectedActivities, item.key)}
+                          className="rounded text-indigo-600 focus:ring-indigo-600 border-gray-300 w-3.5 h-3.5 accent-indigo-600"
+                        />
+                        <span className="truncate">{item.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* BLOQUE 10: Tipo de Grupo & Ambiente */}
+              <div className="pt-3">
+                <button
+                  type="button"
+                  onClick={() => toggleBlock("grupo")}
+                  className="w-full flex items-center justify-between py-1 text-left cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-md bg-pink-500/15 text-pink-600 flex items-center justify-center shrink-0">
+                      <Users className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-black text-gray-800 tracking-tight">Ambiente & Tipo de Grupo</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {selectedGroupTypes.length > 0 && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-pink-600 text-white">
+                        {selectedGroupTypes.length}
+                      </span>
+                    )}
+                    {expandedBlocks.grupo ? <ChevronUp className="w-3.5 h-3.5 text-gray-400" /> : <ChevronDown className="w-3.5 h-3.5 text-gray-400" />}
+                  </div>
+                </button>
+
+                {expandedBlocks.grupo && (
+                  <div className="mt-2 space-y-1.5 pl-7">
+                    {[
+                      { key: "familiar", label: "Familiar (Apto para niños)" },
+                      { key: "solo_adultos", label: "Solo Adultos / Parejas" },
+                      { key: "pet_friendly", label: "Pet Friendly (Mascotas)" },
+                      { key: "travel_proud", label: "Travel Proud (LGBTQ+)" }
+                    ].map(item => (
+                      <label key={item.key} className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={selectedGroupTypes.includes(item.key)}
+                          onChange={() => toggleArrayFilter(setSelectedGroupTypes, item.key)}
+                          className="rounded text-pink-600 focus:ring-pink-600 border-gray-300 w-3.5 h-3.5 accent-pink-600"
+                        />
+                        <span className="truncate">{item.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* BLOQUE 11: Accesibilidad */}
+              <div className="pt-3">
+                <button
+                  type="button"
+                  onClick={() => toggleBlock("accesibilidad")}
+                  className="w-full flex items-center justify-between py-1 text-left cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-md bg-[#00C8D4]/15 text-[#00C8D4] flex items-center justify-center shrink-0">
+                      <Accessibility className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-black text-gray-800 tracking-tight">Accesibilidad Integrada</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {selectedAccessibility.length > 0 && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-[#00C8D4] text-slate-950">
+                        {selectedAccessibility.length}
+                      </span>
+                    )}
+                    {expandedBlocks.accesibilidad ? <ChevronUp className="w-3.5 h-3.5 text-gray-400" /> : <ChevronDown className="w-3.5 h-3.5 text-gray-400" />}
+                  </div>
+                </button>
+
+                {expandedBlocks.accesibilidad && (
+                  <div className="mt-2 space-y-1.5 pl-7">
+                    {[
+                      { key: "silla_ruedas", label: "Accesible en Silla de Ruedas" },
+                      { key: "ascensor", label: "Acceso con Ascensor" },
+                      { key: "planta_baja", label: "Toda la Unidad en Planta Baja" },
+                      { key: "wc_barras", label: "WC Adaptado con Barras" },
+                      { key: "braille_audio", label: "Braille & Guiado Auditivo/Visual" }
+                    ].map(item => (
+                      <label key={item.key} className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={selectedAccessibility.includes(item.key)}
+                          onChange={() => toggleArrayFilter(setSelectedAccessibility, item.key)}
+                          className="rounded text-[#00C8D4] focus:ring-[#00C8D4] border-gray-300 w-3.5 h-3.5 accent-[#00C8D4]"
+                        />
+                        <span className="truncate">{item.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* BLOQUE 12: Ubicación & Proximidad */}
+              <div className="pt-3">
+                <button
+                  type="button"
+                  onClick={() => toggleBlock("ubicacion")}
+                  className="w-full flex items-center justify-between py-1 text-left cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-md bg-teal-500/15 text-teal-600 flex items-center justify-center shrink-0">
+                      <MapPin className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-black text-gray-800 tracking-tight">Ubicación & Proximidad</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {selectedLocationDistances.length > 0 && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-teal-600 text-white">
+                        {selectedLocationDistances.length}
+                      </span>
+                    )}
+                    {expandedBlocks.ubicacion ? <ChevronUp className="w-3.5 h-3.5 text-gray-400" /> : <ChevronDown className="w-3.5 h-3.5 text-gray-400" />}
+                  </div>
+                </button>
+
+                {expandedBlocks.ubicacion && (
+                  <div className="mt-2 space-y-1.5 pl-7">
+                    {[
+                      { key: "cerca_mar", label: "Frente al Mar / < 1 km Playa" },
+                      { key: "cerca_centro", label: "Zona Urbana / < 3 km Centro" },
+                      { key: "cerca_aeropuerto", label: "Cerca del Aeropuerto Principal" }
+                    ].map(item => (
+                      <label key={item.key} className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={selectedLocationDistances.includes(item.key)}
+                          onChange={() => toggleArrayFilter(setSelectedLocationDistances, item.key)}
+                          className="rounded text-teal-600 focus:ring-teal-600 border-gray-300 w-3.5 h-3.5 accent-teal-600"
+                        />
+                        <span className="truncate">{item.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Botón de Limpieza General de Filtros */}
+              {activeFiltersCount > 0 && (
+                <div className="pt-4">
+                  <button
+                    type="button"
+                    onClick={clearFilters}
+                    className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl text-xs font-black transition-colors cursor-pointer select-none"
+                  >
+                    <X className="w-4 h-4" />
+                    <span>Limpiar Todos los Filtros ({activeFiltersCount})</span>
+                  </button>
+                </div>
               )}
             </div>
           </aside>
