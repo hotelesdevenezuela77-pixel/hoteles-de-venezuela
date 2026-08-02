@@ -1,4 +1,4 @@
-import { useEffect, lazy, Suspense } from "react";
+import React, { Component, useEffect, lazy, Suspense, ErrorInfo, ReactNode } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "./lib/auth";
@@ -9,35 +9,102 @@ import { Home } from "./pages/Home";
 import { TENANTS_REGISTRY } from "./tenants/tenantContext";
 import { AdminLayout } from "./components/admin/AdminLayout";
 
-// Helper para importaciones dinámicas de exportaciones nombradas (named exports) con autorecuperación
+// Error Boundary para capturar fallos de carga de chunks y JS desactualizado en cliente
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error?: Error;
+}
+
+class AppErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryState> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("AppErrorBoundary capturó un error:", error, errorInfo);
+  }
+
+  handleReload = () => {
+    if (typeof window !== "undefined") {
+      sessionStorage.clear();
+      window.location.href = window.location.origin + window.location.pathname + "?v=" + Date.now();
+    }
+  };
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center bg-white">
+          <div className="w-16 h-16 bg-[#00C8D4]/15 border border-[#00C8D4]/30 rounded-2xl flex items-center justify-center text-[#00C8D4] mb-4 shadow-lg">
+            <svg className="w-8 h-8 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-black text-slate-900 mb-2 font-serif uppercase tracking-tight">Sincronizando Nueva Versión</h2>
+          <p className="text-xs text-slate-500 max-w-md mb-6 leading-relaxed">
+            Se ha desplegado una actualización de rendimiento en la plataforma. Haz clic abajo para refrescar tu panel de control de manera segura.
+          </p>
+          <button
+            onClick={this.handleReload}
+            className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#00C8D4] to-[#FF0096] text-white font-black text-xs uppercase tracking-wider shadow-lg hover:scale-105 active:scale-95 transition-all cursor-pointer"
+          >
+            Actualizar y Cargar Panel
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+// Helper robusto para importaciones dinámicas nombradas con reintento automático e invalidador de caché
 function lazyNamed<T extends Record<string, any>>(
   importFn: () => Promise<T>,
   exportName: keyof T
 ) {
-  return lazy(() => 
-    importFn()
-      .then((module) => ({ default: module[exportName] }))
-      .catch((error) => {
-        console.error("Chunk load error en lazyNamed, recargando...", error);
-        if (typeof window !== "undefined") {
-          window.location.reload();
-        }
-        return new Promise(() => {});
-      })
-  );
+  return lazy(async () => {
+    try {
+      const module = await importFn();
+      if (!module || !module[exportName]) {
+        throw new Error(`Modulo ${String(exportName)} no encontrado`);
+      }
+      return { default: module[exportName] };
+    } catch (error) {
+      console.error(`Error al cargar módulo dinámico ${String(exportName)}:`, error);
+      const key = `hdv_chunk_reload_${String(exportName)}`;
+      const alreadyReloaded = typeof window !== "undefined" && sessionStorage.getItem(key);
+      
+      if (typeof window !== "undefined" && !alreadyReloaded) {
+        sessionStorage.setItem(key, "true");
+        window.location.reload();
+        return new Promise<never>(() => {});
+      }
+      
+      throw error;
+    }
+  });
 }
 
 // Wrapper para lazy import con autorecuperación en caso de nuevo despliegue
 function lazyWithRetry(importFn: () => Promise<any>) {
-  return lazy(() =>
-    importFn().catch((error) => {
-      console.error("Chunk load error en lazy, recargando...", error);
-      if (typeof window !== "undefined") {
+  return lazy(async () => {
+    try {
+      return await importFn();
+    } catch (error) {
+      console.error("Error al cargar chunk dinámico:", error);
+      if (typeof window !== "undefined" && !sessionStorage.getItem("hdv_chunk_retry")) {
+        sessionStorage.setItem("hdv_chunk_retry", "true");
         window.location.reload();
+        return new Promise<never>(() => {});
       }
-      return new Promise(() => {});
-    })
-  );
+      throw error;
+    }
+  });
 }
 
 // Importaciones dinámicas (React.lazy) para optimización masiva de rendimiento
@@ -250,72 +317,74 @@ function App() {
 
   return (
     <MainLayout>
-      <Suspense fallback={
-        <div className="min-h-[60vh] flex flex-col items-center justify-center bg-transparent">
-          {/* Subtle loading spinner using official colors */}
-          <div className="relative w-12 h-12">
-            <div className="absolute inset-0 rounded-full border-4 border-[#1a0533] opacity-30" />
-            <div className="absolute inset-0 rounded-full border-4 border-t-[#00C8D4] border-r-[#FF0096] animate-spin" />
+      <AppErrorBoundary>
+        <Suspense fallback={
+          <div className="min-h-[60vh] flex flex-col items-center justify-center bg-transparent">
+            {/* Subtle loading spinner using official colors */}
+            <div className="relative w-12 h-12">
+              <div className="absolute inset-0 rounded-full border-4 border-[#1a0533] opacity-30" />
+              <div className="absolute inset-0 rounded-full border-4 border-t-[#00C8D4] border-r-[#FF0096] animate-spin" />
+            </div>
+            <p className="text-[10px] uppercase font-black text-gray-400 tracking-[0.2em] mt-4 animate-pulse">
+              Cargando Experiencia...
+            </p>
           </div>
-          <p className="text-[10px] uppercase font-black text-gray-400 tracking-[0.2em] mt-4 animate-pulse">
-            Cargando Experiencia...
-          </p>
-        </div>
-      }>
-        <Switch>
-          {/* Rutas Públicas */}
-          <Route path="/" component={Home} />
-          <Route path="/login" component={Login} />
-          <Route path="/registro" component={Registro} />
-          <Route path="/perfil" component={Perfil} />
-          <Route path="/perfil/kyc" component={PerfilKYC} />
-          <Route path="/hdv-acceso-llc2027" component={AdminLogin} />
-          <Route path="/establecimientos" component={Establecimientos} />
-          <Route path="/establecimiento/:slug" component={EstablecimientoDetalle} />
-          <Route path="/destinos" component={Destinos} />
-          <Route path="/destinos/:slug" component={DestinoDetalle} />
-          <Route path="/mapa" component={InteractiveMap} />
-          <Route path="/parques" component={NationalParks} />
-          <Route path="/parque/:slug" component={NationalParkDetail} />
-          <Route path="/servicios-b2b" component={B2BMarketplace} />
-          <Route path="/comparar" component={Comparar} />
-          <Route path="/paquetes" component={Paquetes} />
-          <Route path="/links" component={LinkHub} />
-          <Route path="/blog" component={Blog} />
-          <Route path="/sitios-turisticos" component={SitiosTuristicos} />
+        }>
+          <Switch>
+            {/* Rutas Públicas */}
+            <Route path="/" component={Home} />
+            <Route path="/login" component={Login} />
+            <Route path="/registro" component={Registro} />
+            <Route path="/perfil" component={Perfil} />
+            <Route path="/perfil/kyc" component={PerfilKYC} />
+            <Route path="/hdv-acceso-llc2027" component={AdminLogin} />
+            <Route path="/establecimientos" component={Establecimientos} />
+            <Route path="/establecimiento/:slug" component={EstablecimientoDetalle} />
+            <Route path="/destinos" component={Destinos} />
+            <Route path="/destinos/:slug" component={DestinoDetalle} />
+            <Route path="/mapa" component={InteractiveMap} />
+            <Route path="/parques" component={NationalParks} />
+            <Route path="/parque/:slug" component={NationalParkDetail} />
+            <Route path="/servicios-b2b" component={B2BMarketplace} />
+            <Route path="/comparar" component={Comparar} />
+            <Route path="/paquetes" component={Paquetes} />
+            <Route path="/links" component={LinkHub} />
+            <Route path="/blog" component={Blog} />
+            <Route path="/sitios-turisticos" component={SitiosTuristicos} />
 
-          <Route path="/membresias" component={Membresias} />
-          <Route path="/reportar-pago" component={ReportarPago} />
-          <Route path="/privacidad" component={Privacidad} />
-          <Route path="/prestigio-2026" component={ExcelenciaLanding} />
-          <Route path="/los-10-mejores-hoteles" component={Top10Hoteles} />
-          <Route path="/mejores-hoteles-venezuela" component={Top10Hoteles} />
-          <Route path="/viaje-ia" component={AsistenteViajesIA} />
+            <Route path="/membresias" component={Membresias} />
+            <Route path="/reportar-pago" component={ReportarPago} />
+            <Route path="/privacidad" component={Privacidad} />
+            <Route path="/prestigio-2026" component={ExcelenciaLanding} />
+            <Route path="/los-10-mejores-hoteles" component={Top10Hoteles} />
+            <Route path="/mejores-hoteles-venezuela" component={Top10Hoteles} />
+            <Route path="/viaje-ia" component={AsistenteViajesIA} />
 
-          {/* Dashboards Propietarios */}
-          <Route path="/mis-negocios" component={OwnerDashboard} />
-          <Route path="/panel-propietario" component={OwnerDashboard} />
-          <Route path="/andromeda">
-            {() => <AdminLayout><AndromedaPanel /></AdminLayout>}
-          </Route>
-          
-          {/* Rutas del Panel Administrativo Envolvente */}
-          <Route path="/admin" component={AdminShell} />
-          <Route path="/admin/*" component={AdminShell} />
+            {/* Dashboards Propietarios */}
+            <Route path="/mis-negocios" component={OwnerDashboard} />
+            <Route path="/panel-propietario" component={OwnerDashboard} />
+            <Route path="/andromeda">
+              {() => <AdminLayout><AndromedaPanel /></AdminLayout>}
+            </Route>
+            
+            {/* Rutas del Panel Administrativo Envolvente */}
+            <Route path="/admin" component={AdminShell} />
+            <Route path="/admin/*" component={AdminShell} />
 
-          {/* Atajos y Catch-all */}
-          <Route path="/blog/:slug" component={BlogDetalle} />
-          <Route path="/sitio/:slug" component={SitioDetalle} />
-          <Route path="/crm">
-            {() => <AdminLayout><AdminComercial /></AdminLayout>}
-          </Route>
-          <Route path="/centaurus">
-            {() => <AdminLayout><Centauros /></AdminLayout>}
-          </Route>
-          <Route path="/:slug" component={CustomPageViewer} />
-          <Route component={NotFound} />
-        </Switch>
-      </Suspense>
+            {/* Atajos y Catch-all */}
+            <Route path="/blog/:slug" component={BlogDetalle} />
+            <Route path="/sitio/:slug" component={SitioDetalle} />
+            <Route path="/crm">
+              {() => <AdminLayout><AdminComercial /></AdminLayout>}
+            </Route>
+            <Route path="/centaurus">
+              {() => <AdminLayout><Centauros /></AdminLayout>}
+            </Route>
+            <Route path="/:slug" component={CustomPageViewer} />
+            <Route component={NotFound} />
+          </Switch>
+        </Suspense>
+      </AppErrorBoundary>
     </MainLayout>
   );
 }
