@@ -1,4 +1,4 @@
-import React, { Component, useEffect, lazy, Suspense, ErrorInfo, ReactNode } from "react";
+import React, { Component, useEffect, lazy, Suspense, type ErrorInfo, type ReactNode } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "./lib/auth";
