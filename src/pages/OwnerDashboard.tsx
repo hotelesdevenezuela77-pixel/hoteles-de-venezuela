@@ -439,23 +439,32 @@ export function OwnerDashboard() {
     if (selectedCalendarEst) {
       const key = `hdv_surroundings_${selectedCalendarEst}`;
       const saved = localStorage.getItem(key);
-      if (saved) {
+      const isSpanishMock = saved && (
+        saved.includes("Ayuntamiento") || 
+        saved.includes("Rambleta") || 
+        saved.includes("Turia") || 
+        saved.includes("Malvarrosa") || 
+        saved.includes("Valencia") ||
+        saved.includes("Xàtiva")
+      );
+
+      if (saved && !isSpanishMock) {
         setSurroundings(JSON.parse(saved));
       } else {
         const defaults = [
-          { category: "cerca", name: "Plaza del Ayuntamiento", distance: "100 m" },
-          { category: "cerca", name: "Parque de la Rambleta", distance: "100 m" },
-          { category: "cerca", name: "Museo Nacional de Cerámica", distance: "450 m" },
-          { category: "cerca", name: "Lonja de la Seda", distance: "550 m" },
-          { category: "gastronomia", name: "Restaurante Homenaje Taberna Gourmet", distance: "50 m" },
-          { category: "gastronomia", name: "Cafetería/bar McLub", distance: "80 m" },
-          { category: "atracciones", name: "Jardín del Turia", distance: "1.3 km" },
-          { category: "atracciones", name: "Museo de Ciencias Naturales", distance: "1.6 km" },
-          { category: "playas", name: "Playa de las Arenas", distance: "5 km" },
-          { category: "playas", name: "Playa de la Malvarrosa", distance: "5 km" },
-          { category: "transporte", name: "Metro - Estación de Metro Xàtiva", distance: "400 m" },
-          { category: "transporte", name: "Tren - Estación de tren del Norte", distance: "500 m" },
-          { category: "aeropuertos", name: "Aeropuerto de Valencia", distance: "8 km" }
+          { category: "cerca", name: "Plaza Bolívar & Centro Histórico", distance: "150 m" },
+          { category: "cerca", name: "Paseo Turístico & Bulevar Comercial", distance: "300 m" },
+          { category: "cerca", name: "Mirador Panorámico del Valle", distance: "600 m" },
+          { category: "cerca", name: "Parque Histórico y Zona Cultural", distance: "800 m" },
+          { category: "gastronomia", name: "Restaurante Gourmet Criollo & Arepera", distance: "100 m" },
+          { category: "gastronomia", name: "Café Artesanal y Bodegón Boutique", distance: "200 m" },
+          { category: "atracciones", name: "Parque Nacional & Teleférico Turístico", distance: "2.5 km" },
+          { category: "atracciones", name: "Centro de Arte & Galería Histórica", distance: "1.8 km" },
+          { category: "playas", name: "Playa El Yaque / Bahía Turística", distance: "4.5 km" },
+          { category: "playas", name: "Playa Caribe / Malecón del Caribe", distance: "6.2 km" },
+          { category: "transporte", name: "Terminal Turístico & Transporte Urbano", distance: "350 m" },
+          { category: "transporte", name: "Estación Central de Transferencia", distance: "800 m" },
+          { category: "aeropuertos", name: "Aeropuerto Internacional Simón Bolívar / Del Caribe", distance: "15 km" }
         ];
         setSurroundings(defaults);
         localStorage.setItem(key, JSON.stringify(defaults));
@@ -3876,7 +3885,7 @@ export function OwnerDashboard() {
                     <input
                       type="text"
                       required
-                      placeholder="Ej: Jardín del Turia"
+                      placeholder="Ej: Plaza Bolívar o Parque El Ávila"
                       value={newPOI.name}
                       onChange={e => setNewPOI(prev => ({ ...prev, name: e.target.value }))}
                       className="w-full px-3 py-2 bg-white border border-gray-250 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-1 focus:ring-brand-turquesa"
