@@ -5,7 +5,7 @@ import { OFFICIAL_WHATSAPP_NUMBER } from "@/config/whatsapp";
 import { useMutation } from "@tanstack/react-query";
 import { 
   CreditCard, Upload, CheckCircle2, ChevronRight, AlertCircle, 
-  ArrowLeft, Landmark, DollarSign, Calendar, MessageSquare, Loader2
+  ArrowLeft, Landmark, DollarSign, Calendar, MessageSquare, Loader2, FileText
 } from "lucide-react";
 
 const REASONS = [
@@ -428,18 +428,25 @@ export function ReportarPago() {
                 </div>
               </div>
 
-              {/* Upload Screenshot capture */}
+              {/* Upload Screenshot capture or PDF receipt */}
               <div>
-                <label className={labelCls}>Capture de Pantalla / Comprobante *</label>
+                <label className={labelCls}>Capture de Pantalla / Comprobante (Imagen o PDF) *</label>
                 <div className="flex flex-col sm:flex-row items-center gap-4 p-4 border border-dashed border-slate-300 bg-slate-50/50 rounded-2xl">
                   {previewUrl ? (
-                    <div className="relative w-28 h-28 border border-slate-200 rounded-xl overflow-hidden shrink-0 shadow-sm bg-white">
-                      <img src={previewUrl} alt="Capture preview" className="w-full h-full object-cover" />
+                    <div className="relative w-28 h-28 border border-slate-200 rounded-xl overflow-hidden shrink-0 shadow-sm bg-white flex items-center justify-center">
+                      {form.screenshotUrl.startsWith("data:application/pdf") || previewUrl.toLowerCase().includes(".pdf") ? (
+                        <div className="flex flex-col items-center justify-center p-2 text-center">
+                          <FileText className="w-10 h-10 text-brand-purple-deep mb-1" />
+                          <span className="text-[9px] font-bold text-slate-700 truncate max-w-[90px]">Comprobante PDF</span>
+                        </div>
+                      ) : (
+                        <img src={previewUrl} alt="Capture preview" className="w-full h-full object-cover" />
+                      )}
                       <button 
                         type="button" 
                         onClick={() => { setPreviewUrl(null); setF("screenshotUrl", ""); }}
-                        className="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center text-xs font-black cursor-pointer shadow-sm"
-                        title="Quitar imagen"
+                        className="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center text-xs font-black cursor-pointer shadow-sm z-10"
+                        title="Quitar comprobante"
                       >
                         ×
                       </button>
@@ -452,12 +459,12 @@ export function ReportarPago() {
                   )}
                   <div className="flex-1 text-center sm:text-left">
                     <p className="text-xs font-bold text-slate-700">Selecciona el comprobante de pago</p>
-                    <p className="text-[10px] font-semibold text-slate-400 mt-0.5">Formatos admitidos: JPG, PNG. Tamaño máximo: 5MB.</p>
+                    <p className="text-[10px] font-semibold text-slate-400 mt-0.5">Formatos admitidos: JPG, PNG, WEBP, PDF. Tamaño máximo: 5MB.</p>
                     <label className="inline-flex items-center gap-2 px-4 py-2 mt-3 border-2 border-dashed border-[#00C8D4]/40 bg-[#00C8D4]/5 hover:bg-[#00C8D4]/10 rounded-xl text-xs font-bold uppercase text-[#00C8D4] tracking-wider cursor-pointer transition-colors">
                       Elegir archivo
                       <input 
                         type="file" 
-                        accept="image/*" 
+                        accept="image/*,application/pdf" 
                         className="hidden" 
                         onChange={(e) => {
                           const file = e.target.files?.[0];

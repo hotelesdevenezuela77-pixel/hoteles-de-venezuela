@@ -7,7 +7,8 @@ import { supabase } from "@/lib/supabase";
 import { 
   DollarSign, CheckCircle2, XCircle, Clock, Search,
   Phone, Mail, User, Calendar, Receipt, MessageSquare,
-  ChevronDown, ChevronUp, Loader2, Eye, ExternalLink, RefreshCw
+  ChevronDown, ChevronUp, Loader2, Eye, ExternalLink, RefreshCw,
+  Upload, Trash2, FileText, FileCheck, ShieldCheck, Download, X
 } from "lucide-react";
 
 const REASONS: Record<string, string> = {
@@ -38,6 +39,101 @@ export function AdminPagos() {
   const [filterStatus, setFilterStatus] = useState("pendiente");
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [paymentDocsMap, setPaymentDocsMap] = useState<Record<number, any[]>>({});
+  const [selectedTagMap, setSelectedTagMap] = useState<Record<number, string>>({});
+  const [viewingDocModal, setViewingDocModal] = useState<any | null>(null);
+
+  const getPaymentDocs = (p: any) => {
+    if (paymentDocsMap[p.id]) return paymentDocsMap[p.id];
+    
+    const localKey = `hdv_payment_docs_${p.id}`;
+    const stored = localStorage.getItem(localKey);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        return parsed;
+      } catch (e) {
+        // fallback
+      }
+    }
+    
+    if (p.payment_documents && Array.isArray(p.payment_documents) && p.payment_documents.length > 0) {
+      return p.payment_documents;
+    }
+
+    if (p.screenshot_url) {
+      const isPdf = p.screenshot_url.includes(".pdf") || p.screenshot_url.startsWith("data:application/pdf");
+      return [{
+        id: `default_${p.id}`,
+        name: "Comprobante Principal",
+        type: isPdf ? "pdf" : "image",
+        url: p.screenshot_url,
+        uploadedAt: p.payment_date || p.created_at || "Fecha de Reporte",
+        size: "Original",
+        docTypeTag: "Capture de Pago"
+      }];
+    }
+
+    return [];
+  };
+
+  const handleUploadDocForPayment = (paymentId: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const tag = selectedTagMap[paymentId] || "Capture de Transferencia";
+    const currentDocs = getPaymentDocs({ id: paymentId });
+
+    Array.from(files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64 = reader.result as string;
+        const isPdf = file.type.includes("pdf") || file.name.toLowerCase().endsWith(".pdf");
+        const newDoc = {
+          id: `doc_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+          name: file.name,
+          type: isPdf ? "pdf" : "image",
+          url: base64,
+          uploadedAt: new Date().toLocaleDateString("es-VE") + " " + new Date().toLocaleTimeString("es-VE", { hour: "2-digit", minute: "2-digit" }),
+          size: `${(file.size / 1024).toFixed(1)} KB`,
+          docTypeTag: tag
+        };
+
+        const updatedDocs = [...currentDocs, newDoc];
+        setPaymentDocsMap(prev => ({ ...prev, [paymentId]: updatedDocs }));
+        localStorage.setItem(`hdv_payment_docs_${paymentId}`, JSON.stringify(updatedDocs));
+
+        try {
+          await supabase.from("reported_payments").update({
+            payment_documents: updatedDocs,
+            screenshot_url: updatedDocs[0]?.url || base64
+          }).eq("id", paymentId);
+        } catch (err) {
+          console.warn("DB update payment_documents error:", err);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    e.target.value = "";
+  };
+
+  const handleRemoveDocForPayment = async (paymentId: number, docId: string) => {
+    const currentDocs = getPaymentDocs({ id: paymentId });
+    const updatedDocs = currentDocs.filter((d: any) => d.id !== docId);
+
+    setPaymentDocsMap(prev => ({ ...prev, [paymentId]: updatedDocs }));
+    localStorage.setItem(`hdv_payment_docs_${paymentId}`, JSON.stringify(updatedDocs));
+
+    try {
+      await supabase.from("reported_payments").update({
+        payment_documents: updatedDocs,
+        screenshot_url: updatedDocs[0]?.url || null
+      }).eq("id", paymentId);
+    } catch (err) {
+      console.warn("DB remove payment_document error:", err);
+    }
+  };
 
   useEffect(() => {
     if (!authLoading && (!user || (profile?.role !== "admin" && user?.email?.toLowerCase() !== "hotelesdevenezuela77@gmail.com"))) {
@@ -358,26 +454,110 @@ export function AdminPagos() {
                           )}
                         </div>
 
-                        {/* Screenshot column */}
-                        <div className="flex flex-col items-center justify-center p-4 bg-white border border-slate-200/80 rounded-2xl shadow-xs">
-                          <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-2.5">Capture de la Transferencia</span>
-                          {p.screenshot_url ? (
-                            <div className="relative aspect-auto max-h-56 overflow-hidden rounded-xl border border-slate-100 shadow-sm cursor-zoom-in group"
-                              onClick={() => setLightboxImage(p.screenshot_url)}>
-                              <img src={p.screenshot_url} alt="Comprobante de Pago" className="max-w-full h-auto max-h-56 object-contain" />
-                              <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-xs font-bold gap-1">
-                                <Eye className="w-4 h-4" /> Ampliar
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="py-12 text-slate-350 text-xs font-semibold">No se subió captura</div>
-                          )}
-                          {p.screenshot_url && (
-                            <a href={p.screenshot_url} target="_blank" rel="noopener noreferrer" 
-                              className="text-[10px] text-[#00C8D4] font-black uppercase tracking-wider hover:underline flex items-center gap-1 mt-3">
-                              Abrir en nueva pestaña <ExternalLink className="w-3 h-3" />
-                            </a>
-                          )}
+                        {/* Payment Proofs & Documents Column */}
+                        <div className="flex flex-col p-4 bg-white border border-slate-200/80 rounded-2xl shadow-xs space-y-3 text-left">
+                          {(() => {
+                            const docs = getPaymentDocs(p);
+                            return (
+                              <>
+                                <div className="flex items-center justify-between">
+                                  <span className="text-[10px] uppercase font-extrabold text-slate-700 tracking-wider flex items-center gap-1">
+                                    <FileCheck className="w-3.5 h-3.5 text-[#00C8D4]" />
+                                    Zona de Comprobantes ({docs.length})
+                                  </span>
+                                  {docs.length > 0 && (
+                                    <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                      Respaldos Verificados
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* Upload controls for admin */}
+                                <div className="space-y-2 pt-1 border-t border-slate-100">
+                                  <div className="flex gap-1.5">
+                                    <select
+                                      value={selectedTagMap[p.id] || "Capture de Transferencia"}
+                                      onChange={e => setSelectedTagMap(prev => ({ ...prev, [p.id]: e.target.value }))}
+                                      className="px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-[10px] font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-[#00C8D4]"
+                                    >
+                                      <option value="Capture de Transferencia">Capture de Transferencia</option>
+                                      <option value="Comprobante Bancario (PDF)">Comprobante Bancario (PDF)</option>
+                                      <option value="Confirmación Zelle">Confirmación Zelle</option>
+                                      <option value="Recibo Binance USDT">Recibo Binance USDT</option>
+                                      <option value="Otro Respaldo">Otro Respaldo</option>
+                                    </select>
+
+                                    <label className="flex-1 bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-bold py-1.5 px-2.5 rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-xs">
+                                      <Upload className="w-3.5 h-3.5 text-[#00C8D4]" />
+                                      <span>Adjuntar</span>
+                                      <input
+                                        type="file"
+                                        multiple
+                                        accept="image/*,application/pdf"
+                                        onChange={e => handleUploadDocForPayment(p.id, e)}
+                                        className="hidden"
+                                      />
+                                    </label>
+                                  </div>
+                                </div>
+
+                                {/* Documents List */}
+                                {docs.length === 0 ? (
+                                  <div className="py-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                                    <Receipt className="w-6 h-6 text-slate-300 mx-auto mb-1" />
+                                    <p className="text-[11px] font-bold text-slate-500">No se adjuntaron comprobantes</p>
+                                    <p className="text-[9px] text-slate-400 mt-0.5">Usa "Adjuntar" arriba para cargar comprobantes de pago.</p>
+                                  </div>
+                                ) : (
+                                  <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                                    {docs.map((doc: any) => (
+                                      <div key={doc.id} className="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-2 text-xs">
+                                        <div className="flex items-center gap-2 min-w-0">
+                                          {doc.type === "image" ? (
+                                            <div className="w-9 h-9 rounded-lg overflow-hidden bg-gray-200 shrink-0 border border-gray-300">
+                                              <img src={doc.url} alt={doc.name} className="w-full h-full object-cover" />
+                                            </div>
+                                          ) : (
+                                            <div className="w-9 h-9 rounded-lg bg-purple-100 border border-purple-200 flex items-center justify-center shrink-0">
+                                              <FileText className="w-4 h-4 text-purple-700" />
+                                            </div>
+                                          )}
+                                          <div className="min-w-0">
+                                            <div className="flex items-center gap-1">
+                                              <span className="text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-[#00C8D4]/15 text-slate-800">
+                                                {doc.docTypeTag || "Comprobante"}
+                                              </span>
+                                            </div>
+                                            <p className="text-[11px] font-bold text-slate-800 truncate mt-0.5">{doc.name}</p>
+                                          </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-1 shrink-0">
+                                          <button
+                                            type="button"
+                                            onClick={() => setViewingDocModal(doc)}
+                                            className="px-2 py-1 bg-[#00C8D4]/15 hover:bg-[#00C8D4] hover:text-white text-slate-800 rounded-lg text-[9px] font-black uppercase transition-all flex items-center gap-1 cursor-pointer"
+                                            title="Visualizar comprobante"
+                                          >
+                                            <Eye className="w-3 h-3" />
+                                            <span>Ver</span>
+                                          </button>
+                                          <button
+                                            type="button"
+                                            onClick={() => handleRemoveDocForPayment(p.id, doc.id)}
+                                            className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                                            title="Eliminar comprobante"
+                                          >
+                                            <Trash2 className="w-3 h-3" />
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </>
+                            );
+                          })()}
                         </div>
                       </div>
 
@@ -421,6 +601,81 @@ export function AdminPagos() {
               ×
             </button>
             <img src={lightboxImage} alt="Receipt capture lightbox" className="max-w-full max-h-[85vh] object-contain rounded-lg" />
+          </div>
+        </div>
+      )}
+
+      {/* Lightbox / Document Viewer Modal for Payment Receipts */}
+      {viewingDocModal && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden animate-in zoom-in-95 duration-200 my-6">
+            <div className="bg-gradient-to-r from-brand-purple-dark to-brand-purple-deep px-6 py-4 flex items-center justify-between text-white">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-[#00C8D4]/20 border border-[#00C8D4]/30 flex items-center justify-center">
+                  <FileCheck className="w-5 h-5 text-[#00C8D4]" />
+                </div>
+                <div className="text-left">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-extrabold text-sm tracking-wide text-white">{viewingDocModal.name}</h3>
+                    <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-brand-magenta text-white">
+                      {viewingDocModal.docTypeTag || "Comprobante de Pago"}
+                    </span>
+                  </div>
+                  <p className="text-white/70 text-[10px] font-semibold mt-0.5">
+                    Cargado el: {viewingDocModal.uploadedAt} | Tamaño: {viewingDocModal.size}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setViewingDocModal(null)}
+                className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-6 bg-slate-900 flex flex-col items-center justify-center min-h-[400px] max-h-[70vh] overflow-y-auto">
+              {viewingDocModal.type === "image" ? (
+                <img
+                  src={viewingDocModal.url}
+                  alt={viewingDocModal.name}
+                  className="max-h-[60vh] max-w-full rounded-2xl object-contain shadow-2xl border border-slate-700"
+                />
+              ) : (
+                <div className="w-full h-[60vh] flex flex-col items-center justify-center text-center p-6 bg-slate-800 rounded-2xl border border-slate-700">
+                  <iframe
+                    src={viewingDocModal.url}
+                    title={viewingDocModal.name}
+                    className="w-full h-full rounded-xl bg-white border-0 mb-3"
+                  />
+                  <p className="text-xs text-slate-300 font-semibold mb-2">Vista previa de comprobante bancario PDF</p>
+                </div>
+              )}
+            </div>
+
+            <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3">
+              <span className="text-[11px] font-bold text-slate-600 flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-green-600" />
+                Respaldo verificado de transacción comercial para Hoteles de Venezuela LLC
+              </span>
+              <div className="flex gap-2">
+                <a
+                  href={viewingDocModal.url}
+                  download={viewingDocModal.name}
+                  className="px-4 py-2 bg-[#00C8D4] hover:bg-cyan-500 text-slate-900 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Descargar</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setViewingDocModal(null)}
+                  className="px-4 py-2 bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
