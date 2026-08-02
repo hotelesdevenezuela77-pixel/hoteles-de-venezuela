@@ -123,12 +123,6 @@ export function Establecimientos() {
     return category === "posadas" ? 2 + (est.id % 4) : 4 + (est.id % 6);
   };
 
-  const toggleAmenityFilter = (key: string) => {
-    setSelectedAmenities(prev =>
-      prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
-    );
-  };
-
   // Load compared hotels on mount
   useEffect(() => {
     const stored = localStorage.getItem("hdv_compare_list");
@@ -451,7 +445,7 @@ export function Establecimientos() {
 
     // 1. Garantía & Certificaciones
     if (est.has_hdv_seal || est.membership_tier === "diamante" || est.id % 2 === 0) estServices.push("sello_hdv");
-    if (est.is_circuito_excelencia || nameLower.includes("boutique") || est.id % 3 === 0) estServices.push("circuito_excelencia");
+    if ((est as any).is_circuito_excelencia || nameLower.includes("boutique") || est.id % 3 === 0) estServices.push("circuito_excelencia");
     if (est.id % 2 === 1) estServices.push("sostenibilidad");
     if (est.has_reservations_enabled || est.id % 2 === 0) estServices.push("reserva_inmediata");
 
