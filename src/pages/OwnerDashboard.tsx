@@ -1552,15 +1552,15 @@ export function OwnerDashboard() {
       )}
       
       {/* Header Banner - Full Bleed */}
-      <div className="relative overflow-hidden py-10 bg-gradient-to-br from-[#1a0533] via-[#0e011f] to-black text-white w-full">
+      <div className="relative overflow-hidden py-6 bg-gradient-to-br from-[#1a0533] via-[#0e011f] to-black text-white w-full">
         {/* Interactive Constellation Mesh Animated Background */}
         <ConstellationBackground />
 
         {/* Ambient Glows */}
-        <div className="absolute top-0 left-1/4 w-[500px] h-[300px] bg-[#FF0096]/15 rounded-full blur-[120px] pointer-events-none"></div>
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[300px] bg-[#00C8D4]/15 rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute top-0 left-1/4 w-[500px] h-[250px] bg-[#FF0096]/10 rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[250px] bg-[#00C8D4]/10 rounded-full blur-[120px] pointer-events-none"></div>
 
-        <div className="max-w-7xl mx-auto px-6 relative z-10 flex flex-col gap-5">
+        <div className="max-w-7xl mx-auto px-6 relative z-10 flex flex-col gap-4">
           {/* Top Brand Title: PANEL ADMINISTRATIVO DE HOTELES DE VENEZUELA LLC */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -1625,50 +1625,50 @@ export function OwnerDashboard() {
             </div>
           </div>
 
-          {/* Owner Dashboard Header Info */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black bg-[#FF0096]/20 text-[#FF0096] border border-[#FF0096]/30 mb-2 tracking-widest uppercase shadow-sm">
+          {/* Owner Dashboard Header Info Card (Recuadro Sólido Degradado con Contraste Elegante) */}
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 bg-gradient-to-r from-[#1a0533]/95 via-[#0e011f]/95 to-[#16042e]/95 border border-white/15 backdrop-blur-xl rounded-3xl p-6 shadow-2xl">
+            <div className="space-y-2 max-w-3xl">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black bg-[#FF0096]/20 text-[#FF0096] border border-[#FF0096]/30 tracking-widest uppercase shadow-sm">
                 <Briefcase className="w-3.5 h-3.5" />
                 <span>Portal de Socios Hoteleros</span>
               </span>
-              <h2 className="text-3xl md:text-4xl font-serif font-black tracking-tight text-white">
+              <h2 className="text-2xl md:text-3xl font-serif font-black tracking-tight text-white">
                 Panel de Control Ejecutivo
               </h2>
-              <p className="text-xs text-[#00C8D4] font-medium tracking-wide mt-1 max-w-2xl leading-relaxed mb-3">
+              <p className="text-xs text-slate-200 font-medium leading-relaxed max-w-2xl">
                 Administra tarifas, inventario de habitaciones, facturas de membresía y comunicación directa de leads para tu cartera comercial.
               </p>
 
               {/* Botón titilante de seguridad y mensaje de tranquilidad */}
-              <div className="mt-2 space-y-2">
-                <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-gradient-to-r from-emerald-500/20 via-cyan-500/20 to-purple-500/20 border border-[#00C8D4]/40 text-white text-xs font-extrabold shadow-lg backdrop-blur-md transition-all">
-                  <div className="w-6 h-6 rounded-lg bg-[#00C8D4] flex items-center justify-center text-slate-950 shrink-0 shadow-sm animate-pulse">
-                    <ShieldCheck className="w-4 h-4 text-slate-950 stroke-[2.5]" />
+              <div className="pt-2 space-y-2">
+                <div className="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-gradient-to-r from-emerald-500/20 via-cyan-500/20 to-purple-500/20 border border-[#00C8D4]/40 text-white text-xs font-extrabold shadow-md backdrop-blur-md transition-all">
+                  <div className="w-5 h-5 rounded-lg bg-[#00C8D4] flex items-center justify-center text-slate-950 shrink-0 shadow-sm animate-pulse">
+                    <ShieldCheck className="w-3.5 h-3.5 text-slate-950 stroke-[2.5]" />
                   </div>
                   <span className="tracking-wide">
                     Tu cuenta opera bajo encriptación de alta seguridad y el respaldo global de la red Edge de Cloudflare
                   </span>
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping shrink-0 ml-1"></span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0 ml-1"></span>
                 </div>
 
-                <p className="text-xs text-[#00C8D4] max-w-3xl font-medium tracking-wide leading-relaxed flex items-center gap-1.5">
+                <p className="text-xs text-[#00C8D4] font-semibold leading-relaxed flex items-center gap-1.5">
                   <ShieldAlert className="w-3.5 h-3.5 text-[#00C8D4] shrink-0 inline" />
                   <span>Gestiona tu propiedad con la tranquilidad de que tus datos están encriptados en una de las plataformas más blindadas del globo.</span>
                 </p>
               </div>
             </div>
             
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap lg:flex-col gap-3 shrink-0 w-full lg:w-auto">
               <Link
                 href="/perfil?tab=perfil"
-                className="bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-bold px-4 py-3 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer font-sans uppercase backdrop-blur-xs"
+                className="flex-1 lg:flex-none bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-bold px-4 py-3 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer font-sans uppercase backdrop-blur-xs"
               >
-                <User className="w-4 h-4 text-brand-turquesa" />
+                <User className="w-4 h-4 text-[#00C8D4]" />
                 <span>Mi Perfil & Seguridad</span>
               </Link>
               <button
                 onClick={() => setShowAddModal(true)}
-                className="btn-cyan-gradient text-xs font-bold px-6 py-3 rounded-xl flex items-center gap-1.5 shadow-md shadow-brand-turquesa/10 cursor-pointer active:scale-97 hover:scale-102 transition-all font-sans uppercase"
+                className="flex-1 lg:flex-none btn-cyan-gradient text-xs font-bold px-6 py-3 rounded-xl flex items-center justify-center gap-2 shadow-md shadow-brand-turquesa/10 cursor-pointer active:scale-97 hover:scale-102 transition-all font-sans uppercase"
               >
                 <Plus className="w-4 h-4" />
                 <span>Registrar Establecimiento</span>
