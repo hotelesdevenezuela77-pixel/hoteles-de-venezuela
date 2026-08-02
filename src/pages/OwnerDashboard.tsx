@@ -1544,28 +1544,32 @@ export function OwnerDashboard() {
               setImpersonateEstablishmentId(null);
               setLocation("/admin/asistencia");
             }}
-            className="bg-white text-[#FF0096] hover:bg-white/95 px-3 py-1 rounded-lg text-[10px] font-black tracking-wider uppercase transition-all shadow-sm cursor-pointer shrink-0"
+            className="bg-white text-[#FF0096] hover:bg-white/95 px-3 py-1 rounded-lg text-[10px] font-black tracking-wider uppercase transition-all cursor-pointer shadow-sm"
           >
             Salir y Volver
           </button>
         </div>
       )}
       
-      {/* Top Animated Header Banner - Minimal & Sleek */}
-      <div className="relative overflow-hidden py-5 bg-gradient-to-br from-[#1a0533] via-[#0e011f] to-black text-white w-full border-b border-white/10">
-        {/* Interactive Constellation Mesh Animated Background */}
+      {/* Top Animated Header Banner - Idéntico al Panel Administrativo Principal (Print 1) */}
+      <div className="relative overflow-hidden py-8 bg-gradient-to-r from-[#0e0120] via-[#1a0533] to-[#0d1a2e] text-white w-full border-b border-white/10">
         <ConstellationBackground />
-
-        {/* Ambient Glows */}
-        <div className="absolute top-0 left-1/4 w-[400px] h-[180px] bg-[#FF0096]/10 rounded-full blur-[100px] pointer-events-none"></div>
-        <div className="absolute bottom-0 right-1/4 w-[400px] h-[180px] bg-[#00C8D4]/10 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="absolute top-0 right-0 w-72 h-72 rounded-full blur-3xl opacity-10 bg-[#FF0096]" />
+        <div className="absolute bottom-0 left-0 w-56 h-56 rounded-full blur-3xl opacity-10 bg-[#00C8D4]" />
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <div className="flex items-center gap-3 mb-1">
-                <div className="w-8 h-8 rounded-lg bg-[#00C8D4]/20 border border-[#00C8D4]/40 flex items-center justify-center text-[#00C8D4] shrink-0">
-                  <BarChart3 className="w-4 h-4" />
+              {/* Breadcrumb estilo Admin Principal */}
+              <div className="flex items-center gap-2 text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-2">
+                <span>PANEL DE PROPIETARIOS</span>
+                <span>/</span>
+                <span className="text-[#00C8D4]">CONSOLA EJECUTIVA</span>
+              </div>
+
+              <div className="flex items-center gap-3 mb-1.5">
+                <div className="w-9 h-9 rounded-xl bg-[#00C8D4]/15 border border-[#00C8D4]/30 flex items-center justify-center text-[#00C8D4] shrink-0 shadow-sm">
+                  <BarChart3 className="w-5 h-5" />
                 </div>
                 <h1 className="text-xl md:text-2xl font-black text-white tracking-tight flex items-center gap-2.5 flex-wrap font-sans uppercase">
                   <span>PANEL ADMINISTRATIVO DE HOTELES DE VENEZUELA LLC</span>
@@ -1610,16 +1614,18 @@ export function OwnerDashboard() {
               </div>
               <div className="flex items-center gap-2 text-xs text-[#00C8D4] font-medium tracking-wide">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
-                <span>Consola de Propietarios · Conexión Encriptada SSL · {user?.email || "Propietario Verificado"}</span>
+                <span>Consola de Propietarios · Conexión Encriptada · {user?.email || "Propietario Verificado"}</span>
               </div>
             </div>
 
-            {/* Impersonate or Account Status Badge */}
-            <div className="flex items-center gap-3 bg-white/5 border border-white/10 backdrop-blur-md rounded-xl px-4 py-2.5 text-xs text-white shrink-0">
-              <ShieldCheck className="w-4 h-4 text-[#00C8D4] shrink-0" />
-              <div>
-                <p className="text-[10px] uppercase font-bold text-slate-400">Estado de Cuenta</p>
-                <p className="font-bold text-white text-xs">Socio Comercial Activo</p>
+            {/* Status CONECTADO (Estilo idéntico a Print 1 del Panel Admin) */}
+            <div className="flex items-center gap-3 bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl px-4 py-2.5 text-xs text-white shrink-0 shadow-lg">
+              <div className="text-right">
+                <p className="text-[9px] uppercase font-black text-[#00C8D4] tracking-wider">CONECTADO</p>
+                <p className="font-bold text-white text-xs truncate max-w-[180px]">{user?.email || "hotelesdevenezuela"}</p>
+              </div>
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#FF0096] to-[#9B00CC] flex items-center justify-center text-white font-black text-sm uppercase shadow-sm">
+                {(user?.email || "H").charAt(0)}
               </div>
             </div>
           </div>

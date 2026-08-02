@@ -114,6 +114,12 @@ export function Perfil() {
         const params = new URLSearchParams(window.location.search);
         const explicitTab = params.get("tab");
 
+        // Si se loguea un Administrador, llevarlo de una al Panel Administrativo Principal (/admin)
+        if ((profile?.role === "admin" || user?.email?.toLowerCase() === "hotelesdevenezuela77@gmail.com") && explicitTab !== "perfil") {
+          setLocation("/admin");
+          return;
+        }
+
         if (explicitTab === "perfil") {
           setActiveTab("perfil");
         } else if (explicitTab === "registrar") {
