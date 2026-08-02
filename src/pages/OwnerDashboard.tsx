@@ -1626,9 +1626,27 @@ export function OwnerDashboard() {
               <h2 className="text-3xl md:text-4xl font-serif font-black tracking-tight text-white">
                 Panel de Control Ejecutivo
               </h2>
-              <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
+              <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed mb-3">
                 Administra tarifas, inventario de habitaciones, facturas de membresía y comunicación directa de leads para tu cartera comercial.
               </p>
+
+              {/* Botón titilante de seguridad y mensaje de tranquilidad */}
+              <div className="mt-2 space-y-2">
+                <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-gradient-to-r from-emerald-500/20 via-cyan-500/20 to-purple-500/20 border border-[#00C8D4]/40 text-white text-xs font-extrabold shadow-lg backdrop-blur-md transition-all">
+                  <div className="w-6 h-6 rounded-lg bg-[#00C8D4] flex items-center justify-center text-slate-950 shrink-0 shadow-sm animate-pulse">
+                    <ShieldCheck className="w-4 h-4 text-slate-950 stroke-[2.5]" />
+                  </div>
+                  <span className="tracking-wide">
+                    Tu cuenta opera bajo encriptación de alta seguridad y el respaldo global de la red Edge de Cloudflare
+                  </span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping shrink-0 ml-1"></span>
+                </div>
+
+                <p className="text-xs text-slate-300 max-w-3xl font-medium leading-relaxed flex items-center gap-1.5">
+                  <ShieldAlert className="w-3.5 h-3.5 text-[#00C8D4] shrink-0 inline" />
+                  <span>Gestiona tu propiedad con la tranquilidad de que tus datos están encriptados en una de las plataformas más blindadas del globo.</span>
+                </p>
+              </div>
             </div>
             
             <div className="flex flex-wrap gap-3">
