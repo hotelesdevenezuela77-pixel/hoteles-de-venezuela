@@ -1632,26 +1632,26 @@ export function OwnerDashboard() {
         </div>
       </div>
 
-      {/* Recuadro Sólido de Panel de Control Ejecutivo - Ubicado Abajo */}
+      {/* Recuadro Degradado Fucsia Magenta/Púrpura - Panel de Control Ejecutivo */}
       <div className="max-w-7xl mx-auto px-6 pt-6 pb-2">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 bg-gradient-to-r from-[#1a0533] via-[#0e011f] to-[#16042e] border border-white/10 rounded-3xl p-6 md:p-8 shadow-xl text-white">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 bg-gradient-to-r from-[#FF0096] via-[#D80085] to-[#9B00CC] border border-white/20 rounded-3xl p-6 md:p-8 shadow-2xl text-white">
           <div className="space-y-2.5 max-w-3xl">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black bg-[#FF0096]/20 text-[#FF0096] border border-[#FF0096]/30 tracking-widest uppercase shadow-sm">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black bg-white/20 text-white border border-white/30 tracking-widest uppercase shadow-sm">
               <Briefcase className="w-3.5 h-3.5" />
               <span>Portal de Socios Hoteleros</span>
             </span>
-            <h2 className="text-2xl md:text-3xl font-serif font-black tracking-tight text-white">
+            <h2 className="text-2xl md:text-3xl font-serif font-black tracking-tight text-white drop-shadow-sm">
               Panel de Control Ejecutivo
             </h2>
-            <p className="text-xs text-slate-300 font-medium leading-relaxed max-w-2xl">
+            <p className="text-xs text-white/90 font-medium leading-relaxed max-w-2xl">
               Administra tarifas, inventario de habitaciones, facturas de membresía y comunicación directa de leads para tu cartera comercial.
             </p>
 
             {/* Botón titilante de seguridad y mensaje de tranquilidad */}
             <div className="pt-2 space-y-2">
-              <div className="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-gradient-to-r from-emerald-500/20 via-cyan-500/20 to-purple-500/20 border border-[#00C8D4]/40 text-white text-xs font-extrabold shadow-md backdrop-blur-md transition-all">
-                <div className="w-5 h-5 rounded-lg bg-[#00C8D4] flex items-center justify-center text-slate-950 shrink-0 shadow-sm animate-pulse">
-                  <ShieldCheck className="w-3.5 h-3.5 text-slate-950 stroke-[2.5]" />
+              <div className="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-white/15 border border-white/30 text-white text-xs font-extrabold shadow-md backdrop-blur-md transition-all">
+                <div className="w-5 h-5 rounded-lg bg-white flex items-center justify-center text-[#FF0096] shrink-0 shadow-sm animate-pulse">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#FF0096] stroke-[2.5]" />
                 </div>
                 <span className="tracking-wide">
                   Tu cuenta opera bajo encriptación de alta seguridad y el respaldo global de la red Edge de Cloudflare
@@ -1659,8 +1659,8 @@ export function OwnerDashboard() {
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0 ml-1"></span>
               </div>
 
-              <p className="text-xs text-[#00C8D4] font-semibold leading-relaxed flex items-center gap-1.5">
-                <ShieldAlert className="w-3.5 h-3.5 text-[#00C8D4] shrink-0 inline" />
+              <p className="text-xs text-white/95 font-semibold leading-relaxed flex items-center gap-1.5">
+                <ShieldAlert className="w-3.5 h-3.5 text-white shrink-0 inline" />
                 <span>Gestiona tu propiedad con la tranquilidad de que tus datos están encriptados en una de las plataformas más blindadas del globo.</span>
               </p>
             </div>
@@ -1669,16 +1669,16 @@ export function OwnerDashboard() {
           <div className="flex flex-wrap lg:flex-col gap-3 shrink-0 w-full lg:w-auto">
             <Link
               href="/perfil?tab=perfil"
-              className="flex-1 lg:flex-none bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-bold px-5 py-3 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer font-sans uppercase backdrop-blur-xs shadow-sm"
+              className="flex-1 lg:flex-none bg-white/20 hover:bg-white/30 text-white border border-white/30 text-xs font-bold px-5 py-3 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer font-sans uppercase backdrop-blur-md shadow-sm"
             >
-              <User className="w-4 h-4 text-[#00C8D4]" />
+              <User className="w-4 h-4 text-white" />
               <span>Mi Perfil & Seguridad</span>
             </Link>
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex-1 lg:flex-none btn-cyan-gradient text-xs font-bold px-6 py-3 rounded-xl flex items-center justify-center gap-2 shadow-md shadow-brand-turquesa/10 cursor-pointer active:scale-97 hover:scale-102 transition-all font-sans uppercase"
+              className="flex-1 lg:flex-none bg-white hover:bg-white/95 text-[#FF0096] text-xs font-black px-6 py-3 rounded-xl flex items-center justify-center gap-2 shadow-xl hover:scale-102 active:scale-97 transition-all font-sans uppercase cursor-pointer"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 stroke-[3]" />
               <span>Registrar Establecimiento</span>
             </button>
           </div>
