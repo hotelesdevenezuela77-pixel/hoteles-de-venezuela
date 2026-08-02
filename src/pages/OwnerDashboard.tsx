@@ -8,7 +8,7 @@ import {
   DollarSign, Users, Trash2, X, Phone, Globe, Briefcase, User,
   Eye, Check, ListFilter, Tag, Sparkles, CalendarRange,
   Upload, Trash, FileText, ChevronRight, AlertCircle, RefreshCw,
-  TrendingUp, Star, ShieldCheck, ArrowRight, Clipboard, Award, ShieldAlert
+  TrendingUp, Star, ShieldCheck, ArrowRight, Clipboard, Award, ShieldAlert, Download, ExternalLink, FileCheck
 } from "lucide-react";
 import { ScriptGenerator } from "../components/ScriptGenerator";
 import { AmenitiesSelector } from "@/components/admin/AmenitiesSelector";
@@ -292,6 +292,9 @@ export function OwnerDashboard() {
     telefono_verificacion: "",
     document_notes: ""
   });
+  const [verificationDocs, setVerificationDocs] = useState<any[]>([]);
+  const [selectedDocTypeTag, setSelectedDocTypeTag] = useState("RIF Comercial");
+  const [viewingDocModal, setViewingDocModal] = useState<any | null>(null);
 
   const handleOpenVerificationModal = (est: any) => {
     setVerifyingEst(est);
@@ -303,7 +306,63 @@ export function OwnerDashboard() {
       telefono_verificacion: est.phone || "",
       document_notes: est.document_notes || ""
     });
+
+    // Load saved documents from localStorage or est object
+    const savedDocsKey = `hdv_verification_docs_${est.id}`;
+    const stored = localStorage.getItem(savedDocsKey);
+    if (stored) {
+      try {
+        setVerificationDocs(JSON.parse(stored));
+      } catch (e) {
+        setVerificationDocs(est.verification_documents || est.documents || []);
+      }
+    } else {
+      setVerificationDocs(est.verification_documents || est.documents || []);
+    }
+
     setShowVerificationModal(true);
+  };
+
+  const handleUploadVerificationFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    Array.from(files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = reader.result as string;
+        const isPdf = file.type.includes("pdf") || file.name.toLowerCase().endsWith(".pdf");
+        const newDoc = {
+          id: `doc_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+          name: file.name,
+          type: isPdf ? "pdf" : "image",
+          url: base64,
+          uploadedAt: new Date().toLocaleDateString("es-VE") + " " + new Date().toLocaleTimeString("es-VE", { hour: "2-digit", minute: "2-digit" }),
+          size: `${(file.size / 1024).toFixed(1)} KB`,
+          docTypeTag: selectedDocTypeTag
+        };
+        setVerificationDocs(prev => {
+          const updated = [...prev, newDoc];
+          if (verifyingEst) {
+            localStorage.setItem(`hdv_verification_docs_${verifyingEst.id}`, JSON.stringify(updated));
+          }
+          return updated;
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+
+    e.target.value = "";
+  };
+
+  const handleRemoveVerificationDoc = (docId: string) => {
+    setVerificationDocs(prev => {
+      const updated = prev.filter(d => d.id !== docId);
+      if (verifyingEst) {
+        localStorage.setItem(`hdv_verification_docs_${verifyingEst.id}`, JSON.stringify(updated));
+      }
+      return updated;
+    });
   };
 
   const handleSubmitVerificationDocs = async (e: React.FormEvent) => {
@@ -312,6 +371,7 @@ export function OwnerDashboard() {
 
     const payload = {
       status: "under_review",
+      verification_documents: verificationDocs,
       ...verificationForm
     };
 
@@ -321,15 +381,19 @@ export function OwnerDashboard() {
       console.warn("DB update verification status failed:", err);
     }
 
+    if (verifyingEst) {
+      localStorage.setItem(`hdv_verification_docs_${verifyingEst.id}`, JSON.stringify(verificationDocs));
+    }
+
     // Also update in localStorage if mock
     const localEstsKey = "hdv_mock_establishments";
     const existing = JSON.parse(localStorage.getItem(localEstsKey) || "[]");
     const updated = existing.map((e: any) => e.id === verifyingEst.id ? { ...e, ...payload } : e);
     localStorage.setItem(localEstsKey, JSON.stringify(updated));
 
-    setEstablishments(prev => prev.map(e => e.id === verifyingEst.id ? { ...e, ...payload } : e));
+    setEstablishments(prev => prev.map(e => e.id === verifyingEst.id ? { ...e, ...payload, verification_documents: verificationDocs } : e));
     setShowVerificationModal(false);
-    alert("📑 ¡Documentación consignada con éxito! Tus recaudos han sido enviados al equipo legal y comercial de Hoteles de Venezuela LLC para auditoría y verificación.");
+    alert("📑 ¡Documentación consignada con éxito! Tus recaudos han sido guardados y enviados al equipo legal y comercial de Hoteles de Venezuela LLC para auditoría y verificación.");
   };
 
   // Invoices & Liquidation lists state
@@ -3369,6 +3433,33 @@ export function OwnerDashboard() {
                 />
               </div>
 
+              <div>
+                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-2 font-bold">Servicios y Amenities</label>
+                <div className="space-y-4 max-h-48 overflow-y-auto p-4 bg-gray-50 border border-gray-150 rounded-2xl">
+                  {ROOM_AMENITIES_CATEGORIES.map(cat => (
+                    <div key={cat.id} className="space-y-1.5">
+                      <span className="text-[10px] font-black text-brand-turquesa uppercase tracking-wider block">{cat.label}</span>
+                      <div className="grid grid-cols-2 gap-2">
+                        {cat.items.map(item => {
+                          const active = roomFormData.amenities ? roomFormData.amenities.split(",").map(s => s.trim()).includes(item.key) : false;
+                          return (
+                            <label key={item.key} className="flex items-center gap-2 text-[11px] font-semibold text-gray-600 cursor-pointer select-none">
+                              <input
+                                type="checkbox"
+                                checked={active}
+                                onChange={() => handleToggleRoomAmenity(item.key)}
+                                className="accent-brand-magenta w-3.5 h-3.5"
+                              />
+                              <span>{item.label}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 flex items-center justify-between gap-3">
                 <div className="text-left">
                   <span className="text-[10px] font-black text-slate-800 uppercase block">Estado de Publicación: {roomFormData.is_active ? "Activa" : "Desactivada"}</span>
@@ -3490,9 +3581,120 @@ export function OwnerDashboard() {
                   placeholder="Pegue aquí el enlace de Google Drive o Dropbox con la copia digital del RIF, Registro y Cédula..."
                   value={verificationForm.document_notes}
                   onChange={e => setVerificationForm(prev => ({ ...prev, document_notes: e.target.value }))}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700 resize-none font-sans"
-                  rows={3}
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700 resize-none font-sans mb-3"
+                  rows={2}
                 />
+              </div>
+
+              {/* Zona de Carga y Almacenamiento de Documentos / Imágenes */}
+              <div className="border-t border-gray-100 pt-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="block text-[10px] uppercase font-extrabold text-brand-purple-dark tracking-wider">
+                    Cargar Documentos o Imágenes de Respaldo *
+                  </label>
+                  <span className="text-[10px] font-bold text-brand-turquesa bg-brand-turquesa/10 px-2 py-0.5 rounded-full">
+                    PDF, JPG, PNG
+                  </span>
+                </div>
+
+                <div className="flex gap-2">
+                  <select
+                    value={selectedDocTypeTag}
+                    onChange={e => setSelectedDocTypeTag(e.target.value)}
+                    className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-turquesa/20"
+                  >
+                    <option value="RIF Comercial">RIF Comercial</option>
+                    <option value="Registro Mercantil">Registro Mercantil</option>
+                    <option value="Cédula del Rep. Legal">Cédula del Rep. Legal</option>
+                    <option value="Licencia Turística (RTN)">Licencia Turística (RTN)</option>
+                    <option value="Otro Respaldo Legal">Otro Respaldo Legal</option>
+                  </select>
+
+                  <label className="flex-1 bg-gradient-to-r from-brand-purple-dark to-brand-purple-deep hover:from-brand-purple-deep hover:to-brand-purple-dark text-white text-xs font-bold py-2 px-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all shadow-sm">
+                    <Upload className="w-4 h-4 text-brand-turquesa" />
+                    <span>Seleccionar / Cargar</span>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*,application/pdf"
+                      onChange={handleUploadVerificationFiles}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+
+                {/* Zona para ver los documentos guardados */}
+                <div className="mt-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-[11px] font-extrabold uppercase text-slate-700 tracking-wide flex items-center gap-1.5">
+                      <FileCheck className="w-3.5 h-3.5 text-brand-turquesa" />
+                      Zona de Documentos Consignados ({verificationDocs.length})
+                    </h4>
+                    {verificationDocs.length > 0 && (
+                      <span className="text-[9px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-md border border-green-200">
+                        Respaldos Legalmente Almacenados
+                      </span>
+                    )}
+                  </div>
+
+                  {verificationDocs.length === 0 ? (
+                    <div className="p-4 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl text-center">
+                      <FileText className="w-8 h-8 text-gray-300 mx-auto mb-1.5" />
+                      <p className="text-xs font-bold text-gray-500">No hay documentos o imágenes cargados aún.</p>
+                      <p className="text-[10px] text-gray-400 mt-0.5">Selecciona el tipo de documento arriba y presiona "Seleccionar / Cargar" para adjuntar comprobantes de respaldo.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                      {verificationDocs.map((doc) => (
+                        <div key={doc.id} className="p-2.5 bg-slate-50 border border-slate-200 hover:border-brand-turquesa/40 rounded-2xl flex items-center justify-between gap-3 transition-all group">
+                          <div className="flex items-center gap-3 min-w-0">
+                            {doc.type === "image" ? (
+                              <div className="w-10 h-10 rounded-xl overflow-hidden bg-gray-200 shrink-0 border border-gray-300">
+                                <img src={doc.url} alt={doc.name} className="w-full h-full object-cover" />
+                              </div>
+                            ) : (
+                              <div className="w-10 h-10 rounded-xl bg-purple-100 border border-purple-200 flex items-center justify-center shrink-0">
+                                <FileText className="w-5 h-5 text-brand-purple-deep" />
+                              </div>
+                            )}
+
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-brand-turquesa/15 text-slate-800 tracking-wider">
+                                  {doc.docTypeTag || "Respaldo"}
+                                </span>
+                                <span className="text-[9px] text-slate-400 font-semibold">{doc.size}</span>
+                              </div>
+                              <p className="text-xs font-bold text-slate-800 truncate mt-0.5">{doc.name}</p>
+                              <p className="text-[9px] text-slate-400 font-medium">Cargado: {doc.uploadedAt}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => setViewingDocModal(doc)}
+                              className="px-2.5 py-1.5 bg-brand-turquesa/15 hover:bg-brand-turquesa hover:text-white text-slate-800 rounded-xl text-[10px] font-black uppercase transition-all flex items-center gap-1 cursor-pointer"
+                              title="Visualizar documento guardado"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                              <span>Ver</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveVerificationDoc(doc.id)}
+                              className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition-colors cursor-pointer"
+                              title="Eliminar documento"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="flex gap-3 pt-4 border-t border-gray-100">
@@ -3732,6 +3934,81 @@ export function OwnerDashboard() {
               </button>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* Lightbox / Viewer Modal for Verification Backing Documents */}
+      {viewingDocModal && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden animate-in zoom-in-95 duration-200 my-6">
+            <div className="bg-gradient-to-r from-brand-purple-dark to-brand-purple-deep px-6 py-4 flex items-center justify-between text-white">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-brand-turquesa/20 border border-brand-turquesa/30 flex items-center justify-center">
+                  <FileCheck className="w-5 h-5 text-brand-turquesa" />
+                </div>
+                <div className="text-left">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-extrabold text-sm tracking-wide text-white">{viewingDocModal.name}</h3>
+                    <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-brand-magenta text-white">
+                      {viewingDocModal.docTypeTag || "Respaldo Legal"}
+                    </span>
+                  </div>
+                  <p className="text-white/70 text-[10px] font-semibold mt-0.5">
+                    Cargado el: {viewingDocModal.uploadedAt} | Tamaño: {viewingDocModal.size}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setViewingDocModal(null)}
+                className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-6 bg-slate-900 flex flex-col items-center justify-center min-h-[400px] max-h-[70vh] overflow-y-auto">
+              {viewingDocModal.type === "image" ? (
+                <img
+                  src={viewingDocModal.url}
+                  alt={viewingDocModal.name}
+                  className="max-h-[60vh] max-w-full rounded-2xl object-contain shadow-2xl border border-slate-700"
+                />
+              ) : (
+                <div className="w-full h-[60vh] flex flex-col items-center justify-center text-center p-6 bg-slate-800 rounded-2xl border border-slate-700">
+                  <iframe
+                    src={viewingDocModal.url}
+                    title={viewingDocModal.name}
+                    className="w-full h-full rounded-xl bg-white border-0 mb-3"
+                  />
+                  <p className="text-xs text-slate-300 font-semibold mb-2">Vista previa de documento PDF</p>
+                </div>
+              )}
+            </div>
+
+            <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3">
+              <span className="text-[11px] font-bold text-slate-600 flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-green-600" />
+                Respaldo verificado para garantía legal en Hoteles de Venezuela LLC
+              </span>
+              <div className="flex gap-2">
+                <a
+                  href={viewingDocModal.url}
+                  download={viewingDocModal.name}
+                  className="px-4 py-2 bg-brand-turquesa hover:bg-cyan-500 text-slate-900 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Descargar</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setViewingDocModal(null)}
+                  className="px-4 py-2 bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
