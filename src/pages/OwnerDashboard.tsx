@@ -1635,7 +1635,7 @@ export function OwnerDashboard() {
               <h2 className="text-3xl md:text-4xl font-serif font-black tracking-tight text-white">
                 Panel de Control Ejecutivo
               </h2>
-              <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed mb-3">
+              <p className="text-xs text-[#00C8D4] font-medium tracking-wide mt-1 max-w-2xl leading-relaxed mb-3">
                 Administra tarifas, inventario de habitaciones, facturas de membresía y comunicación directa de leads para tu cartera comercial.
               </p>
 
@@ -1651,7 +1651,7 @@ export function OwnerDashboard() {
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping shrink-0 ml-1"></span>
                 </div>
 
-                <p className="text-xs text-slate-300 max-w-3xl font-medium leading-relaxed flex items-center gap-1.5">
+                <p className="text-xs text-[#00C8D4] max-w-3xl font-medium tracking-wide leading-relaxed flex items-center gap-1.5">
                   <ShieldAlert className="w-3.5 h-3.5 text-[#00C8D4] shrink-0 inline" />
                   <span>Gestiona tu propiedad con la tranquilidad de que tus datos están encriptados en una de las plataformas más blindadas del globo.</span>
                 </p>
