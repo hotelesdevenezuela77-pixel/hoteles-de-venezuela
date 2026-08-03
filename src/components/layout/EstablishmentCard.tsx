@@ -267,7 +267,6 @@ export function EstablishmentCard({
     </div>
   );
 }
-
 export function EstablishmentListItem({ 
   establishment, 
   isComparing = false, 
@@ -284,31 +283,35 @@ export function EstablishmentListItem({
   const services = parseServices(establishment.services);
 
   const wrapperClass = isPriority
-    ? "priority-glow-card group shadow-md hover:shadow-2xl hover:shadow-[#FF0096]/10 transition-all duration-300"
-    : "group flex flex-col md:flex-row bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 p-2 md:p-3 gap-6";
+    ? "priority-glow-card group shadow-md hover:shadow-2xl hover:shadow-[#FF0096]/10 transition-all duration-300 w-full"
+    : "group flex flex-col md:flex-row bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 p-2 md:p-3 gap-6 w-full";
+
+  const containerClass = isPriority
+    ? "priority-glow-card-inner bg-gradient-to-br from-[#0e011f] to-[#1a0533] text-white p-2 md:p-3 flex flex-col md:flex-row gap-4 md:gap-6 h-full w-full items-stretch"
+    : "flex flex-col md:flex-row gap-4 md:gap-6 w-full h-full items-stretch";
 
   return (
     <div className={wrapperClass}>
-      <div className={isPriority ? "priority-glow-card-inner bg-gradient-to-br from-[#0e011f] to-[#1a0533] text-white p-2 md:p-3 flex flex-col md:flex-row gap-6 h-full w-full" : "flex flex-col md:flex-row gap-6 w-full h-full items-stretch"}>
+      <div className={containerClass}>
         {/* Image Section */}
-        <div className="relative w-full md:w-64 h-48 md:h-auto shrink-0 rounded-2xl overflow-hidden bg-gray-100">
+        <div className="relative w-full md:w-72 lg:w-80 h-56 md:h-auto min-h-[220px] shrink-0 rounded-2xl overflow-hidden bg-gray-900">
           <img
             src={optimizeImageUrl(establishment.primary_image || placeholderImage, 600)}
             alt={establishment.name}
             className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
             loading="lazy"
             width="600"
-            height="192"
+            height="224"
             onError={(e) => {
               (e.target as HTMLImageElement).src = placeholderImage;
             }}
           />
 
           {/* Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
 
           {/* Badges */}
-          <div className="absolute top-3 left-3 flex flex-col gap-2">
+          <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
             {tier.label && (
               <span className={`px-3 py-1 ${tier.bgColor} ${tier.color} text-[10px] font-black uppercase tracking-wider rounded-full shadow shadow-black/20 flex items-center gap-1`}>
                 <Sparkles className="w-3 h-3" />
@@ -317,12 +320,12 @@ export function EstablishmentListItem({
             )}
           </div>
 
-          {/* Official HDV Seal Image (replaces "desde moderado / noche" button) */}
+          {/* Official HDV Seal Image */}
           {establishment.has_hdv_seal && (
             <img 
               src="/images/sello-hdv.png" 
               alt="Sello de Calidad Hoteles de Venezuela" 
-              className="absolute bottom-2 right-2 w-12 h-12 object-contain z-10 drop-shadow-md hover:scale-110 transition-transform duration-300 pointer-events-none" 
+              className="absolute bottom-2.5 right-2.5 w-12 h-12 object-contain z-10 drop-shadow-md hover:scale-110 transition-transform duration-300 pointer-events-none" 
               loading="lazy"
               width="48"
               height="48"
@@ -331,7 +334,7 @@ export function EstablishmentListItem({
 
           {/* Compare Checkbox */}
           {onCompareToggle && (
-            <div className="absolute top-3 right-3 flex gap-2">
+            <div className="absolute top-3 right-3 flex gap-2 z-10">
               <label className="flex items-center gap-1.5 bg-white/20 backdrop-blur-md border border-white/20 hover:bg-white/30 transition-all px-3 py-1.5 rounded-full text-white text-[10px] font-bold cursor-pointer shadow-md">
                 <input
                   type="checkbox"
@@ -347,18 +350,18 @@ export function EstablishmentListItem({
         </div>
 
         {/* Content Section */}
-        <div className="flex-1 flex flex-col justify-between py-2 text-left">
+        <div className="flex-1 flex flex-col justify-between py-1 md:py-2 text-left">
           <div>
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-2">
               <div>
                 <div className="flex items-center gap-2">
                   {establishment.category_name && (
-                    <span className={`text-[10px] font-extrabold uppercase tracking-wider ${isPriority ? "text-brand-turquesa" : "text-[#00C8D4]"}`}>
+                    <span className={`text-[10px] font-extrabold uppercase tracking-wider ${isPriority ? "text-[#00C8D4]" : "text-[#00C8D4]"}`}>
                       {establishment.category_name}
                     </span>
                   )}
                 </div>
-                <h3 className={`font-black text-xl transition-colors mt-1 ${isPriority ? "text-white group-hover:text-brand-turquesa" : "text-gray-800 group-hover:text-brand-magenta"}`}>
+                <h3 className={`font-black text-xl transition-colors mt-1 ${isPriority ? "text-white group-hover:text-[#00C8D4]" : "text-gray-800 group-hover:text-brand-magenta"}`}>
                   {establishment.name}
                 </h3>
                 <div className="flex items-center gap-1 text-xs mt-1">
@@ -372,7 +375,7 @@ export function EstablishmentListItem({
                     {establishment.has_hdv_seal && (
                       <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider border flex items-center gap-1 shrink-0 ${
                         isPriority 
-                          ? "bg-[#FF0096]/20 border-[#FF0096]/30 text-white" 
+                          ? "bg-[#FF0096]/20 border-[#FF0096]/40 text-white" 
                           : "bg-[#FF0096]/10 border border-[#FF0096]/25 text-[#FF0096]"
                       }`}>
                         <Award className="w-3 h-3 shrink-0" />
@@ -382,8 +385,8 @@ export function EstablishmentListItem({
                     {establishment.has_reservations_enabled && (
                       <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider border flex items-center gap-1 shrink-0 ${
                         isPriority 
-                          ? "bg-[#00C8D4]/20 border-[#00C8D4]/35 text-[#00C8D4]" 
-                        : "bg-[#00C8D4]/10 border border-[#00C8D4]/25 text-[#00C8D4]"
+                          ? "bg-[#00C8D4]/20 border-[#00C8D4]/40 text-[#00C8D4]" 
+                          : "bg-[#00C8D4]/10 border border-[#00C8D4]/25 text-[#00C8D4]"
                       }`}>
                         <Calendar className="w-3 h-3 shrink-0" />
                         Reservas
@@ -392,7 +395,7 @@ export function EstablishmentListItem({
                     {establishment.is_ads_enabled && (
                       <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider border flex items-center gap-1 shrink-0 ${
                         isPriority 
-                          ? "bg-[#9B00CC]/20 border-[#9B00CC]/30 text-purple-350" 
+                          ? "bg-[#9B00CC]/20 border-[#9B00CC]/40 text-purple-300" 
                           : "bg-[#9B00CC]/10 border border-[#9B00CC]/25 text-[#9B00CC]"
                       }`}>
                         <Megaphone className="w-3 h-3 shrink-0" />
@@ -426,14 +429,14 @@ export function EstablishmentListItem({
                 {services.slice(0, 5).map((service, i) => (
                   <span
                     key={i}
-                    className={`flex items-center gap-1 px-2.5 py-0.5 text-[10px] rounded-full font-medium ${isPriority ? "bg-white/5 text-white/70 border border-white/10" : "bg-gray-50 text-gray-500 border border-gray-100"}`}
+                    className={`flex items-center gap-1 px-2.5 py-0.5 text-[10px] rounded-full font-medium ${isPriority ? "bg-white/10 text-white/90 border border-white/15" : "bg-gray-50 text-gray-500 border border-gray-100"}`}
                   >
                     {serviceIcons[service.toLowerCase()] || <Sparkles className="w-3 h-3 text-brand-magenta" />}
                     <span>{getAmenityLabel(service)}</span>
                   </span>
                 ))}
                 {services.length > 5 && (
-                  <span className={`px-2 py-0.5 text-[10px] rounded-full font-bold ${isPriority ? "bg-white/5 text-white/50 border border-white/10" : "bg-gray-50 text-gray-400 border border-gray-100"}`}>
+                  <span className={`px-2 py-0.5 text-[10px] rounded-full font-bold ${isPriority ? "bg-white/10 text-white/70 border border-white/15" : "bg-gray-50 text-gray-400 border border-gray-100"}`}>
                     +{services.length - 5}
                   </span>
                 )}
@@ -442,14 +445,14 @@ export function EstablishmentListItem({
 
             {/* Description */}
             {establishment.description && (
-              <p className={`text-xs leading-relaxed line-clamp-2 ${isPriority ? "text-gray-400" : "text-gray-400"}`}>
+              <p className={`text-xs leading-relaxed line-clamp-2 ${isPriority ? "text-gray-300" : "text-gray-400"}`}>
                 {establishment.description}
               </p>
             )}
           </div>
 
           {/* Action Buttons */}
-          <div className={`flex gap-2.5 pt-4 border-t mt-4 max-w-sm ${isPriority ? "border-white/10" : "border-gray-50"}`}>
+          <div className={`flex gap-2.5 pt-4 border-t mt-4 w-full ${isPriority ? "border-white/10" : "border-gray-50"}`}>
             {(establishment.whatsapp || establishment.phone) ? (
               <div className="flex-1">
                 <TrackedWhatsAppButton

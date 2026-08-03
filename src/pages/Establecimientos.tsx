@@ -81,6 +81,7 @@ export function Establecimientos() {
     setter(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
   };
 
+
   const handleClearFilters = () => {
     setSelectedCategory("");
     setSelectedDestination("");
