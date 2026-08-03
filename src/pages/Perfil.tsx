@@ -23,9 +23,9 @@ import {
   Award
 } from "lucide-react";
 
-import { TouristCalendar, TripEvent } from "../components/tourist/TouristCalendar";
-import { TouristFavorites, FavoriteHotel } from "../components/tourist/TouristFavorites";
-import { TouristPackages, TouristPackageItem } from "../components/tourist/TouristPackages";
+import { TouristCalendar, type TripEvent } from "../components/tourist/TouristCalendar";
+import { TouristFavorites, type FavoriteHotel } from "../components/tourist/TouristFavorites";
+import { TouristPackages, type TouristPackageItem } from "../components/tourist/TouristPackages";
 import { TouristCouponsPassport } from "../components/tourist/TouristCouponsPassport";
 import { TouristBudgetCalculator } from "../components/tourist/TouristBudgetCalculator";
 import { TouristProfileSettings } from "../components/tourist/TouristProfileSettings";
@@ -306,7 +306,7 @@ export function Perfil() {
           <div className="flex items-center gap-4 w-full lg:w-auto">
             <div className="w-16 h-16 rounded-2xl p-0.5 bg-gradient-to-tr from-[#00C8D4] via-[#FF0096] to-[#9B00CC] shadow-md shrink-0">
               <img
-                src={profile?.avatar_url || user?.user_metadata?.avatar_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80"}
+                src={(profile as any)?.avatar_url || user?.user_metadata?.avatar_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80"}
                 alt={profile?.name || "Avatar"}
                 className="w-full h-full object-cover rounded-2xl"
               />

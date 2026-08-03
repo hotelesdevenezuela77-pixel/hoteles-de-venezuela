@@ -24,7 +24,7 @@ export function TouristBudgetCalculator() {
   const [extrasTotal, setExtrasTotal] = useState(50);
 
   const [currency, setCurrency] = useState<"USD" | "BS" | "EUR">("USD");
-  const exchangeRateBS = 42 textBS => 42; // Tasa referencial sim
+  const exchangeRateBS = 42; // Tasa referencial sim
 
   // Cálculos totales
   const totalAccommodation = accommodationPerNight * (numDays - 1);
