@@ -37,6 +37,16 @@ export function Perfil() {
   // Tab activo: "resumen" | "calendario" | "favoritos" | "paquetes" | "cupones" | "presupuesto" | "perfil"
   const [activeTab, setActiveTab] = useState<"resumen" | "calendario" | "favoritos" | "paquetes" | "cupones" | "presupuesto" | "perfil">("resumen");
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tabParam = params.get("tab");
+    if (tabParam && ["resumen", "calendario", "favoritos", "paquetes", "cupones", "presupuesto", "perfil"].includes(tabParam)) {
+      setActiveTab(tabParam as any);
+    } else {
+      setActiveTab("resumen");
+    }
+  }, []);
+
   // Estado de Eventos del Calendario Drag & Drop
   const [events, setEvents] = useState<TripEvent[]>(() => {
     const saved = localStorage.getItem("hdv_tourist_events");

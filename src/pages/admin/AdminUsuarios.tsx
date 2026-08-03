@@ -20,7 +20,8 @@ const ROLES: Record<string, { label: string; bg: string; text: string }> = {
   admin:          { label: "Admin",        bg: "#FCE7F3", text: "#9D174D" },
   superadmin:     { label: "Super Admin",  bg: "#EDE9FE", text: "#5B21B6" },
   owner:          { label: "Propietario",  bg: "#DBEAFE", text: "#1E40AF" },
-  user:           { label: "Usuario",      bg: "#F3F4F6", text: "#374151" },
+  tourist:        { label: "Turista",      bg: "#E0F2FE", text: "#0284C7" },
+  user:           { label: "Turista",      bg: "#E0F2FE", text: "#0284C7" },
   agent:          { label: "Agente",       bg: "#FEF3C7", text: "#92400E" },
   business_owner: { label: "Empresa",      bg: "#D1FAE5", text: "#065F46" },
 };
