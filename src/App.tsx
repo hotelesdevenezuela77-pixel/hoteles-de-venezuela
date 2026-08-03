@@ -336,6 +336,7 @@ function App() {
             <Route path="/login" component={Login} />
             <Route path="/registro" component={Registro} />
             <Route path="/perfil" component={Perfil} />
+            <Route path="/panel-turista" component={Perfil} />
             <Route path="/perfil/kyc" component={PerfilKYC} />
             <Route path="/hdv-acceso-llc2027" component={AdminLogin} />
             <Route path="/establecimientos" component={Establecimientos} />
