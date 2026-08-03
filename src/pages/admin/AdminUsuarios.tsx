@@ -137,11 +137,32 @@ export function AdminUsuarios() {
     }
   });
 
-  const users = allUsers.filter(u =>
-    !search || 
-    u.email.toLowerCase().includes(search.toLowerCase()) || 
-    u.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const filterParam = params.get("filter");
+    if (filterParam && ["tourist", "owner", "admin"].includes(filterParam)) {
+      setRoleFilter(filterParam);
+    }
+  }, []);
+
+  const users = allUsers.filter(u => {
+    const matchesSearch = !search || 
+      u.email.toLowerCase().includes(search.toLowerCase()) || 
+      u.name.toLowerCase().includes(search.toLowerCase());
+    
+    if (!matchesSearch) return false;
+
+    if (roleFilter === "tourist") return u.role === "user" || u.role === "tourist";
+    if (roleFilter === "owner") return u.role === "owner" || u.role === "business_owner";
+    if (roleFilter === "admin") return u.role === "admin" || u.role === "superadmin";
+    return true;
+  });
+
+  const touristCount = allUsers.filter(u => u.role === "user" || u.role === "tourist").length;
+  const ownerCount = allUsers.filter(u => u.role === "owner" || u.role === "business_owner").length;
+  const adminCount = allUsers.filter(u => u.role === "admin" || u.role === "superadmin").length;
 
   if (authLoading) {
     return (
@@ -163,8 +184,8 @@ export function AdminUsuarios() {
               <Users className="w-4 h-4 text-brand-magenta" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white tracking-tight">Usuarios</h1>
-              <p className="text-white/50 text-xs font-semibold">{allUsers.length} usuarios registrados en el sistema</p>
+              <h1 className="text-xl font-bold text-white tracking-tight">Gestión de Usuarios y Turistas</h1>
+              <p className="text-white/50 text-xs font-semibold">{allUsers.length} usuarios registrados en el sistema ({touristCount} Turistas)</p>
             </div>
           </div>
         </div>
@@ -172,9 +193,45 @@ export function AdminUsuarios() {
 
       <AdminTabBar />
 
-      <div className="max-w-5xl mx-auto px-6 py-8">
+      <div className="max-w-5xl mx-auto px-6 py-8 space-y-4">
+        {/* Pestañas de Filtro por Rol */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-bold">
+          <button
+            onClick={() => setRoleFilter("all")}
+            className={`px-4 py-2 rounded-xl transition-all cursor-pointer ${
+              roleFilter === "all" ? "bg-slate-900 text-white shadow-xs" : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+            }`}
+          >
+            Todos ({allUsers.length})
+          </button>
+          <button
+            onClick={() => setRoleFilter("tourist")}
+            className={`px-4 py-2 rounded-xl transition-all cursor-pointer ${
+              roleFilter === "tourist" ? "bg-[#0284C7] text-white shadow-xs" : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+            }`}
+          >
+            Turistas ({touristCount})
+          </button>
+          <button
+            onClick={() => setRoleFilter("owner")}
+            className={`px-4 py-2 rounded-xl transition-all cursor-pointer ${
+              roleFilter === "owner" ? "bg-[#1E40AF] text-white shadow-xs" : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+            }`}
+          >
+            Propietarios ({ownerCount})
+          </button>
+          <button
+            onClick={() => setRoleFilter("admin")}
+            className={`px-4 py-2 rounded-xl transition-all cursor-pointer ${
+              roleFilter === "admin" ? "bg-[#9D174D] text-white shadow-xs" : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+            }`}
+          >
+            Admins ({adminCount})
+          </button>
+        </div>
+
         {/* Search */}
-        <div className="relative mb-6">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             value={search}

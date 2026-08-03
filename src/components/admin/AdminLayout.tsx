@@ -121,6 +121,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       name: "Marketing y Ventas",
       items: [
         { label: "Gestión Comercial", href: "/admin/comercial", icon: Briefcase },
+        { label: "Turistas y Usuarios", href: "/admin/usuarios?filter=tourist", icon: Users },
         { label: "Paquetes Turísticos", href: "/admin/paquetes", icon: Package },
         { label: "WhatsApp CRM", href: "/crm", icon: MessageSquare },
         { label: "Base de Clientes", href: "/admin/clientes", icon: Users },
