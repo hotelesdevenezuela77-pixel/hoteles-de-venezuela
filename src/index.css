@@ -74,6 +74,7 @@
 .text-gradient-brand {
   background: linear-gradient(135deg, var(--color-brand-magenta) 0%, var(--color-brand-turquesa) 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 

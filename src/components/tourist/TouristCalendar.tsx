@@ -308,12 +308,14 @@ export function TouristCalendar({
 
       {/* Grid Interactivo del Calendario */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        {/* Cabecera de días de semana */}
-        <div className="grid grid-cols-7 border-b border-slate-100 bg-slate-50 text-center py-3 text-xs font-black text-slate-500 uppercase tracking-wider">
-          {daysOfWeek.map((d, i) => (
-            <div key={i}>{d}</div>
-          ))}
-        </div>
+        <div className="overflow-x-auto no-scrollbar">
+          <div className="min-w-[650px]">
+            {/* Cabecera de días de semana */}
+            <div className="grid grid-cols-7 border-b border-slate-100 bg-slate-50 text-center py-3 text-xs font-black text-slate-500 uppercase tracking-wider">
+              {daysOfWeek.map((d, i) => (
+                <div key={i}>{d}</div>
+              ))}
+            </div>
 
         {/* Días del Mes */}
         <div className="grid grid-cols-7 auto-rows-fr gap-px bg-slate-100">
@@ -387,6 +389,8 @@ export function TouristCalendar({
           })}
         </div>
       </div>
+    </div>
+  </div>
 
       {/* Lista Resumen de Próximos Eventos */}
       <div className="bg-slate-900 rounded-2xl p-6 text-white border border-slate-800 shadow-xl">

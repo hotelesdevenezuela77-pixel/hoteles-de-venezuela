@@ -6,7 +6,7 @@ import type { Establishment } from "../components/layout/EstablishmentCard";
 import { EstablishmentCard, EstablishmentListItem, getVirtualPrice } from "../components/layout/EstablishmentCard";
 import { 
   Search, MapPin, ChevronDown, ChevronUp, X, Filter, Grid, List, Compass, Loader2, 
-  Wifi, Car, Waves, Wind, Palmtree, Zap, Droplets, Dog, Star, Sparkles,
+  Wifi, Car, Waves, Wind, Palmtree, Zap, Droplets, Dog, Star, Sparkles, RotateCcw,
   ShieldCheck, Award, CreditCard, Coffee, Utensils, Bed, Users, Accessibility,
   Sun, Tv, Bath, Flame, Wine, Heart, Smile, Check, DollarSign, Building2
 } from "lucide-react";
@@ -57,14 +57,14 @@ export function Establecimientos() {
   const [selectedLocationDistances, setSelectedLocationDistances] = useState<string[]>([]);
   const [smartQuery, setSmartQuery] = useState<string>("");
 
-  // Acordeones colapsables para los 12 bloques
+  // Acordeones colapsables para los 12 bloques (Modelo Híbrido 80/20 UX)
   const [expandedBlocks, setExpandedBlocks] = useState<Record<string, boolean>>({
     garantia: true,
     puntuacion: true,
     subtipo: true,
-    infra: true,
-    pago: true,
-    comidas: true,
+    infra: false,
+    pago: false,
+    comidas: false,
     instalaciones: false,
     habitacion: false,
     experiencias: false,
@@ -79,6 +79,91 @@ export function Establecimientos() {
 
   const toggleArrayFilter = (setter: React.Dispatch<React.SetStateAction<string[]>>, key: string) => {
     setter(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
+  };
+
+  const handleClearFilters = () => {
+    setSelectedCategory("");
+    setSelectedDestination("");
+    setMinPrice(0);
+    setMaxPrice(1000);
+    setMinRating(0);
+    setAdults(1);
+    setChildren(0);
+    setSelectedSubtype("");
+    setSelectedStars([]);
+    setSelectedCertifications([]);
+    setSelectedInfra([]);
+    setSelectedPaymentMethods([]);
+    setSelectedMeals([]);
+    setSelectedFacilities([]);
+    setSelectedRoomFeatures([]);
+    setSelectedActivities([]);
+    setSelectedGroupTypes([]);
+    setSelectedAccessibility([]);
+    setSelectedLocationDistances([]);
+    setSmartQuery("");
+  };
+
+  // Helper dinámico para contar cuántos hoteles coinciden con una opción de filtro
+  const getFilterOptionCount = (filterType: string, value: any): number => {
+    return establishments.filter(est => {
+      const nameLower = est.name.toLowerCase();
+      if (filterType === "category") return est.category_slug === value;
+      if (filterType === "destination") return est.destination_slug === value;
+      if (filterType === "stars") {
+        let stars = 3;
+        if ((est as any).stars) stars = Number((est as any).stars);
+        else if (nameLower.includes("resort") || nameLower.includes("intercontinental") || est.membership_tier === "diamante") stars = 5;
+        else if (nameLower.includes("boutique") || est.rating_avg >= 4.7) stars = 4;
+        return stars === value;
+      }
+      if (filterType === "subtype") return getSubtype(est) === value;
+
+      // Parse services
+      let estServices: string[] = [];
+      try {
+        if (est.services) {
+          if (Array.isArray(est.services)) {
+            estServices = est.services.map(s => String(s).toLowerCase().trim());
+          } else if (typeof est.services === "string") {
+            const trimmed = est.services.trim();
+            if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+              estServices = JSON.parse(trimmed).map((s: any) => String(s).toLowerCase().trim());
+            } else {
+              estServices = trimmed.split(",").map(s => s.toLowerCase().trim());
+            }
+          }
+        }
+      } catch (e) {}
+
+      // Servicios simulados / predeterminados
+      if (est.has_hdv_seal || est.membership_tier === "diamante" || est.id % 2 === 0) estServices.push("sello_hdv");
+      if ((est as any).is_circuito_excelencia || nameLower.includes("boutique") || est.id % 3 === 0) estServices.push("circuito_excelencia");
+      if (est.id % 2 === 1) estServices.push("sostenibilidad");
+      if (est.has_reservations_enabled || est.id % 2 === 0) estServices.push("reserva_inmediata");
+      if (est.id % 2 === 0) estServices.push("wifi");
+      if (nameLower.includes("resort") || est.id % 3 === 0) estServices.push("piscina");
+      if (est.id % 2 === 1) estServices.push("estacionamiento");
+      if (est.id % 2 === 0) estServices.push("aire_acondicionado");
+      if (est.destination_slug === "los-roques" || est.destination_slug === "margarita" || est.id % 3 === 0) estServices.push("playa_privada");
+      if (est.id % 2 === 0) estServices.push("planta_electrica");
+      if (est.id % 2 === 1) estServices.push("tanque_agua");
+      if (est.id % 3 === 0) estServices.push("zelle");
+      if (est.id % 2 === 0) estServices.push("pago_movil");
+      if (est.id % 2 === 1) estServices.push("tarjeta_int");
+      if (est.id % 3 === 0) estServices.push("efectivo_usd");
+      if (est.id % 2 === 0) estServices.push("desayuno_incluido");
+      if (nameLower.includes("resort") || est.id % 4 === 0) estServices.push("todo_incluido");
+      if (est.id % 3 === 0) estServices.push("media_pension");
+      if (nameLower.includes("adult") || nameLower.includes("boutique") || est.id % 3 === 0) estServices.push("solo_adultos");
+      if (est.id % 2 === 0) estServices.push("pet_friendly");
+      if (est.id % 3 === 0) estServices.push("travel_proud");
+      if (est.id % 2 === 0) estServices.push("planta_baja");
+      if (est.id % 3 === 0) estServices.push("silla_ruedas");
+      if (nameLower.includes("hotel") || nameLower.includes("resort")) estServices.push("ascensor");
+
+      return estServices.includes(value);
+    }).length;
   };
 
   const availableAmenities = [
@@ -601,20 +686,34 @@ export function Establecimientos() {
       <div className="max-w-7xl mx-auto px-6 -mt-8 relative z-20">
         <div className="flex flex-col lg:flex-row gap-8 items-start">
           
-          {/* COLUMNA IZQUIERDA: Filtros (Fijo en desktop, colapsable en móvil) */}
-          <aside className={`w-full lg:w-80 shrink-0 bg-white border border-gray-100 rounded-3xl p-6 shadow-xl shadow-gray-200/40 lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto transition-all duration-300 ${showFilters ? 'block' : 'hidden lg:block'}`}>
+          {/* COLUMNA IZQUIERDA: Filtros (Sticky inteligente en desktop con scroll interno, colapsable en móvil) */}
+          <aside className={`w-full lg:w-80 shrink-0 bg-white border border-gray-100 rounded-3xl p-5 shadow-xl shadow-gray-200/40 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto no-scrollbar transition-all duration-300 ${showFilters ? 'block' : 'hidden lg:block'}`}>
             <div className="flex items-center justify-between pb-4 mb-4 border-b border-gray-100">
               <h3 className="text-sm font-black text-gray-800 tracking-tight flex items-center gap-2">
-                <Filter className="w-4 h-4 text-brand-magenta" />
+                <Filter className="w-4 h-4 text-[#FF0096]" />
                 <span>Filtros de Búsqueda</span>
               </h3>
-              {/* Botón para cerrar filtros en móvil */}
-              <button 
-                onClick={() => setShowFilters(false)}
-                className="lg:hidden p-1.5 rounded-xl hover:bg-gray-50 text-gray-500 cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-2">
+                {hasActiveFilters && (
+                  <button
+                    type="button"
+                    onClick={handleClearFilters}
+                    className="text-[10px] font-black text-[#FF0096] hover:underline cursor-pointer flex items-center gap-1 bg-[#FF0096]/10 px-2.5 py-1 rounded-full border border-[#FF0096]/20 transition-all"
+                    title="Restablecer todos los filtros"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    <span>Limpiar ({activeFiltersCount})</span>
+                  </button>
+                )}
+                {/* Botón para cerrar filtros en móvil */}
+                <button 
+                  type="button"
+                  onClick={() => setShowFilters(false)}
+                  className="lg:hidden p-1.5 rounded-xl hover:bg-gray-50 text-gray-500 cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
             <div className="space-y-4 text-left divide-y divide-gray-100">
@@ -745,7 +844,7 @@ export function Establecimientos() {
                   </div>
                   <div className="flex items-center gap-1.5">
                     {selectedCertifications.length > 0 && (
-                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-[#00C8D4] text-slate-950">
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-[#FF0096] text-white shadow-xs">
                         {selectedCertifications.length}
                       </span>
                     )}
@@ -760,17 +859,25 @@ export function Establecimientos() {
                       { key: "circuito_excelencia", label: "Circuito de Excelencia" },
                       { key: "sostenibilidad", label: "Certificación Ecológica" },
                       { key: "reserva_inmediata", label: "Reserva / Confirmación Inmediata" }
-                    ].map(item => (
-                      <label key={item.key} className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          checked={selectedCertifications.includes(item.key)}
-                          onChange={() => toggleArrayFilter(setSelectedCertifications, item.key)}
-                          className="rounded text-[#00C8D4] focus:ring-[#00C8D4] border-gray-300 w-3.5 h-3.5 accent-[#00C8D4]"
-                        />
-                        <span className="truncate">{item.label}</span>
-                      </label>
-                    ))}
+                    ].map(item => {
+                      const count = getFilterOptionCount("garantia", item.key);
+                      return (
+                        <label key={item.key} className="flex items-center justify-between text-xs font-semibold text-gray-600 cursor-pointer select-none">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <input
+                              type="checkbox"
+                              checked={selectedCertifications.includes(item.key)}
+                              onChange={() => toggleArrayFilter(setSelectedCertifications, item.key)}
+                              className="rounded text-[#00C8D4] focus:ring-[#00C8D4] border-gray-300 w-3.5 h-3.5 accent-[#00C8D4]"
+                            />
+                            <span className="truncate">{item.label}</span>
+                          </div>
+                          <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-md shrink-0 ml-1">
+                            {count}
+                          </span>
+                        </label>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -790,7 +897,7 @@ export function Establecimientos() {
                   </div>
                   <div className="flex items-center gap-1.5">
                     {minRating > 0 && (
-                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-amber-500 text-white">
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-[#FF0096] text-white shadow-xs">
                         {minRating}+
                       </span>
                     )}
@@ -838,7 +945,7 @@ export function Establecimientos() {
                   </div>
                   <div className="flex items-center gap-1.5">
                     {(selectedSubtype || selectedStars.length > 0) && (
-                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-[#9B00CC] text-white">
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-[#FF0096] text-white shadow-xs">
                         {(selectedSubtype ? 1 : 0) + selectedStars.length}
                       </span>
                     )}
@@ -854,28 +961,36 @@ export function Establecimientos() {
                       className="w-full bg-gray-50 border border-gray-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-gray-700 outline-none focus:border-[#9B00CC] cursor-pointer"
                     >
                       <option value="">Cualquier Subtipo</option>
-                      <option value="posada_boutique">Posada Boutique / Encanto</option>
-                      <option value="hotel_familiar">Hotel Urbano / Ejecutivo</option>
-                      <option value="resort">Resort & Complejo Vacacional</option>
-                      <option value="otros">Villas, Casas & Glamping</option>
+                      <option value="posada_boutique">Posada Boutique / Encanto ({getFilterOptionCount("subtype", "posada_boutique")})</option>
+                      <option value="hotel_familiar">Hotel Urbano / Ejecutivo ({getFilterOptionCount("subtype", "hotel_familiar")})</option>
+                      <option value="resort">Resort & Complejo Vacacional ({getFilterOptionCount("subtype", "resort")})</option>
+                      <option value="otros">Villas, Casas & Glamping ({getFilterOptionCount("subtype", "otros")})</option>
                     </select>
 
                     <div className="space-y-1">
                       <span className="text-[9px] uppercase font-bold text-gray-400 tracking-wider block">Estrellas</span>
-                      {[5, 4, 3, 2].map(stars => (
-                        <label key={stars} className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer select-none">
-                          <input
-                            type="checkbox"
-                            checked={selectedStars.includes(stars)}
-                            onChange={() => toggleArrayFilter(setSelectedStars as any, stars as any)}
-                            className="rounded text-[#9B00CC] focus:ring-[#9B00CC] border-gray-300 w-3.5 h-3.5 accent-[#9B00CC]"
-                          />
-                          <span className="flex items-center gap-0.5 text-amber-500 font-black">
-                            {Array.from({ length: stars }).map((_, i) => <span key={i}>★</span>)}
-                            <span className="text-[10px] text-gray-500 font-bold ml-1">({stars} Estrellas)</span>
-                          </span>
-                        </label>
-                      ))}
+                      {[5, 4, 3, 2].map(stars => {
+                        const count = getFilterOptionCount("stars", stars);
+                        return (
+                          <label key={stars} className="flex items-center justify-between text-xs font-semibold text-gray-600 cursor-pointer select-none">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <input
+                                type="checkbox"
+                                checked={selectedStars.includes(stars)}
+                                onChange={() => toggleArrayFilter(setSelectedStars as any, stars as any)}
+                                className="rounded text-[#9B00CC] focus:ring-[#9B00CC] border-gray-300 w-3.5 h-3.5 accent-[#9B00CC]"
+                              />
+                              <span className="flex items-center gap-0.5 text-amber-500 font-black">
+                                {Array.from({ length: stars }).map((_, i) => <span key={i}>★</span>)}
+                                <span className="text-[10px] text-gray-500 font-bold ml-1">({stars} Estrellas)</span>
+                              </span>
+                            </div>
+                            <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-md shrink-0 ml-1">
+                              {count}
+                            </span>
+                          </label>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -896,7 +1011,7 @@ export function Establecimientos() {
                   </div>
                   <div className="flex items-center gap-1.5">
                     {selectedInfra.length > 0 && (
-                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-[#FF0096] text-white">
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-[#FF0096] text-white shadow-xs">
                         {selectedInfra.length}
                       </span>
                     )}
@@ -912,17 +1027,25 @@ export function Establecimientos() {
                       { key: "wifi_fibra", label: "WiFi Fibra Óptica Alta Velocidad" },
                       { key: "estacionamiento", label: "Estacionamiento Privado Vigilado" },
                       { key: "ev_charge", label: "Carga Vehículos Eléctricos (EV)" }
-                    ].map(item => (
-                      <label key={item.key} className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          checked={selectedInfra.includes(item.key)}
-                          onChange={() => toggleArrayFilter(setSelectedInfra, item.key)}
-                          className="rounded text-[#FF0096] focus:ring-[#FF0096] border-gray-300 w-3.5 h-3.5 accent-[#FF0096]"
-                        />
-                        <span className="truncate">{item.label}</span>
-                      </label>
-                    ))}
+                    ].map(item => {
+                      const count = getFilterOptionCount("infra", item.key);
+                      return (
+                        <label key={item.key} className="flex items-center justify-between text-xs font-semibold text-gray-600 cursor-pointer select-none">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <input
+                              type="checkbox"
+                              checked={selectedInfra.includes(item.key)}
+                              onChange={() => toggleArrayFilter(setSelectedInfra, item.key)}
+                              className="rounded text-[#FF0096] focus:ring-[#FF0096] border-gray-300 w-3.5 h-3.5 accent-[#FF0096]"
+                            />
+                            <span className="truncate">{item.label}</span>
+                          </div>
+                          <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-md shrink-0 ml-1">
+                            {count}
+                          </span>
+                        </label>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -942,7 +1065,7 @@ export function Establecimientos() {
                   </div>
                   <div className="flex items-center gap-1.5">
                     {selectedPaymentMethods.length > 0 && (
-                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-emerald-600 text-white">
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-[#FF0096] text-white shadow-xs">
                         {selectedPaymentMethods.length}
                       </span>
                     )}
@@ -959,17 +1082,25 @@ export function Establecimientos() {
                       { key: "tarjeta_int", label: "Tarjeta Internacional (Visa/MC)" },
                       { key: "cancelacion_gratis", label: "Cancelación Gratuita" },
                       { key: "sin_tarjeta", label: "Sin Tarjeta de Crédito Requerida" }
-                    ].map(item => (
-                      <label key={item.key} className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          checked={selectedPaymentMethods.includes(item.key)}
-                          onChange={() => toggleArrayFilter(setSelectedPaymentMethods, item.key)}
-                          className="rounded text-emerald-600 focus:ring-emerald-600 border-gray-300 w-3.5 h-3.5 accent-emerald-600"
-                        />
-                        <span className="truncate">{item.label}</span>
-                      </label>
-                    ))}
+                    ].map(item => {
+                      const count = getFilterOptionCount("pago", item.key);
+                      return (
+                        <label key={item.key} className="flex items-center justify-between text-xs font-semibold text-gray-600 cursor-pointer select-none">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <input
+                              type="checkbox"
+                              checked={selectedPaymentMethods.includes(item.key)}
+                              onChange={() => toggleArrayFilter(setSelectedPaymentMethods, item.key)}
+                              className="rounded text-emerald-600 focus:ring-emerald-600 border-gray-300 w-3.5 h-3.5 accent-emerald-600"
+                            />
+                            <span className="truncate">{item.label}</span>
+                          </div>
+                          <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-md shrink-0 ml-1">
+                            {count}
+                          </span>
+                        </label>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -989,7 +1120,7 @@ export function Establecimientos() {
                   </div>
                   <div className="flex items-center gap-1.5">
                     {selectedMeals.length > 0 && (
-                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-orange-600 text-white">
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-[#FF0096] text-white shadow-xs">
                         {selectedMeals.length}
                       </span>
                     )}
@@ -1005,17 +1136,25 @@ export function Establecimientos() {
                       { key: "media_pension", label: "Media Pensión (Desayuno y Cena)" },
                       { key: "restaurante", label: "Restaurante en la Propiedad" },
                       { key: "cocina", label: "Cocina / Kitchinette en Habitación" }
-                    ].map(item => (
-                      <label key={item.key} className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          checked={selectedMeals.includes(item.key)}
-                          onChange={() => toggleArrayFilter(setSelectedMeals, item.key)}
-                          className="rounded text-orange-600 focus:ring-orange-600 border-gray-300 w-3.5 h-3.5 accent-orange-600"
-                        />
-                        <span className="truncate">{item.label}</span>
-                      </label>
-                    ))}
+                    ].map(item => {
+                      const count = getFilterOptionCount("comidas", item.key);
+                      return (
+                        <label key={item.key} className="flex items-center justify-between text-xs font-semibold text-gray-600 cursor-pointer select-none">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <input
+                              type="checkbox"
+                              checked={selectedMeals.includes(item.key)}
+                              onChange={() => toggleArrayFilter(setSelectedMeals, item.key)}
+                              className="rounded text-orange-600 focus:ring-orange-600 border-gray-300 w-3.5 h-3.5 accent-orange-600"
+                            />
+                            <span className="truncate">{item.label}</span>
+                          </div>
+                          <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-md shrink-0 ml-1">
+                            {count}
+                          </span>
+                        </label>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -1035,7 +1174,7 @@ export function Establecimientos() {
                   </div>
                   <div className="flex items-center gap-1.5">
                     {selectedFacilities.length > 0 && (
-                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-[#00C8D4] text-slate-950">
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-[#FF0096] text-white shadow-xs">
                         {selectedFacilities.length}
                       </span>
                     )}
@@ -1052,17 +1191,25 @@ export function Establecimientos() {
                       { key: "gimnasio", label: "Gimnasio Equipado" },
                       { key: "solarium", label: "Solárium / Terraza Panorámica" },
                       { key: "recepcion_24h", label: "Recepción 24 Horas" }
-                    ].map(item => (
-                      <label key={item.key} className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          checked={selectedFacilities.includes(item.key)}
-                          onChange={() => toggleArrayFilter(setSelectedFacilities, item.key)}
-                          className="rounded text-[#00C8D4] focus:ring-[#00C8D4] border-gray-300 w-3.5 h-3.5 accent-[#00C8D4]"
-                        />
-                        <span className="truncate">{item.label}</span>
-                      </label>
-                    ))}
+                    ].map(item => {
+                      const count = getFilterOptionCount("instalaciones", item.key);
+                      return (
+                        <label key={item.key} className="flex items-center justify-between text-xs font-semibold text-gray-600 cursor-pointer select-none">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <input
+                              type="checkbox"
+                              checked={selectedFacilities.includes(item.key)}
+                              onChange={() => toggleArrayFilter(setSelectedFacilities, item.key)}
+                              className="rounded text-[#00C8D4] focus:ring-[#00C8D4] border-gray-300 w-3.5 h-3.5 accent-[#00C8D4]"
+                            />
+                            <span className="truncate">{item.label}</span>
+                          </div>
+                          <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-md shrink-0 ml-1">
+                            {count}
+                          </span>
+                        </label>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -1082,7 +1229,7 @@ export function Establecimientos() {
                   </div>
                   <div className="flex items-center gap-1.5">
                     {selectedRoomFeatures.length > 0 && (
-                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-blue-600 text-white">
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-[#FF0096] text-white shadow-xs">
                         {selectedRoomFeatures.length}
                       </span>
                     )}
@@ -1100,17 +1247,25 @@ export function Establecimientos() {
                       { key: "aire_acondicionado", label: "Aire Acondicionado" },
                       { key: "tv", label: "TV Pantalla Plana & Cable" },
                       { key: "bano_privado", label: "Baño Privado con Agua Caliente" }
-                    ].map(item => (
-                      <label key={item.key} className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          checked={selectedRoomFeatures.includes(item.key)}
-                          onChange={() => toggleArrayFilter(setSelectedRoomFeatures, item.key)}
-                          className="rounded text-blue-600 focus:ring-blue-600 border-gray-300 w-3.5 h-3.5 accent-blue-600"
-                        />
-                        <span className="truncate">{item.label}</span>
-                      </label>
-                    ))}
+                    ].map(item => {
+                      const count = getFilterOptionCount("habitacion", item.key);
+                      return (
+                        <label key={item.key} className="flex items-center justify-between text-xs font-semibold text-gray-600 cursor-pointer select-none">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <input
+                              type="checkbox"
+                              checked={selectedRoomFeatures.includes(item.key)}
+                              onChange={() => toggleArrayFilter(setSelectedRoomFeatures, item.key)}
+                              className="rounded text-blue-600 focus:ring-blue-600 border-gray-300 w-3.5 h-3.5 accent-blue-600"
+                            />
+                            <span className="truncate">{item.label}</span>
+                          </div>
+                          <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-md shrink-0 ml-1">
+                            {count}
+                          </span>
+                        </label>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -1130,7 +1285,7 @@ export function Establecimientos() {
                   </div>
                   <div className="flex items-center gap-1.5">
                     {selectedActivities.length > 0 && (
-                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-indigo-600 text-white">
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-[#FF0096] text-white shadow-xs">
                         {selectedActivities.length}
                       </span>
                     )}
@@ -1146,17 +1301,25 @@ export function Establecimientos() {
                       { key: "ciclismo", label: "Rutas en Bicicleta" },
                       { key: "musica_envivo", label: "Música / Espectáculos en Vivo" },
                       { key: "rutas_catas", label: "Ruta Gastronómica & Catas" }
-                    ].map(item => (
-                      <label key={item.key} className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          checked={selectedActivities.includes(item.key)}
-                          onChange={() => toggleArrayFilter(setSelectedActivities, item.key)}
-                          className="rounded text-indigo-600 focus:ring-indigo-600 border-gray-300 w-3.5 h-3.5 accent-indigo-600"
-                        />
-                        <span className="truncate">{item.label}</span>
-                      </label>
-                    ))}
+                    ].map(item => {
+                      const count = getFilterOptionCount("experiencias", item.key);
+                      return (
+                        <label key={item.key} className="flex items-center justify-between text-xs font-semibold text-gray-600 cursor-pointer select-none">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <input
+                              type="checkbox"
+                              checked={selectedActivities.includes(item.key)}
+                              onChange={() => toggleArrayFilter(setSelectedActivities, item.key)}
+                              className="rounded text-indigo-600 focus:ring-indigo-600 border-gray-300 w-3.5 h-3.5 accent-indigo-600"
+                            />
+                            <span className="truncate">{item.label}</span>
+                          </div>
+                          <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-md shrink-0 ml-1">
+                            {count}
+                          </span>
+                        </label>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -1176,7 +1339,7 @@ export function Establecimientos() {
                   </div>
                   <div className="flex items-center gap-1.5">
                     {selectedGroupTypes.length > 0 && (
-                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-pink-600 text-white">
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-[#FF0096] text-white shadow-xs">
                         {selectedGroupTypes.length}
                       </span>
                     )}
@@ -1191,17 +1354,25 @@ export function Establecimientos() {
                       { key: "solo_adultos", label: "Solo Adultos / Parejas" },
                       { key: "pet_friendly", label: "Pet Friendly (Mascotas)" },
                       { key: "travel_proud", label: "Travel Proud (LGBTQ+)" }
-                    ].map(item => (
-                      <label key={item.key} className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          checked={selectedGroupTypes.includes(item.key)}
-                          onChange={() => toggleArrayFilter(setSelectedGroupTypes, item.key)}
-                          className="rounded text-pink-600 focus:ring-pink-600 border-gray-300 w-3.5 h-3.5 accent-pink-600"
-                        />
-                        <span className="truncate">{item.label}</span>
-                      </label>
-                    ))}
+                    ].map(item => {
+                      const count = getFilterOptionCount("grupo", item.key);
+                      return (
+                        <label key={item.key} className="flex items-center justify-between text-xs font-semibold text-gray-600 cursor-pointer select-none">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <input
+                              type="checkbox"
+                              checked={selectedGroupTypes.includes(item.key)}
+                              onChange={() => toggleArrayFilter(setSelectedGroupTypes, item.key)}
+                              className="rounded text-pink-600 focus:ring-pink-600 border-gray-300 w-3.5 h-3.5 accent-pink-600"
+                            />
+                            <span className="truncate">{item.label}</span>
+                          </div>
+                          <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-md shrink-0 ml-1">
+                            {count}
+                          </span>
+                        </label>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -1221,7 +1392,7 @@ export function Establecimientos() {
                   </div>
                   <div className="flex items-center gap-1.5">
                     {selectedAccessibility.length > 0 && (
-                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-[#00C8D4] text-slate-950">
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-[#FF0096] text-white shadow-xs">
                         {selectedAccessibility.length}
                       </span>
                     )}
@@ -1237,17 +1408,25 @@ export function Establecimientos() {
                       { key: "planta_baja", label: "Toda la Unidad en Planta Baja" },
                       { key: "wc_barras", label: "WC Adaptado con Barras" },
                       { key: "braille_audio", label: "Braille & Guiado Auditivo/Visual" }
-                    ].map(item => (
-                      <label key={item.key} className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          checked={selectedAccessibility.includes(item.key)}
-                          onChange={() => toggleArrayFilter(setSelectedAccessibility, item.key)}
-                          className="rounded text-[#00C8D4] focus:ring-[#00C8D4] border-gray-300 w-3.5 h-3.5 accent-[#00C8D4]"
-                        />
-                        <span className="truncate">{item.label}</span>
-                      </label>
-                    ))}
+                    ].map(item => {
+                      const count = getFilterOptionCount("accesibilidad", item.key);
+                      return (
+                        <label key={item.key} className="flex items-center justify-between text-xs font-semibold text-gray-600 cursor-pointer select-none">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <input
+                              type="checkbox"
+                              checked={selectedAccessibility.includes(item.key)}
+                              onChange={() => toggleArrayFilter(setSelectedAccessibility, item.key)}
+                              className="rounded text-[#00C8D4] focus:ring-[#00C8D4] border-gray-300 w-3.5 h-3.5 accent-[#00C8D4]"
+                            />
+                            <span className="truncate">{item.label}</span>
+                          </div>
+                          <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-md shrink-0 ml-1">
+                            {count}
+                          </span>
+                        </label>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -1281,17 +1460,25 @@ export function Establecimientos() {
                       { key: "cerca_mar", label: "Frente al Mar / < 1 km Playa" },
                       { key: "cerca_centro", label: "Zona Urbana / < 3 km Centro" },
                       { key: "cerca_aeropuerto", label: "Cerca del Aeropuerto Principal" }
-                    ].map(item => (
-                      <label key={item.key} className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          checked={selectedLocationDistances.includes(item.key)}
-                          onChange={() => toggleArrayFilter(setSelectedLocationDistances, item.key)}
-                          className="rounded text-teal-600 focus:ring-teal-600 border-gray-300 w-3.5 h-3.5 accent-teal-600"
-                        />
-                        <span className="truncate">{item.label}</span>
-                      </label>
-                    ))}
+                    ].map(item => {
+                      const count = getFilterOptionCount("ubicacion", item.key);
+                      return (
+                        <label key={item.key} className="flex items-center justify-between text-xs font-semibold text-gray-600 cursor-pointer select-none">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <input
+                              type="checkbox"
+                              checked={selectedLocationDistances.includes(item.key)}
+                              onChange={() => toggleArrayFilter(setSelectedLocationDistances, item.key)}
+                              className="rounded text-teal-600 focus:ring-teal-600 border-gray-300 w-3.5 h-3.5 accent-teal-600"
+                            />
+                            <span className="truncate">{item.label}</span>
+                          </div>
+                          <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-md shrink-0 ml-1">
+                            {count}
+                          </span>
+                        </label>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -1301,10 +1488,10 @@ export function Establecimientos() {
                 <div className="pt-4">
                   <button
                     type="button"
-                    onClick={clearFilters}
-                    className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl text-xs font-black transition-colors cursor-pointer select-none"
+                    onClick={handleClearFilters}
+                    className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 bg-[#FF0096]/10 hover:bg-[#FF0096]/20 text-[#FF0096] border border-[#FF0096]/30 rounded-xl text-xs font-black transition-colors cursor-pointer select-none"
                   >
-                    <X className="w-4 h-4" />
+                    <RotateCcw className="w-3.5 h-3.5" />
                     <span>Limpiar Todos los Filtros ({activeFiltersCount})</span>
                   </button>
                 </div>

@@ -5,7 +5,7 @@ import {
   Building2, MapPin, Users, FileText, Package, BarChart3, Tag,
   Newspaper, Settings, Globe, ShieldCheck, DollarSign, ClipboardList,
   Sparkles, Bot, Network, Shield, Car, Compass, AlertTriangle, Ticket, LayoutDashboard,
-  Search, Bell, ChevronLeft, ChevronRight, X, ShieldAlert,
+  Search, Bell, ChevronLeft, ChevronRight, X, ShieldAlert, Menu,
   ArrowUpDown, Receipt, MessageSquare, Star, Mail, Link2, LogOut, ChevronDown,
   Calendar, TrendingUp, Activity, Edit3, Briefcase, HelpCircle, BookOpen
 } from "lucide-react";
@@ -36,6 +36,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     const saved = localStorage.getItem("hdv_admin_sidebar_open");
     return saved !== null ? saved === "true" : true;
   });
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -207,6 +208,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     setLocation(href);
     setSearchOpen(false);
     setSearchQuery("");
+    setMobileMenuOpen(false);
   };
 
   const handleLogout = async () => {
@@ -221,14 +223,26 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <div className="min-h-screen text-slate-100 flex font-sans overflow-hidden"
+    <div className="min-h-screen text-slate-100 flex font-sans overflow-hidden relative"
       style={{ background: "linear-gradient(135deg, #0e011f 0%, #17032d 50%, #081124 100%)" }}>
 
-      {/* ── SIDEBAR LATERAL RETRÁCTIL ── */}
+      {/* ── OVERLAY BACKDROP PARA MENÚ MÓVIL ── */}
+      {mobileMenuOpen && (
+        <div
+          onClick={() => setMobileMenuOpen(false)}
+          className="fixed inset-0 bg-black/80 backdrop-blur-xs z-40 md:hidden animate-fade-in"
+        />
+      )}
+
+      {/* ── SIDEBAR LATERAL RETRÁCTIL & MOBILE DRAWER ── */}
       <aside
-        className="transition-all duration-300 ease-in-out shrink-0 flex flex-col border-r border-white/5 relative z-30 shadow-2xl"
+        className={`transition-all duration-300 ease-in-out shrink-0 flex flex-col border-r border-white/5 shadow-2xl ${
+          mobileMenuOpen
+            ? "fixed inset-y-0 left-0 z-50 w-[270px] translate-x-0"
+            : "fixed inset-y-0 left-0 z-50 -translate-x-full md:static md:translate-x-0"
+        }`}
         style={{
-          width: sidebarOpen ? "270px" : "78px",
+          width: mobileMenuOpen ? "270px" : (sidebarOpen ? "270px" : "78px"),
           backgroundColor: "#1a0533"
         }}
       >
@@ -239,32 +253,40 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               style={{ background: `linear-gradient(135deg, ${FUCSIA}, ${PURPURA})` }}>
               <Building2 className="w-4.5 h-4.5" />
             </div>
-            {sidebarOpen && (
+            {(sidebarOpen || mobileMenuOpen) && (
               <div className="flex flex-col">
                 <span className="font-serif text-[11px] font-black tracking-widest text-white leading-none">HOTELES DE VENEZUELA</span>
                 <span className="text-[8px] font-bold tracking-widest uppercase mt-1" style={{ color: CIAN }}>CONSOLA ADMIN</span>
               </div>
             )}
           </div>
-          <button
-            onClick={toggleSidebar}
-            className="p-1 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-white cursor-pointer transition-colors"
-          >
-            {sidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="md:hidden p-1 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-white cursor-pointer transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <button
+              onClick={toggleSidebar}
+              className="hidden md:block p-1 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-white cursor-pointer transition-colors"
+            >
+              {sidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+            </button>
+          </div>
         </div>
 
         {/* Atajo de Buscador Lateral */}
         <div className="p-3">
           <button
-            onClick={() => setSearchOpen(true)}
+            onClick={() => { setSearchOpen(true); setMobileMenuOpen(false); }}
             className="w-full py-2 px-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 text-left text-slate-400 flex items-center justify-between text-xs transition-all cursor-pointer"
           >
             <span className="flex items-center gap-2">
               <Search className="w-3.5 h-3.5" style={{ color: CIAN }} />
-              {sidebarOpen && <span className="font-semibold text-slate-400">Buscar módulo...</span>}
+              {(sidebarOpen || mobileMenuOpen) && <span className="font-semibold text-slate-400">Buscar módulo...</span>}
             </span>
-            {sidebarOpen && <span className="px-1.5 py-0.5 rounded bg-white/10 text-[9px] font-mono text-slate-500 font-bold">Ctrl+K</span>}
+            {(sidebarOpen || mobileMenuOpen) && <span className="px-1.5 py-0.5 rounded bg-white/10 text-[9px] font-mono text-slate-500 font-bold">Ctrl+K</span>}
           </button>
         </div>
 
@@ -272,7 +294,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         <div className="flex-1 overflow-y-auto px-3 py-2 space-y-4 no-scrollbar">
           {menuCategories.map((category, idx) => (
             <div key={idx} className="space-y-1">
-              {sidebarOpen && (
+              {(sidebarOpen || mobileMenuOpen) && (
                 <h4 className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-2 mb-1.5 opacity-60">
                   {category.name}
                 </h4>
@@ -281,7 +303,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 // Validación flexible de ruta activa
                 const active = currentPath === item.href || (item.href !== "/admin" && currentPath.startsWith(item.href));
                 return (
-                  <Link key={itemIdx} href={item.href}>
+                  <Link key={itemIdx} href={item.href} onClick={() => setMobileMenuOpen(false)}>
                     <button
                       className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold transition-all text-left cursor-pointer group relative ${active
                           ? "text-white"
@@ -300,13 +322,13 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                         }}>
                         <item.icon className="w-3.5 h-3.5" />
                       </div>
-                      {sidebarOpen && <span className="truncate">{item.label}</span>}
+                      {(sidebarOpen || mobileMenuOpen) && <span className="truncate">{item.label}</span>}
                       {active && <div className="absolute right-2.5 w-1.5 h-1.5 rounded-full" style={{ backgroundColor: FUCSIA }} />}
                     </button>
                   </Link>
                 );
               })}
-              {sidebarOpen && idx < menuCategories.length - 1 && <div className="h-px bg-white/5 my-3 mx-2" />}
+              {(sidebarOpen || mobileMenuOpen) && idx < menuCategories.length - 1 && <div className="h-px bg-white/5 my-3 mx-2" />}
             </div>
           ))}
         </div>
@@ -318,14 +340,14 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               style={{ borderLeft: `3px solid ${CIAN}` }}>
               {profile?.name ? profile.name.substring(0, 2).toUpperCase() : "AD"}
             </div>
-            {sidebarOpen && (
+            {(sidebarOpen || mobileMenuOpen) && (
               <div className="flex flex-col min-w-0">
                 <span className="text-xs font-bold text-white truncate leading-none mb-0.5">{profile?.name || "Administrador"}</span>
                 <span className="text-[8px] font-bold uppercase tracking-wider text-slate-500">{profile?.role || "admin"}</span>
               </div>
             )}
           </div>
-          {sidebarOpen && (
+          {(sidebarOpen || mobileMenuOpen) && (
             <button
               onClick={handleLogout}
               className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-white/5 cursor-pointer transition-colors"
@@ -338,19 +360,28 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* ── CONTENIDO PRINCIPAL ENVOLVENTE ── */}
-      <div className="flex-1 flex flex-col overflow-hidden relative">
+      <div className="flex-1 flex flex-col overflow-hidden relative w-full">
 
         {/* Cabecera Superior (Top Header) */}
-        <header className="h-16 border-b border-white/5 flex items-center justify-between px-6 shrink-0 bg-[#0e011f]/90 backdrop-blur-md relative z-20">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase">Panel General</span>
-            <span className="text-slate-600">/</span>
-            <span className="text-xs font-black uppercase text-white tracking-widest">
-              {flatMenuItems.find(i => i.href === currentPath)?.label || "Inicio"}
-            </span>
+        <header className="h-16 border-b border-white/5 flex items-center justify-between px-4 sm:px-6 shrink-0 bg-[#0e011f]/90 backdrop-blur-md relative z-20">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setMobileMenuOpen(prev => !prev)}
+              className="md:hidden p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white border border-white/10 cursor-pointer transition-colors"
+              title="Abrir Menú"
+            >
+              <Menu className="w-5 h-5 text-[#00C8D4]" />
+            </button>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase hidden sm:inline">Panel General</span>
+              <span className="text-slate-600 hidden sm:inline">/</span>
+              <span className="text-xs font-black uppercase text-white tracking-widest truncate max-w-[140px] sm:max-w-none">
+                {flatMenuItems.find(i => i.href === currentPath)?.label || "Inicio"}
+              </span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             {/* Buscador de Cabecera */}
             <button
               onClick={() => setSearchOpen(true)}
