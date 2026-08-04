@@ -245,3 +245,42 @@
   animation: marquee-right 80s linear infinite;
 }
 
+/* Animated Vertical Marquee Keyframes for Hero Banner Sides */
+@keyframes marquee-vertical-up {
+  0% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes marquee-vertical-down {
+  0% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+.animate-marquee-vertical-up {
+  display: flex;
+  flex-direction: column;
+  height: max-content;
+  animation: marquee-vertical-up 22s linear infinite;
+}
+
+.animate-marquee-vertical-down {
+  display: flex;
+  flex-direction: column;
+  height: max-content;
+  animation: marquee-vertical-down 22s linear infinite;
+}
+
+.writing-mode-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+

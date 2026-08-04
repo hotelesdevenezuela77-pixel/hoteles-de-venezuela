@@ -584,6 +584,38 @@ export function Home() {
             <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-20" style={{ background: "#00C8D4" }} />
           </div>
         )}
+
+        {/* BANDERAS VERTICALES ANIMADAS LADO IZQUIERDO Y DERECHO */}
+        {/* Lado Izquierdo: Movimiento de abajo hacia arriba */}
+        <div className="absolute left-1 sm:left-3 md:left-5 top-0 bottom-0 z-10 pointer-events-none select-none flex items-center justify-center overflow-hidden hidden min-[480px]:flex border-r border-[#00C8D4]/20 pr-1 sm:pr-2">
+          <div className="animate-marquee-vertical-up flex flex-col items-center">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div 
+                key={`v-left-${i}`}
+                className="py-5 font-mono font-black text-[9px] sm:text-[11px] tracking-[0.25em] uppercase text-transparent bg-clip-text bg-gradient-to-b from-[#00C8D4] via-white to-[#FF0096] writing-mode-vertical rotate-180 flex items-center gap-3 drop-shadow-[0_0_8px_rgba(0,200,212,0.35)] opacity-85"
+              >
+                <span className="text-[#00C8D4] text-[10px]">✦</span>
+                <span>Plataforma Hoteles de Venezuela en actualización 2026</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Lado Derecho: Movimiento de arriba hacia abajo */}
+        <div className="absolute right-1 sm:right-3 md:right-5 top-0 bottom-0 z-10 pointer-events-none select-none flex items-center justify-center overflow-hidden hidden min-[480px]:flex border-l border-[#FF0096]/20 pl-1 sm:pl-2">
+          <div className="animate-marquee-vertical-down flex flex-col items-center">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div 
+                key={`v-right-${i}`}
+                className="py-5 font-mono font-black text-[9px] sm:text-[11px] tracking-[0.25em] uppercase text-transparent bg-clip-text bg-gradient-to-b from-[#FF0096] via-white to-[#00C8D4] writing-mode-vertical flex items-center gap-3 drop-shadow-[0_0_8px_rgba(255,0,150,0.35)] opacity-85"
+              >
+                <span className="text-[#FF0096] text-[10px]">✦</span>
+                <span>Plataforma Hoteles de Venezuela en actualización 2026</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div className="max-w-5xl mx-auto relative z-10 w-full">
           
           <h1 className="text-4xl sm:text-7xl font-extrabold text-white leading-tight tracking-tight mb-4 font-sans">
