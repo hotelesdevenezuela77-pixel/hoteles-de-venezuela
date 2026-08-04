@@ -8,7 +8,8 @@ import {
   Settings, Check, Plus, Loader2, 
   Sparkles, Building2, MapPin, Map as MapIcon, 
   Globe, Briefcase, Package, Ticket,
-  Shield, Info, Mail, Phone as PhoneIcon, MessageSquare, Text, CreditCard
+  Shield, Info, Mail, Phone as PhoneIcon, MessageSquare, Text, CreditCard,
+  Music, Upload
 } from "lucide-react";
 
 interface Setting {
@@ -37,6 +38,7 @@ const SETTING_LABELS: Record<string, string> = {
   payment_usdt_email: "USDT - Correo Binance",
   payment_paypal_email: "PayPal - Correo",
   payment_paypal_note: "PayPal - Nota",
+  bg_music_url: "Música Corporativa de Fondo (Audio MP3/WAV)",
   payment_stripe_info: "Stripe - Información / Instrucciones",
 };
 
@@ -50,6 +52,7 @@ const SETTING_ICONS: Record<string, { icon: any; color: string }> = {
   facebook_url: { icon: Globe, color: "#1877F2" },
   instagram_url: { icon: Globe, color: "#E1306C" },
   twitter_url: { icon: Globe, color: "#1DA1F2" },
+  bg_music_url: { icon: Music, color: "#00C8D4" },
   payment_pagomovil_bank: { icon: CreditCard, color: "#8B5CF6" },
   payment_pagomovil_phone: { icon: PhoneIcon, color: "#8B5CF6" },
   payment_pagomovil_rif: { icon: CreditCard, color: "#8B5CF6" },
@@ -84,6 +87,38 @@ export function AdminConfig() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [localVisibilities, setLocalVisibilities] = useState<Record<string, boolean>>({});
+  const [uploadingAudio, setUploadingAudio] = useState(false);
+  const [audioSuccess, setAudioSuccess] = useState<string | null>(null);
+
+  const handleAudioUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setUploadingAudio(true);
+      const ext = file.name.split('.').pop() || 'mp3';
+      const fileName = `audio/bg_music_${Date.now()}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("establecimientos")
+        .upload(fileName, file, { contentType: file.type || "audio/mpeg", upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("establecimientos")
+        .getPublicUrl(fileName);
+
+      await updateSetting.mutateAsync({ key: "bg_music_url", value: publicUrl });
+      localStorage.setItem("hdv_custom_audio_url", publicUrl);
+      setAudioSuccess("¡Audio corporativo subido y activado exitosamente para toda la plataforma!");
+      setTimeout(() => setAudioSuccess(null), 5000);
+    } catch (err: any) {
+      console.error("Error subiendo audio corporativo:", err);
+      setErrorMsg("Error al cargar audio: " + (err.message || JSON.stringify(err)));
+    } finally {
+      setUploadingAudio(false);
+    }
+  };
 
   function navAuth() {
     return useAuth();
@@ -297,6 +332,86 @@ export function AdminConfig() {
                 </div>
               );
             })}
+          </div>
+        </div>
+
+        {/* Sección de Gestión de Música Corporativa de Fondo */}
+        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden mb-8 shadow-sm">
+          <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between" style={{ background: "linear-gradient(135deg, #0e011f 0%, #1a0533 100%)" }}>
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-brand-turquesa/20 flex items-center justify-center text-[#00C8D4]">
+                <Music className="w-5 h-5 text-[#00C8D4]" />
+              </div>
+              <div>
+                <h2 className="font-bold text-white text-xs uppercase tracking-wider flex items-center gap-2">
+                  Música Corporativa de Fondo
+                  <span className="text-[9px] bg-pink-500/20 text-brand-magenta font-black px-2 py-0.5 rounded-full border border-brand-magenta/30">
+                    ENVOLVENTE GLOBAL
+                  </span>
+                </h2>
+                <p className="text-[10px] text-white/60 font-semibold mt-0.5">Sube o actualiza la pista de audio libre de derechos para sonar de fondo en toda la plataforma</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 space-y-4">
+            {audioSuccess && (
+              <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                {audioSuccess}
+              </div>
+            )}
+
+            {(() => {
+              const currentBgMusicUrl = settings.find(s => s.key === "bg_music_url")?.value || localStorage.getItem("hdv_custom_audio_url") || "/audio/musica-corporativa.mp3";
+
+              return (
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+                  <div className="space-y-2.5 max-w-md min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-gray-800">Audio Activo en Plataforma:</span>
+                      <span className="text-[10px] bg-emerald-100 text-emerald-700 font-black px-2 py-0.5 rounded-full uppercase">
+                        En Línea
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-gray-500 font-medium break-all bg-white p-2 rounded-lg border border-slate-200 font-mono">
+                      {currentBgMusicUrl}
+                    </p>
+
+                    {/* Vista Previa Reproductor */}
+                    <div className="pt-1">
+                      <audio controls src={currentBgMusicUrl} className="w-full h-9 rounded-lg" />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col items-stretch sm:items-end gap-3 shrink-0">
+                    <label className="px-5 py-3 bg-gradient-to-r from-[#00C8D4] to-[#FF0096] hover:opacity-95 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-95 transition-all">
+                      {uploadingAudio ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Subiendo Audio...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4" />
+                          Cargar Archivo MP3 / WAV
+                        </>
+                      )}
+                      <input
+                        type="file"
+                        accept="audio/*"
+                        onChange={handleAudioUpload}
+                        disabled={uploadingAudio}
+                        className="hidden"
+                      />
+                    </label>
+                    <span className="text-[10px] text-gray-400 font-semibold text-center sm:text-right">
+                      Formatos soportados: MP3, WAV, OGG, M4A
+                    </span>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
 

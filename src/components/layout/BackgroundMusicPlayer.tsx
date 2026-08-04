@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Volume2, VolumeX, Music, Play, Pause, ChevronUp } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 export function BackgroundMusicPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -16,6 +17,29 @@ export function BackgroundMusicPlayer() {
   const [audioSrc, setAudioSrc] = useState<string>(() => {
     return localStorage.getItem("hdv_custom_audio_url") || "/audio/musica-corporativa.mp3";
   });
+
+  // Consultar la URL del audio configurada dinámicamente desde el Panel Administrativo en Supabase
+  useEffect(() => {
+    async function loadAudioSetting() {
+      try {
+        const { data, error } = await supabase
+          .from("site_settings")
+          .select("setting_value")
+          .eq("setting_key", "bg_music_url")
+          .maybeSingle();
+
+        if (!error && data?.setting_value && data.setting_value.trim()) {
+          const remoteUrl = data.setting_value.trim();
+          setAudioSrc(remoteUrl);
+          localStorage.setItem("hdv_custom_audio_url", remoteUrl);
+        }
+      } catch (e) {
+        console.warn("Error consultando configuración de música corporativa:", e);
+      }
+    }
+
+    loadAudioSetting();
+  }, []);
 
   useEffect(() => {
     const audio = new Audio(audioSrc);
