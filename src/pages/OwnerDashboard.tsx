@@ -2728,7 +2728,7 @@ export function OwnerDashboard() {
                 </div>
 
                 {/* Categoría Selector Pills */}
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+                <div className="flex flex-wrap gap-2 pb-2 overflow-x-auto max-w-full">
                   {AREA_CATEGORIES.map(cat => {
                     const estIdNum = Number(selectedCalendarEst);
                     const currentPhotosCount = (areaPhotos[estIdNum]?.[cat.id] || []).length;
