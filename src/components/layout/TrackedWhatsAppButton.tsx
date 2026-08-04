@@ -7,6 +7,7 @@ interface TrackedWhatsAppButtonProps {
   establishmentId: number;
   establishmentName?: string;
   message?: string;
+  customMessage?: string;
   className?: string;
   children?: React.ReactNode;
   iconOnly?: boolean;
