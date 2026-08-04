@@ -223,9 +223,9 @@ export function AnimatedReviewsSection() {
 
       {/* Contenedor de las 3 filas animadas */}
       <div className="space-y-6 relative z-10">
-        {/* Gradiantes laterales de difuminado para un acabado impecable */}
-        <div className="absolute top-0 bottom-0 left-0 w-24 sm:w-40 bg-gradient-to-r from-[#0e011f] via-[#0e011f]/80 to-transparent z-20 pointer-events-none" />
-        <div className="absolute top-0 bottom-0 right-0 w-24 sm:w-40 bg-gradient-to-l from-[#0e011f] via-[#0e011f]/80 to-transparent z-20 pointer-events-none" />
+        {/* Gradiantes laterales muy tenues para un difuminado suave sin oscurecer tarjetas */}
+        <div className="absolute top-0 bottom-0 left-0 w-8 sm:w-14 bg-gradient-to-r from-[#0e011f]/40 to-transparent z-20 pointer-events-none" />
+        <div className="absolute top-0 bottom-0 right-0 w-8 sm:w-14 bg-gradient-to-l from-[#0e011f]/40 to-transparent z-20 pointer-events-none" />
 
         {/* FILA 1: Movimiento continuo a la DERECHA */}
         <div className="flex overflow-hidden group">
