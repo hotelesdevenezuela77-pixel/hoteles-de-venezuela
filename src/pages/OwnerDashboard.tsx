@@ -2514,7 +2514,7 @@ export function OwnerDashboard() {
                 className="btn-cyan-gradient text-xs font-bold px-5 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer uppercase font-sans tracking-wide shadow-md hover:scale-102 transition-all shrink-0"
               >
                 <Plus className="w-4 h-4" />
-                <span>+ Agregar Unidad Operativa</span>
+                <span>Agregar Unidad Operativa</span>
               </button>
             </div>
 
