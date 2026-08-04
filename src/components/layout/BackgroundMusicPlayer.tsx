@@ -47,30 +47,36 @@ export function BackgroundMusicPlayer() {
     audio.volume = volume;
     audioRef.current = audio;
 
-    // Intentar Autoplay automático
+    // Intentar Autoplay automático inmediato
     const attemptAutoplay = async () => {
       try {
         await audio.play();
         setIsPlaying(true);
         setAudioError(false);
       } catch (err) {
-        // El navegador bloqueó el autoplay sin interacción previa.
-        // Agregamos un listener global al primer clic/tap en cualquier parte del sitio para iniciarlo suavemente.
+        // El navegador exige una primera interacción del usuario (Políticas de Autoplay de Chrome/Safari/Edge).
+        // Escuchamos cualquier gesto (clic, toque, scroll o tecla) para iniciar la música automáticamente.
         const handleFirstInteraction = async () => {
           try {
             await audio.play();
             setIsPlaying(true);
             setAudioError(false);
           } catch (e) {
-            console.warn("Audio play error post interaction:", e);
+            console.warn("Error iniciando reproducción tras gesto:", e);
           } finally {
             window.removeEventListener("click", handleFirstInteraction);
             window.removeEventListener("touchstart", handleFirstInteraction);
+            window.removeEventListener("pointerdown", handleFirstInteraction);
+            window.removeEventListener("scroll", handleFirstInteraction);
+            window.removeEventListener("keydown", handleFirstInteraction);
           }
         };
 
         window.addEventListener("click", handleFirstInteraction, { once: true });
         window.addEventListener("touchstart", handleFirstInteraction, { once: true });
+        window.addEventListener("pointerdown", handleFirstInteraction, { once: true });
+        window.addEventListener("scroll", handleFirstInteraction, { once: true });
+        window.addEventListener("keydown", handleFirstInteraction, { once: true });
       }
     };
 
