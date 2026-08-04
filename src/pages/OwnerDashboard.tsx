@@ -281,6 +281,29 @@ export function OwnerDashboard() {
   });
   const [dragActive, setDragActive] = useState<Record<number, boolean>>({});
 
+  // Area & Facility Photos management state (Piscina, Restaurante, Parque, Fachada, Lobby, Spa, etc.)
+  const [areaPhotos, setAreaPhotos] = useState<Record<number, Record<string, string[]>>>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("hdv_area_photos");
+      return saved ? JSON.parse(saved) : {};
+    }
+    return {};
+  });
+  const [selectedAreaCategory, setSelectedAreaCategory] = useState<string>("piscina");
+  const [areaDragActive, setAreaDragActive] = useState<boolean>(false);
+
+  const AREA_CATEGORIES = [
+    { id: "piscina", label: "Piscina & Solárium", icon: "🏊‍♂️", desc: "Tumbonas, piscinas de adultos/niños y jacuzzi" },
+    { id: "restaurante", label: "Restaurante & Bar", icon: "🍽️", desc: "Comedores, áreas gastronómicas, barra y desayunador" },
+    { id: "parque", label: "Parque & Recreación", icon: "🌳", desc: "Parques infantiles, jardines, bohíos y áreas verdes" },
+    { id: "fachada", label: "Fachada & Exteriores", icon: "🏛️", desc: "Entrada principal, estacionamiento y vista exterior" },
+    { id: "lobby", label: "Lobby & Recepción", icon: "🛋️", desc: "Recepción, salas de espera y lounge" },
+    { id: "spa", label: "Spa & Bienestar", icon: "💆‍♀️", desc: "Salas de masaje, sauna y área de relajación" },
+    { id: "eventos", label: "Salón de Eventos", icon: "🎭", desc: "Salones de reuniones y eventos festivos" },
+    { id: "deportes", label: "Gimnasio & Deportes", icon: "🏋️", desc: "Gimnasio y instalaciones deportivas" },
+    { id: "playa", label: "Playa & Marina", icon: "🏖️", desc: "Acceso a playa, embarcadero y lanchas" },
+  ];
+
   // Verification & Document Consignment Modal State
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [verifyingEst, setVerifyingEst] = useState<any>(null);
@@ -1079,6 +1102,38 @@ export function OwnerDashboard() {
       const updated = current.filter((_, i) => i !== index);
       localStorage.setItem("hdv_room_photos", JSON.stringify({ ...prev, [roomId]: updated }));
       return { ...prev, [roomId]: updated };
+    });
+  };
+
+  // Area Photos Handlers (Piscina, Restaurante, Parque, Fachada, Lobby, Spa, etc.)
+  const handleAddAreaPhotos = (estId: number, category: string, fileList: FileList | File[]) => {
+    Array.from(fileList).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = reader.result as string;
+        setAreaPhotos(prev => {
+          const estData = prev[estId] || {};
+          const catPhotos = estData[category] || [];
+          const updatedCat = [...catPhotos, base64];
+          const updatedEst = { ...estData, [category]: updatedCat };
+          const updatedAll = { ...prev, [estId]: updatedEst };
+          localStorage.setItem("hdv_area_photos", JSON.stringify(updatedAll));
+          return updatedAll;
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleRemoveAreaPhoto = (estId: number, category: string, index: number) => {
+    setAreaPhotos(prev => {
+      const estData = prev[estId] || {};
+      const catPhotos = estData[category] || [];
+      const updatedCat = catPhotos.filter((_, i) => i !== index);
+      const updatedEst = { ...estData, [category]: updatedCat };
+      const updatedAll = { ...prev, [estId]: updatedEst };
+      localStorage.setItem("hdv_area_photos", JSON.stringify(updatedAll));
+      return updatedAll;
     });
   };
 
@@ -2653,6 +2708,135 @@ export function OwnerDashboard() {
                     </div>
                   );
                 })}
+              </div>
+            )}
+
+            {/* SECCIÓN DE GALERÍAS POR ÁREAS DE INSTALACIONES (Piscina, Restaurante, Parque, Fachada, Lobby, Spa, etc.) */}
+            {selectedCalendarEst && (
+              <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm space-y-6 mt-8">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-4">
+                  <div>
+                    <h3 className="text-md font-black text-gray-800 tracking-tight font-serif flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-brand-turquesa" />
+                      Galerías Fotográficas de Instalaciones y Otras Áreas
+                    </h3>
+                    <p className="text-xs text-gray-400 mt-1">Carga fotos clasificadas de tu piscina, restaurante, parques, fachada y áreas comunes para que los visitantes las vean ordenadas en la ficha pública.</p>
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 bg-brand-magenta/10 text-brand-magenta rounded-full border border-brand-magenta/20 shrink-0 self-start sm:self-center">
+                    Visualización Organizada en Ficha
+                  </span>
+                </div>
+
+                {/* Categoría Selector Pills */}
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+                  {AREA_CATEGORIES.map(cat => {
+                    const estIdNum = Number(selectedCalendarEst);
+                    const currentPhotosCount = (areaPhotos[estIdNum]?.[cat.id] || []).length;
+                    const isSelected = selectedAreaCategory === cat.id;
+
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setSelectedAreaCategory(cat.id)}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer border ${
+                          isSelected
+                            ? "bg-slate-900 text-white border-slate-900 shadow-sm"
+                            : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"
+                        }`}
+                      >
+                        <span>{cat.icon}</span>
+                        <span>{cat.label}</span>
+                        {currentPhotosCount > 0 && (
+                          <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-black ${isSelected ? "bg-brand-magenta text-white" : "bg-gray-200 text-gray-700"}`}>
+                            {currentPhotosCount}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Current Active Category Uploader and Gallery Grid */}
+                {(() => {
+                  const estIdNum = Number(selectedCalendarEst);
+                  const activeCatObj = AREA_CATEGORIES.find(c => c.id === selectedAreaCategory) || AREA_CATEGORIES[0];
+                  const currentPhotos = areaPhotos[estIdNum]?.[selectedAreaCategory] || [];
+
+                  return (
+                    <div className="bg-gray-50/50 border border-gray-150 rounded-2xl p-5 space-y-4">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h4 className="text-xs font-black text-gray-800 uppercase tracking-wider flex items-center gap-2">
+                            <span>{activeCatObj.icon}</span>
+                            <span>{activeCatObj.label}</span>
+                          </h4>
+                          <p className="text-[11px] text-gray-400 mt-0.5 font-medium">{activeCatObj.desc}</p>
+                        </div>
+                        <span className="text-[10px] text-gray-400 font-bold">
+                          {currentPhotos.length} {currentPhotos.length === 1 ? "foto cargada" : "fotos cargadas"}
+                        </span>
+                      </div>
+
+                      {/* Photo Grid & Drag/Drop Uploader */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                        {currentPhotos.map((phUrl: string, pIdx: number) => (
+                          <div key={pIdx} className="relative aspect-square bg-gray-200 rounded-2xl overflow-hidden group shadow-xs">
+                            <img src={phUrl} alt={`Foto ${pIdx}`} className="w-full h-full object-cover" />
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveAreaPhoto(estIdNum, selectedAreaCategory, pIdx)}
+                              className="absolute top-2 right-2 w-6 h-6 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center shadow-md cursor-pointer transition-colors opacity-0 group-hover:opacity-100"
+                              title="Eliminar foto de esta área"
+                            >
+                              <Trash className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ))}
+
+                        {/* Uploader Box */}
+                        <div
+                          onDragEnter={e => { e.preventDefault(); setAreaDragActive(true); }}
+                          onDragOver={e => { e.preventDefault(); setAreaDragActive(true); }}
+                          onDragLeave={e => { e.preventDefault(); setAreaDragActive(false); }}
+                          onDrop={e => {
+                            e.preventDefault();
+                            setAreaDragActive(false);
+                            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                              handleAddAreaPhotos(estIdNum, selectedAreaCategory, e.dataTransfer.files);
+                            }
+                          }}
+                          className={`aspect-square border-2 border-dashed rounded-2xl flex flex-col items-center justify-center p-3 transition-colors relative cursor-pointer ${
+                            areaDragActive 
+                              ? "border-brand-magenta bg-brand-magenta/5 text-brand-magenta" 
+                              : "border-gray-200 text-gray-400 hover:border-gray-300 hover:text-gray-500 bg-white"
+                          }`}
+                        >
+                          <Upload className="w-6 h-6 mb-1 text-brand-turquesa" />
+                          <span className="text-[9px] font-black uppercase text-center tracking-wider leading-tight">
+                            + Cargar Fotos
+                          </span>
+                          <span className="text-[8px] text-gray-400 text-center mt-0.5">
+                            Arrastra aquí o haz clic
+                          </span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={e => {
+                              if (e.target.files && e.target.files.length > 0) {
+                                handleAddAreaPhotos(estIdNum, selectedAreaCategory, e.target.files);
+                              }
+                            }}
+                            className="absolute inset-0 opacity-0 cursor-pointer"
+                          />
+                        </div>
+                      </div>
+
+                    </div>
+                  );
+                })()}
+
               </div>
             )}
           </div>
