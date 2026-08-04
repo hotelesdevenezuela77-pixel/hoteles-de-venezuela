@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { Navbar } from "./Navbar";
 import { TickerBar } from "./TickerBar";
 import { RouteAlertsBanner } from "../alerts/RouteAlertsBanner";
+import { BackgroundMusicPlayer } from "./BackgroundMusicPlayer";
 import {
   MapPin, Phone, MessageSquare, Send, X
 } from "lucide-react";
@@ -250,6 +251,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       </main>
       <Footer />
       <ChatWidget />
+      <BackgroundMusicPlayer />
     </div>
   );
 }
