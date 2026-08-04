@@ -111,11 +111,13 @@ export function TrackedWhatsAppButton({
   establishmentId,
   establishmentName,
   message,
+  customMessage,
   className = "",
   children,
   iconOnly = false,
   isPriority = false
 }: TrackedWhatsAppButtonProps) {
+  const activeMsg = customMessage || message;
   const [showModal, setShowModal] = useState(false);
   const [visitorName, setVisitorName] = useState("");
   const [visitorPhone, setVisitorPhone] = useState("");
@@ -145,7 +147,7 @@ export function TrackedWhatsAppButton({
       formattedNumber = `+${formattedNumber}`;
     }
 
-    const baseMessage = `Hola, vi a ${establishmentName || "su negocio"} en la plataforma HOTELES DE VENEZUELA (hotelesdevenezuela.com) y me gustaría más información.`;
+    const baseMessage = activeMsg || `Hola, vi a ${establishmentName || "su negocio"} en la plataforma HOTELES DE VENEZUELA (hotelesdevenezuela.com) y me gustaría más información.`;
 
     let finalMessage: string;
     if (includeVisitorInfo && visitorName && visitorPhone) {
@@ -156,7 +158,7 @@ export function TrackedWhatsAppButton({
 
     const whatsappUrl = `https://wa.me/${formattedNumber.replace("+", "")}?text=${encodeURIComponent(finalMessage)}`;
     window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-  }, [whatsappNumber, establishmentName, visitorName, visitorPhone]);
+  }, [whatsappNumber, establishmentName, visitorName, visitorPhone, activeMsg]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -171,7 +173,7 @@ export function TrackedWhatsAppButton({
         establishment_name: establishmentName,
         visitor_name: visitorName.trim(),
         visitor_phone: visitorPhone.trim(),
-        message: message
+        message: activeMsg
       }),
       createWhatsAppLead({
         visitor_name: visitorName.trim(),
