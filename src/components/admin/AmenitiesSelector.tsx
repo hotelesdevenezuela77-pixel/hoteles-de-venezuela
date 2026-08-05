@@ -1,11 +1,20 @@
 import { useState, useMemo } from "react";
-import { MASTER_AMENITIES, AMENITY_CATEGORIES, parseServicesList, getAmenityLabel, type AmenityItem } from "@/lib/amenitiesList";
+import {
+  MASTER_AMENITIES,
+  PILLARS_DOCUMENT77,
+  AMENITY_SCOPES,
+  parseServicesList,
+  getAmenityLabel,
+  type AmenityItem,
+  type AmenityPillar,
+  type AmenityScope
+} from "@/lib/amenitiesList";
 import {
   Sparkles, Search, Check, Plus, Trash2, Zap, Droplets, Wifi, Wind, Car,
   ShieldCheck, Clock, Dog, Accessibility, ArrowUpSquare, Waves, Bath, Palmtree,
-  Dumbbell, Flame, TreePine, Smile, Trophy, Utensils, Coffee, Wine, GlassWater,
+  Dumbbell, Flame, TreePine, Smile, Trophy, Utensils, Coffee, Wine,
   ConciergeBell, Plane, Compass, Sun, Briefcase, Shirt, Eye, Tv, ChefHat,
-  ThermometerSun, Lock, CheckSquare, Square
+  Lock, AlertTriangle, Building, Home, Bed, UserCheck, GraduationCap, Box, Tent, Ship, Heart, Mountain, FileText, Globe
 } from "lucide-react";
 
 interface AmenitiesSelectorProps {
@@ -16,12 +25,14 @@ interface AmenitiesSelectorProps {
 const ICON_MAP: Record<string, any> = {
   Wifi, Wind, Car, Zap, Droplets, ShieldCheck, Clock, Dog, Accessibility, ArrowUpSquare,
   Waves, Bath, Palmtree, Sparkles, Dumbbell, Flame, TreePine, Smile, Trophy, Utensils,
-  Coffee, Wine, GlassWater, ConciergeBell, Plane, Compass, Sun, Briefcase, Shirt,
-  Eye, Tv, ChefHat, ThermometerSun, Lock
+  Coffee, Wine, ConciergeBell, Plane, Compass, Sun, Briefcase, Shirt,
+  Eye, Tv, ChefHat, Lock, AlertTriangle, Building, Home, Bed, UserCheck, GraduationCap,
+  Box, Tent, Ship, Heart, Mountain, FileText, Globe
 };
 
 export function AmenitiesSelector({ selectedServices, onChange }: AmenitiesSelectorProps) {
-  const [activeTab, setActiveTab] = useState<string>("all");
+  const [activePillar, setActivePillar] = useState<string>("all");
+  const [activeScope, setActiveScope] = useState<string>("all");
   const [search, setSearch] = useState<string>("");
   const [customInput, setCustomInput] = useState<string>("");
 
@@ -76,7 +87,7 @@ export function AmenitiesSelector({ selectedServices, onChange }: AmenitiesSelec
   };
 
   const selectBasicEssentials = () => {
-    const basics = ["wifi", "aire_acondicionado", "estacionamiento", "planta_electrica", "tanque_agua", "restaurante"];
+    const basics = ["wifi", "aire_acondicionado", "aparcamiento", "recepcion_24h", "ropa_cama", "papel_higienico", "toallas"];
     const merged = Array.from(new Set([...currentList, ...basics]));
     onChange(merged);
   };
@@ -85,36 +96,41 @@ export function AmenitiesSelector({ selectedServices, onChange }: AmenitiesSelec
     onChange([]);
   };
 
-  // Filter master amenities by tab and search
+  // Filter master amenities by pillar, scope, and search term (label/code/category)
   const filteredAmenities = useMemo(() => {
     return MASTER_AMENITIES.filter(item => {
-      const matchesTab = activeTab === "all" || item.category === activeTab;
-      const matchesSearch = !search.trim() ||
-        item.label.toLowerCase().includes(search.toLowerCase()) ||
-        item.key.toLowerCase().includes(search.toLowerCase());
-      return matchesTab && matchesSearch;
+      const matchesPillar = activePillar === "all" || item.pillar === activePillar;
+      const matchesScope = activeScope === "all" || item.scope === activeScope;
+      const searchLower = search.trim().toLowerCase();
+      const matchesSearch = !searchLower ||
+        item.label.toLowerCase().includes(searchLower) ||
+        item.key.toLowerCase().includes(searchLower) ||
+        item.code.toLowerCase().includes(searchLower) ||
+        item.subCategory.toLowerCase().includes(searchLower);
+
+      return matchesPillar && matchesScope && matchesSearch;
     });
-  }, [activeTab, search]);
+  }, [activePillar, activeScope, search]);
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-xs space-y-5">
+    <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
         <div>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-cyan-500/10 text-[#00C8D4]">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#00C8D4]/10 text-[#00C8D4]">
               <Sparkles className="w-4.5 h-4.5 text-[#00C8D4]" />
             </div>
-            <h2 className="font-bold text-gray-900 text-sm tracking-tight">Servicios y Amenidades</h2>
+            <h2 className="font-bold text-slate-900 text-sm tracking-tight">Estándar Documento 77 V.1 - Taxonomía Oficial</h2>
             <span
-              className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase text-white tracking-wider"
+              className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase text-white tracking-wider shadow-xs"
               style={{ background: "#FF0096" }}
             >
               {currentList.length} seleccionadas
             </span>
           </div>
-          <p className="text-gray-500 text-xs mt-1">
-            Selecciona las comodidades que ofrece tu establecimiento para destacarlo en búsquedas y comparativas.
+          <p className="text-slate-500 text-xs mt-1">
+            Clasificación estructurada en 3 Niveles (Infraestructura Físicas, Servicios e Intangibles, Gestión y Normas) con etiquetado por Ámbito.
           </p>
         </div>
 
@@ -139,38 +155,60 @@ export function AmenitiesSelector({ selectedServices, onChange }: AmenitiesSelec
         </div>
       </div>
 
-      {/* Filter Tabs & Search Bar */}
+      {/* 3 Pillars Tabs */}
       <div className="space-y-3">
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Buscar amenidad (ej. Piscina, Planta Eléctrica, Pet Friendly...)"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-slate-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2 text-xs text-gray-900 placeholder-slate-400 focus:outline-none focus:border-[#00C8D4] font-semibold"
-          />
-        </div>
-
-        {/* Category Pill Tabs */}
-        <div className="flex flex-wrap items-center gap-1.5 pb-1">
-          {AMENITY_CATEGORIES.map((cat) => {
-            const isActive = activeTab === cat.id;
+        <div className="flex flex-wrap gap-2">
+          {PILLARS_DOCUMENT77.map((pillar) => {
+            const isActive = activePillar === pillar.id;
             return (
               <button
-                key={cat.id}
+                key={pillar.id}
                 type="button"
-                onClick={() => setActiveTab(cat.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                onClick={() => setActivePillar(pillar.id)}
+                className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer border ${
                   isActive
-                    ? "bg-slate-900 text-white shadow-sm"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    ? "bg-slate-900 text-white border-slate-900 shadow-md scale-[1.02]"
+                    : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
                 }`}
               >
-                {cat.label}
+                {pillar.label}
               </button>
             );
           })}
+        </div>
+
+        {/* Scope Pill Filters & Search */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Buscar por código (ej. C01.1.3), nombre o subcategoría..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#00C8D4] font-semibold"
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+            {AMENITY_SCOPES.map((sc) => {
+              const isActive = activeScope === sc.id;
+              return (
+                <button
+                  key={sc.id}
+                  type="button"
+                  onClick={() => setActiveScope(sc.id)}
+                  className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                    isActive
+                      ? "bg-[#00C8D4] text-white shadow-xs"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  {sc.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -180,37 +218,67 @@ export function AmenitiesSelector({ selectedServices, onChange }: AmenitiesSelec
           const isSelected = standardKeysSet.has(item.key.toLowerCase());
           const IconComp = ICON_MAP[item.iconName] || Sparkles;
 
+          let scopeBadgeBg = "bg-cyan-100 text-cyan-800";
+          let scopeText = "Privado";
+          if (item.scope === "comun") {
+            scopeBadgeBg = "bg-purple-100 text-purple-800";
+            scopeText = "Zona Común";
+          } else if (item.scope === "servicio") {
+            scopeBadgeBg = "bg-pink-100 text-pink-800";
+            scopeText = "Servicio";
+          }
+
           return (
             <div
               key={item.key}
               onClick={() => toggleAmenity(item.key)}
-              className={`flex items-center justify-between p-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer select-none ${
+              className={`flex flex-col justify-between p-3 rounded-xl border text-xs transition-all cursor-pointer select-none relative group ${
                 isSelected
                   ? "bg-cyan-50/80 border-[#00C8D4] text-slate-900 shadow-xs ring-1 ring-[#00C8D4]/30"
-                  : "bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50/80"
+                  : "bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50/80"
               }`}
             >
-              <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                <div
-                  className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
-                    isSelected ? "bg-[#00C8D4] text-white" : "bg-slate-100 text-slate-500"
-                  }`}
-                >
-                  <IconComp className="w-3.5 h-3.5" />
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div
+                    className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
+                      isSelected ? "bg-[#00C8D4] text-white" : "bg-slate-100 text-slate-500"
+                    }`}
+                  >
+                    <IconComp className="w-3.5 h-3.5" />
+                  </div>
+                  <div>
+                    <span className="text-[9px] font-mono font-bold text-slate-400 block leading-none">
+                      {item.code}
+                    </span>
+                    <span className="text-[10px] font-semibold text-slate-500 leading-tight block">
+                      {item.subCategory}
+                    </span>
+                  </div>
                 </div>
-                <span className="leading-tight text-[11px] sm:text-xs text-slate-850 break-words font-semibold flex-1 select-none">
-                  {item.label}
-                </span>
+
+                <div className="shrink-0 mt-0.5">
+                  {isSelected ? (
+                    <div className="w-5 h-5 rounded-md bg-[#00C8D4] text-white flex items-center justify-center">
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    </div>
+                  ) : (
+                    <div className="w-5 h-5 rounded-md border border-slate-300 bg-white" />
+                  )}
+                </div>
               </div>
 
-              <div className="shrink-0">
-                {isSelected ? (
-                  <div className="w-5 h-5 rounded-md bg-[#00C8D4] text-white flex items-center justify-center">
-                    <Check className="w-3.5 h-3.5 stroke-[3]" />
-                  </div>
-                ) : (
-                  <div className="w-5 h-5 rounded-md border border-gray-300 bg-white" />
-                )}
+              <span className="leading-tight text-[11px] sm:text-xs text-slate-850 font-bold mb-2 break-words">
+                {item.label}
+              </span>
+
+              <div className="flex items-center justify-between mt-auto pt-1 border-t border-slate-100">
+                <span className={`px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${scopeBadgeBg}`}>
+                  {scopeText}
+                </span>
+                <span className="text-[9px] text-slate-400 font-bold uppercase">
+                  {item.pillar}
+                </span>
               </div>
             </div>
           );
@@ -218,20 +286,20 @@ export function AmenitiesSelector({ selectedServices, onChange }: AmenitiesSelec
 
         {filteredAmenities.length === 0 && (
           <div className="col-span-full py-8 text-center text-xs text-slate-400 font-medium">
-            No se encontraron amenidades que coincidan con "{search}".
+            No se encontraron amenidades que coincidan con la búsqueda o filtros aplicados.
           </div>
         )}
       </div>
 
       {/* Add Custom Amenity Input */}
-      <div className="pt-4 border-t border-gray-100 space-y-3">
-        <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block pt-1.5 leading-normal">
-          ¿No encuentras una amenidad? Agrégala manualmente:
+      <div className="pt-4 border-t border-slate-100 space-y-3">
+        <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block pt-1.5 leading-normal">
+          ¿No encuentras una amenidad en el catálogo del Documento 77? Agrégala manualmente:
         </label>
         <div className="flex gap-2">
           <input
             type="text"
-            placeholder="Ej: Vista al Ávila, Helipuerto, Cancha de Pádel..."
+            placeholder="Ej: Helipuerto privado, Cancha de Pádel vista al Ávila..."
             value={customInput}
             onChange={(e) => setCustomInput(e.target.value)}
             onKeyDown={(e) => {
@@ -240,7 +308,7 @@ export function AmenitiesSelector({ selectedServices, onChange }: AmenitiesSelec
                 addCustomService();
               }
             }}
-            className="flex-1 bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-pink-500 font-semibold text-gray-900"
+            className="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-pink-500 font-semibold text-slate-900"
           />
           <button
             type="button"

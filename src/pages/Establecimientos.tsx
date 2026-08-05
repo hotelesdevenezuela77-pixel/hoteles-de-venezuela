@@ -585,7 +585,6 @@ export function Establecimientos() {
     estServices.push("familiar");
     if (nameLower.includes("adult") || nameLower.includes("boutique") || est.id % 3 === 0) estServices.push("solo_adultos");
     if (est.id % 2 === 0) estServices.push("pet_friendly");
-    if (est.id % 3 === 0) estServices.push("travel_proud");
 
     // 11. Accesibilidad
     if (est.id % 2 === 0) estServices.push("planta_baja");

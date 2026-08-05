@@ -14,7 +14,7 @@ import {
   Bed, Users, CheckCircle, Maximize2, X, Camera, MessageCircle, Layers
 } from "lucide-react";
 
-import { parseServicesList, getAmenityLabel } from "../lib/amenitiesList";
+import { parseServicesList, getAmenityLabel, getAmenityInfo, CERTIFICATIONS_DOCUMENT77 } from "../lib/amenitiesList";
 
 const ROOM_AMENITIES_MAP: Record<string, string> = {
   toallas: "Toallas",
@@ -703,20 +703,106 @@ export function EstablecimientoDetalle() {
               </p>
             </div>
 
-            {/* Services Card */}
+            {/* Services & Amenities Card (Document 77 V.1 Taxonomy) */}
             {servicesList.length > 0 && (
-              <div className="bg-white rounded-3xl border border-gray-100 p-6 md:p-8 shadow-sm">
-                <h2 className="text-lg font-black text-gray-800 tracking-tight mb-4">
-                  Servicios y Comodidades
-                </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {servicesList.map((service, i) => (
-                    <div key={i} className="flex items-center gap-2.5 p-3.5 bg-gray-50 border border-gray-100 rounded-xl">
-                      <div className="w-2 h-2 rounded-full shrink-0" style={{ background: "#00C8D4" }} />
-                      <span className="text-xs font-bold text-slate-700">{getAmenityLabel(service)}</span>
-                    </div>
-                  ))}
+              <div className="bg-white rounded-3xl border border-slate-100 p-6 md:p-8 shadow-sm space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                  <div>
+                    <h2 className="text-xl font-serif font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] flex items-center justify-center text-white shrink-0 shadow-xs">
+                        <Sparkles className="w-4 h-4 text-white" />
+                      </div>
+                      Infraestructura, Servicios y Políticas (Documento 77 V.1)
+                    </h2>
+                    <p className="text-xs text-slate-500 font-semibold mt-1">
+                      Catálogo oficial verificado discriminado por Ámbito (Privado de la Unidad, Zona Común y Servicios).
+                    </p>
+                  </div>
+                  <span
+                    className="px-3 py-1 rounded-full text-[10px] font-black uppercase text-white tracking-wider self-start sm:self-center shadow-xs"
+                    style={{ background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)" }}
+                  >
+                    {servicesList.length} Comodidades Registradas
+                  </span>
                 </div>
+
+                {/* Group amenities into 3 Pillars */}
+                {(() => {
+                  const itemsWithInfo = servicesList.map(s => {
+                    const info = getAmenityInfo(s);
+                    return {
+                      rawKey: s,
+                      label: getAmenityLabel(s),
+                      pillar: info?.pillar || "C01",
+                      pillarLabel: info?.pillarLabel || "C01. Infraestructura Físicas",
+                      scope: info?.scope || "privado",
+                      code: info?.code || "",
+                      subCategory: info?.subCategory || "Equipamiento General"
+                    };
+                  });
+
+                  const pillarC01 = itemsWithInfo.filter(i => i.pillar === "C01");
+                  const pillarC02 = itemsWithInfo.filter(i => i.pillar === "C02");
+                  const pillarC03 = itemsWithInfo.filter(i => i.pillar === "C03");
+
+                  const pillarsToRender = [
+                    { id: "C01", title: "C01. Infraestructura y Equipamiento Físico", color: "#00C8D4", items: pillarC01 },
+                    { id: "C02", title: "C02. Servicios y Experiencias", color: "#FF0096", items: pillarC02 },
+                    { id: "C03", title: "C03. Gestión, Políticas y Accesibilidad", color: "#9B00CC", items: pillarC03 },
+                  ].filter(p => p.items.length > 0);
+
+                  return (
+                    <div className="space-y-6">
+                      {pillarsToRender.map(pillarGroup => (
+                        <div key={pillarGroup.id} className="space-y-3">
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full shrink-0" style={{ background: pillarGroup.color }} />
+                            <h3 className="text-xs font-black uppercase tracking-wider text-slate-800">
+                              {pillarGroup.title}
+                            </h3>
+                            <span className="text-[10px] font-bold text-slate-400">({pillarGroup.items.length})</span>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                            {pillarGroup.items.map((item, idx) => {
+                              let scopeTagBg = "bg-cyan-50 text-cyan-800 border-cyan-200";
+                              let scopeLabel = "Privado";
+                              if (item.scope === "comun") {
+                                scopeTagBg = "bg-purple-50 text-purple-800 border-purple-200";
+                                scopeLabel = "Zona Común";
+                              } else if (item.scope === "servicio") {
+                                scopeTagBg = "bg-pink-50 text-pink-800 border-pink-200";
+                                scopeLabel = "Servicio";
+                              }
+
+                              return (
+                                <div key={idx} className="flex items-center justify-between p-3 bg-slate-50/80 border border-slate-200/80 rounded-xl hover:border-slate-300 transition-all">
+                                  <div className="min-w-0 pr-2">
+                                    {item.code && (
+                                      <span className="text-[9px] font-mono font-bold text-slate-400 block leading-none mb-0.5">
+                                        {item.code}
+                                      </span>
+                                    )}
+                                    <span className="text-xs font-bold text-slate-800 leading-tight block">
+                                      {item.label}
+                                    </span>
+                                    <span className="text-[10px] text-slate-500 font-medium leading-tight block">
+                                      {item.subCategory}
+                                    </span>
+                                  </div>
+
+                                  <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider border shrink-0 ${scopeTagBg}`}>
+                                    {scopeLabel}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
               </div>
             )}
 
