@@ -1042,6 +1042,8 @@ export function OwnerDashboard() {
           modules: {
             reservas: true,
             pos: true,
+            galeria: true,
+            contacto: true,
             tareas: true,
             finanzas: true,
             cms: true,
