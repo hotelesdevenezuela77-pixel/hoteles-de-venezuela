@@ -1353,7 +1353,7 @@ export function Establecimientos() {
                       { key: "familiar", label: "Familiar (Apto para niños)" },
                       { key: "solo_adultos", label: "Solo Adultos / Parejas" },
                       { key: "pet_friendly", label: "Pet Friendly (Mascotas)" },
-                      { key: "travel_proud", label: "Travel Proud (LGBTQ+)" }
+                      { key: "travel_proud", label: "Travel Proud Family" }
                     ].map(item => {
                       const count = getFilterOptionCount("grupo", item.key);
                       return (

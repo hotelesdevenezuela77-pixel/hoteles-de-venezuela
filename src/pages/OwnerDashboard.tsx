@@ -8,7 +8,8 @@ import {
   DollarSign, Users, Trash2, X, Phone, Globe, Briefcase, User,
   Eye, Check, ListFilter, Tag, Sparkles, CalendarRange,
   Upload, Trash, FileText, ChevronRight, AlertCircle, RefreshCw,
-  TrendingUp, Star, ShieldCheck, ArrowRight, Clipboard, Award, ShieldAlert, Download, ExternalLink, FileCheck
+  TrendingUp, Star, ShieldCheck, ArrowRight, Clipboard, Award, ShieldAlert, Download, ExternalLink, FileCheck,
+  Coffee, Edit3
 } from "lucide-react";
 import { ScriptGenerator } from "../components/ScriptGenerator";
 import { AmenitiesSelector } from "@/components/admin/AmenitiesSelector";
@@ -16,6 +17,12 @@ import { AvailabilityCalendar } from "../components/AvailabilityCalendar";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area, Legend } from "recharts";
 import { jsPDF } from "jspdf";
 import { ConstellationBackground } from "../components/ConstellationBackground";
+import { TENANTS_REGISTRY, type TenantConfig } from "../tenants/tenantContext";
+import { CMSModule } from "../tenants/templates/components/CMSModule";
+import { TaskModule } from "../tenants/templates/components/TaskModule";
+import { POSModule } from "../tenants/templates/components/POSModule";
+import { FinanceModule } from "../tenants/templates/components/FinanceModule";
+import { AnalyticsModule } from "../tenants/templates/components/AnalyticsModule";
 
 interface Establishment {
   id: number;
@@ -191,11 +198,106 @@ export function OwnerDashboard() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [leads, setLeads] = useState<WhatsAppLead[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"resumen" | "portafolio" | "operaciones" | "inventario" | "finanzas" | "marketing" | "guiones">("resumen");
+  const [activeTab, setActiveTab] = useState<"resumen" | "portafolio" | "operaciones" | "inventario" | "finanzas" | "marketing" | "guiones" | "webapp_cms" | "tareas" | "pos" | "analiticas_saas">("resumen");
   const [operacionesSubTab, setOperacionesSubTab] = useState<"reservas" | "disponibilidad" | "timeline">("reservas");
   const [marketingSubTab, setMarketingSubTab] = useState<"descuentos" | "leads" | "reviews" | "channel-manager">("leads");
   
   const [selectedCalendarEst, setSelectedCalendarEst] = useState<number | "">("");
+  const [currentTenantConfig, setCurrentTenantConfig] = useState<TenantConfig | null>(null);
+
+  // Dynamic detection and resolution of SaaS Tenant Configuration
+  const loadTenantConfigForEstablishment = async (est: Establishment | null) => {
+    if (!est) return;
+
+    try {
+      // 1. Try fetching from Supabase database table tenant_configurations
+      const { data, error } = await supabase
+        .from("tenant_configurations")
+        .select("*")
+        .or(`establishment_id.eq.${est.id},slug.eq.${est.slug}`);
+
+      if (!error && data && data.length > 0) {
+        const t = data[0];
+        const dbConfig: TenantConfig = {
+          establishment_id: t.establishment_id,
+          slug: t.slug,
+          name: t.name,
+          template: t.template,
+          domain: t.domain,
+          branding: typeof t.branding === "string" ? JSON.parse(t.branding) : t.branding,
+          modules: typeof t.modules === "string" ? JSON.parse(t.modules) : t.modules,
+          contact: typeof t.contact === "string" ? JSON.parse(t.contact) : t.contact
+        };
+        setCurrentTenantConfig(dbConfig);
+        return;
+      }
+    } catch (dbErr) {
+      console.warn("[Tenant Sync] DB fetch failed, using fallback sources:", dbErr);
+    }
+
+    // 2. Try fetching from local simulation storage (synced by AdminSaaS)
+    try {
+      const localData = localStorage.getItem("hdv_tenants_configurations");
+      if (localData) {
+        const list: TenantConfig[] = JSON.parse(localData);
+        const matched = list.find(t => t.establishment_id === est.id || t.slug === est.slug);
+        if (matched) {
+          setCurrentTenantConfig(matched);
+          return;
+        }
+      }
+    } catch (localErr) {
+      console.error("[Tenant Sync] Error parsing localStorage:", localErr);
+    }
+
+    // 3. Try fetching from static registry (config.json files)
+    if (TENANTS_REGISTRY[est.slug]) {
+      setCurrentTenantConfig(TENANTS_REGISTRY[est.slug]);
+      return;
+    }
+
+    // 4. Default dynamic TenantConfig fallback
+    const defaultConfig: TenantConfig = {
+      establishment_id: est.id,
+      slug: est.slug || `hotel-${est.id}`,
+      name: est.name,
+      template: "A",
+      domain: est.website ? est.website.replace(/^https?:\/\//, '').split('/')[0] : `${est.slug || 'hotel'}.com`,
+      branding: {
+        primary_color: "#00C8D4",
+        secondary_color: "#9B00CC",
+        accent_color: "#FF0096",
+        font_title: "Playfair Display",
+        font_body: "Montserrat",
+        logo_url: "https://r2.hotelesdevenezuela.com/default/logo.png",
+        banner_url: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1600&auto=format&fit=crop"
+      },
+      modules: {
+        reservas: true,
+        pos: true,
+        galeria: true,
+        contacto: true,
+        tareas: true,
+        finanzas: true,
+        cms: true,
+        analiticas: true
+      },
+      contact: {
+        phone: est.phone || "+58 412 000 0000",
+        whatsapp: est.whatsapp || est.phone || "+58 412 000 0000",
+        email: `contacto@${est.slug || 'hotel'}.com`,
+        instagram: `@${est.slug || 'hotel'}`
+      }
+    };
+    setCurrentTenantConfig(defaultConfig);
+  };
+
+  useEffect(() => {
+    if (establishments.length > 0) {
+      const activeEst = establishments.find(e => e.id === Number(selectedCalendarEst)) || establishments[0];
+      loadTenantConfigForEstablishment(activeEst);
+    }
+  }, [selectedCalendarEst, establishments]);
 
   const [discountCodes, setDiscountCodes] = useState<any[]>([]);
   const [showAddDiscountModal, setShowAddDiscountModal] = useState(false);
@@ -895,6 +997,69 @@ export function OwnerDashboard() {
       fetchRooms(Number(selectedCalendarEst));
     }
   }, [selectedCalendarEst]);
+
+  // Fetch & Sync Tenant Config (SaaS Modules) for active establishment
+  useEffect(() => {
+    if (!selectedCalendarEst && establishments.length > 0) {
+      setSelectedCalendarEst(establishments[0].id);
+    }
+  }, [establishments]);
+
+  useEffect(() => {
+    const loadTenantConfig = async () => {
+      if (!selectedCalendarEst || establishments.length === 0) return;
+      const targetEst = establishments.find(e => Number(e.id) === Number(selectedCalendarEst)) || establishments[0];
+      if (!targetEst) return;
+
+      let tenantsList: TenantConfig[] = [];
+      try {
+        const saved = localStorage.getItem("hdv_tenants_configurations");
+        if (saved) tenantsList = JSON.parse(saved);
+      } catch (e) {}
+
+      let matched = tenantsList.find(t => Number(t.establishment_id) === Number(targetEst.id) || t.slug.toLowerCase() === targetEst.slug.toLowerCase());
+
+      if (!matched) {
+        matched = Object.values(TENANTS_REGISTRY).find(t => Number(t.establishment_id) === Number(targetEst.id) || t.slug.toLowerCase() === targetEst.slug.toLowerCase());
+      }
+
+      if (!matched) {
+        matched = {
+          establishment_id: targetEst.id,
+          slug: targetEst.slug || `hotel-${targetEst.id}`,
+          name: targetEst.name,
+          template: "A",
+          domain: targetEst.website?.replace(/^https?:\/\//, "") || `${targetEst.slug}.com`,
+          branding: {
+            primary_color: "#00C8D4",
+            secondary_color: "#9B00CC",
+            accent_color: "#FF0096",
+            font_title: "Playfair Display",
+            font_body: "Montserrat",
+            logo_url: "",
+            banner_url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600&auto=format&fit=crop"
+          },
+          modules: {
+            reservas: true,
+            pos: true,
+            tareas: true,
+            finanzas: true,
+            cms: true,
+            analiticas: true
+          },
+          contact: {
+            phone: targetEst.phone || "+58 412 000 0000",
+            whatsapp: targetEst.whatsapp || targetEst.phone || "+58 412 000 0000",
+            email: "contacto@hotelesdevenezuela.com",
+            instagram: "@hotelesdevenezuela"
+          }
+        };
+      }
+      setCurrentTenantConfig(matched);
+    };
+
+    loadTenantConfig();
+  }, [selectedCalendarEst, establishments]);
 
   const handleToggleRoomAmenity = (key: string) => {
     const current = roomFormData.amenities ? roomFormData.amenities.split(",").map(s => s.trim()).filter(Boolean) : [];
@@ -1745,25 +1910,34 @@ export function OwnerDashboard() {
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center gap-4">
           <nav className="flex gap-6 -mb-px overflow-x-auto scrollbar-hide py-1">
             {[
-              { id: "resumen", label: "Dashboard", icon: BarChart3 },
-              { id: "portafolio", label: `Mi Portafolio (${establishments.length})`, icon: Building2 },
-              { id: "operaciones", label: "Operaciones Diarias", icon: CalendarRange },
-              { id: "inventario", label: "Inventario de Habitaciones", icon: ListFilter },
-              { id: "finanzas", label: "Finanzas & Membresías", icon: DollarSign },
-              { id: "marketing", label: "Marketing & Canales", icon: Tag },
-              { id: "guiones", label: "Asistente de Guiones", icon: Sparkles }
-            ].map(tab => (
+              { id: "resumen", label: "Dashboard Ejecutivo", icon: BarChart3, enabled: true },
+              { id: "webapp_cms", label: "🌐 Aplicación Web & CMS", icon: Globe, enabled: currentTenantConfig?.modules?.cms !== false, badge: "Web Builder" },
+              { id: "tareas", label: "📋 Gestión de Tareas", icon: Clipboard, enabled: !!currentTenantConfig?.modules?.tareas, badge: "SaaS" },
+              { id: "pos", label: "💳 Club POS", icon: Coffee, enabled: !!currentTenantConfig?.modules?.pos, badge: "SaaS" },
+              { id: "finanzas", label: "💰 Finanzas & Membresías", icon: DollarSign, enabled: true },
+              { id: "analiticas_saas", label: "📊 Analíticas SaaS", icon: TrendingUp, enabled: !!currentTenantConfig?.modules?.analiticas, badge: "SaaS" },
+              { id: "portafolio", label: `Mi Portafolio (${establishments.length})`, icon: Building2, enabled: true },
+              { id: "operaciones", label: "Operaciones Diarias", icon: CalendarRange, enabled: true },
+              { id: "inventario", label: "Inventario de Habitaciones", icon: ListFilter, enabled: true },
+              { id: "marketing", label: "Marketing & Canales", icon: Tag, enabled: true },
+              { id: "guiones", label: "Asistente de Guiones", icon: Sparkles, enabled: true }
+            ].filter(tab => tab.enabled).map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`py-4 border-b-2 flex items-center gap-2 text-xs font-bold cursor-pointer transition-all whitespace-nowrap ${
                   activeTab === tab.id
-                    ? "border-brand-magenta text-brand-magenta font-black"
+                    ? "border-brand-magenta text-brand-magenta font-black scale-102"
                     : "border-transparent text-gray-500 hover:text-gray-800"
                 }`}
               >
                 <tab.icon className="w-4 h-4" />
                 <span>{tab.label}</span>
+                {tab.badge && (
+                  <span className="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider bg-cyan-100 text-cyan-800 border border-cyan-300">
+                    {tab.badge}
+                  </span>
+                )}
               </button>
             ))}
           </nav>
@@ -1799,6 +1973,85 @@ export function OwnerDashboard() {
         {/* DASHBOARD EJECUTIVO TAB */}
         {activeTab === "resumen" && (
           <div className="space-y-8">
+            
+            {/* SaaS Web Application Control Card */}
+            {currentTenantConfig && (
+              <div className="bg-gradient-to-r from-[#0e011f] via-[#1a0533] to-[#0e011f] border border-[#00C8D4]/30 rounded-3xl p-6 text-white shadow-xl space-y-4 text-left">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/10 pb-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase text-white tracking-wider" style={{ background: "#FF0096" }}>
+                        NODO INQUILINO SAAS ACTIVO
+                      </span>
+                      <span className="text-xs text-slate-300 font-bold">ID #{currentTenantConfig.establishment_id}</span>
+                    </div>
+                    <h3 className="text-xl font-black font-serif text-white tracking-tight flex items-center gap-2">
+                      <Globe className="w-5 h-5 text-[#00C8D4]" />
+                      <span>{currentTenantConfig.name} — Aplicación Web Standalone</span>
+                    </h3>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <a
+                      href={`/app/${currentTenantConfig.slug}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-4 py-2 bg-[#00C8D4] hover:bg-[#00b2bd] text-white text-xs font-black rounded-xl flex items-center gap-2 shadow-md transition-all cursor-pointer"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      <span>🚀 Ver Mi Web App</span>
+                    </a>
+                    {currentTenantConfig.modules?.cms !== false && (
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab("webapp_cms")}
+                        className="px-4 py-2 bg-gradient-to-r from-[#FF0096] to-[#9B00CC] text-white text-xs font-black rounded-xl flex items-center gap-2 shadow-md hover:opacity-90 transition-all cursor-pointer"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                        <span>✏️ Personalizar Creador Web (CMS)</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                  <div className="p-3 bg-white/5 border border-white/10 rounded-2xl">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">URL de Pruebas Web App</span>
+                    <a
+                      href={`/app/${currentTenantConfig.slug}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-mono font-bold text-[#00C8D4] hover:underline break-all block"
+                    >
+                      {window.location.origin}/app/{currentTenantConfig.slug}
+                    </a>
+                  </div>
+
+                  <div className="p-3 bg-white/5 border border-white/10 rounded-2xl">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Dominio Oficial Publicado</span>
+                    <a
+                      href={`https://${currentTenantConfig.domain}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-mono font-bold text-pink-400 hover:underline break-all block"
+                    >
+                      https://{currentTenantConfig.domain}
+                    </a>
+                  </div>
+
+                  <div className="p-3 bg-white/5 border border-white/10 rounded-2xl">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Módulos SaaS Contratados</span>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {currentTenantConfig.modules?.reservas && <span className="px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">Reservas</span>}
+                      {currentTenantConfig.modules?.pos && <span className="px-1.5 py-0.5 rounded text-[9px] bg-pink-500/20 text-pink-300 font-bold border border-pink-500/30">Club POS</span>}
+                      {currentTenantConfig.modules?.tareas && <span className="px-1.5 py-0.5 rounded text-[9px] bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30">Tareas</span>}
+                      {currentTenantConfig.modules?.cms !== false && <span className="px-1.5 py-0.5 rounded text-[9px] bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30">Web Builder (CMS)</span>}
+                      {currentTenantConfig.modules?.analiticas && <span className="px-1.5 py-0.5 rounded text-[9px] bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">Analíticas</span>}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
             
             {/* Header info selector mobile */}
             <div className="lg:hidden flex flex-col gap-2 p-4 bg-white border border-gray-150 rounded-2xl text-left">
@@ -3244,6 +3497,82 @@ export function OwnerDashboard() {
         {/* ASISTENTE DE GUIONES TAB */}
         {activeTab === "guiones" && (
           <ScriptGenerator establishments={establishments} />
+        )}
+
+        {/* SAAS MODULE: WEB APP & CMS BUILDER */}
+        {activeTab === "webapp_cms" && currentTenantConfig && (
+          <div className="space-y-8 animate-in fade-in duration-200">
+            <div className="bg-gradient-to-r from-slate-900 via-[#1a0533] to-[#0e011f] border border-[#00C8D4]/30 rounded-3xl p-6 text-white shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <span className="px-3 py-1 bg-[#00C8D4]/20 text-[#00C8D4] border border-[#00C8D4]/30 rounded-full text-[10px] font-black uppercase tracking-wider">
+                  Módulo SaaS Activo: CMS & Creador Web
+                </span>
+                <h2 className="text-xl font-black font-serif mt-2">Personalizador de Aplicación Web Standalone</h2>
+                <p className="text-xs text-slate-300 font-medium mt-1">
+                  Modifica colores, imágenes de portada, tipografía, enlaces de contacto y secciones de tu sitio web oficial.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-2.5 shrink-0">
+                <a
+                  href={`/app/${currentTenantConfig.slug}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-4 py-2.5 bg-[#00C8D4] hover:bg-[#00b2bd] text-white text-xs font-black rounded-xl flex items-center gap-2 shadow-md transition-all cursor-pointer"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  <span>🚀 Abrir Mi Web App Standalone</span>
+                </a>
+              </div>
+            </div>
+
+            <CMSModule
+              config={currentTenantConfig}
+              onConfigChange={(updated) => {
+                setCurrentTenantConfig(updated);
+                const localKey = "hdv_tenants_configurations";
+                const saved = localStorage.getItem(localKey);
+                let list: TenantConfig[] = saved ? JSON.parse(saved) : [];
+                const idx = list.findIndex(t => t.establishment_id === updated.establishment_id);
+                if (idx !== -1) list[idx] = updated; else list.push(updated);
+                localStorage.setItem(localKey, JSON.stringify(list));
+              }}
+              primaryColor="#00C8D4"
+              secondaryColor="#9B00CC"
+              accentColor="#FF0096"
+            />
+          </div>
+        )}
+
+        {/* SAAS MODULE: GESTIÓN DE TAREAS */}
+        {activeTab === "tareas" && activeEstablishment && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            <TaskModule
+              establishmentId={activeEstablishment.id}
+              primaryColor="#00C8D4"
+              secondaryColor="#9B00CC"
+              accentColor="#FF0096"
+            />
+          </div>
+        )}
+
+        {/* SAAS MODULE: CLUB POS */}
+        {activeTab === "pos" && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            <POSModule />
+          </div>
+        )}
+
+        {/* SAAS MODULE: ANALÍTICAS SAAS */}
+        {activeTab === "analiticas_saas" && activeEstablishment && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            <AnalyticsModule
+              establishmentId={activeEstablishment.id}
+              primaryColor="#00C8D4"
+              secondaryColor="#9B00CC"
+              accentColor="#FF0096"
+            />
+          </div>
         )}
 
       </main>
