@@ -35,6 +35,11 @@ export function AdminFinanzas() {
   const [tab, setTab] = useState<Tab>("resumen");
 
   useEffect(() => {
+    localStorage.removeItem("hdv_mock_expenses");
+    localStorage.removeItem("hdv_mock_membership_payments");
+  }, []);
+
+  useEffect(() => {
     if (!authLoading && (!user || (profile?.role !== "admin" && user?.email?.toLowerCase() !== "hotelesdevenezuela77@gmail.com"))) {
       setLocation("/hdv-acceso-llc2027");
     }
@@ -56,17 +61,9 @@ export function AdminFinanzas() {
         if (error) throw error;
         return data || [];
       } catch (err) {
-        console.warn("Error cargando pagos de membresía de Supabase, usando locales:", err);
+        console.warn("Error cargando pagos de membresía de Supabase:", err);
         const localIncomeKey = "hdv_mock_membership_payments";
         const localPay = JSON.parse(localStorage.getItem(localIncomeKey) || "[]");
-        if (localPay.length === 0) {
-          const defaults = [
-            { id: 1, establishment_id: 66, membership_tier: "premium", amount: 150.00, currency: "USD", payment_date: "2026-06-15", payment_method: "zelle", payment_reference: "TXN123456", notes: "Mensualidad Junio" },
-            { id: 2, establishment_id: 67, membership_tier: "fundador", amount: 350.00, currency: "USD", payment_date: "2026-06-12", payment_method: "transferencia", payment_reference: "REF7890", notes: "Suscripción anual" },
-          ];
-          localStorage.setItem(localIncomeKey, JSON.stringify(defaults));
-          return defaults;
-        }
         return localPay;
       }
     },
@@ -84,17 +81,9 @@ export function AdminFinanzas() {
         if (error) throw error;
         return data || [];
       } catch (err) {
-        console.warn("Error cargando egresos de Supabase, usando locales:", err);
+        console.warn("Error cargando egresos de Supabase:", err);
         const localExpensesKey = "hdv_mock_expenses";
         const localExp = JSON.parse(localStorage.getItem(localExpensesKey) || "[]");
-        if (localExp.length === 0) {
-          const defaults = [
-            { id: 1, category: "Tecnología", description: "Servidores Cloud Supabase/Vercel", amount: 45.00, expense_date: "2026-06-18", notes: "[CAJA_GENERAL] Servicios SaaS de desarrollo" },
-            { id: 2, category: "Marketing", description: "Campaña Ads Redes Sociales", amount: 120.00, expense_date: "2026-06-10", notes: "[META_ADS] Publicidad Hoteles de Venezuela" },
-          ];
-          localStorage.setItem(localExpensesKey, JSON.stringify(defaults));
-          return defaults;
-        }
         return localExp;
       }
     },
@@ -112,17 +101,9 @@ export function AdminFinanzas() {
         if (error) throw error;
         return data || [];
       } catch (err) {
-        console.warn("Error cargando personal, usando mock:", err);
+        console.warn("Error cargando personal:", err);
         const localStaffKey = "hdv_mock_staff";
         const localStf = JSON.parse(localStorage.getItem(localStaffKey) || "[]");
-        if (localStf.length === 0) {
-          const defaults = [
-            { id: 1, name: "Israel E. A.", role: "CEO / Administrador", email: "admin@hotelesdevenezuela.com", phone: "+584121234567", roleType: "full-time", salary: 1500.00, isActive: true },
-            { id: 2, name: "Valentina Gómez", role: "Soporte al Cliente", email: "valentina@hotelesdevenezuela.com", phone: "+584249876543", roleType: "part-time", salary: 450.00, isActive: true },
-          ];
-          localStorage.setItem(localStaffKey, JSON.stringify(defaults));
-          return defaults;
-        }
         return localStf;
       }
     },
