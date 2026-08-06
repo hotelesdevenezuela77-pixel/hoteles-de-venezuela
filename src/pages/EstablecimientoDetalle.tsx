@@ -408,51 +408,9 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
 
       let combined = [...dbRooms, ...localRooms];
 
-      // If no custom rooms created yet, provide rich realistic room catalog
-      if (combined.length === 0) {
-        combined = [
-          {
-            id: 1001,
-            establishment_id: establishment.id,
-            name: "Habitación Matrimonial Standard",
-            description: "Elegante habitación equipada con cama matrimonial King Size, baño privado con ducha de agua caliente, aire acondicionado regulable y excelente iluminación natural.",
-            price_per_night: 75,
-            capacity: 2,
-            quantity: 4,
-            room_number: "HAB-101",
-            amenities: "wifi,aire_acondicionado,banio_privado,tv_cable,toallas,ropa_cama",
-            is_active: true
-          },
-          {
-            id: 1002,
-            establishment_id: establishment.id,
-            name: "Suite Junior con Balcón Panorámico",
-            description: "Espaciosa suite con área de estar, balcón privado con vista panorámica, cama King Size, nevera ejecutiva y acabados premium.",
-            price_per_night: 120,
-            capacity: 3,
-            quantity: 2,
-            room_number: "HAB-201",
-            amenities: "wifi,aire_acondicionado,banio_privado,balcon,caja_fuerte,escritorio,nevera,tv_cable",
-            is_active: true
-          },
-          {
-            id: 1003,
-            establishment_id: establishment.id,
-            name: "Habitación Familiar Deluxe (2 Camas Matrimoniales)",
-            description: "Unidad ideal para familias o grupos, con dos camas matrimoniales confortables, kitchenette equipada y servicio de TV con streaming.",
-            price_per_night: 150,
-            capacity: 5,
-            quantity: 3,
-            room_number: "HAB-301",
-            amenities: "wifi,aire_acondicionado,banio_privado,cocina_equipada,nevera,tv_cable,ropa_cama,secador_pelo",
-            is_active: true
-          }
-        ];
-      }
-
       // Filter active rooms
       const activeRooms = combined.filter((r: any) => r.is_active !== false);
-      setRooms(activeRooms.length > 0 ? activeRooms : combined);
+      setRooms(activeRooms);
 
       // Load Room Photos
       const savedRoomPhotos = localStorage.getItem("hdv_room_photos");
@@ -460,18 +418,6 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
       if (savedRoomPhotos) {
         try { roomPhotosMap = JSON.parse(savedRoomPhotos); } catch (e) {}
       }
-
-      const defaultRoomPhotos = [
-        ["https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1000&q=80", "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1000&q=80"],
-        ["https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1000&q=80", "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=1000&q=80"],
-        ["https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1000&q=80", "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1000&q=80"]
-      ];
-
-      combined.forEach((rm: any, i: number) => {
-        if (!roomPhotosMap[rm.id] || roomPhotosMap[rm.id].length === 0) {
-          roomPhotosMap[rm.id] = defaultRoomPhotos[i % defaultRoomPhotos.length];
-        }
-      });
       setRoomPhotos(roomPhotosMap);
 
       // Load Area Photos
@@ -484,29 +430,6 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
             areaPhotosMap = parsed[establishment.id];
           }
         } catch (e) {}
-      }
-
-      if (Object.keys(areaPhotosMap).length === 0) {
-        areaPhotosMap = {
-          piscina: [
-            "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=1000&q=80",
-            "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&w=1000&q=80"
-          ],
-          restaurante: [
-            "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=80",
-            "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=80"
-          ],
-          fachada: [
-            "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1000&q=80",
-            "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1000&q=80"
-          ],
-          lobby: [
-            "https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=1000&q=80"
-          ],
-          parque: [
-            "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80"
-          ]
-        };
       }
       setAreaPhotos(areaPhotosMap);
     }
@@ -952,144 +875,164 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
               ) : (
                 /* RENDERIZADO PARA HOTELES: FICHA TÉCNICA DE HABITACIONES */
                 <div className="space-y-8">
-                  {rooms.map((room) => {
-                    const photos = roomPhotos[room.id] || [];
-                    const activeImgIdx = selectedRoomImageIndex[room.id] || 0;
-                    const mainPhoto = photos[activeImgIdx] || photos[0] || establishment.primary_image;
+                  {rooms.length === 0 ? (
+                    <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-8 text-center space-y-4">
+                      <div className="w-14 h-14 bg-[#00C8D4]/10 rounded-2xl flex items-center justify-center mx-auto text-[#00C8D4]">
+                        <Bed className="w-7 h-7 text-[#00C8D4]" />
+                      </div>
+                      <h3 className="text-lg font-serif font-black text-slate-800">Habitaciones & Tarifas Bajo Consulta Directa</h3>
+                      <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed font-medium">
+                        Este establecimiento gestiona la asignación de sus unidades y tarifas de temporada directamente a través de su recepción sin intermediarios ni comisiones adicionales.
+                      </p>
+                      <div className="pt-2 flex justify-center">
+                        <TrackedWhatsAppButton
+                          whatsappNumber={establishment.whatsapp || establishment.phone}
+                          establishmentId={establishment.id}
+                          establishmentName={establishment.name}
+                          customMessage={`Hola! Quisiera consultar la disponibilidad y tarifas de habitación en ${establishment.name}.`}
+                        >
+                          Consultar Disponibilidad por WhatsApp
+                        </TrackedWhatsAppButton>
+                      </div>
+                    </div>
+                  ) : (
+                    rooms.map((room) => {
+                      const photos = roomPhotos[room.id] || [];
+                      const activeImgIdx = selectedRoomImageIndex[room.id] || 0;
+                      const mainPhoto = photos[activeImgIdx] || photos[0] || establishment.primary_image;
 
-                    return (
-                      <div key={room.id} className="bg-slate-50/70 border border-slate-200/80 rounded-3xl p-5 md:p-6 transition-all hover:border-slate-300 shadow-2xs grid grid-cols-1 lg:grid-cols-12 gap-6">
-                        
-                        <div className="lg:col-span-5 space-y-3">
-                          <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-slate-200 group shadow-xs">
-                            <img
-                              src={mainPhoto}
-                              alt={room.name}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            />
-                            
-                            <button
-                              type="button"
-                              onClick={() => setActiveLightbox({ url: mainPhoto, title: room.name, category: "Habitación" })}
-                              className="absolute bottom-3 right-3 p-2 bg-black/60 hover:bg-black/80 backdrop-blur-md rounded-xl text-white transition-colors cursor-pointer shadow-md"
-                              title="Ampliar fotografía"
-                            >
-                              <Maximize2 className="w-4 h-4" />
-                            </button>
-
-                            <div className="absolute top-3 left-3 px-2.5 py-1 bg-slate-900/80 backdrop-blur-md text-white text-[9px] font-black uppercase rounded-lg shadow-xs">
-                              {room.room_number ? `Código: ${room.room_number}` : `Unidad #${room.id}`}
-                            </div>
-                          </div>
-
-                          {photos.length > 1 && (
-                            <div className="flex gap-2 overflow-x-auto pb-1">
-                              {photos.map((ph: string, pIdx: number) => (
-                                <button
-                                  key={pIdx}
-                                  type="button"
-                                  onClick={() => setSelectedRoomImageIndex(prev => ({ ...prev, [room.id]: pIdx }))}
-                                  className={`w-14 h-14 rounded-xl overflow-hidden border-2 shrink-0 cursor-pointer transition-all ${
-                                    pIdx === activeImgIdx ? "border-[#FF0096] scale-95" : "border-transparent opacity-60 hover:opacity-100"
-                                  }`}
-                                >
-                                  <img src={ph} alt="" className="w-full h-full object-cover" />
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="lg:col-span-7 flex flex-col justify-between space-y-4">
-                          <div>
-                            <div className="flex flex-wrap justify-between items-start gap-2 mb-2">
-                              <h3 className="text-lg font-black text-slate-800 leading-tight font-serif">
-                                {room.name}
-                              </h3>
+                      return (
+                        <div key={room.id} className="bg-slate-50/70 border border-slate-200/80 rounded-3xl p-5 md:p-6 transition-all hover:border-slate-300 shadow-2xs grid grid-cols-1 lg:grid-cols-12 gap-6">
+                          
+                          <div className="lg:col-span-5 space-y-3">
+                            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-slate-200 group shadow-xs">
+                              <img
+                                src={mainPhoto}
+                                alt={room.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              />
                               
-                              <div className="text-right">
-                                <span className="text-[10px] uppercase font-bold text-slate-400 block">Tarifa por Noche</span>
-                                <span className="text-xl font-black text-[#FF0096]">
-                                  ${room.price_per_night} <span className="text-xs font-bold text-slate-500">USD</span>
-                                </span>
+                              <button
+                                type="button"
+                                onClick={() => setActiveLightbox({ url: mainPhoto, title: room.name, category: "Habitación" })}
+                                className="absolute bottom-3 right-3 p-2 bg-black/60 hover:bg-black/80 backdrop-blur-md rounded-xl text-white transition-colors cursor-pointer shadow-md"
+                                title="Ampliar fotografía"
+                              >
+                                <Maximize2 className="w-4 h-4" />
+                              </button>
+
+                              <div className="absolute top-3 left-3 px-2.5 py-1 bg-slate-900/80 backdrop-blur-md text-white text-[9px] font-black uppercase rounded-lg shadow-xs">
+                                {room.room_number ? `Código: ${room.room_number}` : `Unidad #${room.id}`}
                               </div>
                             </div>
 
-                            <p className="text-xs text-slate-500 leading-relaxed mb-4">
-                              {room.description || "Habitación confortable equipada con todas las comodidades para una estancia placentera."}
-                            </p>
-
-                            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 font-bold mb-4">
-                              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-xl shadow-2xs">
-                                <Users className="w-4 h-4 text-[#00C8D4]" />
-                                <span>Capacidad: {room.capacity || 2} personas</span>
-                              </div>
-                              {room.quantity && (
-                                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-xl shadow-2xs">
-                                  <Bed className="w-4 h-4 text-[#FF0096]" />
-                                  <span>{room.quantity} unidades disponibles</span>
-                                </div>
-                              )}
-                            </div>
-
-                            {room.amenities && (
-                              <div className="space-y-1.5">
-                                <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Equipamiento Incluido</span>
-                                <div className="flex flex-wrap gap-1.5">
-                                  {room.amenities.split(",").map((am: string) => {
-                                    const t = am.trim();
-                                    if (!t) return null;
-                                    return (
-                                      <span key={t} className="inline-flex items-center gap-1 px-2.5 py-1 bg-white text-slate-700 border border-slate-200 rounded-lg text-[10px] font-bold shadow-2xs">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-[#00C8D4] shrink-0" />
-                                        {getRoomAmenityText(t)}
-                                      </span>
-                                    );
-                                  })}
-                                </div>
+                            {photos.length > 1 && (
+                              <div className="flex gap-2 overflow-x-auto pb-1">
+                                {photos.map((ph: string, pIdx: number) => (
+                                  <button
+                                    key={pIdx}
+                                    type="button"
+                                    onClick={() => setSelectedRoomImageIndex(prev => ({ ...prev, [room.id]: pIdx }))}
+                                    className={`w-14 h-14 rounded-xl overflow-hidden border-2 shrink-0 cursor-pointer transition-all ${
+                                      pIdx === activeImgIdx ? "border-[#FF0096] scale-95" : "border-transparent opacity-60 hover:opacity-100"
+                                    }`}
+                                  >
+                                    <img src={ph} alt="" className="w-full h-full object-cover" />
+                                  </button>
+                                ))}
                               </div>
                             )}
                           </div>
 
-                          <div className="pt-4 border-t border-slate-200/70 flex flex-col sm:flex-row items-center justify-between gap-3">
-                            <button
-                              type="button"
-                              onClick={() => setActiveDetailModal({
-                                type: "room",
-                                title: room.name,
-                                description: room.description,
-                                image: mainPhoto,
-                                gallery: photos,
-                                price: room.price_per_night,
-                                specs: [
-                                  { label: "Capacidad", value: `${room.capacity || 2} Personas` },
-                                  { label: "Superficie", value: "32 m² Aproximados" },
-                                  { label: "Cama", value: "King Size Confort" },
-                                  { label: "Vista", value: "Vista Panorámica Exterior" }
-                                ],
-                                amenities: room.amenities ? room.amenities.split(",").map((a: string) => getRoomAmenityText(a)) : ["Aire Acondicionado", "Baño Privado", "Wi-Fi", "TV Cable"],
-                                whatsappCustomMsg: `Hola! Estoy consultando la disponibilidad para la unidad: "${room.name}" (Tarifa: $${room.price_per_night} USD/noche) en ${establishment.name}.`
-                              })}
-                              className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl transition-all cursor-pointer w-full sm:w-auto"
-                            >
-                              Ver Ficha Técnica Completa
-                            </button>
+                          <div className="lg:col-span-7 flex flex-col justify-between space-y-4">
+                            <div className="space-y-3">
+                              <div className="flex flex-wrap justify-between items-start gap-2 mb-2">
+                                <h3 className="text-lg font-black text-slate-800 leading-tight font-serif">
+                                  {room.name}
+                                </h3>
+                                <div className="text-right">
+                                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Tarifa por Noche</span>
+                                  <span className="text-xl font-black text-[#FF0096]">
+                                    ${room.price_per_night} <span className="text-xs font-bold text-slate-500">USD</span>
+                                  </span>
+                                </div>
+                              </div>
 
-                            <TrackedWhatsAppButton
-                              whatsappNumber={establishment.whatsapp || establishment.phone}
-                              establishmentId={establishment.id}
-                              establishmentName={establishment.name}
-                              customMessage={`Hola! Estoy viendo la ficha de ${establishment.name} en Hoteles de Venezuela y me gustaría consultar disponibilidad para la unidad: "${room.name}" (Tarifa: $${room.price_per_night} USD/noche).`}
-                            >
-                              Consultar Habitación
-                            </TrackedWhatsAppButton>
+                              <p className="text-xs text-slate-500 leading-relaxed mb-4">
+                                {room.description || "Habitación confortable equipada con todas las comodidades para una estancia placentera."}
+                              </p>
+
+                              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 font-bold mb-4">
+                                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-xl shadow-2xs">
+                                  <Users className="w-4 h-4 text-[#00C8D4]" />
+                                  <span>Capacidad: {room.capacity || 2} personas</span>
+                                </div>
+                                {room.quantity && (
+                                  <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-xl shadow-2xs">
+                                    <Bed className="w-4 h-4 text-[#FF0096]" />
+                                    <span>{room.quantity} unidades disponibles</span>
+                                  </div>
+                                )}
+                              </div>
+
+                              {room.amenities && (
+                                <div className="space-y-1.5">
+                                  <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Equipamiento Incluido</span>
+                                  <div className="flex flex-wrap gap-1.5">
+                                    {room.amenities.split(",").map((am: string) => {
+                                      const t = am.trim();
+                                      if (!t) return null;
+                                      return (
+                                        <span key={t} className="inline-flex items-center gap-1 px-2.5 py-1 bg-white text-slate-700 border border-slate-200 rounded-lg text-[10px] font-bold shadow-2xs">
+                                          <span className="w-1.5 h-1.5 rounded-full bg-[#00C8D4] shrink-0" />
+                                          {getRoomAmenityText(t)}
+                                        </span>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="pt-4 border-t border-slate-200/70 flex flex-col sm:flex-row items-center justify-between gap-3">
+                              <button
+                                type="button"
+                                onClick={() => setActiveDetailModal({
+                                  type: "room",
+                                  title: room.name,
+                                  description: room.description,
+                                  image: mainPhoto,
+                                  gallery: photos,
+                                  price: room.price_per_night,
+                                  specs: [
+                                    { label: "Capacidad", value: `${room.capacity || 2} Personas` },
+                                    { label: "Superficie", value: "32 m² Aproximados" },
+                                    { label: "Cama", value: "King Size Confort" },
+                                    { label: "Vista", value: "Vista Panorámica Exterior" }
+                                  ],
+                                  amenities: room.amenities ? room.amenities.split(",").map((a: string) => getRoomAmenityText(a)) : ["Aire Acondicionado", "Baño Privado", "Wi-Fi", "TV Cable"],
+                                  whatsappCustomMsg: `Hola! Estoy consultando la disponibilidad para la unidad: "${room.name}" (Tarifa: $${room.price_per_night} USD/noche) en ${establishment.name}.`
+                                })}
+                                className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl transition-all cursor-pointer w-full sm:w-auto"
+                              >
+                                Ver Ficha Técnica Completa
+                              </button>
+
+                              <TrackedWhatsAppButton
+                                whatsappNumber={establishment.whatsapp || establishment.phone}
+                                establishmentId={establishment.id}
+                                establishmentName={establishment.name}
+                                customMessage={`Hola! Estoy viendo la ficha de ${establishment.name} en Hoteles de Venezuela y me gustaría consultar disponibilidad para la unidad: "${room.name}" (Tarifa: $${room.price_per_night} USD/noche).`}
+                              >
+                                Consultar Habitación
+                              </TrackedWhatsAppButton>
+                            </div>
                           </div>
 
                         </div>
-
-                      </div>
-                    );
-                  })}
+                      );
+                    })
+                  )}
                 </div>
               )}
             </div>

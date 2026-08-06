@@ -59,35 +59,6 @@ export function AvailabilityCalendar({ establishmentId }: AvailabilityCalendarPr
       if (roomsErr) throw roomsErr;
       
       let finalRooms = dbRooms || [];
-      if (finalRooms.length === 0) {
-        // Fallback mock rooms to ensure direct booking calendar is always testable
-        finalRooms = [
-          {
-            id: 1001,
-            establishment_id: establishmentId,
-            name: "Habitación Matrimonial Standard",
-            price_per_night: 80,
-            quantity: 5,
-            is_active: true
-          },
-          {
-            id: 1002,
-            establishment_id: establishmentId,
-            name: "Suite Premium Vista al Mar",
-            price_per_night: 150,
-            quantity: 3,
-            is_active: true
-          },
-          {
-            id: 1003,
-            establishment_id: establishmentId,
-            name: "Presidential Suite Familiar",
-            price_per_night: 280,
-            quantity: 2,
-            is_active: true
-          }
-        ];
-      }
 
       const mappedRooms = finalRooms.map(r => ({ id: r.id, name: r.name, quantity: r.quantity, price: r.price_per_night }));
       setRooms(mappedRooms);

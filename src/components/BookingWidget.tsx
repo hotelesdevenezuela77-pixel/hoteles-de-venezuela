@@ -120,35 +120,6 @@ export function BookingWidget({
         .eq("is_active", true);
 
       let finalRooms = dbRooms || [];
-      if (finalRooms.length === 0) {
-        // Fallback mock rooms to ensure direct booking engine is always testable
-        finalRooms = [
-          {
-            id: 1001,
-            establishment_id: establishmentId,
-            name: "Habitación Matrimonial Standard",
-            price_per_night: 80,
-            quantity: 5,
-            is_active: true
-          },
-          {
-            id: 1002,
-            establishment_id: establishmentId,
-            name: "Suite Premium Vista al Mar",
-            price_per_night: 150,
-            quantity: 3,
-            is_active: true
-          },
-          {
-            id: 1003,
-            establishment_id: establishmentId,
-            name: "Presidential Suite Familiar",
-            price_per_night: 280,
-            quantity: 2,
-            is_active: true
-          }
-        ];
-      }
 
       if (!checkIn || !checkOut) {
         setRooms(finalRooms.map(r => ({
