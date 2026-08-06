@@ -252,7 +252,13 @@ export function OwnerDashboard() {
 
     // 3. Try fetching from static registry (config.json files)
     if (TENANTS_REGISTRY[est.slug]) {
-      setCurrentTenantConfig(TENANTS_REGISTRY[est.slug]);
+      setCurrentTenantConfig({ ...TENANTS_REGISTRY[est.slug], slug: est.slug, establishment_id: est.id });
+      return;
+    }
+
+    if (est.slug.includes("oleaje") && (TENANTS_REGISTRY["oleaje-beach-club"] || TENANTS_REGISTRY["oleaje-tucacas"])) {
+      const baseOleaje = TENANTS_REGISTRY["oleaje-beach-club"] || TENANTS_REGISTRY["oleaje-tucacas"];
+      setCurrentTenantConfig({ ...baseOleaje, slug: est.slug, establishment_id: est.id });
       return;
     }
 

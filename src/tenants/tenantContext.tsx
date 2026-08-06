@@ -48,6 +48,7 @@ export const TENANTS_REGISTRY: Record<string, TenantConfig> = {
   "perla-negra": perlaNegraConfig as TenantConfig,
   "my-campers": myCampersConfig as TenantConfig,
   "oleaje-beach-club": oleajeBeachClubConfig as TenantConfig,
+  "oleaje-tucacas": { ...(oleajeBeachClubConfig as TenantConfig), slug: "oleaje-tucacas", establishment_id: 65 },
   "complejo-los-roques": complejoLosRoquesConfig as TenantConfig,
 };
 
@@ -109,8 +110,10 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
           console.log("[Multi-tenant] Usando el registro estático de archivos locales config.json");
         }
 
-        // Mapear el registro activo
-        const activeRegistry: Record<string, TenantConfig> = {};
+        // Mapear el registro activo (incluyendo estáticos de TENANTS_REGISTRY por defecto)
+        const activeRegistry: Record<string, TenantConfig> = {
+          ...TENANTS_REGISTRY
+        };
         activeTenantsList.forEach((t) => {
           activeRegistry[t.slug] = t;
         });
@@ -126,14 +129,94 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        // B. Detección por query parameter (útil en desarrollo local: ?tenant=slug)
+        // B. Detección por query parameter (útil en desarrollo local / vistas previas: ?tenant=slug)
         const params = new URLSearchParams(window.location.search);
-        const querySlug = params.get("tenant") || params.get("establishment");
-        if (querySlug && activeRegistry[querySlug]) {
-          console.log(`[Multi-tenant] Cargando desde query parameter: ${querySlug}`);
-          setConfig(activeRegistry[querySlug]);
-          setIsLoading(false);
-          return;
+        const rawQuerySlug = params.get("tenant") || params.get("establishment");
+        if (rawQuerySlug) {
+          const querySlug = rawQuerySlug.toLowerCase().trim();
+
+          // B1. Coincidencia directa por slug en activeRegistry
+          if (activeRegistry[querySlug]) {
+            console.log(`[Multi-tenant] Cargando por query parameter exacto: ${querySlug}`);
+            setConfig(activeRegistry[querySlug]);
+            setIsLoading(false);
+            return;
+          }
+
+          // B2. Coincidencia por ID o búsqueda parcial en lista activa
+          const matchedInList = activeTenantsList.find(t => 
+            t.slug.toLowerCase() === querySlug || 
+            String(t.establishment_id) === querySlug ||
+            t.slug.toLowerCase().includes(querySlug) ||
+            querySlug.includes(t.slug.toLowerCase())
+          );
+          if (matchedInList) {
+            console.log(`[Multi-tenant] Cargando por coincidencia en lista activa: ${matchedInList.slug}`);
+            setConfig(matchedInList);
+            setIsLoading(false);
+            return;
+          }
+
+          // B3. Alias / variante especial para Oleaje
+          if (querySlug.includes("oleaje")) {
+            const oleajeConfig = activeRegistry["oleaje-beach-club"] || activeRegistry["oleaje-tucacas"];
+            if (oleajeConfig) {
+              console.log(`[Multi-tenant] Cargando tenant Oleaje por alias: ${querySlug}`);
+              setConfig({ ...oleajeConfig, slug: querySlug });
+              setIsLoading(false);
+              return;
+            }
+          }
+
+          // B4. Consulta directa a la base de datos (tabla establishments) para generar TenantConfig dinámico
+          try {
+            const { data: estData } = await supabase
+              .from("establishments")
+              .select("*")
+              .or(`slug.eq.${querySlug},id.eq.${Number(querySlug) || 0}`)
+              .maybeSingle();
+
+            if (estData) {
+              console.log(`[Multi-tenant] Generando TenantConfig dinámico para establecimiento DB: ${estData.name}`);
+              const dynamicTenantConfig: TenantConfig = {
+                establishment_id: estData.id,
+                slug: estData.slug,
+                name: estData.name,
+                template: "B",
+                domain: estData.website ? estData.website.replace(/^https?:\/\//, '').split('/')[0] : `${estData.slug}.com`,
+                branding: {
+                  primary_color: "#00C8D4",
+                  secondary_color: "#9B00CC",
+                  accent_color: "#FF0096",
+                  font_title: "Playfair Display",
+                  font_body: "Montserrat",
+                  logo_url: "https://r2.hotelesdevenezuela.com/default/logo.png",
+                  banner_url: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1600&auto=format&fit=crop"
+                },
+                modules: {
+                  reservas: true,
+                  pos: true,
+                  galeria: true,
+                  contacto: true,
+                  tareas: true,
+                  finanzas: true,
+                  cms: true,
+                  analiticas: true
+                },
+                contact: {
+                  phone: estData.phone || "+58 412 000 0000",
+                  whatsapp: estData.whatsapp || estData.phone || "+58 412 000 0000",
+                  email: `contacto@${estData.slug}.com`,
+                  instagram: `@${estData.slug}`
+                }
+              };
+              setConfig(dynamicTenantConfig);
+              setIsLoading(false);
+              return;
+            }
+          } catch (dbQueryErr) {
+            console.warn("[Multi-tenant] Error al consultar establecimiento en DB:", dbQueryErr);
+          }
         }
 
         // C. Detección por Hostname (Producción / Subdominios)
