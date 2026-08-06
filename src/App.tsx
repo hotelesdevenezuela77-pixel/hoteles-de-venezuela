@@ -341,6 +341,10 @@ function App() {
             <Route path="/hdv-acceso-llc2027" component={AdminLogin} />
             <Route path="/establecimientos" component={Establecimientos} />
             <Route path="/establecimiento/:slug" component={EstablecimientoDetalle} />
+            <Route path="/app/:slug" component={EstablecimientoDetalle} />
+            <Route path="/hotel/:slug" component={EstablecimientoDetalle} />
+            <Route path="/posada/:slug" component={EstablecimientoDetalle} />
+            <Route path="/restaurante/:slug" component={EstablecimientoDetalle} />
             <Route path="/destinos" component={Destinos} />
             <Route path="/destinos/:slug" component={DestinoDetalle} />
             <Route path="/mapa" component={InteractiveMap} />

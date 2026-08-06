@@ -92,8 +92,11 @@ interface EstablishmentDetail {
   status?: string;
 }
 
-export function EstablecimientoDetalle() {
-  const { slug } = useParams() as any;
+export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: string]: any }) {
+  const tenantSlug = props?.tenantSlug;
+  const { slug: routeSlug } = useParams() as any;
+  const urlParamSlug = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("tenant") : null;
+  const slug = tenantSlug || routeSlug || urlParamSlug || "aparto-posada-del-mar";
   const { user, profile } = useAuth();
   const [establishment, setEstablishment] = useState<EstablishmentDetail | null>(null);
   const [loading, setLoading] = useState(true);

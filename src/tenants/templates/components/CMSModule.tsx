@@ -134,12 +134,12 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
         
         <div className="flex items-center gap-2">
           <a 
-            href={`/?tenant=${config.slug}`} 
+            href={`/establecimiento/${config.slug}`} 
             target="_blank" 
             rel="noreferrer" 
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/10 hover:border-white/20 text-slate-300 text-xs font-semibold"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/10 hover:border-white/20 text-slate-300 text-xs font-semibold cursor-pointer"
           >
-            <Eye className="w-3.5 h-3.5" />
+            <Eye className="w-4 h-4 text-[#00C8D4]" />
             <span>Ver Web</span>
           </a>
         </div>

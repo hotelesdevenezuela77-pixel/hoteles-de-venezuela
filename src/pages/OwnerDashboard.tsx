@@ -2001,7 +2001,7 @@ export function OwnerDashboard() {
 
                   <div className="flex flex-wrap items-center gap-2.5">
                     <a
-                      href={`/app/${currentTenantConfig.slug}`}
+                      href={`/establecimiento/${currentTenantConfig.slug}`}
                       target="_blank"
                       rel="noreferrer"
                       className="px-4 py-2 bg-[#00C8D4] hover:bg-[#00b2bd] text-white text-xs font-black rounded-xl flex items-center gap-2 shadow-md transition-all cursor-pointer"
@@ -2026,12 +2026,12 @@ export function OwnerDashboard() {
                   <div className="p-3 bg-white/5 border border-white/10 rounded-2xl">
                     <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">URL de Pruebas Web App</span>
                     <a
-                      href={`/app/${currentTenantConfig.slug}`}
+                      href={`/establecimiento/${currentTenantConfig.slug}`}
                       target="_blank"
                       rel="noreferrer"
                       className="font-mono font-bold text-[#00C8D4] hover:underline break-all block"
                     >
-                      {window.location.origin}/app/{currentTenantConfig.slug}
+                      {window.location.origin}/establecimiento/{currentTenantConfig.slug}
                     </a>
                   </div>
 
@@ -3523,7 +3523,7 @@ export function OwnerDashboard() {
 
               <div className="flex flex-wrap gap-2.5 shrink-0">
                 <a
-                  href={`/app/${currentTenantConfig.slug}`}
+                  href={`/establecimiento/${currentTenantConfig.slug}`}
                   target="_blank"
                   rel="noreferrer"
                   className="px-4 py-2.5 bg-[#00C8D4] hover:bg-[#00b2bd] text-white text-xs font-black rounded-xl flex items-center gap-2 shadow-md transition-all cursor-pointer"
