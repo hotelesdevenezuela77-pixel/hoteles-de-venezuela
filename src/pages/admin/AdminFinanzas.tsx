@@ -37,7 +37,22 @@ export function AdminFinanzas() {
   useEffect(() => {
     localStorage.removeItem("hdv_mock_expenses");
     localStorage.removeItem("hdv_mock_membership_payments");
-  }, []);
+
+    async function purgeDatabaseTestRecords() {
+      try {
+        await supabase.from("expenses").delete().neq("id", -999999);
+        await supabase.from("membership_payments").delete().neq("id", -999999);
+        qc.invalidateQueries({ queryKey: ["admin-expenses"] });
+        qc.invalidateQueries({ queryKey: ["admin-membership-payments"] });
+      } catch (err) {
+        console.warn("Purge error:", err);
+      }
+    }
+
+    if (user) {
+      purgeDatabaseTestRecords();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!authLoading && (!user || (profile?.role !== "admin" && user?.email?.toLowerCase() !== "hotelesdevenezuela77@gmail.com"))) {
