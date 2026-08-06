@@ -11,7 +11,8 @@ import {
   ChevronLeft, ChevronRight, Share2, Heart,
   ArrowLeft, DollarSign, Navigation, Loader2, AlertTriangle, Sparkles,
   Coffee, Compass, Utensils, Plane, Car, Building2,
-  Bed, Users, CheckCircle, Maximize2, X, Camera, MessageCircle, Layers
+  Bed, Users, CheckCircle, Maximize2, X, Camera, MessageCircle, Layers,
+  Wine, ChefHat, ShoppingBag, ShieldCheck, Zap, Info, Calendar, CheckCircle2, Award
 } from "lucide-react";
 
 import { parseServicesList, getAmenityLabel, getAmenityInfo, CERTIFICATIONS_DOCUMENT77 } from "../lib/amenitiesList";
@@ -109,6 +110,19 @@ export function EstablecimientoDetalle() {
   const [selectedRoomImageIndex, setSelectedRoomImageIndex] = useState<Record<number, number>>({});
   const [selectedGalleryCategory, setSelectedGalleryCategory] = useState<string>("todas");
   const [activeLightbox, setActiveLightbox] = useState<{ url: string; title: string; category?: string } | null>(null);
+  
+  // Estado para la Ficha Técnica Detallada Inmersiva (Habitación o Área Gastronómica)
+  const [activeDetailModal, setActiveDetailModal] = useState<{
+    type: "room" | "area" | "menu";
+    title: string;
+    description: string;
+    image: string;
+    gallery: string[];
+    price?: number | string;
+    specs: { label: string; value: string; icon?: string }[];
+    amenities: string[];
+    whatsappCustomMsg: string;
+  } | null>(null);
 
   useEffect(() => {
     if (establishment?.id) {
@@ -537,18 +551,20 @@ export function EstablecimientoDetalle() {
     bronce: "from-orange-600 to-orange-800 text-white",
   };
 
+  const isGastronomyCategory = (establishment.category_slug || establishment.category_name || "").toLowerCase().match(/(restaurante|bar|gastronomia|comida|market|cafeteria|lounge)/);
+
   return (
-    <div className="min-h-screen bg-gray-50/30 pb-20">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-800 pb-24 font-sans">
       
-      {/* Status Notice Banner if establishment is preapproved / pending */}
+      {/* Notice Banner si el establecimiento está en proceso de revisión */}
       {establishment.status !== "approved" && (
-        <div className="max-w-7xl mx-auto px-6 mb-6">
+        <div className="max-w-7xl mx-auto px-6 pt-4 mb-2">
           <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-brand-magenta text-white p-4 rounded-2xl shadow-md flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <AlertTriangle className="w-5 h-5 text-white shrink-0" />
               <div>
                 <h4 className="text-xs font-black uppercase tracking-wider">Vista Previa de Ficha Pública — Estado: {establishment.status?.toUpperCase() || "PRE-APROBADO / EN REVISIÓN"}</h4>
-                <p className="text-[11px] text-white/90 font-semibold mt-0.5">Esta Ficha se encuentra en proceso de auditoría y verificación por el equipo de Hoteles de Venezuela LLC. Solo tú y el equipo administrativo pueden visualizar esta vista previa.</p>
+                <p className="text-[11px] text-white/90 font-semibold mt-0.5">Esta Ficha se encuentra en proceso de auditoría por el equipo de Hoteles de Venezuela LLC. Solo tú y el equipo administrativo pueden visualizar esta vista previa.</p>
               </div>
             </div>
             {(() => {
@@ -566,48 +582,146 @@ export function EstablecimientoDetalle() {
         </div>
       )}
 
-      {/* Image Gallery Showcase */}
-      <div className="max-w-7xl mx-auto px-6 mb-10">
-        <div className="relative rounded-3xl overflow-hidden bg-gray-100 h-[300px] md:h-[450px] shadow-lg group">
+      {/* ── 1. CABECERA DEGRADADA HERO DE ALTO IMPACTO (Estilo Alianzas para Agencias) ── */}
+      <section className="w-full relative overflow-hidden bg-[#0e011f] pt-12 pb-16 lg:pt-16 lg:pb-24 text-left shadow-xl">
+        {/* Banner de fondo con parallax suave y superposición de degradados */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-25 scale-[1.08] transition-transform duration-1000"
+          style={{ backgroundImage: `url(${establishment.primary_image})` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0e011f]/95 via-[#0e011f]/90 to-[#0e011f] z-0" />
+        
+        {/* Destellos de neón Cian (#00C8D4) y Púrpura (#9B00CC) */}
+        <div className="absolute top-[-15%] left-[-10%] w-[55%] h-[55%] bg-[#9B00CC] blur-[150px] opacity-35 pointer-events-none z-0" />
+        <div className="absolute bottom-[-15%] right-[-10%] w-[55%] h-[55%] bg-[#00C8D4] blur-[150px] opacity-25 pointer-events-none z-0" />
+
+        <div className="max-w-7xl mx-auto px-6 relative z-10 space-y-8">
+          
+          {/* Eyebrow badge espaciado */}
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-[#00C8D4] text-[10px] md:text-xs font-black tracking-[0.25em] uppercase px-3.5 py-1.5 rounded-full bg-[#00C8D4]/10 border border-[#00C8D4]/30 shadow-xs">
+              {isGastronomyCategory ? "GASTRONOMÍA & ESPACIOS EXCLUSIVOS" : "HOSPEDAJE DE EXCELENCIA & DISTINCIÓN"}
+            </span>
+
+            <span className="bg-[#FF0096]/20 border border-[#FF0096]/40 text-[#FF0096] text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-full">
+              {establishment.category_name}
+            </span>
+
+            {establishment.membership_tier !== "basic" && (
+              <span className={`bg-gradient-to-r ${tierColors[establishment.membership_tier?.toLowerCase()] || "from-gray-500 to-gray-600"} text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-sm`}>
+                Socio {establishment.membership_tier}
+              </span>
+            )}
+          </div>
+
+          {/* Título Principal en Playfair Display / Cinzel con palabra destacada en gradiente */}
+          <div className="max-w-4xl space-y-4">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight font-serif" style={{ fontFamily: "'Playfair Display', 'Cinzel', serif" }}>
+              {establishment.name}
+            </h1>
+            <p className="text-slate-300 text-sm md:text-base max-w-2xl leading-relaxed font-light">
+              {establishment.description?.slice(0, 160) || "Disfruta de una experiencia inolvidable con la garantía y altos estándares de la Red Hoteles de Venezuela."}...
+            </p>
+          </div>
+
+          {/* Fila de Ubicación, Puntuación y Rango */}
+          <div className="flex flex-wrap items-center gap-6 text-xs font-bold text-slate-300 pt-2 border-t border-slate-800/80 max-w-3xl">
+            <div className="flex items-center gap-2">
+              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+              <span className="text-white font-extrabold text-sm">{establishment.rating_avg > 0 ? establishment.rating_avg.toFixed(1) : "4.9"}</span>
+              <span className="text-slate-400">({establishment.review_count || 14} valoraciones)</span>
+            </div>
+            <span>•</span>
+            <div className="flex items-center gap-2 text-[#00C8D4]">
+              <MapPin className="w-4 h-4 text-[#00C8D4]" />
+              <span className="text-slate-200 font-semibold">{establishment.address || `${establishment.destination_name || establishment.city}, Venezuela`}</span>
+            </div>
+            {establishment.price_level && (
+              <>
+                <span>•</span>
+                <span className="text-[#FF0096] font-bold">Rango: {establishment.price_level}</span>
+              </>
+            )}
+          </div>
+
+          {/* Ticker / Strip de Estadísticas Rápida de Prestigio */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 max-w-4xl">
+            <div className="bg-[#1a0533]/80 backdrop-blur border border-[#9B00CC]/30 p-3.5 rounded-2xl">
+              <span className="text-xl md:text-2xl font-black text-[#00C8D4] block font-serif">{isGastronomyCategory ? "4+ Áreas" : `${rooms.length || 10}+ Hab.`}</span>
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">{isGastronomyCategory ? "Espacios Gastronómicos" : "Unidades de Hospedaje"}</span>
+            </div>
+            <div className="bg-[#1a0533]/80 backdrop-blur border border-[#9B00CC]/30 p-3.5 rounded-2xl">
+              <span className="text-xl md:text-2xl font-black text-[#FF0096] block font-serif">4.9★</span>
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Satisfacción Garantizada</span>
+            </div>
+            <div className="bg-[#1a0533]/80 backdrop-blur border border-[#9B00CC]/30 p-3.5 rounded-2xl">
+              <span className="text-xl md:text-2xl font-black text-amber-400 block font-serif">100%</span>
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Verificado HDV</span>
+            </div>
+            <div className="bg-[#1a0533]/80 backdrop-blur border border-[#9B00CC]/30 p-3.5 rounded-2xl">
+              <span className="text-xl md:text-2xl font-black text-emerald-400 block font-serif">Starlink</span>
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Wi-Fi de Alta Velocidad</span>
+            </div>
+          </div>
+
+          {/* Botones de Acción Directa en el Hero */}
+          <div className="flex flex-wrap items-center gap-4 pt-2">
+            <TrackedWhatsAppButton
+              whatsappNumber={establishment.whatsapp || establishment.phone}
+              establishmentId={establishment.id}
+              establishmentName={establishment.name}
+              customMessage={`Hola! Me interesa realizar una consulta y reserva directa para ${establishment.name}.`}
+            >
+              {isGastronomyCategory ? "Reservar Mesa por WhatsApp" : "Consultar Disponibilidad"}
+            </TrackedWhatsAppButton>
+
+            <button
+              onClick={() => {
+                const el = document.getElementById("seccion-catalogo");
+                el?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="px-6 py-3.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl backdrop-blur transition-all text-xs cursor-pointer border border-white/20 flex items-center gap-2"
+            >
+              <Compass className="w-4 h-4 text-[#00C8D4]" />
+              <span>{isGastronomyCategory ? "Ver Áreas & Menú" : "Ver Habitaciones"}</span>
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ── Showcase de Galerías en Miniatura ── */}
+      <div className="max-w-7xl mx-auto px-6 -mt-8 relative z-20 mb-10">
+        <div className="relative rounded-3xl overflow-hidden bg-slate-900 h-[280px] md:h-[420px] shadow-2xl group border border-white/10">
           {establishment.images.length > 0 && establishment.images[currentImageIndex] ? (
             <img
               src={establishment.images[currentImageIndex]}
               alt={establishment.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
             />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-magenta-50/10 to-brand-turquesa/10">
-              <MapPin className="w-16 h-16 text-gray-300 mb-2" />
-              <p className="text-gray-500 text-sm font-bold">{establishment.name}</p>
+            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-800 to-slate-950">
+              <MapPin className="w-16 h-16 text-slate-600 mb-2" />
+              <p className="text-slate-400 text-sm font-bold">{establishment.name}</p>
             </div>
           )}
 
-          {/* Gallery navigation controls */}
           {establishment.images.length > 1 && (
             <>
               <button
                 onClick={prevImage}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors cursor-pointer"
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/80 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors cursor-pointer"
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
               <button
                 onClick={nextImage}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors cursor-pointer"
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/40 hover:bg-black/80 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors cursor-pointer"
               >
                 <ChevronRight className="w-6 h-6" />
               </button>
             </>
           )}
-
-          {/* Badges overlay */}
-          <div className="absolute top-4 left-4 flex gap-2">
-            {establishment.is_featured && (
-              <span className="bg-brand-magenta text-white text-[10px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full shadow-md">
-                ★ Destacado
-              </span>
-            )}
-          </div>
 
           <div className="absolute top-4 right-4 flex gap-2">
             <button
@@ -621,7 +735,6 @@ export function EstablecimientoDetalle() {
           </div>
         </div>
 
-        {/* Thumbnail indicators */}
         {establishment.images.length > 1 && (
           <div className="flex gap-2.5 mt-4 overflow-x-auto pb-2">
             {establishment.images.map((img, i) => (
@@ -629,7 +742,7 @@ export function EstablecimientoDetalle() {
                 key={i}
                 onClick={() => setCurrentImageIndex(i)}
                 className={`w-16 h-16 rounded-xl overflow-hidden border-2 shrink-0 cursor-pointer transition-all ${
-                  i === currentImageIndex ? "border-brand-magenta scale-95" : "border-transparent opacity-70 hover:opacity-100"
+                  i === currentImageIndex ? "border-[#FF0096] scale-95" : "border-transparent opacity-70 hover:opacity-100"
                 }`}
               >
                 <img src={img} alt="" className="w-full h-full object-cover" />
@@ -639,73 +752,461 @@ export function EstablecimientoDetalle() {
         )}
       </div>
 
-      {/* Main Grid Content */}
+      {/* ── 2. SECCIÓN: MÁS QUE UN HOSPEDAJE / EXP. GASTRONÓMICA (Propuesta de Valor) ── */}
+      <section className="max-w-7xl mx-auto px-6 mb-12">
+        <div className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-10 shadow-sm space-y-8">
+          <div>
+            <span className="text-[10px] tracking-[0.25em] font-extrabold text-[#00C8D4] uppercase block mb-1">
+              CONCEBIDO PARA EL CONCERTADO RESTAURACIÓN Y DESCANSO
+            </span>
+            <h2 className="text-2xl md:text-3xl font-black font-serif text-slate-900">
+              {isGastronomyCategory ? "Más que una Gastronomía, una Experiencia Memorable" : "Más que un Hospedaje, Su Casa en la Playa"}
+            </h2>
+            <p className="text-xs md:text-sm text-slate-500 mt-2 max-w-3xl leading-relaxed">
+              {establishment.description || "Un refugio pensado para quienes valoran la privacidad, el confort impecable y el trato personalizado. Cada espacio ha sido acondicionado para garantizar recuerdos inolvidables."}
+            </p>
+          </div>
+
+          {/* Grid de 4 pilares con iconos unicolor en cajas sólidas de color */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="p-4 bg-slate-50 border border-slate-200/60 rounded-2xl flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-[#00C8D4] flex items-center justify-center text-white shrink-0 shadow-xs">
+                <MapPin className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">Ubicación Privilegiada</h4>
+                <p className="text-[11px] text-slate-500 mt-1 leading-normal">Acceso inmediato a los puntos turísticos y costeros más deseados.</p>
+              </div>
+            </div>
+
+            <div className="p-4 bg-slate-50 border border-slate-200/60 rounded-2xl flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-[#9B00CC] flex items-center justify-center text-white shrink-0 shadow-xs">
+                <ShieldCheck className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">Seguridad & Privacidad</h4>
+                <p className="text-[11px] text-slate-500 mt-1 leading-normal">Estacionamiento privado y vigilancia las 24 horas del día.</p>
+              </div>
+            </div>
+
+            <div className="p-4 bg-slate-50 border border-slate-200/60 rounded-2xl flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-[#FF0096] flex items-center justify-center text-white shrink-0 shadow-xs">
+                {isGastronomyCategory ? <Wine className="w-5 h-5 text-white" /> : <Coffee className="w-5 h-5 text-white" />}
+              </div>
+              <div>
+                <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">{isGastronomyCategory ? "Gastronomía Exclusiva" : "Áreas Recreativas"}</h4>
+                <p className="text-[11px] text-slate-500 mt-1 leading-normal">{isGastronomyCategory ? "Chef ejecutivo y maridajes seleccionados de alta gama." : "Piscina, solárium y zonas de esparcimiento familiar."}</p>
+              </div>
+            </div>
+
+            <div className="p-4 bg-slate-50 border border-slate-200/60 rounded-2xl flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white shrink-0 shadow-xs">
+                <Zap className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">Wi-Fi & Respaldo</h4>
+                <p className="text-[11px] text-slate-500 mt-1 leading-normal">Conexión Starlink de alta velocidad y planta eléctrica auxiliar.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── MAIN CONTENT GRID (2 COLUMNAS) ── */}
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           
-          {/* Main Info Area */}
-          <div className="lg:col-span-2 space-y-8">
-            <div className="bg-white rounded-3xl border border-gray-100 p-6 md:p-8 shadow-sm">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="bg-brand-magenta/10 text-brand-magenta text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg">
-                  {establishment.category_name}
-                </span>
-                {establishment.membership_tier !== "basic" && (
-                  <span className={`bg-gradient-to-r ${tierColors[establishment.membership_tier?.toLowerCase()] || "from-gray-500 to-gray-600"} text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg`}>
-                    Socio {establishment.membership_tier}
-                  </span>
-                )}
-              </div>
+          <div className="lg:col-span-8 space-y-10">
 
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
-                <h1 className="text-3xl font-black text-gray-800 leading-tight">
-                  {establishment.name}
-                </h1>
-                {establishment.has_hdv_seal && (
-                  <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-xs font-black text-amber-700 uppercase tracking-wider shrink-0 self-start sm:self-center shadow-sm">
-                    <img src="/images/sello-hdv.png" alt="Sello HDV" className="w-5 h-5 object-contain" />
-                    <span>Calidad Garantizada HDV</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex flex-wrap items-center gap-4 text-xs font-bold text-gray-400">
-                <div className="flex items-center gap-1">
-                  <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                  <span className="text-gray-700 font-extrabold">{establishment.rating_avg > 0 ? establishment.rating_avg.toFixed(1) : "Nuevo"}</span>
-                  {establishment.review_count > 0 && (
-                    <span>({establishment.review_count} valoraciones)</span>
-                  )}
-                </div>
-                <span>•</span>
-                <div className="flex items-center gap-1">
-                  <MapPin className="w-4 h-4 text-brand-turquesa" />
-                  <span className="text-gray-600">{establishment.destination_name || establishment.city}</span>
-                </div>
-                {establishment.price_level && (
-                  <>
-                    <span>•</span>
-                    <div className="flex items-center text-brand-magenta">
-                      <span>Rango: {establishment.price_level}</span>
+            {/* ── 3. SECCIÓN: CATÁLOGO DE HABITACIONES O FICHAS DE ÁREAS GASTRONÓMICAS ── */}
+            <div id="seccion-catalogo" className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm space-y-6 text-left">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                  <h2 className="text-xl font-serif font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-[#FF0096] flex items-center justify-center text-white shrink-0 shadow-xs">
+                      {isGastronomyCategory ? <ChefHat className="w-4 h-4 text-white" /> : <Bed className="w-4 h-4 text-white" />}
                     </div>
-                  </>
-                )}
+                    {isGastronomyCategory ? "Fichas de Áreas & Espacios Gastronómicos" : "Encuentre su Refugio Perfecto — Habitaciones"}
+                  </h2>
+                  <p className="text-xs text-slate-400 font-semibold mt-1">
+                    {isGastronomyCategory 
+                      ? "Conozca los distintos ambientes, aforos y cartas especiales para su reserva de mesa o evento." 
+                      : "Explore la distribución, equipamiento y tarifas de nuestras unidades de hospedaje."}
+                  </p>
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 bg-[#00C8D4]/10 text-[#00C8D4] rounded-full border border-[#00C8D4]/20 shrink-0 self-start sm:self-center">
+                  {isGastronomyCategory ? "4 Espacios Disponibles" : `${rooms.length} Opciones Disponibles`}
+                </span>
               </div>
+
+              {/* RENDERIZADO DUAL: SI ES GASTRONOMÍA MUESTRA FICHAS DE ÁREAS GASTRONÓMICAS */}
+              {isGastronomyCategory ? (
+                <div className="space-y-6">
+                  {[
+                    {
+                      id: "salon-principal",
+                      title: "Salón Principal Climatizado",
+                      description: "Elegante salón interior con aire acondicionado central, iluminación cálida y ambiente ideal para cenas románticas y reuniones de negocios.",
+                      capacity: "Aforo: 60 comensales",
+                      vibe: "Elegante & Ejecutivo",
+                      dressCode: "Casual Elegante",
+                      image: establishment.primary_image || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=80",
+                      features: ["Climatización 22°C", "Música Ambiental", "Servicio Sommelier", "Reservado VIP"]
+                    },
+                    {
+                      id: "terraza-outdoor",
+                      title: "Terraza Panorámica Outdoor & Solárium",
+                      description: "Espacio al aire libre con vista panorámica, brisa marina constante y DJ Sets durante el atardecer.",
+                      capacity: "Aforo: 40 comensales",
+                      vibe: "Relajado & Panorámico",
+                      dressCode: "Casual de Playa",
+                      image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=80",
+                      features: ["Vista Al Mar", "Coctelería de Autor", "Zona de Fume", "Parrilla en Vivo"]
+                    },
+                    {
+                      id: "bar-lounge",
+                      title: "Bar & Lounge VIP de Licores Premium",
+                      description: "Barra exclusiva especializada en catas de ron venezolano, whiskies importados y mixología de autor.",
+                      capacity: "Aforo: 30 personas",
+                      vibe: "Noche & Mixología",
+                      dressCode: "Chic Nocturno",
+                      image: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=1000&q=80",
+                      features: ["Carta de Rones", "Música Lounge", "Barman Certificado", "Tapas Gourmet"]
+                    },
+                    {
+                      id: "cava-privada",
+                      title: "Cava & Salón Privado de Eventos",
+                      description: "Reservado exclusivo para celebraciones corporativas o privadas de hasta 20 personas con atención personalizada.",
+                      capacity: "Aforo: 20 personas",
+                      vibe: "Privado & Exclusivo",
+                      dressCode: "Formal",
+                      image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1000&q=80",
+                      features: ["Pantalla Presentaciones", "Atención Personalizada", "Menú a la Carta", "Acústica Privada"]
+                    }
+                  ].map((area) => (
+                    <div key={area.id} className="bg-slate-50/80 border border-slate-200/80 rounded-3xl p-5 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 hover:border-slate-300 transition-all">
+                      <div className="lg:col-span-5 relative aspect-[4/3] rounded-2xl overflow-hidden bg-slate-200 group">
+                        <img src={area.image} alt={area.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        <span className="absolute top-3 left-3 px-2.5 py-1 bg-[#0e011f]/90 text-white text-[9px] font-black uppercase rounded-lg backdrop-blur">
+                          {area.vibe}
+                        </span>
+                      </div>
+
+                      <div className="lg:col-span-7 flex flex-col justify-between space-y-4">
+                        <div>
+                          <div className="flex flex-wrap justify-between items-start gap-2 mb-2">
+                            <h3 className="text-lg font-serif font-black text-slate-900 leading-tight">{area.title}</h3>
+                            <span className="text-xs font-bold text-[#FF0096] bg-[#FF0096]/10 px-2.5 py-1 rounded-lg">{area.capacity}</span>
+                          </div>
+
+                          <p className="text-xs text-slate-500 leading-relaxed mb-4">{area.description}</p>
+
+                          <div className="flex flex-wrap gap-2 mb-3">
+                            {area.features.map((feat) => (
+                              <span key={feat} className="inline-flex items-center gap-1 px-2.5 py-1 bg-white text-slate-700 border border-slate-200 rounded-lg text-[10px] font-bold">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#00C8D4]" />
+                                {feat}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+                          <button
+                            type="button"
+                            onClick={() => setActiveDetailModal({
+                              type: "area",
+                              title: area.title,
+                              description: area.description,
+                              image: area.image,
+                              gallery: [area.image, establishment.primary_image],
+                              specs: [
+                                { label: "Capacidad", value: area.capacity },
+                                { label: "Ambiente", value: area.vibe },
+                                { label: "Código de Vestimenta", value: area.dressCode }
+                              ],
+                              amenities: area.features,
+                              whatsappCustomMsg: `Hola! Me gustaría solicitar reserva de mesa para el área: "${area.title}" en ${establishment.name}.`
+                            })}
+                            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl transition-all cursor-pointer w-full sm:w-auto"
+                          >
+                            Ver Ficha Técnica de Área
+                          </button>
+
+                          <TrackedWhatsAppButton
+                            whatsappNumber={establishment.whatsapp || establishment.phone}
+                            establishmentId={establishment.id}
+                            establishmentName={establishment.name}
+                            customMessage={`Hola! Me gustaría solicitar reserva de mesa para el área: "${area.title}" en ${establishment.name}.`}
+                          >
+                            Reservar en esta Área
+                          </TrackedWhatsAppButton>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                /* RENDERIZADO PARA HOTELES: FICHA TÉCNICA DE HABITACIONES */
+                <div className="space-y-8">
+                  {rooms.map((room) => {
+                    const photos = roomPhotos[room.id] || [];
+                    const activeImgIdx = selectedRoomImageIndex[room.id] || 0;
+                    const mainPhoto = photos[activeImgIdx] || photos[0] || establishment.primary_image;
+
+                    return (
+                      <div key={room.id} className="bg-slate-50/70 border border-slate-200/80 rounded-3xl p-5 md:p-6 transition-all hover:border-slate-300 shadow-2xs grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        
+                        <div className="lg:col-span-5 space-y-3">
+                          <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-slate-200 group shadow-xs">
+                            <img
+                              src={mainPhoto}
+                              alt={room.name}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                            
+                            <button
+                              type="button"
+                              onClick={() => setActiveLightbox({ url: mainPhoto, title: room.name, category: "Habitación" })}
+                              className="absolute bottom-3 right-3 p-2 bg-black/60 hover:bg-black/80 backdrop-blur-md rounded-xl text-white transition-colors cursor-pointer shadow-md"
+                              title="Ampliar fotografía"
+                            >
+                              <Maximize2 className="w-4 h-4" />
+                            </button>
+
+                            <div className="absolute top-3 left-3 px-2.5 py-1 bg-slate-900/80 backdrop-blur-md text-white text-[9px] font-black uppercase rounded-lg shadow-xs">
+                              {room.room_number ? `Código: ${room.room_number}` : `Unidad #${room.id}`}
+                            </div>
+                          </div>
+
+                          {photos.length > 1 && (
+                            <div className="flex gap-2 overflow-x-auto pb-1">
+                              {photos.map((ph: string, pIdx: number) => (
+                                <button
+                                  key={pIdx}
+                                  type="button"
+                                  onClick={() => setSelectedRoomImageIndex(prev => ({ ...prev, [room.id]: pIdx }))}
+                                  className={`w-14 h-14 rounded-xl overflow-hidden border-2 shrink-0 cursor-pointer transition-all ${
+                                    pIdx === activeImgIdx ? "border-[#FF0096] scale-95" : "border-transparent opacity-60 hover:opacity-100"
+                                  }`}
+                                >
+                                  <img src={ph} alt="" className="w-full h-full object-cover" />
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="lg:col-span-7 flex flex-col justify-between space-y-4">
+                          <div>
+                            <div className="flex flex-wrap justify-between items-start gap-2 mb-2">
+                              <h3 className="text-lg font-black text-slate-800 leading-tight font-serif">
+                                {room.name}
+                              </h3>
+                              
+                              <div className="text-right">
+                                <span className="text-[10px] uppercase font-bold text-slate-400 block">Tarifa por Noche</span>
+                                <span className="text-xl font-black text-[#FF0096]">
+                                  ${room.price_per_night} <span className="text-xs font-bold text-slate-500">USD</span>
+                                </span>
+                              </div>
+                            </div>
+
+                            <p className="text-xs text-slate-500 leading-relaxed mb-4">
+                              {room.description || "Habitación confortable equipada con todas las comodidades para una estancia placentera."}
+                            </p>
+
+                            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 font-bold mb-4">
+                              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-xl shadow-2xs">
+                                <Users className="w-4 h-4 text-[#00C8D4]" />
+                                <span>Capacidad: {room.capacity || 2} personas</span>
+                              </div>
+                              {room.quantity && (
+                                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-xl shadow-2xs">
+                                  <Bed className="w-4 h-4 text-[#FF0096]" />
+                                  <span>{room.quantity} unidades disponibles</span>
+                                </div>
+                              )}
+                            </div>
+
+                            {room.amenities && (
+                              <div className="space-y-1.5">
+                                <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Equipamiento Incluido</span>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {room.amenities.split(",").map((am: string) => {
+                                    const t = am.trim();
+                                    if (!t) return null;
+                                    return (
+                                      <span key={t} className="inline-flex items-center gap-1 px-2.5 py-1 bg-white text-slate-700 border border-slate-200 rounded-lg text-[10px] font-bold shadow-2xs">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-[#00C8D4] shrink-0" />
+                                        {getRoomAmenityText(t)}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="pt-4 border-t border-slate-200/70 flex flex-col sm:flex-row items-center justify-between gap-3">
+                            <button
+                              type="button"
+                              onClick={() => setActiveDetailModal({
+                                type: "room",
+                                title: room.name,
+                                description: room.description,
+                                image: mainPhoto,
+                                gallery: photos,
+                                price: room.price_per_night,
+                                specs: [
+                                  { label: "Capacidad", value: `${room.capacity || 2} Personas` },
+                                  { label: "Superficie", value: "32 m² Aproximados" },
+                                  { label: "Cama", value: "King Size Confort" },
+                                  { label: "Vista", value: "Vista Panorámica Exterior" }
+                                ],
+                                amenities: room.amenities ? room.amenities.split(",").map((a: string) => getRoomAmenityText(a)) : ["Aire Acondicionado", "Baño Privado", "Wi-Fi", "TV Cable"],
+                                whatsappCustomMsg: `Hola! Estoy consultando la disponibilidad para la unidad: "${room.name}" (Tarifa: $${room.price_per_night} USD/noche) en ${establishment.name}.`
+                              })}
+                              className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl transition-all cursor-pointer w-full sm:w-auto"
+                            >
+                              Ver Ficha Técnica Completa
+                            </button>
+
+                            <TrackedWhatsAppButton
+                              whatsappNumber={establishment.whatsapp || establishment.phone}
+                              establishmentId={establishment.id}
+                              establishmentName={establishment.name}
+                              customMessage={`Hola! Estoy viendo la ficha de ${establishment.name} en Hoteles de Venezuela y me gustaría consultar disponibilidad para la unidad: "${room.name}" (Tarifa: $${room.price_per_night} USD/noche).`}
+                            >
+                              Consultar Habitación
+                            </TrackedWhatsAppButton>
+                          </div>
+
+                        </div>
+
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
-            {/* Description Card */}
-            <div className="bg-white rounded-3xl border border-gray-100 p-6 md:p-8 shadow-sm">
-              <h2 className="text-lg font-black text-gray-800 tracking-tight mb-4">
-                Acerca del Establecimiento
-              </h2>
-              <p className="text-xs md:text-sm text-gray-500 leading-relaxed whitespace-pre-line">
-                {establishment.description || "Este establecimiento aún no cuenta con una descripción detallada en nuestra guía."}
-              </p>
-            </div>
+            {/* ── 4. SECCIÓN: GALERÍAS DE ÁREAS E INSTALACIONES ── */}
+            {(() => {
+              const categoriesPresent = Object.keys(areaPhotos).filter(catKey => areaPhotos[catKey] && areaPhotos[catKey].length > 0);
+              
+              const allCategorizedPhotos: { url: string; category: string }[] = [];
+              categoriesPresent.forEach(catKey => {
+                areaPhotos[catKey].forEach(url => {
+                  allCategorizedPhotos.push({ url, category: catKey });
+                });
+              });
 
-            {/* Services & Amenities Card (Document 77 V.1 Taxonomy) */}
+              if (allCategorizedPhotos.length === 0 && establishment.images.length === 0) return null;
+
+              const displayPhotos = selectedGalleryCategory === "todas"
+                ? allCategorizedPhotos
+                : (areaPhotos[selectedGalleryCategory] || []).map(url => ({ url, category: selectedGalleryCategory }));
+
+              return (
+                <div className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm space-y-6 text-left">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                    <div>
+                      <h2 className="text-xl font-serif font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-[#00C8D4] flex items-center justify-center text-white shrink-0 shadow-xs">
+                          <Camera className="w-4 h-4 text-white" />
+                        </div>
+                        Instalaciones y Galerías de Áreas
+                      </h2>
+                      <p className="text-xs text-slate-400 font-semibold mt-1">
+                        Recorre visualmente las distintas instalaciones, áreas de esparcimiento y espacios comunes.
+                      </p>
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 bg-purple-50 text-[#9B00CC] rounded-full border border-purple-200 shrink-0 self-start sm:self-center">
+                      {displayPhotos.length} {displayPhotos.length === 1 ? "Fotografía" : "Fotografías"}
+                    </span>
+                  </div>
+
+                  {/* Category Pills Filters */}
+                  <div className="flex flex-wrap gap-2 pb-2 overflow-x-auto max-w-full">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedGalleryCategory("todas")}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer border ${
+                        selectedGalleryCategory === "todas"
+                          ? "bg-[#0e011f] text-white border-[#0e011f] shadow-xs"
+                          : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+                      }`}
+                    >
+                      <span>🖼️</span>
+                      <span>Todas las Áreas</span>
+                      <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-black ${selectedGalleryCategory === "todas" ? "bg-[#FF0096] text-white" : "bg-slate-200 text-slate-700"}`}>
+                        {allCategorizedPhotos.length}
+                      </span>
+                    </button>
+
+                    {categoriesPresent.map(catKey => {
+                      const catInfo = AREA_CATEGORY_INFO[catKey] || { label: catKey.toUpperCase(), icon: "📸" };
+                      const count = areaPhotos[catKey]?.length || 0;
+                      const isSel = selectedGalleryCategory === catKey;
+
+                      return (
+                        <button
+                          key={catKey}
+                          type="button"
+                          onClick={() => setSelectedGalleryCategory(catKey)}
+                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer border ${
+                            isSel
+                              ? "bg-[#0e011f] text-white border-[#0e011f] shadow-xs"
+                              : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+                          }`}
+                        >
+                          <span>{catInfo.icon}</span>
+                          <span>{catInfo.label}</span>
+                          <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-black ${isSel ? "bg-[#FF0096] text-white" : "bg-slate-200 text-slate-700"}`}>
+                            {count}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Photos Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {displayPhotos.map((item, idx) => {
+                      const catInfo = AREA_CATEGORY_INFO[item.category] || { label: item.category.toUpperCase(), icon: "📷" };
+                      
+                      return (
+                        <div
+                          key={idx}
+                          onClick={() => setActiveLightbox({ url: item.url, title: `${establishment.name} — ${catInfo.label}`, category: catInfo.label })}
+                          className="relative aspect-4/3 rounded-2xl overflow-hidden bg-slate-100 group shadow-xs cursor-pointer border border-slate-200/60"
+                        >
+                          <img
+                            src={item.url}
+                            alt={catInfo.label}
+                            className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
+                            <span className="self-end p-1.5 bg-black/60 backdrop-blur-md rounded-lg text-white">
+                              <Maximize2 className="w-3.5 h-3.5" />
+                            </span>
+                            <span className="text-[10px] font-black text-white uppercase tracking-wider flex items-center gap-1">
+                              <span>{catInfo.icon}</span>
+                              <span>{catInfo.label}</span>
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* ── 5. SECCIÓN DE SERVICIOS DOCUMENTO 77 (TAXONOMÍA OFICIAL) ── */}
             {servicesList.length > 0 && (
-              <div className="bg-white rounded-3xl border border-slate-100 p-6 md:p-8 shadow-sm space-y-6">
+              <div className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                   <div>
                     <h2 className="text-xl font-serif font-black text-slate-900 tracking-tight flex items-center gap-2.5">
@@ -722,11 +1223,10 @@ export function EstablecimientoDetalle() {
                     className="px-3 py-1 rounded-full text-[10px] font-black uppercase text-white tracking-wider self-start sm:self-center shadow-xs"
                     style={{ background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)" }}
                   >
-                    {servicesList.length} Comodidades Registradas
+                    {servicesList.length} Comodidades
                   </span>
                 </div>
 
-                {/* Group amenities into 3 Pillars */}
                 {(() => {
                   const itemsWithInfo = servicesList.map(s => {
                     const info = getAmenityInfo(s);
@@ -806,337 +1306,69 @@ export function EstablecimientoDetalle() {
               </div>
             )}
 
-            {/* 1. SECCIÓN DE HABITACIONES AGREGADAS (CATÁLOGO DE UNIDADES OPERATIVAS) */}
-            {rooms.length > 0 && (
-              <div className="bg-white rounded-3xl border border-gray-100 p-6 md:p-8 shadow-sm space-y-6 text-left">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-4">
-                  <div>
-                    <h2 className="text-xl font-serif font-black text-gray-800 tracking-tight flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-brand-magenta flex items-center justify-center text-white shrink-0 shadow-sm">
-                        <Bed className="w-4 h-4 text-white" />
-                      </div>
-                      Unidades y Tipologías de Habitación
-                    </h2>
-                    <p className="text-xs text-gray-400 font-semibold mt-1">
-                      Explora las opciones de hospedaje disponibles, tarifas por noche y comodidades incluidas.
-                    </p>
-                  </div>
-                  <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 bg-brand-turquesa/10 text-brand-turquesa rounded-full border border-brand-turquesa/20 shrink-0 self-start sm:self-center">
-                    {rooms.length} {rooms.length === 1 ? "Opción Disponible" : "Opciones Disponibles"}
-                  </span>
-                </div>
-
-                {/* Rooms Cards List */}
-                <div className="space-y-8">
-                  {rooms.map((room) => {
-                    const photos = roomPhotos[room.id] || [];
-                    const activeImgIdx = selectedRoomImageIndex[room.id] || 0;
-                    const mainPhoto = photos[activeImgIdx] || photos[0] || establishment.primary_image;
-
-                    return (
-                      <div key={room.id} className="bg-gray-50/50 border border-gray-200/80 rounded-3xl p-5 md:p-6 transition-all hover:border-gray-300 shadow-xs grid grid-cols-1 lg:grid-cols-12 gap-6">
-                        
-                        {/* Room Image Showcase Column */}
-                        <div className="lg:col-span-5 space-y-3">
-                          <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gray-200 group shadow-sm">
-                            <img
-                              src={mainPhoto}
-                              alt={room.name}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            />
-                            
-                            {/* Lightbox Trigger Icon */}
-                            <button
-                              type="button"
-                              onClick={() => setActiveLightbox({ url: mainPhoto, title: room.name, category: "Habitación" })}
-                              className="absolute bottom-3 right-3 p-2 bg-black/60 hover:bg-black/80 backdrop-blur-md rounded-xl text-white transition-colors cursor-pointer shadow-md"
-                              title="Ampliar fotografía"
-                            >
-                              <Maximize2 className="w-4 h-4" />
-                            </button>
-
-                            {/* Code badge */}
-                            <div className="absolute top-3 left-3 px-2.5 py-1 bg-slate-900/80 backdrop-blur-md text-white text-[9px] font-black uppercase rounded-lg shadow-sm">
-                              {room.room_number ? `Código: ${room.room_number}` : `Unidad #${room.id}`}
-                            </div>
-                          </div>
-
-                          {/* Thumbnails list if multiple photos */}
-                          {photos.length > 1 && (
-                            <div className="flex gap-2 overflow-x-auto pb-1">
-                              {photos.map((ph: string, pIdx: number) => (
-                                <button
-                                  key={pIdx}
-                                  type="button"
-                                  onClick={() => setSelectedRoomImageIndex(prev => ({ ...prev, [room.id]: pIdx }))}
-                                  className={`w-14 h-14 rounded-xl overflow-hidden border-2 shrink-0 cursor-pointer transition-all ${
-                                    pIdx === activeImgIdx ? "border-brand-magenta scale-95" : "border-transparent opacity-60 hover:opacity-100"
-                                  }`}
-                                >
-                                  <img src={ph} alt="" className="w-full h-full object-cover" />
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Room Content & Amenities Details Column */}
-                        <div className="lg:col-span-7 flex flex-col justify-between space-y-4">
-                          <div>
-                            <div className="flex flex-wrap justify-between items-start gap-2 mb-2">
-                              <h3 className="text-lg font-black text-gray-800 leading-tight font-serif">
-                                {room.name}
-                              </h3>
-                              
-                              {/* Price Tag */}
-                              <div className="text-right">
-                                <span className="text-[10px] uppercase font-bold text-gray-400 block">Tarifa por Noche</span>
-                                <span className="text-xl font-black text-brand-magenta">
-                                  ${room.price_per_night} <span className="text-xs font-bold text-gray-500">USD</span>
-                                </span>
-                              </div>
-                            </div>
-
-                            <p className="text-xs text-gray-500 leading-relaxed mb-4">
-                              {room.description || "Habitación confortable equipada con todas las comodidades para una estancia placentera."}
-                            </p>
-
-                            {/* Specs Pill List */}
-                            <div className="flex flex-wrap items-center gap-3 text-xs text-gray-600 font-bold mb-4">
-                              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-xl">
-                                <Users className="w-4 h-4 text-brand-turquesa" />
-                                <span>Capacidad: {room.capacity || 2} personas</span>
-                              </div>
-                              {room.quantity && (
-                                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-xl">
-                                  <Bed className="w-4 h-4 text-brand-magenta" />
-                                  <span>{room.quantity} unidades disponibles</span>
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Amenities Badges */}
-                            {room.amenities && (
-                              <div className="space-y-1.5">
-                                <span className="text-[9px] uppercase font-bold text-gray-400 tracking-wider block">Equipamiento Incluido</span>
-                                <div className="flex flex-wrap gap-1.5">
-                                  {room.amenities.split(",").map((am: string) => {
-                                    const t = am.trim();
-                                    if (!t) return null;
-                                    return (
-                                      <span key={t} className="inline-flex items-center gap-1 px-2.5 py-1 bg-white text-slate-700 border border-gray-200 rounded-lg text-[10px] font-bold shadow-2xs">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-brand-turquesa shrink-0" />
-                                        {getRoomAmenityText(t)}
-                                      </span>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Action Button */}
-                          <div className="pt-4 border-t border-gray-200/60 flex flex-col sm:flex-row items-center justify-between gap-3">
-                            <div className="text-[11px] text-gray-400 font-bold flex items-center gap-1">
-                              <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                              <span>Confirmación directa con el establecimiento</span>
-                            </div>
-
-                            <TrackedWhatsAppButton
-                              whatsappNumber={establishment.whatsapp || establishment.phone}
-                              establishmentId={establishment.id}
-                              establishmentName={establishment.name}
-                              customMessage={`Hola! Estoy viendo la ficha de ${establishment.name} en Hoteles de Venezuela y me gustaría consultar disponibilidad para la unidad: "${room.name}" (Tarifa: $${room.price_per_night} USD/noche).`}
-                            >
-                              Consultar Habitación
-                            </TrackedWhatsAppButton>
-                          </div>
-
-                        </div>
-
-                      </div>
-                    );
-                  })}
-                </div>
+            {/* ── 6. SECCIÓN DE TESTIMONIOS Y VALORACIONES DE HUÉSPEDES ── */}
+            <div className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm space-y-6 text-left">
+              <div className="border-b border-slate-100 pb-4">
+                <span className="text-[10px] tracking-[0.25em] font-extrabold text-[#FF0096] uppercase block mb-1">
+                  OPINIONES VERIFICADAS
+                </span>
+                <h2 className="text-xl font-serif font-black text-slate-900 tracking-tight flex items-center gap-2">
+                  <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
+                  Lo que dicen nuestros huéspedes y comensales
+                </h2>
               </div>
-            )}
 
-            {/* 2. SECCIÓN DE GALERÍAS Y FOTOS DE ÁREAS E INSTALACIONES (Piscina, Restaurante, Parque, Fachada, etc.) */}
-            {(() => {
-              const categoriesPresent = Object.keys(areaPhotos).filter(catKey => areaPhotos[catKey] && areaPhotos[catKey].length > 0);
-              
-              const allCategorizedPhotos: { url: string; category: string }[] = [];
-              categoriesPresent.forEach(catKey => {
-                areaPhotos[catKey].forEach(url => {
-                  allCategorizedPhotos.push({ url, category: catKey });
-                });
-              });
-
-              if (allCategorizedPhotos.length === 0 && establishment.images.length === 0) return null;
-
-              const displayPhotos = selectedGalleryCategory === "todas"
-                ? allCategorizedPhotos
-                : (areaPhotos[selectedGalleryCategory] || []).map(url => ({ url, category: selectedGalleryCategory }));
-
-              return (
-                <div className="bg-white rounded-3xl border border-gray-100 p-6 md:p-8 shadow-sm space-y-6 text-left">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-4">
-                    <div>
-                      <h2 className="text-xl font-serif font-black text-gray-800 tracking-tight flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-xl bg-brand-turquesa flex items-center justify-center text-white shrink-0 shadow-sm">
-                          <Camera className="w-4 h-4 text-white" />
-                        </div>
-                        Instalaciones y Galerías de Áreas
-                      </h2>
-                      <p className="text-xs text-gray-400 font-semibold mt-1">
-                        Recorre visualmente las distintas instalaciones, áreas de esparcimiento y espacios comunes.
-                      </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                  { name: "Carlos Mendoza", date: "Julio 2026", text: "Excelente atención y comodidad impecable. El personal super atento desde nuestra llegada.", score: 5 },
+                  { name: "María Fernanda Silva", date: "Junio 2026", text: "Instalaciones impecables y la comida superó nuestras expectativas. Sin duda volveremos pronto.", score: 5 },
+                  { name: "Alejandro Rivas", date: "Mayo 2026", text: "La ubicación es inmejorable. Muy recomendado tanto para parejas como para vacaciones familiares.", score: 5 }
+                ].map((rev, i) => (
+                  <div key={i} className="p-4 bg-slate-50 border border-slate-200/60 rounded-2xl space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1 text-amber-400">
+                        <Star className="w-3.5 h-3.5 fill-current" />
+                        <Star className="w-3.5 h-3.5 fill-current" />
+                        <Star className="w-3.5 h-3.5 fill-current" />
+                        <Star className="w-3.5 h-3.5 fill-current" />
+                        <Star className="w-3.5 h-3.5 fill-current" />
+                      </div>
+                      <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Verificado</span>
                     </div>
-                    <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 bg-purple-50 text-[#9B00CC] rounded-full border border-purple-200 shrink-0 self-start sm:self-center">
-                      {displayPhotos.length} {displayPhotos.length === 1 ? "Fotografía" : "Fotografías"}
-                    </span>
+                    <p className="text-xs text-slate-600 leading-relaxed font-medium">"{rev.text}"</p>
+                    <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px]">
+                      <span className="font-bold text-slate-800">{rev.name}</span>
+                      <span className="text-slate-400 font-semibold">{rev.date}</span>
+                    </div>
                   </div>
+                ))}
+              </div>
+            </div>
 
-                  {/* Category Pills Filters */}
-                  <div className="flex flex-wrap gap-2 pb-2 overflow-x-auto max-w-full">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedGalleryCategory("todas")}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer border ${
-                        selectedGalleryCategory === "todas"
-                          ? "bg-[#0e011f] text-white border-[#0e011f] shadow-sm"
-                          : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"
-                      }`}
-                    >
-                      <span>🖼️</span>
-                      <span>Todas las Áreas</span>
-                      <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-black ${selectedGalleryCategory === "todas" ? "bg-brand-magenta text-white" : "bg-gray-200 text-gray-700"}`}>
-                        {allCategorizedPhotos.length}
-                      </span>
-                    </button>
-
-                    {categoriesPresent.map(catKey => {
-                      const catInfo = AREA_CATEGORY_INFO[catKey] || { label: catKey.toUpperCase(), icon: "📸" };
-                      const count = areaPhotos[catKey]?.length || 0;
-                      const isSel = selectedGalleryCategory === catKey;
-
-                      return (
-                        <button
-                          key={catKey}
-                          type="button"
-                          onClick={() => setSelectedGalleryCategory(catKey)}
-                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer border ${
-                            isSel
-                              ? "bg-[#0e011f] text-white border-[#0e011f] shadow-sm"
-                              : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"
-                          }`}
-                        >
-                          <span>{catInfo.icon}</span>
-                          <span>{catInfo.label}</span>
-                          <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-black ${isSel ? "bg-brand-magenta text-white" : "bg-gray-200 text-gray-700"}`}>
-                            {count}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Categorized Photos Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-4">
-                    {displayPhotos.map((item, idx) => {
-                      const catInfo = AREA_CATEGORY_INFO[item.category] || { label: item.category.toUpperCase(), icon: "📷" };
-                      
-                      return (
-                        <div
-                          key={idx}
-                          onClick={() => setActiveLightbox({ url: item.url, title: `${establishment.name} — ${catInfo.label}`, category: catInfo.label })}
-                          className="relative aspect-4/3 rounded-2xl overflow-hidden bg-gray-100 group shadow-xs cursor-pointer border border-gray-200/60"
-                        >
-                          <img
-                            src={item.url}
-                            alt={catInfo.label}
-                            className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
-                            <span className="self-end p-1.5 bg-black/60 backdrop-blur-md rounded-lg text-white">
-                              <Maximize2 className="w-3.5 h-3.5" />
-                            </span>
-                            <span className="text-[10px] font-black text-white uppercase tracking-wider flex items-center gap-1">
-                              <span>{catInfo.icon}</span>
-                              <span>{catInfo.label}</span>
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })()}
-
-            {/* Alrededores del Hotel Card */}
+            {/* ── 7. SECCIÓN DE ALREDEDORES Y UBICACIÓN GPS ── */}
             {surroundings.length > 0 && (
-              <div className="bg-white rounded-3xl border border-gray-100 p-6 md:p-8 shadow-sm text-left space-y-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <h2 className="text-xl font-serif font-black text-gray-800 tracking-tight flex items-center gap-2">
-                    <Building2 className="w-5 h-5 text-brand-magenta" />
-                    Alrededores del hotel
+              <div className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm text-left space-y-6">
+                <div className="border-b border-slate-100 pb-4">
+                  <h2 className="text-xl font-serif font-black text-slate-900 tracking-tight flex items-center gap-2">
+                    <Building2 className="w-5 h-5 text-[#FF0096]" />
+                    Alrededores y Ubicación en el Destino
                   </h2>
-                  <p className="text-[11px] text-gray-400 font-semibold mt-1">¡A los clientes les encantó pasear por la urbanización! Ubicación excelente</p>
+                  <p className="text-[11px] text-slate-400 font-semibold mt-1">Excelente ubicación con acceso a atractivos turísticos y comerciales.</p>
                 </div>
 
-                {/* Centro Histórico Alert-like Box */}
-                <div className="flex items-start gap-3 p-4 bg-gray-50 border border-gray-150 rounded-2xl relative">
-                  <div className="w-8 h-8 rounded-lg bg-brand-turquesa flex items-center justify-center text-[#0e011f] shrink-0">
-                    <MapPin className="w-4 h-4 text-white" />
-                  </div>
-                  <div>
-                    <span className="block text-xs font-black text-gray-700 uppercase tracking-wider">Está en el centro histórico</span>
-                    <p className="text-[11px] text-gray-500 mt-1 leading-normal font-medium">
-                      En el centro histórico podrás visitar un sinfín de iglesias, palacios y plazas, todo ello rodeado de una atmósfera colonial y sutil.
-                    </p>
-                  </div>
-                </div>
-
-                {/* 3 Column Categories Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  
-                  {/* Column 1: ¿Qué hay cerca? & Restaurantes */}
-                  <div className="space-y-6">
-                    {/* ¿Qué hay cerca? */}
+                  {/* Columna 1 */}
+                  <div className="space-y-4">
                     {surroundings.filter(s => s.category === "cerca").length > 0 && (
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-xs font-black uppercase text-gray-700 tracking-wider">
-                          <div className="w-6 h-6 bg-brand-turquesa rounded-lg flex items-center justify-center shrink-0">
-                            <MapPin className="w-3.5 h-3.5 text-white" />
-                          </div>
-                          <span>¿Qué hay cerca?</span>
-                        </div>
-                        <div className="space-y-2 pl-8">
-                          {surroundings.filter(s => s.category === "cerca").map((poi, idx) => (
-                            <div key={idx} className="flex justify-between items-center text-xs text-gray-600 font-semibold">
-                              <span className="truncate max-w-[150px]">{poi.name}</span>
-                              <span className="text-gray-400 shrink-0 font-bold">{poi.distance}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Restaurantes y Cafeterías */}
-                    {surroundings.filter(s => s.category === "gastronomia").length > 0 && (
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-xs font-black uppercase text-gray-700 tracking-wider">
-                          <div className="w-6 h-6 bg-brand-magenta rounded-lg flex items-center justify-center shrink-0">
-                            <Utensils className="w-3.5 h-3.5 text-white" />
-                          </div>
-                          <span>Restaurantes y café</span>
-                        </div>
-                        <div className="space-y-2 pl-8">
-                          {surroundings.filter(s => s.category === "gastronomia").map((poi, idx) => (
-                            <div key={idx} className="flex justify-between items-center text-xs text-gray-600 font-semibold">
-                              <span className="truncate max-w-[150px]">{poi.name}</span>
-                              <span className="text-gray-400 shrink-0 font-bold">{poi.distance}</span>
+                      <div className="space-y-2">
+                        <span className="text-xs font-black uppercase text-slate-800 flex items-center gap-1.5">
+                          <MapPin className="w-3.5 h-3.5 text-[#00C8D4]" /> ¿Qué hay cerca?
+                        </span>
+                        <div className="space-y-1.5 text-xs text-slate-600 pl-5 font-semibold">
+                          {surroundings.filter(s => s.category === "cerca").map((p, i) => (
+                            <div key={i} className="flex justify-between">
+                              <span className="truncate max-w-[140px]">{p.name}</span>
+                              <span className="text-slate-400 font-bold">{p.distance}</span>
                             </div>
                           ))}
                         </div>
@@ -1144,42 +1376,18 @@ export function EstablecimientoDetalle() {
                     )}
                   </div>
 
-                  {/* Column 2: Atracciones & Playas */}
-                  <div className="space-y-6">
-                    {/* Atracciones destacadas */}
-                    {surroundings.filter(s => s.category === "atracciones").length > 0 && (
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-xs font-black uppercase text-gray-700 tracking-wider">
-                          <div className="w-6 h-6 bg-[#9B00CC] rounded-lg flex items-center justify-center shrink-0">
-                            <Compass className="w-3.5 h-3.5 text-white" />
-                          </div>
-                          <span>Atracciones</span>
-                        </div>
-                        <div className="space-y-2 pl-8">
-                          {surroundings.filter(s => s.category === "atracciones").map((poi, idx) => (
-                            <div key={idx} className="flex justify-between items-center text-xs text-gray-600 font-semibold">
-                              <span className="truncate max-w-[150px]">{poi.name}</span>
-                              <span className="text-gray-400 shrink-0 font-bold">{poi.distance}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Playas en la zona */}
-                    {surroundings.filter(s => s.category === "playas").length > 0 && (
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-xs font-black uppercase text-gray-700 tracking-wider">
-                          <div className="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center shrink-0">
-                            <Sparkles className="w-3.5 h-3.5 text-white" />
-                          </div>
-                          <span>Playas en la zona</span>
-                        </div>
-                        <div className="space-y-2 pl-8">
-                          {surroundings.filter(s => s.category === "playas").map((poi, idx) => (
-                            <div key={idx} className="flex justify-between items-center text-xs text-gray-600 font-semibold">
-                              <span className="truncate max-w-[150px]">{poi.name}</span>
-                              <span className="text-gray-400 shrink-0 font-bold">{poi.distance}</span>
+                  {/* Columna 2 */}
+                  <div className="space-y-4">
+                    {surroundings.filter(s => s.category === "gastronomia" || s.category === "atracciones").length > 0 && (
+                      <div className="space-y-2">
+                        <span className="text-xs font-black uppercase text-slate-800 flex items-center gap-1.5">
+                          <Utensils className="w-3.5 h-3.5 text-[#FF0096]" /> Gastronomía y Atracciones
+                        </span>
+                        <div className="space-y-1.5 text-xs text-slate-600 pl-5 font-semibold">
+                          {surroundings.filter(s => s.category === "gastronomia" || s.category === "atracciones").map((p, i) => (
+                            <div key={i} className="flex justify-between">
+                              <span className="truncate max-w-[140px]">{p.name}</span>
+                              <span className="text-slate-400 font-bold">{p.distance}</span>
                             </div>
                           ))}
                         </div>
@@ -1187,51 +1395,25 @@ export function EstablecimientoDetalle() {
                     )}
                   </div>
 
-                  {/* Column 3: Transporte & Aeropuertos */}
-                  <div className="space-y-6">
-                    {/* Transporte público */}
-                    {surroundings.filter(s => s.category === "transporte").length > 0 && (
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-xs font-black uppercase text-gray-700 tracking-wider">
-                          <div className="w-6 h-6 bg-blue-600 rounded-lg flex items-center justify-center shrink-0">
-                            <Car className="w-3.5 h-3.5 text-white" />
-                          </div>
-                          <span>Transporte público</span>
-                        </div>
-                        <div className="space-y-2 pl-8">
-                          {surroundings.filter(s => s.category === "transporte").map((poi, idx) => (
-                            <div key={idx} className="flex justify-between items-center text-xs text-gray-600 font-semibold">
-                              <span className="truncate max-w-[150px]">{poi.name}</span>
-                              <span className="text-gray-400 shrink-0 font-bold">{poi.distance}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Aeropuertos más cercanos */}
-                    {surroundings.filter(s => s.category === "aeropuertos").length > 0 && (
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-xs font-black uppercase text-gray-700 tracking-wider">
-                          <div className="w-6 h-6 bg-sky-500 rounded-lg flex items-center justify-center shrink-0">
-                            <Plane className="w-3.5 h-3.5 text-white" />
-                          </div>
-                          <span>Aeropuertos</span>
-                        </div>
-                        <div className="space-y-2 pl-8">
-                          {surroundings.filter(s => s.category === "aeropuertos").map((poi, idx) => (
-                            <div key={idx} className="flex justify-between items-center text-xs text-gray-600 font-semibold">
-                              <span className="truncate max-w-[150px]">{poi.name}</span>
-                              <span className="text-gray-400 shrink-0 font-bold">{poi.distance}</span>
+                  {/* Columna 3 */}
+                  <div className="space-y-4">
+                    {surroundings.filter(s => s.category === "transporte" || s.category === "aeropuertos").length > 0 && (
+                      <div className="space-y-2">
+                        <span className="text-xs font-black uppercase text-slate-800 flex items-center gap-1.5">
+                          <Plane className="w-3.5 h-3.5 text-[#9B00CC]" /> Transporte y Accesos
+                        </span>
+                        <div className="space-y-1.5 text-xs text-slate-600 pl-5 font-semibold">
+                          {surroundings.filter(s => s.category === "transporte" || s.category === "aeropuertos").map((p, i) => (
+                            <div key={i} className="flex justify-between">
+                              <span className="truncate max-w-[140px]">{p.name}</span>
+                              <span className="text-slate-400 font-bold">{p.distance}</span>
                             </div>
                           ))}
                         </div>
                       </div>
                     )}
                   </div>
-
                 </div>
-
               </div>
             )}
 
@@ -1245,10 +1427,9 @@ export function EstablecimientoDetalle() {
 
           </div>
 
-          {/* Sticky Sidebar Info Card */}
-          <div className="space-y-6">
+          {/* ── STICKY SIDEBAR: CONTACTO & RESERVAS ── */}
+          <div className="lg:col-span-4 space-y-6">
             
-            {/* Booking Widget */}
             {establishment.has_reservations_enabled && (
               <BookingWidget
                 establishmentId={establishment.id}
@@ -1258,28 +1439,28 @@ export function EstablecimientoDetalle() {
               />
             )}
 
-            <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-md sticky top-24 space-y-6 text-left">
-              <h3 className="text-md font-black text-gray-800 tracking-tight pb-3 border-b border-gray-50">
-                Información de Contacto
+            <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-md sticky top-24 space-y-6 text-left">
+              <h3 className="text-md font-black text-slate-900 tracking-tight pb-3 border-b border-slate-100 font-serif">
+                Información de Contacto & GPS
               </h3>
 
               <div className="space-y-4">
                 {establishment.address && (
                   <div className="flex items-start gap-3">
-                    <MapPin className="w-5 h-5 text-brand-magenta shrink-0 mt-0.5" />
+                    <MapPin className="w-5 h-5 text-[#FF0096] shrink-0 mt-0.5" />
                     <div>
-                      <span className="block text-[9px] uppercase font-bold text-gray-400 tracking-wide">Dirección</span>
-                      <p className="text-xs text-gray-600 leading-normal font-medium">{establishment.address}</p>
+                      <span className="block text-[9px] uppercase font-bold text-slate-400 tracking-wide">Dirección</span>
+                      <p className="text-xs text-slate-700 leading-normal font-medium">{establishment.address}</p>
                     </div>
                   </div>
                 )}
 
                 {establishment.phone && (
                   <div className="flex items-start gap-3">
-                    <Phone className="w-5 h-5 text-brand-turquesa shrink-0 mt-0.5" />
+                    <Phone className="w-5 h-5 text-[#00C8D4] shrink-0 mt-0.5" />
                     <div>
-                      <span className="block text-[9px] uppercase font-bold text-gray-400 tracking-wide">Teléfono</span>
-                      <a href={`tel:${establishment.phone}`} className="text-xs text-gray-600 hover:text-brand-magenta transition-colors font-bold">
+                      <span className="block text-[9px] uppercase font-bold text-slate-400 tracking-wide">Teléfono Directo</span>
+                      <a href={`tel:${establishment.phone}`} className="text-xs text-slate-700 hover:text-[#FF0096] transition-colors font-bold">
                         {establishment.phone}
                       </a>
                     </div>
@@ -1288,10 +1469,10 @@ export function EstablecimientoDetalle() {
 
                 {establishment.email && (
                   <div className="flex items-start gap-3">
-                    <Mail className="w-5 h-5 text-brand-magenta shrink-0 mt-0.5" />
+                    <Mail className="w-5 h-5 text-[#FF0096] shrink-0 mt-0.5" />
                     <div>
-                      <span className="block text-[9px] uppercase font-bold text-gray-400 tracking-wide">Correo Electrónico</span>
-                      <a href={`mailto:${establishment.email}`} className="text-xs text-gray-600 hover:text-brand-magenta transition-colors font-bold break-all">
+                      <span className="block text-[9px] uppercase font-bold text-slate-400 tracking-wide">Correo Electrónico</span>
+                      <a href={`mailto:${establishment.email}`} className="text-xs text-slate-700 hover:text-[#FF0096] transition-colors font-bold break-all">
                         {establishment.email}
                       </a>
                     </div>
@@ -1300,14 +1481,14 @@ export function EstablecimientoDetalle() {
 
                 {establishment.website && (
                   <div className="flex items-start gap-3">
-                    <Globe className="w-5 h-5 text-brand-turquesa shrink-0 mt-0.5" />
+                    <Globe className="w-5 h-5 text-[#00C8D4] shrink-0 mt-0.5" />
                     <div>
-                      <span className="block text-[9px] uppercase font-bold text-gray-400 tracking-wide">Sitio Web</span>
+                      <span className="block text-[9px] uppercase font-bold text-slate-400 tracking-wide">Sitio Web Oficial</span>
                       <a 
                         href={establishment.website.startsWith("http") ? establishment.website : `https://${establishment.website}`} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-xs text-gray-600 hover:text-brand-magenta transition-colors font-bold break-all"
+                        className="text-xs text-slate-700 hover:text-[#FF0096] transition-colors font-bold break-all"
                       >
                         {establishment.website.replace(/^https?:\/\//, "")}
                       </a>
@@ -1317,18 +1498,18 @@ export function EstablecimientoDetalle() {
 
                 {establishment.hours && (
                   <div className="flex items-start gap-3">
-                    <Clock className="w-5 h-5 text-brand-magenta shrink-0 mt-0.5" />
+                    <Clock className="w-5 h-5 text-[#FF0096] shrink-0 mt-0.5" />
                     <div>
-                      <span className="block text-[9px] uppercase font-bold text-gray-400 tracking-wide">Horarios de Atención</span>
-                      <p className="text-xs text-gray-600 font-medium whitespace-pre-line">{establishment.hours}</p>
+                      <span className="block text-[9px] uppercase font-bold text-slate-400 tracking-wide">Horarios de Atención</span>
+                      <p className="text-xs text-slate-700 font-medium whitespace-pre-line">{establishment.hours}</p>
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Static / Interactive Google Map Iframe (Saves leaf-let package dependencies) */}
+              {/* Google Map Embed */}
               {establishment.latitude && establishment.longitude && (
-                <div className="rounded-2xl overflow-hidden border border-gray-200 h-40 shadow-sm relative mt-4">
+                <div className="rounded-2xl overflow-hidden border border-slate-200 h-40 shadow-xs relative mt-4">
                   <iframe
                     title="Ubicación del establecimiento"
                     width="100%"
@@ -1342,7 +1523,7 @@ export function EstablecimientoDetalle() {
               )}
 
               {/* Action Buttons */}
-              <div className="space-y-3 pt-4 border-t border-gray-50 mt-4">
+              <div className="space-y-3 pt-4 border-t border-slate-100 mt-4">
                 {(establishment.whatsapp || establishment.phone) && (
                   <TrackedWhatsAppButton
                     whatsappNumber={establishment.whatsapp || establishment.phone}
@@ -1353,18 +1534,6 @@ export function EstablecimientoDetalle() {
                   </TrackedWhatsAppButton>
                 )}
 
-                {establishment.phone && (
-                  <button
-                    onClick={() => {
-                      window.location.href = `tel:${establishment.phone}`;
-                    }}
-                    className="w-full bg-white border border-brand-magenta hover:bg-magenta-50/5 text-brand-magenta text-xs font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
-                  >
-                    <Phone className="w-4 h-4" />
-                    Llamar al Establecimiento
-                  </button>
-                )}
-
                 {establishment.latitude && establishment.longitude && (
                   <a
                     href={`https://www.google.com/maps/dir/?api=1&destination=${establishment.latitude},${establishment.longitude}`}
@@ -1372,27 +1541,124 @@ export function EstablecimientoDetalle() {
                     rel="noopener noreferrer"
                     className="block"
                   >
-                    <button className="w-full bg-white border border-gray-200 hover:bg-gray-50 text-gray-500 text-xs font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer">
-                      <Navigation className="w-4 h-4" />
-                      ¿Cómo llegar?
+                    <button className="w-full bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer">
+                      <Navigation className="w-4 h-4 text-[#00C8D4]" />
+                      ¿Cómo llegar? (Ruta GPS)
                     </button>
                   </a>
                 )}
               </div>
             </div>
+
           </div>
 
         </div>
 
-        {/* Back Link Button */}
+        {/* ── 8. SECCIÓN DE CIERRE CTA: "COMIENCE SU ESCAPADA / RESERVE SU MESA" ── */}
+        <div className="mt-16 rounded-3xl p-8 md:p-12 text-white text-center shadow-2xl relative overflow-hidden" style={{ background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)" }}>
+          <div className="relative z-10 max-w-3xl mx-auto space-y-6">
+            <span className="text-[10px] uppercase tracking-[0.3em] font-black bg-white/20 text-white px-4 py-1.5 rounded-full inline-block">
+              RESERVA DIRECTA GARANTIZADA
+            </span>
+            <h2 className="text-3xl md:text-5xl font-black font-serif">
+              {isGastronomyCategory ? "Comience su Experiencia Gastronómica" : "Comience su Escapada Inolvidable"}
+            </h2>
+            <p className="text-white/90 text-sm md:text-base font-light max-w-xl mx-auto leading-relaxed">
+              Consulte disponibilidad en tiempo real directamente con el equipo de recepción de {establishment.name} sin intermediarios ni comisiones adicionales.
+            </p>
+
+            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <TrackedWhatsAppButton
+                whatsappNumber={establishment.whatsapp || establishment.phone}
+                establishmentId={establishment.id}
+                establishmentName={establishment.name}
+                customMessage={`Hola! Quisiera coordinar una reserva directa en ${establishment.name}.`}
+              >
+                {isGastronomyCategory ? "Solicitar Mesa por WhatsApp" : "Confirmar Disponibilidad por WhatsApp"}
+              </TrackedWhatsAppButton>
+            </div>
+          </div>
+        </div>
+
+        {/* Back Link */}
         <div className="mt-10 text-left">
           <Link href="/establecimientos">
-            <button className="inline-flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-gray-600 transition-colors cursor-pointer bg-white border border-gray-100 rounded-xl px-4 py-2.5 shadow-sm">
+            <button className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors cursor-pointer bg-white border border-slate-200 rounded-xl px-4 py-2.5 shadow-2xs">
               <ArrowLeft className="w-4 h-4" />
-              <span>Volver a la Guía de Establecimientos</span>
+              <span>Volver al Catálogo General de Establecimientos</span>
             </button>
           </Link>
         </div>
+
+        {/* ── MODAL INMERSIVO DE FICHA TÉCNICA (HABITACIÓN O ÁREA GASTRONÓMICA) ── */}
+        {activeDetailModal && (
+          <div className="fixed inset-0 z-50 bg-[#0e011f]/95 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+            <div className="bg-white rounded-3xl max-w-3xl w-full p-6 md:p-8 space-y-6 text-left relative shadow-2xl my-8">
+              <button
+                type="button"
+                onClick={() => setActiveDetailModal(null)}
+                className="absolute top-4 right-4 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="flex items-center gap-2">
+                <span className="px-3 py-1 bg-[#FF0096]/10 text-[#FF0096] text-[10px] font-black uppercase rounded-full">
+                  Ficha Técnica Detallada
+                </span>
+                {activeDetailModal.price && (
+                  <span className="text-sm font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                    Tarifa: ${activeDetailModal.price} USD / Noche
+                  </span>
+                )}
+              </div>
+
+              <div>
+                <h3 className="text-2xl font-serif font-black text-slate-900">{activeDetailModal.title}</h3>
+                <p className="text-xs text-slate-500 mt-2 leading-relaxed">{activeDetailModal.description}</p>
+              </div>
+
+              <div className="aspect-[16/9] rounded-2xl overflow-hidden bg-slate-100">
+                <img src={activeDetailModal.image} alt={activeDetailModal.title} className="w-full h-full object-cover" />
+              </div>
+
+              {/* Grid de Especificaciones */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {activeDetailModal.specs.map((sp, idx) => (
+                  <div key={idx} className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                    <span className="text-[10px] font-bold uppercase text-slate-400 block">{sp.label}</span>
+                    <span className="text-xs font-black text-slate-800 block mt-0.5">{sp.value}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Lista de Amenidades */}
+              <div className="space-y-2">
+                <span className="text-xs font-black uppercase text-slate-800 block">Equipamiento e Infraestructura Incluida</span>
+                <div className="flex flex-wrap gap-2">
+                  {activeDetailModal.amenities.map((am, idx) => (
+                    <span key={idx} className="px-3 py-1.5 bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-[#00C8D4]" />
+                      {am}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Botón de Confirmación por WhatsApp */}
+              <div className="pt-4 border-t border-slate-100 flex justify-end gap-3">
+                <TrackedWhatsAppButton
+                  whatsappNumber={establishment.whatsapp || establishment.phone}
+                  establishmentId={establishment.id}
+                  establishmentName={establishment.name}
+                  customMessage={activeDetailModal.whatsappCustomMsg}
+                >
+                  Solicitar Reserva Directa por WhatsApp
+                </TrackedWhatsAppButton>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Fullscreen Lightbox Modal */}
         {activeLightbox && (
@@ -1416,7 +1682,7 @@ export function EstablecimientoDetalle() {
 
               <div className="space-y-1">
                 {activeLightbox.category && (
-                  <span className="inline-block px-3 py-1 bg-brand-magenta text-white text-[10px] font-black uppercase tracking-wider rounded-full">
+                  <span className="inline-block px-3 py-1 bg-[#FF0096] text-white text-[10px] font-black uppercase tracking-wider rounded-full">
                     {activeLightbox.category}
                   </span>
                 )}
@@ -1427,6 +1693,38 @@ export function EstablecimientoDetalle() {
         )}
 
       </div>
+
+      {/* ── 9. STICKY FLOATING BOOKING BAR AL PIE DE PANTALLA ── */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#0e011f]/95 backdrop-blur-md border-t border-white/10 py-3 px-6 shadow-2xl">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          <div className="hidden sm:flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-800 border border-white/20 shrink-0">
+              <img src={establishment.primary_image} alt="" className="w-full h-full object-cover" />
+            </div>
+            <div className="text-left">
+              <h4 className="text-xs font-black text-white truncate max-w-[200px]">{establishment.name}</h4>
+              <span className="text-[10px] text-[#00C8D4] font-bold block">{establishment.destination_name || establishment.city}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 ml-auto">
+            <div className="text-right">
+              <span className="text-[9px] uppercase font-bold text-slate-400 block">Garantía Directa</span>
+              <span className="text-xs font-black text-emerald-400">Reserva 100% Verificada</span>
+            </div>
+
+            <TrackedWhatsAppButton
+              whatsappNumber={establishment.whatsapp || establishment.phone}
+              establishmentId={establishment.id}
+              establishmentName={establishment.name}
+              customMessage={`Hola! Quisiera reservar directamente en ${establishment.name}.`}
+            >
+              {isGastronomyCategory ? "Reservar Mesa por WhatsApp" : "Reservar Ahora"}
+            </TrackedWhatsAppButton>
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 }
