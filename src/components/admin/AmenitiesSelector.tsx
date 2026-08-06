@@ -14,7 +14,8 @@ import {
   ShieldCheck, Clock, Dog, Accessibility, ArrowUpSquare, Waves, Bath, Palmtree,
   Dumbbell, Flame, TreePine, Smile, Trophy, Utensils, Coffee, Wine,
   ConciergeBell, Plane, Compass, Sun, Briefcase, Shirt, Eye, Tv, ChefHat,
-  Lock, AlertTriangle, Building, Home, Bed, UserCheck, GraduationCap, Box, Tent, Ship, Heart, Mountain, FileText, Globe
+  Lock, AlertTriangle, Building, Home, Bed, UserCheck, GraduationCap, Box, Tent, Ship, Heart, Mountain, FileText, Globe,
+  VolumeX, EyeOff, Footprints, IceCream, Ban, Building2, Users
 } from "lucide-react";
 
 interface AmenitiesSelectorProps {
@@ -27,7 +28,7 @@ const ICON_MAP: Record<string, any> = {
   Waves, Bath, Palmtree, Sparkles, Dumbbell, Flame, TreePine, Smile, Trophy, Utensils,
   Coffee, Wine, ConciergeBell, Plane, Compass, Sun, Briefcase, Shirt,
   Eye, Tv, ChefHat, Lock, AlertTriangle, Building, Home, Bed, UserCheck, GraduationCap,
-  Box, Tent, Ship, Heart, Mountain, FileText, Globe
+  Box, Tent, Ship, Heart, Mountain, FileText, Globe, VolumeX, EyeOff, Footprints, IceCream, Ban, Building2, Users
 };
 
 export function AmenitiesSelector({ selectedServices, onChange }: AmenitiesSelectorProps) {
