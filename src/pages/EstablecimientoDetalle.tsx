@@ -1563,7 +1563,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
             <span className="text-[10px] uppercase tracking-[0.3em] font-black bg-white/20 text-white px-4 py-1.5 rounded-full inline-block">
               RESERVA DIRECTA GARANTIZADA
             </span>
-            <h2 className="text-3xl md:text-5xl font-black font-serif">
+            <h2 className="text-3xl md:text-5xl font-black font-serif text-white drop-shadow-sm">
               {isGastronomyCategory ? "Comience su Experiencia Gastronómica" : "Comience su Escapada Inolvidable"}
             </h2>
             <p className="text-white/90 text-sm md:text-base font-light max-w-xl mx-auto leading-relaxed">
