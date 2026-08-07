@@ -6,6 +6,7 @@ import perlaNegraConfig from "./instances/perla-negra/config.json";
 import myCampersConfig from "./instances/my-campers/config.json";
 import oleajeBeachClubConfig from "./instances/oleaje-beach-club/config.json";
 import complejoLosRoquesConfig from "./instances/complejo-los-roques/config.json";
+import hostalEntre2AguasConfig from "./instances/hostal-entre-2-aguas/config.json";
 
 export interface TenantConfig {
   establishment_id: number;
@@ -50,6 +51,8 @@ export const TENANTS_REGISTRY: Record<string, TenantConfig> = {
   "oleaje-beach-club": oleajeBeachClubConfig as TenantConfig,
   "oleaje-tucacas": { ...(oleajeBeachClubConfig as TenantConfig), slug: "oleaje-tucacas", establishment_id: 65 },
   "complejo-los-roques": complejoLosRoquesConfig as TenantConfig,
+  "hostal-entre-2-aguas": hostalEntre2AguasConfig as TenantConfig,
+  "hostal-entre-dos-aguas": { ...(hostalEntre2AguasConfig as TenantConfig), slug: "hostal-entre-dos-aguas" },
 };
 
 interface TenantContextType {

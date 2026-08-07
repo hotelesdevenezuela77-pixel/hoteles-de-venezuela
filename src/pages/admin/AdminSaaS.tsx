@@ -43,18 +43,26 @@ export function AdminSaaS() {
       
       let finalTenantsList: TenantConfig[] = [];
       
-      // 2. Si no hay tabla o da error, usar localStorage como simulación SaaS
+      // 2. Si no hay tabla o da error, usar localStorage fusionado con TENANTS_REGISTRY
       const localKey = "hdv_tenants_configurations";
       const localData = localStorage.getItem(localKey);
       
+      let storedList: TenantConfig[] = [];
+      if (localData) {
+        try {
+          storedList = JSON.parse(localData);
+        } catch {}
+      }
+
       if (error || !data || data.length === 0) {
-        if (localData) {
-          finalTenantsList = JSON.parse(localData);
-        } else {
-          // Inicializar con el registro estático de config.json
-          finalTenantsList = Object.values(TENANTS_REGISTRY);
-          localStorage.setItem(localKey, JSON.stringify(finalTenantsList));
-        }
+        const staticList = Object.values(TENANTS_REGISTRY);
+        const mergedMap = new Map<number, TenantConfig>();
+
+        staticList.forEach(t => mergedMap.set(t.establishment_id, t));
+        storedList.forEach(t => mergedMap.set(t.establishment_id, t));
+
+        finalTenantsList = Array.from(mergedMap.values());
+        localStorage.setItem(localKey, JSON.stringify(finalTenantsList));
       } else {
         // Mapear datos de la DB
         finalTenantsList = data.map((t: any) => ({

@@ -251,18 +251,15 @@ export function OwnerDashboard() {
     }
 
     // 3. Try fetching from static registry (config.json files)
-    if (TENANTS_REGISTRY[est.slug]) {
-      setCurrentTenantConfig({ ...TENANTS_REGISTRY[est.slug], slug: est.slug, establishment_id: est.id });
+    const staticMatch = Object.values(TENANTS_REGISTRY).find(
+      t => t.establishment_id === est.id || t.slug === est.slug || (t.slug && est.slug && (t.slug.includes(est.slug) || est.slug.includes(t.slug)))
+    );
+    if (staticMatch) {
+      setCurrentTenantConfig({ ...staticMatch, establishment_id: est.id });
       return;
     }
 
-    if (est.slug.includes("oleaje") && (TENANTS_REGISTRY["oleaje-beach-club"] || TENANTS_REGISTRY["oleaje-tucacas"])) {
-      const baseOleaje = TENANTS_REGISTRY["oleaje-beach-club"] || TENANTS_REGISTRY["oleaje-tucacas"];
-      setCurrentTenantConfig({ ...baseOleaje, slug: est.slug, establishment_id: est.id });
-      return;
-    }
-
-    // 4. Default dynamic TenantConfig fallback
+    // 4. Default dynamic TenantConfig fallback for NON-SaaS establishments (No SaaS modules enabled)
     const defaultConfig: TenantConfig = {
       establishment_id: est.id,
       slug: est.slug || `hotel-${est.id}`,
@@ -280,13 +277,13 @@ export function OwnerDashboard() {
       },
       modules: {
         reservas: true,
-        pos: true,
+        pos: false,
         galeria: true,
         contacto: true,
-        tareas: true,
-        finanzas: true,
-        cms: true,
-        analiticas: true
+        tareas: false,
+        finanzas: false,
+        cms: false,
+        analiticas: false
       },
       contact: {
         phone: est.phone || "+58 412 000 0000",
