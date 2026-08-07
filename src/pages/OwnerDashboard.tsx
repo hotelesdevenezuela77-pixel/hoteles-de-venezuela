@@ -2267,6 +2267,42 @@ export function OwnerDashboard() {
           />
         )}
 
+        {/* CLUB POS TAB */}
+        {activeTab === "pos" && (
+          <POSModule customConfig={currentTenantConfig || undefined} />
+        )}
+
+        {/* GESTIÓN DE TAREAS TAB */}
+        {activeTab === "tareas" && (
+          <TaskModule
+            establishmentId={selectedCalendarEst ? Number(selectedCalendarEst) : (establishments[0]?.id || 0)}
+            primaryColor="#FF0096"
+            secondaryColor="#9B00CC"
+            accentColor="#00C8D4"
+          />
+        )}
+
+        {/* ANALÍTICAS SAAS TAB */}
+        {activeTab === "analiticas_saas" && (
+          <AnalyticsModule
+            establishmentId={selectedCalendarEst ? Number(selectedCalendarEst) : (establishments[0]?.id || 0)}
+            primaryColor="#FF0096"
+            secondaryColor="#9B00CC"
+            accentColor="#00C8D4"
+          />
+        )}
+
+        {/* APLICACIÓN WEB & CMS TAB */}
+        {activeTab === "webapp_cms" && currentTenantConfig && (
+          <CMSModule
+            config={currentTenantConfig}
+            onConfigChange={(updated) => setCurrentTenantConfig(updated)}
+            primaryColor="#FF0096"
+            secondaryColor="#9B00CC"
+            accentColor="#00C8D4"
+          />
+        )}
+
         {/* MI PORTAFOLIO TAB */}
         {activeTab === "portafolio" && (
           <div className="space-y-6">

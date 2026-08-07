@@ -29,8 +29,25 @@ const POS_MENU_ITEMS: POSItem[] = [
   { id: "p6", name: "Masaje Relajante Piedras Volcánicas", category: "spa", price: 80, description: "Sesión de 60 minutos con aceites esenciales orgánicos." }
 ];
 
-export function POSModule() {
-  const { config } = useTenant();
+export function POSModule({ customConfig }: { customConfig?: any }) {
+  let tenantConfig: any = null;
+  try {
+    const ctx = useTenant();
+    tenantConfig = ctx?.config || null;
+  } catch (e) {
+    // Si se llama fuera de TenantProvider (ej: OwnerDashboard)
+  }
+
+  const config = customConfig || tenantConfig || {
+    establishment_id: 81,
+    slug: "hostal-entre-2-aguas",
+    name: "Hostal Entre 2 Aguas",
+    template: "boutique",
+    domain: "hostalentre2aguas.com",
+    branding: { primary_color: "#FF0096", secondary_color: "#9B00CC", accent_color: "#00C8D4", font_title: "Playfair Display", font_body: "Montserrat" },
+    modules: { reservas: true, pos: true, tareas: true, cms: true, analiticas: true },
+    contact: { phone: "", email: "", whatsapp: "", instagram: "" }
+  };
   const [cart, setCart] = useState<CartItem[]>([]);
   const [roomNumber, setRoomNumber] = useState("");
   const [guestName, setGuestName] = useState("");
