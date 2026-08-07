@@ -1913,65 +1913,80 @@ export function OwnerDashboard() {
         </div>
       </div>
 
-      {/* Tabs Sub-Navigation Bar */}
-      <div className="border-b border-gray-200 bg-white sticky top-[60px] z-40 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center gap-4">
-          <nav className="flex gap-6 -mb-px overflow-x-auto scrollbar-hide py-1">
+      {/* Responsive Module Navigation Cluster (Sin barra de desplazamiento horizontal) */}
+      <div className="bg-white border-b border-gray-200 sticky top-[60px] z-40 shadow-xs py-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-2">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#FF0096] animate-pulse" />
+              <span className="text-[11px] font-black uppercase text-slate-800 tracking-wider">
+                Módulos de Gestión & Panel Operativo
+              </span>
+            </div>
+            {establishments.length > 0 && (
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-[10px] font-black uppercase text-gray-400">Establecimiento:</span>
+                <select
+                  value={selectedCalendarEst}
+                  onChange={(e) => setSelectedCalendarEst(Number(e.target.value))}
+                  className="px-2.5 py-1 bg-slate-50 border border-gray-200 rounded-lg text-xs font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-magenta/20 focus:border-brand-magenta cursor-pointer"
+                >
+                  {establishments.map(est => (
+                    <option key={est.id} value={est.id}>{est.name}</option>
+                  ))}
+                </select>
+                <button
+                  onClick={() => setShowSurroundingsModal(true)}
+                  className="px-2.5 py-1 bg-brand-turquesa/10 hover:bg-brand-turquesa/20 text-brand-turquesa border border-brand-turquesa/20 rounded-lg text-[10px] font-black uppercase tracking-wider cursor-pointer transition-all flex items-center gap-1"
+                >
+                  <MapPin className="w-3.5 h-3.5" />
+                  <span>Alrededores</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
             {[
               { id: "resumen", label: "Dashboard Ejecutivo", icon: BarChart3, enabled: true },
-              { id: "webapp_cms", label: "🌐 Aplicación Web & CMS", icon: Globe, enabled: currentTenantConfig?.modules?.cms !== false, badge: "Web Builder" },
-              { id: "tareas", label: "📋 Gestión de Tareas", icon: Clipboard, enabled: !!currentTenantConfig?.modules?.tareas, badge: "SaaS" },
-              { id: "pos", label: "💳 Club POS", icon: Coffee, enabled: !!currentTenantConfig?.modules?.pos, badge: "SaaS" },
-              { id: "finanzas", label: "💰 Finanzas & Membresías", icon: DollarSign, enabled: true },
-              { id: "analiticas_saas", label: "📊 Analíticas SaaS", icon: TrendingUp, enabled: !!currentTenantConfig?.modules?.analiticas, badge: "SaaS" },
+              { id: "webapp_cms", label: "Aplicación Web & CMS", icon: Globe, enabled: currentTenantConfig?.modules?.cms !== false, badge: "Web Builder" },
+              { id: "tareas", label: "Gestión de Tareas", icon: Clipboard, enabled: !!currentTenantConfig?.modules?.tareas, badge: "SaaS" },
+              { id: "pos", label: "Club POS", icon: Coffee, enabled: !!currentTenantConfig?.modules?.pos, badge: "SaaS" },
+              { id: "finanzas", label: "Finanzas & Membresías", icon: DollarSign, enabled: true },
+              { id: "analiticas_saas", label: "Analíticas SaaS", icon: TrendingUp, enabled: !!currentTenantConfig?.modules?.analiticas, badge: "SaaS" },
               { id: "portafolio", label: `Mi Portafolio (${establishments.length})`, icon: Building2, enabled: true },
               { id: "operaciones", label: "Operaciones Diarias", icon: CalendarRange, enabled: true },
-              { id: "inventario", label: "Inventario de Habitaciones", icon: ListFilter, enabled: true },
+              { id: "inventario", label: "Inventario Habitaciones", icon: ListFilter, enabled: true },
               { id: "marketing", label: "Marketing & Canales", icon: Tag, enabled: true },
-              { id: "guiones", label: "Asistente de Guiones", icon: Sparkles, enabled: true }
-            ].filter(tab => tab.enabled).map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`py-4 border-b-2 flex items-center gap-2 text-xs font-bold cursor-pointer transition-all whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? "border-brand-magenta text-brand-magenta font-black scale-102"
-                    : "border-transparent text-gray-500 hover:text-gray-800"
-                }`}
-              >
-                <tab.icon className="w-4 h-4" />
-                <span>{tab.label}</span>
-                {tab.badge && (
-                  <span className="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider bg-cyan-100 text-cyan-800 border border-cyan-300">
-                    {tab.badge}
-                  </span>
-                )}
-              </button>
-            ))}
-          </nav>
-
-          {/* Active Establishment Selector Dropdown */}
-          {establishments.length > 0 && (
-            <div className="hidden lg:flex items-center gap-3 shrink-0 py-2">
-              <span className="text-[10px] font-black uppercase text-gray-400">Hotel Activo:</span>
-              <select
-                value={selectedCalendarEst}
-                onChange={(e) => setSelectedCalendarEst(Number(e.target.value))}
-                className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-magenta/20 focus:border-brand-magenta cursor-pointer"
-              >
-                {establishments.map(est => (
-                  <option key={est.id} value={est.id}>{est.name}</option>
-                ))}
-              </select>
-              <button
-                onClick={() => setShowSurroundingsModal(true)}
-                className="px-3 py-1.5 bg-brand-turquesa/10 hover:bg-brand-turquesa/20 text-brand-turquesa border border-brand-turquesa/20 rounded-xl text-[10px] font-black uppercase tracking-wider cursor-pointer transition-all flex items-center gap-1"
-              >
-                <MapPin className="w-3.5 h-3.5" />
-                <span>Alrededores</span>
-              </button>
-            </div>
-          )}
+              { id: "guiones", label: "Asistente Guiones", icon: Sparkles, enabled: true }
+            ].filter(tab => tab.enabled).map(tab => {
+              const active = activeTab === tab.id;
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer text-left border ${
+                    active
+                      ? "bg-[#0e011f] text-white border-[#FF0096] shadow-md scale-[1.02]"
+                      : "bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200/80 hover:border-slate-300"
+                  }`}
+                >
+                  <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${
+                    active ? "bg-[#FF0096] text-white" : "bg-white text-slate-600 border border-slate-200"
+                  }`}>
+                    <Icon className="w-3.5 h-3.5" />
+                  </div>
+                  <span className="truncate leading-tight font-sans text-[11px]">{tab.label}</span>
+                  {tab.badge && (
+                    <span className="ml-auto px-1.5 py-0.5 rounded text-[7px] font-black uppercase tracking-wider bg-cyan-100 text-cyan-800 shrink-0">
+                      {tab.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
