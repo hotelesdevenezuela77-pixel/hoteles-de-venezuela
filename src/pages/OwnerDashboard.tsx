@@ -530,17 +530,10 @@ export function OwnerDashboard() {
 
   // OTA Channel Manager sync state
   const [otaSyncing, setOtaSyncing] = useState(false);
-  const [otaLogs, setOtaLogs] = useState([
-    { id: 1, channel: "Booking.com", status: "success", timestamp: "Hace 10 minutos" },
-    { id: 2, channel: "Airbnb", status: "success", timestamp: "Hace 15 minutos" },
-    { id: 3, channel: "Expedia", status: "success", timestamp: "Hace 1 hora" }
-  ]);
+  const [otaLogs, setOtaLogs] = useState<any[]>([]);
 
   // Guest reviews list state
-  const [reviews, setReviews] = useState<any[]>([
-    { id: 1, guest_name: "María Alejandra", rating: 5, comment: "Excelente ubicación y la atención fue insuperable. Volveremos sin duda.", date: "2026-07-20", reply: "¡Muchas gracias María! Será un placer recibirlos de nuevo." },
-    { id: 2, guest_name: "Carlos Mendoza", rating: 4, comment: "Muy limpio y cómodo, el wifi falló un poco en las habitaciones de arriba.", date: "2026-07-18", reply: "" }
-  ]);
+  const [reviews, setReviews] = useState<any[]>([]);
 
   // Bulk rate modifier state
   const [bulkRate, setBulkRate] = useState("");
@@ -918,23 +911,27 @@ export function OwnerDashboard() {
         .in("establishment_id", estIds)
         .order("payment_date", { ascending: false });
       
-      const mockInvoices = [
-        { id: 201, payment_date: new Date().toISOString().split("T")[0], amount: 150, currency: "USD", payment_method: "zelle", payment_reference: "ZELLE-98317", notes: "Membresía Premium - Suscripción Mensual", status: "paid" },
-        { id: 202, payment_date: "2026-06-15", amount: 150, currency: "USD", payment_method: "zelle", payment_reference: "ZELLE-88311", notes: "Membresía Premium - Mensualidad Junio", status: "paid" },
-        { id: 203, payment_date: "2026-05-15", amount: 150, currency: "USD", payment_method: "zelle", payment_reference: "ZELLE-77192", notes: "Membresía Premium - Mensualidad Mayo", status: "paid" }
-      ];
-      setInvoices(invData && invData.length > 0 ? invData : mockInvoices);
+      setInvoices(invData || []);
 
-      // 7. Calculate liquidations report
+      // 7. Calculate liquidations report based strictly on real confirmed reservations
       const confirmedRevenue = combinedRes
         .filter(r => r.status === "confirmed")
         .reduce((sum, r) => sum + r.total_price, 0);
 
-      const mockLiquidationsList = [
-        { id: 301, period: "Julio 2026", gross: confirmedRevenue || 1200, commission: (confirmedRevenue || 1200) * 0.1, net: (confirmedRevenue || 1200) * 0.9, account: "Banesco Corriente - ...8912", date: "2026-07-25", status: "liquidated" },
-        { id: 302, period: "Junio 2026", gross: 950, commission: 95, net: 855, account: "Banesco Corriente - ...8912", date: "2026-06-25", status: "liquidated" }
-      ];
-      setLiquidations(mockLiquidationsList);
+      const realLiquidations = confirmedRevenue > 0 ? [
+        {
+          id: 301,
+          period: "Periodo Actual",
+          gross: confirmedRevenue,
+          commission: confirmedRevenue * 0.1,
+          net: confirmedRevenue * 0.9,
+          account: "Cuenta Registrada",
+          date: new Date().toISOString().split("T")[0],
+          status: "liquidated"
+        }
+      ] : [];
+
+      setLiquidations(realLiquidations);
 
     } catch (err) {
       console.error("Error fetching dashboard stats/data:", err);
@@ -3157,24 +3154,32 @@ export function OwnerDashboard() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                      {invoices.map(inv => (
-                        <tr key={inv.id} className="hover:bg-gray-50/50">
-                          <td className="p-4 pl-6 font-bold text-gray-700">#MEMB-{inv.id}</td>
-                          <td className="p-4 font-semibold text-gray-500">{inv.notes || "Mensualidad de Afiliación Directa"}</td>
-                          <td className="p-4 font-black text-slate-800">${inv.amount} USD</td>
-                          <td className="p-4 font-semibold text-gray-500">{new Date(inv.payment_date).toLocaleDateString("es-VE")}</td>
-                          <td className="p-4 font-mono text-gray-400 uppercase">{inv.payment_reference}</td>
-                          <td className="p-4 pr-6 text-right">
-                            <button
-                              onClick={() => handleDownloadInvoicePDF(inv)}
-                              className="px-3.5 py-1.5 bg-gray-100 hover:bg-brand-turquesa hover:text-white text-gray-600 border border-gray-200 rounded-xl text-[10px] font-black uppercase tracking-wider cursor-pointer transition-all inline-flex items-center gap-1"
-                            >
-                              <FileText className="w-3.5 h-3.5" />
-                              <span>Descargar PDF</span>
-                            </button>
+                      {invoices.length > 0 ? (
+                        invoices.map(inv => (
+                          <tr key={inv.id} className="hover:bg-gray-50/50">
+                            <td className="p-4 pl-6 font-bold text-gray-700">#MEMB-{inv.id}</td>
+                            <td className="p-4 font-semibold text-gray-500">{inv.notes || "Mensualidad de Afiliación Directa"}</td>
+                            <td className="p-4 font-black text-slate-800">${inv.amount} USD</td>
+                            <td className="p-4 font-semibold text-gray-500">{new Date(inv.payment_date).toLocaleDateString("es-VE")}</td>
+                            <td className="p-4 font-mono text-gray-400 uppercase">{inv.payment_reference}</td>
+                            <td className="p-4 pr-6 text-right">
+                              <button
+                                onClick={() => handleDownloadInvoicePDF(inv)}
+                                className="px-3.5 py-1.5 bg-gray-100 hover:bg-brand-turquesa hover:text-white text-gray-600 border border-gray-200 rounded-xl text-[10px] font-black uppercase tracking-wider cursor-pointer transition-all inline-flex items-center gap-1"
+                              >
+                                <FileText className="w-3.5 h-3.5" />
+                                <span>Descargar PDF</span>
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={6} className="p-8 text-center text-slate-400 text-xs font-bold">
+                            No hay facturas o recibos de membresía registrados aún.
                           </td>
                         </tr>
-                      ))}
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -3199,21 +3204,29 @@ export function OwnerDashboard() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                      {liquidations.map(liq => (
-                        <tr key={liq.id} className="hover:bg-gray-50/50">
-                          <td className="p-4 pl-6 font-bold text-gray-700">{liq.period}</td>
-                          <td className="p-4 font-semibold text-gray-600">${liq.gross} USD</td>
-                          <td className="p-4 font-semibold text-red-500">-${liq.commission} USD</td>
-                          <td className="p-4 font-black text-emerald-600">${liq.net} USD</td>
-                          <td className="p-4 font-semibold text-gray-500">{liq.account}</td>
-                          <td className="p-4 font-semibold text-gray-500">{new Date(liq.date).toLocaleDateString("es-VE")}</td>
-                          <td className="p-4 pr-6">
-                            <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-green-50 text-green-700 border border-green-150">
-                              Transferido
-                            </span>
+                      {liquidations.length > 0 ? (
+                        liquidations.map(liq => (
+                          <tr key={liq.id} className="hover:bg-gray-50/50">
+                            <td className="p-4 pl-6 font-bold text-gray-700">{liq.period}</td>
+                            <td className="p-4 font-semibold text-gray-600">${liq.gross} USD</td>
+                            <td className="p-4 font-semibold text-red-500">-${liq.commission} USD</td>
+                            <td className="p-4 font-black text-emerald-600">${liq.net} USD</td>
+                            <td className="p-4 font-semibold text-gray-500">{liq.account}</td>
+                            <td className="p-4 font-semibold text-gray-500">{new Date(liq.date).toLocaleDateString("es-VE")}</td>
+                            <td className="p-4 pr-6">
+                              <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-green-50 text-green-700 border border-green-150">
+                                Transferido
+                              </span>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={7} className="p-8 text-center text-slate-400 text-xs font-bold">
+                            No hay reportes de liquidación acumulados. Inicia tus ventas para recibir depósitos periódicos.
                           </td>
                         </tr>
-                      ))}
+                      )}
                     </tbody>
                   </table>
                 </div>
