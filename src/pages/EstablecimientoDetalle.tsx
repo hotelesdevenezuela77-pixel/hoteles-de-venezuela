@@ -272,7 +272,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
         setLoading(true);
         setError(false);
 
-        // 1. Try Supabase DB lookup
+        // 1. Try Supabase DB lookup by exact slug or alias
         let dbData: any = null;
         try {
           const { data, error: dbErr } = await supabase
@@ -288,6 +288,49 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
 
           if (!dbErr && data) {
             dbData = data;
+          } else {
+            // Alias fallback: try replacing -dos- with -2- or -2- with -dos-
+            const altSlug = slug.includes("-dos-") 
+              ? slug.replace("-dos-", "-2-") 
+              : slug.includes("-2-") 
+              ? slug.replace("-2-", "-dos-") 
+              : slug;
+
+            if (altSlug !== slug) {
+              const { data: altData } = await supabase
+                .from("establishments")
+                .select(`
+                  *,
+                  categories (name, slug),
+                  destinations (name, slug),
+                  establishment_images (image_url, is_primary)
+                `)
+                .eq("slug", altSlug)
+                .maybeSingle();
+
+              if (altData) dbData = altData;
+            }
+
+            // Fuzzy fallback: search by slug ilike
+            if (!dbData && slug.length > 3) {
+              const prefix = slug.split("-")[0];
+              const { data: searchData } = await supabase
+                .from("establishments")
+                .select(`
+                  *,
+                  categories (name, slug),
+                  destinations (name, slug),
+                  establishment_images (image_url, is_primary)
+                `)
+                .ilike("slug", `%${prefix}%`)
+                .limit(5);
+
+              if (searchData && searchData.length > 0) {
+                dbData = searchData.find((e: any) => 
+                  e.slug.includes("entre") || e.name?.toLowerCase().includes("entre")
+                ) || searchData[0];
+              }
+            }
           }
         } catch (e) {
           console.warn("Error querying Supabase for detail:", e);

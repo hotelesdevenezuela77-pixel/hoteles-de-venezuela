@@ -52,7 +52,7 @@ export const TENANTS_REGISTRY: Record<string, TenantConfig> = {
   "oleaje-tucacas": { ...(oleajeBeachClubConfig as TenantConfig), slug: "oleaje-tucacas", establishment_id: 65 },
   "complejo-los-roques": complejoLosRoquesConfig as TenantConfig,
   "hostal-entre-2-aguas": hostalEntre2AguasConfig as TenantConfig,
-  "hostal-entre-dos-aguas": { ...(hostalEntre2AguasConfig as TenantConfig), slug: "hostal-entre-dos-aguas" },
+  "hostal-entre-dos-aguas": { ...(hostalEntre2AguasConfig as TenantConfig), slug: "hostal-entre-2-aguas" },
 };
 
 interface TenantContextType {
