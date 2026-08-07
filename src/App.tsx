@@ -39,19 +39,19 @@ class AppErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryS
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center bg-white">
-          <div className="w-16 h-16 bg-[#00C8D4]/15 border border-[#00C8D4]/30 rounded-2xl flex items-center justify-center text-[#00C8D4] mb-4 shadow-lg">
-            <svg className="w-8 h-8 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div style={{ minHeight: "80vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "2rem", textAlign: "center", fontFamily: "system-ui, -apple-system, sans-serif", backgroundColor: "#ffffff" }}>
+          <div style={{ width: "64px", height: "64px", backgroundColor: "#e6f9fa", border: "1px solid #00C8D4", borderRadius: "16px", display: "flex", alignItems: "center", justifyContent: "center", color: "#00C8D4", marginBottom: "1rem" }}>
+            <svg style={{ width: "32px", height: "32px" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
           </div>
-          <h2 className="text-xl font-black text-slate-900 mb-2 font-serif uppercase tracking-tight">Sincronizando Nueva Versión</h2>
-          <p className="text-xs text-slate-500 max-w-md mb-6 leading-relaxed">
+          <h2 style={{ fontSize: "1.25rem", fontWeight: "900", color: "#0f172a", marginBottom: "0.5rem", textTransform: "uppercase" }}>Sincronizando Nueva Versión</h2>
+          <p style={{ fontSize: "0.875rem", color: "#64748b", maxWidth: "420px", marginBottom: "1.5rem", lineHeight: "1.5" }}>
             Se ha desplegado una actualización de rendimiento en la plataforma. Haz clic abajo para refrescar tu panel de control de manera segura.
           </p>
           <button
             onClick={this.handleReload}
-            className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#00C8D4] to-[#FF0096] text-white font-black text-xs uppercase tracking-wider shadow-lg hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            style={{ padding: "12px 28px", borderRadius: "12px", background: "linear-gradient(to right, #00C8D4, #FF0096)", color: "#ffffff", fontWeight: "900", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em", border: "none", cursor: "pointer", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
           >
             Actualizar y Cargar Panel
           </button>
