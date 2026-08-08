@@ -571,18 +571,19 @@ export function AdminSaaS() {
                     </div>
 
                     {/* TABLA DE REGISTROS CON BOTÓN COPIAR VALUE */}
-                    <div className="space-y-2 font-mono text-[11px]">
+                    <div className="space-y-2.5 font-mono text-[11px]">
                       
                       {/* REGISTRO 1: CNAME */}
-                      <div className="p-2.5 bg-[#121620] border border-slate-800 rounded-xl flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-3">
+                      <div className="p-3 bg-[#121620] border border-slate-800 rounded-xl flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex flex-wrap items-center gap-3">
                           <span className="px-2 py-0.5 rounded text-[9px] font-black bg-cyan-950 text-[#00C8D4] border border-cyan-800">
-                            CNAME Record
+                            Type: CNAME Record
                           </span>
                           <span className="text-slate-400">Host: <strong className="text-white">www</strong></span>
-                          <span className="text-slate-400 truncate max-w-[140px] sm:max-w-none">
+                          <span className="text-slate-400 truncate max-w-[180px] sm:max-w-none">
                             Value: <strong className="text-cyan-300">hotelesdevenezuela.com</strong>
                           </span>
+                          <span className="text-slate-400 text-[10px]">TTL: <strong className="text-slate-200">Automatic</strong></span>
                         </div>
 
                         <button
@@ -597,16 +598,20 @@ export function AdminSaaS() {
                         </button>
                       </div>
 
-                      {/* REGISTRO 2: REDIRECCIÓN O REGISTRO A */}
-                      <div className="p-2.5 bg-[#121620] border border-slate-800 rounded-xl flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-3">
+                      {/* REGISTRO 2: REDIRECCIÓN URL REDIRECT (PERMANENT 301) */}
+                      <div className="p-3 bg-[#121620] border border-slate-800 rounded-xl flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex flex-wrap items-center gap-3">
                           <span className="px-2 py-0.5 rounded text-[9px] font-black bg-pink-950 text-[#FF0096] border border-pink-800">
-                            URL Redirect
+                            Type: URL Redirect Record
                           </span>
                           <span className="text-slate-400">Host: <strong className="text-white">@</strong></span>
-                          <span className="text-slate-400 truncate max-w-[140px] sm:max-w-none">
+                          <span className="text-slate-400 truncate max-w-[180px] sm:max-w-none">
                             Value: <strong className="text-pink-300">https://www.{editingTenant.domain.replace(/^https?:\/\//, '').replace(/^www\./, '')}</strong>
                           </span>
+                          <span className="px-2 py-0.5 rounded text-[9px] font-black bg-purple-950 text-purple-300 border border-purple-800" title="Seleccionar en el desplegable de Namecheap">
+                            Modo: Permanent (301)
+                          </span>
+                          <span className="text-slate-400 text-[10px]">TTL: <strong className="text-slate-200">Automatic</strong></span>
                         </div>
 
                         <button
@@ -631,9 +636,18 @@ export function AdminSaaS() {
                         type="button"
                         onClick={() => {
                           const cleanDomain = editingTenant.domain?.replace(/^https?:\/\//, '').replace(/^www\./, '');
-                          const instructions = `📋 INSTRUCCIONES DNS PARA NAMECHEAP DE ${editingTenant.name || 'CLIENTE'}:\n\n` +
-                            `REGISTRO 1 (CNAME):\n- Type: CNAME Record\n- Host: www\n- Value: hotelesdevenezuela.com\n- TTL: Automatic\n\n` +
-                            `REGISTRO 2 (Redirección Raíz):\n- Type: URL Redirect Record\n- Host: @\n- Value: https://www.${cleanDomain}\n- TTL: Automatic (Unmasked 301)\n\n` +
+                          const instructions = `📋 INSTRUCCIONES DNS DE NAMECHEAP / GODADDY PARA ${editingTenant.name || 'CLIENTE'}:\n\n` +
+                            `REGISTRO 1 (Subdominio WWW):\n` +
+                            `- Type (Tipo): CNAME Record\n` +
+                            `- Host: www\n` +
+                            `- Value (Target): hotelesdevenezuela.com\n` +
+                            `- TTL: Automatic\n\n` +
+                            `REGISTRO 2 (Redirección Dominio Raíz):\n` +
+                            `- Type (Tipo): URL Redirect Record\n` +
+                            `- Host: @\n` +
+                            `- Value (Target): https://www.${cleanDomain}\n` +
+                            `- Desplegable de Modo: Permanent (301)\n` +
+                            `- TTL: Automatic\n\n` +
                             `Soporte Hoteles de Venezuela SaaS`;
                           navigator.clipboard.writeText(instructions);
                           triggerCopiedToast("Instrucciones completas de Namecheap");
