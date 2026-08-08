@@ -49,10 +49,8 @@ export const TENANTS_REGISTRY: Record<string, TenantConfig> = {
   "perla-negra": perlaNegraConfig as TenantConfig,
   "my-campers": myCampersConfig as TenantConfig,
   "oleaje-beach-club": oleajeBeachClubConfig as TenantConfig,
-  "oleaje-tucacas": { ...(oleajeBeachClubConfig as TenantConfig), slug: "oleaje-tucacas", establishment_id: 65 },
   "complejo-los-roques": complejoLosRoquesConfig as TenantConfig,
   "hostal-entre-2-aguas": hostalEntre2AguasConfig as TenantConfig,
-  "hostal-entre-dos-aguas": { ...(hostalEntre2AguasConfig as TenantConfig), slug: "hostal-entre-2-aguas" },
 };
 
 interface TenantContextType {

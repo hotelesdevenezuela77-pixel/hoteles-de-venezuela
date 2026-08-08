@@ -44,6 +44,9 @@ export function AdminSaaS() {
     try {
       setLoading(true);
       
+      const deletedIdsRaw = localStorage.getItem("hdv_deleted_tenant_ids");
+      const deletedIds = new Set<number>(deletedIdsRaw ? JSON.parse(deletedIdsRaw) : []);
+
       // 1. Intentar consultar en base de datos
       const { data, error } = await supabase.from("tenant_configurations").select("*");
       
@@ -62,13 +65,12 @@ export function AdminSaaS() {
 
       if (error || !data || data.length === 0) {
         const staticList = Object.values(TENANTS_REGISTRY);
-        const mergedMap = new Map<number, TenantConfig>();
+        const mergedMap = new Map<string, TenantConfig>();
 
-        staticList.forEach(t => mergedMap.set(t.establishment_id, t));
-        storedList.forEach(t => mergedMap.set(t.establishment_id, t));
+        staticList.forEach(t => mergedMap.set(t.slug.toLowerCase(), t));
+        storedList.forEach(t => mergedMap.set(t.slug.toLowerCase(), t));
 
         finalTenantsList = Array.from(mergedMap.values());
-        localStorage.setItem(localKey, JSON.stringify(finalTenantsList));
       } else {
         // Mapear datos de la DB
         finalTenantsList = data.map((t: any) => ({
@@ -81,15 +83,15 @@ export function AdminSaaS() {
           modules: typeof t.modules === "string" ? JSON.parse(t.modules) : t.modules,
           contact: typeof t.contact === "string" ? JSON.parse(t.contact) : t.contact
         }));
-        
-        // Sincronizar en localStorage por respaldo
-        localStorage.setItem(localKey, JSON.stringify(finalTenantsList));
       }
+
+      // Filtrar aquellos que fueron eliminados explícitamente
+      finalTenantsList = finalTenantsList.filter(t => !deletedIds.has(t.establishment_id));
+      localStorage.setItem(localKey, JSON.stringify(finalTenantsList));
       
       setTenants(finalTenantsList);
     } catch (e) {
       console.error("Error al cargar configuración SaaS:", e);
-      // Fallback robusto final
       setTenants(Object.values(TENANTS_REGISTRY));
     } finally {
       setLoading(false);
@@ -242,7 +244,15 @@ export function AdminSaaS() {
         console.warn("Error al borrar en DB Supabase, aplicando borrado local:", error);
       }
 
-      // 2. Borrar en local
+      // 2. Borrar en local y guardar ID en la lista de eliminaciones permanentes
+      const deletedIdsKey = "hdv_deleted_tenant_ids";
+      const deletedIdsRaw = localStorage.getItem(deletedIdsKey);
+      const deletedIdsList: number[] = deletedIdsRaw ? JSON.parse(deletedIdsRaw) : [];
+      if (!deletedIdsList.includes(id)) {
+        deletedIdsList.push(id);
+      }
+      localStorage.setItem(deletedIdsKey, JSON.stringify(deletedIdsList));
+
       const localKey = "hdv_tenants_configurations";
       const deletedTenant = tenants.find(t => t.establishment_id === id);
       const updated = tenants.filter(t => t.establishment_id !== id);
