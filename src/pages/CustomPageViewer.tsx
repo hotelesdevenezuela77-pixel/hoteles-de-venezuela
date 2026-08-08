@@ -262,16 +262,28 @@ export function CustomPageViewer() {
 
       {/* Main Cover Header - Full Width Bleed */}
       {slug === "quienes-somos" ? (
-        <div className="w-full relative py-20 md:py-28 overflow-hidden" style={{ background: "linear-gradient(135deg, #0e0120 0%, #1a0533 60%, #0d1a2e 100%)" }}>
+        <div className="w-full relative py-20 md:py-28 overflow-hidden">
+          {/* Background Image of Brand & Beach */}
+          <img 
+            src="/images/quienes-somos/banner_hv_pareja.jpg" 
+            alt="Hoteles de Venezuela Su Guía Turística" 
+            className="absolute inset-0 w-full h-full object-cover scale-[1.08] object-center"
+          />
+
+          {/* Dark Overlay for Contrast and Readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0e0120]/80 via-[#1a0533]/70 to-[#0d1a2e]/85 pointer-events-none" />
+
+          {/* Animated Constellation Canvas */}
           <ConstellationBackground />
+
           <div className="absolute top-0 right-0 w-72 h-72 rounded-full blur-3xl opacity-20 pointer-events-none" style={{ background: "#FF0096" }} />
           <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full blur-3xl opacity-20 pointer-events-none" style={{ background: "#00C8D4" }} />
           
           {/* Bottom white fade overlay to blend with the white page background */}
-          <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white via-white/40 to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none" />
 
           <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-            <p className="text-[#00C8D4] text-[10px] md:text-xs font-black tracking-[0.3em] uppercase mb-3 flex items-center justify-center gap-2">
+            <p className="text-[#00C8D4] text-[10px] md:text-xs font-black tracking-[0.3em] uppercase mb-3 flex items-center justify-center gap-2 drop-shadow-md">
               <Sparkles className="w-4 h-4 text-[#FF0096]" />
               <span>TECNOLOGÍA DE VANGUARDIA · EL PARAÍSO TE ESPERA</span>
             </p>
@@ -317,7 +329,7 @@ export function CustomPageViewer() {
               </span>
             </h1>
             
-            <p className="text-base md:text-xl font-serif text-white/90 font-bold tracking-widest mt-2 uppercase">
+            <p className="text-base md:text-xl font-serif text-white/90 font-bold tracking-widest mt-2 uppercase drop-shadow-md">
               {page.h1Title || page.title || "QUIÉNES SOMOS - NUESTRO EQUIPO"}
             </p>
           </div>
