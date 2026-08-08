@@ -93,7 +93,18 @@ export function AdminPanel() {
   const [, setLocation] = useLocation();
 
   const [loadingData, setLoadingData] = useState(true);
-  const [activeTab, setActiveTab] = useState<"resumen" | "andromeda_ops" | "auditoria_legal" | "aprobaciones" | "abandonadas" | "reservas" | "establecimientos" | "usuarios" | "categorias" | "destinos" | "configuracion">("resumen");
+  const [activeTab, setActiveTab] = useState<any>(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("tab") || "resumen";
+  });
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tabParam = params.get("tab");
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [location]);
 
   // Lists data
   const [establishments, setEstablishments] = useState<Establishment[]>([]);

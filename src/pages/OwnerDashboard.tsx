@@ -202,7 +202,18 @@ export function OwnerDashboard() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [leads, setLeads] = useState<WhatsAppLead[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"resumen" | "portafolio" | "operaciones" | "inventario" | "finanzas" | "marketing" | "guiones" | "webapp_cms" | "tareas" | "pos" | "analiticas_saas" | "agenda" | "soporte" | "andromeda_ops" | "legal">("resumen");
+  const [activeTab, setActiveTab] = useState<any>(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("tab") || "resumen";
+  });
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tabParam = params.get("tab");
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [location]);
   const [operacionesSubTab, setOperacionesSubTab] = useState<"reservas" | "disponibilidad" | "timeline">("reservas");
   const [marketingSubTab, setMarketingSubTab] = useState<"descuentos" | "leads" | "reviews" | "channel-manager">("leads");
   

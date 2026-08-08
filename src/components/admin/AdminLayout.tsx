@@ -7,7 +7,7 @@ import {
   Sparkles, Bot, Network, Shield, Car, Compass, AlertTriangle, Ticket, LayoutDashboard,
   Search, Bell, ChevronLeft, ChevronRight, X, ShieldAlert, Menu,
   ArrowUpDown, Receipt, MessageSquare, Star, Mail, Link2, LogOut, ChevronDown,
-  Calendar, TrendingUp, Activity, Edit3, Briefcase, HelpCircle, BookOpen
+  Calendar, TrendingUp, Activity, Edit3, Briefcase, HelpCircle, BookOpen, Cpu, LifeBuoy, Scale
 } from "lucide-react";
 
 // Colores Oficiales (Sistemas de Contraste)
@@ -114,6 +114,9 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         { label: "Verificación KYC", href: "/admin/kyc", icon: ShieldAlert },
         { label: "Traslados y Flota", href: "/admin/transfers", icon: Car },
         { label: "Experiencias", href: "/admin/experiences", icon: Compass },
+        { label: "Soporte Técnico (Tickets D&D)", href: "/mis-negocios?tab=soporte", icon: LifeBuoy },
+        { label: "Nodo Andrómeda-X (NASA)", href: "/admin?tab=andromeda_ops", icon: Cpu },
+        { label: "Auditoría Legal (Resoluciones PDF)", href: "/admin?tab=auditoria_legal", icon: Scale },
         { label: "Agenda y Calendario", href: "/admin/agenda", icon: Calendar },
         { label: "Expedición de Rutas", href: "/admin/expedicion-rutas", icon: MapPin },
       ]
@@ -153,6 +156,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       items: [
         { label: "Centaurus IA", href: "/centaurus", icon: Star },
         { label: "Andromeda Analytics", href: "/andromeda", icon: Sparkles },
+        { label: "Telemetría NASA Andrómeda-X", href: "/admin?tab=andromeda_ops", icon: Cpu },
         { label: "Agente IA Chat", href: "/admin/ia-conversacional", icon: Bot },
         { label: "Asistente Guiones", href: "/admin/asistente-guiones", icon: Sparkles },
         { label: "Reportes Analíticos", href: "/admin/analiticas", icon: BarChart3 },
