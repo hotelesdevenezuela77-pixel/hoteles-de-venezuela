@@ -57,10 +57,11 @@ export function Navbar() {
     { href: "/destinos", label: "Destinos", settingKey: "MENU_SHOW_DESTINOS" },
     { href: "/mapa", label: "Mapa", icon: <Map className="w-3.5 h-3.5 inline-block mr-1 -mt-0.5" />, settingKey: "MENU_SHOW_MAPA" },
     { href: "/parques", label: "Parques", settingKey: "MENU_SHOW_PARQUES" },
+    { href: "/membresias", label: "Membresías", settingKey: "MENU_SHOW_MEMBRESIAS" },
+    { href: "/quienes-somos", label: "Quiénes Somos", settingKey: "MENU_SHOW_QUIENES_SOMOS" },
     { href: "/viaje-ia", label: "Planear con IA ✨", settingKey: "MENU_SHOW_VIAJE_IA" },
     { href: "/servicios-b2b", label: "Marketplace B2B", settingKey: "MENU_SHOW_SERVICIOS_B2B" },
     { href: "/paquetes", label: "Paquetes", settingKey: "MENU_SHOW_PAQUETES" },
-    { href: "/membresias", label: "Membresías", settingKey: "MENU_SHOW_MEMBRESIAS" },
     { href: "/comparar", label: compareCount > 0 ? `Comparar (${compareCount})` : "Comparar", settingKey: "MENU_SHOW_COMPARAR" }
   ];
 

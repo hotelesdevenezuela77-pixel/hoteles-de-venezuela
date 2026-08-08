@@ -7,7 +7,7 @@ import { AdminTabBar } from "@/components/admin/AdminTabBar";
 import { 
   Settings, Check, Plus, Loader2, 
   Sparkles, Building2, MapPin, Map as MapIcon, 
-  Globe, Briefcase, Package, Ticket,
+  Globe, Briefcase, Package, Ticket, Users,
   Shield, Info, Mail, Phone as PhoneIcon, MessageSquare, Text, CreditCard,
   Music, Upload
 } from "lucide-react";
@@ -74,6 +74,7 @@ const MENU_SECTIONS = [
   { key: "MENU_SHOW_SERVICIOS_B2B", label: "Marketplace B2B", description: "Directorio de servicios y negocios B2B", icon: Briefcase, color: "#F59E0B" },
   { key: "MENU_SHOW_PAQUETES", label: "Paquetes Turísticos", description: "Promociones y planes todo incluido", icon: Package, color: "#EF4444" },
   { key: "MENU_SHOW_MEMBRESIAS", label: "Membresías", description: "Información del club y planes de membresía", icon: Ticket, color: "#EC4899" },
+  { key: "MENU_SHOW_QUIENES_SOMOS", label: "Quiénes Somos", description: "Página corporativa de quienes somos, misión y equipo", icon: Users, color: "#8B5CF6" },
 ];
 
 export function AdminConfig() {
