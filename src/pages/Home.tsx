@@ -273,9 +273,10 @@ export function Home() {
     return [
       { id: 1, name: "Hoteles", slug: "hoteles" },
       { id: 2, name: "Posadas", slug: "posadas" },
-      { id: 3, name: "Restaurantes", slug: "restaurantes" },
-      { id: 4, name: "Parques Nacionales", slug: "parques" },
-      { id: 5, name: "Complejos Turísticos", slug: "complejos" }
+      { id: 3, name: "Glamping & Ecolodges", slug: "glamping" },
+      { id: 4, name: "Restaurantes", slug: "restaurantes" },
+      { id: 5, name: "Parques Nacionales", slug: "parques" },
+      { id: 6, name: "Complejos Turísticos", slug: "complejos" }
     ];
   });
   const [loading, setLoading] = useState(false);

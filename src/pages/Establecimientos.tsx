@@ -152,7 +152,9 @@ export function Establecimientos() {
       if (est.id % 3 === 0) estServices.push("zelle");
       if (est.id % 2 === 0) estServices.push("pago_movil");
       if (est.id % 2 === 1) estServices.push("tarjeta_int");
-      if (est.id % 3 === 0) estServices.push("efectivo_usd");
+      if (est.id % 3 === 1) estServices.push("paypal");
+      if (est.id % 3 === 2) estServices.push("pago_bizum");
+      if (est.id % 3 === 0) { estServices.push("usdt_crypto"); estServices.push("pago_crypto"); }
       if (est.id % 2 === 0) estServices.push("desayuno_incluido");
       if (nameLower.includes("resort") || est.id % 4 === 0) estServices.push("todo_incluido");
       if (est.id % 3 === 0) estServices.push("media_pension");
@@ -197,6 +199,8 @@ export function Establecimientos() {
 
   const getSubtype = (est: Establishment) => {
     const nameLower = est.name.toLowerCase();
+    const catSlug = (est.category_slug || "").toLowerCase();
+    if (nameLower.includes("glamping") || catSlug === "glamping" || nameLower.includes("domo")) return "glamping";
     if (nameLower.includes("posada") || nameLower.includes("boutique")) return "posada_boutique";
     if (nameLower.includes("resort") || nameLower.includes("complex") || nameLower.includes("hesperia")) return "resort";
     if (nameLower.includes("hotel") || nameLower.includes("suites")) return "hotel_familiar";
@@ -961,10 +965,11 @@ export function Establecimientos() {
                       className="w-full bg-gray-50 border border-gray-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-gray-700 outline-none focus:border-[#9B00CC] cursor-pointer"
                     >
                       <option value="">Cualquier Subtipo</option>
+                      <option value="glamping">Glamping & Eco-Lodges ({getFilterOptionCount("subtype", "glamping")})</option>
                       <option value="posada_boutique">Posada Boutique / Encanto ({getFilterOptionCount("subtype", "posada_boutique")})</option>
                       <option value="hotel_familiar">Hotel Urbano / Ejecutivo ({getFilterOptionCount("subtype", "hotel_familiar")})</option>
                       <option value="resort">Resort & Complejo Vacacional ({getFilterOptionCount("subtype", "resort")})</option>
-                      <option value="otros">Villas, Casas & Glamping ({getFilterOptionCount("subtype", "otros")})</option>
+                      <option value="otros">Villas & Casas ({getFilterOptionCount("subtype", "otros")})</option>
                     </select>
 
                     <div className="space-y-1">
@@ -1077,9 +1082,11 @@ export function Establecimientos() {
                   <div className="mt-2 space-y-1.5 pl-7">
                     {[
                       { key: "pago_movil", label: "Pago Móvil (Bs. VES)" },
-                      { key: "zelle", label: "Zelle (USD)" },
+                      { key: "zelle", label: "Zelle (USA)" },
+                      { key: "pago_bizum", label: "Bizum (España)" },
                       { key: "usdt_crypto", label: "Binance USDT / Crypto" },
-                      { key: "tarjeta_int", label: "Tarjeta Internacional (Visa/MC)" },
+                      { key: "paypal", label: "PayPal (USD)" },
+                      { key: "tarjeta_int", label: "Tarjeta de Crédito Internacional (VISA, MC)" },
                       { key: "cancelacion_gratis", label: "Cancelación Gratuita" },
                       { key: "sin_tarjeta", label: "Sin Tarjeta de Crédito Requerida" }
                     ].map(item => {

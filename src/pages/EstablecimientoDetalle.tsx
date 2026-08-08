@@ -1202,7 +1202,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                       <div className="w-8 h-8 rounded-xl bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] flex items-center justify-center text-white shrink-0 shadow-xs">
                         <Sparkles className="w-4 h-4 text-white" />
                       </div>
-                      Infraestructura, Servicios y Políticas (Documento 77 V.1)
+                      Infraestructura, Servicios y Políticas (Documento 77 V.2)
                     </h2>
                     <p className="text-xs text-slate-500 font-semibold mt-1">
                       Catálogo oficial verificado discriminado por Ámbito (Privado de la Unidad, Zona Común y Servicios).

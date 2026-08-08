@@ -403,7 +403,7 @@ export function Membresias() {
             <div className="relative z-10">
               <h3 className="text-xl font-bold text-gray-900 mb-2">🇻🇪 Métodos de Pago Locales y Alternativos</h3>
               <p className="text-gray-500 text-sm mb-5 max-w-2xl mx-auto">
-                ¿No puedes pagar con tarjeta de crédito internacional a través de Stripe? No te preocupes. Aceptamos <strong>Pago Móvil (Bs.), Zelle, USDT (Binance Pay) y PayPal</strong>. 
+                Aceptamos <strong>Pago Móvil (Bs. VES), Zelle (USA), Binance USDT, Bizum (España), PayPal (USD) y Tarjeta de Crédito Internacional (VISA, MC)</strong>. 
                 Realiza tu transferencia y reporta el pago con tu captura de pantalla en nuestro módulo de verificación.
               </p>
               <Link href="/reportar-pago" className="inline-block px-6 py-3 bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] text-white text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-md hover:shadow-lg cursor-pointer text-center">

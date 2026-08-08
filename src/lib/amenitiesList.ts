@@ -52,6 +52,7 @@ export const PROPERTY_TYPES_DOCUMENT77 = [
   { id: "residencias_estudiantes", label: "Residencias de estudiantes", icon: "GraduationCap", code: "C04-1.11" },
   { id: "hoteles_capsula", label: "Hoteles cápsula", icon: "Box", code: "C04-1.12" },
   { id: "campings", label: "Campings", icon: "Tent", code: "C04-1.13" },
+  { id: "glamping", label: "Glamping & Ecolodges", icon: "Tent", code: "C04-1.13b" },
   { id: "villas", label: "Villas", icon: "Palmtree", code: "C04-1.14" },
   { id: "barcos", label: "Barcos (veleros, yates, catamaranes o houseboats)", icon: "Ship", code: "C04-1.15" },
   { id: "love_hotels", label: "Love hotels", icon: "Heart", code: "C04-1.16" },
@@ -305,9 +306,12 @@ export const MASTER_AMENITIES: AmenityItem[] = [
   { key: "toque_de_queda", code: "C03.3.5.2.1", label: "Hora de toque de queda", pillar: "C03", pillarLabel: "C03. Gestión, Políticas y Logística", category: "general", subCategory: "Políticas Especiales", scope: "servicio", iconName: "Clock" },
   { key: "edad_minima", code: "C03.3.5.2.2", label: "Edad mínima requerida", pillar: "C03", pillarLabel: "C03. Gestión, Políticas y Logística", category: "general", subCategory: "Políticas Especiales", scope: "servicio", iconName: "UserCheck" },
 
-  { key: "pago_tarjeta", code: "C03.3.6.1", label: "Acepta Pago con Tarjeta", pillar: "C03", pillarLabel: "C03. Gestión, Políticas y Logística", category: "general", subCategory: "Métodos de Pago", scope: "servicio", iconName: "Zap" },
-  { key: "pago_bizum", code: "C03.3.6.2", label: "Acepta Pago con Bizum", pillar: "C03", pillarLabel: "C03. Gestión, Políticas y Logística", category: "general", subCategory: "Métodos de Pago", scope: "servicio", iconName: "Zap" },
-  { key: "pago_crypto", code: "C03.3.6.3", label: "Acepta Pago con Criptomonedas", pillar: "C03", pillarLabel: "C03. Gestión, Políticas y Logística", category: "general", subCategory: "Métodos de Pago", scope: "servicio", iconName: "Zap" },
+  { key: "pago_movil", code: "C03.3.6.1", label: "Pago Móvil (Bs. VES)", pillar: "C03", pillarLabel: "C03. Gestión, Políticas y Logística", category: "general", subCategory: "Métodos de Pago", scope: "servicio", iconName: "Zap" },
+  { key: "zelle", code: "C03.3.6.2", label: "Zelle (USA)", pillar: "C03", pillarLabel: "C03. Gestión, Políticas y Logística", category: "general", subCategory: "Métodos de Pago", scope: "servicio", iconName: "Zap" },
+  { key: "pago_bizum", code: "C03.3.6.3", label: "Bizum (España)", pillar: "C03", pillarLabel: "C03. Gestión, Políticas y Logística", category: "general", subCategory: "Métodos de Pago", scope: "servicio", iconName: "Zap" },
+  { key: "pago_crypto", code: "C03.3.6.4", label: "Binance USDT / Crypto", pillar: "C03", pillarLabel: "C03. Gestión, Políticas y Logística", category: "general", subCategory: "Métodos de Pago", scope: "servicio", iconName: "Zap" },
+  { key: "paypal", code: "C03.3.6.5", label: "PayPal (USD)", pillar: "C03", pillarLabel: "C03. Gestión, Políticas y Logística", category: "general", subCategory: "Métodos de Pago", scope: "servicio", iconName: "Zap" },
+  { key: "tarjeta_int", code: "C03.3.6.6", label: "Tarjeta de Crédito Internacional (VISA, MC)", pillar: "C03", pillarLabel: "C03. Gestión, Políticas y Logística", category: "general", subCategory: "Métodos de Pago", scope: "servicio", iconName: "Zap" },
 
   { key: "con_cocina", code: "C03.3.7.1", label: "Con cocina", pillar: "C03", pillarLabel: "C03. Gestión, Políticas y Logística", category: "general", subCategory: "Régimen de Estancia", scope: "servicio", iconName: "Utensils" },
   { key: "desayuno_incluido", code: "C03.3.7.2", label: "Desayuno incluido", pillar: "C03", pillarLabel: "C03. Gestión, Políticas y Logística", category: "general", subCategory: "Régimen de Estancia", scope: "servicio", iconName: "Coffee" },

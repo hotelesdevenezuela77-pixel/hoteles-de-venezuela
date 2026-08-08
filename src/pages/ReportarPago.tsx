@@ -16,10 +16,12 @@ const REASONS = [
 ];
 
 const METHODS = [
-  { value: "pago_movil", label: "Pago Móvil (Bs.)" },
-  { value: "zelle", label: "Zelle (USD)" },
-  { value: "usdt", label: "USDT / Binance Pay" },
-  { value: "paypal", label: "PayPal (USD)" }
+  { value: "pago_movil", label: "Pago Móvil (Bs. VES)" },
+  { value: "zelle", label: "Zelle (USA)" },
+  { value: "usdt", label: "Binance USDT / Crypto" },
+  { value: "bizum", label: "Bizum (España)" },
+  { value: "paypal", label: "PayPal (USD)" },
+  { value: "tarjeta_int", label: "Tarjeta de Crédito Internacional (VISA, MC)" }
 ];
 
 export function ReportarPago() {
@@ -73,10 +75,12 @@ export function ReportarPago() {
   }, []);
 
   const paymentMethods = [
-    { value: "pago_movil", label: "Pago Móvil (Bs.)" },
-    { value: "zelle", label: "Zelle (USD)" },
-    { value: "usdt", label: "USDT / Binance Pay" },
+    { value: "pago_movil", label: "Pago Móvil (Bs. VES)" },
+    { value: "zelle", label: "Zelle (USA)" },
+    { value: "usdt", label: "Binance USDT / Crypto" },
+    { value: "bizum", label: "Bizum (España)" },
     { value: "paypal", label: "PayPal (USD)" },
+    { value: "tarjeta_int", label: "Tarjeta de Crédito Internacional (VISA, MC)" },
     ...(settings.payment_stripe_info ? [{ value: "stripe", label: "Stripe (Tarjeta de Crédito)" }] : [])
   ];
   const [form, setForm] = useState({
@@ -543,7 +547,7 @@ export function ReportarPago() {
                 {/* Zelle */}
                 <div className="border-b border-slate-800/80 pb-3">
                   <div className="font-bold flex items-center gap-1.5 text-white/90">
-                    <DollarSign className="w-3.5 h-3.5 text-[#00C8D4]" /> Zelle (USD)
+                    <DollarSign className="w-3.5 h-3.5 text-[#00C8D4]" /> Zelle (USA)
                   </div>
                   <div className="font-semibold text-slate-400 mt-1 font-mono text-[10px]">
                     <p>Correo: {settings.payment_zelle_email}</p>

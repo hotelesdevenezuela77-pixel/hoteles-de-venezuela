@@ -174,7 +174,7 @@ export function AdminEstablecimientoNuevo() {
   const [aiQuery, setAiQuery] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
 
-  const isSpecificType = ["campings", "barcos", "love_hotels", "chalets_montana"].includes(propertyType);
+  const isSpecificType = ["campings", "glamping", "barcos", "love_hotels", "chalets_montana"].includes(propertyType);
 
   const autoSlug = (val: string) =>
     val.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
