@@ -22,7 +22,7 @@ import {
   Edit3,
   Plus
 } from "lucide-react";
-import { LegalResolutionSubmission } from "@/pages/legal/LegalUploadResolution";
+import type { LegalResolutionSubmission } from "@/pages/legal/LegalUploadResolution";
 
 export function AdminLegalModule() {
   const [submissions, setSubmissions] = useState<LegalResolutionSubmission[]>([]);
@@ -183,15 +183,15 @@ export function AdminLegalModule() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3 shrink-0">
-            <Link href="/legal/upload-resolution?ticket=TKT-BG-3108501">
-              <a
-                target="_blank"
-                className="px-5 py-3 bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] text-white text-xs font-black uppercase tracking-wider rounded-2xl shadow-lg hover:opacity-95 transition-all flex items-center gap-2 cursor-pointer"
-              >
-                <ExternalLink className="w-4 h-4" />
-                <span>Abrir Portal de Carga Seguro</span>
-              </a>
-            </Link>
+            <a
+              href="/legal/upload-resolution?ticket=TKT-BG-3108501"
+              target="_blank"
+              rel="noreferrer"
+              className="px-5 py-3 bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] text-white text-xs font-black uppercase tracking-wider rounded-2xl shadow-lg hover:opacity-95 transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <ExternalLink className="w-4 h-4" />
+              <span>Abrir Portal de Carga Seguro</span>
+            </a>
           </div>
         </div>
       </div>
