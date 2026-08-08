@@ -356,28 +356,154 @@ export function CustomPageViewer() {
       )}
 
       {/* Rich Page Body Content */}
-      <div className="max-w-4xl mx-auto px-6 mt-12 mb-16">
-        {/* Breadcrumb Navigation */}
-        <div className="mb-6">
-          <Link href="/" className="inline-flex items-center gap-2 text-xs font-black text-gray-500 hover:text-brand-magenta transition-colors cursor-pointer">
-            <ArrowLeft className="w-4 h-4" />
-            <span>INICIO</span>
-          </Link>
-        </div>
+      {slug === "quienes-somos" ? (
+        <div className="max-w-6xl mx-auto px-6 mt-12 mb-16 space-y-12">
+          {/* Breadcrumb Navigation */}
+          <div>
+            <Link href="/" className="inline-flex items-center gap-2 text-xs font-black text-gray-500 hover:text-brand-magenta transition-colors cursor-pointer">
+              <ArrowLeft className="w-4 h-4" />
+              <span>INICIO</span>
+            </Link>
+          </div>
 
-        <div className="bg-white border border-gray-100 rounded-3xl p-8 md:p-12 shadow-lg shadow-gray-250/20 text-left">
-          {isHtmlContent ? (
-            <div 
-              className="prose max-w-none text-gray-700 text-sm leading-relaxed whitespace-pre-wrap" 
-              dangerouslySetInnerHTML={{ __html: page.content || "" }} 
-            />
-          ) : (
-            <div className="text-gray-750 text-base leading-relaxed whitespace-pre-line">
-              {page.content}
+          {/* Section 1: Quiénes Somos - Imagen Ejecutiva + Pareja Playa */}
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            {/* Left Column: Image Card 1 & 2 Grid */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="rounded-3xl overflow-hidden shadow-xl border border-gray-150 group relative">
+                <img 
+                  src="/images/quienes-somos/ejecutiva_portal_alojamiento_hv.jpg" 
+                  alt="Atención al Cliente Hoteles de Venezuela" 
+                  className="w-full h-72 md:h-80 object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer"
+                  onClick={() => setLightboxImage("/images/quienes-somos/ejecutiva_portal_alojamiento_hv.jpg")}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-90 p-4 flex flex-col justify-end">
+                  <span className="text-[10px] font-black uppercase text-[#00C8D4] tracking-widest">Atención Corporativa</span>
+                  <span className="text-xs font-bold text-white">Portal Alojamiento</span>
+                </div>
+              </div>
+
+              <div className="rounded-3xl overflow-hidden shadow-xl border border-gray-150 group relative mt-6">
+                <img 
+                  src="/images/quienes-somos/pareja_playa_hv.jpg" 
+                  alt="Turismo de Playa Hoteles de Venezuela" 
+                  className="w-full h-72 md:h-80 object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer"
+                  onClick={() => setLightboxImage("/images/quienes-somos/pareja_playa_hv.jpg")}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-90 p-4 flex flex-col justify-end">
+                  <span className="text-[10px] font-black uppercase text-[#FF0096] tracking-widest">Guía Oficial</span>
+                  <span className="text-xs font-bold text-white">Turismo de Playa</span>
+                </div>
+              </div>
             </div>
-          )}
+
+            {/* Right Column: Texto Principal en Tarjeta Elegante */}
+            <div className="bg-white border border-gray-100 rounded-3xl p-8 md:p-10 shadow-xl text-left space-y-4">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-black bg-[#00C8D4]/10 text-[#00C8D4] border border-[#00C8D4]/20">
+                <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
+                <span>NUESTRA MISIÓN & VISIÓN</span>
+              </div>
+              
+              <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight font-serif">
+                Impulsando el Turismo y la Excelencia Hotelera en Venezuela
+              </h2>
+
+              {isHtmlContent ? (
+                <div 
+                  className="prose max-w-none text-slate-700 text-sm leading-relaxed whitespace-pre-wrap" 
+                  dangerouslySetInnerHTML={{ __html: page.content || "" }} 
+                />
+              ) : (
+                <div className="text-slate-700 text-sm md:text-base leading-relaxed whitespace-pre-line">
+                  {page.content}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Section 2: Galería Visual de Destinos (Flamenco + Chica Coctel Morrocoy) */}
+          <div className="grid md:grid-cols-2 gap-8 items-center pt-6">
+            {/* Left Column: Tarjeta de Innovación */}
+            <div className="bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 text-white rounded-3xl p-8 md:p-10 shadow-2xl border border-slate-800 text-left space-y-4">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-black bg-[#FF0096]/20 text-[#FF0096] border border-[#FF0096]/30">
+                <Compass className="w-3.5 h-3.5" />
+                <span>ECOSISTEMA TURÍSTICO NACIONAL</span>
+              </div>
+              
+              <h3 className="text-2xl font-black tracking-tight font-serif text-white">
+                La Red de Hospedajes y Destinos Más Amplia del País
+              </h3>
+
+              <p className="text-slate-300 text-sm leading-relaxed">
+                Nuestra plataforma conecta a turistas nacionales e internacionales con los mejores hoteles, posadas y complejos turísticos en los destinos más paradisíacos de Venezuela, desde Morrocoy y Los Roques hasta los Andes y Canaima.
+              </p>
+
+              <div className="grid grid-cols-2 gap-4 pt-2">
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
+                  <span className="text-2xl font-black text-[#00C8D4] block">+100</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Establecimientos</span>
+                </div>
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
+                  <span className="text-2xl font-black text-[#FF0096] block">24/7</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Atención Directa</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Image Card 3 & 4 Grid */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="rounded-3xl overflow-hidden shadow-xl border border-gray-150 group relative">
+                <img 
+                  src="/images/quienes-somos/flamenco_morrocoy_hv.jpg" 
+                  alt="Flamenco en Morrocoy Hoteles de Venezuela" 
+                  className="w-full h-72 md:h-80 object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer"
+                  onClick={() => setLightboxImage("/images/quienes-somos/flamenco_morrocoy_hv.jpg")}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-90 p-4 flex flex-col justify-end">
+                  <span className="text-[10px] font-black uppercase text-[#00C8D4] tracking-widest">Fauna & Naturaleza</span>
+                  <span className="text-xs font-bold text-white">Morrocoy</span>
+                </div>
+              </div>
+
+              <div className="rounded-3xl overflow-hidden shadow-xl border border-gray-150 group relative mt-6">
+                <img 
+                  src="/images/quienes-somos/chica_coctel_morrocoy_hv.jpg" 
+                  alt="Experiencia Caribeña Hoteles de Venezuela" 
+                  className="w-full h-72 md:h-80 object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer"
+                  onClick={() => setLightboxImage("/images/quienes-somos/chica_coctel_morrocoy_hv.jpg")}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-90 p-4 flex flex-col justify-end">
+                  <span className="text-[10px] font-black uppercase text-[#FF0096] tracking-widest">Experiencia Premium</span>
+                  <span className="text-xs font-bold text-white">Caribe Venezolano</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="max-w-4xl mx-auto px-6 mt-12 mb-16">
+          {/* Breadcrumb Navigation */}
+          <div className="mb-6">
+            <Link href="/" className="inline-flex items-center gap-2 text-xs font-black text-gray-500 hover:text-brand-magenta transition-colors cursor-pointer">
+              <ArrowLeft className="w-4 h-4" />
+              <span>INICIO</span>
+            </Link>
+          </div>
+
+          <div className="bg-white border border-gray-100 rounded-3xl p-8 md:p-12 shadow-lg shadow-gray-250/20 text-left">
+            {isHtmlContent ? (
+              <div 
+                className="prose max-w-none text-gray-700 text-sm leading-relaxed whitespace-pre-wrap" 
+                dangerouslySetInnerHTML={{ __html: page.content || "" }} 
+              />
+            ) : (
+              <div className="text-gray-750 text-base leading-relaxed whitespace-pre-line">
+                {page.content}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* YouTube Video Section */}
       {embedVideoUrl && (
