@@ -8,7 +8,7 @@ import { TENANTS_REGISTRY, type TenantConfig } from "../../tenants/tenantContext
 import { 
   Network, Settings, Server, Plus, Edit3, Save, Trash2, 
   Search, ShieldAlert, CheckCircle, HelpCircle, Activity, 
-  Sliders, Grid, Smartphone, RefreshCw, X, Loader2
+  Sliders, Grid, Smartphone, RefreshCw, X, Loader2, Copy, Globe, ExternalLink, Check
 } from "lucide-react";
 
 export function AdminSaaS() {
@@ -25,6 +25,12 @@ export function AdminSaaS() {
   const [editingTenant, setEditingTenant] = useState<Partial<TenantConfig> | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [feedbackMsg, setFeedbackMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [copiedToast, setCopiedToast] = useState<string | null>(null);
+
+  const triggerCopiedToast = (msg: string) => {
+    setCopiedToast(msg);
+    setTimeout(() => setCopiedToast(null), 3000);
+  };
 
   // Seguridad: Redirección si no es administrador
   useEffect(() => {
@@ -257,6 +263,17 @@ export function AdminSaaS() {
   return (
     <div className="min-h-screen pb-20 text-slate-100 font-sans" style={{ backgroundColor: "#0b0c10" }}>
       
+      {/* Toast de Copiado DNS */}
+      {copiedToast && (
+        <div className="fixed bottom-6 right-6 z-[100] bg-slate-900 border border-[#00C8D4] text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-left">
+          <Check className="w-5 h-5 text-[#00C8D4]" />
+          <div>
+            <span className="text-[10px] font-black text-[#00C8D4] uppercase tracking-wider block">¡Copiado al Portapapeles!</span>
+            <span className="text-xs font-bold font-mono">{copiedToast}</span>
+          </div>
+        </div>
+      )}
+
       {/* Cabecera Principal del Panel */}
       <header className="relative w-full border-b border-white/5 py-10 bg-[#121620]/45 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
@@ -415,6 +432,21 @@ export function AdminSaaS() {
                       <td className="py-4 px-4 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <button
+                            onClick={() => {
+                              const cleanDomain = t.domain?.replace(/^https?:\/\//, '').replace(/^www\./, '');
+                              const instructions = `📋 INSTRUCCIONES DNS DE ${t.name} PARA NAMECHEAP / GODADDY:\n\n` +
+                                `REGISTRO 1 (CNAME):\n- Type: CNAME Record\n- Host: www\n- Value: hotelesdevenezuela.com\n- TTL: Automatic\n\n` +
+                                `REGISTRO 2 (Redirección Raíz):\n- Type: URL Redirect Record\n- Host: @\n- Value: https://www.${cleanDomain}\n- TTL: Automatic (Unmasked 301)\n\n` +
+                                `Soporte Hoteles de Venezuela SaaS`;
+                              navigator.clipboard.writeText(instructions);
+                              triggerCopiedToast(`Instrucciones DNS de ${t.name}`);
+                            }}
+                            className="p-2 bg-white/5 hover:bg-[#00C8D4]/20 text-[#00C8D4] rounded-lg border border-white/5 hover:border-[#00C8D4]/40 transition-all cursor-pointer"
+                            title="Copiar Registros DNS para Namecheap"
+                          >
+                            <Copy className="w-4 h-4" />
+                          </button>
+                          <button
                             onClick={() => handleEditClick(t)}
                             className="p-2 bg-white/5 hover:bg-[#00C8D4]/20 text-slate-300 hover:text-[#00C8D4] rounded-lg border border-white/5 hover:border-[#00C8D4]/40 transition-all cursor-pointer"
                             title="Editar Configuración"
@@ -526,6 +558,104 @@ export function AdminSaaS() {
                     />
                   </div>
                 </div>
+
+                {/* ASISTENTE DE CONFIGURACIÓN DNS AUTOGENERADO PARA NAMECHEAP / GODADDY */}
+                {editingTenant.domain && (
+                  <div className="p-4 bg-slate-950/90 border border-[#00C8D4]/40 rounded-2xl space-y-3 text-xs font-sans">
+                    <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                      <span className="text-[10px] font-mono font-black text-[#00C8D4] uppercase tracking-wider flex items-center gap-1.5">
+                        <Globe className="w-3.5 h-3.5 text-[#00C8D4]" />
+                        ASISTENTE DNS PARA NAMECHEAP / GODADDY (COPIAR & PEGAR)
+                      </span>
+                      <span className="text-[9px] text-slate-400 font-bold">Autogenerado</span>
+                    </div>
+
+                    {/* TABLA DE REGISTROS CON BOTÓN COPIAR VALUE */}
+                    <div className="space-y-2 font-mono text-[11px]">
+                      
+                      {/* REGISTRO 1: CNAME */}
+                      <div className="p-2.5 bg-[#121620] border border-slate-800 rounded-xl flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-3">
+                          <span className="px-2 py-0.5 rounded text-[9px] font-black bg-cyan-950 text-[#00C8D4] border border-cyan-800">
+                            CNAME Record
+                          </span>
+                          <span className="text-slate-400">Host: <strong className="text-white">www</strong></span>
+                          <span className="text-slate-400 truncate max-w-[140px] sm:max-w-none">
+                            Value: <strong className="text-cyan-300">hotelesdevenezuela.com</strong>
+                          </span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText("hotelesdevenezuela.com");
+                            triggerCopiedToast("hotelesdevenezuela.com (CNAME Value)");
+                          }}
+                          className="px-2.5 py-1 bg-[#00C8D4]/10 hover:bg-[#00C8D4]/20 text-[#00C8D4] border border-[#00C8D4]/30 rounded-lg font-sans font-bold text-[10px] cursor-pointer flex items-center gap-1 shrink-0"
+                        >
+                          <Copy className="w-3 h-3" /> Copiar Value
+                        </button>
+                      </div>
+
+                      {/* REGISTRO 2: REDIRECCIÓN O REGISTRO A */}
+                      <div className="p-2.5 bg-[#121620] border border-slate-800 rounded-xl flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-3">
+                          <span className="px-2 py-0.5 rounded text-[9px] font-black bg-pink-950 text-[#FF0096] border border-pink-800">
+                            URL Redirect
+                          </span>
+                          <span className="text-slate-400">Host: <strong className="text-white">@</strong></span>
+                          <span className="text-slate-400 truncate max-w-[140px] sm:max-w-none">
+                            Value: <strong className="text-pink-300">https://www.{editingTenant.domain.replace(/^https?:\/\//, '').replace(/^www\./, '')}</strong>
+                          </span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const cleanDomain = editingTenant.domain?.replace(/^https?:\/\//, '').replace(/^www\./, '');
+                            const val = `https://www.${cleanDomain}`;
+                            navigator.clipboard.writeText(val);
+                            triggerCopiedToast(val);
+                          }}
+                          className="px-2.5 py-1 bg-[#FF0096]/10 hover:bg-[#FF0096]/20 text-[#FF0096] border border-[#FF0096]/30 rounded-lg font-sans font-bold text-[10px] cursor-pointer flex items-center gap-1 shrink-0"
+                        >
+                          <Copy className="w-3 h-3" /> Copiar Value
+                        </button>
+                      </div>
+
+                    </div>
+
+                    {/* BOTONES DE COPIADO DE INSTRUCCIONES COMPLETAS Y COMPROBACÍON */}
+                    <div className="pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-[10px]">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const cleanDomain = editingTenant.domain?.replace(/^https?:\/\//, '').replace(/^www\./, '');
+                          const instructions = `📋 INSTRUCCIONES DNS PARA NAMECHEAP DE ${editingTenant.name || 'CLIENTE'}:\n\n` +
+                            `REGISTRO 1 (CNAME):\n- Type: CNAME Record\n- Host: www\n- Value: hotelesdevenezuela.com\n- TTL: Automatic\n\n` +
+                            `REGISTRO 2 (Redirección Raíz):\n- Type: URL Redirect Record\n- Host: @\n- Value: https://www.${cleanDomain}\n- TTL: Automatic (Unmasked 301)\n\n` +
+                            `Soporte Hoteles de Venezuela SaaS`;
+                          navigator.clipboard.writeText(instructions);
+                          triggerCopiedToast("Instrucciones completas de Namecheap");
+                        }}
+                        className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-xl font-bold flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Copy className="w-3.5 h-3.5 text-[#00C8D4]" />
+                        <span>Copiar Instrucciones Completas para Cliente</span>
+                      </button>
+
+                      <a
+                        href={`https://dnschecker.org/#CNAME/www.${editingTenant.domain?.replace(/^https?:\/\//, '').replace(/^www\./, '')}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="px-3 py-1.5 bg-[#00C8D4]/10 hover:bg-[#00C8D4]/20 text-[#00C8D4] border border-[#00C8D4]/30 rounded-xl font-bold flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>Comprobar Propagación DNS</span>
+                      </a>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Bloque: Configuración de Plantilla y Módulos */}
