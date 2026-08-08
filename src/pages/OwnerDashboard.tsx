@@ -9,7 +9,7 @@ import {
   Eye, Check, ListFilter, Tag, Sparkles, CalendarRange,
   Upload, Trash, FileText, ChevronRight, AlertCircle, RefreshCw,
   TrendingUp, Star, ShieldCheck, ArrowRight, Clipboard, Award, ShieldAlert, Download, ExternalLink, FileCheck,
-  Coffee, Edit3
+  Coffee, Edit3, Wrench, LifeBuoy
 } from "lucide-react";
 import { ScriptGenerator } from "../components/ScriptGenerator";
 import { AmenitiesSelector } from "@/components/admin/AmenitiesSelector";
@@ -24,6 +24,7 @@ import { POSModule } from "../tenants/templates/components/POSModule";
 import { FinanceModule } from "../tenants/templates/components/FinanceModule";
 import { AnalyticsModule } from "../tenants/templates/components/AnalyticsModule";
 import { OwnerAgendaModule } from "@/components/owner/OwnerAgendaModule";
+import { OwnerTechnicalSupportModule } from "@/components/owner/OwnerTechnicalSupportModule";
 
 interface Establishment {
   id: number;
@@ -199,7 +200,7 @@ export function OwnerDashboard() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [leads, setLeads] = useState<WhatsAppLead[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"resumen" | "portafolio" | "operaciones" | "inventario" | "finanzas" | "marketing" | "guiones" | "webapp_cms" | "tareas" | "pos" | "analiticas_saas" | "agenda">("resumen");
+  const [activeTab, setActiveTab] = useState<"resumen" | "portafolio" | "operaciones" | "inventario" | "finanzas" | "marketing" | "guiones" | "webapp_cms" | "tareas" | "pos" | "analiticas_saas" | "agenda" | "soporte">("resumen");
   const [operacionesSubTab, setOperacionesSubTab] = useState<"reservas" | "disponibilidad" | "timeline">("reservas");
   const [marketingSubTab, setMarketingSubTab] = useState<"descuentos" | "leads" | "reviews" | "channel-manager">("leads");
   
@@ -1945,6 +1946,7 @@ export function OwnerDashboard() {
             {[
               { id: "resumen", label: "Dashboard Ejecutivo", icon: BarChart3, enabled: true },
               { id: "agenda", label: "Agenda & Calendario", icon: Calendar, enabled: true, badge: "Drag & Drop" },
+              { id: "soporte", label: "Soporte Técnico", icon: Wrench, enabled: true, badge: "Tickets D&D" },
               { id: "webapp_cms", label: "Aplicación Web & CMS", icon: Globe, enabled: currentTenantConfig?.modules?.cms !== false, badge: "Web Builder" },
               { id: "tareas", label: "Gestión de Tareas", icon: Clipboard, enabled: !!currentTenantConfig?.modules?.tareas, badge: "SaaS" },
               { id: "pos", label: "Club POS", icon: Coffee, enabled: !!currentTenantConfig?.modules?.pos, badge: "SaaS" },
@@ -2262,6 +2264,14 @@ export function OwnerDashboard() {
         {/* AGENDA Y CALENDARIO TAB */}
         {activeTab === "agenda" && (
           <OwnerAgendaModule
+            establishmentId={selectedCalendarEst ? Number(selectedCalendarEst) : (establishments[0]?.id || 0)}
+            establishmentName={activeEstablishment?.name || "Mi Establecimiento"}
+          />
+        )}
+
+        {/* SOPORTE TÉCNICO TAB */}
+        {activeTab === "soporte" && (
+          <OwnerTechnicalSupportModule
             establishmentId={selectedCalendarEst ? Number(selectedCalendarEst) : (establishments[0]?.id || 0)}
             establishmentName={activeEstablishment?.name || "Mi Establecimiento"}
           />
