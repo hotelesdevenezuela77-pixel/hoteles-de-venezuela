@@ -268,7 +268,7 @@ export function CustomPageViewer() {
           <img 
             src="/images/quienes-somos/banner_hv_pareja.jpg" 
             alt="Hoteles de Venezuela Su Guía Turística" 
-            className="absolute inset-0 w-full h-full object-cover scale-[1.05] object-center"
+            className="absolute inset-0 w-full h-full object-cover scale-[1.05] object-top"
           />
 
           {/* Soft Dark Overlay to ensure image is clearly visible while text pops */}
