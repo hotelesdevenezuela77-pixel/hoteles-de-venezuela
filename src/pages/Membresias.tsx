@@ -261,24 +261,24 @@ export function Membresias() {
             <Zap className="w-3.5 h-3.5" /> Para propietarios de hoteles, posadas y negocios turísticos
           </div>
 
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight">
-            Tu Hotel en el{" "}
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight uppercase font-serif tracking-tight">
+            Destaca tu Hotel en{" "}
             <span style={{ background: `linear-gradient(90deg,${F},${T})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-              #1 de Google
+              Google
             </span>
             <br />+ Aplicación Web Propia
           </h1>
-          <p className="text-white/60 text-lg mb-4 max-w-2xl mx-auto">
-            Hoteles de Venezuela está posicionado #1 en Google. <br />
-            <span className="text-white/80 font-medium">¿Quieres que tu Hotel aparezca en el #1? Al-CLICA AQUÍ WEB</span>
+          <p className="text-white/70 text-base md:text-lg mb-4 max-w-2xl mx-auto leading-relaxed">
+            Hoteles de Venezuela cuenta con un alto alcance y visibilidad orgánica en los principales motores de búsqueda. <br />
+            <span className="text-white/90 font-bold">¿Quieres destacar tu alojamiento aquí?</span>
           </p>
 
           {/* Dos bloques principales */}
           <div className="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto mt-8 mb-8">
             <div className="rounded-2xl p-6 text-left" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
               <Globe className="w-7 h-7 mb-3" style={{ color: F }} />
-              <h3 className="text-white font-bold text-lg mb-1">Espacio en el #1 de Google</h3>
-              <p className="text-white/50 text-sm mb-3">Aparecer donde te buscan tus futuros clientes sin costosas campañas.</p>
+              <h3 className="text-white font-bold text-lg mb-1">Espacio Destacado en Google</h3>
+              <p className="text-white/50 text-sm mb-3">Aparecer donde te buscan tus futuros clientes con alta visibilidad orgánica.</p>
               <p className="text-2xl font-bold" style={{ color: F }}>Desde <span>$19</span><span className="text-base font-normal text-white/50">/mes</span></p>
             </div>
             <div className="rounded-2xl p-6 text-left" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
