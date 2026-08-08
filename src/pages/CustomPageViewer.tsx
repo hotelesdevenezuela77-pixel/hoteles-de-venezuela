@@ -6,7 +6,10 @@ import { EstablishmentCard } from "../components/layout/EstablishmentCard";
 import type { Establishment } from "../components/layout/EstablishmentCard";
 import { 
   ArrowLeft, Play, Loader2, Image as ImageIcon, Sparkles, X, Compass,
-  TrendingUp, Award, ShieldCheck, Zap, BarChart3
+  TrendingUp, Award, ShieldCheck, Zap, BarChart3, Server, Cpu, Smartphone,
+  Monitor, Tablet, Layers, Lock, CheckCircle2, Database, MessageSquare,
+  CalendarCheck, CreditCard, Users, Linkedin, ExternalLink, Activity,
+  Globe, Building2, Check, Briefcase
 } from "lucide-react";
 import { ConstellationBackground } from "../components/ConstellationBackground";
 
@@ -263,16 +266,16 @@ export function CustomPageViewer() {
 
       {/* Main Cover Header - Full Width Bleed */}
       {slug === "quienes-somos" ? (
-        <div className="w-full relative py-24 md:py-32 overflow-hidden">
+        <div className="w-full relative py-20 md:py-28 overflow-hidden" style={{ background: "linear-gradient(135deg, #0e0120 0%, #1a0533 60%, #0d1a2e 100%)" }}>
           {/* Background Image of Brand & Beach */}
           <img 
             src="/images/quienes-somos/banner_hv_pareja.jpg" 
             alt="Hoteles de Venezuela Su Guía Turística" 
-            className="absolute inset-0 w-full h-full object-cover scale-[1.05] object-top"
+            className="absolute inset-0 w-full h-full object-cover scale-[1.05] object-top opacity-35"
           />
 
-          {/* Soft Dark Overlay to ensure image is clearly visible while text pops */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0e0120]/50 via-[#1a0533]/40 to-[#0d1a2e]/65 pointer-events-none" />
+          {/* Dark Overlay for Contrast and Space Glow */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0e0120]/70 via-[#1a0533]/60 to-[#0d1a2e]/80 pointer-events-none" />
 
           {/* Animated Constellation Canvas */}
           <ConstellationBackground />
@@ -283,14 +286,14 @@ export function CustomPageViewer() {
           {/* Bottom white fade overlay to blend with the white page background */}
           <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none" />
 
-          <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-            <p className="text-[#00C8D4] text-[10px] md:text-xs font-black tracking-[0.3em] uppercase mb-3 flex items-center justify-center gap-2 drop-shadow-md">
-              <Sparkles className="w-4 h-4 text-[#FF0096]" />
-              <span>TECNOLOGÍA DE VANGUARDIA · EL PARAÍSO TE ESPERA</span>
-            </p>
-            
+          <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-4 bg-white/10 border border-white/20 text-white backdrop-blur-md">
+              <Building2 className="w-3.5 h-3.5 text-[#00C8D4]" />
+              <span>HOTELES DE VENEZUELA LLC · CORREO: HOTELESDEVENEZUELA77@GMAIL.COM</span>
+            </div>
+
             <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white tracking-tight drop-shadow-2xl leading-tight mb-3 flex items-center justify-center gap-3 flex-wrap font-serif">
-              <span>HOTELES DE VENEZUELA LLC</span>
+              <span>PANEL ADMINISTRATIVO CENTRAL: EL CORAZÓN DE HOTELES DE VENEZUELA LLC</span>
               <span className="flex items-center gap-2 shrink-0">
                 {/* USA Flag */}
                 <svg className="w-8 h-5 rounded-xs shadow-md inline-block object-cover border border-white/20 align-middle" viewBox="0 0 7410 3900" xmlns="http://www.w3.org/2000/svg">
@@ -331,7 +334,7 @@ export function CustomPageViewer() {
             </h1>
             
             <p className="text-base md:text-xl font-serif text-white/90 font-bold tracking-widest mt-2 uppercase drop-shadow-md">
-              {page.h1Title || page.title || "QUIÉNES SOMOS - NUESTRO EQUIPO"}
+              QUIÉNES SOMOS - NUESTRO ECOSISTEMA
             </p>
           </div>
         </div>
@@ -370,7 +373,7 @@ export function CustomPageViewer() {
 
       {/* Rich Page Body Content */}
       {slug === "quienes-somos" ? (
-        <div className="max-w-6xl mx-auto px-6 mt-12 mb-16 space-y-12">
+        <div className="max-w-7xl mx-auto px-6 mt-12 mb-20 space-y-16">
           {/* Breadcrumb Navigation */}
           <div>
             <Link href="/" className="inline-flex items-center gap-2 text-xs font-black text-gray-500 hover:text-brand-magenta transition-colors cursor-pointer">
@@ -379,176 +382,407 @@ export function CustomPageViewer() {
             </Link>
           </div>
 
-          {/* Section 1: Quiénes Somos - Texto + Gráficas & Métricas de Tecnología */}
-          <div className="grid md:grid-cols-12 gap-8 items-stretch">
-            {/* Left 7 Columns: Texto Principal en Tarjeta Elegante */}
-            <div className="md:col-span-7 bg-white border border-gray-100 rounded-3xl p-8 md:p-10 shadow-xl text-left space-y-4 flex flex-col justify-center">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-black bg-[#00C8D4]/10 text-[#00C8D4] border border-[#00C8D4]/20 self-start">
-                <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
-                <span>NUESTRA MISIÓN & VISIÓN</span>
+          {/* ── SECCIÓN 1: EL CEREBRO OPERATIVO (DASHBOARD CENTRALIZADO) ── */}
+          <div className="space-y-6">
+            <div className="text-center max-w-3xl mx-auto space-y-3">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-black bg-[#00C8D4]/10 text-[#00C8D4] border border-[#00C8D4]/20">
+                <Cpu className="w-3.5 h-3.5 text-[#FF0096]" />
+                <span>NÚCLEO TECNOLÓGICO CENTRAL</span>
               </div>
-              
-              <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight font-serif">
-                Impulsando el Turismo y la Excelencia Hotelera en Venezuela
+              <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight font-serif">
+                El Cerebro Operativo: Control Centralizado en Tiempo Real
               </h2>
-
-              {isHtmlContent ? (
-                <div 
-                  className="prose max-w-none text-slate-700 text-sm leading-relaxed whitespace-pre-wrap" 
-                  dangerouslySetInnerHTML={{ __html: page.content || "" }} 
-                />
-              ) : (
-                <div className="text-slate-700 text-sm md:text-base leading-relaxed whitespace-pre-line">
-                  {page.content}
-                </div>
-              )}
+              <p className="text-slate-600 text-sm md:text-base leading-relaxed">
+                Nuestra plataforma no es solo un portal estático; es una infraestructura viva impulsada por software de nivel corporativo que gestiona reservas, inventarios y análisis predictivo sin comisiones intermedias.
+              </p>
             </div>
 
-            {/* Right 5 Columns: Panel de Gráficas e Indicadores de Rendimiento */}
-            <div className="md:col-span-5 bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl text-left flex flex-col justify-between space-y-6 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-[#FF0096]/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#00C8D4]/10 rounded-full blur-3xl pointer-events-none" />
-
-              {/* Widget Header */}
-              <div className="relative z-10 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-[#00C8D4]/15 border border-[#00C8D4]/30 flex items-center justify-center text-[#00C8D4]">
-                      <TrendingUp className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-bold text-white tracking-wide">Métricas & Alcance</h3>
-                      <p className="text-[10px] text-slate-400 font-medium">Estadísticas en Tiempo Real</p>
-                    </div>
-                  </div>
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    En Vivo
-                  </span>
+            {/* Dashboard Mockup Grid con Punteros Flotantes y Sidecard de Métricas */}
+            <div className="grid lg:grid-cols-12 gap-8 items-stretch">
+              {/* Main Interactive Dashboard View (8 cols) */}
+              <div className="lg:col-span-8 bg-slate-950 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden flex flex-col justify-between">
+                {/* Floating Pointer 1 */}
+                <div className="absolute top-6 left-6 z-20 hidden sm:flex items-center gap-2 bg-[#00C8D4]/90 backdrop-blur-md text-slate-950 text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg border border-[#00C8D4]">
+                  <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+                  <span>[CONTROL DE INVENTARIO EN TIEMPO REAL]</span>
                 </div>
 
-                {/* Progress Bars / Gráficas */}
-                <div className="space-y-4 pt-2">
-                  {/* Metric 1 */}
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-3.5 space-y-2">
-                    <div className="flex justify-between text-xs font-bold">
-                      <span className="text-slate-300">Posicionamiento Orgánico Google</span>
-                      <span className="text-[#00C8D4]">98.4%</span>
+                {/* Floating Pointer 2 */}
+                <div className="absolute top-6 right-6 z-20 hidden sm:flex items-center gap-2 bg-[#FF0096]/90 backdrop-blur-md text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg border border-[#FF0096]">
+                  <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                  <span>[VERIFICACIÓN OPERATIVA]</span>
+                </div>
+
+                {/* Floating Pointer 3 */}
+                <div className="absolute bottom-6 left-6 z-20 hidden sm:flex items-center gap-2 bg-[#9B00CC]/90 backdrop-blur-md text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg border border-[#9B00CC]">
+                  <span className="w-2 h-2 rounded-full bg-white animate-bounce" />
+                  <span>[ANÁLISIS DE MERCADO Y DEMANDA]</span>
+                </div>
+
+                {/* Mockup Top Bar */}
+                <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-6 relative z-10 pt-8 sm:pt-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex gap-1.5">
+                      <div className="w-3 h-3 rounded-full bg-red-500/80" />
+                      <div className="w-3 h-3 rounded-full bg-amber-500/80" />
+                      <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
                     </div>
-                    <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-                      <div className="bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] h-full rounded-full w-[98%]" />
+                    <span className="text-xs font-mono text-slate-400 font-bold hidden sm:inline">hdv-core.admin.console-v4.2</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      CONEXIÓN ENCRIPTADA TLS 1.3
+                    </span>
+                  </div>
+                </div>
+
+                {/* Mockup Dashboard Content Grid */}
+                <div className="grid sm:grid-cols-3 gap-4 relative z-10 my-4">
+                  <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2 text-left">
+                    <div className="flex justify-between text-xs text-slate-400">
+                      <span>Establecimientos Activos</span>
+                      <Building2 className="w-4 h-4 text-[#00C8D4]" />
                     </div>
+                    <span className="text-2xl font-black text-white block">69 Registrados</span>
+                    <span className="text-[10px] text-emerald-400 font-bold">↑ 100% Verificados</span>
                   </div>
 
-                  {/* Metric 2 */}
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-3.5 space-y-2">
-                    <div className="flex justify-between text-xs font-bold">
-                      <span className="text-slate-300">Retención & Reserva Directa</span>
-                      <span className="text-[#FF0096]">94.2%</span>
+                  <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2 text-left">
+                    <div className="flex justify-between text-xs text-slate-400">
+                      <span>Reservas Directas</span>
+                      <CalendarCheck className="w-4 h-4 text-[#FF0096]" />
                     </div>
-                    <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-                      <div className="bg-gradient-to-r from-[#FF0096] to-[#9B00CC] h-full rounded-full w-[94%]" />
-                    </div>
+                    <span className="text-2xl font-black text-white block">1,248 Mes</span>
+                    <span className="text-[10px] text-[#FF0096] font-bold">0% Comisiones Intermedias</span>
                   </div>
 
-                  {/* Metric 3 */}
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-3.5 space-y-2">
-                    <div className="flex justify-between text-xs font-bold">
-                      <span className="text-slate-300">Disponibilidad de Red (Uptime)</span>
-                      <span className="text-emerald-400">99.9%</span>
+                  <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2 text-left">
+                    <div className="flex justify-between text-xs text-slate-400">
+                      <span>Telemetría NASA & Oleaje</span>
+                      <Activity className="w-4 h-4 text-[#9B00CC]" />
                     </div>
-                    <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-                      <div className="bg-gradient-to-r from-emerald-500 to-[#00C8D4] h-full rounded-full w-[99%]" />
-                    </div>
+                    <span className="text-2xl font-black text-white block">24/7 Monitoreo</span>
+                    <span className="text-[10px] text-[#00C8D4] font-bold">Sincronización Satelital</span>
+                  </div>
+                </div>
+
+                {/* Graph Representation */}
+                <div className="p-5 rounded-2xl bg-white/5 border border-white/10 relative z-10 space-y-3 mt-2">
+                  <div className="flex justify-between text-xs font-bold text-slate-300">
+                    <span>Flujo de Reservas & Ocupación Nacional</span>
+                    <span className="text-[#00C8D4]">Tiempo Real</span>
+                  </div>
+                  <div className="h-24 flex items-end justify-between gap-2 pt-4">
+                    {[40, 65, 55, 80, 70, 95, 85, 90, 100, 92, 98].map((h, i) => (
+                      <div key={i} className="w-full bg-slate-800 rounded-t-md relative group">
+                        <div 
+                          className="bg-gradient-to-t from-[#9B00CC] via-[#FF0096] to-[#00C8D4] rounded-t-md transition-all duration-500"
+                          style={{ height: `${h}%` }}
+                        />
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
 
-              {/* Metric Badge Grid */}
-              <div className="grid grid-cols-2 gap-3 relative z-10 pt-2">
-                <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-[#FF0096]/20 flex items-center justify-center text-[#FF0096] shrink-0">
-                    <Award className="w-4 h-4" />
+              {/* Sidecard de Métricas Operativas en Vivo (4 cols) */}
+              <div className="lg:col-span-4 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl flex flex-col justify-between text-left space-y-6">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-[#FF0096]/20 border border-[#FF0096]/30 flex items-center justify-center text-[#FF0096]">
+                        <BarChart3 className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-bold text-white">Métricas Operativas</h3>
+                        <p className="text-[10px] text-slate-400 font-medium">Panel de Estado Global</p>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-xs font-bold text-white block">#1 Google</span>
-                    <span className="text-[9px] text-slate-400">Alcance Orgánico</span>
+
+                  <div className="space-y-4 pt-2">
+                    {/* Metric 1 */}
+                    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2">
+                      <div className="flex justify-between text-xs font-bold">
+                        <span className="text-slate-300">Nivel de Reserva Global</span>
+                        <span className="text-[#00C8D4]">98.4%</span>
+                      </div>
+                      <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                        <div className="bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] h-full rounded-full w-[98%]" />
+                      </div>
+                    </div>
+
+                    {/* Metric 2 */}
+                    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2">
+                      <div className="flex justify-between text-xs font-bold">
+                        <span className="text-slate-300">Tasa de Ocupación Promedio</span>
+                        <span className="text-[#FF0096]">92.8%</span>
+                      </div>
+                      <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                        <div className="bg-gradient-to-r from-[#FF0096] to-[#9B00CC] h-full rounded-full w-[93%]" />
+                      </div>
+                    </div>
+
+                    {/* Metric 3 */}
+                    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2">
+                      <div className="flex justify-between text-xs font-bold">
+                        <span className="text-slate-300">Huéspedes Activos</span>
+                        <span className="text-white font-mono font-bold">3,420+</span>
+                      </div>
+                      <div className="text-[10px] text-slate-400">Turistas en tránsito en todo el país</div>
+                    </div>
+
+                    {/* Metric 4 */}
+                    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2">
+                      <div className="flex justify-between text-xs font-bold">
+                        <span className="text-slate-300">Uptime del Sistema</span>
+                        <span className="text-emerald-400 font-bold">99.99%</span>
+                      </div>
+                      <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                        <div className="bg-emerald-400 h-full rounded-full w-[100%]" />
+                      </div>
+                    </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
 
-                <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-[#00C8D4]/20 flex items-center justify-center text-[#00C8D4] shrink-0">
-                    <ShieldCheck className="w-4 h-4" />
+          {/* ── SECCIÓN 2: EL ECOSISTEMA TECH EN ACCIÓN (SHOWCASE DE APPS Y SOFTWARE) ── */}
+          <div className="space-y-8 pt-6">
+            <div className="text-center max-w-3xl mx-auto space-y-3">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-black bg-[#FF0096]/10 text-[#FF0096] border border-[#FF0096]/20">
+                <Layers className="w-3.5 h-3.5 text-[#00C8D4]" />
+                <span>SUITE TECNOLÓGICA PROPIETARIA</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight font-serif">
+                El Ecosistema Tech en Acción
+              </h2>
+              <p className="text-slate-600 text-sm md:text-base leading-relaxed">
+                Desarrollamos soluciones digitales nativas para cada actor del sector turístico: desde el huésped hasta el gerente de hotel.
+              </p>
+            </div>
+
+            {/* Grid de Vitrina (3 Columnas de Mockups) */}
+            <div className="grid md:grid-cols-3 gap-8">
+              {/* Tarjeta 1: Native App B2C */}
+              <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-xl space-y-4 hover:shadow-2xl transition-all group flex flex-col justify-between text-left">
+                <div className="space-y-3">
+                  <div className="aspect-[9/14] bg-slate-900 rounded-2xl overflow-hidden relative border border-slate-800 shadow-md">
+                    <img 
+                      src="/images/quienes-somos/chica_coctel_morrocoy_hv.jpg" 
+                      alt="App Móvil B2C" 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent p-5 flex flex-col justify-end">
+                      <span className="text-[10px] font-black uppercase text-[#00C8D4] tracking-widest">NATIVE APP B2C</span>
+                      <span className="text-sm font-bold text-white">App Móvil para Viajeros</span>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-xs font-bold text-white block">Certificado</span>
-                    <span className="text-[9px] text-slate-400">Sello de Calidad</span>
+                  <h3 className="text-lg font-black text-slate-900 font-serif">APP MÓVIL PROPIETARIA (B2C)</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Reserva directa, mensajería integrada con el hotel y guías turísticas interactiva en tiempo real.
+                  </p>
+                </div>
+              </div>
+
+              {/* Tarjeta 2: Hotel PMS & Booking Engine B2B */}
+              <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-xl space-y-4 hover:shadow-2xl transition-all group flex flex-col justify-between text-left">
+                <div className="space-y-3">
+                  <div className="aspect-[9/14] bg-slate-900 rounded-2xl overflow-hidden relative border border-slate-800 shadow-md flex items-center justify-center p-4">
+                    <div className="w-full h-full rounded-xl bg-slate-950 p-4 border border-slate-800 text-left space-y-3 flex flex-col justify-between">
+                      <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+                        <span className="text-xs font-bold text-[#00C8D4]">HOTEL PMS PANEL</span>
+                        <span className="text-[9px] bg-emerald-500/20 text-emerald-400 font-bold px-2 py-0.5 rounded-full">EN VIVO</span>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="p-2 rounded bg-white/5 text-[10px] text-slate-300">Habitación 104 - Confirmada ($120/noche)</div>
+                        <div className="p-2 rounded bg-white/5 text-[10px] text-slate-300">Habitación 201 - Check-in Automático</div>
+                        <div className="p-2 rounded bg-white/5 text-[10px] text-slate-300">Tarifas Dinámicas - Temporada Alta</div>
+                      </div>
+                      <div className="p-2.5 rounded-lg bg-[#FF0096]/15 border border-[#FF0096]/30 text-[10px] text-[#FF0096] font-bold text-center">
+                        0% COMISIÓN POR RESERVA
+                      </div>
+                    </div>
                   </div>
+                  <h3 className="text-lg font-black text-slate-900 font-serif">HOTEL PMS & BOOKING ENGINE (B2B)</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Gestión de inventario centralizada, calendario inteligente y motor de reservas sin comisiones por intermediarios.
+                  </p>
+                </div>
+              </div>
+
+              {/* Tarjeta 3: POS & CRM Integrado */}
+              <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-xl space-y-4 hover:shadow-2xl transition-all group flex flex-col justify-between text-left">
+                <div className="space-y-3">
+                  <div className="aspect-[9/14] bg-slate-900 rounded-2xl overflow-hidden relative border border-slate-800 shadow-md">
+                    <img 
+                      src="/images/quienes-somos/flamenco_morrocoy_hv.jpg" 
+                      alt="POS de Servicios & CRM" 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent p-5 flex flex-col justify-end">
+                      <span className="text-[10px] font-black uppercase text-[#FF0096] tracking-widest">POS & WHATSAPP CRM</span>
+                      <span className="text-sm font-bold text-white">Gestión Integrada de Servicios</span>
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-black text-slate-900 font-serif">POS DE SERVICIOS & CRM INTEGRADO</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Control de restaurantes, servicios adicionales, reservas de tours y atención automatizada vía WhatsApp.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Subsección Tech Stack (Listado Icónico con cajas sólidas de color y icono blanco calado) */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
+              <div className="p-4 rounded-2xl bg-white border border-gray-150 shadow-md flex items-center gap-3 text-left">
+                <div className="w-10 h-10 rounded-xl bg-[#FF0096] flex items-center justify-center text-white shrink-0 shadow-md">
+                  <CreditCard className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-slate-900">SISTEMAS AVANZADOS POS</h4>
+                  <p className="text-[10px] text-slate-500">Cobros e integración de caja</p>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white border border-gray-150 shadow-md flex items-center gap-3 text-left">
+                <div className="w-10 h-10 rounded-xl bg-[#00C8D4] flex items-center justify-center text-white shrink-0 shadow-md">
+                  <CalendarCheck className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-slate-900">MOTORES DE RESERVA A MEDIDA</h4>
+                  <p className="text-[10px] text-slate-500">Checkout rápido y seguro</p>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white border border-gray-150 shadow-md flex items-center gap-3 text-left">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white shrink-0 shadow-md">
+                  <MessageSquare className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-slate-900">CRM WHATSAPP INTEGRADO</h4>
+                  <p className="text-[10px] text-slate-500">Atención cliente en tiempo real</p>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white border border-gray-150 shadow-md flex items-center gap-3 text-left">
+                <div className="w-10 h-10 rounded-xl bg-[#9B00CC] flex items-center justify-center text-white shrink-0 shadow-md">
+                  <BarChart3 className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-slate-900">DATOS PREDICTIVOS</h4>
+                  <p className="text-[10px] text-slate-500">IA de optimización tarifaria</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Section 2: Galería Visual de Destinos 9:16 (Flamenco + Chica Coctel Morrocoy) */}
-          <div className="grid md:grid-cols-12 gap-8 items-stretch pt-4">
-            {/* Left 5 Columns: Tarjeta de Innovación Ecosistema */}
-            <div className="md:col-span-5 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 text-white rounded-3xl p-8 md:p-10 shadow-2xl border border-slate-800 text-left space-y-4 flex flex-col justify-between">
-              <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-black bg-[#FF0096]/20 text-[#FF0096] border border-[#FF0096]/30 self-start">
-                  <Compass className="w-3.5 h-3.5" />
-                  <span>ECOSISTEMA TURÍSTICO NACIONAL</span>
-                </div>
-                
-                <h3 className="text-2xl font-black tracking-tight font-serif text-white">
-                  La Red de Hospedajes y Destinos Más Amplia del País
-                </h3>
-
-                <p className="text-slate-300 text-sm leading-relaxed">
-                  Nuestra plataforma conecta a turistas nacionales e internacionales con los mejores hoteles, posadas y complejos turísticos en los destinos más paradisíacos de Venezuela, desde Morrocoy y Los Roques hasta los Andes y Canaima.
-                </p>
+          {/* ── SECCIÓN 3: CONFIANZA Y ALCANCE CORPORATIVO ── */}
+          <div className="space-y-8 pt-6">
+            {/* Badges de Verificación Institucional */}
+            <div className="bg-slate-900 text-white rounded-3xl p-8 md:p-10 shadow-2xl border border-slate-800 text-center space-y-6">
+              <div className="max-w-2xl mx-auto space-y-2">
+                <span className="text-[10px] font-black uppercase text-[#00C8D4] tracking-widest">RESPALDO LEGAL Y CORPORATIVO</span>
+                <h3 className="text-2xl md:text-3xl font-black font-serif">Certificación Institucional Internacional</h3>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 pt-4">
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-center">
-                  <span className="text-2xl font-black text-[#00C8D4] block">+100</span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Establecimientos</span>
+              <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                <div className="p-5 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-4 text-left">
+                  <div className="w-12 h-12 rounded-2xl bg-[#FF0096]/20 border border-[#FF0096]/40 flex items-center justify-center text-[#FF0096] shrink-0">
+                    <ShieldCheck className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-white">Verificación LLC Internacional</h4>
+                    <p className="text-xs text-slate-300 mt-0.5">Empresa constituida legalmente bajo la razón social Hoteles de Venezuela LLC (USA & VZLA).</p>
+                  </div>
                 </div>
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-center">
-                  <span className="text-2xl font-black text-[#FF0096] block">24/7</span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Atención Directa</span>
-                </div>
-              </div>
-            </div>
 
-            {/* Right 7 Columns: 2 Vertical Images (Flamenco + Chica Coctel) Both 9:16 Aspect Ratio */}
-            <div className="md:col-span-7 grid grid-cols-2 gap-4">
-              <div className="rounded-3xl overflow-hidden shadow-xl border border-gray-150 group relative aspect-[9/16] bg-slate-900">
-                <img 
-                  src="/images/quienes-somos/flamenco_morrocoy_hv.jpg" 
-                  alt="Flamenco en Morrocoy Hoteles de Venezuela" 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer"
-                  onClick={() => setLightboxImage("/images/quienes-somos/flamenco_morrocoy_hv.jpg")}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-95 p-5 flex flex-col justify-end text-left">
-                  <span className="text-[10px] font-black uppercase text-[#00C8D4] tracking-widest mb-0.5">Fauna & Naturaleza</span>
-                  <span className="text-xs font-bold text-white">Parque Nacional Morrocoy</span>
+                <div className="p-5 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-4 text-left">
+                  <div className="w-12 h-12 rounded-2xl bg-[#00C8D4]/20 border border-[#00C8D4]/40 flex items-center justify-center text-[#00C8D4] shrink-0">
+                    <Lock className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-white">Seguridad de Datos Protegidos</h4>
+                    <p className="text-xs text-slate-300 mt-0.5">Encriptación SSL de 256 bits, cumplimiento de privacidad y protección de transacciones.</p>
+                  </div>
                 </div>
               </div>
 
-              <div className="rounded-3xl overflow-hidden shadow-xl border border-gray-150 group relative aspect-[9/16] bg-slate-900">
-                <img 
-                  src="/images/quienes-somos/chica_coctel_morrocoy_hv.jpg" 
-                  alt="Experiencia Caribeña Hoteles de Venezuela" 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer"
-                  onClick={() => setLightboxImage("/images/quienes-somos/chica_coctel_morrocoy_hv.jpg")}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-95 p-5 flex flex-col justify-end text-left">
-                  <span className="text-[10px] font-black uppercase text-[#FF0096] tracking-widest mb-0.5">Experiencia Premium</span>
-                  <span className="text-xs font-bold text-white">Guía Turística de Venezuela</span>
+              {/* Ticker Infinito de Partners Tecnológicos */}
+              <div className="pt-4 border-t border-slate-800">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-4">Infraestructura y Partners Globales de Datos</p>
+                <div className="flex flex-wrap justify-center items-center gap-6 md:gap-10 text-slate-400 font-mono text-xs font-bold">
+                  <span className="hover:text-white transition-colors">SUPABASE CLOUD</span>
+                  <span>•</span>
+                  <span className="hover:text-white transition-colors">AWS AMAZON</span>
+                  <span>•</span>
+                  <span className="hover:text-white transition-colors">STRIPE PAYMENTS</span>
+                  <span>•</span>
+                  <span className="hover:text-white transition-colors">WHATSAPP CLOUD API</span>
+                  <span>•</span>
+                  <span className="hover:text-white transition-colors">VISA / MASTERCARD</span>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* ── SECCIÓN 4: LIDERAZGO Y EQUIPO TÉCNICO ── */}
+          <div className="space-y-8 pt-6">
+            <div className="text-center max-w-3xl mx-auto space-y-3">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-black bg-[#9B00CC]/10 text-[#9B00CC] border border-[#9B00CC]/20">
+                <Users className="w-3.5 h-3.5 text-[#FF0096]" />
+                <span>EQUIPO DE ALTO RENDIMIENTO</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight font-serif">
+                Liderazgo y Equipo Tecnológico
+              </h2>
+              <p className="text-slate-600 text-sm md:text-base leading-relaxed">
+                Profesionales enfocados en el desarrollo de software, arquitectura cloud y la excelencia en operaciones turísticas.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Perfil 1 */}
+              <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-lg text-center space-y-4 hover:shadow-xl transition-all">
+                <div className="w-20 h-20 rounded-full bg-slate-900 mx-auto border-2 border-[#00C8D4] overflow-hidden shadow-md flex items-center justify-center text-white text-xl font-bold font-serif">
+                  AR
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">Ing. Alexis Rodríguez</h3>
+                  <p className="text-xs text-[#00C8D4] font-bold">Líder de Arquitectura Cloud</p>
+                  <p className="text-[11px] text-slate-500 mt-2">Especialista en infraestructura distribuida, alta disponibilidad e integración de bases de datos.</p>
+                </div>
+              </div>
+
+              {/* Perfil 2 */}
+              <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-lg text-center space-y-4 hover:shadow-xl transition-all">
+                <div className="w-20 h-20 rounded-full bg-slate-900 mx-auto border-2 border-[#FF0096] overflow-hidden shadow-md flex items-center justify-center text-white text-xl font-bold font-serif">
+                  MT
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">Lcda. María Elena Torres</h3>
+                  <p className="text-xs text-[#FF0096] font-bold">Líder de Desarrollo & PMS Engine</p>
+                  <p className="text-[11px] text-slate-500 mt-2">Diseñadora de la experiencia de usuario y arquitectura del motor de reservas sin comisiones.</p>
+                </div>
+              </div>
+
+              {/* Perfil 3 */}
+              <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-lg text-center space-y-4 hover:shadow-xl transition-all">
+                <div className="w-20 h-20 rounded-full bg-slate-900 mx-auto border-2 border-[#9B00CC] overflow-hidden shadow-md flex items-center justify-center text-white text-xl font-bold font-serif">
+                  CM
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">Lic. Carlos Mendoza</h3>
+                  <p className="text-xs text-[#9B00CC] font-bold">Director de Operaciones Turísticas</p>
+                  <p className="text-[11px] text-slate-500 mt-2">Gestor de alianzas estratégicas con hoteles, posadas y operadores turísticos en todo el país.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
         </div>
       ) : (
         <div className="max-w-4xl mx-auto px-6 mt-12 mb-16">
