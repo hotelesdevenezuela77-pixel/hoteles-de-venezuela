@@ -7,6 +7,7 @@ import type { Establishment } from "../components/layout/EstablishmentCard";
 import { 
   ArrowLeft, Play, Loader2, Image as ImageIcon, Sparkles, X, Compass
 } from "lucide-react";
+import { ConstellationBackground } from "../components/ConstellationBackground";
 
 interface CustomPage {
   id: number;
@@ -260,36 +261,99 @@ export function CustomPageViewer() {
       )}
 
       {/* Main Cover Header - Full Width Bleed */}
-      <div className="w-full relative h-[400px] md:h-[500px] overflow-hidden">
-        {page.featuredImage ? (
-          <img 
-            src={page.featuredImage} 
-            alt={page.title} 
-            className="w-full h-full object-cover scale-[1.08]"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&w=1200&q=80";
-            }}
-          />
-        ) : (
-          <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #0e0120, #1a0533, #0a1628)" }} />
-        )}
+      {slug === "quienes-somos" ? (
+        <div className="w-full relative py-20 md:py-28 overflow-hidden" style={{ background: "linear-gradient(135deg, #0e0120 0%, #1a0533 60%, #0d1a2e 100%)" }}>
+          <ConstellationBackground />
+          <div className="absolute top-0 right-0 w-72 h-72 rounded-full blur-3xl opacity-20 pointer-events-none" style={{ background: "#FF0096" }} />
+          <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full blur-3xl opacity-20 pointer-events-none" style={{ background: "#00C8D4" }} />
+          
+          {/* Bottom white fade overlay to blend with the white page background */}
+          <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white via-white/40 to-transparent pointer-events-none" />
 
-        {/* Top/Middle dark overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/25 to-transparent pointer-events-none" />
-
-        {/* Bottom white fade overlay to blend with the white page background */}
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none" />
-
-        {/* Center-aligned info overlay */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-          <p className="text-white/80 text-[10px] md:text-xs font-black tracking-[0.3em] uppercase mb-3 drop-shadow-md">
-            EL PARAÍSO TE ESPERA
-          </p>
-          <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white tracking-tight drop-shadow-2xl leading-tight max-w-4xl playfair">
-            {page.h1Title || page.title}
-          </h1>
+          <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
+            <p className="text-[#00C8D4] text-[10px] md:text-xs font-black tracking-[0.3em] uppercase mb-3 flex items-center justify-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#FF0096]" />
+              <span>TECNOLOGÍA DE VANGUARDIA · EL PARAÍSO TE ESPERA</span>
+            </p>
+            
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white tracking-tight drop-shadow-2xl leading-tight mb-3 flex items-center justify-center gap-3 flex-wrap font-serif">
+              <span>HOTELES DE VENEZUELA LLC</span>
+              <span className="flex items-center gap-2 shrink-0">
+                {/* USA Flag */}
+                <svg className="w-8 h-5 rounded-xs shadow-md inline-block object-cover border border-white/20 align-middle" viewBox="0 0 7410 3900" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="7410" height="3900" fill="#b22234"/>
+                  <path d="M0,300h7410M0,900h7410M0,1500h7410M0,2100h7410M0,2700h7410M0,3300h7410" stroke="#fff" strokeWidth="300"/>
+                  <rect width="2964" height="2100" fill="#3c3b6e"/>
+                  <g fill="#fff">
+                    <circle cx="296" cy="175" r="45"/><circle cx="889" cy="175" r="45"/><circle cx="1482" cy="175" r="45"/><circle cx="2075" cy="175" r="45"/><circle cx="2668" cy="175" r="45"/>
+                    <circle cx="593" cy="350" r="45"/><circle cx="1186" cy="350" r="45"/><circle cx="1778" cy="350" r="45"/><circle cx="2371" cy="350" r="45"/>
+                    <circle cx="296" cy="525" r="45"/><circle cx="889" cy="525" r="45"/><circle cx="1482" cy="525" r="45"/><circle cx="2075" cy="525" r="45"/><circle cx="2668" cy="525" r="45"/>
+                    <circle cx="593" cy="700" r="45"/><circle cx="1186" cy="700" r="45"/><circle cx="1778" cy="700" r="45"/><circle cx="2371" cy="700" r="45"/>
+                    <circle cx="296" cy="875" r="45"/><circle cx="889" cy="875" r="45"/><circle cx="1482" cy="875" r="45"/><circle cx="2075" cy="875" r="45"/><circle cx="2668" cy="875" r="45"/>
+                    <circle cx="593" cy="1050" r="45"/><circle cx="1186" cy="1050" r="45"/><circle cx="1778" cy="1050" r="45"/><circle cx="2371" cy="1050" r="45"/>
+                    <circle cx="296" cy="1225" r="45"/><circle cx="889" cy="1225" r="45"/><circle cx="1482" cy="1225" r="45"/><circle cx="2075" cy="1225" r="45"/><circle cx="2668" cy="1225" r="45"/>
+                    <circle cx="593" cy="1400" r="45"/><circle cx="1186" cy="1400" r="45"/><circle cx="1778" cy="1400" r="45"/><circle cx="2371" cy="1400" r="45"/>
+                    <circle cx="296" cy="1575" r="45"/><circle cx="889" cy="1575" r="45"/><circle cx="1482" cy="1575" r="45"/><circle cx="2075" cy="1575" r="45"/><circle cx="2668" cy="1575" r="45"/>
+                    <circle cx="593" cy="1750" r="45"/><circle cx="1186" cy="1750" r="45"/><circle cx="1778" cy="1750" r="45"/><circle cx="2371" cy="1750" r="45"/>
+                    <circle cx="296" cy="1925" r="45"/><circle cx="889" cy="1925" r="45"/><circle cx="1482" cy="1925" r="45"/><circle cx="2075" cy="1925" r="45"/><circle cx="2668" cy="1925" r="45"/>
+                  </g>
+                </svg>
+                {/* Venezuela Flag */}
+                <svg className="w-8 h-5 rounded-xs shadow-md inline-block object-cover border border-white/20 align-middle" viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="900" height="200" fill="#ffcc00"/>
+                  <rect y="200" width="900" height="200" fill="#00247d"/>
+                  <rect y="400" width="900" height="200" fill="#cf142b"/>
+                  <g fill="#fff" transform="translate(450, 310)">
+                    <circle cx="-100" cy="20" r="10" />
+                    <circle cx="-73" cy="-10" r="10" />
+                    <circle cx="-40" cy="-30" r="10" />
+                    <circle cx="-13" cy="-40" r="10" />
+                    <circle cx="13" cy="-40" r="10" />
+                    <circle cx="40" cy="-30" r="10" />
+                    <circle cx="73" cy="-10" r="10" />
+                    <circle cx="100" cy="20" r="10" />
+                  </g>
+                </svg>
+              </span>
+            </h1>
+            
+            <p className="text-base md:text-xl font-serif text-white/90 font-bold tracking-widest mt-2 uppercase">
+              {page.h1Title || page.title || "QUIÉNES SOMOS - NUESTRO EQUIPO"}
+            </p>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="w-full relative h-[400px] md:h-[500px] overflow-hidden">
+          {page.featuredImage ? (
+            <img 
+              src={page.featuredImage} 
+              alt={page.title} 
+              className="w-full h-full object-cover scale-[1.08]"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&w=1200&q=80";
+              }}
+            />
+          ) : (
+            <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #0e0120, #1a0533, #0a1628)" }} />
+          )}
+
+          {/* Top/Middle dark overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/25 to-transparent pointer-events-none" />
+
+          {/* Bottom white fade overlay to blend with the white page background */}
+          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none" />
+
+          {/* Center-aligned info overlay */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+            <p className="text-white/80 text-[10px] md:text-xs font-black tracking-[0.3em] uppercase mb-3 drop-shadow-md">
+              EL PARAÍSO TE ESPERA
+            </p>
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white tracking-tight drop-shadow-2xl leading-tight max-w-4xl playfair">
+              {page.h1Title || page.title}
+            </h1>
+          </div>
+        </div>
+      )}
 
       {/* Rich Page Body Content */}
       <div className="max-w-4xl mx-auto px-6 mt-12 mb-16">
