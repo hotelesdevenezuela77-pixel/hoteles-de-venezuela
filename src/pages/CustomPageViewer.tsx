@@ -5,7 +5,8 @@ import { ESTABLISHMENTS_MOCK } from "../lib/establishmentsMock";
 import { EstablishmentCard } from "../components/layout/EstablishmentCard";
 import type { Establishment } from "../components/layout/EstablishmentCard";
 import { 
-  ArrowLeft, Play, Loader2, Image as ImageIcon, Sparkles, X, Compass
+  ArrowLeft, Play, Loader2, Image as ImageIcon, Sparkles, X, Compass,
+  TrendingUp, Award, ShieldCheck, Zap, BarChart3
 } from "lucide-react";
 import { ConstellationBackground } from "../components/ConstellationBackground";
 
@@ -262,16 +263,16 @@ export function CustomPageViewer() {
 
       {/* Main Cover Header - Full Width Bleed */}
       {slug === "quienes-somos" ? (
-        <div className="w-full relative py-20 md:py-28 overflow-hidden">
+        <div className="w-full relative py-24 md:py-32 overflow-hidden">
           {/* Background Image of Brand & Beach */}
           <img 
             src="/images/quienes-somos/banner_hv_pareja.jpg" 
             alt="Hoteles de Venezuela Su Guía Turística" 
-            className="absolute inset-0 w-full h-full object-cover scale-[1.08] object-center"
+            className="absolute inset-0 w-full h-full object-cover scale-[1.05] object-center"
           />
 
-          {/* Dark Overlay for Contrast and Readability */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0e0120]/80 via-[#1a0533]/70 to-[#0d1a2e]/85 pointer-events-none" />
+          {/* Soft Dark Overlay to ensure image is clearly visible while text pops */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0e0120]/50 via-[#1a0533]/40 to-[#0d1a2e]/65 pointer-events-none" />
 
           {/* Animated Constellation Canvas */}
           <ConstellationBackground />
@@ -378,7 +379,7 @@ export function CustomPageViewer() {
             </Link>
           </div>
 
-          {/* Section 1: Quiénes Somos - Texto + Imagen Ejecutiva Vertical (9:16) */}
+          {/* Section 1: Quiénes Somos - Texto + Gráficas & Métricas de Tecnología */}
           <div className="grid md:grid-cols-12 gap-8 items-stretch">
             {/* Left 7 Columns: Texto Principal en Tarjeta Elegante */}
             <div className="md:col-span-7 bg-white border border-gray-100 rounded-3xl p-8 md:p-10 shadow-xl text-left space-y-4 flex flex-col justify-center">
@@ -403,17 +404,87 @@ export function CustomPageViewer() {
               )}
             </div>
 
-            {/* Right 5 Columns: Imagen Ejecutiva Vertical 9:16 */}
-            <div className="md:col-span-5 rounded-3xl overflow-hidden shadow-xl border border-gray-150 group relative aspect-[9/16] bg-slate-900">
-              <img 
-                src="/images/quienes-somos/ejecutiva_portal_alojamiento_hv.jpg" 
-                alt="Atención al Cliente Hoteles de Venezuela" 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer"
-                onClick={() => setLightboxImage("/images/quienes-somos/ejecutiva_portal_alojamiento_hv.jpg")}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-95 p-6 flex flex-col justify-end text-left">
-                <span className="text-[11px] font-black uppercase text-[#00C8D4] tracking-widest mb-1">Atención Corporativa</span>
-                <span className="text-sm font-bold text-white">Portal Alojamiento & Servicio al Cliente</span>
+            {/* Right 5 Columns: Panel de Gráficas e Indicadores de Rendimiento */}
+            <div className="md:col-span-5 bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl text-left flex flex-col justify-between space-y-6 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-[#FF0096]/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#00C8D4]/10 rounded-full blur-3xl pointer-events-none" />
+
+              {/* Widget Header */}
+              <div className="relative z-10 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-xl bg-[#00C8D4]/15 border border-[#00C8D4]/30 flex items-center justify-center text-[#00C8D4]">
+                      <TrendingUp className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-white tracking-wide">Métricas & Alcance</h3>
+                      <p className="text-[10px] text-slate-400 font-medium">Estadísticas en Tiempo Real</p>
+                    </div>
+                  </div>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    En Vivo
+                  </span>
+                </div>
+
+                {/* Progress Bars / Gráficas */}
+                <div className="space-y-4 pt-2">
+                  {/* Metric 1 */}
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-3.5 space-y-2">
+                    <div className="flex justify-between text-xs font-bold">
+                      <span className="text-slate-300">Posicionamiento Orgánico Google</span>
+                      <span className="text-[#00C8D4]">98.4%</span>
+                    </div>
+                    <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                      <div className="bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] h-full rounded-full w-[98%]" />
+                    </div>
+                  </div>
+
+                  {/* Metric 2 */}
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-3.5 space-y-2">
+                    <div className="flex justify-between text-xs font-bold">
+                      <span className="text-slate-300">Retención & Reserva Directa</span>
+                      <span className="text-[#FF0096]">94.2%</span>
+                    </div>
+                    <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                      <div className="bg-gradient-to-r from-[#FF0096] to-[#9B00CC] h-full rounded-full w-[94%]" />
+                    </div>
+                  </div>
+
+                  {/* Metric 3 */}
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-3.5 space-y-2">
+                    <div className="flex justify-between text-xs font-bold">
+                      <span className="text-slate-300">Disponibilidad de Red (Uptime)</span>
+                      <span className="text-emerald-400">99.9%</span>
+                    </div>
+                    <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                      <div className="bg-gradient-to-r from-emerald-500 to-[#00C8D4] h-full rounded-full w-[99%]" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Metric Badge Grid */}
+              <div className="grid grid-cols-2 gap-3 relative z-10 pt-2">
+                <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-[#FF0096]/20 flex items-center justify-center text-[#FF0096] shrink-0">
+                    <Award className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-white block">#1 Google</span>
+                    <span className="text-[9px] text-slate-400">Alcance Orgánico</span>
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-[#00C8D4]/20 flex items-center justify-center text-[#00C8D4] shrink-0">
+                    <ShieldCheck className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-white block">Certificado</span>
+                    <span className="text-[9px] text-slate-400">Sello de Calidad</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
