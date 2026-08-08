@@ -208,12 +208,21 @@ export function OwnerDashboard() {
   });
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const tabParam = params.get("tab");
-    if (tabParam) {
-      setActiveTab(tabParam);
-    }
-  }, [location]);
+    const handleUrlChange = () => {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get("tab");
+      if (tabParam) {
+        setActiveTab(tabParam);
+      }
+    };
+    handleUrlChange();
+    window.addEventListener("popstate", handleUrlChange);
+    const interval = setInterval(handleUrlChange, 100);
+    return () => {
+      window.removeEventListener("popstate", handleUrlChange);
+      clearInterval(interval);
+    };
+  }, []);
   const [operacionesSubTab, setOperacionesSubTab] = useState<"reservas" | "disponibilidad" | "timeline">("reservas");
   const [marketingSubTab, setMarketingSubTab] = useState<"descuentos" | "leads" | "reviews" | "channel-manager">("leads");
   

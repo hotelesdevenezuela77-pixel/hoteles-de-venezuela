@@ -30,6 +30,21 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, profile, logout } = useAuth();
   const [, setLocation] = useLocation();
   const [currentPath] = useLocation();
+  const [fullPath, setFullPath] = useState(() => typeof window !== "undefined" ? window.location.pathname + window.location.search : currentPath);
+
+  useEffect(() => {
+    const updateFullPath = () => {
+      const current = window.location.pathname + window.location.search;
+      setFullPath(current);
+    };
+    updateFullPath();
+    window.addEventListener("popstate", updateFullPath);
+    const interval = setInterval(updateFullPath, 150);
+    return () => {
+      window.removeEventListener("popstate", updateFullPath);
+      clearInterval(interval);
+    };
+  }, [currentPath]);
 
   // Estados de control de la UI
   const [sidebarOpen, setSidebarOpen] = useState(() => {
@@ -304,8 +319,16 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 </h4>
               )}
               {category.items.map((item, itemIdx) => {
-                // Validación flexible de ruta activa
-                const active = currentPath === item.href || (item.href !== "/admin" && currentPath.startsWith(item.href));
+                // Validación flexible de ruta activa (incluyendo query params)
+                const active = (() => {
+                  if (item.href.includes("?")) {
+                    return fullPath === item.href;
+                  }
+                  if (item.href === "/admin") {
+                    return currentPath === "/admin" && !fullPath.includes("tab=");
+                  }
+                  return currentPath === item.href || (item.href !== "/admin" && currentPath.startsWith(item.href));
+                })();
                 return (
                   <Link key={itemIdx} href={item.href} onClick={() => setMobileMenuOpen(false)}>
                     <button

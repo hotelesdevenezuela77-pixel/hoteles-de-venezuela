@@ -3,6 +3,8 @@ import { Link, useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { AdminTabBar } from "@/components/admin/AdminTabBar";
+import { AndromedaOperationsCenter } from "@/components/admin/AndromedaOperationsCenter";
+import { AdminLegalModule } from "@/components/admin/AdminLegalModule";
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid,
@@ -60,6 +62,8 @@ const TABS = [
   { id: "estadisticas", label: "Estadísticas"     },
   { id: "gestion",      label: "Gestión Rápida"   },
   { id: "actividad",    label: "Actividad"        },
+  { id: "andromeda_ops", label: "🚀 Telemetría NASA" },
+  { id: "auditoria_legal", label: "⚖️ Auditoría Legal" },
 ];
 
 function StatCard({
@@ -103,8 +107,41 @@ export { ConstellationBackground };
 
 export function AdminDashboard() {
   const { user, profile, loading: authLoading, onlineUsers } = useAuth();
-  const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState("resumen");
+  const [location, setLocation] = useLocation();
+
+  const getTabFromUrl = () => {
+    if (typeof window === "undefined") return "resumen";
+    const params = new URLSearchParams(window.location.search);
+    return params.get("tab") || "resumen";
+  };
+
+  const [activeTab, setActiveTab] = useState<string>(getTabFromUrl);
+
+  useEffect(() => {
+    const handleUrlChange = () => {
+      const tabFromUrl = getTabFromUrl();
+      setActiveTab(tabFromUrl);
+    };
+
+    handleUrlChange();
+
+    window.addEventListener("popstate", handleUrlChange);
+    const interval = setInterval(handleUrlChange, 100);
+
+    return () => {
+      window.removeEventListener("popstate", handleUrlChange);
+      clearInterval(interval);
+    };
+  }, []);
+
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId);
+    if (tabId === "resumen") {
+      setLocation("/admin");
+    } else {
+      setLocation(`/admin?tab=${tabId}`);
+    }
+  };
   
   // Data loading states
   const [loading, setLoading] = useState(true);
@@ -458,7 +495,7 @@ export function AdminDashboard() {
             {TABS.map((t) => (
               <button
                 key={t.id}
-                onClick={() => setActiveTab(t.id)}
+                onClick={() => handleTabChange(t.id)}
                 className="px-5 py-3.5 text-xs font-bold whitespace-nowrap transition-all border-b-2 cursor-pointer"
                 style={{
                   borderColor: activeTab === t.id ? C.fucsia : "transparent",
@@ -1034,6 +1071,26 @@ export function AdminDashboard() {
                 })}
               </div>
             )}
+          </div>
+        )}
+
+        {/* ─ Tab: Telemetría NASA Andrómeda-X ─ */}
+        {activeTab === "andromeda_ops" && (
+          <div className="animate-fade-in">
+            <AndromedaOperationsCenter
+              onNavigateTab={(tab) => {
+                if (tab === "establecimientos") setLocation("/admin/establecimientos");
+                if (tab === "blog") setLocation("/admin/blog");
+                if (tab === "soporte") setLocation("/mis-negocios?tab=soporte");
+              }}
+            />
+          </div>
+        )}
+
+        {/* ─ Tab: Auditoría Legal & Resoluciones Custodia ─ */}
+        {activeTab === "auditoria_legal" && (
+          <div className="animate-fade-in">
+            <AdminLegalModule />
           </div>
         )}
 
