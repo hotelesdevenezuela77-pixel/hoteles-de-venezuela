@@ -783,8 +783,6 @@ export function CustomPageViewer() {
           </div>
         </div>
       ) : (
-        </div>
-      ) : (
         <div className="max-w-4xl mx-auto px-6 mt-12 mb-16">
           {/* Breadcrumb Navigation */}
           <div className="mb-6">
