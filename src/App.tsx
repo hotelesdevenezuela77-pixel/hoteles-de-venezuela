@@ -178,6 +178,7 @@ const BlogDetalle = lazyNamed(() => import("./pages/BlogDetalle"), "BlogDetalle"
 const SitioDetalle = lazyNamed(() => import("./pages/SitioDetalle"), "SitioDetalle");
 const ExcelenciaLanding = lazyNamed(() => import("./pages/ExcelenciaLanding"), "ExcelenciaLanding");
 const Top10Hoteles = lazyNamed(() => import("./pages/Top10Hoteles"), "Top10Hoteles");
+const LegalUploadResolution = lazyNamed(() => import("./pages/legal/LegalUploadResolution"), "LegalUploadResolution");
 const Blog = lazyNamed(() => import("./pages/Blog"), "Blog");
 const SitiosTuristicos = lazyNamed(() => import("./pages/SitiosTuristicos"), "SitiosTuristicos");
 const PerfilKYC = lazyNamed(() => import("./pages/PerfilKYC"), "PerfilKYC");
@@ -364,6 +365,8 @@ function App() {
             <Route path="/los-10-mejores-hoteles" component={Top10Hoteles} />
             <Route path="/mejores-hoteles-venezuela" component={Top10Hoteles} />
             <Route path="/viaje-ia" component={AsistenteViajesIA} />
+            <Route path="/legal/upload-resolution" component={LegalUploadResolution} />
+            <Route path="/upload-resolution" component={LegalUploadResolution} />
 
             {/* Dashboards Propietarios */}
             <Route path="/mis-negocios" component={OwnerDashboard} />

@@ -8,9 +8,10 @@ import {
   CheckCircle2, Loader2, ShieldAlert, Send, ArrowLeft,
   Tag, Filter, Search, RefreshCw, BarChart3, TrendingUp,
   Inbox, HelpCircle, Map, FolderOpen, Edit2, FileText,
-  Lightbulb, Settings, Plus, Key, ChevronDown, CheckCircle2 as CheckIcon, Cpu
+  Lightbulb, Settings, Plus, Key, ChevronDown, CheckCircle2 as CheckIcon, Cpu, Scale
 } from "lucide-react";
 import { AndromedaOperationsCenter } from "@/components/admin/AndromedaOperationsCenter";
+import { AdminLegalModule } from "@/components/admin/AdminLegalModule";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area, Legend, CartesianGrid } from "recharts";
 
 interface Establishment {
@@ -92,7 +93,7 @@ export function AdminPanel() {
   const [, setLocation] = useLocation();
 
   const [loadingData, setLoadingData] = useState(true);
-  const [activeTab, setActiveTab] = useState<"resumen" | "andromeda_ops" | "aprobaciones" | "abandonadas" | "reservas" | "establecimientos" | "usuarios" | "categorias" | "destinos" | "configuracion">("resumen");
+  const [activeTab, setActiveTab] = useState<"resumen" | "andromeda_ops" | "auditoria_legal" | "aprobaciones" | "abandonadas" | "reservas" | "establecimientos" | "usuarios" | "categorias" | "destinos" | "configuracion">("resumen");
 
   // Lists data
   const [establishments, setEstablishments] = useState<Establishment[]>([]);
@@ -725,6 +726,7 @@ export function AdminPanel() {
   const mainTabsList = [
     { id: "resumen", label: "Resumen", icon: BarChart3 },
     { id: "andromeda_ops", label: "🚀 Telemetría Andrómeda-X", icon: Cpu },
+    { id: "auditoria_legal", label: "⚖️ Auditoría Legal", icon: Scale },
     { id: "aprobaciones", label: `Aprobaciones (${pendingApprovalsCount})`, icon: Clock },
     { id: "establecimientos", label: `Establecimientos (${establishments.length})`, icon: Building2 },
     { id: "usuarios", label: `Usuarios (${users.length})`, icon: Users },
@@ -1139,6 +1141,11 @@ export function AdminPanel() {
               if (tab === "soporte") setLocation("/mis-negocios");
             }}
           />
+        )}
+
+        {/* 1.C AUDITORÍA LEGAL & RESOLUCIONES CUSTODIA TAB */}
+        {!loadingData && activeTab === "auditoria_legal" && (
+          <AdminLegalModule />
         )}
 
         {/* 2. REVISIÓN/APROBACIONES TAB */}

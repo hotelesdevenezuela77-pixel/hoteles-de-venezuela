@@ -9,7 +9,7 @@ import {
   Eye, Check, ListFilter, Tag, Sparkles, CalendarRange,
   Upload, Trash, FileText, ChevronRight, AlertCircle, RefreshCw,
   TrendingUp, Star, ShieldCheck, ArrowRight, Clipboard, Award, ShieldAlert, Download, ExternalLink, FileCheck,
-  Coffee, Edit3, Wrench, LifeBuoy, Cpu
+  Coffee, Edit3, Wrench, LifeBuoy, Cpu, Scale
 } from "lucide-react";
 import { ScriptGenerator } from "../components/ScriptGenerator";
 import { AmenitiesSelector } from "@/components/admin/AmenitiesSelector";
@@ -26,6 +26,7 @@ import { AnalyticsModule } from "../tenants/templates/components/AnalyticsModule
 import { OwnerAgendaModule } from "@/components/owner/OwnerAgendaModule";
 import { OwnerTechnicalSupportModule } from "@/components/owner/OwnerTechnicalSupportModule";
 import { AndromedaOperationsCenter } from "@/components/admin/AndromedaOperationsCenter";
+import { AdminLegalModule } from "@/components/admin/AdminLegalModule";
 
 interface Establishment {
   id: number;
@@ -201,7 +202,7 @@ export function OwnerDashboard() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [leads, setLeads] = useState<WhatsAppLead[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"resumen" | "portafolio" | "operaciones" | "inventario" | "finanzas" | "marketing" | "guiones" | "webapp_cms" | "tareas" | "pos" | "analiticas_saas" | "agenda" | "soporte" | "andromeda_ops">("resumen");
+  const [activeTab, setActiveTab] = useState<"resumen" | "portafolio" | "operaciones" | "inventario" | "finanzas" | "marketing" | "guiones" | "webapp_cms" | "tareas" | "pos" | "analiticas_saas" | "agenda" | "soporte" | "andromeda_ops" | "legal">("resumen");
   const [operacionesSubTab, setOperacionesSubTab] = useState<"reservas" | "disponibilidad" | "timeline">("reservas");
   const [marketingSubTab, setMarketingSubTab] = useState<"descuentos" | "leads" | "reviews" | "channel-manager">("leads");
   
@@ -1947,6 +1948,7 @@ export function OwnerDashboard() {
             {[
               { id: "resumen", label: "Dashboard Ejecutivo", icon: BarChart3, enabled: true },
               { id: "andromeda_ops", label: "Nodo Andrómeda-X", icon: Cpu, enabled: true, badge: "NASA Control" },
+              { id: "legal", label: "Auditoría Legal", icon: Scale, enabled: true, badge: "Resoluciones PDF" },
               { id: "agenda", label: "Agenda & Calendario", icon: Calendar, enabled: true, badge: "Drag & Drop" },
               { id: "soporte", label: "Soporte Técnico", icon: Wrench, enabled: true, badge: "Tickets D&D" },
               { id: "webapp_cms", label: "Aplicación Web & CMS", icon: Globe, enabled: currentTenantConfig?.modules?.cms !== false, badge: "Web Builder" },
@@ -2282,6 +2284,11 @@ export function OwnerDashboard() {
         {/* NODO GALÁCTICO ANDRÓMEDA-X (TELEMETRÍA NASA) TAB */}
         {activeTab === "andromeda_ops" && (
           <AndromedaOperationsCenter />
+        )}
+
+        {/* AUDITORÍA & DEPARTAMENTO LEGAL TAB */}
+        {activeTab === "legal" && (
+          <AdminLegalModule />
         )}
 
         {/* CLUB POS TAB */}
