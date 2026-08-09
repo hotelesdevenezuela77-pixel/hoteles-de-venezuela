@@ -8,7 +8,7 @@ import {
   ArrowLeft, Play, Loader2, Image as ImageIcon, Sparkles, X, Compass,
   TrendingUp, Award, ShieldCheck, Zap, BarChart3, Server, Cpu, Smartphone,
   Monitor, Tablet, Layers, Lock, CheckCircle2, Database, MessageSquare,
-  CalendarCheck, CreditCard, Users, Linkedin, ExternalLink, Activity,
+  CalendarCheck, CreditCard, Users, ExternalLink, Activity,
   Globe, Building2, Check, Briefcase
 } from "lucide-react";
 import { ConstellationBackground } from "../components/ConstellationBackground";

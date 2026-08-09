@@ -1,5 +1,5 @@
-name = "hdv-rate-limiter"
-main = "cloudflare/rate-limiter.ts"
+name = "hoteles-de-venezuela"
+pages_build_output_dir = "dist"
 compatibility_date = "2024-05-02"
 
 [vars]
