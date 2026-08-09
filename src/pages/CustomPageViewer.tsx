@@ -444,8 +444,8 @@ export function CustomPageViewer() {
                       <span>Establecimientos Activos</span>
                       <Building2 className="w-4 h-4 text-[#00C8D4]" />
                     </div>
-                    <span className="text-2xl font-black text-white block">450 En Gestión</span>
-                    <span className="text-[10px] text-emerald-400 font-bold">↑ 100% Verificados</span>
+                    <span className="text-2xl font-black text-white block">4,500 En Gestión</span>
+                    <span className="text-[10px] text-emerald-400 font-bold">↑ 100% En Proceso</span>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2 text-left">
@@ -674,6 +674,161 @@ export function CustomPageViewer() {
                 <div>
                   <h4 className="text-xs font-bold text-slate-900">DATOS PREDICTIVOS</h4>
                   <p className="text-[10px] text-slate-500">IA de optimización tarifaria</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── SECCIÓN: MANIFIESTO CORPORATIVO Y POSICIONAMIENTO SEO ── */}
+          <div className="space-y-10 pt-8">
+            <div className="text-center max-w-4xl mx-auto space-y-3">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-black bg-gradient-to-r from-[#00C8D4]/15 to-[#FF0096]/15 text-slate-900 border border-[#00C8D4]/30 shadow-sm">
+                <Sparkles className="w-4 h-4 text-[#FF0096]" />
+                <span className="tracking-widest uppercase font-bold text-[11px]">LA REVOLUCIÓN TECNOLÓGICA DEL TURISMO NACIONAL</span>
+              </div>
+              <h2 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight font-serif">
+                Hoteles de Venezuela: El Epicentro de la Transformación Digital
+              </h2>
+              <p className="text-slate-600 text-sm md:text-base leading-relaxed max-w-3xl mx-auto font-light">
+                Infraestructura tecnológica, posicionamiento orgánico en Google y comercialización directa sin comisiones para el sector hotelero del país.
+              </p>
+            </div>
+
+            <div className="bg-white border border-gray-150 rounded-3xl p-8 md:p-12 shadow-xl space-y-10 text-left">
+              {/* BLOQUE 1: Quiénes Somos */}
+              <div className="grid lg:grid-cols-12 gap-8 items-center border-b border-gray-100 pb-8">
+                <div className="lg:col-span-4 space-y-3">
+                  <div className="w-12 h-12 rounded-2xl bg-[#00C8D4] text-white flex items-center justify-center shadow-lg">
+                    <Globe className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-black text-slate-900 font-serif">
+                    ¿Quiénes Somos?
+                  </h3>
+                  <p className="text-xs font-bold text-[#00C8D4] uppercase tracking-wider">Infraestructura Tecnológica Avanzada</p>
+                </div>
+                <div className="lg:col-span-8 space-y-4 text-slate-700 text-sm leading-relaxed font-normal">
+                  <p>
+                    En un ecosistema digital saturado de intermediarios y procesos burocráticos, <strong className="text-slate-900 font-bold">Hoteles de Venezuela</strong> surge no solo como un directorio, sino como la infraestructura tecnológica más robusta y avanzada del país. Somos la plataforma líder en posicionamiento orgánico, ocupando de forma indiscutible el puesto número 1 en Google, lo que nos convierte en la vitrina principal para el turismo nacional.
+                  </p>
+                  <p>
+                    Nuestra misión trasciende el simple listado de alojamientos; somos una <strong className="text-slate-900 font-bold">Application PWA (Progressive Web App)</strong> de alto rendimiento, diseñada para ofrecer una experiencia de usuario fluida, veloz y eficiente, capaz de conectar de forma orgánica a los prestadores de servicios con el turista moderno.
+                  </p>
+                </div>
+              </div>
+
+              {/* BLOQUE 2: Modelo de Negocio Basado en Valores */}
+              <div className="space-y-6 border-b border-gray-100 pb-8">
+                <div className="space-y-2">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FF0096]/10 text-[#FF0096] text-xs font-bold uppercase">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>SIN COMISIONES POR RESERVA</span>
+                  </div>
+                  <h3 className="text-2xl font-black text-slate-900 font-serif">
+                    Un Modelo de Negocio Basado en Valores, No en Comisiones
+                  </h3>
+                  <p className="text-slate-600 text-sm">
+                    A diferencia de las grandes OTAs (Online Travel Agencies) internacionales que asfixian la rentabilidad del hotelero con altas tasas por reserva, Hoteles de Venezuela ha roto el paradigma. Creemos en el fortalecimiento del patrimonio del aliado.
+                  </p>
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-6 pt-2">
+                  <div className="p-5 rounded-2xl bg-slate-50 border border-gray-150 space-y-2">
+                    <div className="w-10 h-10 rounded-xl bg-[#00C8D4] text-white flex items-center justify-center font-bold shadow-md">
+                      <CheckCircle2 className="w-5 h-5 text-white" />
+                    </div>
+                    <h4 className="text-sm font-bold text-slate-900">Reservas Sin Intermediarios</h4>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      El trato es directo. El turista contacta al hotel y el hotel gestiona su venta. Sin filtros, sin esperas y sin costos ocultos.
+                    </p>
+                  </div>
+
+                  <div className="p-5 rounded-2xl bg-slate-50 border border-gray-150 space-y-2">
+                    <div className="w-10 h-10 rounded-xl bg-[#FF0096] text-white flex items-center justify-center font-bold shadow-md">
+                      <TrendingUp className="w-5 h-5 text-white" />
+                    </div>
+                    <h4 className="text-sm font-bold text-slate-900">Ahorro Real & Rentabilidad</h4>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      Eliminamos la fuga de capital en comisiones, permitiendo que tanto el establecimiento como el turista disfruten de precios más competitivos.
+                    </p>
+                  </div>
+
+                  <div className="p-5 rounded-2xl bg-slate-50 border border-gray-150 space-y-2">
+                    <div className="w-10 h-10 rounded-xl bg-[#9B00CC] text-white flex items-center justify-center font-bold shadow-md">
+                      <Cpu className="w-5 h-5 text-white" />
+                    </div>
+                    <h4 className="text-sm font-bold text-slate-900">Activos Digitales Propios</h4>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      No solo damos visibilidad; entregamos tecnología. Los aliados reciben herramientas que se convierten en sus propios activos digitales.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* BLOQUE 3: Tecnología de Punta & Herramientas Exclusivas */}
+              <div className="space-y-6 border-b border-gray-100 pb-8">
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-black text-slate-900 font-serif">
+                    Tecnología de Punta: Más que un Directorio, un Socio Tecnológico
+                  </h3>
+                  <p className="text-slate-600 text-sm">
+                    Lo que nos hace verdaderamente singulares es nuestra capacidad de desarrollar soluciones a medida que ninguna otra plataforma en el mercado ofrece bajo un modelo de membresía. No somos una solución genérica; somos arquitectura tecnológica aplicada a la hospitalidad.
+                  </p>
+                </div>
+
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-1">
+                    <span className="text-xs font-bold text-[#FF0096] uppercase">Sistemas POS para Restaurantes</span>
+                    <p className="text-xs text-slate-600">Integración total para el manejo de ventas y consumos dentro de los complejos turísticos.</p>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-1">
+                    <span className="text-xs font-bold text-[#00C8D4] uppercase">Centrales de Reservas a Medida</span>
+                    <p className="text-xs text-slate-600">Software personalizado para que cada hotel administre su disponibilidad en tiempo real con gráficas de ocupación.</p>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-1">
+                    <span className="text-xs font-bold text-[#9B00CC] uppercase">CRM con Integración de WhatsApp</span>
+                    <p className="text-xs text-slate-600">Automatizamos y profesionalizamos el canal de ventas directo para un seguimiento impecable de prospectos.</p>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-1">
+                    <span className="text-xs font-bold text-[#00C8D4] uppercase">Landing Pages de Alto Impacto</span>
+                    <p className="text-xs text-slate-600">Sitios de aterrizaje optimizados para la conversión, asegurando que el tráfico se transforme en huéspedes.</p>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-1">
+                    <span className="text-xs font-bold text-[#FF0096] uppercase">Gestión de Tareas para Alojamientos</span>
+                    <p className="text-xs text-slate-600">Sistemas inteligentes para coordinar el mantenimiento, limpieza y operatividad diaria del establecimiento.</p>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-1">
+                    <span className="text-xs font-bold text-[#9B00CC] uppercase">Guía Turística & Alianzas Marca País</span>
+                    <p className="text-xs text-slate-600">Contenido cultural de valor y red de apoyo estratégica con organismos turísticos nacionales.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* BLOQUE 4: Compromiso Territorial & Cierre SEO */}
+              <div className="grid lg:grid-cols-2 gap-8 items-center pt-2">
+                <div className="space-y-4">
+                  <h3 className="text-xl font-black text-slate-900 font-serif">
+                    El Compromiso con el Crecimiento del Turismo Nacional
+                  </h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Hoteles de Venezuela es una fuerza activa en el territorio. Nuestra diferenciación radica en la visita presencial personalizada. Conocemos cada rincón, validamos cada servicio y estrechamos la mano de nuestros aliados en sus propios establecimientos. Esta cercanía nos permite crear estrategias de marketing que realmente funcionan, porque entendemos la realidad de cada región, desde las playas de Morrocoy hasta la majestuosidad de Canaima.
+                  </p>
+                </div>
+
+                <div className="p-6 rounded-3xl bg-gradient-to-br from-[#0e0120] to-[#1a0533] text-white space-y-3 border border-purple-900/50 shadow-xl">
+                  <span className="text-[10px] font-mono font-bold text-[#00C8D4] uppercase tracking-widest">OBJETIVO FINAL DE POSICIONAMIENTO</span>
+                  <h4 className="text-lg font-extrabold font-serif text-white">Conseguir Clientes a Nuestros Clientes</h4>
+                  <p className="text-xs text-slate-300 leading-relaxed font-light">
+                    Nuestra obsesión es el posicionamiento SEO. Trabajamos incansablemente para que, cuando alguien busque "dónde hospedarse en Venezuela", su establecimiento aparezca frente a sus ojos.
+                  </p>
+                  <div className="pt-2 flex items-center justify-between border-t border-white/10 text-xs flex-wrap gap-2">
+                    <span className="font-bold text-[#FF0096]">Hoteles de Venezuela: Reserva sin intermediarios.</span>
+                    <span className="text-[#00C8D4] font-serif italic">Simplemente Maravilloso.</span>
+                  </div>
                 </div>
               </div>
             </div>
