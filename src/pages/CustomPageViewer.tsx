@@ -444,7 +444,7 @@ export function CustomPageViewer() {
                       <span>Establecimientos Activos</span>
                       <Building2 className="w-4 h-4 text-[#00C8D4]" />
                     </div>
-                    <span className="text-2xl font-black text-white block">69 Registrados</span>
+                    <span className="text-2xl font-black text-white block">450 En Gestión</span>
                     <span className="text-[10px] text-emerald-400 font-bold">↑ 100% Verificados</span>
                   </div>
 
@@ -453,7 +453,7 @@ export function CustomPageViewer() {
                       <span>Reservas Directas</span>
                       <CalendarCheck className="w-4 h-4 text-[#FF0096]" />
                     </div>
-                    <span className="text-2xl font-black text-white block">1,248 Mes</span>
+                    <span className="text-2xl font-black text-white block">10,248 Mes</span>
                     <span className="text-[10px] text-[#FF0096] font-bold">0% Comisiones Intermedias</span>
                   </div>
 
