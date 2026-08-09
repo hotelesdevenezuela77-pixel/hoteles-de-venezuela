@@ -902,11 +902,28 @@ export function CustomPageViewer() {
               {/* Perfil 1 */}
               <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-lg text-center space-y-4 hover:shadow-xl transition-all">
                 <div className="w-20 h-20 rounded-full bg-slate-900 mx-auto border-2 border-[#00C8D4] overflow-hidden shadow-md flex items-center justify-center text-white text-xl font-bold font-serif">
-                  AR
+                  IE
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Ing. Alexis Rodríguez</h3>
-                  <p className="text-xs text-[#00C8D4] font-bold">Líder de Arquitectura Cloud</p>
+                  <h3 className="text-base font-bold text-slate-900 inline-flex items-center gap-1.5 justify-center">
+                    <span>CEO Israel Escalona</span>
+                    <svg className="w-5 h-3.5 rounded-xs shadow-sm inline-block object-cover border border-gray-200 align-middle" viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg" title="Venezuela">
+                      <rect width="900" height="200" fill="#ffcc00"/>
+                      <rect y="200" width="900" height="200" fill="#00247d"/>
+                      <rect y="400" width="900" height="200" fill="#cf142b"/>
+                      <g fill="#fff" transform="translate(450, 310)">
+                        <circle cx="-100" cy="20" r="10" />
+                        <circle cx="-73" cy="-10" r="10" />
+                        <circle cx="-40" cy="-30" r="10" />
+                        <circle cx="-13" cy="-40" r="10" />
+                        <circle cx="13" cy="-40" r="10" />
+                        <circle cx="40" cy="-30" r="10" />
+                        <circle cx="73" cy="-10" r="10" />
+                        <circle cx="100" cy="20" r="10" />
+                      </g>
+                    </svg>
+                  </h3>
+                  <p className="text-xs text-[#00C8D4] font-bold">Líder de Arquitectura Cloud & CEO</p>
                   <p className="text-[11px] text-slate-500 mt-2">Especialista en infraestructura distribuida, alta disponibilidad e integración de bases de datos.</p>
                 </div>
               </div>
@@ -914,22 +931,48 @@ export function CustomPageViewer() {
               {/* Perfil 2 */}
               <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-lg text-center space-y-4 hover:shadow-xl transition-all">
                 <div className="w-20 h-20 rounded-full bg-slate-900 mx-auto border-2 border-[#FF0096] overflow-hidden shadow-md flex items-center justify-center text-white text-xl font-bold font-serif">
-                  MT
+                  RP
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Lcda. María Elena Torres</h3>
+                  <h3 className="text-base font-bold text-slate-900 inline-flex items-center gap-1.5 justify-center">
+                    <span>Lcdo. Ramiro Pastor</span>
+                    <svg className="w-5 h-3.5 rounded-xs shadow-sm inline-block object-cover border border-gray-200 align-middle" viewBox="0 0 750 500" xmlns="http://www.w3.org/2000/svg" title="España">
+                      <rect width="750" height="500" fill="#c60b1e"/>
+                      <rect y="125" width="750" height="250" fill="#ffc400"/>
+                    </svg>
+                  </h3>
                   <p className="text-xs text-[#FF0096] font-bold">Líder de Desarrollo & PMS Engine</p>
-                  <p className="text-[11px] text-slate-500 mt-2">Diseñadora de la experiencia de usuario y arquitectura del motor de reservas sin comisiones.</p>
+                  <p className="text-[11px] text-slate-500 mt-2">Diseñador de la experiencia de usuario y arquitectura del motor de reservas sin comisiones.</p>
                 </div>
               </div>
 
               {/* Perfil 3 */}
               <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-lg text-center space-y-4 hover:shadow-xl transition-all">
                 <div className="w-20 h-20 rounded-full bg-slate-900 mx-auto border-2 border-[#9B00CC] overflow-hidden shadow-md flex items-center justify-center text-white text-xl font-bold font-serif">
-                  CM
+                  RR
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Lic. Carlos Mendoza</h3>
+                  <h3 className="text-base font-bold text-slate-900 inline-flex items-center gap-1.5 justify-center">
+                    <span>Lcdo. Rogelio Robinson</span>
+                    <svg className="w-5 h-3.5 rounded-xs shadow-sm inline-block object-cover border border-gray-200 align-middle" viewBox="0 0 7410 3900" xmlns="http://www.w3.org/2000/svg" title="EE.UU.">
+                      <rect width="7410" height="3900" fill="#b22234"/>
+                      <path d="M0,300h7410M0,900h7410M0,1500h7410M0,2100h7410M0,2700h7410M0,3300h7410" stroke="#fff" strokeWidth="300"/>
+                      <rect width="2964" height="2100" fill="#3c3b6e"/>
+                      <g fill="#fff">
+                        <circle cx="296" cy="175" r="45"/><circle cx="889" cy="175" r="45"/><circle cx="1482" cy="175" r="45"/><circle cx="2075" cy="175" r="45"/><circle cx="2668" cy="175" r="45"/>
+                        <circle cx="593" cy="350" r="45"/><circle cx="1186" cy="350" r="45"/><circle cx="1778" cy="350" r="45"/><circle cx="2371" cy="350" r="45"/>
+                        <circle cx="296" cy="525" r="45"/><circle cx="889" cy="525" r="45"/><circle cx="1482" cy="525" r="45"/><circle cx="2075" cy="525" r="45"/><circle cx="2668" cy="525" r="45"/>
+                        <circle cx="593" cy="700" r="45"/><circle cx="1186" cy="700" r="45"/><circle cx="1778" cy="700" r="45"/><circle cx="2371" cy="700" r="45"/>
+                        <circle cx="296" cy="875" r="45"/><circle cx="889" cy="875" r="45"/><circle cx="1482" cy="875" r="45"/><circle cx="2075" cy="875" r="45"/><circle cx="2668" cy="875" r="45"/>
+                        <circle cx="593" cy="1050" r="45"/><circle cx="1186" cy="1050" r="45"/><circle cx="1778" cy="1050" r="45"/><circle cx="2371" cy="1050" r="45"/>
+                        <circle cx="296" cy="1225" r="45"/><circle cx="889" cy="1225" r="45"/><circle cx="1482" cy="1225" r="45"/><circle cx="2075" cy="1225" r="45"/><circle cx="2668" cy="1225" r="45"/>
+                        <circle cx="593" cy="1400" r="45"/><circle cx="1186" cy="1400" r="45"/><circle cx="1778" cy="1400" r="45"/><circle cx="2371" cy="1400" r="45"/>
+                        <circle cx="296" cy="1575" r="45"/><circle cx="889" cy="1575" r="45"/><circle cx="1482" cy="1575" r="45"/><circle cx="2075" cy="1575" r="45"/><circle cx="2668" cy="1575" r="45"/>
+                        <circle cx="593" cy="1750" r="45"/><circle cx="1186" cy="1750" r="45"/><circle cx="1778" cy="1750" r="45"/><circle cx="2371" cy="1750" r="45"/>
+                        <circle cx="296" cy="1925" r="45"/><circle cx="889" cy="1925" r="45"/><circle cx="1482" cy="1925" r="45"/><circle cx="2075" cy="1925" r="45"/><circle cx="2668" cy="1925" r="45"/>
+                      </g>
+                    </svg>
+                  </h3>
                   <p className="text-xs text-[#9B00CC] font-bold">Director de Operaciones Turísticas</p>
                   <p className="text-[11px] text-slate-500 mt-2">Gestor de alianzas estratégicas con hoteles, posadas y operadores turísticos en todo el país.</p>
                 </div>
