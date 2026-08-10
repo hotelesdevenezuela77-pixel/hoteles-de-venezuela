@@ -5,7 +5,7 @@ import { TickerBar } from "./TickerBar";
 import { RouteAlertsBanner } from "../alerts/RouteAlertsBanner";
 import { BackgroundMusicPlayer } from "./BackgroundMusicPlayer";
 import {
-  MapPin, Phone, MessageSquare, Send, X
+  MapPin, Phone, MessageSquare, Send, X, Headphones
 } from "lucide-react";
 import { OFFICIAL_WHATSAPP_DISPLAY, OFFICIAL_WHATSAPP_URL, SECONDARY_WHATSAPP_DISPLAY, SECONDARY_WHATSAPP_URL } from "@/config/whatsapp";
 
@@ -82,6 +82,20 @@ function Footer() {
                   <path d="M23.498 6.163c-.272-.98-1.09-1.755-2.115-2.013C19.51 3.75 12 3.75 12 3.75s-7.51 0-9.383.5c-1.025.258-1.843 1.033-2.115 2.013C0 7.962 0 12 0 12s0 4.038.5 5.837c.272.98.109 1.755 2.115 2.013c1.873.5 9.383.5 9.383.5s7.51 0 9.383-.5c1.025-.258 1.843-1.033 2.115-2.013c.5-1.8.5-5.837.5-5.837s0-4.038-.5-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                 </svg>
               </a>
+            <div className="mt-6">
+              <Link
+                href="/soporte"
+                className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-2xl text-xs font-extrabold text-white transition-all shadow-lg hover:shadow-cyan-500/25 hover:scale-105 active:scale-95 border border-white/15 group"
+                style={{ background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)" }}
+              >
+                <div className="w-7 h-7 rounded-xl bg-white/20 flex items-center justify-center shrink-0 shadow-inner">
+                  <Headphones className="w-4 h-4 text-white group-hover:rotate-12 transition-transform" />
+                </div>
+                <div className="flex flex-col text-left">
+                  <span className="text-[9px] text-pink-200 uppercase font-black tracking-widest leading-none">Centro de Asistencia</span>
+                  <span className="text-xs font-black text-white leading-tight">Soporte Técnico 24/7</span>
+                </div>
+              </Link>
             </div>
           </div>
 
@@ -117,7 +131,6 @@ function Footer() {
             <ul className="space-y-2.5">
               {[
                 { href: "/50-fundadores", label: "50 Fundadores" },
-                { href: "/soporte", label: "Soporte Técnico 24/7" },
                 { href: "/alianzas-para-agencias", label: "Alianzas para Agencias" },
                 { href: "/membresias", label: "Membresías" },
                 { href: "/prestigio-2026", label: "Prestigio" },
@@ -132,6 +145,18 @@ function Footer() {
                   </Link>
                 </li>
               ))}
+              <li className="pt-2">
+                <Link
+                  href="/soporte"
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-extrabold text-white transition-all shadow-md hover:scale-105 active:scale-95 border border-[#00C8D4]/40 hover:border-[#00C8D4]"
+                  style={{ background: "linear-gradient(135deg, #00C8D4 0%, #1a0533 100%)" }}
+                >
+                  <div className="w-5 h-5 rounded-lg bg-[#00C8D4] text-white flex items-center justify-center shrink-0 shadow-sm">
+                    <Headphones className="w-3.5 h-3.5 text-white" />
+                  </div>
+                  <span>Soporte Técnico 24/7</span>
+                </Link>
+              </li>
             </ul>
           </div>
 
