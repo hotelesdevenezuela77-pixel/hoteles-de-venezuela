@@ -183,6 +183,7 @@ const Blog = lazyNamed(() => import("./pages/Blog"), "Blog");
 const SitiosTuristicos = lazyNamed(() => import("./pages/SitiosTuristicos"), "SitiosTuristicos");
 const PerfilKYC = lazyNamed(() => import("./pages/PerfilKYC"), "PerfilKYC");
 const AsistenteViajesIA = lazyNamed(() => import("./pages/AsistenteViajesIA"), "AsistenteViajesIA");
+const PublicSupportPage = lazyNamed(() => import("./pages/PublicSupportPage"), "PublicSupportPage");
 const AdminIaViajes = lazyNamed(() => import("./pages/admin/AdminIaViajes"), "AdminIaViajes");
 const AdminExpedicionRutas = lazyNamed(() => import("./pages/admin/AdminExpedicionRutas"), "AdminExpedicionRutas");
 const AdminAsistencia = lazyWithRetry(() => import("./pages/admin/AdminAsistencia"));
@@ -365,6 +366,9 @@ function App() {
             <Route path="/los-10-mejores-hoteles" component={Top10Hoteles} />
             <Route path="/mejores-hoteles-venezuela" component={Top10Hoteles} />
             <Route path="/viaje-ia" component={AsistenteViajesIA} />
+            <Route path="/soporte" component={PublicSupportPage} />
+            <Route path="/soporte-tecnico" component={PublicSupportPage} />
+            <Route path="/contacto" component={PublicSupportPage} />
             <Route path="/legal/upload-resolution" component={LegalUploadResolution} />
             <Route path="/upload-resolution" component={LegalUploadResolution} />
 

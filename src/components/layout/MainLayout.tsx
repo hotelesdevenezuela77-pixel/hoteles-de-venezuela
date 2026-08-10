@@ -117,14 +117,14 @@ function Footer() {
             <ul className="space-y-2.5">
               {[
                 { href: "/50-fundadores", label: "50 Fundadores" },
+                { href: "/soporte", label: "Soporte Técnico 24/7" },
                 { href: "/alianzas-para-agencias", label: "Alianzas para Agencias" },
-                { href: "/membresias",   label: "Membresías" },
+                { href: "/membresias", label: "Membresías" },
                 { href: "/prestigio-2026", label: "Prestigio" },
                 { href: "/reportar-pago", label: "Reportar Pago Local" },
-                { href: "/sobre-nosotros", label: "Publicidad" },
                 { href: "/mis-negocios", label: "Registrar mi negocio" },
                 { href: "/servicios-b2b", label: "Servicios B2B" },
-                { href: "/blog",         label: "Blog" },
+                { href: "/blog", label: "Blog" },
               ].map((l, i) => (
                 <li key={i}>
                   <Link href={l.href} className="text-gray-300 text-sm hover:text-cyan-400 transition-colors flex items-center gap-1.5">

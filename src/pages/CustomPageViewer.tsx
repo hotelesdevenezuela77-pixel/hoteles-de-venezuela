@@ -907,7 +907,8 @@ export function CustomPageViewer() {
                 <div>
                   <h3 className="text-base font-bold text-slate-900 inline-flex items-center gap-1.5 justify-center">
                     <span>CEO Israel Escalona</span>
-                    <svg className="w-5 h-3.5 rounded-xs shadow-sm inline-block object-cover border border-gray-200 align-middle" viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg" title="Venezuela">
+                    <svg className="w-5 h-3.5 rounded-xs shadow-sm inline-block object-cover border border-gray-200 align-middle" viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg" aria-label="Venezuela">
+                      <title>Venezuela</title>
                       <rect width="900" height="200" fill="#ffcc00"/>
                       <rect y="200" width="900" height="200" fill="#00247d"/>
                       <rect y="400" width="900" height="200" fill="#cf142b"/>
@@ -936,7 +937,8 @@ export function CustomPageViewer() {
                 <div>
                   <h3 className="text-base font-bold text-slate-900 inline-flex items-center gap-1.5 justify-center">
                     <span>Lcdo. Ramiro Pastor</span>
-                    <svg className="w-5 h-3.5 rounded-xs shadow-sm inline-block object-cover border border-gray-200 align-middle" viewBox="0 0 750 500" xmlns="http://www.w3.org/2000/svg" title="España">
+                    <svg className="w-5 h-3.5 rounded-xs shadow-sm inline-block object-cover border border-gray-200 align-middle" viewBox="0 0 750 500" xmlns="http://www.w3.org/2000/svg" aria-label="España">
+                      <title>España</title>
                       <rect width="750" height="500" fill="#c60b1e"/>
                       <rect y="125" width="750" height="250" fill="#ffc400"/>
                     </svg>
@@ -954,7 +956,8 @@ export function CustomPageViewer() {
                 <div>
                   <h3 className="text-base font-bold text-slate-900 inline-flex items-center gap-1.5 justify-center">
                     <span>Lcdo. Rogelio Robinson</span>
-                    <svg className="w-5 h-3.5 rounded-xs shadow-sm inline-block object-cover border border-gray-200 align-middle" viewBox="0 0 7410 3900" xmlns="http://www.w3.org/2000/svg" title="EE.UU.">
+                    <svg className="w-5 h-3.5 rounded-xs shadow-sm inline-block object-cover border border-gray-200 align-middle" viewBox="0 0 7410 3900" xmlns="http://www.w3.org/2000/svg" aria-label="EE.UU.">
+                      <title>EE.UU.</title>
                       <rect width="7410" height="3900" fill="#b22234"/>
                       <path d="M0,300h7410M0,900h7410M0,1500h7410M0,2100h7410M0,2700h7410M0,3300h7410" stroke="#fff" strokeWidth="300"/>
                       <rect width="2964" height="2100" fill="#3c3b6e"/>

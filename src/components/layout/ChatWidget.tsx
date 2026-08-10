@@ -9,30 +9,37 @@ const WA_NUMBER = OFFICIAL_WHATSAPP_NUMBER;
 
 /* ── auto-responses per visitor type ────────────────────── */
 const BOT_GREET = {
-  turista:     (name: string) => `¡Hola ${name.split(" ")[0]}! 🌴 Bienvenido a Hoteles de Venezuela. Soy tu asistente de viaje. Puedo ayudarte a encontrar hoteles, posadas, paquetes turísticos y más. ¿A qué destino piensas viajar?`,
-  propietario: (name: string) => `¡Hola ${name.split(" ")[0]}! 🏨 Bienvenido a Hoteles de Venezuela. Soy tu asistente de negocios. Puedo ayudarte a registrar tu propiedad, conocer nuestros planes de membresía y maximizar tu visibilidad. ¿En qué puedo ayudarte?`,
+  turista: (name: string) => `¡Hola ${name.split(" ")[0]}! 🌴 Bienvenido a Hoteles de Venezuela (Atención al Turista).
+
+Soy tu asistente inteligente de viajes. Puedo ayudarte a cotizar las mejores posadas y hoteles, sugerirte destinos paradisíacos y coordinar tu reserva **100% directa sin comisiones**.
+
+¿A qué destino de Venezuela te gustaría viajar en tu próxima escapada? 🏖️`,
+  propietario: (name: string) => `¡Hola ${name.split(" ")[0]}! 🏨 Bienvenido a Hoteles de Venezuela (Atención a Propietarios).
+
+Soy tu consultor comercial de negocios turísticos. Puedo guiarte paso a paso para afiliar tu establecimiento, conocer los planes de membresía y recibir **contactos directos por WhatsApp** de miles de viajeros.
+
+¿En qué podemos potenciar tu negocio hotelero hoy? 🚀`,
 };
 
 const RULES_TURISTA = [
-  { k: ["hola","buenos","buenas","hey"],            r: "¡Hola! 👋 Cuéntame, ¿a qué parte de Venezuela te gustaría viajar?" },
-  { k: ["precio","costo","cuanto","cuánto","tarif"], r: "Los precios varían por temporada y establecimiento. Puedes ver tarifas en cada ficha. ¿Quieres que te oriente hacia un destino específico?" },
-  { k: ["reserva","reservar","disponib","booking"],  r: "Para reservar, entra al perfil del establecimiento y haz clic en 'Reservar'. También puedes contactar directamente al hotel por WhatsApp. 📲" },
-  { k: ["paquete","tour","excursion","plan"],        r: "¡Tenemos paquetes turísticos increíbles! ✈️ Visita /paquetes para ver opciones con todo incluido para familias y grupos." },
-  { k: ["destino","playa","isla","montaña","selva"], r: "Venezuela tiene destinos únicos: Morrocoy 🏖️, Los Roques 🪸, Canaima 🌊, Mérida ⛰️, Margarita 🌅 y más. ¿Cuál te llama la atención?" },
-  { k: ["hotel","posada","alojamiento","hospedaje"], r: "Tenemos una amplia selección de hoteles y posadas en todo el país. 🏨 Visita /establecimientos para filtrar por categoría y destino." },
-  { k: ["gracias","thank","perfecto","excelente"],   r: "¡Con gusto! 😊 Que disfrutes tu viaje por Venezuela. ¿Algo más en lo que pueda ayudarte?" },
-  { k: ["whatsapp","wa","llamar","contacto"],        r: "Puedes escribirnos por WhatsApp directamente desde este chat usando el botón 'Continuar por WhatsApp' de abajo. 📱" },
+  { k: ["hola","buenos","buenas","hey","saludos"],   r: "¡Hola! 👋 Qué alegría saludarte. Cuéntame, ¿a qué destino de Venezuela te gustaría viajar en tu próxima escapada?" },
+  { k: ["precio","costo","cuanto","cuánto","tarif","promocion"], r: "En Hoteles de Venezuela garantizamos tarifas directas **sin el 15-20% de recargo** de agencias tradicionales 💰.\n\nPuedes consultar disponibilidad en [Alojamientos](/establecimientos) o ver nuestras ofertas en [Paquetes Turísticos](/paquetes). ¿Hacia qué destino deseas cotizar?" },
+  { k: ["reserva","reservar","disponib","booking","habitac","cupo"], r: "¡Reservar es directo y sin comisiones! 📲\n\n1. Selecciona tu posada u hotel en [Alojamientos](/establecimientos).\n2. Presiona **Reservar Directo** o contáctalos directamente a su WhatsApp comercial.\n\n¿Quieres recomendaciones de los lugares más cotizados?" },
+  { k: ["paquete","tour","excursio","plan","todo incl"], r: "¡Tenemos experiencias turísticas espectaculares! ✈️🌴 Planes con todo incluido para familias, parejas y grupos en Los Roques, Morrocoy, Canaima y Margarita.\n\n👉 [Explorar Catálogo de Paquetes](/paquetes)" },
+  { k: ["destino","playa","isla","montana","montaña","selva","los roques","morrocoy","canaima","merida","margarita"], r: "Venezuela ofrece destinos únicos 🪸. Te recomendamos explorar [Los Roques](/establecimientos?destination=los-roques), [Morrocoy](/establecimientos?destination=morrocoy), [Canaima](/establecimientos?destination=canaima) o [Mérida](/establecimientos?destination=merida).\n\n¿Cuál de estos te inspira más?" },
+  { k: ["hotel","posada","alojamiento","hospedaje","cabana"], r: "Contamos con una red seleccionada de hoteles boutique, posadas turísticas y resorts 🏨. Revisa las mejores opciones en [Alojamientos](/establecimientos)." },
+  { k: ["gracias","thank","perfecto","excelente","vale"], r: "¡Con muchísimo gusto! 😊 Queremos que tengas unas vacaciones inolvidables. ¿Hay alguna otra duda que pueda aclararte?" },
+  { k: ["whatsapp","wa","llamar","contacto","asesor"], r: "Puedes presionar el botón **'Continuar por WhatsApp'** al final de este chat para chatear directamente con uno de nuestros asesores de atención al turista. 📱" },
 ];
 
 const RULES_PROPIETARIO = [
-  { k: ["hola","buenos","buenas","hey"],            r: "¡Hola! 👋 ¿Cómo puedo ayudarte con tu negocio hoy?" },
-  { k: ["registr","publicar","listar","poner"],     r: "Para registrar tu negocio visita /registro-negocio. El proceso es sencillo y tendrás visibilidad inmediata en toda la plataforma. 🚀" },
-  { k: ["membresia","membresía","plan","precio"],   r: "Tenemos 3 planes: Básico (gratis), Premium y 50 Fundadores (cupo limitado con precio especial). Visita /membresias para ver beneficios de cada uno. 💼" },
-  { k: ["beneficio","ventaja","visibilidad"],       r: "Al publicar en HDV obtienes: perfil profesional, reservas en línea, acceso al CRM de leads, analíticas, y más. ¿Quieres conocer los detalles?" },
-  { k: ["reserva","booking","cliente"],             r: "Con tu perfil activo los turistas pueden reservar directamente o contactarte por WhatsApp. Tú controlas tu disponibilidad y precios. 📅" },
-  { k: ["costo","precio","cuanto","cuánto","pago"], r: "El plan Básico es gratuito. Los planes Premium tienen inversión mensual según los beneficios. Te recomendamos los 50 Fundadores mientras haya cupo. ¿Necesitas más info?" },
-  { k: ["gracias","thank","perfecto","excelente"],  r: "¡Con gusto! 😊 Esperamos pronto tenerte en nuestra red de establecimientos." },
-  { k: ["whatsapp","wa","llamar","contacto"],       r: "Puedes escribirnos directamente por WhatsApp. Uno de nuestros asesores te atenderá. 📱" },
+  { k: ["hola","buenos","buenas","hey","saludos"],   r: "¡Estimado propietario, bienvenido! 👋 ¿En qué podemos apoyarte hoy para impulsar la ocupación de tu hospedaje?" },
+  { k: ["registr","publicar","listar","poner","afiliar","unir"], r: "¡Es el momento de multiplicar tus reservas directas! 🚀 Afiliar tu establecimiento te dará visibilidad ante miles de viajeros y reservas 100% libres de comisiones.\n\n👉 [Registrar mi Negocio](/registro-negocio)\n👉 [Ver Planes de Membresía](/membresias)" },
+  { k: ["membresia","membresía","plan","precio","inversio","costo"], r: "Ofrecemos 3 niveles de membresía para tu negocio:\n\n1. **Básico (Gratis)**: Perfil esencial y contacto directo.\n2. **Premium**: Posicionamiento destacado y CRM de leads.\n3. **50 Fundadores**: Beneficios VIP de posicionamiento de por vida (cupos especiales de lanzamiento).\n\n👉 [Comparar Planes de Membresía](/membresias)" },
+  { k: ["beneficio","ventaja","visibilidad","ganancia"], r: "Al afiliarte a Hoteles de Venezuela obtienes: ficha optimizada, canal directo de WhatsApp a tu recepción, motor de reservas sin comisiones y analíticas de visitas. 💼" },
+  { k: ["reserva","booking","cliente","comision","comisión"], r: "A diferencia de las plataformas tradicionales, **Hoteles de Venezuela NO cobra comisiones por tus reservas**. El pago va directo a ti y conservas el 100% de tus ingresos. 📅" },
+  { k: ["gracias","thank","perfecto","excelente"],  r: "¡A la orden! 😊 Estamos listos para acompañarte en el crecimiento comercial de tu establecimiento." },
+  { k: ["whatsapp","wa","llamar","contacto","asesor"], r: "Pulsa el botón verde **'Continuar por WhatsApp'** abajo para conectar de inmediato con nuestro departamento de atención a propietarios y alianzas comerciales. 📱" },
 ];
 
 interface ChatbotRule {
@@ -58,17 +65,32 @@ async function fetchAIResponse(
   const hotelListSummary = hoteles.slice(0, 15).map(h => `${h.name} (slug: ${h.slug})`).join(", ");
 
   const systemInstruction = `Eres el Asistente Oficial e IA Inteligente de la plataforma "Hoteles de Venezuela" (la plataforma líder de turismo y reserva directa del país).
-Tu rol es atender a un visitante de tipo: ${tipo.toUpperCase()} (Nombre: ${name || 'Estimado Huésped'}).
+Tu rol es atender a un visitante de tipo: ${tipo.toUpperCase()} (Nombre: ${name || 'Estimado Cliente'}).
 
-DIRECTRICES CLAVE:
-1. Si el usuario es TURISTA: Ayúdale a encontrar destinos, posadas, hoteles y paquetes turísticos en Venezuela. Resalta que reservar directo ahorra el 100% de comisiones intermedias.
-2. Si el usuario es PROPIETARIO: Explícale cómo registrar su hotel/posada, los planes de membresía (Básico, Premium, 50 Fundadores) y las ventajas de estar en la red oficial.
-3. Si el usuario consulta sobre soporte o reclamos: Indica amablemente que su caso fue remitido al área encargada y se le dará seguimiento en 48 a 72 horas hábiles.
-4. UTILIZA ENLACES MARKDOWN: Cuando menciones un destino o hotel, incluye enlaces navegables como [Nombre Destino](/establecimientos?destination=slug) o [Nombre Hotel](/establecimiento/slug).
-5. DESTINOS DISPONIBLES EN PLATAFORMA: ${destListSummary}.
-6. HOTELES RECOMENDADOS: ${hotelListSummary}.
+ESTRATEGIA DE COMUNICACIÓN Y GUION PERSUASIVO SEGÚN EL CASO:
 
-Sé muy atento, educado, persuasivo y cercano. Responde en español limpio sin rodeos.`;
+SI EL USUARIO ES TURISTA (Atención al Turista):
+- Tu objetivo es enamorar e inspirar al turista para organizar sus vacaciones o escapadas en Venezuela.
+- Destaca que reservar a través de Hoteles de Venezuela ahorra el 100% de comisiones intermedias y conecta directamente con los hospedajes.
+- Sugiere destinos destacados (Los Roques, Morrocoy, Canaima, Mérida, Margarita, Colonia Tovar, Mochima, etc.).
+- Invítalo a ver detalles en [Alojamientos](/establecimientos) o explorar [Paquetes Turísticos](/paquetes).
+- Muestra cercanía, entusiasmo y excelente disposición servicial.
+
+SI EL USUARIO ES PROPIETARIO (Atención a Propietarios):
+- Tu objetivo es persuadir al dueño, gerente o administrador hotelero para afiliar su posada u hotel a la red oficial.
+- Destaca los beneficios comerciales clave: visibilidad nacional, clientes directos a su WhatsApp, 0% comisiones sobre reservaciones, analíticas y panel comercial.
+- Presenta las membresías: Básico (gratuito), Premium y la edición limitada "50 Fundadores" (posicionamiento preferencial de por vida).
+- Invítalo a completar su registro en [Registrar mi Negocio](/registro-negocio) o evaluar opciones en [Membresías](/membresias).
+- Utiliza un tono ejecutivo, respetuoso, dinámico y enfocado en maximizar sus ventas.
+
+SI CONSULTA SOBRE SOPORTE O RECLAMOS:
+- Transmite tranquilidad. Explica amablemente que el requerimiento fue canalizado al departamento de Atención al Cliente y Soporte Central, con un tiempo estimado de atención de 48 a 72 horas hábiles. Ofrece el botón "Continuar por WhatsApp" para atención directa.
+
+REGLAS DE FORMATO:
+- UTILIZA ENLACES MARKDOWN: [Texto del enlace](/ruta) cuando menciones destinos o propiedades.
+- DESTINOS DISPONIBLES EN PLATAFORMA: ${destListSummary}.
+- HOTELES RECOMENDADOS: ${hotelListSummary}.
+- Responde en español limpio, conciso y elegante.`;
 
   // Intentar llamada directa a la API de Gemini si hay API Key disponible y no es placeholder
   if (apiKey && apiKey !== "Hola177*H" && apiKey.length > 20) {
@@ -120,10 +142,10 @@ function smartFallbackAI(
 
     if (matchedDest) {
       const destHoteles = hoteles.filter(h => h.destination_id === matchedDest.id);
-      let response = `¡${matchedDest.name} es uno de los destinos más deslumbrantes de Venezuela! 🌴\n\n${matchedDest.description || 'Disfruta de paisajes inolvidables y la mejor hospitalidad local.'}\n\n`;
+      let response = `¡${matchedDest.name} es uno de los destinos más espectaculares de Venezuela! 🌴\n\n${matchedDest.description || 'Disfruta de paisajes inolvidables y la mejor hospitalidad local.'}\n\n`;
       
       if (destHoteles.length > 0) {
-        response += `Alojamientos destacados recomendados en ${matchedDest.name}:\n`;
+        response += `Alojamientos recomendados en ${matchedDest.name}:\n`;
         destHoteles.forEach(h => {
           response += `👉 [${h.name}](/establecimiento/${h.slug})\n`;
         });
@@ -131,7 +153,7 @@ function smartFallbackAI(
       }
       
       response += `🔗 [Ver todos los alojamientos en ${matchedDest.name}](/establecimientos?destination=${matchedDest.slug})\n\n`;
-      response += `¿Te gustaría cotizar fechas específicas o necesitas información de traslados? 😊`;
+      response += `¿Te gustaría cotizar fechas o necesitas información de traslados? 😊`;
       return response;
     }
 
@@ -143,8 +165,8 @@ function smartFallbackAI(
 
     if (matchedHotel) {
       const dest = destinos.find(d => d.id === matchedHotel.destination_id);
-      let response = `¡Excelente elección! 🏨 **[${matchedHotel.name}](/establecimiento/${matchedHotel.slug})** es una opción de hospedaje destacada en nuestro portal.\n\n`;
-      response += `Reservar a través de Hoteles de Venezuela te garantiza **0% de comisiones intermedias** y trato directo con el establecimiento.\n\n`;
+      let response = `¡Excelente elección! 🏨 **[${matchedHotel.name}](/establecimiento/${matchedHotel.slug})** es una opción destacada en nuestro portal.\n\n`;
+      response += `Reservar a través de Hoteles de Venezuela te garantiza **0% de comisiones intermedias** y trato directo con el hospedaje.\n\n`;
       response += `👉 [Ver ficha completa de ${matchedHotel.name}](/establecimiento/${matchedHotel.slug})\n`;
       if (dest) {
         response += `🔗 [Explorar otros hoteles en ${dest.name}](/establecimientos?destination=${dest.slug})\n`;
@@ -154,45 +176,45 @@ function smartFallbackAI(
 
     // 3. Intenciones frecuentes para turistas
     if (lower.includes("precio") || lower.includes("costo") || lower.includes("cuanto") || lower.includes("tarifa") || lower.includes("cotiz")) {
-      return `Los costos varían según el destino, tipo de habitación y la temporada del viaje 💰.\n\nEn Hoteles de Venezuela garantizamos la **tarifa directa sin sobreprecio de agencias**.\n\nPuedes consultar precios y disponibilidad en línea en nuestra sección de [Alojamientos](/establecimientos) o explorar nuestros [Paquetes Turísticos](/paquetes).\n\n¿Hacia qué ciudad o playa tienes planeado viajar?`;
+      return `Los costos varían según el destino, tipo de hospedaje y temporada 💰.\n\nEn Hoteles de Venezuela garantizamos la **tarifa directa sin sobreprecio de agencias**.\n\nPuedes consultar precios y disponibilidad en [Alojamientos](/establecimientos) o explorar nuestros [Paquetes Turísticos](/paquetes).\n\n¿Hacia qué ciudad o playa tienes planeado viajar?`;
     }
 
     if (lower.includes("reserva") || lower.includes("disponib") || lower.includes("cupo") || lower.includes("habitac")) {
-      return `¡Reservar es muy sencillo! 📅\n\n1. Busca tu destino ideal en [Destinos](/destinos) o en [Establecimientos](/establecimientos).\n2. Selecciona la posada u hotel de tu preferencia.\n3. Haz clic en **Reservar Directo** o escríbeles directamente por su botón de WhatsApp sin comisiones.\n\n¿Quieres que te sugiera los destinos más cotizados de la temporada? 🏝️`;
+      return `¡Reservar es muy sencillo y directo! 📅\n\n1. Selecciona tu destino favorito en [Alojamientos](/establecimientos).\n2. Escoge el hotel o posada de tu preferencia.\n3. Haz clic en **Reservar Directo** o escríbeles directamente por su botón de WhatsApp sin comisiones.\n\n¿Quieres sugerencias para esta temporada? 🏝️`;
     }
 
     if (lower.includes("paquete") || lower.includes("tour") || lower.includes("excursio") || lower.includes("todo incl")) {
-      return `¡Contamos con increíbles [Paquetes Turísticos](/paquetes) con todo incluido! ✈️🌴\n\nTenemos planes ideales para parejas, familias y grupos a destinos como Morrocoy, Los Roques, Margarita y Canaima.\n\n👉 [Explorar Catálogo de Paquetes](/paquetes)`;
+      return `¡Contamos con fabulosos [Paquetes Turísticos](/paquetes) con todo incluido! ✈️🌴\n\nTenemos opciones para parejas, familias y grupos a Morrocoy, Los Roques, Margarita y Canaima.\n\n👉 [Explorar Catálogo de Paquetes](/paquetes)`;
     }
 
     if (lower.includes("soporte") || lower.includes("queja") || lower.includes("reclamo") || lower.includes("pago") || lower.includes("factura") || lower.includes("problema")) {
-      return `Estimado(a) ${name || 'usuario'}, tu tranquilidad es nuestra prioridad. 🤝\n\nHemos registrado tu consulta para ser remitida formalmente al departamento de Atención y Soporte. Nuestro equipo dará seguimiento a tu caso en un lapso estimado de **48 a 72 horas hábiles**.\n\nTambién puedes contactar directamente a nuestro equipo central haciendo clic en el botón de abajo **"Continuar por WhatsApp"**.`;
+      return `Estimado(a) ${name || 'usuario'}, tu tranquilidad y satisfacción son prioridad absoluta. 🤝\n\nHemos canalizado tu consulta al departamento central de Soporte. Tu caso será atendido formalmente en un lapso de **48 a 72 horas hábiles**.\n\nSi requieres atención inmediata, puedes pulsar en **"Continuar por WhatsApp"** para ser atendido por un asesor.`;
     }
 
     if (lower.includes("gracias") || lower.includes("excelente") || lower.includes("perfecto")) {
-      return `¡Es un placer atenderte, ${name.split(" ")[0]}! 😊 Estamos aquí para ayudarte a vivir la mejor experiencia en Venezuela. ¿Hay algún otro destino u hotel del que desees información? 🇻🇪`;
+      return `¡Un gran placer atenderte, ${name.split(" ")[0]}! 😊 Estamos aquí para ayudarte a planificar tu mejor experiencia en Venezuela. ¿Hay algún otro lugar u hospedaje que deseas consultar? 🇻🇪`;
     }
 
     if (lower.includes("hola") || lower.includes("buenas") || lower.includes("saludo") || lower.includes("hey")) {
-      return `¡Hola ${name.split(" ")[0]}! 👋 Bienvenido a la plataforma oficial de Hoteles de Venezuela.\n\nPuedo ayudarte a descubrir [Destinos](/destinos), consultar [Alojamientos](/establecimientos) o explorar [Paquetes](/paquetes).\n\n¿A qué parte de Venezuela sueñas con viajar en tus próximas vacaciones? 🌴`;
+      return `¡Hola ${name.split(" ")[0]}! 👋 Bienvenido a Hoteles de Venezuela.\n\nPuedo ayudarte a descubrir [Destinos](/destinos), explorar [Alojamientos](/establecimientos) o consultar [Paquetes Turísticos](/paquetes).\n\n¿A qué parte de Venezuela sueñas con viajar? 🌴`;
     }
 
-    return `Entendido, ${name.split(" ")[0]}. 😊 Como asistente oficial de Hoteles de Venezuela, puedo sugerirte los mejores destinos del país como Morrocoy, Los Roques, Canaima o Margarita.\n\n👉 [Explorar Directorio de Posadas y Hoteles](/establecimientos)\n👉 [Ver Todos los Destinos](/destinos)\n\nTambién puedes hacer clic en **"Continuar por WhatsApp"** para atención personalizada de un asesor de viajes.`;
+    return `Entendido, ${name.split(" ")[0]}. 😊 Como tu asistente oficial de viajes, te invito a explorar nuestras mejores recomendaciones de posadas y hoteles en Morrocoy, Los Roques, Canaima, Margarita y Mérida.\n\n👉 [Directorio de Alojamientos](/establecimientos)\n👉 [Ver Todos los Destinos](/destinos)\n\nTambién puedes pulsar en **"Continuar por WhatsApp"** para conversar con un asesor en tiempo real.`;
   } else {
     // PROPIETARIO
     if (lower.includes("registr") || lower.includes("publicar") || lower.includes("unir") || lower.includes("afiliar") || lower.includes("anunciar")) {
-      return `¡Bienvenido aliados turísticos! 🏨 Publicar tu posada o complejo hotelero en Hoteles de Venezuela te dará visibilidad directa ante miles de viajeros y reservas 100% libres de comisiones.\n\n👉 [Registrar mi Negocio](/registro-negocio)\n👉 [Ver Planes de Membresía](/membresias)\n\n¿Te gustaría conocer los beneficios del plan 50 Fundadores? 🚀`;
+      return `¡Bienvenido, aliado turístico! 🏨 Afiliar tu hotel o posada a Hoteles de Venezuela te dará exposición nacional e internacional y clientes directos a tu WhatsApp sin pagar comisiones por reserva.\n\n👉 [Registrar mi Negocio](/registro-negocio)\n👉 [Ver Planes de Membresía](/membresias)\n\n¿Deseas conocer la oferta exclusiva para los **50 Fundadores**? 🚀`;
     }
 
     if (lower.includes("membresia") || lower.includes("plan") || lower.includes("precio") || lower.includes("costo") || lower.includes("inversio")) {
-      return `Ofrecemos 3 niveles de membresía adaptados a la dimensión de tu establecimiento:\n\n1. **Básico (Gratuito)**: Perfil esencial y contacto directo.\n2. **Premium**: Destacado prioritario, CRM de leads y reservaciones directas.\n3. **50 Fundadores**: Beneficios exclusivos de posicionamiento de por vida.\n\n👉 [Comparar Planes de Membresía](/membresias)`;
+      return `Contamos con 3 niveles de membresía diseñados para impulsar la ocupación de tu hospedaje:\n\n1. **Básico (Gratuito)**: Perfil esencial y contacto directo.\n2. **Premium**: Posicionamiento prioritario, CRM de leads y analíticas.\n3. **50 Fundadores**: Beneficios VIP de posicionamiento de por vida.\n\n👉 [Comparar Planes de Membresía](/membresias)`;
     }
 
     if (lower.includes("hola") || lower.includes("buenas") || lower.includes("saludo")) {
-      return `¡Hola ${name.split(" ")[0]}! 👋 Qué gusto saludarte. Soy tu asistente corporativo de Hoteles de Venezuela. Puedo orientarte sobre cómo listar tu propiedad, activar tu motor de reservas y potenciar tus ventas directas.\n\n¿En qué puedo apoyarte hoy?`;
+      return `¡Hola ${name.split(" ")[0]}! 👋 Qué gusto saludarte. Soy tu consultor de negocios de Hoteles de Venezuela. Puedo orientarte sobre cómo afiliar tu propiedad, activar tu motor de reservaciones directas y multiplicar tus ventas.\n\n¿En qué podemos apoyarte hoy?`;
     }
 
-    return `Excelente, ${name.split(" ")[0]}. Te invitamos a conocer todos los beneficios de formar parte de la red hotelera oficial del país.\n\n👉 [Ir a Registro de Negocio](/registro-negocio)\n👉 [Ver Detalles de Membresías](/membresias)\n\nO si prefieres, haz clic abajo en **"Continuar por WhatsApp"** para conversar directamente con nuestro director de ventas.`;
+    return `Excelente, ${name.split(" ")[0]}. Te invitamos a formar parte de la red hotelera líder de Venezuela.\n\n👉 [Ir a Registro de Negocio](/registro-negocio)\n👉 [Ver Detalles de Membresías](/membresias)\n\nO si prefieres, presiona **"Continuar por WhatsApp"** para hablar de inmediato con un ejecutivo comercial.`;
   }
 }
 

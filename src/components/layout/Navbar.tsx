@@ -7,6 +7,8 @@ import { useAuth } from "../../lib/auth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
 
+import { OFFICIAL_WHATSAPP_URL, OFFICIAL_WHATSAPP_DISPLAY } from "@/config/whatsapp";
+
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -59,6 +61,7 @@ export function Navbar() {
     { href: "/parques", label: "Parques", settingKey: "MENU_SHOW_PARQUES" },
     { href: "/membresias", label: "Membresías", settingKey: "MENU_SHOW_MEMBRESIAS" },
     { href: "/quienes-somos", label: "Quiénes Somos", settingKey: "MENU_SHOW_QUIENES_SOMOS" },
+    { href: "/soporte", label: "Soporte", settingKey: "MENU_SHOW_SOPORTE" },
     { href: "/viaje-ia", label: "Planear con IA ✨", settingKey: "MENU_SHOW_VIAJE_IA" },
     { href: "/servicios-b2b", label: "Marketplace B2B", settingKey: "MENU_SHOW_SERVICIOS_B2B" },
     { href: "/paquetes", label: "Paquetes", settingKey: "MENU_SHOW_PAQUETES" },
@@ -136,14 +139,14 @@ export function Navbar() {
           
           {/* Teléfono de contacto oficial para verificación */}
           <a
-            href="https://wa.me/584145069774"
+            href={OFFICIAL_WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 text-xs text-slate-800 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors"
             title="Contacto oficial WhatsApp"
           >
             <Phone className="w-3.5 h-3.5 text-emerald-600" />
-            <span className="hidden 2xl:inline">+58 414-5069774</span>
+            <span className="hidden 2xl:inline">{OFFICIAL_WHATSAPP_DISPLAY}</span>
           </a>
 
           {/* Selector de Idioma */}

@@ -15,7 +15,7 @@ export function Registro() {
       setLoading(true);
       // Guardar el rol temporalmente en localStorage antes de redireccionar a Google OAuth
       localStorage.setItem("hdv_pending_signup_role", role);
-      
+
       const { error } = await loginWithGoogle();
       if (error) {
         setErrorMsg("Error al conectar con Google: " + error.message);
@@ -35,7 +35,7 @@ export function Registro() {
       <div className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] bg-brand-turquesa/5 rounded-full blur-[80px] pointer-events-none"></div>
 
       <div className="bg-white border border-gray-100 max-w-md w-full rounded-3xl p-8 md:p-10 shadow-xl relative z-10 text-center">
-        
+
         {/* Volver */}
         <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors mb-6 self-start">
           <ArrowLeft className="w-3.5 h-3.5" />
@@ -44,9 +44,9 @@ export function Registro() {
 
         {/* Logo */}
         <div className="flex justify-center mb-6">
-          <img 
-            src="/images/logo-hdv-transparent.png" 
-            alt="Hoteles de Venezuela" 
+          <img
+            src="/images/logo-hdv-transparent.png"
+            alt="Hoteles de Venezuela"
             className="h-12 w-auto object-contain"
           />
         </div>
@@ -74,11 +74,10 @@ export function Registro() {
               <button
                 type="button"
                 onClick={() => setRole("user")}
-                className={`py-3.5 px-4 rounded-xl border text-center font-bold text-xs flex flex-col items-center justify-center gap-2 cursor-pointer transition-all ${
-                  role === "user" 
-                    ? "border-brand-magenta bg-magenta-50/5 text-brand-magenta shadow-sm scale-102" 
-                    : "border-gray-100 bg-gray-50/50 text-gray-400 hover:bg-gray-50"
-                }`}
+                className={`py-3.5 px-4 rounded-xl border text-center font-bold text-xs flex flex-col items-center justify-center gap-2 cursor-pointer transition-all ${role === "user"
+                  ? "border-brand-magenta bg-magenta-50/5 text-brand-magenta shadow-sm scale-102"
+                  : "border-gray-100 bg-gray-50/50 text-gray-400 hover:bg-gray-50"
+                  }`}
               >
                 <div className={`p-2 rounded-lg ${role === "user" ? "bg-brand-magenta text-white" : "bg-gray-100 text-gray-400"}`}>
                   <User className="w-4 h-4" />
@@ -88,11 +87,10 @@ export function Registro() {
               <button
                 type="button"
                 onClick={() => setRole("owner")}
-                className={`py-3.5 px-4 rounded-xl border text-center font-bold text-xs flex flex-col items-center justify-center gap-2 cursor-pointer transition-all ${
-                  role === "owner" 
-                    ? "border-brand-purple bg-purple-50/5 text-brand-purple shadow-sm scale-102" 
-                    : "border-gray-100 bg-gray-50/50 text-gray-400 hover:bg-gray-50"
-                }`}
+                className={`py-3.5 px-4 rounded-xl border text-center font-bold text-xs flex flex-col items-center justify-center gap-2 cursor-pointer transition-all ${role === "owner"
+                  ? "border-brand-purple bg-purple-50/5 text-brand-purple shadow-sm scale-102"
+                  : "border-gray-100 bg-gray-50/50 text-gray-400 hover:bg-gray-50"
+                  }`}
               >
                 <div className={`p-2 rounded-lg ${role === "owner" ? "bg-brand-purple text-white" : "bg-gray-100 text-gray-400"}`}>
                   <Building2 className="w-4 h-4" />
@@ -103,7 +101,7 @@ export function Registro() {
           </div>
 
           {/* Botón de Registro con Google */}
-          <button 
+          <button
             type="button"
             onClick={handleGoogleLogin}
             disabled={loading}
@@ -114,7 +112,7 @@ export function Registro() {
             ) : (
               <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-brand-turquesa shrink-0">
                 <svg className="w-3.5 h-3.5 text-white fill-current" viewBox="0 0 24 24">
-                  <path d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114-3.41 0-6.177-2.767-6.177-6.177S10.582 6.16 13.991 6.16c1.558 0 2.977.576 4.07 1.526l3.14-3.14C19.273 2.766 16.79 1.6 13.99 1.6 8.252 1.6 3.6 6.252 3.6 12s4.652 10.4 10.39 10.4c5.776 0 10.38-4.232 10.38-10.4 0-.693-.082-1.353-.245-1.715H12.24z"/>
+                  <path d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114-3.41 0-6.177-2.767-6.177-6.177S10.582 6.16 13.991 6.16c1.558 0 2.977.576 4.07 1.526l3.14-3.14C19.273 2.766 16.79 1.6 13.99 1.6 8.252 1.6 3.6 6.252 3.6 12s4.652 10.4 10.39 10.4c5.776 0 10.38-4.232 10.38-10.4 0-.693-.082-1.353-.245-1.715H12.24z" />
                 </svg>
               </span>
             )}
