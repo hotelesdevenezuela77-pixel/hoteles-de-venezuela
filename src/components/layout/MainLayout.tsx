@@ -4,6 +4,7 @@ import { Navbar } from "./Navbar";
 import { TickerBar } from "./TickerBar";
 import { RouteAlertsBanner } from "../alerts/RouteAlertsBanner";
 import { BackgroundMusicPlayer } from "./BackgroundMusicPlayer";
+import { ChatWidget } from "./ChatWidget";
 import {
   MapPin, Phone, MessageSquare, Send, X, Headphones
 } from "lucide-react";
@@ -82,6 +83,7 @@ function Footer() {
                   <path d="M23.498 6.163c-.272-.98-1.09-1.755-2.115-2.013C19.51 3.75 12 3.75 12 3.75s-7.51 0-9.383.5c-1.025.258-1.843 1.033-2.115 2.013C0 7.962 0 12 0 12s0 4.038.5 5.837c.272.98.109 1.755 2.115 2.013c1.873.5 9.383.5 9.383.5s7.51 0 9.383-.5c1.025-.258 1.843-1.033 2.115-2.013c.5-1.8.5-5.837.5-5.837s0-4.038-.5-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                 </svg>
               </a>
+            </div>
             <div className="mt-6">
               <Link
                 href="/soporte"
@@ -258,8 +260,6 @@ function Footer() {
     </footer>
   );
 }
-
-import { ChatWidget } from "./ChatWidget";
 
 interface MainLayoutProps {
   children: React.ReactNode;

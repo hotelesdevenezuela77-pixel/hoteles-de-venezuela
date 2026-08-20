@@ -61,6 +61,7 @@ export function Navbar() {
     { href: "/parques", label: "Parques", settingKey: "MENU_SHOW_PARQUES" },
     { href: "/membresias", label: "Membresías", settingKey: "MENU_SHOW_MEMBRESIAS" },
     { href: "/quienes-somos", label: "Quiénes Somos", settingKey: "MENU_SHOW_QUIENES_SOMOS" },
+    { href: "/soporte", label: "Soporte", settingKey: "MENU_SHOW_SOPORTE" },
     { href: "/viaje-ia", label: "Planear con IA ✨", settingKey: "MENU_SHOW_VIAJE_IA" },
     { href: "/servicios-b2b", label: "Marketplace B2B", settingKey: "MENU_SHOW_SERVICIOS_B2B" },
     { href: "/paquetes", label: "Paquetes", settingKey: "MENU_SHOW_PAQUETES" },
