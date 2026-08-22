@@ -41,46 +41,20 @@ export function BackgroundMusicPlayer() {
     loadAudioSetting();
   }, []);
 
+  // Instanciar audio de forma manual (sin autoplay automático)
   useEffect(() => {
     const audio = new Audio(audioSrc);
     audio.loop = true;
-    audio.volume = volume;
+    audio.volume = isMuted ? 0 : volume;
     audioRef.current = audio;
 
-    // Intentar Autoplay automático inmediato
-    const attemptAutoplay = async () => {
-      try {
-        await audio.play();
-        setIsPlaying(true);
-        setAudioError(false);
-      } catch (err) {
-        // El navegador exige una primera interacción del usuario (Políticas de Autoplay de Chrome/Safari/Edge).
-        // Escuchamos cualquier gesto (clic, toque, scroll o tecla) para iniciar la música automáticamente.
-        const handleFirstInteraction = async () => {
-          try {
-            await audio.play();
-            setIsPlaying(true);
-            setAudioError(false);
-          } catch (e) {
-            console.warn("Error iniciando reproducción tras gesto:", e);
-          } finally {
-            window.removeEventListener("click", handleFirstInteraction);
-            window.removeEventListener("touchstart", handleFirstInteraction);
-            window.removeEventListener("pointerdown", handleFirstInteraction);
-            window.removeEventListener("scroll", handleFirstInteraction);
-            window.removeEventListener("keydown", handleFirstInteraction);
-          }
-        };
-
-        window.addEventListener("click", handleFirstInteraction, { once: true });
-        window.addEventListener("touchstart", handleFirstInteraction, { once: true });
-        window.addEventListener("pointerdown", handleFirstInteraction, { once: true });
-        window.addEventListener("scroll", handleFirstInteraction, { once: true });
-        window.addEventListener("keydown", handleFirstInteraction, { once: true });
-      }
-    };
-
-    attemptAutoplay();
+    // Si ya estaba reproduciendo cuando cambió la URL, continuar la reproducción con la nueva fuente
+    if (isPlaying) {
+      audio.play().catch((err) => {
+        console.warn("Error reproduciendo nueva pista:", err);
+        setIsPlaying(false);
+      });
+    }
 
     return () => {
       audio.pause();
@@ -88,6 +62,7 @@ export function BackgroundMusicPlayer() {
     };
   }, [audioSrc]);
 
+  // Sincronizar cambios de volumen y mute en el elemento de audio
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = isMuted ? 0 : volume;
@@ -107,14 +82,15 @@ export function BackgroundMusicPlayer() {
           setIsPlaying(true);
           setAudioError(false);
         })
-        .catch(err => {
-          console.warn("Error reproduciendo audio:", err);
+        .catch((err) => {
+          console.warn("Error iniciando reproducción manual:", err);
           setAudioError(true);
         });
     }
   };
 
-  const toggleMute = () => {
+  const toggleMute = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (!audioRef.current) return;
     const nextMute = !isMuted;
     setIsMuted(nextMute);
@@ -124,12 +100,12 @@ export function BackgroundMusicPlayer() {
   return (
     <div className="fixed bottom-6 left-6 z-40 font-sans select-none">
       <div className="relative group flex items-center gap-2 bg-[#0e011f]/90 backdrop-blur-md text-white border border-[#00C8D4]/40 p-2 pl-3 rounded-full shadow-2xl hover:border-[#FF0096]/60 transition-all duration-300">
-        
+
         {/* Visualizador de Ondas / Icono Principal */}
         <button
           type="button"
           onClick={togglePlay}
-          className="flex items-center gap-2 cursor-pointer focus:outline-none"
+          className="flex items-center gap-2 cursor-pointer focus:outline-none group/title"
           title={isPlaying ? "Pausar Música Corporativa" : "Reproducir Música Corporativa"}
         >
           {isPlaying ? (
@@ -139,11 +115,11 @@ export function BackgroundMusicPlayer() {
               <span className="w-1 bg-[#00C8D4] h-full rounded-full animate-bounce [animation-delay:300ms]" />
             </div>
           ) : (
-            <Music className="w-4 h-4 text-gray-400 group-hover:text-[#00C8D4] transition-colors" />
+            <Music className="w-4 h-4 text-[#00C8D4] group-hover/title:text-[#FF0096] transition-colors" />
           )}
 
           <span className="text-[11px] font-bold tracking-wide pr-1 text-gray-200 hidden sm:inline-block">
-            {isPlaying ? "Música HDV" : "Música de Fondo"}
+            {isPlaying ? "Música HDV" : "Escuchar Música"}
           </span>
         </button>
 
@@ -151,9 +127,18 @@ export function BackgroundMusicPlayer() {
         <button
           type="button"
           onClick={togglePlay}
-          className="w-7 h-7 rounded-full bg-white/10 hover:bg-[#FF0096] text-white flex items-center justify-center transition-all cursor-pointer shadow-xs"
+          title={isPlaying ? "Pausar" : "Reproducir"}
+          className={`w-7 h-7 rounded-full text-white flex items-center justify-center transition-all cursor-pointer shadow-xs ${
+            isPlaying
+              ? "bg-white/10 hover:bg-[#FF0096]"
+              : "bg-[#00C8D4] hover:bg-[#00e2f0] text-[#0e011f]"
+          }`}
         >
-          {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 ml-0.5" />}
+          {isPlaying ? (
+            <Pause className="w-3.5 h-3.5 text-white" />
+          ) : (
+            <Play className="w-3.5 h-3.5 ml-0.5 fill-current text-[#0e011f]" />
+          )}
         </button>
 
         {/* Botón Mute / Volumen desplegable */}
@@ -161,23 +146,34 @@ export function BackgroundMusicPlayer() {
           <button
             type="button"
             onClick={toggleMute}
-            className="w-7 h-7 rounded-full bg-white/10 hover:bg-[#00C8D4] text-white flex items-center justify-center transition-all cursor-pointer shadow-xs"
+            className="w-7 h-7 rounded-full bg-white/10 hover:bg-[#00C8D4] hover:text-[#0e011f] text-white flex items-center justify-center transition-all cursor-pointer shadow-xs"
             title={isMuted ? "Activar Sonido" : "Silenciar"}
           >
-            {isMuted || volume === 0 ? <VolumeX className="w-3.5 h-3.5 text-red-400" /> : <Volume2 className="w-3.5 h-3.5" />}
+            {isMuted || volume === 0 ? (
+              <VolumeX className="w-3.5 h-3.5 text-red-400" />
+            ) : (
+              <Volume2 className="w-3.5 h-3.5" />
+            )}
           </button>
 
           {/* Desplegable de Control de Volumen */}
           <button
             type="button"
-            onClick={() => setIsExpanded(!isExpanded)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsExpanded(!isExpanded);
+            }}
             className="w-5 h-5 text-gray-400 hover:text-white flex items-center justify-center cursor-pointer"
+            title="Ajustar volumen"
           >
             <ChevronUp className={`w-3 h-3 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
           </button>
 
           {isExpanded && (
-            <div className="absolute bottom-10 left-0 bg-[#0e011f] border border-[#00C8D4]/40 p-3 rounded-2xl shadow-xl flex flex-col gap-2 min-w-[140px] text-xs">
+            <div
+              className="absolute bottom-10 left-0 bg-[#0e011f] border border-[#00C8D4]/40 p-3 rounded-2xl shadow-xl flex flex-col gap-2 min-w-[140px] text-xs"
+              onClick={(e) => e.stopPropagation()}
+            >
               <span className="text-[10px] font-black uppercase text-gray-400 tracking-wider">Volumen Ambiente</span>
               <input
                 type="range"
