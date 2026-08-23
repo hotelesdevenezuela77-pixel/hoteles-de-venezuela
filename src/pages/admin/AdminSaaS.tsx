@@ -591,7 +591,7 @@ export function AdminSaaS() {
                           </span>
                           <span className="text-slate-400">Host: <strong className="text-white">www</strong></span>
                           <span className="text-slate-400 truncate max-w-[180px] sm:max-w-none">
-                            Value: <strong className="text-cyan-300">hotelesdevenezuela.com</strong>
+                            Value: <strong className="text-cyan-300">hoteles-de-venezuela.pages.dev</strong>
                           </span>
                           <span className="text-slate-400 text-[10px]">TTL: <strong className="text-slate-200">Automatic</strong></span>
                         </div>
@@ -599,8 +599,8 @@ export function AdminSaaS() {
                         <button
                           type="button"
                           onClick={() => {
-                            navigator.clipboard.writeText("hotelesdevenezuela.com");
-                            triggerCopiedToast("hotelesdevenezuela.com (CNAME Value)");
+                            navigator.clipboard.writeText("hoteles-de-venezuela.pages.dev");
+                            triggerCopiedToast("hoteles-de-venezuela.pages.dev (CNAME Value)");
                           }}
                           className="px-2.5 py-1 bg-[#00C8D4]/10 hover:bg-[#00C8D4]/20 text-[#00C8D4] border border-[#00C8D4]/30 rounded-lg font-sans font-bold text-[10px] cursor-pointer flex items-center gap-1 shrink-0"
                         >
@@ -650,7 +650,7 @@ export function AdminSaaS() {
                             `REGISTRO 1 (Subdominio WWW):\n` +
                             `- Type (Tipo): CNAME Record\n` +
                             `- Host: www\n` +
-                            `- Value (Target): hotelesdevenezuela.com\n` +
+                            `- Value (Target): hoteles-de-venezuela.pages.dev\n` +
                             `- TTL: Automatic\n\n` +
                             `REGISTRO 2 (Redirección Dominio Raíz):\n` +
                             `- Type (Tipo): URL Redirect Record\n` +
