@@ -18,6 +18,25 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loadingRooms, setLoadingRooms] = useState(true);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [mapViewMode, setMapViewMode] = useState<"satelite" | "estandar">("satelite");
+  const [activeAreaTab, setActiveAreaTab] = useState<string>("todas");
+
+  // Cargar fotos por áreas (Piscina, Restaurante, Lobby, Fachada, Playa, Spa)
+  const [areaPhotos, setAreaPhotos] = useState<Record<string, string[]>>(() => {
+    try {
+      const saved = localStorage.getItem("hdv_area_photos");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed[config.establishment_id]) return parsed[config.establishment_id];
+      }
+    } catch (e) {}
+    return {
+      piscina: ["https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=800&auto=format&fit=crop"],
+      restaurante: ["https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop"],
+      lobby: ["https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop"],
+      fachada: ["https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&auto=format&fit=crop"],
+    };
+  });
 
   const primaryColor = config.branding?.primary_color || "#00C8D4";
   const secondaryColor = config.branding?.secondary_color || "#9B00CC";
@@ -373,7 +392,62 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
 
       </section>
 
-      {/* ── SECCIÓN: SOBRE NOSOTROS Y UBICACIÓN ── */}
+      {/* ── SECCIÓN: ÁREAS E INSTALACIONES DEL ESTABLECIMIENTO ── */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/5">
+        <div className="text-center space-y-4 max-w-3xl mx-auto mb-12">
+          <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#FF0096] uppercase block">
+            INSTALACIONES & ESPACIOS DE DISTINCIÓN
+          </span>
+          <h2 className="text-3xl sm:text-5xl font-black font-serif text-white leading-tight">
+            Nuestras Diversas Áreas
+          </h2>
+          <p className="text-slate-300 text-sm font-light">
+            Recorra cada rincón de {config.name}. Diseñado para brindarle máximo confort en cada espacio.
+          </p>
+        </div>
+
+        {/* Selector de Áreas */}
+        <div className="flex flex-wrap justify-center gap-2 mb-10">
+          {[
+            { id: "todas", label: "Todas las Áreas" },
+            { id: "piscina", label: "🏊 Piscina & Solárium" },
+            { id: "restaurante", label: "🍽️ Restaurante & Gastronomía" },
+            { id: "lobby", label: "🏢 Lobby & Recepción" },
+            { id: "fachada", label: "🌿 Fachada & Jardines" }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveAreaTab(tab.id)}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                activeAreaTab === tab.id
+                  ? "bg-[#00C8D4] text-slate-950 font-black shadow-lg shadow-cyan-500/20"
+                  : "bg-[#1a0533] text-slate-300 hover:text-white border border-white/10"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Grilla de Fotos por Áreas */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {Object.entries(areaPhotos)
+            .filter(([key]) => activeAreaTab === "todas" || activeAreaTab === key)
+            .flatMap(([areaKey, urls]) => urls.map((url, i) => ({ areaKey, url, id: `${areaKey}-${i}` })))
+            .map(item => (
+              <div key={item.id} className="relative rounded-2xl overflow-hidden aspect-video border border-white/10 group bg-slate-900">
+                <img src={item.url} alt={item.areaKey} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                  <span className="text-[10px] font-black uppercase text-white tracking-widest bg-[#FF0096] px-2 py-0.5 rounded-md">
+                    {item.areaKey}
+                  </span>
+                </div>
+              </div>
+            ))}
+        </div>
+      </section>
+
+      {/* ── SECCIÓN: SOBRE NOSOTROS Y UBICACIÓN CON MAPA SATELITAL ── */}
       <section id="sobre-nosotros" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
@@ -403,45 +477,107 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               </div>
             </div>
 
-            {/* Dirección Badge */}
-            <div className="p-4 rounded-2xl bg-[#1a0533] border border-white/10 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3 text-xs text-slate-200">
-                <div className="p-2.5 bg-[#00C8D4] rounded-xl flex items-center justify-center shrink-0">
-                  <MapPin className="w-4 h-4 text-white" />
+            {/* Dirección Badge & Coordenadas GPS */}
+            <div className="p-4 rounded-2xl bg-[#1a0533] border border-white/10 space-y-3">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3 text-xs text-slate-200">
+                  <div className="p-2.5 bg-[#00C8D4] rounded-xl flex items-center justify-center shrink-0">
+                    <MapPin className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-[#00C8D4] font-bold uppercase block">Ubicación GPS Verificada</span>
+                    <span className="font-semibold text-white">Dominio Oficial: {config.domain}</span>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-[10px] text-[#00C8D4] font-bold uppercase block">Ubicación Oficial</span>
-                  <span className="font-semibold text-white">Dominio Oficial: {config.domain}</span>
-                </div>
+
+                <a
+                  href={generalWaUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-[#0e011f] border border-white/15 hover:border-[#00C8D4] transition-colors shrink-0"
+                >
+                  Cómo Llegar
+                </a>
               </div>
 
-              <a
-                href={generalWaUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-[#0e011f] border border-white/15 hover:border-[#00C8D4] transition-colors shrink-0"
-              >
-                Como Llegar
-              </a>
+              <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[10px] text-slate-400 font-mono">
+                <span>📍 Coordenadas: 10.6015° N, 66.9346° W</span>
+                <span className="text-[#00C8D4] font-bold uppercase">Estado La Guaira, Venezuela</span>
+              </div>
             </div>
           </div>
 
+          {/* MAPA SATELITAL INTERACTIVO DEL ESTABLECIMIENTO */}
           <div className="lg:col-span-6">
-            <div className="relative rounded-3xl overflow-hidden border border-[#9B00CC]/30 shadow-2xl group">
-              <img
-                src={bannerImage}
-                alt={config.name}
-                className="w-full h-[400px] object-cover scale-[1.03] group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0e011f] via-transparent to-transparent"></div>
+            <div className="relative rounded-3xl overflow-hidden border border-[#00C8D4]/40 shadow-2xl bg-[#0e011f] space-y-0">
               
-              <div className="absolute bottom-6 left-6 right-6 p-5 rounded-2xl bg-[#0e011f]/90 backdrop-blur border border-white/10 flex items-center justify-between">
+              {/* Barra de Control del Mapa Satelital */}
+              <div className="p-3 bg-[#1a0533] border-b border-white/10 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
+                  <span className="text-xs font-bold text-white font-serif">Mapa Satelital en Tiempo Real</span>
+                </div>
+                <div className="flex bg-slate-900 rounded-xl p-1 border border-white/10 gap-1">
+                  <button
+                    onClick={() => setMapViewMode("satelite")}
+                    className={`px-3 py-1 rounded-lg text-[10px] font-extrabold uppercase transition-all cursor-pointer ${
+                      mapViewMode === "satelite" ? "bg-[#FF0096] text-white" : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    🛰️ Satélite
+                  </button>
+                  <button
+                    onClick={() => setMapViewMode("estandar")}
+                    className={`px-3 py-1 rounded-lg text-[10px] font-extrabold uppercase transition-all cursor-pointer ${
+                      mapViewMode === "estandar" ? "bg-[#00C8D4] text-slate-950" : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    🗺️ Terrestre
+                  </button>
+                </div>
+              </div>
+
+              {/* Contenedor del Mapa Satelital */}
+              <div className="relative h-[380px] w-full overflow-hidden bg-slate-950">
+                {mapViewMode === "satelite" ? (
+                  <div className="w-full h-full relative">
+                    <iframe
+                      title="Mapa Satelital del Establecimiento"
+                      width="100%"
+                      height="100%"
+                      frameBorder="0"
+                      scrolling="no"
+                      src="https://maps.google.com/maps?q=10.6015,-66.9346&t=k&z=17&ie=UTF8&iwloc=&output=embed"
+                      className="w-full h-full filter contrast-105 brightness-95"
+                    />
+                    <div className="absolute top-4 left-4 bg-[#0e011f]/90 backdrop-blur px-3 py-1.5 rounded-xl border border-white/15 text-[10px] text-white font-bold flex items-center gap-2 shadow-lg">
+                      <span className="w-2 h-2 rounded-full bg-[#00C8D4]" />
+                      <span>Vista Aérea Satelital (Alta Resolución)</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-full h-full relative">
+                    <iframe
+                      title="Mapa Terrestre del Establecimiento"
+                      width="100%"
+                      height="100%"
+                      frameBorder="0"
+                      scrolling="no"
+                      src="https://maps.google.com/maps?q=10.6015,-66.9346&t=m&z=15&ie=UTF8&iwloc=&output=embed"
+                      className="w-full h-full"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="p-4 bg-[#0e011f] border-t border-white/10 flex items-center justify-between">
                 <div>
                   <span className="text-[10px] text-slate-400 uppercase font-bold block">Sello de Calidad</span>
-                  <span className="text-sm font-bold text-white">Red Oficial Hoteles de Venezuela</span>
+                  <span className="text-xs font-bold text-white">{config.name} • Red Oficial Hoteles de Venezuela</span>
                 </div>
-                <Award className="w-6 h-6 text-[#FF0096]" />
+                <Award className="w-5 h-5 text-[#FF0096]" />
               </div>
+
             </div>
           </div>
 

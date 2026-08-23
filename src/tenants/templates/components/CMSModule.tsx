@@ -18,11 +18,38 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
   // Estados para inputs del CMS
   const [name, setName] = useState(config.name);
   const [domain, setDomain] = useState(config.domain);
-  const [bannerUrl, setBannerUrl] = useState(config.branding.banner_url);
+  const [bannerUrl, setBannerUrl] = useState(config.branding.banner_url || "");
+  const [logoUrl, setLogoUrl] = useState(config.branding.logo_url || "");
   const [phone, setPhone] = useState(config.contact.phone);
   const [whatsapp, setWhatsapp] = useState(config.contact.whatsapp);
   const [email, setEmail] = useState(config.contact.email);
   const [instagram, setInstagram] = useState(config.contact.instagram);
+
+  // Cargar fotos por área del establecimiento (Piscina, Restaurante, Lobby, Fachada, Playa, Spa)
+  const [areaPhotosState, setAreaPhotosState] = useState<Record<string, string[]>>(() => {
+    try {
+      const saved = localStorage.getItem("hdv_area_photos");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return parsed[config.establishment_id] || {
+          piscina: ["https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=800&auto=format&fit=crop"],
+          restaurante: ["https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop"],
+          lobby: ["https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop"],
+          fachada: ["https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&auto=format&fit=crop"],
+        };
+      }
+    } catch (e) {}
+    return {
+      piscina: ["https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=800&auto=format&fit=crop"],
+      restaurante: ["https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop"],
+      lobby: ["https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop"],
+      fachada: ["https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&auto=format&fit=crop"],
+    };
+  });
+
+  const [newAreaInput, setNewAreaInput] = useState<Record<string, string>>({
+    piscina: "", restaurante: "", lobby: "", fachada: "", playa: "", spa: ""
+  });
 
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -30,7 +57,7 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
   // Manejo de carga de imagen local (Simulador Base64 para R2)
   const [isUploading, setIsUploading] = useState(false);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, type: "banner" | "logo") => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -38,11 +65,29 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
     const reader = new FileReader();
     reader.onloadend = () => {
       if (typeof reader.result === "string") {
-        setBannerUrl(reader.result); // Inyectar como Base64
+        if (type === "banner") setBannerUrl(reader.result);
+        else setLogoUrl(reader.result);
       }
       setIsUploading(false);
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleAddAreaPhoto = (areaKey: string) => {
+    const url = (newAreaInput[areaKey] || "").trim();
+    if (!url) return;
+    setAreaPhotosState(prev => {
+      const current = prev[areaKey] || [];
+      return { ...prev, [areaKey]: [...current, url] };
+    });
+    setNewAreaInput(prev => ({ ...prev, [areaKey]: "" }));
+  };
+
+  const handleRemoveAreaPhoto = (areaKey: string, index: number) => {
+    setAreaPhotosState(prev => {
+      const current = prev[areaKey] || [];
+      return { ...prev, [areaKey]: current.filter((_, i) => i !== index) };
+    });
   };
 
   const handleSaveCMS = async (e: React.FormEvent) => {
@@ -57,7 +102,8 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
       domain,
       branding: {
         ...config.branding,
-        banner_url: bannerUrl
+        banner_url: bannerUrl,
+        logo_url: logoUrl
       },
       contact: {
         ...config.contact,
@@ -187,6 +233,52 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
           </div>
         </div>
 
+        {/* Sección: Logo Oficial del Establecimiento */}
+        <div className="space-y-4">
+          <h4 className="text-[10px] uppercase font-extrabold tracking-wider text-slate-400 flex items-center gap-1.5 border-b border-white/5 pb-1">
+            <Sparkles className="w-3.5 h-3.5 text-[#00C8D4]" /> Logo Oficial del Establecimiento (Reflejado en Menú Superior)
+          </h4>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+            {/* Vista previa del Logo */}
+            <div className="relative rounded-2xl overflow-hidden h-24 border border-white/10 bg-slate-950/60 p-3 flex items-center justify-center">
+              {logoUrl ? (
+                <img src={logoUrl} alt="Logo del establecimiento" className="max-h-full max-w-full object-contain" />
+              ) : (
+                <div className="text-center">
+                  <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider block">Sin Logo Configurado</span>
+                  <span className="text-[9px] text-gray-600">Se usará el distintivo con iniciales por defecto</span>
+                </div>
+              )}
+            </div>
+
+            {/* Subir archivo de Logo */}
+            <div className="space-y-3">
+              <div>
+                <label className="block text-[9px] uppercase font-bold text-gray-500 tracking-wider mb-1">Subir Logo desde tus archivos</label>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={e => handleImageUpload(e, "logo")} 
+                  className="block w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#00C8D4]/15 file:text-[#00C8D4] hover:file:bg-[#00C8D4]/25 cursor-pointer" 
+                  disabled={isUploading} 
+                />
+              </div>
+
+              <div>
+                <label className="block text-[9px] uppercase font-bold text-gray-500 tracking-wider mb-1">O escribe URL Directa del Logo</label>
+                <input
+                  type="url"
+                  value={logoUrl.startsWith("data:") ? "" : logoUrl}
+                  onChange={e => setLogoUrl(e.target.value)}
+                  placeholder="https://midominio.com/logo.png"
+                  className="w-full bg-slate-950/40 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-[#00C8D4]"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Sección: Carga de Imagen de Banner */}
         <div className="space-y-4">
           <h4 className="text-[10px] uppercase font-extrabold tracking-wider text-slate-400 flex items-center gap-1.5 border-b border-white/5 pb-1">
@@ -221,7 +313,7 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
                     <input 
                       type="file" 
                       accept="image/*" 
-                      onChange={handleImageUpload} 
+                      onChange={e => handleImageUpload(e, "banner")} 
                       className="hidden" 
                       disabled={isUploading} 
                     />
@@ -240,6 +332,68 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
                 />
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Sección: Fotos de las Diversas Áreas del Establecimiento */}
+        <div className="space-y-4">
+          <h4 className="text-[10px] uppercase font-extrabold tracking-wider text-slate-400 flex items-center gap-1.5 border-b border-white/5 pb-1">
+            <Image className="w-3.5 h-3.5 text-[#9B00CC]" /> Fotos de las Diversas Áreas e Instalaciones
+          </h4>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              { key: "piscina", title: "🏊 Piscina & Solárium" },
+              { key: "restaurante", title: "🍽️ Restaurante & Gastronomía" },
+              { key: "lobby", title: "🏢 Lobby & Recepción" },
+              { key: "fachada", title: "🌿 Fachada & Jardines" },
+              { key: "playa", title: "🏖️ Playa / Exteriores" },
+              { key: "spa", title: "🧘 Spa & Bienestar" }
+            ].map(area => {
+              const list = areaPhotosState[area.key] || [];
+              return (
+                <div key={area.key} className="p-4 bg-slate-950/50 border border-white/10 rounded-2xl space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-bold text-white">{area.title}</span>
+                    <span className="text-[10px] font-bold text-slate-400">{list.length} fotos</span>
+                  </div>
+
+                  {/* Grid de Fotos Existentes */}
+                  <div className="grid grid-cols-3 gap-2">
+                    {list.map((photoUrl, idx) => (
+                      <div key={idx} className="relative group rounded-xl overflow-hidden h-16 border border-white/10 bg-slate-900">
+                        <img src={photoUrl} alt={area.title} className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveAreaPhoto(area.key, idx)}
+                          className="absolute inset-0 bg-red-900/80 text-white font-extrabold text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Agregar URL de Foto */}
+                  <div className="flex gap-2">
+                    <input
+                      type="url"
+                      placeholder="https://imagen-area.jpg"
+                      value={newAreaInput[area.key] || ""}
+                      onChange={e => setNewAreaInput(prev => ({ ...prev, [area.key]: e.target.value }))}
+                      className="flex-1 bg-slate-900 border border-white/10 rounded-xl px-2.5 py-1 text-xs text-white placeholder:text-gray-600 focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleAddAreaPhoto(area.key)}
+                      className="px-3 py-1 bg-[#00C8D4]/20 text-[#00C8D4] hover:bg-[#00C8D4]/30 rounded-xl text-xs font-bold cursor-pointer"
+                    >
+                      + Añadir
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
