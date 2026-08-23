@@ -215,7 +215,7 @@ export function OwnerDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<any>(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get("tab") || "resumen";
+    return params.get("tab") || "portafolio";
   });
 
   useEffect(() => {

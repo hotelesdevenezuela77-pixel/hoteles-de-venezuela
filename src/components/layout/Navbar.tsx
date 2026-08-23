@@ -224,7 +224,7 @@ export function Navbar() {
 
                     {(profile?.role === "owner" || profile?.role === "admin" || user?.email?.toLowerCase() === "hotelesdevenezuela77@gmail.com") && (
                       <>
-                        <Link href="/mis-negocios" className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-brand-magenta hover:bg-pink-50 transition-colors">
+                        <Link href="/mis-negocios?tab=portafolio" className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-brand-magenta hover:bg-pink-50 transition-colors">
                           <Briefcase className="w-3.5 h-3.5 text-brand-magenta" /> Mis Establecimientos / Panel
                         </Link>
                         <Link href="/andromeda" className="flex items-center gap-2 px-4 py-2 text-xs text-gray-700 hover:bg-pink-50 hover:text-brand-magenta transition-colors">
