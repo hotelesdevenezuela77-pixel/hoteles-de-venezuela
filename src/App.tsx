@@ -261,8 +261,17 @@ function App() {
   const params = new URLSearchParams(window.location.search);
   const hasTenantParam = params.has("tenant") || params.has("establishment");
   const hostname = window.location.hostname;
-  const isCustomDomain = Object.values(TENANTS_REGISTRY).some(
-    (t) => t.domain.toLowerCase() === hostname.toLowerCase() || hostname.toLowerCase().includes(t.slug.toLowerCase())
+  const cleanHost = hostname.toLowerCase().replace(/^www\./, "").trim();
+  const isLocal = cleanHost === "localhost" || cleanHost === "127.0.0.1";
+  const isMainPlatformDomain = cleanHost === "hotelesdevenezuela.com" || cleanHost === "hoteles-de-venezuela.pages.dev";
+
+  // Si no es el dominio de la plataforma principal ni localhost, o coincide con un tenant registrado
+  const isCustomDomain = (!isLocal && !isMainPlatformDomain) || Object.values(TENANTS_REGISTRY).some(
+    (t) => {
+      if (!t.domain) return false;
+      const cleanDomain = t.domain.toLowerCase().replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0].trim();
+      return cleanDomain === cleanHost || cleanHost.includes(t.slug.toLowerCase().replace(/-/g, ""));
+    }
   );
   const isEnvTenant = !!import.meta.env.VITE_TENANT_SLUG;
 
@@ -276,7 +285,7 @@ function App() {
   }
 
   // Desviar a la vista del nodo inquilino si aplica
-  if (isEnvTenant || hasTenantParam || (isCustomDomain && hostname !== "localhost" && hostname !== "127.0.0.1")) {
+  if (isEnvTenant || hasTenantParam || (isCustomDomain && !isLocal)) {
     return <TenantApp />;
   }
 

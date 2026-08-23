@@ -220,13 +220,16 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
           }
         }
 
-        // C. Detección por Hostname (Producción / Subdominios)
+        // C. Detección por Hostname (Producción / Subdominios / Dominios Personalizados)
         const hostname = window.location.hostname;
+        const cleanHost = hostname.toLowerCase().replace(/^www\./, "").trim();
         
-        // Buscar coincidencia exacta del dominio
-        const matchedByDomain = Object.values(activeRegistry).find(
-          (t) => t.domain.toLowerCase() === hostname.toLowerCase()
-        );
+        // C1. Buscar coincidencia del dominio (normalizando www y http/https)
+        const matchedByDomain = Object.values(activeRegistry).find((t) => {
+          if (!t.domain) return false;
+          const cleanDomain = t.domain.toLowerCase().replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0].trim();
+          return cleanDomain === cleanHost;
+        });
         if (matchedByDomain) {
           console.log(`[Multi-tenant] Cargando por dominio exacto: ${matchedByDomain.slug}`);
           setConfig(matchedByDomain);
@@ -234,12 +237,14 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        // Buscar si el hostname contiene el slug (ej. aparto-posada-del-mar.hotelesdevenezuela.com)
-        const matchedBySubdomain = Object.values(activeRegistry).find((t) =>
-          hostname.toLowerCase().includes(t.slug.toLowerCase())
-        );
+        // C2. Buscar si el hostname contiene el slug (ej. aparto-posada-del-mar.hotelesdevenezuela.com)
+        const matchedBySubdomain = Object.values(activeRegistry).find((t) => {
+          const cleanSlug = t.slug.toLowerCase().replace(/-/g, "");
+          const cleanHostNoHyphens = cleanHost.replace(/-/g, "");
+          return cleanHostNoHyphens.includes(cleanSlug) || cleanSlug.includes(cleanHostNoHyphens);
+        });
         if (matchedBySubdomain) {
-          console.log(`[Multi-tenant] Cargando por subdominio: ${matchedBySubdomain.slug}`);
+          console.log(`[Multi-tenant] Cargando por subdominio o slug: ${matchedBySubdomain.slug}`);
           setConfig(matchedBySubdomain);
           setIsLoading(false);
           return;
