@@ -598,7 +598,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             Comience su Escapada Inolvidable
           </h2>
 
-          <p className="text-sm sm:text-base text-pink-100 font-light max-w-2xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base text-white font-medium max-w-2xl mx-auto leading-relaxed drop-shadow-sm">
             Consulte disponibilidad en tiempo real directamente con el equipo de recepción de {config.name} y asegure su mejor tarifa sin comisiones.
           </p>
 

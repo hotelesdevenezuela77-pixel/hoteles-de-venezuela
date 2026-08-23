@@ -486,6 +486,101 @@ export function OwnerDashboard() {
     setShowVerificationModal(true);
   };
 
+  // Edit Business Parameters Modal State (Mi Portafolio)
+  const [showEditEstModal, setShowEditEstModal] = useState(false);
+  const [editingEst, setEditingEst] = useState<any>(null);
+  const [editEstForm, setEditEstForm] = useState({
+    name: "",
+    address: "",
+    phone: "",
+    whatsapp: "",
+    website: "",
+    description: "",
+    rif: ""
+  });
+  const [savingEstEdit, setSavingEstEdit] = useState(false);
+
+  const handleOpenEditEstModal = (est: any) => {
+    setEditingEst(est);
+    setEditEstForm({
+      name: est.name || "",
+      address: est.address || "",
+      phone: est.phone || "",
+      whatsapp: est.whatsapp || est.phone || "",
+      website: est.website || "",
+      description: est.description || "",
+      rif: est.rif || ""
+    });
+    setShowEditEstModal(true);
+  };
+
+  const handleSaveEstEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingEst) return;
+    setSavingEstEdit(true);
+
+    try {
+      // Update in Supabase if connection exists
+      await supabase
+        .from("establishments")
+        .update({
+          name: editEstForm.name,
+          address: editEstForm.address,
+          phone: editEstForm.phone,
+          whatsapp: editEstForm.whatsapp,
+          website: editEstForm.website,
+          description: editEstForm.description,
+          rif: editEstForm.rif,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", editingEst.id);
+
+      // Update in local state establishments
+      setEstablishments(prev => prev.map(est => {
+        if (est.id === editingEst.id) {
+          return {
+            ...est,
+            name: editEstForm.name,
+            address: editEstForm.address,
+            phone: editEstForm.phone,
+            whatsapp: editEstForm.whatsapp,
+            website: editEstForm.website,
+            description: editEstForm.description,
+            rif: editEstForm.rif
+          };
+        }
+        return est;
+      }));
+
+      // Update in localStorage
+      const localEstsKey = "hdv_custom_establishments";
+      const savedEsts = JSON.parse(localStorage.getItem(localEstsKey) || "[]");
+      const updatedLocal = savedEsts.map((est: any) => {
+        if (Number(est.id) === Number(editingEst.id)) {
+          return {
+            ...est,
+            name: editEstForm.name,
+            address: editEstForm.address,
+            phone: editEstForm.phone,
+            whatsapp: editEstForm.whatsapp,
+            website: editEstForm.website,
+            description: editEstForm.description,
+            rif: editEstForm.rif
+          };
+        }
+        return est;
+      });
+      localStorage.setItem(localEstsKey, JSON.stringify(updatedLocal));
+
+      setShowEditEstModal(false);
+      setEditingEst(null);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSavingEstEdit(false);
+    }
+  };
+
   const handleUploadVerificationFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -2439,6 +2534,13 @@ export function OwnerDashboard() {
                     </div>
 
                     <div className="flex gap-2 pt-4 border-t border-gray-100 flex-wrap">
+                      <button
+                        onClick={() => handleOpenEditEstModal(est)}
+                        className="px-4 bg-[#00C8D4]/10 hover:bg-[#00C8D4]/20 text-[#00C8D4] border border-[#00C8D4]/30 font-extrabold text-xs py-2.5 rounded-xl cursor-pointer flex items-center gap-1.5"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span>Editar Negocio</span>
+                      </button>
                       <Link href={`/establecimiento/${est.slug}`} className="flex-1 min-w-[120px]">
                         <button className="w-full bg-white border border-gray-200 text-gray-600 font-bold text-xs py-2.5 rounded-xl hover:bg-gray-50 cursor-pointer">
                           Ver Ficha Pública
@@ -4690,6 +4792,129 @@ export function OwnerDashboard() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE EDICIÓN DE PARÁMETROS DEL NEGOCIO */}
+      {showEditEstModal && editingEst && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-[#0e011f]/80 backdrop-blur-md">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-6 text-white text-left relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0e011f 0%, #1a0533 100%)" }}>
+              <div className="flex items-center justify-between gap-3 relative z-10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#00C8D4] text-slate-950 font-black shrink-0 shadow-md">
+                    <Edit3 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-sm text-white tracking-wide">Editar Parámetros del Negocio</h3>
+                    <p className="text-white/70 text-[10px] mt-0.5 font-bold">{editingEst.name}</p>
+                  </div>
+                </div>
+                <button onClick={() => setShowEditEstModal(false)} className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors cursor-pointer">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <form onSubmit={handleSaveEstEdit} className="p-6 space-y-4 text-left">
+              <div>
+                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 font-bold">Nombre Comercial *</label>
+                <input
+                  type="text"
+                  required
+                  value={editEstForm.name}
+                  onChange={e => setEditEstForm(prev => ({ ...prev, name: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-800 outline-none focus:border-[#00C8D4]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 font-bold">Teléfono de Contacto</label>
+                  <input
+                    type="text"
+                    value={editEstForm.phone}
+                    onChange={e => setEditEstForm(prev => ({ ...prev, phone: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-800 outline-none focus:border-[#00C8D4]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 font-bold">WhatsApp Oficial</label>
+                  <input
+                    type="text"
+                    value={editEstForm.whatsapp}
+                    onChange={e => setEditEstForm(prev => ({ ...prev, whatsapp: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-800 outline-none focus:border-[#00C8D4]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 font-bold">Sitio Web / Dominio</label>
+                  <input
+                    type="text"
+                    value={editEstForm.website}
+                    onChange={e => setEditEstForm(prev => ({ ...prev, website: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-800 outline-none focus:border-[#00C8D4]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 font-bold">RIF Comercial</label>
+                  <input
+                    type="text"
+                    value={editEstForm.rif}
+                    onChange={e => setEditEstForm(prev => ({ ...prev, rif: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-800 outline-none focus:border-[#00C8D4]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 font-bold">Dirección Física Completa</label>
+                <input
+                  type="text"
+                  value={editEstForm.address}
+                  onChange={e => setEditEstForm(prev => ({ ...prev, address: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-800 outline-none focus:border-[#00C8D4]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 font-bold">Descripción Comercial</label>
+                <textarea
+                  rows={3}
+                  value={editEstForm.description}
+                  onChange={e => setEditEstForm(prev => ({ ...prev, description: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-800 outline-none focus:border-[#00C8D4] resize-none"
+                />
+              </div>
+
+              <div className="pt-4 border-t border-gray-100 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowEditEstModal(false)}
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-3 rounded-xl cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingEstEdit}
+                  className="flex-1 bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] text-white font-extrabold text-xs py-3 rounded-xl shadow-md hover:shadow-cyan-500/20 transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
+                  {savingEstEdit ? (
+                    <span>Guardando...</span>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      <span>Guardar Cambios</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
