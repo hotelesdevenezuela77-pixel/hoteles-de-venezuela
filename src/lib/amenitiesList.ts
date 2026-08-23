@@ -39,24 +39,30 @@ export const AMENITY_CATEGORIES = [
 ];
 
 export const PROPERTY_TYPES_DOCUMENT77 = [
-  { id: "apartamentos", label: "Apartamentos", icon: "Building", code: "C04-1.1" },
-  { id: "casas_apartamentos_enteros", label: "Casas y apartamentos enteros", icon: "Home", code: "C04-1.2" },
-  { id: "hoteles", label: "Hoteles", icon: "Hotel", code: "C04-1.3" },
-  { id: "hostales_pensiones", label: "Hostales y pensiones", icon: "Bed", code: "C04-1.4" },
-  { id: "posadas", label: "Posadas", icon: "TreePine", code: "C04-1.5" },
-  { id: "habitaciones_casas_particulares", label: "Habitaciones en casas particulares", icon: "UserCheck", code: "C04-1.6" },
-  { id: "apartahoteles", label: "Apartahoteles", icon: "Building2", code: "C04-1.7" },
-  { id: "albergues_turisticos", label: "Albergues turísticos", icon: "Users", code: "C04-1.8" },
-  { id: "bed_and_breakfasts", label: "Bed and breakfasts", icon: "Coffee", code: "C04-1.9" },
-  { id: "casas_chalets_rurales", label: "Casas y chalets rurales", icon: "Home", code: "C04-1.10" },
-  { id: "residencias_estudiantes", label: "Residencias de estudiantes", icon: "GraduationCap", code: "C04-1.11" },
-  { id: "hoteles_capsula", label: "Hoteles cápsula", icon: "Box", code: "C04-1.12" },
-  { id: "campings", label: "Campings", icon: "Tent", code: "C04-1.13" },
-  { id: "glamping", label: "Glamping & Ecolodges", icon: "Tent", code: "C04-1.13b" },
-  { id: "villas", label: "Villas", icon: "Palmtree", code: "C04-1.14" },
-  { id: "barcos", label: "Barcos (veleros, yates, catamaranes o houseboats)", icon: "Ship", code: "C04-1.15" },
-  { id: "love_hotels", label: "Love hotels", icon: "Heart", code: "C04-1.16" },
-  { id: "chalets_montana", label: "Chalets de montaña", icon: "Mountain", code: "C04-1.17" },
+  { id: "apartamentos", label: "Apartamentos", icon: "Building", code: "C05.1.1" },
+  { id: "casas_apartamentos_enteros", label: "Casas y apartamentos enteros", icon: "Home", code: "C05.1.2" },
+  { id: "hoteles", label: "Hoteles", icon: "Hotel", code: "C05.1.3" },
+  { id: "hostales_pensiones", label: "Hostales y pensiones", icon: "Bed", code: "C05.1.4" },
+  { id: "posadas", label: "Posadas", icon: "TreePine", code: "C05.1.5" },
+  { id: "habitaciones_casas_particulares", label: "Habitaciones en casas particulares", icon: "UserCheck", code: "C05.1.6" },
+  { id: "apartahoteles", label: "Apartahoteles", icon: "Building2", code: "C05.1.7" },
+  { id: "albergues_turisticos", label: "Albergues turísticos", icon: "Users", code: "C05.1.8" },
+  { id: "bed_and_breakfasts", label: "Bed and breakfasts", icon: "Coffee", code: "C05.1.9" },
+  { id: "casas_chalets_rurales", label: "Casas y chalets rurales", icon: "Home", code: "C05.1.10" },
+  { id: "residencias_estudiantes", label: "Residencias de estudiantes", icon: "GraduationCap", code: "C05.1.11" },
+  { id: "hoteles_capsula", label: "Hoteles cápsula", icon: "Box", code: "C05.1.12" },
+  { id: "campings", label: "Campings", icon: "Tent", code: "C05.1.13" },
+  { id: "glamping", label: "Glamping & Eco-Lodges", icon: "Tent", code: "C05.1.13b" },
+  { id: "villas", label: "Villas", icon: "Palmtree", code: "C05.1.14" },
+  { id: "barcos", label: "Barcos (veleros, yates, catamaranes o houseboats)", icon: "Ship", code: "C05.1.15" },
+  { id: "love_hotels", label: "Love hotels", icon: "Heart", code: "C05.1.16" },
+  { id: "chalets_montana", label: "Chalets de montaña", icon: "Mountain", code: "C05.1.17" },
+  { id: "resorts", label: "Resorts & Complejos Vacacionales", icon: "Palmtree", code: "C05.1.18" },
+  { id: "agencias_viaje", label: "Agencias de viaje", icon: "Briefcase", code: "C05.1.19" },
+  { id: "alquiler_carros", label: "Alquiler de carros", icon: "Car", code: "C05.1.20" },
+  { id: "alquiler_yates", label: "Alquiler de Yates", icon: "Ship", code: "C05.1.21" },
+  { id: "marinas", label: "Marinas", icon: "Anchor", code: "C05.1.22" },
+  { id: "restaurantes", label: "Restaurantes", icon: "Utensils", code: "C05.1.23" },
 ];
 
 export const CERTIFICATIONS_DOCUMENT77 = [
@@ -372,6 +378,98 @@ export const MASTER_AMENITIES: AmenityItem[] = [
   { key: "ch_guardaesquis_ski_room", code: "C04.3.6.1", label: "Guardaesquís (Ski Room) y secador de botas", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Chalets de Montaña", scope: "comun", iconName: "Mountain" },
   { key: "ch_acceso_ski_in_out", code: "C04.3.6.4", label: "Acceso Ski-in / Ski-out", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Chalets de Montaña", scope: "servicio", iconName: "Mountain" },
   { key: "ch_shuttle_telecabinas", code: "C04.3.7.1", label: "Shuttle privado a telecabinas / entrega de forfaits", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Chalets de Montaña", scope: "servicio", iconName: "Car" },
+
+  // ==========================================
+  // C04.5. INSTALACIONES Y SERVICIOS ESPECÍFICOS PARA RESTAURANTES
+  // ==========================================
+  // C04.5.1. Tipología y Formato de las Mesas
+  { key: "r_mesas_individuales", code: "C04.5.1.1", label: "Mesas individuales / Parejas", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Utensils" },
+  { key: "r_mesas_4_6", code: "C04.5.1.2", label: "Mesas para 4-6 pax", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Utensils" },
+  { key: "r_mesas_8_10", code: "C04.5.1.3", label: "Mesas para 8-10 pax", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Users" },
+  { key: "r_mesa_imperial", code: "C04.5.1.4", label: "Mesa imperial fija +10 comensales", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Users" },
+  { key: "r_mesas_altas", code: "C04.5.1.5", label: "Mesas altas con taburetes", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Coffee" },
+  { key: "r_mesas_bajas_pufs", code: "C04.5.1.6", label: "Mesas bajas para comer con pufs", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Smile" },
+  { key: "r_mesas_compartidas", code: "C04.5.1.7", label: "Mesas compartidas", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Users" },
+  { key: "r_cabinas_booths", code: "C04.5.1.8", label: "Cabinas tipo diner americano (Booths)", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Building2" },
+
+  // C04.5.2. Distribución y Privacidad en Sala
+  { key: "r_bistro_parisino", code: "C04.5.2.1", label: "Disposición junta bistró parisino", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Utensils" },
+  { key: "r_espacio_amplio_mesas", code: "C04.5.2.2", label: "Espacio amplio entre mesas (alta privacidad +1.5m)", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "ShieldCheck" },
+  { key: "r_mesas_ventana", code: "C04.5.2.3", label: "Mesas junto a la ventana", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Sun" },
+  { key: "r_mesas_esquinas", code: "C04.5.2.4", label: "Mesas en esquinas", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Building" },
+  { key: "r_mesas_vista_cocina", code: "C04.5.2.5", label: "Mesas con vista a la cocina", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "ChefHat" },
+  { key: "r_divisores_mesas", code: "C04.5.2.6", label: "Elementos divisorios entre mesas (biombos, paneles, plantas)", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "ShieldCheck" },
+  { key: "r_zonas_insonorizadas", code: "C04.5.2.7", label: "Zonas insonorizadas", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "VolumeX" },
+  { key: "r_salon_un_nivel", code: "C04.5.2.8", label: "Salón a un solo nivel", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Home" },
+  { key: "r_salon_desniveles", code: "C04.5.2.9", label: "Salón con desniveles", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Building" },
+  { key: "r_varias_salas", code: "C04.5.2.10", label: "Varias salas", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Building2" },
+  { key: "r_percheros_mesa", code: "C04.5.2.11", label: "Percheros individuales por mesa", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Shirt" },
+  { key: "r_percheros_comunes", code: "C04.5.2.12", label: "Percheros comunes", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Shirt" },
+  { key: "r_aparadores_servicio", code: "C04.5.2.13", label: "Aparadores de servicios cerca de las mesas", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "ConciergeBell" },
+
+  // C04.5.3. Materiales y Vestimenta de la Mesa
+  { key: "r_mantel_hilo", code: "C04.5.3.1", label: "Mantel de hilo/algodón completo", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Sparkles" },
+  { key: "r_mesa_desnuda", code: "C04.5.3.2", label: "Mesa desnuda con manteles individuales o dobles", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Utensils" },
+  { key: "r_vajilla_artesanal", code: "C04.5.3.3", label: "Vajilla artesanal o de autor", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Sparkles" },
+  { key: "r_cristaleria_fina", code: "C04.5.3.4", label: "Cristalería fina", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Wine" },
+  { key: "r_cuberteria_plata", code: "C04.5.3.5", label: "Cubertería de plata o alta gama", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Sparkles" },
+  { key: "r_cambio_cubiertos", code: "C04.5.3.6", label: "Cambio de cubiertos con cada plato", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "servicio", iconName: "ConciergeBell" },
+
+  // C04.5.4. Ambiente, Acústica y Climatización
+  { key: "r_luz_natural", code: "C04.5.4.1", label: "Luz natural abundante (grandes ventanales)", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Sun" },
+  { key: "r_iluminacion_cenital", code: "C04.5.4.2", label: "Iluminación cenital directa sobre la mesa", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Zap" },
+  { key: "r_velas_candiles", code: "C04.5.4.3", label: "Velas o candiles en la mesa", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Flame" },
+  { key: "r_ambiente_silencioso", code: "C04.5.4.4", label: "Ambiente silencioso y tranquilo (sin música)", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "VolumeX" },
+  { key: "r_hilo_musical", code: "C04.5.4.5", label: "Hilo musical ambiente (jazz, clásica, electrónica)", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Music" },
+  { key: "r_dj_en_vivo", code: "C04.5.4.6", label: "DJ en vivo", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Music" },
+  { key: "r_aire_acondicionado", code: "C04.5.4.7", label: "Aire acondicionado en sala", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Wind" },
+  { key: "r_ventiladores", code: "C04.5.4.8", label: "Ventiladores de techo", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Wind" },
+  { key: "r_purificadores_aire", code: "C04.5.4.9", label: "Purificadores de aire", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Wind" },
+
+  // C04.5.5. Integración Tecnológica en la Mesa
+  { key: "r_enchufes_mesa", code: "C04.5.5.1", label: "Enchufes 220v bajo o junto a la mesa", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Zap" },
+  { key: "r_usb_mesa", code: "C04.5.5.2", label: "Puerto de carga USB integrados en la mesa", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Zap" },
+  { key: "r_qr_mesa", code: "C04.5.5.3", label: "Código QR fijo en la mesa para carta", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "FileText" },
+  { key: "r_boton_camarero", code: "C04.5.5.4", label: "Botón físico o digital para llamar al camarero", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "ConciergeBell" },
+  { key: "r_calefaccion_bajo_mesa", code: "C04.5.5.5", label: "Calefacción radiante bajo la mesa", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Flame" },
+  { key: "r_ganchos_bolsos", code: "C04.5.5.6", label: "Ganchos cuelga-bolsos bajo el tablero", pillar: "C04", pillarLabel: "C04. Específicos por Tipología", category: "especificos", subCategory: "Restaurantes", scope: "comun", iconName: "Briefcase" },
+
+  // ==========================================
+  // C01.6. SOLO RESTAURANTES (Estructura C01.6)
+  // ==========================================
+  { key: "c01_6_1_1", code: "C01.6.1.1", label: "Mesas individuales / Parejas", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Tipología de Mesas", scope: "comun", iconName: "Utensils" },
+  { key: "c01_6_1_2", code: "C01.6.1.2", label: "Mesas para 4-6 pax", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Tipología de Mesas", scope: "comun", iconName: "Utensils" },
+  { key: "c01_6_1_3", code: "C01.6.1.3", label: "Mesas para 8-10 pax", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Tipología de Mesas", scope: "comun", iconName: "Users" },
+  { key: "c01_6_1_4", code: "C01.6.1.4", label: "Mesa imperial fija +10 comensales", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Tipología de Mesas", scope: "comun", iconName: "Users" },
+  { key: "c01_6_1_5", code: "C01.6.1.5", label: "Mesas altas con taburetes", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Tipología de Mesas", scope: "comun", iconName: "Coffee" },
+  { key: "c01_6_1_6", code: "C01.6.1.6", label: "Mesas bajas para comer con pufs", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Tipología de Mesas", scope: "comun", iconName: "Smile" },
+  { key: "c01_6_1_7", code: "C01.6.1.7", label: "Mesas compartidas", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Tipología de Mesas", scope: "comun", iconName: "Users" },
+  { key: "c01_6_1_8", code: "C01.6.1.8", label: "Cabinas tipo diner americano (Booths)", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Tipología de Mesas", scope: "comun", iconName: "Building2" },
+
+  { key: "c01_6_2_1", code: "C01.6.2.1", label: "Disposición junta bistró parisino", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Distribución y Privacidad", scope: "comun", iconName: "Utensils" },
+  { key: "c01_6_2_2", code: "C01.6.2.2", label: "Espacio amplio entre mesas (+1,5m privacidad)", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Distribución y Privacidad", scope: "comun", iconName: "ShieldCheck" },
+  { key: "c01_6_2_3", code: "C01.6.2.3", label: "Mesas junto a la ventana", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Distribución y Privacidad", scope: "comun", iconName: "Sun" },
+  { key: "c01_6_2_4", code: "C01.6.2.4", label: "Mesas en esquinas", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Distribución y Privacidad", scope: "comun", iconName: "Building" },
+  { key: "c01_6_2_5", code: "C01.6.2.5", label: "Mesas con vista a la cocina", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Distribución y Privacidad", scope: "comun", iconName: "ChefHat" },
+  { key: "c01_6_2_6", code: "C01.6.2.6", label: "Elementos divisorios entre mesas (biombos/paneles)", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Distribución y Privacidad", scope: "comun", iconName: "ShieldCheck" },
+  { key: "c01_6_2_7", code: "C01.6.2.7", label: "Zonas insonorizadas", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Distribución y Privacidad", scope: "comun", iconName: "VolumeX" },
+  { key: "c01_6_2_8", code: "C01.6.2.8", label: "Salón a un solo nivel", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Distribución y Privacidad", scope: "comun", iconName: "Home" },
+  { key: "c01_6_2_9", code: "C01.6.2.9", label: "Salón con desniveles", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Distribución y Privacidad", scope: "comun", iconName: "Building" },
+  { key: "c01_6_2_10", code: "C01.6.2.10", label: "Varias salas", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Distribución y Privacidad", scope: "comun", iconName: "Building2" },
+  { key: "c01_6_2_11", code: "C01.6.2.11", label: "Percheros individuales por mesa", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Distribución y Privacidad", scope: "comun", iconName: "Shirt" },
+  { key: "c01_6_2_12", code: "C01.6.2.12", label: "Percheros comunes", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Distribución y Privacidad", scope: "comun", iconName: "Shirt" },
+  { key: "c01_6_2_13", code: "C01.6.2.13", label: "Aparadores de servicios cerca de las mesas", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Distribución y Privacidad", scope: "comun", iconName: "ConciergeBell" },
+
+  { key: "c01_6_3_1", code: "C01.6.3.1", label: "Mantel de hilo/algodón completo", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Vestimenta de Mesa", scope: "comun", iconName: "Sparkles" },
+  { key: "c01_6_3_2", code: "C01.6.3.2", label: "Mesa desnuda con manteles individuales", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Vestimenta de Mesa", scope: "comun", iconName: "Utensils" },
+  { key: "c01_6_3_3", code: "C01.6.3.3", label: "Vajilla artesanal o de autor", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Vestimenta de Mesa", scope: "comun", iconName: "Sparkles" },
+  { key: "c01_6_3_4", code: "C01.6.3.4", label: "Cristalería fina", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Vestimenta de Mesa", scope: "comun", iconName: "Wine" },
+  { key: "c01_6_3_5", code: "C01.6.3.5", label: "Cubertería de plata o alta gama", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Vestimenta de Mesa", scope: "comun", iconName: "Sparkles" },
+  { key: "c01_6_3_6", code: "C01.6.3.6", label: "Cambio de cubiertos con cada plato", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Vestimenta de Mesa", scope: "servicio", iconName: "ConciergeBell" },
+
+  { key: "c01_6_4_1", code: "C01.6.4.1", label: "Luz natural abundante (grandes ventanales)", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Ambiente y Climatización", scope: "comun", iconName: "Sun" },
+  { key: "c01_6_4_2", code: "C01.6.4.2", label: "Iluminación cenital directa sobre la mesa", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Ambiente y Climatización", scope: "comun", iconName: "Zap" },
+  { key: "c01_6_4_3", code: "C01.6.4.3", label: "Velas o candiles en la mesa", pillar: "C01", pillarLabel: "C01. Infraestructura Físicas", category: "gastronomia", subCategory: "Ambiente y Climatización", scope: "comun", iconName: "Flame" },
 ];
 
 /**

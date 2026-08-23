@@ -122,7 +122,7 @@ export function AmenitiesSelector({ selectedServices, onChange }: AmenitiesSelec
             <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#00C8D4]/10 text-[#00C8D4]">
               <Sparkles className="w-4.5 h-4.5 text-[#00C8D4]" />
             </div>
-            <h2 className="font-bold text-slate-900 text-sm tracking-tight">Estándar Documento 77 V.2 - Taxonomía Oficial</h2>
+            <h2 className="font-bold text-slate-900 text-sm tracking-tight">Estándar Documento 77 V.5 - Taxonomía Oficial HDV</h2>
             <span
               className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase text-white tracking-wider shadow-xs"
               style={{ background: "#FF0096" }}

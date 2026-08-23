@@ -831,7 +831,59 @@ export function Establecimientos() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </div>              {/* BLOQUE ESPECIAL GASTRONOMÍA & RESTAURANTES (C01.6) */}
+              {(selectedCategory === "restaurantes" || selectedCategory === "gastronomia") && (
+                <div className="p-3.5 bg-gradient-to-br from-amber-500/10 via-rose-500/5 to-[#FF0096]/10 rounded-2xl border border-amber-200/60 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Utensils className="w-4 h-4 text-[#FF0096]" />
+                    <span className="text-xs font-black text-gray-800 tracking-tight uppercase">Filtros Gastronómicos (C01.6)</span>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-bold uppercase text-gray-500 block">Formato de Mesas (C01.6.1)</span>
+                    <div className="grid grid-cols-1 gap-1.5 pl-1">
+                      {[
+                        { key: "r_mesas_individuales", label: "Parejas / Individuales (C01.6.1.1)" },
+                        { key: "r_mesas_4_6", label: "Mesas 4-6 pax (C01.6.1.2)" },
+                        { key: "r_mesa_imperial", label: "Mesa Imperial +10 pax (C01.6.1.4)" },
+                        { key: "r_cabinas_booths", label: "Booths / Diner americano (C01.6.1.8)" }
+                      ].map(item => (
+                        <label key={item.key} className="flex items-center gap-2 text-xs font-semibold text-gray-700 cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={selectedFacilities.includes(item.key)}
+                            onChange={() => toggleArrayFilter(setSelectedFacilities, item.key)}
+                            className="rounded text-[#FF0096] border-gray-300 w-3.5 h-3.5 accent-[#FF0096]"
+                          />
+                          <span className="truncate">{item.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 pt-2 border-t border-amber-200/50">
+                    <span className="text-[10px] font-bold uppercase text-gray-500 block">Privacidad & Ambiente (C01.6.2 / C01.6.4)</span>
+                    <div className="grid grid-cols-1 gap-1.5 pl-1">
+                      {[
+                        { key: "r_mesas_ventana", label: "Junto a la ventana (C01.6.2.3)" },
+                        { key: "r_divisores_mesas", label: "Biombos / Privacidad +1.5m (C01.6.2.6)" },
+                        { key: "r_mesas_vista_cocina", label: "Vista a la cocina (C01.6.2.5)" },
+                        { key: "r_velas_candiles", label: "Velas / Ambiente romántico (C01.6.4.3)" }
+                      ].map(item => (
+                        <label key={item.key} className="flex items-center gap-2 text-xs font-semibold text-gray-700 cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={selectedFacilities.includes(item.key)}
+                            onChange={() => toggleArrayFilter(setSelectedFacilities, item.key)}
+                            className="rounded text-[#FF0096] border-gray-300 w-3.5 h-3.5 accent-[#FF0096]"
+                          />
+                          <span className="truncate">{item.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* BLOQUE 1: Garantía & Verificación Oficial */}
               <div className="pt-3">

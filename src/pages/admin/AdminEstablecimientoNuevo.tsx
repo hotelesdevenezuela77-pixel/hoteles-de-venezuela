@@ -174,7 +174,7 @@ export function AdminEstablecimientoNuevo() {
   const [aiQuery, setAiQuery] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
 
-  const isSpecificType = ["campings", "glamping", "barcos", "love_hotels", "chalets_montana"].includes(propertyType);
+  const isSpecificType = ["campings", "glamping", "barcos", "love_hotels", "chalets_montana", "restaurantes"].includes(propertyType);
 
   const autoSlug = (val: string) =>
     val.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -491,7 +491,7 @@ export function AdminEstablecimientoNuevo() {
                 <Building2 className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-[10px] font-black uppercase text-[#00C8D4] tracking-wider">Documento 77 V.1 — Asistente Guiado</span>
+                <span className="text-[10px] font-black uppercase text-[#00C8D4] tracking-wider">Documento 77 V.5 — Asistente Guiado</span>
                 <h1 className="text-xl font-bold text-white tracking-tight">
                   {editId ? "Editar Ficha de Alta" : "Ficha de Alta / Configuración de Propiedad"}
                 </h1>
@@ -862,7 +862,7 @@ export function AdminEstablecimientoNuevo() {
               ) : (
                 <div className="p-8 text-center bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
                   <p className="text-xs font-bold text-slate-600">
-                    Este paso aplica únicamente para las tipologías: Campings, Barcos, Love Hotels o Chalets de Montaña.
+                    Este paso aplica únicamente para las tipologías: Campings, Barcos, Love Hotels, Chalets de Montaña o Restaurantes.
                   </p>
                   <p className="text-[11px] text-slate-400 font-medium">
                     Para la tipología actual ({propertyType}) puedes continuar directamente al guardado final.

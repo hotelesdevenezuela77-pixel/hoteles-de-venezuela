@@ -127,6 +127,15 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
     whatsappCustomMsg: string;
   } | null>(null);
 
+  const [tableReservationModalOpen, setTableReservationModalOpen] = useState(false);
+  const [tableReservationData, setTableReservationData] = useState({
+    date: new Date().toISOString().split("T")[0],
+    time: "20:00",
+    pax: 2,
+    tablePreference: "Junto a la ventana",
+    notes: ""
+  });
+
   useEffect(() => {
     if (establishment?.id) {
       const key = `hdv_surroundings_${establishment.id}`;
@@ -635,14 +644,25 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
 
           {/* Botones de Acción Directa en el Hero */}
           <div className="flex flex-wrap items-center gap-4 pt-2">
-            <TrackedWhatsAppButton
-              whatsappNumber={establishment.whatsapp || establishment.phone}
-              establishmentId={establishment.id}
-              establishmentName={establishment.name}
-              customMessage={`Hola! Me interesa realizar una consulta y reserva directa para ${establishment.name}.`}
-            >
-              {isGastronomyCategory ? "Reservar Mesa por WhatsApp" : "Consultar Disponibilidad"}
-            </TrackedWhatsAppButton>
+            {isGastronomyCategory ? (
+              <button
+                type="button"
+                onClick={() => setTableReservationModalOpen(true)}
+                className="px-6 py-3.5 bg-gradient-to-r from-[#FF0096] to-[#9B00CC] text-white font-extrabold text-xs rounded-2xl shadow-lg hover:shadow-pink-500/25 hover:scale-[1.02] transition-all cursor-pointer flex items-center gap-2"
+              >
+                <Utensils className="w-4 h-4 text-white" />
+                <span>Reservar Mesa en Línea</span>
+              </button>
+            ) : (
+              <TrackedWhatsAppButton
+                whatsappNumber={establishment.whatsapp || establishment.phone}
+                establishmentId={establishment.id}
+                establishmentName={establishment.name}
+                customMessage={`Hola! Me interesa realizar una consulta y reserva directa para ${establishment.name}.`}
+              >
+                Consultar Disponibilidad
+              </TrackedWhatsAppButton>
+            )}
 
             <button
               onClick={() => {
@@ -1644,6 +1664,125 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                 >
                   Solicitar Reserva Directa por WhatsApp
                 </TrackedWhatsAppButton>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal de Reserva de Mesa para Restaurantes */}
+        {tableReservationModalOpen && (
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-[#0e011f]/80 backdrop-blur-md">
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+              <div className="p-6 text-white text-left relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0e011f 0%, #1a0533 100%)" }}>
+                <div className="flex items-center justify-between gap-3 relative z-10">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#FF0096] text-white shrink-0 shadow-md">
+                      <Utensils className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-extrabold text-sm text-white tracking-wide">Reserva de Mesa en Línea</h3>
+                      <p className="text-white/70 text-[10px] mt-0.5 font-bold">{establishment.name}</p>
+                    </div>
+                  </div>
+                  <button onClick={() => setTableReservationModalOpen(false)} className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors cursor-pointer">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-6 space-y-4 text-left">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 font-bold">Fecha de Reserva *</label>
+                    <input
+                      type="date"
+                      value={tableReservationData.date}
+                      onChange={e => setTableReservationData(prev => ({ ...prev, date: e.target.value }))}
+                      className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-800 outline-none focus:border-[#FF0096]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 font-bold">Hora Estimada *</label>
+                    <select
+                      value={tableReservationData.time}
+                      onChange={e => setTableReservationData(prev => ({ ...prev, time: e.target.value }))}
+                      className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-800 outline-none focus:border-[#FF0096]"
+                    >
+                      <option value="12:30">12:30 PM (Almuerzo)</option>
+                      <option value="13:30">01:30 PM (Almuerzo)</option>
+                      <option value="14:30">02:30 PM (Almuerzo tardío)</option>
+                      <option value="19:00">07:00 PM (Cena)</option>
+                      <option value="20:00">08:00 PM (Cena)</option>
+                      <option value="21:00">09:00 PM (Cena nocturna)</option>
+                      <option value="22:00">10:00 PM (Cena tardía)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 font-bold">Comensales (Pax) *</label>
+                    <select
+                      value={tableReservationData.pax}
+                      onChange={e => setTableReservationData(prev => ({ ...prev, pax: Number(e.target.value) }))}
+                      className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-800 outline-none focus:border-[#FF0096]"
+                    >
+                      <option value={1}>1 Persona (Individual)</option>
+                      <option value={2}>2 Personas (Pareja)</option>
+                      <option value={4}>4 Personas (Familia / Grupo)</option>
+                      <option value={6}>6 Personas (Grupo)</option>
+                      <option value={8}>8 Personas (Grupo grande)</option>
+                      <option value={10}>10+ Personas (Mesa Imperial / Evento)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 font-bold">Preferencia de Mesa</label>
+                    <select
+                      value={tableReservationData.tablePreference}
+                      onChange={e => setTableReservationData(prev => ({ ...prev, tablePreference: e.target.value }))}
+                      className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-800 outline-none focus:border-[#FF0096]"
+                    >
+                      <option value="Junto a la ventana">Junto a la ventana (C01.6.2.3)</option>
+                      <option value="Terraza al aire libre">Terraza al aire libre</option>
+                      <option value="Biombo / Alta privacidad">Biombo / Privacidad (C01.6.2.6)</option>
+                      <option value="Salón VIP / Mesa del Chef">Salón VIP / Mesa del Chef</option>
+                      <option value="Cabina tipo Diner (Booth)">Cabina tipo Diner (Booth)</option>
+                      <option value="Indiferente">Indiferente / Sin preferencia</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 font-bold">Notas Especiales / Alergias</label>
+                  <textarea
+                    rows={2}
+                    placeholder="Ej: Aniversario, requerimos silla para bebé, alergia al marisco..."
+                    value={tableReservationData.notes}
+                    onChange={e => setTableReservationData(prev => ({ ...prev, notes: e.target.value }))}
+                    className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-800 outline-none focus:border-[#FF0096] resize-none"
+                  />
+                </div>
+
+                <div className="pt-3 border-t border-gray-100 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setTableReservationModalOpen(false)}
+                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-3 rounded-xl cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                  
+                  <div className="flex-1">
+                    <TrackedWhatsAppButton
+                      whatsappNumber={establishment.whatsapp || establishment.phone}
+                      establishmentId={establishment.id}
+                      establishmentName={establishment.name}
+                      customMessage={`Hola! Quisiera solicitar una reserva de mesa en *${establishment.name}* para *${tableReservationData.pax} comensales* el día *${tableReservationData.date}* a las *${tableReservationData.time}*. Preferencia de mesa: *${tableReservationData.tablePreference}*.${tableReservationData.notes ? ` Notas: ${tableReservationData.notes}` : ''}`}
+                    >
+                      Confirmar por WhatsApp
+                    </TrackedWhatsAppButton>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

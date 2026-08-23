@@ -84,55 +84,66 @@ interface WhatsAppLead {
 const ROOM_AMENITIES_CATEGORIES = [
   {
     id: "banio",
-    label: "Baño",
+    label: "C01.1.3 Baño Privado & PMR",
     items: [
-      { key: "toallas", label: "Toallas" },
-      { key: "banio_privado", label: "Baño Privado" },
-      { key: "articulos_aseo", label: "Artículos de Aseo Gratis" },
-      { key: "secador_pelo", label: "Secador de Pelo" },
-      { key: "ducha", label: "Ducha" }
+      { key: "toallas", label: "Toallas (C01.1.3.2)" },
+      { key: "papel_higienico", label: "Papel higiénico (C01.1.3.1)" },
+      { key: "articulos_aseo", label: "Artículos de Aseo Gratis (C01.1.3.9)" },
+      { key: "secador_pelo", label: "Secador de Pelo (C01.1.3.5)" },
+      { key: "ducha_ras_suelo", label: "Ducha a ras de suelo (C01.1.3.3)" },
+      { key: "banera", label: "Bañera (C01.1.3.4)" },
+      { key: "jacuzzi_privado", label: "Jacuzzi / Hidromasaje Privado (C01.1.3.6)" },
+      { key: "wc_barras_apoyo", label: "WC con barras de apoyo PMR (C01.1.4.3)" },
+      { key: "ducha_adaptada_silla", label: "Ducha adaptada para silla de ruedas (C01.1.4.4)" }
     ]
   },
   {
     id: "habitacion",
-    label: "Habitación",
+    label: "C01.1.1 Descanso, Confort & Climatización",
     items: [
-      { key: "aire_acondicionado", label: "Aire Acondicionado" },
-      { key: "ropa_cama", label: "Ropa de Cama" },
-      { key: "armario", label: "Armario / Vestier" },
-      { key: "caja_fuerte", label: "Caja Fuerte Digital" },
-      { key: "calefaccion", label: "Calefacción" }
+      { key: "ropa_cama", label: "Ropa de Cama (C01.1.1.1)" },
+      { key: "almohadas_a_la_carta", label: "Almohadas a la carta (C01.1.1.2)" },
+      { key: "armario", label: "Armario / Vestier (C01.1.1.3)" },
+      { key: "insonorizacion", label: "Insonorización (C01.1.1.6)" },
+      { key: "cortinas_blackout", label: "Cortinas opacas / persianas (C01.1.1.7)" },
+      { key: "aire_acondicionado", label: "Aire Acondicionado (C01.1.6.1)" },
+      { key: "calefaccion", label: "Calefacción (C01.1.6.2)" },
+      { key: "ventilador_techo", label: "Ventiladores de techo (C01.1.6.4)" }
     ]
   },
   {
     id: "instalaciones",
-    label: "Instalaciones y Confort",
+    label: "C01.1.7-8 Trabajo, Tecnología & Entretenimiento",
     items: [
-      { key: "escritorio", label: "Zona de Trabajo / Escritorio" },
-      { key: "enchufe_cerca", label: "Enchufe cerca de la cama" },
-      { key: "tv_cable", label: "TV por Cable / Streaming" },
-      { key: "balcon", label: "Balcón / Terraza Privada" },
-      { key: "vista_mar", label: "Vista al Mar / Panorámica" }
+      { key: "escritorio", label: "Zona de Trabajo / Escritorio (C01.1.8.1)" },
+      { key: "enchufe_cerca", label: "Enchufe cerca de la cama (C01.1.6.5)" },
+      { key: "cargadores_usb", label: "Cargadores USB integrados (C01.1.6.6)" },
+      { key: "tv_cable", label: "TV pantalla plana / Cable (C01.1.7.1)" },
+      { key: "servicios_streaming", label: "Streaming (Netflix, HBO) (C01.1.7.2)" },
+      { key: "caja_fuerte", label: "Caja Fuerte (C01.1.8.5)" }
+    ]
+  },
+  {
+    id: "exteriores",
+    label: "C01.2 Exteriores Privados",
+    items: [
+      { key: "balcon", label: "Balcón privado (C01.2.1.1)" },
+      { key: "terraza_privada", label: "Terraza privada (C01.2.1.2)" },
+      { key: "patio_privado", label: "Patio interior privado (C01.2.1.3)" },
+      { key: "jardin_privado", label: "Jardín privado (C01.2.1.4)" },
+      { key: "barbacoa_privada", label: "Barbacoa privada (C01.2.1.5)" }
     ]
   },
   {
     id: "cocina",
-    label: "Cocina",
+    label: "C01.1.5 Cocina y Menaje Privado",
     items: [
-      { key: "cafetera", label: "Cafetera" },
-      { key: "nevera", label: "Nevera / Frigobar" },
-      { key: "cocina_equipada", label: "Cocina / Kitchenette Equipada" },
-      { key: "limpieza_productos", label: "Productos de Limpieza" }
-    ]
-  },
-  {
-    id: "seguridad",
-    label: "Seguridad",
-    items: [
-      { key: "extintores", label: "Extintores" },
-      { key: "detector_humo", label: "Detectores de Humo" },
-      { key: "tarjeta_acceso", label: "Tarjeta de Acceso" },
-      { key: "camaras_seguridad", label: "Cámaras de Seguridad" }
+      { key: "mesa_comedor", label: "Mesa de comedor (C01.1.5.1)" },
+      { key: "cafetera", label: "Cafetera (C01.1.5.2)" },
+      { key: "nevera", label: "Nevera / Minibar (C01.1.5.9)" },
+      { key: "microondas", label: "Microondas (C01.1.5.6)" },
+      { key: "placa_vitro", label: "Placa vitro / Cocina (C01.1.5.5)" },
+      { key: "utensilios_cocina", label: "Utensilios de cocina & Vajilla (C01.1.5.12)" }
     ]
   }
 ];
