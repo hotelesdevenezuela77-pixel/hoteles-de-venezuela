@@ -136,7 +136,17 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
     if (!url) return;
     setAreaPhotosState(prev => {
       const current = prev[areaKey] || [];
-      return { ...prev, [areaKey]: [...current, url] };
+      const updatedList = [...current, url];
+      try {
+        const saved = localStorage.getItem("hdv_area_photos");
+        let parsed: Record<string, Record<string, string[]>> = saved ? JSON.parse(saved) : {};
+        parsed[config.establishment_id] = {
+          ...(parsed[config.establishment_id] || {}),
+          [areaKey]: updatedList
+        };
+        localStorage.setItem("hdv_area_photos", JSON.stringify(parsed));
+      } catch (err) {}
+      return { ...prev, [areaKey]: updatedList };
     });
     setNewAreaInput(prev => ({ ...prev, [areaKey]: "" }));
   };
@@ -144,8 +154,64 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
   const handleRemoveAreaPhoto = (areaKey: string, index: number) => {
     setAreaPhotosState(prev => {
       const current = prev[areaKey] || [];
-      return { ...prev, [areaKey]: current.filter((_, i) => i !== index) };
+      const updatedList = current.filter((_, i) => i !== index);
+      try {
+        const saved = localStorage.getItem("hdv_area_photos");
+        let parsed: Record<string, Record<string, string[]>> = saved ? JSON.parse(saved) : {};
+        parsed[config.establishment_id] = {
+          ...(parsed[config.establishment_id] || {}),
+          [areaKey]: updatedList
+        };
+        localStorage.setItem("hdv_area_photos", JSON.stringify(parsed));
+      } catch (err) {}
+      return { ...prev, [areaKey]: updatedList };
     });
+  };
+
+  const handleAreaImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, areaKey: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const compressed = await compressImage(file, 1200, 0.82);
+      setAreaPhotosState(prev => {
+        const current = prev[areaKey] || [];
+        const updatedList = [...current, compressed];
+        try {
+          const saved = localStorage.getItem("hdv_area_photos");
+          let parsed: Record<string, Record<string, string[]>> = saved ? JSON.parse(saved) : {};
+          parsed[config.establishment_id] = {
+            ...(parsed[config.establishment_id] || {}),
+            [areaKey]: updatedList
+          };
+          localStorage.setItem("hdv_area_photos", JSON.stringify(parsed));
+        } catch (err) {}
+        return { ...prev, [areaKey]: updatedList };
+      });
+
+      try {
+        const targetEstId = config.establishment_id;
+        if (targetEstId) {
+          await supabase.from("establishment_images").insert([
+            {
+              establishment_id: targetEstId,
+              image_url: compressed,
+              is_primary: false,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }
+          ]);
+        }
+      } catch (dbErr) {
+        console.warn("[CMS Area Image Upload] Error guardando imagen en DB:", dbErr);
+      }
+    } catch (err) {
+      console.error("Error procesando imagen del área:", err);
+    } finally {
+      setIsUploading(false);
+      e.target.value = "";
+    }
   };
 
   const handleSaveCMS = async (e: React.FormEvent) => {
@@ -507,22 +573,36 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
                     ))}
                   </div>
 
-                  {/* Agregar URL de Foto */}
-                  <div className="flex gap-2">
-                    <input
-                      type="url"
-                      placeholder="https://imagen-area.jpg"
-                      value={newAreaInput[area.key] || ""}
-                      onChange={e => setNewAreaInput(prev => ({ ...prev, [area.key]: e.target.value }))}
-                      className="flex-1 bg-slate-900 border border-white/10 rounded-xl px-2.5 py-1 text-xs text-white placeholder:text-gray-600 focus:outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleAddAreaPhoto(area.key)}
-                      className="px-3 py-1 bg-[#00C8D4]/20 text-[#00C8D4] hover:bg-[#00C8D4]/30 rounded-xl text-xs font-bold cursor-pointer"
-                    >
-                      + Añadir
-                    </button>
+                  {/* Opciones para Añadir Foto (Subir Archivo o URL) */}
+                  <div className="space-y-2 pt-1 border-t border-white/5">
+                    <label className="flex items-center justify-center gap-2 w-full py-2 px-3 bg-[#00C8D4]/15 hover:bg-[#00C8D4]/25 border border-[#00C8D4]/30 rounded-xl text-xs font-black text-[#00C8D4] cursor-pointer transition-all">
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>Subir Foto desde Archivos</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={e => handleAreaImageUpload(e, area.key)}
+                        className="hidden"
+                        disabled={isUploading}
+                      />
+                    </label>
+
+                    <div className="flex gap-2">
+                      <input
+                        type="url"
+                        placeholder="O pega URL: https://imagen.jpg"
+                        value={newAreaInput[area.key] || ""}
+                        onChange={e => setNewAreaInput(prev => ({ ...prev, [area.key]: e.target.value }))}
+                        className="flex-1 bg-slate-900 border border-white/10 rounded-xl px-2.5 py-1 text-[11px] text-white placeholder:text-gray-600 focus:outline-none focus:border-[#00C8D4]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleAddAreaPhoto(area.key)}
+                        className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold cursor-pointer"
+                      >
+                        + Añadir
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
