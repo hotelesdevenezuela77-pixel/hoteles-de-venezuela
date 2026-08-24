@@ -3,6 +3,7 @@ import { Link, useParams } from "wouter";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/auth";
 import { ESTABLISHMENTS_MOCK } from "../lib/establishmentsMock";
+import { TENANTS_REGISTRY } from "../tenants/tenantContext";
 import { TrackedWhatsAppButton, trackEvent } from "../components/layout/TrackedWhatsAppButton";
 import { AvailabilityCalendar } from "../components/AvailabilityCalendar";
 import { BookingWidget } from "../components/BookingWidget";
@@ -373,6 +374,54 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
               categories: { name: sf.category || sf.category_name || "Posadas", slug: (sf.category || "posadas").toLowerCase() },
               destinations: { name: sf.destination || sf.destination_name || "Venezuela", slug: (sf.destination || "venezuela").toLowerCase() },
               establishment_images: [{ image_url: sf.image || sf.primary_image || "", is_primary: true }]
+            };
+          }
+        }
+
+        // 3.5. Fallback a TENANTS_REGISTRY o hdv_tenants_configurations para nodos SaaS
+        if (!dbData) {
+          let foundTenant: any = null;
+          try {
+            const savedTenants = localStorage.getItem("hdv_tenants_configurations");
+            if (savedTenants) {
+              const list: any[] = JSON.parse(savedTenants);
+              foundTenant = list.find((t: any) => t.slug === slug || (t.slug && slug && (t.slug.includes(slug) || slug.includes(t.slug))));
+            }
+          } catch (e) {}
+
+          if (!foundTenant) {
+            foundTenant = TENANTS_REGISTRY[slug] || Object.values(TENANTS_REGISTRY).find((t: any) => t.slug === slug);
+          }
+
+          if (foundTenant) {
+            dbData = {
+              id: foundTenant.establishment_id || 101,
+              slug: foundTenant.slug,
+              name: foundTenant.name,
+              description: `¡Escápate al paraíso caribeño que siempre soñaste en la ${foundTenant.name}!`,
+              address: "Av. Silva, Diagonal a Plaza el Ancla, Tucacas 2055, Falcón",
+              city: "Tucacas",
+              state: "Falcón",
+              phone: foundTenant.contact?.phone || "+58 414 123 4567",
+              email: foundTenant.contact?.email || "contacto@apartoposadadelmar.com",
+              website: foundTenant.domain || `${foundTenant.slug}.net`,
+              categories: { name: "Posadas", slug: "posadas" },
+              destinations: { name: "Tucacas", slug: "tucacas" },
+              category_name: "Posadas",
+              destination_name: "Tucacas",
+              primary_image: foundTenant.branding?.banner_url || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1600&auto=format&fit=crop",
+              rating_avg: 4.8,
+              review_count: 12,
+              price_level: "$$",
+              is_featured: true,
+              services: "[\"wifi\", \"piscina\", \"restaurante\", \"estacionamiento\"]",
+              membership_tier: "diamante",
+              has_hdv_seal: true,
+              has_reservations_enabled: true,
+              establishment_images: [
+                { image_url: foundTenant.branding?.banner_url || "", is_primary: true },
+                { image_url: foundTenant.branding?.logo_url || "", is_primary: false }
+              ]
             };
           }
         }

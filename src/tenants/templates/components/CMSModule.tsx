@@ -54,23 +54,67 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  // Manejo de carga de imagen local (Simulador Base64 para R2)
-  const [isUploading, setIsUploading] = useState(false);
+  // Helper de compresión de imágenes con Canvas HTML5 (evita sobrepasar la cuota de localStorage y Payload de Supabase)
+  const compressImage = (file: File, maxWidth: number, quality: number = 0.8): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = document.createElement("img");
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          let width = img.width;
+          let height = img.height;
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, type: "banner" | "logo") => {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            resolve(event.target?.result as string);
+            return;
+          }
+
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL("image/jpeg", quality);
+          resolve(compressedDataUrl);
+        };
+        img.onerror = () => resolve(event.target?.result as string);
+        img.src = event.target?.result as string;
+      };
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: "banner" | "logo") => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setIsUploading(true);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      if (typeof reader.result === "string") {
-        if (type === "banner") setBannerUrl(reader.result);
-        else setLogoUrl(reader.result);
-      }
+    try {
+      const maxWidth = type === "banner" ? 1600 : 600;
+      const compressed = await compressImage(file, maxWidth, 0.82);
+      if (type === "banner") setBannerUrl(compressed);
+      else setLogoUrl(compressed);
+    } catch (err) {
+      console.error("Error al procesar la imagen cargada:", err);
+      // Fallback directo a FileReader si la compresión falla
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === "string") {
+          if (type === "banner") setBannerUrl(reader.result);
+          else setLogoUrl(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+    } finally {
       setIsUploading(false);
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   const handleAddAreaPhoto = (areaKey: string) => {
