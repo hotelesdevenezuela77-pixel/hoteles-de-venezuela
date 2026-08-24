@@ -377,13 +377,38 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
           }
         }
 
+        // 4. Buscar si existe una configuración de Tenant (CMS) personalizada en localStorage para este establecimiento
+        let tenantConfigOverride: any = null;
+        try {
+          const savedTenants = localStorage.getItem("hdv_tenants_configurations");
+          if (savedTenants) {
+            const tenantList: any[] = JSON.parse(savedTenants);
+            tenantConfigOverride = tenantList.find((t: any) => 
+              t.slug === slug || 
+              String(t.establishment_id) === String(dbData?.id) ||
+              (t.slug && slug && (t.slug.includes(slug) || slug.includes(t.slug)))
+            );
+          }
+        } catch (e) {}
+
         if (dbData) {
-          const primaryImg = dbData.establishment_images?.find((img: any) => img.is_primary)?.image_url 
+          const tenantBranding = tenantConfigOverride?.branding;
+          const tenantContact = tenantConfigOverride?.contact;
+
+          const primaryImg = tenantBranding?.banner_url
+            || dbData.primary_image
+            || dbData.establishment_images?.find((img: any) => img.is_primary)?.image_url 
             || dbData.establishment_images?.[0]?.image_url 
             || dbData.image 
             || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80";
 
-          const allImages = dbData.establishment_images?.map((img: any) => img.image_url) || [];
+          let allImages: string[] = dbData.establishment_images?.map((img: any) => img.image_url) || [];
+          if (tenantBranding?.banner_url && !allImages.includes(tenantBranding.banner_url)) {
+            allImages.unshift(tenantBranding.banner_url);
+          }
+          if (tenantBranding?.logo_url && !allImages.includes(tenantBranding.logo_url)) {
+            allImages.push(tenantBranding.logo_url);
+          }
           if (allImages.length === 0 && primaryImg) {
             allImages.push(primaryImg);
           }
@@ -391,14 +416,14 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
           const mapped: EstablishmentDetail = {
             id: dbData.id,
             slug: dbData.slug,
-            name: dbData.name,
+            name: tenantConfigOverride?.name || dbData.name,
             description: dbData.description || "",
             address: dbData.address || "",
             city: dbData.city || "",
             state: dbData.state || "",
-            phone: dbData.phone || "",
-            email: dbData.email || "",
-            website: dbData.website || "",
+            phone: tenantContact?.phone || dbData.phone || "",
+            email: tenantContact?.email || dbData.email || "",
+            website: tenantConfigOverride?.domain || dbData.website || "",
             category_name: dbData.categories?.name || dbData.category_name || "Establecimiento",
             category_slug: dbData.categories?.slug || "posadas",
             destination_name: dbData.destinations?.name || dbData.destination_name || "Venezuela",
@@ -416,7 +441,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
             latitude: dbData.latitude,
             longitude: dbData.longitude,
             hours: dbData.hours,
-            whatsapp: dbData.whatsapp,
+            whatsapp: tenantContact?.whatsapp || dbData.whatsapp,
             status: dbData.status || "approved"
           };
 
@@ -426,7 +451,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
           setError(true);
         }
       } catch (err) {
-        console.error("Error al cargar detalles:", err);
+        console.error("Error fetching detail:", err);
         setError(true);
       } finally {
         setLoading(false);
@@ -435,6 +460,14 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
 
     if (slug) {
       fetchDetail();
+    }
+    
+    const handleCMSLiveUpdate = () => {
+      fetchDetail();
+    };
+    if (typeof window !== "undefined") {
+      window.addEventListener("hdv_tenant_config_updated", handleCMSLiveUpdate);
+      return () => window.removeEventListener("hdv_tenant_config_updated", handleCMSLiveUpdate);
     }
   }, [slug]);
 

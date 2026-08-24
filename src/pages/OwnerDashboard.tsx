@@ -244,8 +244,23 @@ export function OwnerDashboard() {
   const loadTenantConfigForEstablishment = async (est: Establishment | null) => {
     if (!est) return;
 
+    // 1. Intentar cargar desde el almacenamiento local sincronizado en tiempo real (localStorage)
     try {
-      // 1. Try fetching from Supabase database table tenant_configurations
+      const localData = localStorage.getItem("hdv_tenants_configurations");
+      if (localData) {
+        const list: TenantConfig[] = JSON.parse(localData);
+        const matched = list.find(t => t.establishment_id === est.id || t.slug === est.slug);
+        if (matched) {
+          setCurrentTenantConfig(matched);
+          return;
+        }
+      }
+    } catch (localErr) {
+      console.error("[Tenant Sync] Error parsing localStorage:", localErr);
+    }
+
+    // 2. Intentar consultar la base de datos Supabase
+    try {
       const { data, error } = await supabase
         .from("tenant_configurations")
         .select("*")
@@ -268,21 +283,6 @@ export function OwnerDashboard() {
       }
     } catch (dbErr) {
       console.warn("[Tenant Sync] DB fetch failed, using fallback sources:", dbErr);
-    }
-
-    // 2. Try fetching from local simulation storage (synced by AdminSaaS)
-    try {
-      const localData = localStorage.getItem("hdv_tenants_configurations");
-      if (localData) {
-        const list: TenantConfig[] = JSON.parse(localData);
-        const matched = list.find(t => t.establishment_id === est.id || t.slug === est.slug);
-        if (matched) {
-          setCurrentTenantConfig(matched);
-          return;
-        }
-      }
-    } catch (localErr) {
-      console.error("[Tenant Sync] Error parsing localStorage:", localErr);
     }
 
     // 3. Try fetching from static registry (config.json files)

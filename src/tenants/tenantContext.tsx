@@ -92,20 +92,28 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
           console.warn("[Multi-tenant] Falló consulta a Supabase (tabla tenant_configurations), usando respaldo local:", dbErr);
         }
 
-        // 2. Intentar cargar desde el localStorage (sincronizado por AdminSaaS)
-        if (activeTenantsList.length === 0) {
-          try {
-            const localData = localStorage.getItem("hdv_tenants_configurations");
-            if (localData) {
-              activeTenantsList = JSON.parse(localData);
-              console.log("[Multi-tenant] Cargando configuraciones de respaldo de localStorage.");
-            }
-          } catch (localErr) {
-            console.error("[Multi-tenant] Error al parsear localStorage:", localErr);
+        // 2. Fusionar siempre las configuraciones guardadas localmente en localStorage (sincronizadas por CMS y AdminSaaS)
+        try {
+          const localData = localStorage.getItem("hdv_tenants_configurations");
+          if (localData) {
+            const localList: TenantConfig[] = JSON.parse(localData);
+            localList.forEach((localTenant) => {
+              const idx = activeTenantsList.findIndex(
+                t => t.establishment_id === localTenant.establishment_id || t.slug === localTenant.slug
+              );
+              if (idx !== -1) {
+                activeTenantsList[idx] = { ...activeTenantsList[idx], ...localTenant };
+              } else {
+                activeTenantsList.push(localTenant);
+              }
+            });
+            console.log(`[Multi-tenant] ${localList.length} configuraciones fusionadas desde localStorage.`);
           }
+        } catch (localErr) {
+          console.error("[Multi-tenant] Error al parsear localStorage:", localErr);
         }
 
-        // 3. Fallback final: Usar el registro estático local de los archivos config.json
+        // 3. Fallback final: Usar el registro estático local de los archivos config.json si no hay ninguno
         if (activeTenantsList.length === 0) {
           activeTenantsList = Object.values(TENANTS_REGISTRY);
           console.log("[Multi-tenant] Usando el registro estático de archivos locales config.json");
@@ -269,6 +277,20 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
 
     resolveTenant();
   }, []);
+
+  // Escuchar cambios en vivo emitidos por el CMS
+  useEffect(() => {
+    const handleLiveUpdate = (e: any) => {
+      const updated: TenantConfig = e.detail;
+      if (updated && config && (updated.establishment_id === config.establishment_id || updated.slug === config.slug)) {
+        setConfig(updated);
+      }
+    };
+    if (typeof window !== "undefined") {
+      window.addEventListener("hdv_tenant_config_updated", handleLiveUpdate);
+      return () => window.removeEventListener("hdv_tenant_config_updated", handleLiveUpdate);
+    }
+  }, [config]);
 
   // Inyectar variables de estilos dinámicos de Tailwind en base al theme del Tenant
   useEffect(() => {

@@ -115,20 +115,42 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
     };
 
     try {
-      // 1. Guardar en base de datos Supabase
+      // 1. Guardar en base de datos Supabase usando upsert para crear o actualizar el registro
       const { error } = await supabase
         .from("tenant_configurations")
-        .update({
-          name: updatedConfig.name,
-          domain: updatedConfig.domain,
-          branding: JSON.stringify(updatedConfig.branding),
-          contact: JSON.stringify(updatedConfig.contact),
-          updated_at: new Date().toISOString()
-        })
-        .eq("establishment_id", config.establishment_id);
+        .upsert(
+          {
+            establishment_id: config.establishment_id,
+            slug: config.slug,
+            name: updatedConfig.name,
+            template: updatedConfig.template || "A",
+            domain: updatedConfig.domain,
+            branding: JSON.stringify(updatedConfig.branding),
+            contact: JSON.stringify(updatedConfig.contact),
+            modules: JSON.stringify(updatedConfig.modules),
+            updated_at: new Date().toISOString()
+          },
+          { onConflict: "establishment_id" }
+        );
 
       if (error) {
         console.warn("[PMS CMS] Error al guardar en base de datos remota, aplicando almacenamiento local simulado:", error);
+      }
+
+      // 1b. Intentar actualizar tabla "establishments" de Supabase si existe
+      try {
+        await supabase
+          .from("establishments")
+          .update({
+            name: updatedConfig.name,
+            website: updatedConfig.domain,
+            primary_image: bannerUrl || logoUrl || config.branding.banner_url,
+            phone: phone,
+            whatsapp: whatsapp
+          })
+          .eq("id", config.establishment_id);
+      } catch (estErr) {
+        console.warn("[PMS CMS] No se pudo actualizar tabla de establecimientos en DB:", estErr);
       }
 
       // 2. Guardar en localStorage para persistencia local de simulación
@@ -137,12 +159,16 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
       let currentList: TenantConfig[] = [];
 
       if (localData) {
-        currentList = JSON.parse(localData);
+        try {
+          currentList = JSON.parse(localData);
+        } catch (e) {
+          currentList = [config];
+        }
       } else {
         currentList = [config];
       }
 
-      const index = currentList.findIndex(t => t.establishment_id === config.establishment_id);
+      const index = currentList.findIndex(t => t.establishment_id === config.establishment_id || t.slug === config.slug);
       if (index !== -1) {
         currentList[index] = updatedConfig;
       } else {
@@ -151,8 +177,46 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
 
       localStorage.setItem(localKey, JSON.stringify(currentList));
 
-      // 3. Notificar cambios al contexto del inquilino
+      // 2b. Sincronizar también con hdv_mock_establishments para la vista de detalle del portal (/establecimiento/:slug)
+      try {
+        const mockKey = "hdv_mock_establishments";
+        const mockData = localStorage.getItem(mockKey);
+        let mockList: any[] = mockData ? JSON.parse(mockData) : [];
+        const mockIndex = mockList.findIndex(e => e.id === config.establishment_id || e.slug === config.slug);
+        
+        const updatedEstMock = {
+          id: config.establishment_id,
+          slug: config.slug,
+          name: updatedConfig.name,
+          website: updatedConfig.domain,
+          primary_image: bannerUrl || logoUrl || config.branding.banner_url,
+          phone,
+          whatsapp,
+          rating_avg: 4.8,
+          review_count: 12,
+          price_level: "$$",
+          is_featured: true,
+          services: "[]",
+          membership_tier: "diamante",
+          category_name: "Posadas",
+          destination_name: "Tucacas"
+        };
+
+        if (mockIndex !== -1) {
+          mockList[mockIndex] = { ...mockList[mockIndex], ...updatedEstMock };
+        } else {
+          mockList.push(updatedEstMock);
+        }
+        localStorage.setItem(mockKey, JSON.stringify(mockList));
+      } catch (mockErr) {
+        console.error("[PMS CMS] Error actualizando hdv_mock_establishments:", mockErr);
+      }
+
+      // 3. Notificar cambios al contexto del inquilino y despachar evento global en window
       onConfigChange(updatedConfig);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("hdv_tenant_config_updated", { detail: updatedConfig }));
+      }
 
       setFeedback({ type: "success", text: "¡Contenido actualizado en vivo con éxito!" });
     } catch (err: any) {
