@@ -72,24 +72,53 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
       try {
         let activeTenantsList: TenantConfig[] = [];
 
-        // 1. Intentar consultar en base de datos de Supabase
+        // 1. Intentar consultar en base de datos de Supabase (tabla establishments y establishment_images)
         try {
-          const { data, error: dbError } = await supabase.from("tenant_configurations").select("*");
-          if (!dbError && data && data.length > 0) {
-            activeTenantsList = data.map((t: any) => ({
-              establishment_id: t.establishment_id,
-              slug: t.slug,
-              name: t.name,
-              template: t.template,
-              domain: t.domain,
-              branding: typeof t.branding === "string" ? JSON.parse(t.branding) : t.branding,
-              modules: typeof t.modules === "string" ? JSON.parse(t.modules) : t.modules,
-              contact: typeof t.contact === "string" ? JSON.parse(t.contact) : t.contact
-            }));
-            console.log(`[Multi-tenant] ${activeTenantsList.length} configuraciones cargadas desde la DB.`);
+          const { data: dbEsts, error: dbError } = await supabase
+            .from("establishments")
+            .select("id, slug, name, website, phone, whatsapp, email, instagram, establishment_images(image_url, is_primary)");
+
+          if (!dbError && dbEsts && dbEsts.length > 0) {
+            dbEsts.forEach((est: any) => {
+              const primaryImgObj = est.establishment_images?.find((img: any) => img.is_primary) || est.establishment_images?.[0];
+              const bannerImg = primaryImgObj?.image_url;
+
+              const matchingStatic = TENANTS_REGISTRY[est.slug];
+              const mergedTenant: TenantConfig = {
+                establishment_id: est.id,
+                slug: est.slug,
+                name: est.name || matchingStatic?.name || "Establecimiento",
+                template: matchingStatic?.template || "A",
+                domain: est.website ? est.website.replace(/^https?:\/\//, "").replace(/\/$/, "").split("/")[0] : matchingStatic?.domain || `${est.slug}.com`,
+                branding: {
+                  primary_color: matchingStatic?.branding?.primary_color || "#00C8D4",
+                  secondary_color: matchingStatic?.branding?.secondary_color || "#9B00CC",
+                  accent_color: matchingStatic?.branding?.accent_color || "#FF0096",
+                  font_title: matchingStatic?.branding?.font_title || "Playfair Display",
+                  font_body: matchingStatic?.branding?.font_body || "Montserrat",
+                  logo_url: matchingStatic?.branding?.logo_url || "https://r2.hotelesdevenezuela.com/default/logo.png",
+                  banner_url: bannerImg || matchingStatic?.branding?.banner_url || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1600&auto=format&fit=crop"
+                },
+                modules: matchingStatic?.modules || {
+                  reservas: true,
+                  pos: false,
+                  galeria: true,
+                  contacto: true
+                },
+                contact: {
+                  phone: est.phone || matchingStatic?.contact?.phone || "+58 412 000 0000",
+                  whatsapp: est.whatsapp || matchingStatic?.contact?.whatsapp || est.phone || "+58 412 000 0000",
+                  email: est.email || matchingStatic?.contact?.email || `contacto@${est.slug}.com`,
+                  instagram: est.instagram || matchingStatic?.contact?.instagram || `@${est.slug}`
+                }
+              };
+
+              activeTenantsList.push(mergedTenant);
+            });
+            console.log(`[Multi-tenant] ${activeTenantsList.length} establecimientos sincronizados desde Supabase DB.`);
           }
         } catch (dbErr) {
-          console.warn("[Multi-tenant] Falló consulta a Supabase (tabla tenant_configurations), usando respaldo local:", dbErr);
+          console.warn("[Multi-tenant] Falló consulta a Supabase (tabla establishments), usando respaldo local:", dbErr);
         }
 
         // 2. Fusionar siempre las configuraciones guardadas localmente en localStorage (sincronizadas por CMS y AdminSaaS)
@@ -102,7 +131,14 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
                 t => t.establishment_id === localTenant.establishment_id || t.slug === localTenant.slug
               );
               if (idx !== -1) {
-                activeTenantsList[idx] = { ...activeTenantsList[idx], ...localTenant };
+                activeTenantsList[idx] = { 
+                  ...activeTenantsList[idx], 
+                  ...localTenant,
+                  branding: {
+                    ...activeTenantsList[idx].branding,
+                    ...localTenant.branding
+                  }
+                };
               } else {
                 activeTenantsList.push(localTenant);
               }

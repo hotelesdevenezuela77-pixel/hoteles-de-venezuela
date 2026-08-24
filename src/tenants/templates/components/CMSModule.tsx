@@ -159,42 +159,53 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
     };
 
     try {
-      // 1. Guardar en base de datos Supabase usando upsert para crear o actualizar el registro
-      const { error } = await supabase
-        .from("tenant_configurations")
-        .upsert(
-          {
-            establishment_id: config.establishment_id,
-            slug: config.slug,
-            name: updatedConfig.name,
-            template: updatedConfig.template || "A",
-            domain: updatedConfig.domain,
-            branding: JSON.stringify(updatedConfig.branding),
-            contact: JSON.stringify(updatedConfig.contact),
-            modules: JSON.stringify(updatedConfig.modules),
-            updated_at: new Date().toISOString()
-          },
-          { onConflict: "establishment_id" }
-        );
-
-      if (error) {
-        console.warn("[PMS CMS] Error al guardar en base de datos remota, aplicando almacenamiento local simulado:", error);
-      }
-
-      // 1b. Intentar actualizar tabla "establishments" de Supabase si existe
+      // 1. Guardar y actualizar en la base de datos de Supabase (tabla "establishments" y "establishment_images")
       try {
-        await supabase
+        const { data: dbEst } = await supabase
           .from("establishments")
-          .update({
-            name: updatedConfig.name,
-            website: updatedConfig.domain,
-            primary_image: bannerUrl || logoUrl || config.branding.banner_url,
-            phone: phone,
-            whatsapp: whatsapp
-          })
-          .eq("id", config.establishment_id);
+          .select("id")
+          .or(`slug.eq.${config.slug},id.eq.${config.establishment_id || 0}`)
+          .maybeSingle();
+
+        const targetEstId = dbEst?.id || config.establishment_id;
+
+        if (targetEstId) {
+          await supabase
+            .from("establishments")
+            .update({
+              name: updatedConfig.name,
+              website: updatedConfig.domain ? `https://${updatedConfig.domain.replace(/^https?:\/\//, "").replace(/\/$/, "")}/` : undefined,
+              phone: phone,
+              whatsapp: whatsapp,
+              email: email,
+              instagram: instagram,
+              updated_at: new Date().toISOString()
+            })
+            .eq("id", targetEstId);
+
+          if (bannerUrl) {
+            // Desmarcar principal previa e insertar la nueva imagen principal
+            await supabase
+              .from("establishment_images")
+              .update({ is_primary: false })
+              .eq("establishment_id", targetEstId);
+
+            await supabase
+              .from("establishment_images")
+              .insert([
+                {
+                  establishment_id: targetEstId,
+                  image_url: bannerUrl,
+                  is_primary: true,
+                  sort_order: 0,
+                  created_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString()
+                }
+              ]);
+          }
+        }
       } catch (estErr) {
-        console.warn("[PMS CMS] No se pudo actualizar tabla de establecimientos en DB:", estErr);
+        console.warn("[PMS CMS] No se pudo actualizar tabla de establecimientos e imágenes en DB:", estErr);
       }
 
       // 2. Guardar en localStorage para persistencia local de simulación
