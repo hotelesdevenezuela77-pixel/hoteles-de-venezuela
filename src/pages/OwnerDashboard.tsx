@@ -1099,21 +1099,60 @@ export function OwnerDashboard() {
       if (combined.length > 0) {
         setRooms(combined);
       } else {
-        // 2. Solo 1 sola unidad de ejemplo que no se pueda editar
-        const mockRooms = [
+        // Pre-poblar las 3 unidades reales del sitio web para que sean 100% editables inmediatamente
+        const defaultRooms = [
           { 
             id: 101, 
-            name: "Habitación Matrimonial Standard", 
-            price_per_night: 80, 
+            establishment_id: estId,
+            name: "Apartamento Suite Vista al Mar", 
+            category: "Suite Familiar",
+            price_per_night: 75, 
+            capacity: 4, 
+            quantity: 2, 
+            description: "Espaciosa suite frente a la costa con balcón privado, cama King, aire acondicionado central y cocina equipada.", 
+            amenities: "wifi,aire,balcon,vista_mar,cocina_equipada,tv_cable", 
+            primary_image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&auto=format&fit=crop",
+            photos: ["https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&auto=format&fit=crop"],
+            is_active: true
+          },
+          { 
+            id: 102, 
+            establishment_id: estId,
+            name: "Habitación Matrimonial Executive", 
+            category: "Matrimonial VIP",
+            price_per_night: 55, 
             capacity: 2, 
-            quantity: 5, 
-            description: "Habitación cómoda con cama matrimonial y baño privado (Unidad Demostrativa de Referencia).", 
-            amenities: "wifi,aire,tv", 
-            is_active: true,
-            is_example: true 
+            quantity: 3, 
+            description: "Diseñada para parejas buscando descanso absoluto con lencería de hilo de algodón, baño privado con ducha panorámica y frigobar.", 
+            amenities: "wifi,aire,banio_privado,nevera,caja_fuerte", 
+            primary_image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800&auto=format&fit=crop",
+            photos: ["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&auto=format&fit=crop"],
+            is_active: true
+          },
+          { 
+            id: 103, 
+            establishment_id: estId,
+            name: "Apartamento Dúplex Familiar", 
+            category: "Apartamento Completo",
+            price_per_night: 110, 
+            capacity: 6, 
+            quantity: 1, 
+            description: "Dos niveles con capacidad hasta 6 personas, ideal para grupos y familias con sala de estar, comedor y terraza.", 
+            amenities: "wifi,aire,balcon,cocina_equipada,tv_cable", 
+            primary_image: "https://images.unsplash.com/photo-1591088398332-8a7791972843?w=800&auto=format&fit=crop",
+            photos: ["https://images.unsplash.com/photo-1591088398332-8a7791972843?w=1200&auto=format&fit=crop"],
+            is_active: true
           }
         ];
-        setRooms(mockRooms);
+        setRooms(defaultRooms);
+
+        // Guardar automáticamente en localStorage para que el sitio web y CMS los reconozcan
+        try {
+          const localRoomsKey = "hdv_custom_rooms";
+          const existing = JSON.parse(localStorage.getItem(localRoomsKey) || "[]");
+          const nonEst = existing.filter((r: any) => Number(r.establishment_id) !== Number(estId));
+          localStorage.setItem(localRoomsKey, JSON.stringify([...defaultRooms, ...nonEst]));
+        } catch (e) {}
       }
     } catch (err) {
       console.error("Error fetching rooms:", err);
@@ -1193,6 +1232,53 @@ export function OwnerDashboard() {
     loadTenantConfig();
   }, [selectedCalendarEst, establishments]);
 
+  const compressImage = (file: File, maxWidth: number, quality: number = 0.8): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = document.createElement("img");
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            resolve(event.target?.result as string);
+            return;
+          }
+
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL("image/jpeg", quality);
+          resolve(compressedDataUrl);
+        };
+        img.onerror = () => resolve(event.target?.result as string);
+        img.src = event.target?.result as string;
+      };
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleRoomImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const compressed = await compressImage(file, 1200, 0.82);
+      setRoomFormData(prev => ({ ...prev, primary_image: compressed }));
+    } catch (err) {
+      console.error("Error al procesar la imagen de la habitación:", err);
+    }
+  };
+
   const handleToggleRoomAmenity = (key: string) => {
     const current = roomFormData.amenities ? roomFormData.amenities.split(",").map(s => s.trim()).filter(Boolean) : [];
     const idx = current.indexOf(key);
@@ -1210,6 +1296,7 @@ export function OwnerDashboard() {
     e.preventDefault();
     if (!selectedCalendarEst) return;
     try {
+      const imgUrl = roomFormData.primary_image;
       const payload = {
         establishment_id: Number(selectedCalendarEst),
         name: roomFormData.name,
@@ -1218,8 +1305,11 @@ export function OwnerDashboard() {
         price_per_night: Number(roomFormData.price_per_night),
         quantity: Number(roomFormData.quantity),
         amenities: roomFormData.amenities,
-        is_active: roomFormData.is_active, // 4. Desactivado por defecto
-        room_number: roomFormData.room_number
+        is_active: roomFormData.is_active,
+        room_number: roomFormData.room_number,
+        primary_image: imgUrl,
+        image_url: imgUrl,
+        photos: imgUrl ? [imgUrl] : []
       };
 
       let insertedRoom = null;
@@ -1253,13 +1343,13 @@ export function OwnerDashboard() {
         price_per_night: 100,
         quantity: 5,
         amenities: "",
-        is_active: false,
-        room_number: ""
+        is_active: true,
+        room_number: "",
+        primary_image: ""
       });
 
       fetchRooms(Number(selectedCalendarEst));
-      // 5. Notificación obligatoria al crear
-      alert("🎉 ¡Unidad Operativa creada con éxito! Recuerda activar la unidad OPERATIVA para que se refleje públicamente.");
+      alert("🎉 ¡Unidad Operativa creada con éxito!");
     } catch (err) {
       console.warn("Error creando habitación:", err);
     }
@@ -1267,10 +1357,6 @@ export function OwnerDashboard() {
 
   // 3. Abrir modal para Editar Unidad Operativa
   const handleOpenEditRoomModal = (room: any) => {
-    if (room.is_example) {
-      alert("Esta es una unidad de ejemplo de solo lectura.");
-      return;
-    }
     setEditingRoomId(room.id);
     setRoomFormData({
       name: room.name,
@@ -1279,8 +1365,9 @@ export function OwnerDashboard() {
       price_per_night: room.price_per_night || 100,
       quantity: room.quantity || 1,
       amenities: room.amenities || "",
-      is_active: room.is_active ?? false,
-      room_number: room.room_number || ""
+      is_active: room.is_active ?? true,
+      room_number: room.room_number || "",
+      primary_image: room.primary_image || room.image_url || (room.photos && room.photos[0]) || ""
     });
     setEditingRoomModalOpen(true);
   };
@@ -1290,6 +1377,7 @@ export function OwnerDashboard() {
     e.preventDefault();
     if (!editingRoomId) return;
 
+    const imgUrl = roomFormData.primary_image;
     const payload = {
       name: roomFormData.name,
       description: roomFormData.description,
@@ -1298,7 +1386,10 @@ export function OwnerDashboard() {
       quantity: Number(roomFormData.quantity),
       amenities: roomFormData.amenities,
       is_active: roomFormData.is_active,
-      room_number: roomFormData.room_number
+      room_number: roomFormData.room_number,
+      primary_image: imgUrl,
+      image_url: imgUrl,
+      photos: imgUrl ? [imgUrl] : []
     };
 
     try {
@@ -1310,7 +1401,14 @@ export function OwnerDashboard() {
     // Persist edits locally
     const localRoomsKey = "hdv_custom_rooms";
     const existing = JSON.parse(localStorage.getItem(localRoomsKey) || "[]");
-    const updated = existing.map((r: any) => r.id === editingRoomId ? { ...r, ...payload } : r);
+    const idx = existing.findIndex((r: any) => Number(r.id) === Number(editingRoomId));
+    let updated;
+    if (idx !== -1) {
+      existing[idx] = { ...existing[idx], ...payload };
+      updated = existing;
+    } else {
+      updated = [{ id: editingRoomId, establishment_id: Number(selectedCalendarEst), ...payload }, ...existing];
+    }
     localStorage.setItem(localRoomsKey, JSON.stringify(updated));
 
     setRooms(prev => prev.map(r => r.id === editingRoomId ? { ...r, ...payload } : r));
@@ -3003,6 +3101,25 @@ export function OwnerDashboard() {
                       
                       {/* Room properties details */}
                       <div className="lg:col-span-1 space-y-4">
+                        {/* Thumbnail principal de la habitación */}
+                        {(room.primary_image || room.image_url || (room.photos && room.photos[0])) && (
+                          <div className="relative rounded-2xl overflow-hidden h-36 border border-gray-200 shadow-xs">
+                            <img
+                              src={room.primary_image || room.image_url || room.photos[0]}
+                              alt={room.name}
+                              className="w-full h-full object-cover"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleOpenEditRoomModal(room)}
+                              className="absolute top-2 right-2 px-2.5 py-1 bg-black/60 hover:bg-black/80 text-white rounded-lg text-[9px] font-black uppercase backdrop-blur-xs flex items-center gap-1 cursor-pointer"
+                            >
+                              <Edit3 className="w-3 h-3 text-[#00C8D4]" />
+                              <span>Cambiar Foto</span>
+                            </button>
+                          </div>
+                        )}
+
                         <div className="flex justify-between items-start gap-2">
                           <div>
                             <h4 className="font-black text-gray-800 text-lg leading-tight font-serif">{room.name}</h4>
@@ -4016,6 +4133,40 @@ export function OwnerDashboard() {
                 />
               </div>
 
+              {/* Fotografía Principal de la Habitación */}
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+                <label className="block text-[10px] uppercase font-extrabold text-slate-700 tracking-wider">
+                  Fotografía Principal de la Habitación
+                </label>
+                
+                {roomFormData.primary_image && (
+                  <div className="relative rounded-xl overflow-hidden h-32 border border-slate-300 bg-slate-900">
+                    <img src={roomFormData.primary_image} alt="Vista previa de la habitación" className="w-full h-full object-cover" />
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <label className="flex items-center justify-center gap-2 py-2 px-3 bg-[#00C8D4]/15 hover:bg-[#00C8D4]/25 border border-[#00C8D4]/30 rounded-xl text-xs font-extrabold text-[#00C8D4] cursor-pointer transition-all">
+                    <Upload className="w-4 h-4" />
+                    <span>Subir Imagen</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleRoomImageUpload}
+                      className="hidden"
+                    />
+                  </label>
+
+                  <input
+                    type="url"
+                    placeholder="O pega URL de imagen..."
+                    value={roomFormData.primary_image.startsWith("data:") ? "" : roomFormData.primary_image}
+                    onChange={e => setRoomFormData(prev => ({ ...prev, primary_image: e.target.value }))}
+                    className="px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:border-[#00C8D4]"
+                  />
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Precio Noche (USD) *</label>
@@ -4159,6 +4310,40 @@ export function OwnerDashboard() {
                   onChange={e => setRoomFormData(prev => ({ ...prev, name: e.target.value }))}
                   className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-turquesa/20"
                 />
+              </div>
+
+              {/* Fotografía Principal de la Habitación */}
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+                <label className="block text-[10px] uppercase font-extrabold text-slate-700 tracking-wider">
+                  Fotografía Principal de la Habitación
+                </label>
+                
+                {roomFormData.primary_image && (
+                  <div className="relative rounded-xl overflow-hidden h-32 border border-slate-300 bg-slate-900">
+                    <img src={roomFormData.primary_image} alt="Vista previa de la habitación" className="w-full h-full object-cover" />
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <label className="flex items-center justify-center gap-2 py-2 px-3 bg-[#00C8D4]/15 hover:bg-[#00C8D4]/25 border border-[#00C8D4]/30 rounded-xl text-xs font-extrabold text-[#00C8D4] cursor-pointer transition-all">
+                    <Upload className="w-4 h-4" />
+                    <span>Subir Imagen</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleRoomImageUpload}
+                      className="hidden"
+                    />
+                  </label>
+
+                  <input
+                    type="url"
+                    placeholder="O pega URL de imagen..."
+                    value={roomFormData.primary_image.startsWith("data:") ? "" : roomFormData.primary_image}
+                    onChange={e => setRoomFormData(prev => ({ ...prev, primary_image: e.target.value }))}
+                    className="px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:border-[#00C8D4]"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">

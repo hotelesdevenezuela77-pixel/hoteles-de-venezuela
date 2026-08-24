@@ -68,7 +68,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         // 2. Consultar en localStorage
         const localRoomsKey = "hdv_custom_rooms";
         const localRooms = JSON.parse(localStorage.getItem(localRoomsKey) || "[]")
-          .filter((r: any) => Number(r.establishment_id) === Number(config.establishment_id));
+          .filter((r: any) => !dbRooms.some(d => d.id === r.id) && (Number(r.establishment_id) === Number(config.establishment_id) || String(r.establishment_id) === String(config.establishment_id)));
 
         let combined = [...dbRooms, ...localRooms];
 
