@@ -16,14 +16,28 @@ interface CMSModuleProps {
 
 export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor, accentColor }: CMSModuleProps) {
   // Estados para inputs del CMS
-  const [name, setName] = useState(config.name);
-  const [domain, setDomain] = useState(config.domain);
-  const [bannerUrl, setBannerUrl] = useState(config.branding.banner_url || "");
-  const [logoUrl, setLogoUrl] = useState(config.branding.logo_url || "");
-  const [phone, setPhone] = useState(config.contact.phone);
-  const [whatsapp, setWhatsapp] = useState(config.contact.whatsapp);
-  const [email, setEmail] = useState(config.contact.email);
-  const [instagram, setInstagram] = useState(config.contact.instagram);
+  const [name, setName] = useState(config?.name || "");
+  const [domain, setDomain] = useState(config?.domain || "");
+  const [bannerUrl, setBannerUrl] = useState(config?.branding?.banner_url || "");
+  const [logoUrl, setLogoUrl] = useState(config?.branding?.logo_url || "");
+  const [phone, setPhone] = useState(config?.contact?.phone || "");
+  const [whatsapp, setWhatsapp] = useState(config?.contact?.whatsapp || "");
+  const [email, setEmail] = useState(config?.contact?.email || "");
+  const [instagram, setInstagram] = useState(config?.contact?.instagram || "");
+  const [isUploading, setIsUploading] = useState(false);
+
+  useEffect(() => {
+    if (config) {
+      if (config.name) setName(config.name);
+      if (config.domain) setDomain(config.domain);
+      if (config.branding?.banner_url) setBannerUrl(config.branding.banner_url);
+      if (config.branding?.logo_url) setLogoUrl(config.branding.logo_url);
+      if (config.contact?.phone) setPhone(config.contact.phone);
+      if (config.contact?.whatsapp) setWhatsapp(config.contact.whatsapp);
+      if (config.contact?.email) setEmail(config.contact.email);
+      if (config.contact?.instagram) setInstagram(config.contact.instagram);
+    }
+  }, [config]);
 
   // Cargar fotos por área del establecimiento (Piscina, Restaurante, Lobby, Fachada, Playa, Spa)
   const [areaPhotosState, setAreaPhotosState] = useState<Record<string, string[]>>(() => {
@@ -145,12 +159,12 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
       name,
       domain,
       branding: {
-        ...config.branding,
+        ...(config?.branding || {}),
         banner_url: bannerUrl,
         logo_url: logoUrl
       },
       contact: {
-        ...config.contact,
+        ...(config?.contact || {}),
         phone,
         whatsapp,
         email,

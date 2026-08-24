@@ -2442,16 +2442,6 @@ export function OwnerDashboard() {
           />
         )}
 
-        {/* APLICACIÓN WEB & CMS TAB */}
-        {activeTab === "webapp_cms" && currentTenantConfig && (
-          <CMSModule
-            config={currentTenantConfig}
-            onConfigChange={(updated) => setCurrentTenantConfig(updated)}
-            primaryColor="#FF0096"
-            secondaryColor="#9B00CC"
-            accentColor="#00C8D4"
-          />
-        )}
 
         {/* MI PORTAFOLIO TAB */}
         {activeTab === "portafolio" && (
@@ -3736,48 +3726,55 @@ export function OwnerDashboard() {
         )}
 
         {/* SAAS MODULE: WEB APP & CMS BUILDER */}
-        {activeTab === "webapp_cms" && currentTenantConfig && (
-          <div className="space-y-8 animate-in fade-in duration-200">
-            <div className="bg-gradient-to-r from-slate-900 via-[#1a0533] to-[#0e011f] border border-[#00C8D4]/30 rounded-3xl p-6 text-white shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <div>
-                <span className="px-3 py-1 bg-[#00C8D4]/20 text-[#00C8D4] border border-[#00C8D4]/30 rounded-full text-[10px] font-black uppercase tracking-wider">
-                  Módulo SaaS Activo: CMS & Creador Web
-                </span>
-                <h2 className="text-xl font-black font-serif mt-2">Personalizador de Aplicación Web Standalone</h2>
-                <p className="text-xs text-slate-300 font-medium mt-1">
-                  Modifica colores, imágenes de portada, tipografía, enlaces de contacto y secciones de tu sitio web oficial.
-                </p>
+        {activeTab === "webapp_cms" && (
+          currentTenantConfig ? (
+            <div className="space-y-8 animate-in fade-in duration-200">
+              <div className="bg-gradient-to-r from-slate-900 via-[#1a0533] to-[#0e011f] border border-[#00C8D4]/30 rounded-3xl p-6 text-white shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                  <span className="px-3 py-1 bg-[#00C8D4]/20 text-[#00C8D4] border border-[#00C8D4]/30 rounded-full text-[10px] font-black uppercase tracking-wider">
+                    Módulo SaaS Activo: CMS & Creador Web
+                  </span>
+                  <h2 className="text-xl font-black font-serif mt-2">Personalizador de Aplicación Web Standalone</h2>
+                  <p className="text-xs text-slate-300 font-medium mt-1">
+                    Modifica colores, imágenes de portada, tipografía, enlaces de contacto y secciones de tu sitio web oficial.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-2.5 shrink-0">
+                  <a
+                    href={`/establecimiento/${currentTenantConfig.slug}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-4 py-2.5 bg-[#00C8D4] hover:bg-[#00b2bd] text-white text-xs font-black rounded-xl flex items-center gap-2 shadow-md transition-all cursor-pointer"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    <span>🚀 Abrir Mi Web App Standalone</span>
+                  </a>
+                </div>
               </div>
 
-              <div className="flex flex-wrap gap-2.5 shrink-0">
-                <a
-                  href={`/establecimiento/${currentTenantConfig.slug}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-4 py-2.5 bg-[#00C8D4] hover:bg-[#00b2bd] text-white text-xs font-black rounded-xl flex items-center gap-2 shadow-md transition-all cursor-pointer"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  <span>🚀 Abrir Mi Web App Standalone</span>
-                </a>
-              </div>
+              <CMSModule
+                config={currentTenantConfig}
+                onConfigChange={(updated) => {
+                  setCurrentTenantConfig(updated);
+                  const localKey = "hdv_tenants_configurations";
+                  const saved = localStorage.getItem(localKey);
+                  let list: TenantConfig[] = saved ? JSON.parse(saved) : [];
+                  const idx = list.findIndex(t => t.establishment_id === updated.establishment_id);
+                  if (idx !== -1) list[idx] = updated; else list.push(updated);
+                  localStorage.setItem(localKey, JSON.stringify(list));
+                }}
+                primaryColor="#00C8D4"
+                secondaryColor="#9B00CC"
+                accentColor="#FF0096"
+              />
             </div>
-
-            <CMSModule
-              config={currentTenantConfig}
-              onConfigChange={(updated) => {
-                setCurrentTenantConfig(updated);
-                const localKey = "hdv_tenants_configurations";
-                const saved = localStorage.getItem(localKey);
-                let list: TenantConfig[] = saved ? JSON.parse(saved) : [];
-                const idx = list.findIndex(t => t.establishment_id === updated.establishment_id);
-                if (idx !== -1) list[idx] = updated; else list.push(updated);
-                localStorage.setItem(localKey, JSON.stringify(list));
-              }}
-              primaryColor="#00C8D4"
-              secondaryColor="#9B00CC"
-              accentColor="#FF0096"
-            />
-          </div>
+          ) : (
+            <div className="text-center py-20 bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
+              <Loader2 className="w-10 h-10 text-[#00C8D4] animate-spin mx-auto mb-4" />
+              <h4 className="text-base font-bold text-slate-700">Cargando Configuración de la Aplicación Web...</h4>
+            </div>
+          )
         )}
 
         {/* SAAS MODULE: GESTIÓN DE TAREAS */}
