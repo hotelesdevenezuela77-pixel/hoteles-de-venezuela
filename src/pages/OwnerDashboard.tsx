@@ -1161,8 +1161,8 @@ export function OwnerDashboard() {
             quantity: 1,
             description: "Dos niveles con capacidad hasta 6 personas, ideal para grupos y familias con sala de estar, comedor y terraza.",
             amenities: "wifi,aire,balcon,cocina_equipada,tv_cable",
-            primary_image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&auto=format&fit=crop",
-            photos: ["https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&auto=format&fit=crop"],
+            primary_image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&auto=format&fit=crop",
+            photos: ["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&auto=format&fit=crop"],
             is_active: true
           }
         ];

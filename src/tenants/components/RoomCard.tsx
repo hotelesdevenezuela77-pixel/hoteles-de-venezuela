@@ -147,24 +147,24 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
           src={finalImageUrl}
           alt={roomTitle}
           loading="lazy"
-          className="w-full h-56 md:h-64 object-cover scale-[1.03] group-hover:scale-110 transition-transform duration-700"
+          className="w-full h-full object-cover scale-[1.03] group-hover:scale-110 transition-transform duration-700"
           onError={(e) => {
             // Si la URL falla (ej. error 404 de Supabase), mostramos una imagen neutra NUNCA una foto de Unsplash
             e.currentTarget.src = "/placeholder-hotel.jpg";
             console.error(`Error cargando imagen para: ${room.nombre || room.name || roomTitle}`);
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-black/30"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-black/30 pointer-events-none z-0"></div>
 
         {/* Badge Categoría Dinámico (Superior Izquierda) */}
-        <div className="absolute top-4 left-4">
-          <span className="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-[#FF0096] text-white shadow-md">
+        <div className="absolute top-4 left-4 z-10">
+          <span className="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-[#FF0096] text-white shadow-md inline-block">
             {category}
           </span>
         </div>
 
         {/* Badge Precio USD Dinámico (Superior Derecha) */}
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-4 right-4 z-10">
           <div className="px-3.5 py-1.5 rounded-full bg-[#00C8D4] text-white font-extrabold text-xs shadow-md flex items-center gap-1">
             <span className="text-[10px] opacity-85 uppercase">Desde</span>
             <span className="text-sm font-black">${displayPrice}</span>
@@ -173,7 +173,7 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
         </div>
 
         {/* Badge Capacidad Dinámica (Inferior) */}
-        <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-xs text-slate-200">
+        <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-xs text-slate-200 z-10">
           <div className="flex items-center gap-2 bg-slate-900/90 backdrop-blur px-3 py-1 rounded-full border border-white/10 text-white">
             <Users className="w-3.5 h-3.5 text-[#00C8D4]" />
             <span className="font-semibold text-[11px]">{capacity} Huéspedes</span>
