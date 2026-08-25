@@ -437,11 +437,7 @@ export function OwnerDashboard() {
   const [roomPhotos, setRoomPhotos] = useState<Record<number, string[]>>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("hdv_room_photos");
-      return saved ? JSON.parse(saved) : {
-        101: ["https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=400&q=80"],
-        102: ["https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=400&q=80"],
-        103: ["https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=400&q=80"]
-      };
+      return saved ? JSON.parse(saved) : {};
     }
     return {};
   });

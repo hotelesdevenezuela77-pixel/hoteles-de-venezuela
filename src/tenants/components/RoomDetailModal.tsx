@@ -15,13 +15,13 @@ export function RoomDetailModal({ room, hotelName, whatsappPhone, onClose }: Roo
   if (!room) return null;
 
   const displayPrice = room.price_per_night || room.price || room.base_price || 60;
-  const photos = room.photos && room.photos.length > 0
-    ? room.photos
-    : [
-        room.primary_image || room.image_url || "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&auto=format&fit=crop"
-      ];
+  const rawModalPhotos =
+    (Array.isArray(room.fotos) && room.fotos.length > 0 ? room.fotos : null) ||
+    (Array.isArray((room as any).galeria) && (room as any).galeria.length > 0 ? (room as any).galeria : null) ||
+    (Array.isArray(room.photos) && room.photos.length > 0 ? room.photos : null) ||
+    [(room as any).foto_principal || (room as any).imagen_portada || room.cover_image || room.primary_image || room.image_url || (room as any).imagen || (room as any).foto].filter(Boolean);
+
+  const photos = rawModalPhotos && rawModalPhotos.length > 0 ? rawModalPhotos : ["/placeholder-hotel.jpg"];
 
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
   const [checkIn, setCheckIn] = useState("");

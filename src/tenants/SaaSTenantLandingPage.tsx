@@ -207,61 +207,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
 
         let fetched = Array.from(combinedMap.values());
 
-        // Unidades por defecto correspondientes exactamente al Inventario de Habitaciones del propietario
-        if (fetched.length === 0) {
-          fetched = [
-            {
-              id: "101",
-              name: "Apartamento Suite Vista al Mar",
-              category: "Suite Familiar",
-              description: "Espaciosa suite frente a la costa con balcón privado, cama King, aire acondicionado central y cocina equipada.",
-              price_per_night: 75,
-              capacity: 4,
-              beds_count: 2,
-              bed_type: "King Size",
-              amenities: ["wifi", "aire", "balcon", "vista_mar", "cocina_equipada", "tv_cable"],
-              primary_image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80",
-              photos: ["https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80"]
-            },
-            {
-              id: "102",
-              name: "Habitación Matrimonial Executive",
-              category: "Matrimonial VIP",
-              description: "Diseñada para parejas buscando descanso absoluto con lencería de hilo de algodón, baño privado con ducha panorámica y frigobar.",
-              price_per_night: 55,
-              capacity: 2,
-              beds_count: 1,
-              bed_type: "Matrimonial",
-              amenities: ["wifi", "aire", "banio_privado", "nevera", "caja_fuerte"],
-              primary_image: "https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1200&q=80",
-              photos: ["https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1200&q=80"]
-            },
-            {
-              id: "103",
-              name: "Apartamento Dúplex Familiar",
-              category: "Apartamento Completo",
-              description: "Dos niveles con capacidad hasta 6 personas, ideal para grupos y familias con sala de estar, comedor y terraza.",
-              price_per_night: 110,
-              capacity: 6,
-              beds_count: 3,
-              bed_type: "Queen + 2 Individuales",
-              amenities: ["wifi", "aire", "balcon", "cocina_equipada", "tv_cable"],
-              primary_image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1200&q=80",
-              photos: ["https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1200&q=80"]
-            }
-          ];
-        }
-
         const customPhotos = JSON.parse(localStorage.getItem("hdv_room_photos") || "{}");
-
-        const isStockUrl = (url?: string) => {
-          if (!url) return true;
-          return (
-            url.includes("photo-1540555700478") ||
-            url.includes("photo-1595526114035") ||
-            url.includes("photo-1582719508461")
-          );
-        };
 
         const updatedRooms = fetched.map((room, index) => {
           const numericId = String(room.id).replace(/\D/g, "");
@@ -275,6 +221,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             positionId,
             simpleIndex,
             room.name,
+            room.nombre,
             `r${numericId}`
           ];
 
@@ -286,26 +233,21 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             }
           }
 
-          const dashboardDefaults: Record<string, string[]> = {
-            "101": ["https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80"],
-            "102": ["https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1200&q=80"],
-            "103": ["https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1200&q=80"]
-          };
+          // Evaluar propiedades de fotos reales subidas en el panel
+          const realPhotos =
+            roomCustom ||
+            (Array.isArray(room.fotos) && room.fotos.length > 0 ? room.fotos : null) ||
+            (Array.isArray((room as any).galeria) && (room as any).galeria.length > 0 ? (room as any).galeria : null) ||
+            (Array.isArray(room.photos) && room.photos.length > 0 ? room.photos : null) ||
+            [(room as any).foto_principal || (room as any).imagen_portada || room.cover_image || room.primary_image || room.image_url || (room as any).imagen || (room as any).foto].filter(Boolean);
 
-          const matchedDefault = dashboardDefaults[positionId] || dashboardDefaults[numericId] || dashboardDefaults[simpleIndex];
-
-          const finalPhotos = (roomCustom && roomCustom.length > 0)
-            ? roomCustom
-            : (room.photos && room.photos.length > 0 && !isStockUrl(room.photos[0]))
-              ? room.photos
-              : (room.primary_image && !isStockUrl(room.primary_image))
-                ? [room.primary_image]
-                : matchedDefault;
+          const finalPhotos = realPhotos && realPhotos.length > 0 ? realPhotos : ["/placeholder-hotel.jpg"];
 
           return {
             ...room,
             primary_image: finalPhotos[0],
-            photos: finalPhotos
+            photos: finalPhotos,
+            fotos: finalPhotos
           };
         });
 
