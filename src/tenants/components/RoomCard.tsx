@@ -5,19 +5,31 @@ import {
 
 export interface Room {
   id: string | number;
-  name: string;
+  name?: string;
+  nombre?: string;
+  title?: string;
   category?: string;
+  categoria?: string;
+  tipo_unidad?: string;
   description?: string;
+  descripcion?: string;
   price_per_night?: number;
   price?: number;
   base_price?: number;
+  tarifa_base?: number;
+  price_usd?: number;
   capacity?: number;
+  capacidad_max?: number;
+  max_guests?: number;
   beds_count?: number;
   bed_type?: string;
   photos?: string[];
+  fotos?: string[];
+  cover_image?: string;
   image_url?: string;
   primary_image?: string;
   amenities?: string[];
+  comodidades?: string[];
   features?: string[];
   is_active?: boolean;
 }
@@ -30,12 +42,22 @@ interface RoomCardProps {
 }
 
 export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomCardProps) {
-  const displayPrice = room.price_per_night || room.price || room.base_price || 60;
-  const image = room.primary_image || room.image_url || (room.photos && room.photos[0]) || 
+  // Title Mapping: room.nombre || room.title || room.name
+  const roomTitle = room.nombre || room.title || room.name || "Habitación Premium";
+
+  // Price Mapping: room.tarifa_base || room.price_usd || room.price_per_night || room.price || room.base_price
+  const displayPrice = room.tarifa_base || room.price_usd || room.price_per_night || room.price || room.base_price || 70;
+
+  // Cover Image Mapping: room.cover_image || room.fotos?.[0] || room.primary_image || room.image_url || room.photos?.[0]
+  const image = room.cover_image || (room.fotos && room.fotos[0]) || room.primary_image || room.image_url || (room.photos && room.photos[0]) || 
     "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800&auto=format&fit=crop";
-  
-  const category = room.category || "Habitación Premium";
-  const capacity = room.capacity || 2;
+
+  // Category Badge Mapping: room.categoria || room.tipo_unidad || room.category
+  const category = room.categoria || room.tipo_unidad || room.category || "Habitación Premium";
+
+  // Capacity Mapping: room.capacidad_max || room.max_guests || room.capacity
+  const capacity = room.capacidad_max || room.max_guests || room.capacity || 2;
+
   const AMENITY_MAP: Record<string, string> = {
     "wifi": "WiFi Starlink",
     "aire": "Aire Acondicionado Split",
@@ -50,7 +72,8 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
     "estacionamiento": "Estacionamiento"
   };
 
-  const rawAmenities = room.amenities || room.features;
+  // Amenities Tag Array Mapping: room.comodidades || room.amenities || room.features
+  const rawAmenities = room.comodidades || room.amenities || room.features;
   let amenitiesList: string[] = [];
   if (Array.isArray(rawAmenities)) {
     amenitiesList = rawAmenities.map(a => AMENITY_MAP[a] || a);
@@ -66,34 +89,34 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
     ];
   }
 
-  // Formatear mensaje directo para WhatsApp
+  // Formatear mensaje directo dinámico para WhatsApp
   const cleanPhone = whatsappPhone.replace(/[^0-9]/g, "");
   const waText = encodeURIComponent(
-    `Hola ${hotelName}, deseo consultar disponibilidad y tarifas para la habitación "${room.name}". ¿Podrían asesorarme?`
+    `Hola ${hotelName}, deseo consultar disponibilidad y tarifas para la habitación "${roomTitle}". ¿Podrían asesorarme?`
   );
   const waUrl = `https://wa.me/${cleanPhone || "584141234567"}?text=${waText}`;
 
   return (
     <div className="group relative bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-xl shadow-slate-200/50 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
       
-      {/* IMAGEN DE CABECERA CON BADGES */}
+      {/* IMAGEN DE CABECERA CON BADGES DINOÁMICOS */}
       <div className="relative h-64 overflow-hidden shrink-0 bg-slate-100">
         <img
           src={image}
-          alt={room.name}
+          alt={roomTitle}
           loading="lazy"
           className="w-full h-full object-cover scale-[1.03] group-hover:scale-110 transition-transform duration-700"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-black/30"></div>
 
-        {/* Badge Categoria (Superior Izquierda) */}
+        {/* Badge Categoría Dinámico (Superior Izquierda) */}
         <div className="absolute top-4 left-4">
           <span className="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-[#FF0096] text-white shadow-md">
             {category}
           </span>
         </div>
 
-        {/* Badge Precio por Noche en USD (Superior Derecha) */}
+        {/* Badge Precio USD Dinámico (Superior Derecha) */}
         <div className="absolute top-4 right-4">
           <div className="px-3.5 py-1.5 rounded-full bg-[#00C8D4] text-white font-extrabold text-xs shadow-md flex items-center gap-1">
             <span className="text-[10px] opacity-85 uppercase">Desde</span>
@@ -102,7 +125,7 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
           </div>
         </div>
 
-        {/* Badge de Capacidad & Estrellas (Inferior) */}
+        {/* Badge Capacidad Dinámica (Inferior) */}
         <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-xs text-slate-200">
           <div className="flex items-center gap-2 bg-slate-900/90 backdrop-blur px-3 py-1 rounded-full border border-white/10 text-white">
             <Users className="w-3.5 h-3.5 text-[#00C8D4]" />
@@ -120,19 +143,19 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
       <div className="p-6 flex flex-col justify-between flex-1 space-y-4 bg-white">
         
         <div>
-          {/* Título de la Habitación en Serif */}
+          {/* Título de la Habitación Dinámico */}
           <h3 className="text-xl md:text-2xl font-black font-serif text-slate-900 group-hover:text-[#00C8D4] transition-colors leading-snug">
-            {room.name}
+            {roomTitle}
           </h3>
 
-          {/* Descripción Corta */}
-          {room.description && (
+          {/* Descripción Corta Dinámica */}
+          {(room.descripcion || room.description) && (
             <p className="text-slate-600 text-xs font-normal leading-relaxed mt-2 line-clamp-2">
-              {room.description}
+              {room.descripcion || room.description}
             </p>
           )}
 
-          {/* Cápsulas de Amenidades Soft Pills */}
+          {/* Cápsulas de Amenidades Dinámicas */}
           <div className="mt-4 flex flex-wrap gap-1.5">
             {amenitiesList.slice(0, 4).map((amenity, idx) => (
               <span

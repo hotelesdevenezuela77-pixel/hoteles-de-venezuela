@@ -169,20 +169,39 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         // Combinar habitaciones reales de DB y locales evitando duplicados
         const combinedMap = new Map<string, Room>();
         [...dbRooms, ...localRooms].forEach((r: any) => {
-          const key = String(r.id || r.name);
+          const key = String(r.id || r.nombre || r.title || r.name);
+          const roomTitle = r.nombre || r.title || r.name;
+          const coverImage = r.cover_image || (r.fotos && r.fotos[0]) || r.primary_image || r.image_url || (r.photos && r.photos[0]);
+          const categoryName = r.categoria || r.tipo_unidad || r.category || "Habitación Premium";
+          const roomPrice = r.tarifa_base || r.price_usd || r.price_per_night || r.price || r.base_price || 70;
+          const roomCapacity = r.capacidad_max || r.max_guests || r.capacity || 2;
+          const roomAmenities = r.comodidades || r.amenities || r.features;
+
           combinedMap.set(key, {
             ...r,
             id: r.id || key,
-            name: r.name,
-            category: r.category || "Habitación Premium",
-            description: r.description,
-            price_per_night: r.price_per_night || r.price || r.base_price || 70,
-            capacity: r.capacity || 2,
+            name: roomTitle,
+            nombre: roomTitle,
+            title: roomTitle,
+            category: categoryName,
+            categoria: categoryName,
+            tipo_unidad: categoryName,
+            description: r.descripcion || r.description,
+            descripcion: r.descripcion || r.description,
+            price_per_night: roomPrice,
+            tarifa_base: roomPrice,
+            price_usd: roomPrice,
+            capacity: roomCapacity,
+            capacidad_max: roomCapacity,
+            max_guests: roomCapacity,
             beds_count: r.beds_count || 1,
             bed_type: r.bed_type || "Matrimonial",
-            primary_image: r.primary_image || r.image_url || (r.photos && r.photos[0]),
-            photos: r.photos || (r.primary_image ? [r.primary_image] : []),
-            amenities: r.amenities
+            primary_image: coverImage,
+            cover_image: coverImage,
+            photos: r.photos || (coverImage ? [coverImage] : []),
+            fotos: r.fotos || (coverImage ? [coverImage] : []),
+            amenities: roomAmenities,
+            comodidades: roomAmenities
           });
         });
 
