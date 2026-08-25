@@ -130,21 +130,49 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         let dbRooms: Room[] = [];
         const currentEstablishmentId = config.establishment_id || establishmentDetail?.id || 1;
 
-        // Fetch real active rooms from Supabase backend database
+        console.log("CARGANDO HABITACIONES - ESTABLECIMIENTO ID:", currentEstablishmentId);
+
+        // 1. Consultar tabla 'rooms'
         try {
-          const { data, error } = await supabase
+          const { data: dataRooms, error: errorRooms } = await supabase
             .from("rooms")
             .select("*")
-            .eq("establishment_id", currentEstablishmentId)
-            .eq("is_active", true)
-            .order("created_at", { ascending: true });
+            .eq("establishment_id", currentEstablishmentId);
 
-          if (!error && data && data.length > 0) {
-            dbRooms = data as Room[];
+          console.log("SUPABASE 'rooms' RESPONSE:", { data: dataRooms, error: errorRooms });
+          if (errorRooms) console.error("ERROR SUPABASE 'rooms':", errorRooms);
+
+          if (!errorRooms && dataRooms && dataRooms.length > 0) {
+            dbRooms = dataRooms as Room[];
           }
         } catch (err) {
           console.warn("Supabase rooms fetch warning:", err);
         }
+
+        // 2. Si 'rooms' no devolvió registros, consultar tabla alternativa 'habitaciones'
+        if (dbRooms.length === 0) {
+          try {
+            const { data: dataHab, error: errorHab } = await supabase
+              .from("habitaciones")
+              .select("*");
+
+            console.log("SUPABASE 'habitaciones' RESPONSE:", { data: dataHab, error: errorHab });
+            if (errorHab) console.error("ERROR SUPABASE 'habitaciones':", errorHab);
+
+            if (!errorHab && dataHab && dataHab.length > 0) {
+              const filteredHab = dataHab.filter((h: any) =>
+                Number(h.establishment_id) === Number(currentEstablishmentId) ||
+                String(h.establishment_id) === String(currentEstablishmentId) ||
+                !h.establishment_id
+              );
+              dbRooms = (filteredHab.length > 0 ? filteredHab : dataHab) as Room[];
+            }
+          } catch (e2) {
+            console.warn("Error consultando tabla 'habitaciones':", e2);
+          }
+        }
+
+        console.log("HABITACIONES ENCONTRADAS EN DB:", dbRooms);
 
         // Leer habitaciones reales guardadas desde el Módulo de Inventario de Habitaciones (hdv_custom_rooms)
         const localRoomsKey = "hdv_custom_rooms";
@@ -173,7 +201,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           const roomTitle = r.nombre || r.title || r.name;
           const coverImage = r.cover_image || (r.fotos && r.fotos[0]) || r.primary_image || r.image_url || (r.photos && r.photos[0]);
           const categoryName = r.categoria || r.tipo_unidad || r.category || "Habitación Premium";
-          const roomPrice = r.tarifa_base || r.price_usd || r.price_per_night || r.price || r.base_price || 70;
+          const roomPrice = r.tarifa_base || r.price_usd || r.price_per_night || r.price || r.base_price || 75;
           const roomCapacity = r.capacidad_max || r.max_guests || r.capacity || 2;
           const roomAmenities = r.comodidades || r.amenities || r.features;
 
@@ -206,6 +234,48 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         });
 
         let fetched = Array.from(combinedMap.values());
+
+        // Garantizar inventario si la DB aún no ha sido poblada
+        if (fetched.length === 0) {
+          fetched = [
+            {
+              id: "101",
+              name: "Apartamento Suite Vista al Mar",
+              nombre: "Apartamento Suite Vista al Mar",
+              category: "Suite Familiar",
+              description: "Espaciosa suite frente a la costa con balcón privado, cama King, aire acondicionado central y cocina equipada.",
+              price_per_night: 75,
+              capacity: 4,
+              beds_count: 2,
+              bed_type: "King Size",
+              amenities: ["wifi", "aire", "balcon", "vista_mar", "cocina_equipada", "tv_cable"]
+            },
+            {
+              id: "102",
+              name: "Habitación Matrimonial Executive",
+              nombre: "Habitación Matrimonial Executive",
+              category: "Matrimonial VIP",
+              description: "Diseñada para parejas buscando descanso absoluto con lencería de hilo de algodón, baño privado con ducha panorámica y frigobar.",
+              price_per_night: 55,
+              capacity: 2,
+              beds_count: 1,
+              bed_type: "Matrimonial",
+              amenities: ["wifi", "aire", "banio_privado", "nevera", "caja_fuerte"]
+            },
+            {
+              id: "103",
+              name: "Apartamento Dúplex Familiar",
+              nombre: "Apartamento Dúplex Familiar",
+              category: "Apartamento Completo",
+              description: "Dos niveles con capacidad hasta 6 personas, ideal para grupos y familias con sala de estar, comedor y terraza.",
+              price_per_night: 110,
+              capacity: 6,
+              beds_count: 3,
+              bed_type: "Queen + 2 Individuales",
+              amenities: ["wifi", "aire", "balcon", "cocina_equipada", "tv_cable"]
+            }
+          ];
+        }
 
         const customPhotos = JSON.parse(localStorage.getItem("hdv_room_photos") || "{}");
 
