@@ -104,9 +104,9 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
       setAreaPhotos({
         piscina: [
           "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=1200&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=1200&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=1200&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&auto=format&fit=crop"
+          "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&auto=format&fit=crop",
+          "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&auto=format&fit=crop",
+          "https://images.unsplash.com/photo-1591088398332-8a7791972843?w=1200&auto=format&fit=crop"
         ],
         restaurante: ["https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&auto=format&fit=crop"],
         lobby: ["https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&auto=format&fit=crop"],
@@ -194,8 +194,8 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               beds_count: 2,
               bed_type: "King Size",
               amenities: ["wifi", "aire", "balcon", "vista_mar", "cocina_equipada", "tv_cable"],
-              primary_image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&auto=format&fit=crop",
-              photos: ["https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&auto=format&fit=crop"]
+              primary_image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80",
+              photos: ["https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80"]
             },
             {
               id: "102",
@@ -207,8 +207,8 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               beds_count: 1,
               bed_type: "Matrimonial",
               amenities: ["wifi", "aire", "banio_privado", "nevera", "caja_fuerte"],
-              primary_image: "https://images.unsplash.com/photo-1591088398332-8a7791972843?w=800&auto=format&fit=crop",
-              photos: ["https://images.unsplash.com/photo-1591088398332-8a7791972843?w=1200&auto=format&fit=crop"]
+              primary_image: "https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1200&q=80",
+              photos: ["https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1200&q=80"]
             },
             {
               id: "103",
@@ -220,8 +220,8 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               beds_count: 3,
               bed_type: "Queen + 2 Individuales",
               amenities: ["wifi", "aire", "balcon", "cocina_equipada", "tv_cable"],
-              primary_image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800&auto=format&fit=crop",
-              photos: ["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&auto=format&fit=crop"]
+              primary_image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1200&q=80",
+              photos: ["https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1200&q=80"]
             }
           ];
         }
@@ -233,8 +233,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           return (
             url.includes("photo-1540555700478") ||
             url.includes("photo-1595526114035") ||
-            url.includes("photo-1582719508461") ||
-            url.includes("photo-1590490360182")
+            url.includes("photo-1582719508461")
           );
         };
 
@@ -262,9 +261,9 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           }
 
           const dashboardDefaults: Record<string, string[]> = {
-            "101": ["https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&auto=format&fit=crop"],
-            "102": ["https://images.unsplash.com/photo-1591088398332-8a7791972843?w=800&auto=format&fit=crop"],
-            "103": ["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800&auto=format&fit=crop"]
+            "101": ["https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80"],
+            "102": ["https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1200&q=80"],
+            "103": ["https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1200&q=80"]
           };
 
           const matchedDefault = dashboardDefaults[positionId] || dashboardDefaults[numericId] || dashboardDefaults[simpleIndex];
