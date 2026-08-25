@@ -17,7 +17,11 @@
     "reservas": true,
     "pos": false,
     "galeria": true,
-    "contacto": true
+    "contacto": true,
+    "cms": true,
+    "tareas": true,
+    "finanzas": true,
+    "analiticas": true
   },
   "contact": {
     "phone": "+58 414 123 4567",

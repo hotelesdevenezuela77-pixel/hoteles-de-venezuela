@@ -2205,7 +2205,7 @@ export function OwnerDashboard() {
               { id: "resumen", label: "Dashboard Ejecutivo", icon: BarChart3, enabled: true },
               { id: "agenda", label: "Agenda & Calendario", icon: Calendar, enabled: true, badge: "Drag & Drop" },
               { id: "soporte", label: "Soporte Técnico", icon: Wrench, enabled: true, badge: "Tickets D&D" },
-              { id: "webapp_cms", label: "Aplicación Web & CMS", icon: Globe, enabled: !!currentTenantConfig?.modules?.cms, badge: "Web Builder" },
+              { id: "webapp_cms", label: "Aplicación Web & CMS", icon: Globe, enabled: currentTenantConfig?.modules?.cms !== false, badge: "Web Builder" },
               { id: "tareas", label: "Gestión de Tareas", icon: Clipboard, enabled: !!currentTenantConfig?.modules?.tareas, badge: "SaaS" },
               { id: "pos", label: "Club POS", icon: Coffee, enabled: !!currentTenantConfig?.modules?.pos, badge: "SaaS" },
               { id: "finanzas", label: "Finanzas & Membresías", icon: DollarSign, enabled: !!currentTenantConfig?.modules?.finanzas },
@@ -2529,6 +2529,58 @@ export function OwnerDashboard() {
           <OwnerTechnicalSupportModule
             establishmentId={selectedCalendarEst ? Number(selectedCalendarEst) : (establishments[0]?.id || 0)}
             establishmentName={activeEstablishment?.name || "Mi Establecimiento"}
+          />
+        )}
+
+        {/* APLICACIÓN WEB & CMS TAB */}
+        {activeTab === "webapp_cms" && (
+          <CMSModule
+            config={currentTenantConfig || {
+              establishment_id: activeEstablishment?.id || 101,
+              slug: activeEstablishment?.slug || "aparto-posada-del-mar",
+              name: activeEstablishment?.name || "Aparto Posada del Mar",
+              template: "A",
+              domain: activeEstablishment?.website?.replace(/^https?:\/\//, '').split('/')[0] || "apartoposadadelmar.net",
+              branding: {
+                primary_color: "#00C8D4",
+                secondary_color: "#9B00CC",
+                accent_color: "#FF0096",
+                font_title: "Playfair Display",
+                font_body: "Montserrat",
+                logo_url: "https://r2.hotelesdevenezuela.com/aparto-posada-del-mar/logo.png",
+                banner_url: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1600&auto=format&fit=crop"
+              },
+              modules: {
+                reservas: true,
+                pos: false,
+                galeria: true,
+                contacto: true,
+                cms: true
+              },
+              contact: {
+                phone: activeEstablishment?.phone || "+58 414 123 4567",
+                whatsapp: activeEstablishment?.whatsapp || activeEstablishment?.phone || "+58 414 123 4567",
+                email: "contacto@apartoposadadelmar.com",
+                instagram: "@apartoposadadelmar"
+              }
+            }}
+            onConfigChange={(updated) => {
+              setCurrentTenantConfig(updated);
+              try {
+                const localData = localStorage.getItem("hdv_tenants_configurations");
+                let list: TenantConfig[] = localData ? JSON.parse(localData) : [];
+                const idx = list.findIndex(t => t.establishment_id === updated.establishment_id || t.slug === updated.slug);
+                if (idx >= 0) list[idx] = updated;
+                else list.push(updated);
+                localStorage.setItem("hdv_tenants_configurations", JSON.stringify(list));
+                window.dispatchEvent(new Event("hdv_tenant_config_changed"));
+                window.dispatchEvent(new Event("hdv_area_photos_updated"));
+                window.dispatchEvent(new Event("storage"));
+              } catch (e) {}
+            }}
+            primaryColor="#FF0096"
+            secondaryColor="#9B00CC"
+            accentColor="#00C8D4"
           />
         )}
 

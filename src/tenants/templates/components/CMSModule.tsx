@@ -144,7 +144,17 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
           ...(parsed[config.establishment_id] || {}),
           [areaKey]: updatedList
         };
+        if (config.slug) {
+          parsed[config.slug] = {
+            ...(parsed[config.slug] || {}),
+            [areaKey]: updatedList
+          };
+        }
         localStorage.setItem("hdv_area_photos", JSON.stringify(parsed));
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("hdv_area_photos_updated"));
+          window.dispatchEvent(new Event("storage"));
+        }
       } catch (err) {}
       return { ...prev, [areaKey]: updatedList };
     });
@@ -162,7 +172,17 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
           ...(parsed[config.establishment_id] || {}),
           [areaKey]: updatedList
         };
+        if (config.slug) {
+          parsed[config.slug] = {
+            ...(parsed[config.slug] || {}),
+            [areaKey]: updatedList
+          };
+        }
         localStorage.setItem("hdv_area_photos", JSON.stringify(parsed));
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("hdv_area_photos_updated"));
+          window.dispatchEvent(new Event("storage"));
+        }
       } catch (err) {}
       return { ...prev, [areaKey]: updatedList };
     });
@@ -185,7 +205,17 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
             ...(parsed[config.establishment_id] || {}),
             [areaKey]: updatedList
           };
+          if (config.slug) {
+            parsed[config.slug] = {
+              ...(parsed[config.slug] || {}),
+              [areaKey]: updatedList
+            };
+          }
           localStorage.setItem("hdv_area_photos", JSON.stringify(parsed));
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(new Event("hdv_area_photos_updated"));
+            window.dispatchEvent(new Event("storage"));
+          }
         } catch (err) {}
         return { ...prev, [areaKey]: updatedList };
       });
