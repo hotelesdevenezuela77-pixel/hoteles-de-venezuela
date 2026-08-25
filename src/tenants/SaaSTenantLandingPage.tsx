@@ -94,10 +94,21 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           const parsed = JSON.parse(saved);
           const matched = parsed[config.establishment_id] || 
                           parsed[String(config.establishment_id)] || 
+                          (establishmentDetail?.id && parsed[establishmentDetail.id]) ||
+                          (establishmentDetail?.id && parsed[String(establishmentDetail.id)]) ||
                           parsed[config.slug] || 
-                          Object.values(parsed)[0];
+                          (establishmentDetail?.slug && parsed[establishmentDetail.slug]);
           if (matched && Object.keys(matched).length > 0) {
             setAreaPhotos(matched);
+            return;
+          }
+
+          // Fallback: Si no coincide por ID directo, buscar cualquier objeto en hdv_area_photos que contenga fotos
+          const anyWithPhotos = Object.values(parsed).find((val: any) => 
+            val && typeof val === "object" && Object.values(val).some((arr: any) => Array.isArray(arr) && arr.length > 0)
+          );
+          if (anyWithPhotos) {
+            setAreaPhotos(anyWithPhotos as Record<string, string[]>);
             return;
           }
         }
@@ -118,7 +129,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
       window.removeEventListener("storage", loadAreaPhotos);
       window.removeEventListener("hdv_area_photos_updated", loadAreaPhotos);
     };
-  }, [config]);
+  }, [config, establishmentDetail]);
 
   const primaryColor = config.branding?.primary_color || "#00C8D4";
   const secondaryColor = config.branding?.secondary_color || "#9B00CC";
@@ -563,9 +574,14 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             { id: "todas", label: "Todas las Áreas" },
             { id: "piscina", label: "🏊 Piscina & Solárium" },
             { id: "restaurante", label: "🍽️ Restaurante & Gastronomía" },
-            { id: "lobby", label: "🏢 Lobby & Recepción" },
-            { id: "fachada", label: "🌿 Fachada & Jardines" }
-          ].map(tab => (
+            { id: "parque", label: "🌳 Parque & Recreación" },
+            { id: "fachada", label: "🏛️ Fachada & Exteriores" },
+            { id: "lobby", label: "🛋️ Lobby & Recepción" },
+            { id: "spa", label: "💆‍♀️ Spa & Bienestar" },
+            { id: "eventos", label: "🎭 Salón de Eventos" },
+            { id: "deportes", label: "🏋️ Gimnasio & Deportes" },
+            { id: "playa", label: "🏖️ Playa & Marina" }
+          ].filter(tab => tab.id === "todas" || (areaPhotos[tab.id] && areaPhotos[tab.id].length > 0)).map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveAreaTab(tab.id)}
