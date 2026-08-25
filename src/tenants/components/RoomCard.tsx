@@ -130,13 +130,27 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
   return (
     <div className="group relative bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-xl shadow-slate-200/50 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
       
-      {/* IMAGEN DE CABECERA CON BADGES DINOÁMICOS */}
+      {/* IMAGEN DE CABECERA CON BADGES DINÁMICOS */}
       <div className="relative h-64 overflow-hidden shrink-0 bg-slate-100">
+        {/* Lógica dinámica para la foto real de la habitación */}
         <img
-          src={image}
-          alt={roomTitle}
+          src={
+            (Array.isArray(room.fotos) && room.fotos.length > 0 ? room.fotos[0] : null) ||
+            (Array.isArray((room as any).galeria) && (room as any).galeria.length > 0 ? (room as any).galeria[0] : null) ||
+            (Array.isArray(room.photos) && room.photos.length > 0 ? room.photos[0] : null) ||
+            (room as any).foto_principal ||
+            (room as any).imagen_portada ||
+            room.cover_image ||
+            room.primary_image ||
+            room.image_url ||
+            (room as any).imagen ||
+            (room as any).foto ||
+            image ||
+            "/placeholder.jpg"
+          }
+          alt={room.nombre || room.name || "Habitación"}
           loading="lazy"
-          className="w-full h-full object-cover scale-[1.03] group-hover:scale-110 transition-transform duration-700"
+          className="w-full h-56 md:h-64 object-cover scale-[1.03] group-hover:scale-110 transition-transform duration-700"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-black/30"></div>
 
