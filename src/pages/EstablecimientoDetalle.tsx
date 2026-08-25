@@ -560,8 +560,12 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
       if (savedAreaPhotos) {
         try {
           const parsed = JSON.parse(savedAreaPhotos);
-          if (parsed[establishment.id]) {
-            areaPhotosMap = parsed[establishment.id];
+          const matched = parsed[establishment.id] || 
+                          parsed[String(establishment.id)] || 
+                          parsed[establishment.slug] || 
+                          Object.values(parsed)[0];
+          if (matched) {
+            areaPhotosMap = matched;
           }
         } catch (e) {}
       }

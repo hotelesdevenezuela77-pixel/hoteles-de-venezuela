@@ -209,6 +209,9 @@ export function AdminSaaS() {
 
       localStorage.setItem(localKey, JSON.stringify(currentList));
       setTenants(currentList);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("hdv_tenant_config_changed"));
+      }
 
       logActivity(
          user?.id || null,

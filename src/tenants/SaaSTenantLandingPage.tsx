@@ -14,29 +14,111 @@ interface SaaSTenantLandingPageProps {
   config: TenantConfig;
 }
 
+const DESTINATION_MAP_INFO: Record<string, { lat: number; lng: number; state: string; name: string }> = {
+  "morrocoy": { lat: 10.7933, lng: -68.3214, state: "Falcón", name: "Morrocoy / Tucacas" },
+  "tucacas": { lat: 10.7933, lng: -68.3214, state: "Falcón", name: "Tucacas / Morrocoy" },
+  "chichiriviche": { lat: 10.8931, lng: -68.2717, state: "Falcón", name: "Chichiriviche / Morrocoy" },
+  "roques": { lat: 11.9519, lng: -66.6719, state: "Dependencias Federales", name: "Archipiélago Los Roques" },
+  "margarita": { lat: 10.9577, lng: -63.8697, state: "Nueva Esparta", name: "Isla de Margarita" },
+  "porlamar": { lat: 10.9577, lng: -63.8697, state: "Nueva Esparta", name: "Porlamar, Margarita" },
+  "caracas": { lat: 10.4806, lng: -66.9036, state: "Distrito Capital", name: "Caracas" },
+  "guaira": { lat: 10.6015, lng: -66.9346, state: "La Guaira", name: "Estado La Guaira" },
+  "maiquetia": { lat: 10.6015, lng: -66.9346, state: "La Guaira", name: "Maiquetía" },
+  "merida": { lat: 8.5983, lng: -71.1449, state: "Mérida", name: "Mérida" },
+  "mérida": { lat: 8.5983, lng: -71.1449, state: "Mérida", name: "Mérida" },
+  "canaima": { lat: 6.2415, lng: -62.8528, state: "Bolívar", name: "Parque Nacional Canaima" },
+  "tovar": { lat: 10.4069, lng: -67.2889, state: "Aragua", name: "Colonia Tovar" },
+  "choroni": { lat: 10.5050, lng: -67.6108, state: "Aragua", name: "Choroní" },
+  "mochima": { lat: 10.3542, lng: -64.3542, state: "Sucre", name: "Parque Nacional Mochima" },
+  "puerto-la-cruz": { lat: 10.2167, lng: -64.6333, state: "Anzoátegui", name: "Puerto La Cruz" },
+  "lecheria": { lat: 10.1906, lng: -64.6933, state: "Anzoátegui", name: "Lechería" },
+  "barquisimeto": { lat: 10.0678, lng: -69.3474, state: "Lara", name: "Barquisimeto" },
+  "maracaibo": { lat: 10.6544, lng: -71.6441, state: "Zulia", name: "Maracaibo" },
+  "valencia": { lat: 10.1620, lng: -68.0077, state: "Carabobo", name: "Valencia" },
+  "puerto-cabello": { lat: 10.4731, lng: -68.0125, state: "Carabobo", name: "Puerto Cabello" },
+  "punto-fijo": { lat: 11.6975, lng: -70.1983, state: "Falcón", name: "Punto Fijo / Paraguaná" }
+};
+
 export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loadingRooms, setLoadingRooms] = useState(true);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [mapViewMode, setMapViewMode] = useState<"satelite" | "estandar">("satelite");
   const [activeAreaTab, setActiveAreaTab] = useState<string>("todas");
+  const [establishmentDetail, setEstablishmentDetail] = useState<any>(null);
 
-  // Cargar fotos por áreas (Piscina, Restaurante, Lobby, Fachada, Playa, Spa)
-  const [areaPhotos, setAreaPhotos] = useState<Record<string, string[]>>(() => {
-    try {
-      const saved = localStorage.getItem("hdv_area_photos");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed[config.establishment_id]) return parsed[config.establishment_id];
+  // Cargar registro detallado del establecimiento (para dirección, teléfonos reales, descripción, coordenadas)
+  useEffect(() => {
+    async function fetchDetail() {
+      try {
+        let dbData: any = null;
+        if (config.establishment_id) {
+          const { data } = await supabase
+            .from("establishments")
+            .select("*, destinations(name, state), categories(name)")
+            .or(`id.eq.${config.establishment_id},slug.eq.${config.slug}`)
+            .maybeSingle();
+          if (data) dbData = data;
+        }
+
+        if (!dbData && config.slug) {
+          const { data } = await supabase
+            .from("establishments")
+            .select("*, destinations(name, state), categories(name)")
+            .eq("slug", config.slug)
+            .maybeSingle();
+          if (data) dbData = data;
+        }
+
+        if (!dbData) {
+          const localEsts = JSON.parse(localStorage.getItem("hdv_mock_establishments") || "[]");
+          dbData = localEsts.find((e: any) => e.id === config.establishment_id || e.slug === config.slug);
+        }
+
+        if (dbData) setEstablishmentDetail(dbData);
+      } catch (e) {
+        console.warn("Error cargando detalle del establecimiento para SaaS landing:", e);
       }
-    } catch (e) {}
-    return {
-      piscina: ["https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=800&auto=format&fit=crop"],
-      restaurante: ["https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop"],
-      lobby: ["https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop"],
-      fachada: ["https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&auto=format&fit=crop"],
+    }
+    fetchDetail();
+  }, [config]);
+
+  // Cargar fotos por áreas (Piscina, Restaurante, Lobby, Fachada, Playa, Spa) con sync en vivo
+  const [areaPhotos, setAreaPhotos] = useState<Record<string, string[]>>({});
+
+  useEffect(() => {
+    function loadAreaPhotos() {
+      try {
+        const saved = localStorage.getItem("hdv_area_photos");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          const matched = parsed[config.establishment_id] || 
+                          parsed[String(config.establishment_id)] || 
+                          parsed[config.slug] || 
+                          Object.values(parsed)[0];
+          if (matched && Object.keys(matched).length > 0) {
+            setAreaPhotos(matched);
+            return;
+          }
+        }
+      } catch (e) {}
+
+      setAreaPhotos({
+        piscina: ["https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=800&auto=format&fit=crop"],
+        restaurante: ["https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop"],
+        lobby: ["https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop"],
+        fachada: ["https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&auto=format&fit=crop"],
+      });
+    }
+
+    loadAreaPhotos();
+    window.addEventListener("storage", loadAreaPhotos);
+    window.addEventListener("hdv_area_photos_updated", loadAreaPhotos);
+    return () => {
+      window.removeEventListener("storage", loadAreaPhotos);
+      window.removeEventListener("hdv_area_photos_updated", loadAreaPhotos);
     };
-  });
+  }, [config]);
 
   const primaryColor = config.branding?.primary_color || "#00C8D4";
   const secondaryColor = config.branding?.secondary_color || "#9B00CC";
@@ -45,18 +127,51 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
   const bannerImage = config.branding?.banner_url || 
     "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1600&auto=format&fit=crop";
 
-  const phone = config.contact?.phone || "+58 414 123 4567";
-  const whatsapp = config.contact?.whatsapp || phone;
+  const phone = establishmentDetail?.phone || config.contact?.phone || "+58 412 000 0000";
+  const whatsapp = establishmentDetail?.whatsapp || establishmentDetail?.phone || config.contact?.whatsapp || phone;
   const cleanWhatsapp = whatsapp.replace(/[^0-9]/g, "");
 
-  // Cargar habitaciones reales desde Supabase + localStorage + Fallback
+  const address = establishmentDetail?.address || "Carretera Principal, Sector Tucacas / Morrocoy";
+  const description = establishmentDetail?.description || `En ${config.name} nos esmeramos por ofrecer una atención cálida, personalizada y de primer nivel. Nuestras instalaciones combinan la tranquilidad natural con el confort moderno para que su única preocupación sea descansar.`;
+  const destName = establishmentDetail?.destinations?.name || establishmentDetail?.destination_name || "Tucacas / Morrocoy";
+  const stateName = establishmentDetail?.destinations?.state || establishmentDetail?.state || "Falcón";
+
+  // Resolver Coordenadas GPS del Establecimiento
+  const resolveCoordinates = () => {
+    if (establishmentDetail?.latitude && establishmentDetail?.longitude) {
+      return {
+        lat: Number(establishmentDetail.latitude),
+        lng: Number(establishmentDetail.longitude),
+        state: stateName,
+        name: destName
+      };
+    }
+
+    const searchKey = `${config.slug} ${config.name} ${destName} ${stateName} ${address}`.toLowerCase();
+    for (const [key, val] of Object.entries(DESTINATION_MAP_INFO)) {
+      if (searchKey.includes(key)) {
+        return val;
+      }
+    }
+
+    if (searchKey.includes("posada") || searchKey.includes("mar") || searchKey.includes("beach")) {
+      return DESTINATION_MAP_INFO["morrocoy"];
+    }
+
+    return { lat: 10.7933, lng: -68.3214, state: stateName || "Falcón", name: destName || "Morrocoy" };
+  };
+
+  const coords = resolveCoordinates();
+  const latStr = coords.lat.toFixed(4);
+  const lngStr = Math.abs(coords.lng).toFixed(4);
+
+  // Cargar habitaciones reales desde Supabase + localStorage + Fotos Personalizadas
   useEffect(() => {
     async function loadRooms() {
       setLoadingRooms(true);
       try {
         let dbRooms: any[] = [];
         
-        // 1. Intentar consultar por establishment_id en Supabase
         if (config.establishment_id) {
           const { data, error } = await supabase
             .from("rooms")
@@ -65,23 +180,40 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           if (!error && data) dbRooms = data;
         }
 
-        // 2. Consultar en localStorage
         const localRoomsKey = "hdv_custom_rooms";
         const localRooms = JSON.parse(localStorage.getItem(localRoomsKey) || "[]")
           .filter((r: any) => !dbRooms.some(d => d.id === r.id) && (Number(r.establishment_id) === Number(config.establishment_id) || String(r.establishment_id) === String(config.establishment_id)));
 
         let combined = [...dbRooms, ...localRooms];
 
-        if (combined.length > 0) {
-          const formatted: Room[] = combined.map((r) => ({
+        const customPhotosRaw = localStorage.getItem("hdv_room_photos");
+        let customRoomPhotosMap: Record<string, string[]> = {};
+        if (customPhotosRaw) {
+          try { customRoomPhotosMap = JSON.parse(customPhotosRaw); } catch (e) {}
+        }
+
+        const applyCustomPhotosToRoom = (r: any, idx: number): Room => {
+          const uploadedRoomPhotos = customRoomPhotosMap[r.id] || 
+                                     customRoomPhotosMap[String(r.id)] || 
+                                     customRoomPhotosMap[idx + 101] || 
+                                     (r.photos && r.photos.length > 0 ? r.photos : null);
+
+          const primaryImage = (uploadedRoomPhotos && uploadedRoomPhotos[0]) || 
+                               r.primary_image || 
+                               r.image_url || 
+                               bannerImage;
+
+          const finalPhotos = uploadedRoomPhotos && uploadedRoomPhotos.length > 0 ? uploadedRoomPhotos : [primaryImage];
+
+          return {
             id: r.id,
             name: r.name || r.room_type || "Habitación Estándar",
             category: r.category || r.room_type || "Habitación Premium",
             description: r.description || "Espaciosa habitación equipada con todas las comodidades para una estadía inolvidable.",
             price_per_night: r.price_per_night || r.price || r.base_price || 60,
             capacity: r.capacity || r.max_guests || 2,
-            primary_image: r.primary_image || r.image_url || (r.photos && r.photos[0]) || bannerImage,
-            photos: r.photos || [r.primary_image || bannerImage],
+            primary_image: primaryImage,
+            photos: finalPhotos,
             amenities: r.amenities || r.features || [
               "Aire Acondicionado",
               "WiFi de Alta Velocidad",
@@ -89,52 +221,49 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               "TV por Cable",
               "Servicio de Limpieza"
             ]
-          }));
+          };
+        };
+
+        if (combined.length > 0) {
+          const formatted: Room[] = combined.map((r, idx) => applyCustomPhotosToRoom(r, idx));
           setRooms(formatted);
         } else {
-          // Fallback de habitaciones atractivas predeterminadas para el establecimiento
-          setRooms([
+          const defaults = [
             {
-              id: "room-1",
+              id: 101,
               name: "Apartamento Suite Vista al Mar",
               category: "Suite Familiar",
               description: "Espaciosa suite frente a la costa con balcón privado, cama King, aire acondicionado central y cocina equipada.",
               price_per_night: 75,
               capacity: 4,
               primary_image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&auto=format&fit=crop",
-              photos: [
-                "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&auto=format&fit=crop"
-              ],
+              photos: ["https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&auto=format&fit=crop"],
               amenities: ["Vista al Mar", "Balcón Privado", "Cocina Equipada", "WiFi 200MB", "A/C Central", "TV 55\" Smart"]
             },
             {
-              id: "room-2",
+              id: 102,
               name: "Habitación Matrimonial Executive",
               category: "Matrimonial VIP",
               description: "Diseñada para parejas buscando descanso absoluto con lencería de hilo de algodón, baño privado con ducha panorámica y frigobar.",
               price_per_night: 55,
               capacity: 2,
               primary_image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800&auto=format&fit=crop",
-              photos: [
-                "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&auto=format&fit=crop"
-              ],
+              photos: ["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&auto=format&fit=crop"],
               amenities: ["Cama King Size", "Baño Privado", "Frigobar", "WiFi Gratis", "Caja Fuerte", "A/C Split"]
             },
             {
-              id: "room-3",
+              id: 103,
               name: "Apartamento Dúplex Familiar",
               category: "Apartamento Completo",
               description: "Dos niveles con capacidad hasta 6 personas, ideal para grupos y familias con sala de estar, comedor y terraza.",
               price_per_night: 110,
               capacity: 6,
               primary_image: "https://images.unsplash.com/photo-1591088398332-8a7791972843?w=800&auto=format&fit=crop",
-              photos: [
-                "https://images.unsplash.com/photo-1591088398332-8a7791972843?w=1200&auto=format&fit=crop"
-              ],
+              photos: ["https://images.unsplash.com/photo-1591088398332-8a7791972843?w=1200&auto=format&fit=crop"],
               amenities: ["Dos Niveles", "2 Baños Privados", "Terraza Privada", "Cocina Gourmet", "Estacionamiento", "WiFi"]
             }
-          ]);
+          ];
+          setRooms(defaults.map((r, idx) => applyCustomPhotosToRoom(r, idx)));
         }
       } catch (e) {
         console.warn("Error cargando habitaciones del tenant:", e);
@@ -142,7 +271,14 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         setLoadingRooms(false);
       }
     }
+
     loadRooms();
+    window.addEventListener("storage", loadRooms);
+    window.addEventListener("hdv_room_photos_updated", loadRooms);
+    return () => {
+      window.removeEventListener("storage", loadRooms);
+      window.removeEventListener("hdv_room_photos_updated", loadRooms);
+    };
   }, [config]);
 
   // Mensaje general para WhatsApp
@@ -474,7 +610,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               Más que un Hospedaje, Su Casa en la Playa
             </h2>
             <p className="text-slate-300 text-sm sm:text-base font-light leading-relaxed">
-              En <strong className="text-white font-semibold">{config.name}</strong> nos esmeramos por ofrecer una atención cálida, personalizada y de primer nivel. Nuestras instalaciones combinan la tranquilidad natural con el confort moderno para que su única preocupación sea descansar.
+              {description}
             </p>
 
             <div className="space-y-3 pt-2">
@@ -484,7 +620,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               </div>
               <div className="flex items-center gap-3 text-xs text-slate-200">
                 <CheckCircle2 className="w-4 h-4 text-[#FF0096]" />
-                <span>Ubicación estratégica cerca de atractivos principales.</span>
+                <span>Ubicación estratégica: {address} ({destName}).</span>
               </div>
               <div className="flex items-center gap-3 text-xs text-slate-200">
                 <CheckCircle2 className="w-4 h-4 text-[#9B00CC]" />
@@ -501,7 +637,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                   </div>
                   <div>
                     <span className="text-[10px] text-[#00C8D4] font-bold uppercase block">Ubicación GPS Verificada</span>
-                    <span className="font-semibold text-white">Dominio Oficial: {config.domain}</span>
+                    <span className="font-semibold text-white truncate max-w-[200px] block">{address}</span>
                   </div>
                 </div>
 
@@ -516,8 +652,8 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               </div>
 
               <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[10px] text-slate-400 font-mono">
-                <span>📍 Coordenadas: 10.6015° N, 66.9346° W</span>
-                <span className="text-[#00C8D4] font-bold uppercase">Estado La Guaira, Venezuela</span>
+                <span>📍 Coordenadas: {latStr}° N, {lngStr}° W</span>
+                <span className="text-[#00C8D4] font-bold uppercase">Estado {coords.state}, Venezuela</span>
               </div>
             </div>
           </div>
@@ -530,7 +666,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               <div className="p-3 bg-[#1a0533] border-b border-white/10 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
-                  <span className="text-xs font-bold text-white font-serif">Mapa Satelital en Tiempo Real</span>
+                  <span className="text-xs font-bold text-white font-serif">Mapa Satelital ({destName})</span>
                 </div>
                 <div className="flex bg-slate-900 rounded-xl p-1 border border-white/10 gap-1">
                   <button
@@ -562,12 +698,12 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                       height="100%"
                       frameBorder="0"
                       scrolling="no"
-                      src="https://maps.google.com/maps?q=10.6015,-66.9346&t=k&z=17&ie=UTF8&iwloc=&output=embed"
+                      src={`https://maps.google.com/maps?q=${coords.lat},${coords.lng}&t=k&z=17&ie=UTF8&iwloc=&output=embed`}
                       className="w-full h-full filter contrast-105 brightness-95"
                     />
                     <div className="absolute top-4 left-4 bg-[#0e011f]/90 backdrop-blur px-3 py-1.5 rounded-xl border border-white/15 text-[10px] text-white font-bold flex items-center gap-2 shadow-lg">
                       <span className="w-2 h-2 rounded-full bg-[#00C8D4]" />
-                      <span>Vista Aérea Satelital (Alta Resolución)</span>
+                      <span>Vista Aérea Satelital: {destName} ({coords.state})</span>
                     </div>
                   </div>
                 ) : (
@@ -578,7 +714,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                       height="100%"
                       frameBorder="0"
                       scrolling="no"
-                      src="https://maps.google.com/maps?q=10.6015,-66.9346&t=m&z=15&ie=UTF8&iwloc=&output=embed"
+                      src={`https://maps.google.com/maps?q=${coords.lat},${coords.lng}&t=m&z=15&ie=UTF8&iwloc=&output=embed`}
                       className="w-full h-full"
                     />
                   </div>

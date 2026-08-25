@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "../lib/auth";
 import { supabase } from "../lib/supabase";
-import { 
-  Building2, Clock, CheckCircle, XCircle, Plus, 
-  MapPin, Loader2, MessageSquare, BarChart3, Calendar, 
+import {
+  Building2, Clock, CheckCircle, XCircle, Plus,
+  MapPin, Loader2, MessageSquare, BarChart3, Calendar,
   DollarSign, Users, Trash2, X, Phone, Globe, Briefcase, User,
   Eye, Check, ListFilter, Tag, Sparkles, CalendarRange,
   Upload, Trash, FileText, ChevronRight, AlertCircle, RefreshCw,
@@ -25,8 +25,6 @@ import { FinanceModule } from "../tenants/templates/components/FinanceModule";
 import { AnalyticsModule } from "../tenants/templates/components/AnalyticsModule";
 import { OwnerAgendaModule } from "@/components/owner/OwnerAgendaModule";
 import { OwnerTechnicalSupportModule } from "@/components/owner/OwnerTechnicalSupportModule";
-import { AndromedaOperationsCenter } from "@/components/admin/AndromedaOperationsCenter";
-import { AdminLegalModule } from "@/components/admin/AdminLegalModule";
 
 interface Establishment {
   id: number;
@@ -182,16 +180,16 @@ function getRoomAmenityLabel(key: string) {
 export function OwnerDashboard() {
   const { user, profile, loading: authLoading } = useAuth();
   const [, setLocation] = useLocation();
-  
+
   const isAdmin = profile?.role === 'admin' || user?.email?.toLowerCase() === "hotelesdevenezuela77@gmail.com";
-  
+
   const [impersonateId, setImpersonateId] = useState<string | null>(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("hdv_impersonate_owner_user_id");
     }
     return null;
   });
-  
+
   const [impersonateName, setImpersonateName] = useState<string | null>(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("hdv_impersonate_owner_user_name");
@@ -208,7 +206,7 @@ export function OwnerDashboard() {
   });
 
   const activeOwnerId = (isAdmin && impersonateId) ? impersonateId : user?.id;
-  
+
   const [establishments, setEstablishments] = useState<Establishment[]>([]);
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [leads, setLeads] = useState<WhatsAppLead[]>([]);
@@ -236,7 +234,7 @@ export function OwnerDashboard() {
   }, []);
   const [operacionesSubTab, setOperacionesSubTab] = useState<"reservas" | "disponibilidad" | "timeline">("reservas");
   const [marketingSubTab, setMarketingSubTab] = useState<"descuentos" | "leads" | "reviews" | "channel-manager">("leads");
-  
+
   const [selectedCalendarEst, setSelectedCalendarEst] = useState<number | "">("");
   const [currentTenantConfig, setCurrentTenantConfig] = useState<TenantConfig | null>(null);
 
@@ -316,8 +314,8 @@ export function OwnerDashboard() {
         galeria: true,
         contacto: true,
         tareas: false,
-        finanzas: false,
-        cms: false,
+        finanzas: true,
+        cms: true,
         analiticas: false
       },
       contact: {
@@ -331,11 +329,39 @@ export function OwnerDashboard() {
   };
 
   useEffect(() => {
-    if (establishments.length > 0) {
-      const activeEst = establishments.find(e => e.id === Number(selectedCalendarEst)) || establishments[0];
-      loadTenantConfigForEstablishment(activeEst);
-    }
+    const syncConfig = () => {
+      if (establishments.length > 0) {
+        const activeEst = establishments.find(e => e.id === Number(selectedCalendarEst)) || establishments[0];
+        loadTenantConfigForEstablishment(activeEst);
+      }
+    };
+
+    syncConfig();
+
+    window.addEventListener("storage", syncConfig);
+    window.addEventListener("hdv_tenant_config_changed", syncConfig);
+
+    return () => {
+      window.removeEventListener("storage", syncConfig);
+      window.removeEventListener("hdv_tenant_config_changed", syncConfig);
+    };
   }, [selectedCalendarEst, establishments]);
+
+  // Safety fallback if activeTab is disabled by SaaS configuration or belongs to Super-Admin
+  useEffect(() => {
+    const disabledSuperAdminTabs = ["andromeda_ops", "legal", "guiones"];
+    const isExplicitlyDisabled = 
+      (activeTab === "tareas" && !currentTenantConfig?.modules?.tareas) ||
+      (activeTab === "pos" && !currentTenantConfig?.modules?.pos) ||
+      (activeTab === "webapp_cms" && !currentTenantConfig?.modules?.cms) ||
+      (activeTab === "finanzas" && !currentTenantConfig?.modules?.finanzas) ||
+      (activeTab === "analiticas_saas" && !currentTenantConfig?.modules?.analiticas) ||
+      (activeTab === "operaciones" && currentTenantConfig?.modules?.reservas === false);
+
+    if (disabledSuperAdminTabs.includes(activeTab) || isExplicitlyDisabled) {
+      setActiveTab("resumen");
+    }
+  }, [activeTab, currentTenantConfig]);
 
   const [discountCodes, setDiscountCodes] = useState<any[]>([]);
   const [showAddDiscountModal, setShowAddDiscountModal] = useState(false);
@@ -406,7 +432,7 @@ export function OwnerDashboard() {
     is_active: false, // 4. Por defecto desactivado al crear
     room_number: ""
   });
-  
+
   // Drag and drop image states
   const [roomPhotos, setRoomPhotos] = useState<Record<number, string[]>>(() => {
     if (typeof window !== "undefined") {
@@ -691,10 +717,10 @@ export function OwnerDashboard() {
       const key = `hdv_surroundings_${selectedCalendarEst}`;
       const saved = localStorage.getItem(key);
       const isSpanishMock = saved && (
-        saved.includes("Ayuntamiento") || 
-        saved.includes("Rambleta") || 
-        saved.includes("Turia") || 
-        saved.includes("Malvarrosa") || 
+        saved.includes("Ayuntamiento") ||
+        saved.includes("Rambleta") ||
+        saved.includes("Turia") ||
+        saved.includes("Malvarrosa") ||
         saved.includes("Valencia") ||
         saved.includes("Xàtiva")
       );
@@ -761,7 +787,7 @@ export function OwnerDashboard() {
     const resIdStr = e.dataTransfer.getData("text/plain");
     if (!resIdStr) return;
     const resId = Number(resIdStr);
-    
+
     // Find reservation
     const res = reservations.find(r => r.id === resId);
     if (!res) return;
@@ -783,10 +809,10 @@ export function OwnerDashboard() {
     const hasOverlap = reservations.some(r => {
       if (r.id === resId) return false;
       if (r.status !== "confirmed") return false;
-      
+
       const sameRoom = (r as any).room_id === targetRoomId || r.room_type === rooms.find(rm => rm.id === targetRoomId)?.name;
       if (!sameRoom) return false;
-      
+
       const overlap = checkInStr < r.check_out_date && checkOutStr > r.check_in_date;
       return overlap;
     });
@@ -818,7 +844,7 @@ export function OwnerDashboard() {
           .eq("id", resId);
         if (error) throw error;
       }
-      
+
       alert(`🎉 Reservación de ${res.guest_name} reasignada con éxito del ${checkInStr} al ${checkOutStr}.`);
       await fetchDashboardData();
     } catch (err) {
@@ -859,7 +885,7 @@ export function OwnerDashboard() {
     if (!activeOwnerId) return;
     try {
       setLoading(true);
-      
+
       // 1. Get establishments owned by this user
       const { data: estData, error: estError } = await supabase
         .from("establishments")
@@ -908,7 +934,7 @@ export function OwnerDashboard() {
       }
 
       setEstablishments(mappedEsts);
-      
+
       if (mappedEsts.length > 0) {
         const firstEstId = mappedEsts[0].id;
         setSelectedCalendarEst(prev => prev || firstEstId);
@@ -950,7 +976,7 @@ export function OwnerDashboard() {
       const localResKey = "hdv_mock_reservations";
       const localRes = JSON.parse(localStorage.getItem(localResKey) || "[]")
         .filter((r: any) => estIds.includes(r.establishment_id));
-      
+
       const mappedLocalRes: Reservation[] = localRes.map((r: any) => {
         const est = mappedEsts.find(e => e.id === r.establishment_id);
         return {
@@ -1040,7 +1066,7 @@ export function OwnerDashboard() {
         .select("*")
         .in("establishment_id", estIds)
         .order("payment_date", { ascending: false });
-      
+
       setInvoices(invData || []);
 
       // 7. Calculate liquidations report based strictly on real confirmed reservations
@@ -1086,7 +1112,7 @@ export function OwnerDashboard() {
         .from("rooms")
         .select("*")
         .eq("establishment_id", estId);
-      
+
       const dbRooms = (!error && data) ? data : [];
 
       // Combine with local rooms in localStorage
@@ -1101,44 +1127,44 @@ export function OwnerDashboard() {
       } else {
         // Pre-poblar las 3 unidades reales del sitio web para que sean 100% editables inmediatamente
         const defaultRooms = [
-          { 
-            id: 101, 
+          {
+            id: 101,
             establishment_id: estId,
-            name: "Apartamento Suite Vista al Mar", 
+            name: "Apartamento Suite Vista al Mar",
             category: "Suite Familiar",
-            price_per_night: 75, 
-            capacity: 4, 
-            quantity: 2, 
-            description: "Espaciosa suite frente a la costa con balcón privado, cama King, aire acondicionado central y cocina equipada.", 
-            amenities: "wifi,aire,balcon,vista_mar,cocina_equipada,tv_cable", 
+            price_per_night: 75,
+            capacity: 4,
+            quantity: 2,
+            description: "Espaciosa suite frente a la costa con balcón privado, cama King, aire acondicionado central y cocina equipada.",
+            amenities: "wifi,aire,balcon,vista_mar,cocina_equipada,tv_cable",
             primary_image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&auto=format&fit=crop",
             photos: ["https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&auto=format&fit=crop"],
             is_active: true
           },
-          { 
-            id: 102, 
+          {
+            id: 102,
             establishment_id: estId,
-            name: "Habitación Matrimonial Executive", 
+            name: "Habitación Matrimonial Executive",
             category: "Matrimonial VIP",
-            price_per_night: 55, 
-            capacity: 2, 
-            quantity: 3, 
-            description: "Diseñada para parejas buscando descanso absoluto con lencería de hilo de algodón, baño privado con ducha panorámica y frigobar.", 
-            amenities: "wifi,aire,banio_privado,nevera,caja_fuerte", 
+            price_per_night: 55,
+            capacity: 2,
+            quantity: 3,
+            description: "Diseñada para parejas buscando descanso absoluto con lencería de hilo de algodón, baño privado con ducha panorámica y frigobar.",
+            amenities: "wifi,aire,banio_privado,nevera,caja_fuerte",
             primary_image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800&auto=format&fit=crop",
             photos: ["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&auto=format&fit=crop"],
             is_active: true
           },
-          { 
-            id: 103, 
+          {
+            id: 103,
             establishment_id: estId,
-            name: "Apartamento Dúplex Familiar", 
+            name: "Apartamento Dúplex Familiar",
             category: "Apartamento Completo",
-            price_per_night: 110, 
-            capacity: 6, 
-            quantity: 1, 
-            description: "Dos niveles con capacidad hasta 6 personas, ideal para grupos y familias con sala de estar, comedor y terraza.", 
-            amenities: "wifi,aire,balcon,cocina_equipada,tv_cable", 
+            price_per_night: 110,
+            capacity: 6,
+            quantity: 1,
+            description: "Dos niveles con capacidad hasta 6 personas, ideal para grupos y familias con sala de estar, comedor y terraza.",
+            amenities: "wifi,aire,balcon,cocina_equipada,tv_cable",
             primary_image: "https://images.unsplash.com/photo-1591088398332-8a7791972843?w=800&auto=format&fit=crop",
             photos: ["https://images.unsplash.com/photo-1591088398332-8a7791972843?w=1200&auto=format&fit=crop"],
             is_active: true
@@ -1152,7 +1178,7 @@ export function OwnerDashboard() {
           const existing = JSON.parse(localStorage.getItem(localRoomsKey) || "[]");
           const nonEst = existing.filter((r: any) => Number(r.establishment_id) !== Number(estId));
           localStorage.setItem(localRoomsKey, JSON.stringify([...defaultRooms, ...nonEst]));
-        } catch (e) {}
+        } catch (e) { }
       }
     } catch (err) {
       console.error("Error fetching rooms:", err);
@@ -1184,7 +1210,7 @@ export function OwnerDashboard() {
       try {
         const saved = localStorage.getItem("hdv_tenants_configurations");
         if (saved) tenantsList = JSON.parse(saved);
-      } catch (e) {}
+      } catch (e) { }
 
       let matched = tenantsList.find(t => Number(t.establishment_id) === Number(targetEst.id) || t.slug.toLowerCase() === targetEst.slug.toLowerCase());
 
@@ -1474,7 +1500,7 @@ export function OwnerDashboard() {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(prev => ({ ...prev, [roomId]: false }));
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
       const reader = new FileReader();
@@ -1513,6 +1539,9 @@ export function OwnerDashboard() {
           const updatedEst = { ...estData, [category]: updatedCat };
           const updatedAll = { ...prev, [estId]: updatedEst };
           localStorage.setItem("hdv_area_photos", JSON.stringify(updatedAll));
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(new Event("hdv_area_photos_updated"));
+          }
           return updatedAll;
         });
       };
@@ -1528,6 +1557,9 @@ export function OwnerDashboard() {
       const updatedEst = { ...estData, [category]: updatedCat };
       const updatedAll = { ...prev, [estId]: updatedEst };
       localStorage.setItem("hdv_area_photos", JSON.stringify(updatedAll));
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("hdv_area_photos_updated"));
+      }
       return updatedAll;
     });
   };
@@ -1539,7 +1571,7 @@ export function OwnerDashboard() {
       alert("Por favor completa los campos de fechas y tarifa.");
       return;
     }
-    
+
     alert(`Actualización masiva programada con éxito:\n\nAcción: ${bulkAction === "rate" ? `Modificar tarifa a $${bulkRate} USD` : bulkAction === "lock" ? "Bloquear fechas" : "Desbloquear fechas"}\nPeriodo: Del ${bulkStart} al ${bulkEnd}\n\nLos canales de venta vinculados (Airbnb/Booking.com) han sido sincronizados.`);
     setBulkRate("");
     setBulkStart("");
@@ -1578,56 +1610,56 @@ export function OwnerDashboard() {
   const handleDownloadInvoicePDF = (inv: any) => {
     try {
       const doc = new jsPDF();
-      
+
       // Top background accent
       doc.setFillColor(14, 1, 31); // #0e011f Púrpura Profundo
       doc.rect(0, 0, 210, 40, "F");
-      
+
       doc.setTextColor(255, 255, 255);
       doc.setFont("Helvetica", "bold");
       doc.setFontSize(20);
       doc.text("HOTELES DE VENEZUELA LLC", 20, 25);
-      
+
       doc.setFontSize(9);
       doc.text("Suscripciones de Socios | info@hotelesdevenezuela.com", 120, 25);
-      
+
       // Invoice details
       doc.setTextColor(30, 41, 59); // Slate-800
       doc.setFontSize(16);
       doc.text(`COMPROBANTE DE SUSCRIPCIÓN: #MEMB-${inv.id}`, 20, 60);
-      
+
       doc.setFont("Helvetica", "normal");
       doc.setFontSize(11);
       doc.text(`Fecha de Emisión: ${inv.payment_date}`, 20, 75);
       doc.text(`Método de Pago: ${inv.payment_method.toUpperCase()}`, 20, 82);
       doc.text(`Referencia: ${inv.payment_reference}`, 20, 89);
       doc.text(`Estado del Pago: COMPLETO`, 20, 96);
-      
+
       // Table Header
       doc.setFillColor(243, 244, 246); // gray-100
       doc.rect(20, 110, 170, 10, "F");
       doc.setFont("Helvetica", "bold");
       doc.text("Concepto / Servicio", 25, 117);
       doc.text("Total", 160, 117);
-      
+
       // Table Content
       doc.setFont("Helvetica", "normal");
       doc.text(inv.notes || "Mensualidad de Afiliación Directa a la Red", 25, 132);
       doc.text(`$${inv.amount}.00 USD`, 160, 132);
-      
+
       doc.line(20, 142, 190, 142);
-      
+
       doc.setFont("Helvetica", "bold");
       doc.text("Total Liquidado:", 110, 155);
       doc.text(`$${inv.amount}.00 USD`, 160, 155);
-      
+
       // Footer
       doc.setFont("Helvetica", "italic");
       doc.setFontSize(9);
       doc.setTextColor(156, 163, 175); // gray-400
       doc.text("Gracias por su confianza. Su hotel se mantiene activo en la red principal.", 20, 185);
       doc.text("Hoteles de Venezuela LLC © 2026", 20, 192);
-      
+
       doc.save(`Factura-Membresia-${inv.id}.pdf`);
     } catch (error) {
       console.error(error);
@@ -1718,7 +1750,7 @@ export function OwnerDashboard() {
       const isMock = existingDiscounts.some((d: any) => d.id === id);
 
       if (isMock) {
-        const updatedDiscounts = existingDiscounts.map((d: any) => 
+        const updatedDiscounts = existingDiscounts.map((d: any) =>
           d.id === id ? { ...d, is_active: !currentStatus } : d
         );
         localStorage.setItem(localDiscountsKey, JSON.stringify(updatedDiscounts));
@@ -1953,7 +1985,7 @@ export function OwnerDashboard() {
   const activeReservations = reservations.filter(r => r.status === "confirmed");
   const monthlyRevenue = activeReservations.reduce((sum, r) => sum + r.total_price, 0);
   const totalRooms = rooms.reduce((sum, r) => sum + (r.quantity || 1), 0);
-  
+
   // Dynamic occupancy count for today
   const todayStr = new Date().toISOString().split("T")[0];
   const occupiedRoomsCount = reservations.filter(r => r.status === "confirmed" && todayStr >= r.check_in_date && todayStr < r.check_out_date).length;
@@ -2000,7 +2032,7 @@ export function OwnerDashboard() {
           </button>
         </div>
       )}
-      
+
       {/* Top Animated Header Banner - Altura py-20 Idéntica al Panel Administrativo Principal (Print 1) */}
       <div className="relative overflow-hidden py-20 bg-gradient-to-r from-[#0e0120] via-[#1a0533] to-[#0d1a2e] text-white w-full border-b border-white/10">
         <ConstellationBackground />
@@ -2026,28 +2058,28 @@ export function OwnerDashboard() {
                   <span className="flex items-center gap-1.5 shrink-0">
                     {/* USA Flag */}
                     <svg className="w-7 h-4.5 rounded-xs shadow-md inline-block object-cover border border-white/20 align-middle" viewBox="0 0 7410 3900" xmlns="http://www.w3.org/2000/svg">
-                      <rect width="7410" height="3900" fill="#b22234"/>
-                      <path d="M0,300h7410M0,900h7410M0,1500h7410M0,2100h7410M0,2700h7410M0,3300h7410" stroke="#fff" strokeWidth="300"/>
-                      <rect width="2964" height="2100" fill="#3c3b6e"/>
+                      <rect width="7410" height="3900" fill="#b22234" />
+                      <path d="M0,300h7410M0,900h7410M0,1500h7410M0,2100h7410M0,2700h7410M0,3300h7410" stroke="#fff" strokeWidth="300" />
+                      <rect width="2964" height="2100" fill="#3c3b6e" />
                       <g fill="#fff">
-                        <circle cx="296" cy="175" r="45"/><circle cx="889" cy="175" r="45"/><circle cx="1482" cy="175" r="45"/><circle cx="2075" cy="175" r="45"/><circle cx="2668" cy="175" r="45"/>
-                        <circle cx="593" cy="350" r="45"/><circle cx="1186" cy="350" r="45"/><circle cx="1778" cy="350" r="45"/><circle cx="2371" cy="350" r="45"/>
-                        <circle cx="296" cy="525" r="45"/><circle cx="889" cy="525" r="45"/><circle cx="1482" cy="525" r="45"/><circle cx="2075" cy="525" r="45"/><circle cx="2668" cy="525" r="45"/>
-                        <circle cx="593" cy="700" r="45"/><circle cx="1186" cy="700" r="45"/><circle cx="1778" cy="700" r="45"/><circle cx="2371" cy="700" r="45"/>
-                        <circle cx="296" cy="875" r="45"/><circle cx="889" cy="875" r="45"/><circle cx="1482" cy="875" r="45"/><circle cx="2075" cy="875" r="45"/><circle cx="2668" cy="875" r="45"/>
-                        <circle cx="593" cy="1050" r="45"/><circle cx="1186" cy="1050" r="45"/><circle cx="1778" cy="1050" r="45"/><circle cx="2371" cy="1050" r="45"/>
-                        <circle cx="296" cy="1225" r="45"/><circle cx="889" cy="1225" r="45"/><circle cx="1482" cy="1225" r="45"/><circle cx="2075" cy="1225" r="45"/><circle cx="2668" cy="1225" r="45"/>
-                        <circle cx="593" cy="1400" r="45"/><circle cx="1186" cy="1400" r="45"/><circle cx="1778" cy="1400" r="45"/><circle cx="2371" cy="1400" r="45"/>
-                        <circle cx="296" cy="1575" r="45"/><circle cx="889" cy="1575" r="45"/><circle cx="1482" cy="1575" r="45"/><circle cx="2075" cy="1575" r="45"/><circle cx="2668" cy="1575" r="45"/>
-                        <circle cx="593" cy="1750" r="45"/><circle cx="1186" cy="1750" r="45"/><circle cx="1778" cy="1750" r="45"/><circle cx="2371" cy="1750" r="45"/>
-                        <circle cx="296" cy="1925" r="45"/><circle cx="889" cy="1925" r="45"/><circle cx="1482" cy="1925" r="45"/><circle cx="2075" cy="1925" r="45"/><circle cx="2668" cy="1925" r="45"/>
+                        <circle cx="296" cy="175" r="45" /><circle cx="889" cy="175" r="45" /><circle cx="1482" cy="175" r="45" /><circle cx="2075" cy="175" r="45" /><circle cx="2668" cy="175" r="45" />
+                        <circle cx="593" cy="350" r="45" /><circle cx="1186" cy="350" r="45" /><circle cx="1778" cy="350" r="45" /><circle cx="2371" cy="350" r="45" />
+                        <circle cx="296" cy="525" r="45" /><circle cx="889" cy="525" r="45" /><circle cx="1482" cy="525" r="45" /><circle cx="2075" cy="525" r="45" /><circle cx="2668" cy="525" r="45" />
+                        <circle cx="593" cy="700" r="45" /><circle cx="1186" cy="700" r="45" /><circle cx="1778" cy="700" r="45" /><circle cx="2371" cy="700" r="45" />
+                        <circle cx="296" cy="875" r="45" /><circle cx="889" cy="875" r="45" /><circle cx="1482" cy="875" r="45" /><circle cx="2075" cy="875" r="45" /><circle cx="2668" cy="875" r="45" />
+                        <circle cx="593" cy="1050" r="45" /><circle cx="1186" cy="1050" r="45" /><circle cx="1778" cy="1050" r="45" /><circle cx="2371" cy="1050" r="45" />
+                        <circle cx="296" cy="1225" r="45" /><circle cx="889" cy="1225" r="45" /><circle cx="1482" cy="1225" r="45" /><circle cx="2075" cy="1225" r="45" /><circle cx="2668" cy="1225" r="45" />
+                        <circle cx="593" cy="1400" r="45" /><circle cx="1186" cy="1400" r="45" /><circle cx="1778" cy="1400" r="45" /><circle cx="2371" cy="1400" r="45" />
+                        <circle cx="296" cy="1575" r="45" /><circle cx="889" cy="1575" r="45" /><circle cx="1482" cy="1575" r="45" /><circle cx="2075" cy="1575" r="45" /><circle cx="2668" cy="1575" r="45" />
+                        <circle cx="593" cy="1750" r="45" /><circle cx="1186" cy="1750" r="45" /><circle cx="1778" cy="1750" r="45" /><circle cx="2371" cy="1750" r="45" />
+                        <circle cx="296" cy="1925" r="45" /><circle cx="889" cy="1925" r="45" /><circle cx="1482" cy="1925" r="45" /><circle cx="2075" cy="1925" r="45" /><circle cx="2668" cy="1925" r="45" />
                       </g>
                     </svg>
                     {/* Venezuela Flag */}
                     <svg className="w-7 h-4.5 rounded-xs shadow-md inline-block object-cover border border-white/20 align-middle" viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
-                      <rect width="900" height="200" fill="#ffcc00"/>
-                      <rect y="200" width="900" height="200" fill="#00247d"/>
-                      <rect y="400" width="900" height="200" fill="#cf142b"/>
+                      <rect width="900" height="200" fill="#ffcc00" />
+                      <rect y="200" width="900" height="200" fill="#00247d" />
+                      <rect y="400" width="900" height="200" fill="#cf142b" />
                       <g fill="#fff" transform="translate(450, 310)">
                         <circle cx="-100" cy="20" r="10" />
                         <circle cx="-73" cy="-10" r="10" />
@@ -2115,7 +2147,7 @@ export function OwnerDashboard() {
               </p>
             </div>
           </div>
-          
+
           <div className="flex flex-wrap lg:flex-col gap-3 shrink-0 w-full lg:w-auto">
             <Link
               href="/perfil?tab=perfil"
@@ -2171,20 +2203,17 @@ export function OwnerDashboard() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
             {[
               { id: "resumen", label: "Dashboard Ejecutivo", icon: BarChart3, enabled: true },
-              { id: "andromeda_ops", label: "Nodo Andrómeda-X", icon: Cpu, enabled: true, badge: "NASA Control" },
-              { id: "legal", label: "Auditoría Legal", icon: Scale, enabled: true, badge: "Resoluciones PDF" },
               { id: "agenda", label: "Agenda & Calendario", icon: Calendar, enabled: true, badge: "Drag & Drop" },
               { id: "soporte", label: "Soporte Técnico", icon: Wrench, enabled: true, badge: "Tickets D&D" },
-              { id: "webapp_cms", label: "Aplicación Web & CMS", icon: Globe, enabled: currentTenantConfig?.modules?.cms !== false, badge: "Web Builder" },
+              { id: "webapp_cms", label: "Aplicación Web & CMS", icon: Globe, enabled: !!currentTenantConfig?.modules?.cms, badge: "Web Builder" },
               { id: "tareas", label: "Gestión de Tareas", icon: Clipboard, enabled: !!currentTenantConfig?.modules?.tareas, badge: "SaaS" },
               { id: "pos", label: "Club POS", icon: Coffee, enabled: !!currentTenantConfig?.modules?.pos, badge: "SaaS" },
-              { id: "finanzas", label: "Finanzas & Membresías", icon: DollarSign, enabled: true },
+              { id: "finanzas", label: "Finanzas & Membresías", icon: DollarSign, enabled: !!currentTenantConfig?.modules?.finanzas },
               { id: "analiticas_saas", label: "Analíticas SaaS", icon: TrendingUp, enabled: !!currentTenantConfig?.modules?.analiticas, badge: "SaaS" },
               { id: "portafolio", label: `Mi Portafolio (${establishments.length})`, icon: Building2, enabled: true },
-              { id: "operaciones", label: "Operaciones Diarias", icon: CalendarRange, enabled: true },
+              { id: "operaciones", label: "Operaciones Diarias", icon: CalendarRange, enabled: currentTenantConfig?.modules?.reservas !== false },
               { id: "inventario", label: "Inventario Habitaciones", icon: ListFilter, enabled: true },
-              { id: "marketing", label: "Marketing & Canales", icon: Tag, enabled: true },
-              { id: "guiones", label: "Asistente Guiones", icon: Sparkles, enabled: true }
+              { id: "marketing", label: "Marketing & Canales", icon: Tag, enabled: true }
             ].filter(tab => tab.enabled).map(tab => {
               const active = activeTab === tab.id;
               const Icon = tab.icon;
@@ -2192,15 +2221,13 @@ export function OwnerDashboard() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer text-left border ${
-                    active
+                  className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer text-left border ${active
                       ? "bg-[#0e011f] text-white border-[#FF0096] shadow-md scale-[1.02]"
                       : "bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200/80 hover:border-slate-300"
-                  }`}
+                    }`}
                 >
-                  <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${
-                    active ? "bg-[#FF0096] text-white" : "bg-white text-slate-600 border border-slate-200"
-                  }`}>
+                  <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${active ? "bg-[#FF0096] text-white" : "bg-white text-slate-600 border border-slate-200"
+                    }`}>
                     <Icon className="w-3.5 h-3.5" />
                   </div>
                   <span className="truncate leading-tight font-sans text-[11px]">{tab.label}</span>
@@ -2218,11 +2245,11 @@ export function OwnerDashboard() {
 
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto px-6 mt-8">
-        
+
         {/* DASHBOARD EJECUTIVO TAB */}
         {activeTab === "resumen" && (
           <div className="space-y-8">
-            
+
             {/* SaaS Web Application Control Card */}
             {currentTenantConfig && (
               <div className="bg-gradient-to-r from-[#0e011f] via-[#1a0533] to-[#0e011f] border border-[#00C8D4]/30 rounded-3xl p-6 text-white shadow-xl space-y-4 text-left">
@@ -2301,7 +2328,7 @@ export function OwnerDashboard() {
                 </div>
               </div>
             )}
-            
+
             {/* Header info selector mobile */}
             <div className="lg:hidden flex flex-col gap-2 p-4 bg-white border border-gray-150 rounded-2xl text-left">
               <span className="text-[10px] font-black uppercase text-gray-400">Establecimiento Seleccionado:</span>
@@ -2332,7 +2359,7 @@ export function OwnerDashboard() {
 
             {/* KPIs Row */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-              
+
               <div className="bg-white border border-gray-200 rounded-3xl p-5 shadow-xs flex items-center gap-4">
                 <div className="w-10 h-10 bg-brand-turquesa rounded-xl flex items-center justify-center text-white shrink-0">
                   <TrendingUp className="w-5 h-5" />
@@ -2377,10 +2404,10 @@ export function OwnerDashboard() {
 
             {/* Charts and Data section */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              
+
               {/* Financial chart */}
               <div className="lg:col-span-2 space-y-6">
-                
+
                 {/* Revenue trends chart */}
                 <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-xs text-left">
                   <h3 className="text-sm font-black text-gray-800 uppercase tracking-wider mb-4 flex items-center gap-2">
@@ -2392,8 +2419,8 @@ export function OwnerDashboard() {
                       <AreaChart data={monthlyRevenueData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                         <defs>
                           <linearGradient id="colorIngresos" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#00C8D4" stopOpacity={0.4}/>
-                            <stop offset="95%" stopColor="#00C8D4" stopOpacity={0}/>
+                            <stop offset="5%" stopColor="#00C8D4" stopOpacity={0.4} />
+                            <stop offset="95%" stopColor="#00C8D4" stopOpacity={0} />
                           </linearGradient>
                         </defs>
                         <XAxis dataKey="name" stroke="#94A3B8" fontSize={10} tickLine={false} />
@@ -2430,7 +2457,7 @@ export function OwnerDashboard() {
 
               {/* Sidebar Info */}
               <div className="space-y-6">
-                
+
                 {/* Channel manager summary */}
                 <div className="bg-[#0e011f] border border-white/5 rounded-3xl p-6 text-white text-left">
                   <h3 className="text-xs font-black uppercase tracking-wider mb-4 text-brand-turquesa">Distribución por Canales</h3>
@@ -2505,16 +2532,6 @@ export function OwnerDashboard() {
           />
         )}
 
-        {/* NODO GALÁCTICO ANDRÓMEDA-X (TELEMETRÍA NASA) TAB */}
-        {activeTab === "andromeda_ops" && (
-          <AndromedaOperationsCenter />
-        )}
-
-        {/* AUDITORÍA & DEPARTAMENTO LEGAL TAB */}
-        {activeTab === "legal" && (
-          <AdminLegalModule />
-        )}
-
         {/* CLUB POS TAB */}
         {activeTab === "pos" && (
           <POSModule customConfig={currentTenantConfig || undefined} />
@@ -2567,7 +2584,7 @@ export function OwnerDashboard() {
                         {getStatusBadge(est.status)}
                       </div>
                       <p className="text-[11px] font-bold text-brand-magenta uppercase tracking-wider mb-4">{est.category_name} • {est.destination_name}</p>
-                      
+
                       <div className="space-y-2 text-xs text-gray-500 mb-4">
                         {est.address && <p><span className="font-bold text-gray-400 uppercase text-[9px] tracking-wider block">Dirección:</span> {est.address}</p>}
                         {est.phone && <p><span className="font-bold text-gray-400 uppercase text-[9px] tracking-wider block">Contacto:</span> {est.phone}</p>}
@@ -2634,13 +2651,13 @@ export function OwnerDashboard() {
                           Ver Ficha Pública
                         </button>
                       </Link>
-                      <button 
+                      <button
                         onClick={() => { setSelectedCalendarEst(est.id); setActiveTab("inventario"); }}
                         className="flex-1 min-w-[120px] bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold text-xs py-2.5 rounded-xl border border-gray-250 cursor-pointer"
                       >
                         Gestionar Inventario
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleOpenVerificationModal(est)}
                         className="px-3 bg-brand-magenta/10 hover:bg-brand-magenta/20 text-brand-magenta border border-brand-magenta/20 font-bold text-xs py-2.5 rounded-xl cursor-pointer"
                         title="Consignación de Documentos y Verificación"
@@ -2658,36 +2675,33 @@ export function OwnerDashboard() {
         {/* OPERACIONES DIARIAS TAB */}
         {activeTab === "operaciones" && (
           <div className="space-y-6">
-            
+
             {/* Sub-tabs menu */}
             <div className="flex gap-3 border-b border-gray-200 pb-3">
               <button
                 onClick={() => setOperacionesSubTab("reservas")}
-                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                  operacionesSubTab === "reservas"
+                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${operacionesSubTab === "reservas"
                     ? "bg-brand-magenta text-white shadow-sm"
                     : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                }`}
+                  }`}
               >
                 Reservaciones Recibidas
               </button>
               <button
                 onClick={() => setOperacionesSubTab("disponibilidad")}
-                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                  operacionesSubTab === "disponibilidad"
+                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${operacionesSubTab === "disponibilidad"
                     ? "bg-brand-magenta text-white shadow-sm"
                     : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                }`}
+                  }`}
               >
                 Calendario Pro & Tarifas
               </button>
               <button
                 onClick={() => setOperacionesSubTab("timeline")}
-                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                  operacionesSubTab === "timeline"
+                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${operacionesSubTab === "timeline"
                     ? "bg-brand-magenta text-white shadow-sm"
                     : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                }`}
+                  }`}
               >
                 Timeline PMS (Drag & Drop)
               </button>
@@ -2732,11 +2746,10 @@ export function OwnerDashboard() {
                               <td className="p-4 font-black text-brand-magenta">${res.total_price}</td>
                               <td className="p-4 pr-6">
                                 <div className="flex flex-col gap-2">
-                                  <span className={`inline-block w-fit px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                                    res.status === "confirmed" ? "bg-green-50 text-green-700 border border-green-150" :
-                                    res.status === "cancelled" ? "bg-red-50 text-red-700 border border-red-150" :
-                                    "bg-yellow-50 text-yellow-700 border border-yellow-150"
-                                  }`}>
+                                  <span className={`inline-block w-fit px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${res.status === "confirmed" ? "bg-green-50 text-green-700 border border-green-150" :
+                                      res.status === "cancelled" ? "bg-red-50 text-red-700 border border-red-150" :
+                                        "bg-yellow-50 text-yellow-700 border border-yellow-150"
+                                    }`}>
                                     {res.status === "confirmed" ? "Confirmado" : res.status === "cancelled" ? "Cancelado" : "Pendiente"}
                                   </span>
                                   {res.status === "pending" && (
@@ -2771,7 +2784,7 @@ export function OwnerDashboard() {
             {operacionesSubTab === "disponibilidad" && (
               <div className="space-y-6 text-left">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  
+
                   {/* Calendar view */}
                   <div className="lg:col-span-2 space-y-4">
                     <h3 className="text-md font-black text-gray-800 tracking-tight font-serif">Planilla de Disponibilidad</h3>
@@ -2893,7 +2906,7 @@ export function OwnerDashboard() {
                     <h3 className="text-md font-black text-gray-800 tracking-tight font-serif">Calendario Timeline PMS & Asignador</h3>
                     <p className="text-xs text-gray-400 mt-1">Arrastra y suelta reservaciones horizontalmente para cambiar fechas, o verticalmente para reasignar habitaciones.</p>
                   </div>
-                  
+
                   {/* Month navigation controls */}
                   <div className="flex items-center gap-2">
                     <button
@@ -2922,7 +2935,7 @@ export function OwnerDashboard() {
                   <div className="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden p-6">
                     <div className="overflow-x-auto">
                       <div className="relative min-w-[1400px]">
-                        
+
                         {/* Timeline Grid Header */}
                         <div className="grid border-b border-gray-200 pb-2" style={{ gridTemplateColumns: `180px repeat(${getTimelineDays().length}, minmax(45px, 1fr))` }}>
                           <div className="text-[10px] font-black uppercase text-gray-400 select-none">Habitaciones / Unidades</div>
@@ -2941,7 +2954,7 @@ export function OwnerDashboard() {
                             // Get active month limits
                             const monthStartStr = days[0].toISOString().split("T")[0];
                             const monthEndStr = days[days.length - 1].toISOString().split("T")[0];
-                            
+
                             // Find active reservations for this room type within this month
                             const roomReservations = reservations.filter(r => {
                               const sameRoom = (r as any).room_id === room.id || r.room_type === room.name;
@@ -2951,7 +2964,7 @@ export function OwnerDashboard() {
 
                             return (
                               <div key={room.id} className="grid relative min-h-[56px] items-center" style={{ gridTemplateColumns: `180px repeat(${days.length}, minmax(45px, 1fr))` }}>
-                                
+
                                 {/* Room Label Left */}
                                 <div className="pr-4 py-2 border-r border-gray-100 min-h-[56px] flex flex-col justify-center bg-gray-50/30">
                                   <span className="font-extrabold text-xs text-gray-700 block truncate">{room.name}</span>
@@ -2976,7 +2989,7 @@ export function OwnerDashboard() {
                                   // Compute positioning
                                   const resCheckIn = new Date(res.check_in_date);
                                   const resCheckOut = new Date(res.check_out_date);
-                                  
+
                                   // Find start day index relative to this month's days
                                   let startIdx = days.findIndex(d => d.toISOString().split("T")[0] === res.check_in_date);
                                   // Fallback if check_in is in previous month
@@ -2987,7 +3000,7 @@ export function OwnerDashboard() {
                                       return null; // out of bounds
                                     }
                                   }
-                                  
+
                                   // Calculate span length of reservation within the month
                                   const checkInDateClamped = res.check_in_date < monthStartStr ? new Date(monthStartStr) : resCheckIn;
                                   const checkOutDateClamped = res.check_out_date > monthEndStr ? new Date(monthEndStr) : resCheckOut;
@@ -3036,7 +3049,7 @@ export function OwnerDashboard() {
         {/* INVENTARIO DE HABITACIONES TAB */}
         {activeTab === "inventario" && (
           <div className="space-y-6 text-left">
-            
+
             {/* 5. Notificación obligatoria */}
             <div className="bg-gradient-to-r from-[#00C8D4]/10 via-pink-500/10 to-purple-500/10 border border-[#00C8D4]/30 rounded-2xl p-4 flex items-center justify-between gap-4 shadow-xs">
               <div className="flex items-center gap-3.5">
@@ -3098,7 +3111,7 @@ export function OwnerDashboard() {
 
                   return (
                     <div key={room.id} className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm grid grid-cols-1 lg:grid-cols-3 gap-8">
-                      
+
                       {/* Room properties details */}
                       <div className="lg:col-span-1 space-y-4">
                         {/* Thumbnail principal de la habitación */}
@@ -3137,7 +3150,7 @@ export function OwnerDashboard() {
                         </div>
 
                         <p className="text-xs text-gray-500 font-medium leading-relaxed">{room.description}</p>
-                        
+
                         <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-gray-600">
                           <div className="p-3 bg-gray-50 rounded-xl">
                             <span className="text-[10px] text-gray-400 uppercase tracking-wider block">Tarifa Base</span>
@@ -3181,11 +3194,10 @@ export function OwnerDashboard() {
                               {/* 4. Botón Activar / Desactivar */}
                               <button
                                 onClick={() => handleToggleRoomActive(room)}
-                                className={`flex-1 min-w-[120px] px-3 py-2.5 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer border ${
-                                  room.is_active
+                                className={`flex-1 min-w-[120px] px-3 py-2.5 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer border ${room.is_active
                                     ? "bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-200"
                                     : "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-300 shadow-xs"
-                                }`}
+                                  }`}
                               >
                                 {room.is_active ? (
                                   <>
@@ -3229,7 +3241,7 @@ export function OwnerDashboard() {
                       {/* Photo manager Drag and Drop */}
                       <div className="lg:col-span-2 space-y-4">
                         <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Galería Fotográfica de Habitación</span>
-                        
+
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                           {photos.map((ph: string, idx: number) => (
                             <div key={idx} className="relative aspect-video sm:aspect-square bg-gray-100 rounded-2xl overflow-hidden group">
@@ -3249,11 +3261,10 @@ export function OwnerDashboard() {
                             onDragLeave={e => handleDrag(e, room.id)}
                             onDragOver={e => handleDrag(e, room.id)}
                             onDrop={e => handleDrop(e, room.id)}
-                            className={`aspect-video sm:aspect-square border-2 border-dashed rounded-2xl flex flex-col items-center justify-center p-4 transition-colors relative cursor-pointer ${
-                              isDragOver 
-                                ? "border-brand-turquesa bg-brand-turquesa/5 text-brand-turquesa" 
+                            className={`aspect-video sm:aspect-square border-2 border-dashed rounded-2xl flex flex-col items-center justify-center p-4 transition-colors relative cursor-pointer ${isDragOver
+                                ? "border-brand-turquesa bg-brand-turquesa/5 text-brand-turquesa"
                                 : "border-gray-200 text-gray-400 hover:border-gray-300 hover:text-gray-500"
-                            }`}
+                              }`}
                           >
                             <Upload className="w-6 h-6 mb-1" />
                             <span className="text-[9px] font-black uppercase text-center tracking-wider leading-relaxed">Arrastrar Fotos aquí</span>
@@ -3319,11 +3330,10 @@ export function OwnerDashboard() {
                         key={cat.id}
                         type="button"
                         onClick={() => setSelectedAreaCategory(cat.id)}
-                        className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer border ${
-                          isSelected
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer border ${isSelected
                             ? "bg-slate-900 text-white border-slate-900 shadow-sm"
                             : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"
-                        }`}
+                          }`}
                       >
                         <span>{cat.icon}</span>
                         <span>{cat.label}</span>
@@ -3386,11 +3396,10 @@ export function OwnerDashboard() {
                               handleAddAreaPhotos(estIdNum, selectedAreaCategory, e.dataTransfer.files);
                             }
                           }}
-                          className={`aspect-square border-2 border-dashed rounded-2xl flex flex-col items-center justify-center p-3 transition-colors relative cursor-pointer ${
-                            areaDragActive 
-                              ? "border-brand-magenta bg-brand-magenta/5 text-brand-magenta" 
+                          className={`aspect-square border-2 border-dashed rounded-2xl flex flex-col items-center justify-center p-3 transition-colors relative cursor-pointer ${areaDragActive
+                              ? "border-brand-magenta bg-brand-magenta/5 text-brand-magenta"
                               : "border-gray-200 text-gray-400 hover:border-gray-300 hover:text-gray-500 bg-white"
-                          }`}
+                            }`}
                         >
                           <Upload className="w-6 h-6 mb-1 text-brand-turquesa" />
                           <span className="text-[9px] font-black uppercase text-center tracking-wider leading-tight">
@@ -3426,7 +3435,7 @@ export function OwnerDashboard() {
         {activeTab === "finanzas" && (
           <div className="space-y-8 text-left">
             <h3 className="text-md font-black text-gray-800 tracking-tight font-serif">Facturación & Membresía de Socio</h3>
-            
+
             {/* Membership plans details card */}
             <div className="bg-[#0e011f] border border-white/5 rounded-3xl p-6 md:p-8 text-white grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
               <div className="md:col-span-2 space-y-4">
@@ -3549,46 +3558,42 @@ export function OwnerDashboard() {
         {/* MARKETING Y CANALES TAB */}
         {activeTab === "marketing" && (
           <div className="space-y-6 text-left">
-            
+
             {/* Sub-tabs menu */}
             <div className="flex gap-3 border-b border-gray-200 pb-3">
               <button
                 onClick={() => setMarketingSubTab("leads")}
-                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                  marketingSubTab === "leads"
+                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${marketingSubTab === "leads"
                     ? "bg-brand-magenta text-white shadow-sm"
                     : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                }`}
+                  }`}
               >
                 CRM Leads de WhatsApp ({leads.length})
               </button>
               <button
                 onClick={() => setMarketingSubTab("descuentos")}
-                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                  marketingSubTab === "descuentos"
+                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${marketingSubTab === "descuentos"
                     ? "bg-brand-magenta text-white shadow-sm"
                     : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                }`}
+                  }`}
               >
                 Códigos de Descuento
               </button>
               <button
                 onClick={() => setMarketingSubTab("reviews")}
-                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                  marketingSubTab === "reviews"
+                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${marketingSubTab === "reviews"
                     ? "bg-brand-magenta text-white shadow-sm"
                     : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                }`}
+                  }`}
               >
                 Reseñas de Huéspedes ({reviews.length})
               </button>
               <button
                 onClick={() => setMarketingSubTab("channel-manager")}
-                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                  marketingSubTab === "channel-manager"
+                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${marketingSubTab === "channel-manager"
                     ? "bg-brand-magenta text-white shadow-sm"
                     : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                }`}
+                  }`}
               >
                 Channel Manager OTA
               </button>
@@ -3628,8 +3633,8 @@ export function OwnerDashboard() {
                             <Sparkles className="w-4 h-4" />
                             <span>Responder con Guion</span>
                           </button>
-                          
-                          <a 
+
+                          <a
                             href={`https://wa.me/${lead.visitor_phone.replace(/[^\d]/g, "")}`}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -3704,11 +3709,10 @@ export function OwnerDashboard() {
                               <td className="p-4">
                                 <button
                                   onClick={() => handleToggleDiscountActive(code.id, code.is_active)}
-                                  className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-colors cursor-pointer ${
-                                    code.is_active 
-                                      ? "bg-green-50 text-green-700 border border-green-150" 
+                                  className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-colors cursor-pointer ${code.is_active
+                                      ? "bg-green-50 text-green-700 border border-green-150"
                                       : "bg-red-50 text-red-700 border border-red-150"
-                                  }`}
+                                    }`}
                                 >
                                   {code.is_active ? "Activo" : "Inactivo"}
                                 </button>
@@ -3750,7 +3754,7 @@ export function OwnerDashboard() {
                         </div>
                       </div>
                       <p className="text-xs text-gray-600 font-medium italic">"{rev.comment}"</p>
-                      
+
                       {rev.reply ? (
                         <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
                           <p className="text-[10px] text-gray-400 uppercase font-black tracking-wider mb-1">Tu Respuesta:</p>
@@ -4138,7 +4142,7 @@ export function OwnerDashboard() {
                 <label className="block text-[10px] uppercase font-extrabold text-slate-700 tracking-wider">
                   Fotografía Principal de la Habitación
                 </label>
-                
+
                 {roomFormData.primary_image && (
                   <div className="relative rounded-xl overflow-hidden h-32 border border-slate-300 bg-slate-900">
                     <img src={roomFormData.primary_image} alt="Vista previa de la habitación" className="w-full h-full object-cover" />
@@ -4260,11 +4264,10 @@ export function OwnerDashboard() {
                 <button
                   type="button"
                   onClick={() => setRoomFormData(prev => ({ ...prev, is_active: !prev.is_active }))}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase transition-all cursor-pointer ${
-                    roomFormData.is_active
+                  className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase transition-all cursor-pointer ${roomFormData.is_active
                       ? "bg-green-600 text-white"
                       : "bg-gray-200 text-gray-700"
-                  }`}
+                    }`}
                 >
                   {roomFormData.is_active ? "Activa" : "Desactivada"}
                 </button>
@@ -4317,7 +4320,7 @@ export function OwnerDashboard() {
                 <label className="block text-[10px] uppercase font-extrabold text-slate-700 tracking-wider">
                   Fotografía Principal de la Habitación
                 </label>
-                
+
                 {roomFormData.primary_image && (
                   <div className="relative rounded-xl overflow-hidden h-32 border border-slate-300 bg-slate-900">
                     <img src={roomFormData.primary_image} alt="Vista previa de la habitación" className="w-full h-full object-cover" />
@@ -4433,11 +4436,10 @@ export function OwnerDashboard() {
                 <button
                   type="button"
                   onClick={() => setRoomFormData(prev => ({ ...prev, is_active: !prev.is_active }))}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase transition-all cursor-pointer ${
-                    roomFormData.is_active
+                  className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase transition-all cursor-pointer ${roomFormData.is_active
                       ? "bg-green-600 text-white"
                       : "bg-gray-300 text-gray-700"
-                  }`}
+                    }`}
                 >
                   {roomFormData.is_active ? "Activa" : "Desactivada"}
                 </button>
@@ -4801,7 +4803,7 @@ export function OwnerDashboard() {
             </div>
 
             <div className="p-6 space-y-6 text-left max-h-[70vh] overflow-y-auto">
-              
+
               {/* Form to add POI */}
               <form onSubmit={handleAddPOI} className="bg-gray-50 border border-gray-150 rounded-2xl p-4 space-y-4">
                 <span className="text-[10px] font-black text-brand-turquesa uppercase tracking-wider block">Registrar Punto de Interés</span>
@@ -4852,7 +4854,7 @@ export function OwnerDashboard() {
               {/* Listed POIs by category */}
               <div className="space-y-4">
                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Lugares de Interés Registrados</span>
-                
+
                 {POI_CATEGORIES.map(cat => {
                   const items = surroundings.filter(s => s.category === cat.id);
                   return (
