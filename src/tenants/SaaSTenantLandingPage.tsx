@@ -188,7 +188,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                 if (r.is_active === false) return false;
                 if (Number(r.establishment_id) === Number(currentEstablishmentId) || String(r.establishment_id) === String(currentEstablishmentId)) return true;
                 if (config.slug && r.establishment_slug === config.slug) return true;
-                if (Number(r.establishment_id) === 1 || Number(r.establishment_id) === 101) return true;
+                if (Number(r.establishment_id) === 1 || Number(r.establishment_id) === 2 || Number(r.establishment_id) === 101) return true;
                 return false;
               });
               localRooms = filtered.length > 0 ? filtered : parsedLocal.filter((r: any) => r.is_active !== false);
