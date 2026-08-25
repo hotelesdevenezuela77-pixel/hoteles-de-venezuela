@@ -757,15 +757,15 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           className="relative overflow-hidden rounded-3xl p-8 sm:p-14 text-center text-white shadow-2xl space-y-6"
           style={{ background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)" }}
         >
-          <span className="text-xs font-extrabold tracking-[0.25em] text-pink-200 uppercase block">
+          <span className="text-xs font-extrabold tracking-[0.25em] text-pink-100 uppercase block drop-shadow-sm">
             RESERVA DIRECTA Y GARANTIZADA
           </span>
 
-          <h2 className="text-3xl sm:text-5xl font-black font-serif leading-tight">
+          <h2 className="text-3xl sm:text-5xl font-black font-serif leading-tight !text-white drop-shadow-md">
             Comience su Escapada Inolvidable
           </h2>
 
-          <p className="text-sm sm:text-base text-white font-medium max-w-2xl mx-auto leading-relaxed drop-shadow-sm">
+          <p className="text-sm sm:text-base !text-white font-medium max-w-2xl mx-auto leading-relaxed drop-shadow-sm">
             Consulte disponibilidad en tiempo real directamente con el equipo de recepción de {config.name} y asegure su mejor tarifa sin comisiones.
           </p>
 
@@ -774,7 +774,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               href={generalWaUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-4 rounded-2xl font-extrabold text-sm text-[#FF0096] bg-white hover:bg-slate-100 transition-all shadow-xl active:scale-95 flex items-center gap-2"
+              className="px-8 py-4 rounded-2xl font-extrabold text-sm text-[#FF0096] bg-white hover:bg-slate-100 transition-all shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer"
             >
               <MessageCircle className="w-5 h-5 fill-current" />
               <span>Contactar recepción por WhatsApp</span>
