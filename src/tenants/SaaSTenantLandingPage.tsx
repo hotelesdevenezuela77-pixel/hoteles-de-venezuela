@@ -721,20 +721,19 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         </div>
       </section>
 
-      <section id="contacto" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div 
-          className="relative overflow-hidden rounded-3xl p-8 sm:p-14 text-center text-white shadow-2xl shadow-pink-500/20 space-y-6"
-          style={{ background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 50%, #4F46E5 100%)" }}
-        >
-          <span className="text-xs font-extrabold tracking-[0.25em] text-pink-100 uppercase block drop-shadow-sm">
+      {/* ── SECCIÓN DE CIERRE (BOTTOM CTA BANNER FULL-WIDTH CONTINUO) ── */}
+      <section id="contacto" className="w-full m-0 bg-gradient-to-r from-[#D9008F] via-[#8B00D9] to-[#00D2FF] py-16 sm:py-20 px-4 sm:px-6 shadow-2xl">
+        <div className="max-w-4xl mx-auto text-center text-white space-y-6">
+          
+          <span className="text-xs sm:text-sm font-extrabold tracking-[0.25em] text-pink-100 uppercase block drop-shadow">
             RESERVA DIRECTA Y GARANTIZADA
           </span>
 
-          <h2 className="text-3xl sm:text-5xl font-black font-serif leading-tight !text-white drop-shadow-md">
+          <h2 className="text-3xl sm:text-5xl md:text-6xl font-black font-serif leading-tight !text-white drop-shadow-md">
             Comience su Escapada Inolvidable
           </h2>
 
-          <p className="text-sm sm:text-base !text-white font-medium max-w-2xl mx-auto leading-relaxed drop-shadow-sm">
+          <p className="text-sm sm:text-base !text-white font-medium max-w-2xl mx-auto leading-relaxed drop-shadow">
             Consulte disponibilidad en tiempo real directamente con el equipo de recepción de {config.name} y asegure su mejor tarifa sin comisiones.
           </p>
 
@@ -743,9 +742,9 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               href={generalWaUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-4 rounded-2xl font-extrabold text-sm text-[#FF0096] bg-white hover:bg-slate-100 transition-all shadow-xl active:scale-95 flex items-center gap-2.5 cursor-pointer"
+              className="px-8 py-4 rounded-full font-extrabold text-sm text-[#8B00D9] bg-white hover:bg-slate-100 transition-all shadow-2xl hover:scale-105 active:scale-95 flex items-center gap-3 cursor-pointer"
             >
-              <MessageCircle className="w-5 h-5 fill-current" />
+              <MessageCircle className="w-5 h-5 fill-[#25D366] text-[#25D366]" />
               <span>Contactar recepción por WhatsApp</span>
             </a>
           </div>
