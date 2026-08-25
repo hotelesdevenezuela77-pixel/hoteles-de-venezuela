@@ -66,17 +66,17 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
 
         {/* Badge Categoria (Superior Izquierda) */}
         <div className="absolute top-4 left-4">
-          <span className="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-900/85 backdrop-blur border border-white/10 text-white shadow-lg">
+          <span className="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-[#FF0096] text-white shadow-md">
             {category}
           </span>
         </div>
 
         {/* Badge Precio por Noche en USD (Superior Derecha) */}
         <div className="absolute top-4 right-4">
-          <div className="px-3.5 py-1.5 rounded-full bg-[#00C8D4]/90 text-white backdrop-blur-md font-extrabold text-xs shadow-lg flex items-center gap-1">
-            <span className="text-[10px] opacity-80 uppercase">Desde</span>
+          <div className="px-3.5 py-1.5 rounded-full bg-[#00C8D4] text-white font-extrabold text-xs shadow-md flex items-center gap-1">
+            <span className="text-[10px] opacity-85 uppercase">Desde</span>
             <span className="text-sm font-black">${displayPrice}</span>
-            <span className="text-[10px] opacity-80">/noche</span>
+            <span className="text-[10px] opacity-85">/noche</span>
           </div>
         </div>
 
@@ -122,32 +122,32 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
               </span>
             ))}
             {amenitiesList.length > 4 && (
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-[#9B00CC]/10 text-[#9B00CC] border border-[#9B00CC]/20">
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-[#FF0096]/10 text-[#FF0096] border border-[#FF0096]/20">
                 +{amenitiesList.length - 4} más
               </span>
             )}
           </div>
         </div>
 
-        {/* BOTONES DE ACCIÓN (DUAL CTA) */}
+        {/* BOTONES DE ACCIÓN (DUAL CTA EN COLORES SÓLIDOS OFICIALES) */}
         <div className="pt-4 border-t border-slate-100 grid grid-cols-2 gap-2.5">
           
-          {/* Botón 1: WhatsApp Directo */}
+          {/* Botón 1: WhatsApp Directo (Verde Sólido WhatsApp #25D366) */}
           <a
             href={waUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-extrabold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 transition-all shadow-md active:scale-95 text-center"
+            className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-2xl text-xs font-extrabold text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-md active:scale-95 text-center cursor-pointer"
             title="Consultar por WhatsApp"
           >
             <MessageCircle className="w-4 h-4 fill-current shrink-0" />
             <span className="truncate">WhatsApp</span>
           </a>
 
-          {/* Botón 2: Ver Ficha / Reservar */}
+          {/* Botón 2: Ver Ficha / Reservar (Azul Turquesa Sólido #00C8D4) */}
           <button
             onClick={() => onOpenDetail(room)}
-            className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-extrabold text-white bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] hover:from-[#00C8D4]/90 hover:to-[#9B00CC]/90 transition-all shadow-md active:scale-95 text-center cursor-pointer"
+            className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-2xl text-xs font-extrabold text-white bg-[#00C8D4] hover:bg-[#00b3be] transition-all shadow-md active:scale-95 text-center cursor-pointer"
           >
             <Eye className="w-4 h-4 shrink-0" />
             <span className="truncate">Ver Ficha</span>

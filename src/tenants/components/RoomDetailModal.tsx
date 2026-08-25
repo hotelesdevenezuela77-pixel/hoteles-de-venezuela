@@ -222,13 +222,13 @@ export function RoomDetailModal({ room, hotelName, whatsappPhone, onClose }: Roo
               </div>
             </div>
 
-            {/* BOTÓN WHATSAPP PRE-FILLED */}
+            {/* BOTÓN WHATSAPP PRE-FILLED EN VERDE SÓLIDO */}
             <div>
               <a
                 href={waUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl font-extrabold text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 transition-all shadow-lg shadow-emerald-500/20 active:scale-95 text-center text-xs sm:text-sm"
+                className="w-full flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl font-extrabold text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-xl active:scale-95 text-center text-xs sm:text-sm cursor-pointer"
               >
                 <MessageCircle className="w-5 h-5 fill-current shrink-0" />
                 <span>Reservar esta Habitación por WhatsApp</span>

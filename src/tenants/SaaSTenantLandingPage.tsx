@@ -284,7 +284,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             href={generalWaUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-black text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 transition-all shadow-lg active:scale-95 shrink-0"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-black text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-md active:scale-95 shrink-0 cursor-pointer"
           >
             <MessageCircle className="w-4 h-4 fill-current" />
             <span className="hidden sm:inline">WhatsApp Directo</span>
@@ -317,7 +317,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           </h1>
 
           <div className="flex flex-col items-center justify-center gap-3">
-            <div className="inline-flex items-center gap-2.5 p-[2px] rounded-2xl bg-gradient-to-r from-[#FF0096] via-amber-400 to-[#00C8D4] shadow-2xl animate-pulse hover:scale-105 transition-all">
+            <div className="inline-flex items-center gap-2.5 p-[2px] rounded-2xl bg-[#FF0096] shadow-2xl animate-pulse hover:scale-105 transition-all">
               <div className="px-5 py-2 rounded-[14px] bg-slate-900/90 backdrop-blur flex items-center gap-2.5">
                 <span className="relative flex h-3 w-3 shrink-0">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
@@ -357,7 +357,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             
             <a
               href="#habitaciones"
-              className="px-8 py-4 rounded-2xl font-extrabold text-sm text-white bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] hover:from-[#00C8D4]/90 hover:to-[#9B00CC]/90 transition-all shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer"
+              className="px-8 py-4 rounded-2xl font-extrabold text-sm text-white bg-[#00C8D4] hover:bg-[#00b0bc] transition-all shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer"
             >
               <span>Ver Habitaciones & Tarifas</span>
               <ArrowRight className="w-4 h-4" />
@@ -367,7 +367,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               href={generalWaUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-4 rounded-2xl font-extrabold text-sm text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 transition-all shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer"
+              className="px-8 py-4 rounded-2xl font-extrabold text-sm text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer"
             >
               <MessageCircle className="w-4 h-4 fill-current" />
               <span>Reservar Directo por WhatsApp</span>
@@ -716,7 +716,8 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         </div>
       </section>
 
-      <section id="contacto" className="w-full m-0 bg-gradient-to-r from-[#D9008F] via-[#8B00D9] to-[#00D2FF] py-16 sm:py-20 px-4 sm:px-6 shadow-2xl">
+      {/* ── SECCIÓN DE CIERRE (BOTTOM CTA BANNER ANCHO COMPLETO EN COLORES SÓLIDOS OFICIALES) ── */}
+      <section id="contacto" className="w-full m-0 bg-[#FF0096] py-16 sm:py-20 px-4 sm:px-6 shadow-2xl">
         <div className="max-w-4xl mx-auto text-center text-white space-y-6">
           
           <span className="text-xs sm:text-sm font-extrabold tracking-[0.25em] text-pink-100 uppercase block drop-shadow">
@@ -736,7 +737,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               href={generalWaUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-4 rounded-full font-extrabold text-sm text-[#8B00D9] bg-white hover:bg-slate-100 transition-all shadow-2xl hover:scale-105 active:scale-95 flex items-center gap-3 cursor-pointer"
+              className="px-8 py-4 rounded-full font-extrabold text-sm text-[#FF0096] bg-white hover:bg-slate-100 transition-all shadow-2xl hover:scale-105 active:scale-95 flex items-center gap-3 cursor-pointer"
             >
               <MessageCircle className="w-5 h-5 fill-[#25D366] text-[#25D366]" />
               <span>Contactar recepción por WhatsApp</span>
