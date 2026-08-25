@@ -102,10 +102,15 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
       } catch (e) {}
 
       setAreaPhotos({
-        piscina: ["https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=800&auto=format&fit=crop"],
-        restaurante: ["https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop"],
-        lobby: ["https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop"],
-        fachada: ["https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&auto=format&fit=crop"],
+        piscina: [
+          "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=1200&auto=format&fit=crop",
+          "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=1200&auto=format&fit=crop",
+          "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=1200&auto=format&fit=crop",
+          "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&auto=format&fit=crop"
+        ],
+        restaurante: ["https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&auto=format&fit=crop"],
+        lobby: ["https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&auto=format&fit=crop"],
+        fachada: ["https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1200&auto=format&fit=crop"],
       });
     }
 
@@ -172,7 +177,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
 
         let fetched = Array.from(combinedMap.values());
 
-        // Unidades por defecto correspondientes exactamente al panel de control del propietario
+        // Unidades por defecto correspondientes exactamente a las fotos asignadas en el panel del propietario
         if (fetched.length === 0) {
           fetched = [
             {
@@ -185,7 +190,8 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               beds_count: 2,
               bed_type: "King Size",
               amenities: ["wifi", "aire", "balcon", "vista_mar", "cocina_equipada", "tv_cable"],
-              primary_image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&auto=format&fit=crop"
+              primary_image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&auto=format&fit=crop",
+              photos: ["https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&auto=format&fit=crop"]
             },
             {
               id: "r102",
@@ -197,7 +203,8 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               beds_count: 1,
               bed_type: "Matrimonial",
               amenities: ["wifi", "aire", "banio_privado", "nevera", "caja_fuerte"],
-              primary_image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800&auto=format&fit=crop"
+              primary_image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=1200&auto=format&fit=crop",
+              photos: ["https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=1200&auto=format&fit=crop"]
             },
             {
               id: "r103",
@@ -209,7 +216,8 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               beds_count: 3,
               bed_type: "Queen + 2 Individuales",
               amenities: ["wifi", "aire", "balcon", "cocina_equipada", "tv_cable"],
-              primary_image: "https://images.unsplash.com/photo-1591088398332-8a7791972843?w=800&auto=format&fit=crop"
+              primary_image: "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=1200&auto=format&fit=crop",
+              photos: ["https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=1200&auto=format&fit=crop"]
             }
           ];
         }
@@ -217,7 +225,22 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         const customPhotos = JSON.parse(localStorage.getItem("hdv_room_photos") || "{}");
 
         const updatedRooms = fetched.map((room) => {
-          const roomCustom = customPhotos[room.id] || customPhotos[String(room.id)];
+          const keysToTry = [
+            room.id,
+            String(room.id),
+            room.name,
+            String(room.id).replace(/^r/, ""),
+            `r${room.id}`
+          ];
+
+          let roomCustom: string[] | null = null;
+          for (const k of keysToTry) {
+            if (k && customPhotos[k] && customPhotos[k].length > 0) {
+              roomCustom = customPhotos[k];
+              break;
+            }
+          }
+
           if (roomCustom && roomCustom.length > 0) {
             return {
               ...room,
@@ -225,6 +248,15 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               primary_image: roomCustom[0]
             };
           }
+
+          if (room.primary_image || (room.photos && room.photos.length > 0)) {
+            return {
+              ...room,
+              primary_image: room.primary_image || (room.photos && room.photos[0]),
+              photos: room.photos && room.photos.length > 0 ? room.photos : [room.primary_image]
+            };
+          }
+
           return room;
         });
 
