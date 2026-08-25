@@ -237,7 +237,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
 
         let fetched = Array.from(combinedMap.values());
 
-        // Garantizar inventario si la DB aún no ha sido poblada
+        // Garantizar inventario con las fotos de las 3 unidades de Aparto Posada del Mar si la DB aún no ha sido poblada
         if (fetched.length === 0) {
           fetched = [
             {
@@ -250,7 +250,11 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               capacity: 4,
               beds_count: 2,
               bed_type: "King Size",
-              amenities: ["wifi", "aire", "balcon", "vista_mar", "cocina_equipada", "tv_cable"]
+              amenities: ["wifi", "aire", "balcon", "vista_mar", "cocina_equipada", "tv_cable"],
+              primary_image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80",
+              cover_image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80",
+              photos: ["https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80"],
+              fotos: ["https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80"]
             },
             {
               id: "102",
@@ -262,7 +266,11 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               capacity: 2,
               beds_count: 1,
               bed_type: "Matrimonial",
-              amenities: ["wifi", "aire", "banio_privado", "nevera", "caja_fuerte"]
+              amenities: ["wifi", "aire", "banio_privado", "nevera", "caja_fuerte"],
+              primary_image: "https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1200&q=80",
+              cover_image: "https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1200&q=80",
+              photos: ["https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1200&q=80"],
+              fotos: ["https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1200&q=80"]
             },
             {
               id: "103",
@@ -274,7 +282,11 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               capacity: 6,
               beds_count: 3,
               bed_type: "Queen + 2 Individuales",
-              amenities: ["wifi", "aire", "balcon", "cocina_equipada", "tv_cable"]
+              amenities: ["wifi", "aire", "balcon", "cocina_equipada", "tv_cable"],
+              primary_image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1200&q=80",
+              cover_image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1200&q=80",
+              photos: ["https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1200&q=80"],
+              fotos: ["https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1200&q=80"]
             }
           ];
         }
