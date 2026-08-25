@@ -1133,8 +1133,8 @@ export function OwnerDashboard() {
             quantity: 2,
             description: "Espaciosa suite frente a la costa con balcón privado, cama King, aire acondicionado central y cocina equipada.",
             amenities: "wifi,aire,balcon,vista_mar,cocina_equipada,tv_cable",
-            primary_image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&auto=format&fit=crop",
-            photos: ["https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&auto=format&fit=crop"],
+            primary_image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&auto=format&fit=crop",
+            photos: ["https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&auto=format&fit=crop"],
             is_active: true
           },
           {
@@ -1147,7 +1147,7 @@ export function OwnerDashboard() {
             quantity: 3,
             description: "Diseñada para parejas buscando descanso absoluto con lencería de hilo de algodón, baño privado con ducha panorámica y frigobar.",
             amenities: "wifi,aire,banio_privado,nevera,caja_fuerte",
-            primary_image: "https://images.unsplash.com/photo-1591088398332-8a7791972843?w=800&auto=format&fit=crop",
+            primary_image: "https://images.unsplash.com/photo-1591088398332-8a7791972843?w=1200&auto=format&fit=crop",
             photos: ["https://images.unsplash.com/photo-1591088398332-8a7791972843?w=1200&auto=format&fit=crop"],
             is_active: true
           },
@@ -1161,8 +1161,8 @@ export function OwnerDashboard() {
             quantity: 1,
             description: "Dos niveles con capacidad hasta 6 personas, ideal para grupos y familias con sala de estar, comedor y terraza.",
             amenities: "wifi,aire,balcon,cocina_equipada,tv_cable",
-            primary_image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800&auto=format&fit=crop",
-            photos: ["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&auto=format&fit=crop"],
+            primary_image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&auto=format&fit=crop",
+            photos: ["https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&auto=format&fit=crop"],
             is_active: true
           }
         ];
@@ -1508,6 +1508,10 @@ export function OwnerDashboard() {
           const current = prev[roomId] || [];
           const updated = [...current, base64];
           localStorage.setItem("hdv_room_photos", JSON.stringify({ ...prev, [roomId]: updated }));
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(new Event("hdv_room_photos_updated"));
+            window.dispatchEvent(new Event("hdv_custom_rooms_updated"));
+          }
           return { ...prev, [roomId]: updated };
         });
       };
@@ -1520,6 +1524,10 @@ export function OwnerDashboard() {
       const current = prev[roomId] || [];
       const updated = current.filter((_, i) => i !== index);
       localStorage.setItem("hdv_room_photos", JSON.stringify({ ...prev, [roomId]: updated }));
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("hdv_room_photos_updated"));
+        window.dispatchEvent(new Event("hdv_custom_rooms_updated"));
+      }
       return { ...prev, [roomId]: updated };
     });
   };
