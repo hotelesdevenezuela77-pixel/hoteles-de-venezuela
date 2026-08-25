@@ -36,13 +36,35 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
   
   const category = room.category || "Habitación Premium";
   const capacity = room.capacity || 2;
-  const amenitiesList = room.amenities || room.features || [
-    "Aire Acondicionado",
-    "WiFi de Alta Velocidad",
-    "Baño Privado",
-    "TV por Cable",
-    "Servicio a la Habitación"
-  ];
+  const AMENITY_MAP: Record<string, string> = {
+    "wifi": "WiFi Starlink",
+    "aire": "Aire Acondicionado Split",
+    "balcon": "Balcón Privado",
+    "vista_mar": "Vista Panorámica al Mar",
+    "cocina_equipada": "Cocineta Equipada",
+    "tv_cable": "TV Smart 50''",
+    "banio_privado": "Baño Privado",
+    "nevera": "Frigobar / Nevera",
+    "caja_fuerte": "Caja Fuerte",
+    "jacuzzi": "Jacuzzi Privado",
+    "estacionamiento": "Estacionamiento"
+  };
+
+  const rawAmenities = room.amenities || room.features;
+  let amenitiesList: string[] = [];
+  if (Array.isArray(rawAmenities)) {
+    amenitiesList = rawAmenities.map(a => AMENITY_MAP[a] || a);
+  } else if (typeof rawAmenities === "string") {
+    amenitiesList = (rawAmenities as string).split(",").map(a => a.trim()).map(a => AMENITY_MAP[a] || a.replace(/_/g, " "));
+  } else {
+    amenitiesList = [
+      "Aire Acondicionado Split",
+      "WiFi Starlink",
+      "Baño Privado",
+      "TV Smart",
+      "Servicio a la Habitación"
+    ];
+  }
 
   // Formatear mensaje directo para WhatsApp
   const cleanPhone = whatsappPhone.replace(/[^0-9]/g, "");

@@ -50,16 +50,38 @@ export function RoomDetailModal({ room, hotelName, whatsappPhone, onClose }: Roo
   );
   const waUrl = `https://wa.me/${cleanPhone || "584141234567"}?text=${waMsg}`;
 
-  const amenitiesList = room.amenities || room.features || [
-    "Aire Acondicionado Split 18.000 BTU",
-    "WiFi Fibra Óptica High-Speed",
-    "Baño Privado con Agua Caliente 24/7",
-    "TV por Cable / Smart TV 43''",
-    "Lencería de Algodón 400 Hilos",
-    "Nevera Ejecutiva & Cocineta Equipada",
-    "Caja Fuerte Digital",
-    "Servicio de Limpieza Diario"
-  ];
+  const AMENITY_MAP: Record<string, string> = {
+    "wifi": "WiFi Starlink High-Speed",
+    "aire": "Aire Acondicionado Split 18.000 BTU",
+    "balcon": "Balcón Privado Vista al Mar",
+    "vista_mar": "Vista Panorámica al Mar",
+    "cocina_equipada": "Cocineta Equipada",
+    "tv_cable": "TV por Cable / Smart TV 43''",
+    "banio_privado": "Baño Privado con Agua Caliente",
+    "nevera": "Nevera Ejecutiva",
+    "caja_fuerte": "Caja Fuerte Digital",
+    "jacuzzi": "Jacuzzi Privado",
+    "estacionamiento": "Estacionamiento Privado"
+  };
+
+  const rawAmenities = room.amenities || room.features;
+  let amenitiesList: string[] = [];
+  if (Array.isArray(rawAmenities)) {
+    amenitiesList = rawAmenities.map(a => AMENITY_MAP[a] || a);
+  } else if (typeof rawAmenities === "string") {
+    amenitiesList = (rawAmenities as string).split(",").map(a => a.trim()).map(a => AMENITY_MAP[a] || a.replace(/_/g, " "));
+  } else {
+    amenitiesList = [
+      "Aire Acondicionado Split 18.000 BTU",
+      "WiFi Fibra Óptica High-Speed",
+      "Baño Privado con Agua Caliente 24/7",
+      "TV por Cable / Smart TV 43''",
+      "Lencería de Algodón 400 Hilos",
+      "Nevera Ejecutiva & Cocineta Equipada",
+      "Caja Fuerte Digital",
+      "Servicio de Limpieza Diario"
+    ];
+  }
 
   return (
     <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto bg-slate-950/75 backdrop-blur-md animate-fade-in">

@@ -122,55 +122,99 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
     async function loadRooms() {
       setLoadingRooms(true);
       try {
-        let fetched: Room[] = [];
-        if (config.establishment_id) {
-          const { data } = await supabase
+        let dbRooms: Room[] = [];
+        const estId = config.establishment_id || establishmentDetail?.id;
+
+        if (estId) {
+          const { data, error } = await supabase
             .from("rooms")
             .select("*")
-            .eq("establishment_id", config.establishment_id)
+            .eq("establishment_id", estId)
             .eq("is_active", true);
-          if (data && data.length > 0) fetched = data as Room[];
+          if (!error && data && data.length > 0) dbRooms = data as Room[];
         }
 
-        const customPhotos = JSON.parse(localStorage.getItem("hdv_room_photos") || "{}");
+        // Leer habitaciones locales sincronizadas desde el CMS / Dashboard del propietario (hdv_custom_rooms)
+        const localRoomsKey = "hdv_custom_rooms";
+        let localRooms: any[] = [];
+        try {
+          const rawLocal = localStorage.getItem(localRoomsKey);
+          if (rawLocal) {
+            const parsedLocal = JSON.parse(rawLocal);
+            localRooms = parsedLocal.filter((r: any) => {
+              if (r.is_active === false) return false;
+              if (estId && (Number(r.establishment_id) === Number(estId) || String(r.establishment_id) === String(estId))) return true;
+              if (config.slug && r.establishment_slug === config.slug) return true;
+              return !estId;
+            });
+          }
+        } catch (e) {}
 
+        // Combinar habitaciones de DB y locales evitando duplicados
+        const combinedMap = new Map<string, Room>();
+        [...dbRooms, ...localRooms].forEach((r: any) => {
+          const key = String(r.id || r.name);
+          combinedMap.set(key, {
+            ...r,
+            id: r.id || key,
+            name: r.name,
+            category: r.category || "Habitación Premium",
+            description: r.description,
+            price_per_night: r.price_per_night || r.price || r.base_price || 70,
+            capacity: r.capacity || 2,
+            beds_count: r.beds_count || 1,
+            bed_type: r.bed_type || "Matrimonial",
+            primary_image: r.primary_image || r.image_url || (r.photos && r.photos[0]),
+            photos: r.photos || (r.primary_image ? [r.primary_image] : []),
+            amenities: r.amenities
+          });
+        });
+
+        let fetched = Array.from(combinedMap.values());
+
+        // Unidades por defecto correspondientes exactamente al panel de control del propietario
         if (fetched.length === 0) {
           fetched = [
             {
-              id: "r1",
-              name: "Suite Vista al Mar",
-              category: "Suite Premium",
-              description: "Habitación espaciosa con cama King Size, balcón privado vista panorámica al mar y jacuzzi.",
-              price_per_night: 120,
-              capacity: 2,
-              beds_count: 1,
-              bed_type: "King Size",
-              amenities: ["Aire Acondicionado Split", "WiFi Starlink", "Jacuzzi Privado", "TV Smart 50''", "Desayuno Incluido"]
-            },
-            {
-              id: "r2",
-              name: "Habitación Familiar Deluxe",
-              category: "Familiar",
-              description: "Ideal para familias. Cuenta con 2 camas Queen, cuna disponible y cocineta totalmente equipada.",
-              price_per_night: 95,
-              capacity: 4,
+              id: "r101",
+              name: "Apartamento Suite Vista al Mar",
+              category: "Suite Familiar",
+              description: "Espaciosa suite frente a la costa con balcón privado, cama King, aire acondicionado central y cocina equipada.",
+              price_per_night: 70,
+              capacity: 5,
               beds_count: 2,
-              bed_type: "Queen",
-              amenities: ["Aire Acondicionado Split", "WiFi Starlink", "Cocineta", "TV Smart 43''", "Estacionamiento"]
+              bed_type: "King Size",
+              amenities: ["wifi", "aire", "balcon", "vista_mar", "cocina_equipada", "tv_cable"],
+              primary_image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&auto=format&fit=crop"
             },
             {
-              id: "r3",
-              name: "Habitación Estándar Confort",
-              category: "Estándar",
-              description: "Acogedora habitación doble con acabados modernos, baño privado y vista a los jardines.",
-              price_per_night: 65,
+              id: "r102",
+              name: "Habitación Matrimonial Confort",
+              category: "Matrimonial VIP",
+              description: "Diseñada para parejas buscando descanso absoluto con lencería de hilo de algodón, baño privado con ducha panorámica y frigobar.",
+              price_per_night: 50,
               capacity: 2,
               beds_count: 1,
               bed_type: "Matrimonial",
-              amenities: ["Aire Acondicionado", "WiFi Starlink", "Baño Privado", "TV por Cable"]
+              amenities: ["wifi", "aire", "banio_privado", "nevera", "caja_fuerte"],
+              primary_image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800&auto=format&fit=crop"
+            },
+            {
+              id: "r103",
+              name: "Apartamento Dúplex Familiar",
+              category: "Apartamento Completo",
+              description: "Dos niveles con capacidad hasta 6 personas, ideal para grupos y familias con sala de estar, comedor y terraza.",
+              price_per_night: 120,
+              capacity: 6,
+              beds_count: 3,
+              bed_type: "Queen + 2 Individuales",
+              amenities: ["wifi", "aire", "balcon", "cocina_equipada", "tv_cable"],
+              primary_image: "https://images.unsplash.com/photo-1591088398332-8a7791972843?w=800&auto=format&fit=crop"
             }
           ];
         }
+
+        const customPhotos = JSON.parse(localStorage.getItem("hdv_room_photos") || "{}");
 
         const updatedRooms = fetched.map((room) => {
           const roomCustom = customPhotos[room.id] || customPhotos[String(room.id)];
@@ -194,12 +238,14 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
 
     loadRooms();
     window.addEventListener("storage", loadRooms);
+    window.addEventListener("hdv_custom_rooms_updated", loadRooms);
     window.addEventListener("hdv_room_photos_updated", loadRooms);
     return () => {
       window.removeEventListener("storage", loadRooms);
+      window.removeEventListener("hdv_custom_rooms_updated", loadRooms);
       window.removeEventListener("hdv_room_photos_updated", loadRooms);
     };
-  }, [config]);
+  }, [config, establishmentDetail]);
 
   const bannerImage = config.branding?.banner_url || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1600&auto=format&fit=crop";
   const phone = establishmentDetail?.phone || config.contact?.phone || "+58 412 000 0000";
