@@ -43,7 +43,7 @@ interface RoomCardProps {
 
 // Función para construir la URL pública real de Supabase Storage
 export function getPublicImageUrl(photo: any): string {
-  if (!photo) return "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&auto=format&fit=crop";
+  if (!photo) return "/placeholder-hotel.jpg";
 
   // Si ya viene con http o https completa:
   if (typeof photo === "string") {
@@ -66,7 +66,7 @@ export function getPublicImageUrl(photo: any): string {
     }
   }
 
-  return "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&auto=format&fit=crop";
+  return "/placeholder-hotel.jpg";
 }
 
 export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomCardProps) {
@@ -149,8 +149,9 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
           loading="lazy"
           className="w-full h-56 md:h-64 object-cover scale-[1.03] group-hover:scale-110 transition-transform duration-700"
           onError={(e) => {
-            console.error("Error cargando imagen:", finalImageUrl);
-            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&auto=format&fit=crop";
+            // Si la URL falla (ej. error 404 de Supabase), mostramos una imagen neutra NUNCA una foto de Unsplash
+            e.currentTarget.src = "/placeholder-hotel.jpg";
+            console.error(`Error cargando imagen para: ${room.nombre || room.name || roomTitle}`);
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-black/30"></div>
