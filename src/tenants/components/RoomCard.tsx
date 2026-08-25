@@ -41,34 +41,32 @@ interface RoomCardProps {
   onOpenDetail: (room: Room) => void;
 }
 
-export function resolveRoomImageUrl(room: any): string {
-  if (!room) return "";
+// Función para construir la URL pública real de Supabase Storage
+export function getPublicImageUrl(photo: any): string {
+  if (!photo) return "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&auto=format&fit=crop";
 
-  const candidate =
-    (Array.isArray(room.fotos) && room.fotos.length > 0 ? room.fotos[0] : null) ||
-    (Array.isArray(room.galeria) && room.galeria.length > 0 ? room.galeria[0] : null) ||
-    (Array.isArray(room.galeria_fotos) && room.galeria_fotos.length > 0 ? room.galeria_fotos[0] : null) ||
-    (Array.isArray(room.photos) && room.photos.length > 0 ? room.photos[0] : null) ||
-    room.foto_principal ||
-    room.imagen_portada ||
-    room.cover_image ||
-    room.cover_url ||
-    room.primary_image ||
-    room.image_url ||
-    room.imagen ||
-    room.foto;
-
-  if (!candidate) return "";
-
-  if (typeof candidate === "string") {
-    if (candidate.startsWith("http://") || candidate.startsWith("https://") || candidate.startsWith("data:")) {
-      return candidate;
+  // Si ya viene con http o https completa:
+  if (typeof photo === "string") {
+    const trimmed = photo.trim();
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("data:")) {
+      return trimmed;
     }
-    const cleanPath = candidate.replace(/^\/+/, "");
-    return `https://supabase.co/storage/v1/object/public/${cleanPath}`;
+    // Si solo viene el path o nombre de archivo guardado en el bucket de Supabase:
+    const cleanPath = trimmed.replace(/^\/+/, "");
+    const SUPABASE_PROJECT_URL = import.meta.env?.VITE_SUPABASE_URL || "https://ghgetcznlrilgocwigmj.supabase.co";
+    const bucketPrefix = cleanPath.includes("/") ? "" : "habitaciones/";
+    return `${SUPABASE_PROJECT_URL}/storage/v1/object/public/${bucketPrefix}${cleanPath}`;
   }
 
-  return "";
+  // Si viene como objeto { url: "..." } o { publicUrl: "..." } o { path: "..." }:
+  if (typeof photo === "object" && photo !== null) {
+    const urlCandidate = photo.url || photo.publicUrl || photo.src || photo.path;
+    if (urlCandidate) {
+      return getPublicImageUrl(urlCandidate);
+    }
+  }
+
+  return "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&auto=format&fit=crop";
 }
 
 export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomCardProps) {
@@ -80,8 +78,20 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
   // Price Mapping: room.tarifa_base || room.price_usd || room.price_per_night || room.price || room.base_price
   const displayPrice = room.tarifa_base || room.price_usd || room.price_per_night || room.price || room.base_price || 70;
 
-  // Lógica dinámica para la foto real de la habitación (arrays y nombres comunes de columnas)
-  const image = resolveRoomImageUrl(room);
+  // Lógica dinámica para resolver la foto real de la habitación
+  const rawPhoto =
+    (Array.isArray(room.fotos) && room.fotos.length > 0 ? room.fotos[0] : null) ||
+    (Array.isArray((room as any).galeria) && (room as any).galeria.length > 0 ? (room as any).galeria[0] : null) ||
+    (Array.isArray(room.photos) && room.photos.length > 0 ? room.photos[0] : null) ||
+    (room as any).foto_principal ||
+    (room as any).imagen_portada ||
+    room.cover_image ||
+    room.primary_image ||
+    room.image_url ||
+    (room as any).imagen ||
+    (room as any).foto;
+
+  const finalImageUrl = getPublicImageUrl(rawPhoto);
 
   // Category Badge Mapping: room.categoria || room.tipo_unidad || room.category
   const category = room.categoria || room.tipo_unidad || room.category || "Habitación Premium";
@@ -134,23 +144,14 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
       <div className="relative h-64 overflow-hidden shrink-0 bg-slate-100">
         {/* Lógica dinámica para la foto real de la habitación */}
         <img
-          src={
-            (Array.isArray(room.fotos) && room.fotos.length > 0 ? room.fotos[0] : null) ||
-            (Array.isArray((room as any).galeria) && (room as any).galeria.length > 0 ? (room as any).galeria[0] : null) ||
-            (Array.isArray(room.photos) && room.photos.length > 0 ? room.photos[0] : null) ||
-            (room as any).foto_principal ||
-            (room as any).imagen_portada ||
-            room.cover_image ||
-            room.primary_image ||
-            room.image_url ||
-            (room as any).imagen ||
-            (room as any).foto ||
-            image ||
-            "/placeholder.jpg"
-          }
-          alt={room.nombre || room.name || "Habitación"}
+          src={finalImageUrl}
+          alt={roomTitle}
           loading="lazy"
           className="w-full h-56 md:h-64 object-cover scale-[1.03] group-hover:scale-110 transition-transform duration-700"
+          onError={(e) => {
+            console.error("Error cargando imagen:", finalImageUrl);
+            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&auto=format&fit=crop";
+          }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-black/30"></div>
 
