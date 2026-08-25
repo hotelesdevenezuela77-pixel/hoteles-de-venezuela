@@ -52,20 +52,20 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
   const waUrl = `https://wa.me/${cleanPhone || "584141234567"}?text=${waText}`;
 
   return (
-    <div className="group relative bg-[#1a0533] border border-[#9B00CC]/20 hover:border-[#00C8D4]/60 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-[#00C8D4]/10 transition-all duration-500 flex flex-col h-full">
+    <div className="group relative bg-white border border-slate-200/80 hover:border-[#00C8D4] rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:shadow-cyan-500/10 transition-all duration-500 flex flex-col h-full">
       
       {/* IMAGEN DE CABECERA CON BADGES */}
-      <div className="relative h-64 overflow-hidden shrink-0">
+      <div className="relative h-64 overflow-hidden shrink-0 bg-slate-100">
         <img
           src={image}
           alt={room.name}
           className="w-full h-full object-cover scale-[1.03] group-hover:scale-110 transition-transform duration-700"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1a0533] via-transparent to-black/40"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-black/30"></div>
 
         {/* Badge Categoria (Superior Izquierda) */}
         <div className="absolute top-4 left-4">
-          <span className="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-[#0e011f]/80 backdrop-blur border border-white/10 text-white shadow-lg">
+          <span className="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-900/85 backdrop-blur border border-white/10 text-white shadow-lg">
             {category}
           </span>
         </div>
@@ -81,12 +81,12 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
 
         {/* Badge de Capacidad & Estrellas (Inferior) */}
         <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-xs text-slate-200">
-          <div className="flex items-center gap-2 bg-[#0e011f]/90 backdrop-blur px-3 py-1 rounded-full border border-white/10">
+          <div className="flex items-center gap-2 bg-slate-900/90 backdrop-blur px-3 py-1 rounded-full border border-white/10 text-white">
             <Users className="w-3.5 h-3.5 text-[#00C8D4]" />
             <span className="font-semibold text-[11px]">{capacity} Huéspedes</span>
           </div>
 
-          <div className="flex items-center gap-1 bg-[#0e011f]/90 backdrop-blur px-2.5 py-1 rounded-full border border-white/10 text-amber-400 font-bold text-[11px]">
+          <div className="flex items-center gap-1 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded-full border border-white/10 text-amber-400 font-bold text-[11px]">
             <Star className="w-3.5 h-3.5 fill-current" />
             <span>4.9</span>
           </div>
@@ -94,17 +94,17 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
       </div>
 
       {/* CUERPO DE LA TARJETA */}
-      <div className="p-6 flex flex-col justify-between flex-1 space-y-4">
+      <div className="p-6 flex flex-col justify-between flex-1 space-y-4 bg-white">
         
         <div>
           {/* Título de la Habitación en Serif */}
-          <h3 className="text-xl md:text-2xl font-black font-serif text-white group-hover:text-[#00C8D4] transition-colors leading-snug">
+          <h3 className="text-xl md:text-2xl font-black font-serif text-slate-900 group-hover:text-[#00C8D4] transition-colors leading-snug">
             {room.name}
           </h3>
 
           {/* Descripción Corta */}
           {room.description && (
-            <p className="text-slate-300 text-xs font-light leading-relaxed mt-2 line-clamp-2">
+            <p className="text-slate-600 text-xs font-medium leading-relaxed mt-2 line-clamp-2">
               {room.description}
             </p>
           )}
@@ -114,14 +114,14 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
             {amenitiesList.slice(0, 4).map((amenity, idx) => (
               <span
                 key={idx}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-[#0e011f] border border-[#9B00CC]/20 text-slate-200"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-slate-100 border border-slate-200/80 text-slate-700"
               >
                 <CheckCircle2 className="w-3 h-3 text-[#FF0096]" />
                 {amenity}
               </span>
             ))}
             {amenitiesList.length > 4 && (
-              <span className="inline-flex items-center px-2 py-1 rounded-lg text-[10px] font-bold bg-[#9B00CC]/20 text-[#00C8D4]">
+              <span className="inline-flex items-center px-2 py-1 rounded-lg text-[10px] font-bold bg-[#9B00CC]/10 text-[#9B00CC] border border-[#9B00CC]/20">
                 +{amenitiesList.length - 4} más
               </span>
             )}
@@ -129,7 +129,7 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
         </div>
 
         {/* BOTONES DE ACCIÓN (DUAL CTA) */}
-        <div className="pt-4 border-t border-white/10 grid grid-cols-2 gap-2.5">
+        <div className="pt-4 border-t border-slate-100 grid grid-cols-2 gap-2.5">
           
           {/* Botón 1: WhatsApp Directo */}
           <a

@@ -393,17 +393,17 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
   };
 
   return (
-    <div className="bg-[#121620] border border-white/5 rounded-3xl p-6 shadow-xl space-y-6">
+    <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 text-slate-800">
       
       {/* Header del Módulo */}
-      <div className="flex items-center justify-between border-b border-white/5 pb-4">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-pink-500/15 flex items-center justify-center">
-            <FileText className="w-5 h-5 text-pink-400" />
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#FF0096] to-[#9B00CC] flex items-center justify-center text-white shadow-md">
+            <FileText className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h3 className="text-base font-bold font-serif text-white tracking-wide">CMS - Administrador de Contenidos</h3>
-            <p className="text-[10px] uppercase font-bold text-gray-500 tracking-widest mt-0.5">Controla las imágenes y textos de tu web</p>
+            <h3 className="text-base font-bold font-serif text-slate-900 tracking-wide">CMS - Administrador de Contenidos Web</h3>
+            <p className="text-[10px] uppercase font-bold text-slate-400 tracking-widest mt-0.5">Controla la imagen visual, fotos e información pública de tu hospedaje</p>
           </div>
         </div>
         
@@ -412,22 +412,22 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
             href={`/establecimiento/${config.slug}`} 
             target="_blank" 
             rel="noreferrer" 
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/10 hover:border-white/20 text-slate-300 text-xs font-semibold cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
           >
             <Eye className="w-4 h-4 text-[#00C8D4]" />
-            <span>Ver Web</span>
+            <span>Ver Web en Vivo</span>
           </a>
         </div>
       </div>
 
       {feedback && (
-        <div className={`border rounded-xl px-4 py-3 text-xs flex items-center gap-2 ${
+        <div className={`border rounded-2xl px-4 py-3 text-xs flex items-center gap-2 ${
           feedback.type === "success" 
-            ? "bg-emerald-500/10 border-emerald-500/35 text-emerald-400" 
-            : "bg-red-500/10 border-red-500/35 text-red-400"
+            ? "bg-emerald-50 border-emerald-200 text-emerald-800" 
+            : "bg-red-50 border-red-200 text-red-800"
         }`}>
-          {feedback.type === "success" ? <CheckCircle className="w-5 h-5 shrink-0" /> : <ShieldAlert className="w-5 h-5 shrink-0" />}
-          <span>{feedback.text}</span>
+          {feedback.type === "success" ? <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" /> : <ShieldAlert className="w-5 h-5 text-red-600 shrink-0" />}
+          <span className="font-semibold">{feedback.text}</span>
         </div>
       )}
 
@@ -435,28 +435,28 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
         
         {/* Sección: Textos y Datos */}
         <div className="space-y-4">
-          <h4 className="text-[10px] uppercase font-extrabold tracking-wider text-slate-400 flex items-center gap-1.5 border-b border-white/5 pb-1">
-            <Sparkles className="w-3.5 h-3.5 text-[#00C8D4]" /> Textos de Presentación
+          <h4 className="text-[10px] uppercase font-extrabold tracking-wider text-[#FF0096] flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-[#00C8D4]" /> Textos de Presentación & Dominio
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-[9px] uppercase font-bold text-gray-500 tracking-wider mb-1.5">Nombre Comercial de la Posada</label>
+              <label className="block text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1.5">Nombre Comercial de la Posada</label>
               <input
                 type="text"
                 required
                 value={name}
                 onChange={e => setName(e.target.value)}
-                className="w-full bg-slate-950/40 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#00C8D4]"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#00C8D4] focus:bg-white"
               />
             </div>
             <div>
-              <label className="block text-[9px] uppercase font-bold text-gray-500 tracking-wider mb-1.5">Dominio Asignado</label>
+              <label className="block text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1.5">Dominio Asignado</label>
               <input
                 type="text"
                 required
                 value={domain}
                 onChange={e => setDomain(e.target.value)}
-                className="w-full bg-slate-950/40 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#00C8D4]"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#00C8D4] focus:bg-white"
               />
             </div>
           </div>
@@ -464,19 +464,19 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
 
         {/* Sección: Logo Oficial del Establecimiento */}
         <div className="space-y-4">
-          <h4 className="text-[10px] uppercase font-extrabold tracking-wider text-slate-400 flex items-center gap-1.5 border-b border-white/5 pb-1">
+          <h4 className="text-[10px] uppercase font-extrabold tracking-wider text-[#FF0096] flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
             <Sparkles className="w-3.5 h-3.5 text-[#00C8D4]" /> Logo Oficial del Establecimiento (Reflejado en Menú Superior)
           </h4>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
             {/* Vista previa del Logo */}
-            <div className="relative rounded-2xl overflow-hidden h-24 border border-white/10 bg-slate-950/60 p-3 flex items-center justify-center">
+            <div className="relative rounded-2xl overflow-hidden h-28 border border-slate-200 bg-slate-50 p-4 flex items-center justify-center shadow-inner">
               {logoUrl ? (
                 <img src={logoUrl} alt="Logo del establecimiento" className="max-h-full max-w-full object-contain" />
               ) : (
                 <div className="text-center">
-                  <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider block">Sin Logo Configurado</span>
-                  <span className="text-[9px] text-gray-600">Se usará el distintivo con iniciales por defecto</span>
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Sin Logo Configurado</span>
+                  <span className="text-[9px] text-slate-400">Se usará el distintivo con iniciales por defecto</span>
                 </div>
               )}
             </div>
@@ -484,24 +484,24 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
             {/* Subir archivo de Logo */}
             <div className="space-y-3">
               <div>
-                <label className="block text-[9px] uppercase font-bold text-gray-500 tracking-wider mb-1">Subir Logo desde tus archivos</label>
+                <label className="block text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">Subir Logo desde tus archivos</label>
                 <input 
                   type="file" 
                   accept="image/*" 
                   onChange={e => handleImageUpload(e, "logo")} 
-                  className="block w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#00C8D4]/15 file:text-[#00C8D4] hover:file:bg-[#00C8D4]/25 cursor-pointer" 
+                  className="block w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#00C8D4]/15 file:text-[#00C8D4] hover:file:bg-[#00C8D4]/25 cursor-pointer" 
                   disabled={isUploading} 
                 />
               </div>
 
               <div>
-                <label className="block text-[9px] uppercase font-bold text-gray-500 tracking-wider mb-1">O escribe URL Directa del Logo</label>
+                <label className="block text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">O escribe URL Directa del Logo</label>
                 <input
                   type="url"
                   value={logoUrl.startsWith("data:") ? "" : logoUrl}
                   onChange={e => setLogoUrl(e.target.value)}
                   placeholder="https://midominio.com/logo.png"
-                  className="w-full bg-slate-950/40 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-[#00C8D4]"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#00C8D4] focus:bg-white"
                 />
               </div>
             </div>
@@ -510,34 +510,34 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
 
         {/* Sección: Carga de Imagen de Banner */}
         <div className="space-y-4">
-          <h4 className="text-[10px] uppercase font-extrabold tracking-wider text-slate-400 flex items-center gap-1.5 border-b border-white/5 pb-1">
+          <h4 className="text-[10px] uppercase font-extrabold tracking-wider text-[#FF0096] flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
             <Image className="w-3.5 h-3.5 text-[#FF0096]" /> Imagen de Banner Principal (Full-Bleed)
           </h4>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
             {/* Vista previa de imagen */}
-            <div className="relative rounded-2xl overflow-hidden aspect-video border border-white/10 bg-slate-950/40 flex items-center justify-center">
+            <div className="relative rounded-2xl overflow-hidden aspect-video border border-slate-200 bg-slate-100 flex items-center justify-center shadow-xs">
               {bannerUrl ? (
                 <img src={bannerUrl} alt="Vista previa del banner" className="object-cover w-full h-full" />
               ) : (
-                <span className="text-[10px] text-gray-600 font-bold uppercase tracking-wider">Sin imagen configurada</span>
+                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Sin imagen configurada</span>
               )}
             </div>
 
             {/* Subir archivo */}
             <div className="space-y-4">
               <div>
-                <label className="block text-[9px] uppercase font-bold text-gray-500 tracking-wider mb-1.5">Opción A: Subir imagen de tus archivos</label>
+                <label className="block text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1.5">Opción A: Subir imagen de tus archivos</label>
                 <div className="flex items-center justify-center w-full">
-                  <label className="flex flex-col items-center justify-center w-full h-24 border border-dashed border-white/15 hover:border-white/30 rounded-2xl cursor-pointer hover:bg-white/2 transition-colors">
+                  <label className="flex flex-col items-center justify-center w-full h-24 border border-dashed border-slate-300 hover:border-[#00C8D4] rounded-2xl cursor-pointer hover:bg-slate-50 transition-colors">
                     <div className="flex flex-col items-center justify-center pt-4 pb-4">
                       {isUploading ? (
-                        <RefreshCw className="w-5 h-5 text-gray-500 animate-spin mb-1" />
+                        <RefreshCw className="w-5 h-5 text-[#00C8D4] animate-spin mb-1" />
                       ) : (
-                        <Upload className="w-5 h-5 text-gray-500 mb-1" />
+                        <Upload className="w-5 h-5 text-[#00C8D4] mb-1" />
                       )}
-                      <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Cargar Archivo</p>
-                      <p className="text-[9px] text-gray-600">PNG, JPG de alta resolución</p>
+                      <p className="text-[10px] text-slate-700 font-bold uppercase tracking-wider">Cargar Archivo de Banner</p>
+                      <p className="text-[9px] text-slate-400">PNG, JPG de alta resolución</p>
                     </div>
                     <input 
                       type="file" 
@@ -551,13 +551,13 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
               </div>
 
               <div>
-                <label className="block text-[9px] uppercase font-bold text-gray-500 tracking-wider mb-1.5">Opción B: URL Directa de la Imagen</label>
+                <label className="block text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1.5">Opción B: URL Directa de la Imagen</label>
                 <input
                   type="url"
                   value={bannerUrl.startsWith("data:") ? "" : bannerUrl}
                   onChange={e => setBannerUrl(e.target.value)}
                   placeholder="https://images.unsplash.com/..."
-                  className="w-full bg-slate-950/40 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#00C8D4]"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#00C8D4] focus:bg-white"
                 />
               </div>
             </div>
@@ -566,7 +566,7 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
 
         {/* Sección: Fotos de las Diversas Áreas del Establecimiento */}
         <div className="space-y-4">
-          <h4 className="text-[10px] uppercase font-extrabold tracking-wider text-slate-400 flex items-center gap-1.5 border-b border-white/5 pb-1">
+          <h4 className="text-[10px] uppercase font-extrabold tracking-wider text-[#FF0096] flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
             <Image className="w-3.5 h-3.5 text-[#9B00CC]" /> Fotos de las Diversas Áreas e Instalaciones
           </h4>
           
@@ -581,21 +581,21 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
             ].map(area => {
               const list = areaPhotosState[area.key] || [];
               return (
-                <div key={area.key} className="p-4 bg-slate-950/50 border border-white/10 rounded-2xl space-y-3">
+                <div key={area.key} className="p-4 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-3 shadow-xs">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs font-bold text-white">{area.title}</span>
-                    <span className="text-[10px] font-bold text-slate-400">{list.length} fotos</span>
+                    <span className="text-xs font-bold text-slate-900">{area.title}</span>
+                    <span className="text-[10px] font-bold text-slate-500 bg-slate-200 px-2 py-0.5 rounded-full">{list.length} fotos</span>
                   </div>
 
                   {/* Grid de Fotos Existentes */}
                   <div className="grid grid-cols-3 gap-2">
                     {list.map((photoUrl, idx) => (
-                      <div key={idx} className="relative group rounded-xl overflow-hidden h-16 border border-white/10 bg-slate-900">
+                      <div key={idx} className="relative group rounded-xl overflow-hidden h-16 border border-slate-200 bg-slate-200">
                         <img src={photoUrl} alt={area.title} className="w-full h-full object-cover" />
                         <button
                           type="button"
                           onClick={() => handleRemoveAreaPhoto(area.key, idx)}
-                          className="absolute inset-0 bg-red-900/80 text-white font-extrabold text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                          className="absolute inset-0 bg-red-900/85 text-white font-extrabold text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                         >
                           Eliminar
                         </button>
@@ -604,8 +604,8 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
                   </div>
 
                   {/* Opciones para Añadir Foto (Subir Archivo o URL) */}
-                  <div className="space-y-2 pt-1 border-t border-white/5">
-                    <label className="flex items-center justify-center gap-2 w-full py-2 px-3 bg-[#00C8D4]/15 hover:bg-[#00C8D4]/25 border border-[#00C8D4]/30 rounded-xl text-xs font-black text-[#00C8D4] cursor-pointer transition-all">
+                  <div className="space-y-2 pt-1 border-t border-slate-200/60">
+                    <label className="flex items-center justify-center gap-2 w-full py-2 px-3 bg-[#00C8D4]/10 hover:bg-[#00C8D4]/20 border border-[#00C8D4]/30 rounded-xl text-xs font-black text-[#00C8D4] cursor-pointer transition-all">
                       <Upload className="w-3.5 h-3.5" />
                       <span>Subir Foto desde Archivos</span>
                       <input
@@ -623,12 +623,12 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
                         placeholder="O pega URL: https://imagen.jpg"
                         value={newAreaInput[area.key] || ""}
                         onChange={e => setNewAreaInput(prev => ({ ...prev, [area.key]: e.target.value }))}
-                        className="flex-1 bg-slate-900 border border-white/10 rounded-xl px-2.5 py-1 text-[11px] text-white placeholder:text-gray-600 focus:outline-none focus:border-[#00C8D4]"
+                        className="flex-1 bg-white border border-slate-200 rounded-xl px-2.5 py-1 text-[11px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#00C8D4]"
                       />
                       <button
                         type="button"
                         onClick={() => handleAddAreaPhoto(area.key)}
-                        className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold cursor-pointer"
+                        className="px-3 py-1 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold cursor-pointer"
                       >
                         + Añadir
                       </button>
@@ -642,65 +642,64 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
 
         {/* Sección: Contacto */}
         <div className="space-y-4">
-          <h4 className="text-[10px] uppercase font-extrabold tracking-wider text-slate-400 flex items-center gap-1.5 border-b border-white/5 pb-1">
+          <h4 className="text-[10px] uppercase font-extrabold tracking-wider text-[#FF0096] flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
             <Sparkles className="w-3.5 h-3.5 text-[#9B00CC]" /> Información de Contacto del Hotel
           </h4>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-[9px] uppercase font-bold text-gray-500 tracking-wider mb-1.5">Teléfono</label>
+              <label className="block text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1.5">Teléfono</label>
               <input
                 type="text"
                 required
                 value={phone}
                 onChange={e => setPhone(e.target.value)}
-                className="w-full bg-slate-950/40 border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#00C8D4] focus:bg-white"
               />
             </div>
             <div>
-              <label className="block text-[9px] uppercase font-bold text-gray-500 tracking-wider mb-1.5">WhatsApp</label>
+              <label className="block text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1.5">WhatsApp</label>
               <input
                 type="text"
                 required
                 value={whatsapp}
                 onChange={e => setWhatsapp(e.target.value)}
-                className="w-full bg-slate-950/40 border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#00C8D4] focus:bg-white"
               />
             </div>
             <div>
-              <label className="block text-[9px] uppercase font-bold text-gray-500 tracking-wider mb-1.5">Email Público</label>
+              <label className="block text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1.5">Email Público</label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                className="w-full bg-slate-950/40 border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#00C8D4] focus:bg-white"
               />
             </div>
             <div>
-              <label className="block text-[9px] uppercase font-bold text-gray-500 tracking-wider mb-1.5">Instagram</label>
+              <label className="block text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1.5">Instagram</label>
               <input
                 type="text"
                 required
                 value={instagram}
                 onChange={e => setInstagram(e.target.value)}
-                className="w-full bg-slate-950/40 border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#00C8D4] focus:bg-white"
               />
             </div>
           </div>
         </div>
 
         {/* Botón de Guardado */}
-        <div className="flex justify-end pt-4 border-t border-white/5">
+        <div className="flex justify-end pt-4 border-t border-slate-100">
           <button
             type="submit"
             disabled={saving || isUploading}
-            className="flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider text-[#0b0c10] transition-transform duration-200 active:scale-97 cursor-pointer"
-            style={{ backgroundColor: accentColor }}
+            className="flex items-center gap-2 px-8 py-3.5 rounded-xl text-xs font-black uppercase tracking-wider text-white bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:from-[#FF0096]/90 hover:to-[#9B00CC]/90 transition-all shadow-lg shadow-pink-500/20 active:scale-97 cursor-pointer"
           >
             {saving ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Guardando...</span>
+                <span>Guardando Cambios Web...</span>
               </>
             ) : (
               <>
