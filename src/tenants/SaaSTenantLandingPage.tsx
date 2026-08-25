@@ -139,6 +139,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             .select("*")
             .eq("establishment_id", currentEstablishmentId);
 
+          console.log("DATOS REALES DE HABITACIONES:", dataRooms);
           console.log("SUPABASE 'rooms' RESPONSE:", { data: dataRooms, error: errorRooms });
           if (errorRooms) console.error("ERROR SUPABASE 'rooms':", errorRooms);
 
@@ -156,6 +157,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               .from("habitaciones")
               .select("*");
 
+            console.log("DATOS REALES DE HABITACIONES (habitaciones):", dataHab);
             console.log("SUPABASE 'habitaciones' RESPONSE:", { data: dataHab, error: errorHab });
             if (errorHab) console.error("ERROR SUPABASE 'habitaciones':", errorHab);
 
@@ -172,7 +174,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           }
         }
 
-        console.log("HABITACIONES ENCONTRADAS EN DB:", dbRooms);
+        console.log("DATOS REALES DE HABITACIONES (COMBINADOS):", dbRooms);
 
         // Leer habitaciones reales guardadas desde el Módulo de Inventario de Habitaciones (hdv_custom_rooms)
         const localRoomsKey = "hdv_custom_rooms";
