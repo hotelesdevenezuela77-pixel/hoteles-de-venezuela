@@ -52,13 +52,14 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
   const waUrl = `https://wa.me/${cleanPhone || "584141234567"}?text=${waText}`;
 
   return (
-    <div className="group relative bg-white border border-slate-200/80 hover:border-[#00C8D4] rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:shadow-cyan-500/10 transition-all duration-500 flex flex-col h-full">
+    <div className="group relative bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-xl shadow-slate-200/50 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
       
       {/* IMAGEN DE CABECERA CON BADGES */}
       <div className="relative h-64 overflow-hidden shrink-0 bg-slate-100">
         <img
           src={image}
           alt={room.name}
+          loading="lazy"
           className="w-full h-full object-cover scale-[1.03] group-hover:scale-110 transition-transform duration-700"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-black/30"></div>
@@ -70,9 +71,9 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
           </span>
         </div>
 
-        {/* Badge Precio por Noche (Superior Derecha) */}
+        {/* Badge Precio por Noche en USD (Superior Derecha) */}
         <div className="absolute top-4 right-4">
-          <div className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#00C8D4] to-[#0099AA] text-white font-extrabold text-xs shadow-lg flex items-center gap-1">
+          <div className="px-3.5 py-1.5 rounded-full bg-[#00C8D4]/90 text-white backdrop-blur-md font-extrabold text-xs shadow-lg flex items-center gap-1">
             <span className="text-[10px] opacity-80 uppercase">Desde</span>
             <span className="text-sm font-black">${displayPrice}</span>
             <span className="text-[10px] opacity-80">/noche</span>
@@ -109,19 +110,19 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
             </p>
           )}
 
-          {/* Cápsulas de Amenidades */}
+          {/* Cápsulas de Amenidades Soft Pills */}
           <div className="mt-4 flex flex-wrap gap-1.5">
             {amenitiesList.slice(0, 4).map((amenity, idx) => (
               <span
                 key={idx}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-slate-100 border border-slate-200/80 text-slate-700"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 border border-slate-200/60 text-slate-700"
               >
                 <CheckCircle2 className="w-3 h-3 text-[#FF0096]" />
                 {amenity}
               </span>
             ))}
             {amenitiesList.length > 4 && (
-              <span className="inline-flex items-center px-2 py-1 rounded-lg text-[10px] font-bold bg-[#9B00CC]/10 text-[#9B00CC] border border-[#9B00CC]/20">
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-[#9B00CC]/10 text-[#9B00CC] border border-[#9B00CC]/20">
                 +{amenitiesList.length - 4} más
               </span>
             )}

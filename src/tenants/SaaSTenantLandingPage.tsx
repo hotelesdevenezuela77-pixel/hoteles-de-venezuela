@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { 
   MapPin, Phone, Mail, Clock, Star, ShieldCheck, Wifi, Coffee, Compass, 
   Utensils, Car, Sparkles, CheckCircle2, MessageCircle, ExternalLink, Calendar,
-  Bed, Users, Award, ChevronDown, Layers, ArrowRight, Heart
+  Bed, Users, Award, ChevronDown, Layers, ArrowRight, Heart, Navigation, X
 } from "lucide-react";
 import { type TenantConfig } from "./tenantContext";
 import { createTenantClient } from "./lib/supabaseTenant";
@@ -28,35 +28,27 @@ const DESTINATION_MAP_INFO: Record<string, { lat: number; lng: number; state: st
   "mérida": { lat: 8.5983, lng: -71.1449, state: "Mérida", name: "Mérida" },
   "canaima": { lat: 6.2415, lng: -62.8528, state: "Bolívar", name: "Parque Nacional Canaima" },
   "tovar": { lat: 10.4069, lng: -67.2889, state: "Aragua", name: "Colonia Tovar" },
-  "choroni": { lat: 10.5050, lng: -67.6108, state: "Aragua", name: "Choroní" },
-  "mochima": { lat: 10.3542, lng: -64.3542, state: "Sucre", name: "Parque Nacional Mochima" },
-  "puerto-la-cruz": { lat: 10.2167, lng: -64.6333, state: "Anzoátegui", name: "Puerto La Cruz" },
-  "lecheria": { lat: 10.1906, lng: -64.6933, state: "Anzoátegui", name: "Lechería" },
-  "barquisimeto": { lat: 10.0678, lng: -69.3474, state: "Lara", name: "Barquisimeto" },
-  "maracaibo": { lat: 10.6544, lng: -71.6441, state: "Zulia", name: "Maracaibo" },
-  "valencia": { lat: 10.1620, lng: -68.0077, state: "Carabobo", name: "Valencia" },
-  "puerto-cabello": { lat: 10.4731, lng: -68.0125, state: "Carabobo", name: "Puerto Cabello" },
-  "punto-fijo": { lat: 11.6975, lng: -70.1983, state: "Falcón", name: "Punto Fijo / Paraguaná" }
 };
 
 export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
-  const [rooms, setRooms] = useState<Room[]>([]);
-  const [loadingRooms, setLoadingRooms] = useState(true);
-  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
-  const [mapViewMode, setMapViewMode] = useState<"satelite" | "estandar">("satelite");
-  const [activeAreaTab, setActiveAreaTab] = useState<string>("todas");
   const [establishmentDetail, setEstablishmentDetail] = useState<any>(null);
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [activeAreaTab, setActiveAreaTab] = useState<string>("todas");
+  const [mapViewMode, setMapViewMode] = useState<"satelite" | "estandar">("satelite");
+  const [activeLightboxImg, setActiveLightboxImg] = useState<{ url: string; category: string } | null>(null);
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [loadingRooms, setLoadingRooms] = useState<boolean>(true);
+  const [areaPhotos, setAreaPhotos] = useState<Record<string, string[]>>({});
 
-  // Cargar registro detallado del establecimiento (para dirección, teléfonos reales, descripción, coordenadas)
   useEffect(() => {
     async function fetchDetail() {
       try {
-        let dbData: any = null;
+        let dbData = null;
         if (config.establishment_id) {
           const { data } = await supabase
             .from("establishments")
             .select("*, destinations(name, state), categories(name)")
-            .or(`id.eq.${config.establishment_id},slug.eq.${config.slug}`)
+            .eq("id", config.establishment_id)
             .maybeSingle();
           if (data) dbData = data;
         }
@@ -70,692 +62,206 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           if (data) dbData = data;
         }
 
-        if (!dbData) {
-          const localEsts = JSON.parse(localStorage.getItem("hdv_mock_establishments") || "[]");
-          dbData = localEsts.find((e: any) => e.id === config.establishment_id || e.slug === config.slug);
-        }
-
         if (dbData) setEstablishmentDetail(dbData);
       } catch (e) {
-        console.warn("Error cargando detalle del establecimiento para SaaS landing:", e);
+        console.warn("Error cargando detalle del establecimiento:", e);
       }
     }
     fetchDetail();
   }, [config]);
 
-  // Cargar fotos por áreas (Piscina, Restaurante, Lobby, Fachada, Playa, Spa) con sync en vivo
-  const [areaPhotos, setAreaPhotos] = useState<Record<string, string[]>>({});
-
   useEffect(() => {
-    function loadAreaPhotos() {
+    async function loadRooms() {
+      setLoadingRooms(true);
       try {
-        const saved = localStorage.getItem("hdv_area_photos");
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          const matched = parsed[config.establishment_id] || 
-                          parsed[String(config.establishment_id)] || 
-                          (establishmentDetail?.id && parsed[establishmentDetail.id]) ||
-                          (establishmentDetail?.id && parsed[String(establishmentDetail.id)]) ||
-                          parsed[config.slug] || 
-                          (establishmentDetail?.slug && parsed[establishmentDetail.slug]);
-          if (matched && Object.keys(matched).length > 0) {
-            setAreaPhotos(matched);
-            return;
-          }
-
-          // Fallback: Si no coincide por ID directo, buscar cualquier objeto en hdv_area_photos que contenga fotos
-          const anyWithPhotos = Object.values(parsed).find((val: any) => 
-            val && typeof val === "object" && Object.values(val).some((arr: any) => Array.isArray(arr) && arr.length > 0)
-          );
-          if (anyWithPhotos) {
-            setAreaPhotos(anyWithPhotos as Record<string, string[]>);
-            return;
-          }
+        let fetched: Room[] = [];
+        if (config.establishment_id) {
+          const { data } = await supabase
+            .from("rooms")
+            .select("*")
+            .eq("establishment_id", config.establishment_id)
+            .eq("is_active", true);
+          if (data && data.length > 0) fetched = data as Room[];
         }
-      } catch (e) {}
 
-      setAreaPhotos({
-        piscina: ["https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=800&auto=format&fit=crop"],
-        restaurante: ["https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop"],
-        lobby: ["https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop"],
-        fachada: ["https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&auto=format&fit=crop"],
-      });
+        const customPhotos = JSON.parse(localStorage.getItem("hdv_room_photos") || "{}");
+
+        if (fetched.length === 0) {
+          fetched = [
+            {
+              id: "r1",
+              name: "Suite Vista al Mar",
+              category: "Suite Premium",
+              description: "Habitación espaciosa con cama King Size, balcón privado vista panorámica al mar y jacuzzi.",
+              price_per_night: 120,
+              capacity: 2,
+              beds_count: 1,
+              bed_type: "King Size",
+              amenities: ["Aire Acondicionado Split", "WiFi Starlink", "Jacuzzi Privado", "TV Smart 50''", "Desayuno Incluido"]
+            },
+            {
+              id: "r2",
+              name: "Habitación Familiar Deluxe",
+              category: "Familiar",
+              description: "Ideal para familias. Cuenta con 2 camas Queen, cuna disponible y cocineta totalmente equipada.",
+              price_per_night: 95,
+              capacity: 4,
+              beds_count: 2,
+              bed_type: "Queen",
+              amenities: ["Aire Acondicionado Split", "WiFi Starlink", "Cocineta", "TV Smart 43''", "Estacionamiento"]
+            },
+            {
+              id: "r3",
+              name: "Habitación Estándar Confort",
+              category: "Estándar",
+              description: "Acogedora habitación doble con acabados modernos, baño privado y vista a los jardines.",
+              price_per_night: 65,
+              capacity: 2,
+              beds_count: 1,
+              bed_type: "Matrimonial",
+              amenities: ["Aire Acondicionado", "WiFi Starlink", "Baño Privado", "TV por Cable"]
+            }
+          ];
+        }
+
+        const updatedRooms = fetched.map((room) => {
+          const roomCustom = customPhotos[room.id] || customPhotos[String(room.id)];
+          if (roomCustom && roomCustom.length > 0) {
+            return {
+              ...room,
+              photos: roomCustom,
+              primary_image: roomCustom[0]
+            };
+          }
+          return room;
+        });
+
+        setRooms(updatedRooms);
+      } catch (e) {
+        console.warn("Error cargando habitaciones:", e);
+      } finally {
+        setLoadingRooms(false);
+      }
     }
+    loadRooms();
+  }, [config]);
 
-    loadAreaPhotos();
-    window.addEventListener("storage", loadAreaPhotos);
-    window.addEventListener("hdv_area_photos_updated", loadAreaPhotos);
-    return () => {
-      window.removeEventListener("storage", loadAreaPhotos);
-      window.removeEventListener("hdv_area_photos_updated", loadAreaPhotos);
-    };
-  }, [config, establishmentDetail]);
-
-  const primaryColor = config.branding?.primary_color || "#00C8D4";
-  const secondaryColor = config.branding?.secondary_color || "#9B00CC";
-  const accentColor = config.branding?.accent_color || "#FF0096";
-
-  const bannerImage = config.branding?.banner_url || 
-    "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1600&auto=format&fit=crop";
-
+  const bannerImage = config.branding?.banner_url || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1600&auto=format&fit=crop";
   const phone = establishmentDetail?.phone || config.contact?.phone || "+58 412 000 0000";
   const whatsapp = establishmentDetail?.whatsapp || establishmentDetail?.phone || config.contact?.whatsapp || phone;
   const cleanWhatsapp = whatsapp.replace(/[^0-9]/g, "");
+  const generalWaMsg = encodeURIComponent(`Hola ${config.name}, deseo consultar disponibilidad.`);
+  const generalWaUrl = `https://wa.me/${cleanWhatsapp || "584141234567"}?text=${generalWaMsg}`;
 
   const address = establishmentDetail?.address || "Carretera Principal, Sector Tucacas / Morrocoy";
-  const description = establishmentDetail?.description || `En ${config.name} nos esmeramos por ofrecer una atención cálida, personalizada y de primer nivel. Nuestras instalaciones combinan la tranquilidad natural con el confort moderno para que su única preocupación sea descansar.`;
-  const destName = establishmentDetail?.destinations?.name || establishmentDetail?.destination_name || "Tucacas / Morrocoy";
-  const stateName = establishmentDetail?.destinations?.state || establishmentDetail?.state || "Falcón";
+  const description = establishmentDetail?.description || `En ${config.name} nos esmeramos por ofrecer una atención cálida.`;
+  const destName = establishmentDetail?.destinations?.name || "Tucacas / Morrocoy";
+  const stateName = establishmentDetail?.destinations?.state || "Falcón";
 
-  // Resolver Coordenadas GPS del Establecimiento
   const resolveCoordinates = () => {
     if (establishmentDetail?.latitude && establishmentDetail?.longitude) {
-      return {
-        lat: Number(establishmentDetail.latitude),
-        lng: Number(establishmentDetail.longitude),
-        state: stateName,
-        name: destName
-      };
+      return { lat: Number(establishmentDetail.latitude), lng: Number(establishmentDetail.longitude), state: stateName, name: destName };
     }
-
-    const searchKey = `${config.slug} ${config.name} ${destName} ${stateName} ${address}`.toLowerCase();
-    for (const [key, val] of Object.entries(DESTINATION_MAP_INFO)) {
-      if (searchKey.includes(key)) {
-        return val;
-      }
-    }
-
-    if (searchKey.includes("posada") || searchKey.includes("mar") || searchKey.includes("beach")) {
-      return DESTINATION_MAP_INFO["morrocoy"];
-    }
-
-    return { lat: 10.7933, lng: -68.3214, state: stateName || "Falcón", name: destName || "Morrocoy" };
+    return { lat: 10.7933, lng: -68.3214, state: "Falcón", name: "Morrocoy" };
   };
 
   const coords = resolveCoordinates();
   const latStr = coords.lat.toFixed(4);
   const lngStr = Math.abs(coords.lng).toFixed(4);
 
-  // Cargar habitaciones reales desde Supabase + localStorage + Fotos Personalizadas
-  useEffect(() => {
-    async function loadRooms() {
-      setLoadingRooms(true);
-      try {
-        let dbRooms: any[] = [];
-        
-        if (config.establishment_id) {
-          const { data, error } = await supabase
-            .from("rooms")
-            .select("*")
-            .eq("establishment_id", config.establishment_id);
-          if (!error && data) dbRooms = data;
-        }
-
-        const localRoomsKey = "hdv_custom_rooms";
-        const localRooms = JSON.parse(localStorage.getItem(localRoomsKey) || "[]")
-          .filter((r: any) => !dbRooms.some(d => d.id === r.id) && (Number(r.establishment_id) === Number(config.establishment_id) || String(r.establishment_id) === String(config.establishment_id)));
-
-        let combined = [...dbRooms, ...localRooms];
-
-        const customPhotosRaw = localStorage.getItem("hdv_room_photos");
-        let customRoomPhotosMap: Record<string, string[]> = {};
-        if (customPhotosRaw) {
-          try { customRoomPhotosMap = JSON.parse(customPhotosRaw); } catch (e) {}
-        }
-
-        const applyCustomPhotosToRoom = (r: any, idx: number): Room => {
-          const uploadedRoomPhotos = customRoomPhotosMap[r.id] || 
-                                     customRoomPhotosMap[String(r.id)] || 
-                                     customRoomPhotosMap[idx + 101] || 
-                                     (r.photos && r.photos.length > 0 ? r.photos : null);
-
-          const primaryImage = (uploadedRoomPhotos && uploadedRoomPhotos[0]) || 
-                               r.primary_image || 
-                               r.image_url || 
-                               bannerImage;
-
-          const finalPhotos = uploadedRoomPhotos && uploadedRoomPhotos.length > 0 ? uploadedRoomPhotos : [primaryImage];
-
-          return {
-            id: r.id,
-            name: r.name || r.room_type || "Habitación Estándar",
-            category: r.category || r.room_type || "Habitación Premium",
-            description: r.description || "Espaciosa habitación equipada con todas las comodidades para una estadía inolvidable.",
-            price_per_night: r.price_per_night || r.price || r.base_price || 60,
-            capacity: r.capacity || r.max_guests || 2,
-            primary_image: primaryImage,
-            photos: finalPhotos,
-            amenities: r.amenities || r.features || [
-              "Aire Acondicionado",
-              "WiFi de Alta Velocidad",
-              "Baño Privado",
-              "TV por Cable",
-              "Servicio de Limpieza"
-            ]
-          };
-        };
-
-        if (combined.length > 0) {
-          const formatted: Room[] = combined.map((r, idx) => applyCustomPhotosToRoom(r, idx));
-          setRooms(formatted);
-        } else {
-          const defaults = [
-            {
-              id: 101,
-              name: "Apartamento Suite Vista al Mar",
-              category: "Suite Familiar",
-              description: "Espaciosa suite frente a la costa con balcón privado, cama King, aire acondicionado central y cocina equipada.",
-              price_per_night: 75,
-              capacity: 4,
-              primary_image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&auto=format&fit=crop",
-              photos: ["https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&auto=format&fit=crop"],
-              amenities: ["Vista al Mar", "Balcón Privado", "Cocina Equipada", "WiFi 200MB", "A/C Central", "TV 55\" Smart"]
-            },
-            {
-              id: 102,
-              name: "Habitación Matrimonial Executive",
-              category: "Matrimonial VIP",
-              description: "Diseñada para parejas buscando descanso absoluto con lencería de hilo de algodón, baño privado con ducha panorámica y frigobar.",
-              price_per_night: 55,
-              capacity: 2,
-              primary_image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800&auto=format&fit=crop",
-              photos: ["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&auto=format&fit=crop"],
-              amenities: ["Cama King Size", "Baño Privado", "Frigobar", "WiFi Gratis", "Caja Fuerte", "A/C Split"]
-            },
-            {
-              id: 103,
-              name: "Apartamento Dúplex Familiar",
-              category: "Apartamento Completo",
-              description: "Dos niveles con capacidad hasta 6 personas, ideal para grupos y familias con sala de estar, comedor y terraza.",
-              price_per_night: 110,
-              capacity: 6,
-              primary_image: "https://images.unsplash.com/photo-1591088398332-8a7791972843?w=800&auto=format&fit=crop",
-              photos: ["https://images.unsplash.com/photo-1591088398332-8a7791972843?w=1200&auto=format&fit=crop"],
-              amenities: ["Dos Niveles", "2 Baños Privados", "Terraza Privada", "Cocina Gourmet", "Estacionamiento", "WiFi"]
-            }
-          ];
-          setRooms(defaults.map((r, idx) => applyCustomPhotosToRoom(r, idx)));
-        }
-      } catch (e) {
-        console.warn("Error cargando habitaciones del tenant:", e);
-      } finally {
-        setLoadingRooms(false);
-      }
-    }
-
-    loadRooms();
-    window.addEventListener("storage", loadRooms);
-    window.addEventListener("hdv_room_photos_updated", loadRooms);
-    return () => {
-      window.removeEventListener("storage", loadRooms);
-      window.removeEventListener("hdv_room_photos_updated", loadRooms);
-    };
-  }, [config]);
-
-  // Mensaje general para WhatsApp
-  const generalWaMsg = encodeURIComponent(
-    `Hola ${config.name}, estoy visitando su sitio web oficial (${config.domain}) y deseo solicitar información de reservas. ¿Podrían atenderme?`
-  );
-  const generalWaUrl = `https://wa.me/${cleanWhatsapp || "584141234567"}?text=${generalWaMsg}`;
-
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 selection:bg-[#FF0096] selection:text-white font-sans">
-      
-      {/* ── BARRA DE NAVEGACIÓN CORPORATIVA FLOTANTE ── */}
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
       <header className="sticky top-0 z-50 bg-[#0e011f]/95 backdrop-blur-md border-b border-[#9B00CC]/30 text-white shadow-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-          
-          {/* Logo / Nombre del Establecimiento */}
-          <a href="#inicio" className="flex items-center gap-3 group">
-            {config.branding?.logo_url ? (
-              <img
-                src={config.branding.logo_url}
-                alt={config.name}
-                className="h-10 w-auto object-contain max-w-[160px]"
-              />
-            ) : (
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#00C8D4] to-[#9B00CC] flex items-center justify-center text-white font-black font-serif text-lg shadow-lg">
-                {config.name.charAt(0)}
-              </div>
-            )}
-            <div>
-              <span className="text-lg font-black font-serif text-white tracking-wide group-hover:text-[#00C8D4] transition-colors block leading-tight">
-                {config.name}
-              </span>
-              <span className="text-[10px] text-[#00C8D4] font-bold tracking-widest uppercase block">
-                Sello Oficial de Excelencia
-              </span>
-            </div>
-          </a>
-
-          {/* Menú de Navegación */}
-          <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-200">
-            <a href="#inicio" className="hover:text-[#00C8D4] transition-colors">Inicio</a>
-            <a href="#habitaciones" className="hover:text-[#00C8D4] transition-colors">Habitaciones & Tarifas</a>
-            <a href="#servicios" className="hover:text-[#00C8D4] transition-colors">Servicios</a>
-            <a href="#sobre-nosotros" className="hover:text-[#00C8D4] transition-colors">Sobre Nosotros</a>
-            <a href="#contacto" className="hover:text-[#00C8D4] transition-colors">Ubicación</a>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+          <span className="text-lg font-black font-serif">{config.name}</span>
+          <nav className="hidden md:flex gap-6 text-xs font-bold">
+            <a href="#inicio" className="hover:text-[#00C8D4]">Inicio</a>
+            <a href="#habitaciones" className="hover:text-[#00C8D4]">Habitaciones</a>
+            <a href="#contacto" className="hover:text-[#00C8D4]">Ubicación</a>
           </nav>
-
-          {/* Botón WhatsApp Flotante Header */}
-          <a
-            href={generalWaUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-black text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 transition-all shadow-lg active:scale-95 shrink-0"
-          >
-            <MessageCircle className="w-4 h-4 fill-current" />
-            <span className="hidden sm:inline">WhatsApp Directo</span>
-          </a>
-
         </div>
       </header>
 
-      {/* ── HERO BANNER FULL-BLEED (GRADIENTE MAGENTA / PURPURA RETENIDO) ── */}
-      <section id="inicio" className="relative w-full min-h-[85vh] flex items-center justify-center overflow-hidden">
-        
-        {/* Imagen de Fondo Full-Bleed con Scale 1.08 */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src={bannerImage}
-            alt={config.name}
-            className="w-full h-full object-cover scale-[1.08] filter brightness-95"
-          />
-          {/* Overlay de Degradado Continuo Suave */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0e011f] via-[#0e011f]/65 to-black/40"></div>
+      <section id="inicio" className="relative w-full min-h-[60vh] flex items-center justify-center overflow-hidden">
+        <img src={bannerImage} alt={config.name} className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-black/50" />
+        <div className="relative z-10 text-center px-6">
+          <h1 className="text-4xl md:text-6xl font-black font-serif text-white">{config.name}</h1>
+          <p className="mt-4 text-slate-200 text-lg">Su refugio perfecto en {destName}</p>
         </div>
-
-        {/* Contenido Central Persuasivo */}
-        <div className="relative z-10 max-w-5xl mx-auto px-6 py-20 text-center space-y-8 animate-fade-in">
-          
-          {/* Pre-título en Mayúsculas Espaciadas */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#0e011f]/80 backdrop-blur border border-[#00C8D4]/40 text-[#00C8D4] text-[11px] font-extrabold tracking-[0.25em] uppercase shadow-2xl">
-            <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
-            HOSPEDAJE DE EXCELENCIA & DISTINCIÓN
-          </div>
-
-          {/* Título Principal Centrado en Tipografía Serif */}
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-black font-serif text-white tracking-tight leading-tight drop-shadow-2xl">
-            {config.name}
-          </h1>
-
-          {/* Botón Resaltado: Web en Mantenimiento */}
-          <div className="flex flex-col items-center justify-center gap-3">
-            <div className="inline-flex items-center gap-2.5 p-[2px] rounded-2xl bg-gradient-to-r from-[#FF0096] via-amber-400 to-[#00C8D4] shadow-2xl animate-pulse hover:scale-105 transition-all">
-              <div className="px-5 py-2 rounded-[14px] bg-[#0e011f]/90 backdrop-blur flex items-center gap-2.5">
-                <span className="relative flex h-3 w-3 shrink-0">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-400"></span>
-                </span>
-                <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-amber-300 drop-shadow">
-                  🛠️ SITIO WEB EN MANTENIMIENTO
-                </span>
-              </div>
-            </div>
-
-            {/* Subtítulo Persuasivo */}
-            <p className="text-base sm:text-xl text-slate-200 font-light max-w-3xl mx-auto leading-relaxed drop-shadow">
-              Más que un Hospedaje, su refugio perfecto. Disfrute de una experiencia inolvidable con atención personalizada y garantía directa de tarifa.
-            </p>
-          </div>
-
-          {/* Barra de Estadísticas y Confianza */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto pt-2">
-            <div className="p-3 bg-[#1a0533]/80 backdrop-blur rounded-2xl border border-white/10 text-center">
-              <span className="text-lg font-black text-[#00C8D4] block font-serif">⭐ 4.9 / 5</span>
-              <span className="text-[10px] text-slate-300 font-medium uppercase">Valoración Huéspedes</span>
-            </div>
-            <div className="p-3 bg-[#1a0533]/80 backdrop-blur rounded-2xl border border-white/10 text-center">
-              <span className="text-lg font-black text-[#FF0096] block font-serif">100%</span>
-              <span className="text-[10px] text-slate-300 font-medium uppercase">Garantía Directa</span>
-            </div>
-            <div className="p-3 bg-[#1a0533]/80 backdrop-blur rounded-2xl border border-white/10 text-center">
-              <span className="text-lg font-black text-white block font-serif">24/7</span>
-              <span className="text-[10px] text-slate-300 font-medium uppercase">Atención WhatsApp</span>
-            </div>
-            <div className="p-3 bg-[#1a0533]/80 backdrop-blur rounded-2xl border border-white/10 text-center">
-              <span className="text-lg font-black text-[#00C8D4] block font-serif">Starlink</span>
-              <span className="text-[10px] text-slate-300 font-medium uppercase">WiFi Ultra Rápido</span>
-            </div>
-          </div>
-
-          {/* Botones de Acción Principales (Dual Call to Action) */}
-          <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
-            
-            <a
-              href="#habitaciones"
-              className="px-8 py-4 rounded-2xl font-extrabold text-sm text-white bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] hover:from-[#00C8D4]/90 hover:to-[#9B00CC]/90 transition-all shadow-xl shadow-cyan-500/20 active:scale-95 flex items-center gap-2"
-            >
-              <span>Ver Habitaciones & Tarifas</span>
-              <ArrowRight className="w-4 h-4" />
-            </a>
-
-            <a
-              href={generalWaUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-8 py-4 rounded-2xl font-extrabold text-sm text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 transition-all shadow-xl shadow-emerald-900/30 active:scale-95 flex items-center gap-2"
-            >
-              <MessageCircle className="w-4 h-4 fill-current" />
-              <span>Reservar Directo por WhatsApp</span>
-            </a>
-
-          </div>
-
-        </div>
-
-        {/* Indicador de Desplazamiento */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 animate-bounce">
-          <a href="#habitaciones" className="text-slate-300 hover:text-white transition-colors">
-            <ChevronDown className="w-6 h-6" />
-          </a>
-        </div>
-
       </section>
 
-      {/* ── SECCIÓN DE FICHAS DE HABITACIONES (IMAGEN 3 EN FONDO BLANCO LIMPIO) ── */}
+      <div className="bg-white border-b border-slate-200/80 py-4 px-4 sm:px-6 lg:px-8 shadow-xs">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 text-center sm:text-left">
+          <div className="flex items-center justify-center sm:justify-start gap-3 p-2">
+            <span className="text-xl">🛡️</span>
+            <div>
+              <span className="text-xs font-bold text-slate-900 block">Mejor Tarifa Oficial Garantizada</span>
+              <span className="text-[11px] text-slate-500 font-medium">Sin comisiones de intermediarios</span>
+            </div>
+          </div>
+          <div className="flex items-center justify-center sm:justify-start gap-3 p-2 border-t sm:border-t-0 sm:border-l border-slate-100">
+            <span className="text-xl">⚡</span>
+            <div>
+              <span className="text-xs font-bold text-slate-900 block">Confirmación Inmediata</span>
+              <span className="text-[11px] text-slate-500 font-medium">Vía WhatsApp Oficial directo</span>
+            </div>
+          </div>
+          <div className="flex items-center justify-center sm:justify-start gap-3 p-2 border-t sm:border-t-0 sm:border-l border-slate-100">
+            <span className="text-xl">🌟</span>
+            <div>
+              <span className="text-xs font-bold text-slate-900 block">Atención Personalizada 24/7</span>
+              <span className="text-[11px] text-slate-500 font-medium">Atendidos por el equipo del hospedaje</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <section id="habitaciones" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        
-        <div className="text-center space-y-4 max-w-3xl mx-auto mb-16">
-          <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#FF0096] uppercase block">
-            SU REFUGIO DE DESCANSO
-          </span>
-          <h2 className="text-3xl sm:text-5xl font-black font-serif text-slate-900">
-            Nuestras Habitaciones & Suites
-          </h2>
-          <p className="text-slate-600 text-sm sm:text-base font-medium leading-relaxed">
-            Explore nuestras opciones de hospedaje completamente equipadas. Seleccione la opción ideal para su estadía y consulte disponibilidad en tiempo real.
-          </p>
-        </div>
-
-        {/* GRID DE FICHAS DE HABITACIONES */}
-        {loadingRooms ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-96 bg-white rounded-3xl animate-pulse border border-slate-200 shadow-sm"></div>
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {rooms.map((room) => (
-              <RoomCard
-                key={room.id}
-                room={room}
-                hotelName={config.name}
-                whatsappPhone={whatsapp}
-                onOpenDetail={(r) => setSelectedRoom(r)}
-              />
-            ))}
-          </div>
-        )}
-
-      </section>
-
-      {/* ── SECCIÓN: SERVICIOS Y COMODIDADES (ICONOS UNICOLOR EN CAJAS SÓLIDAS SOBRE BLANCO) ── */}
-      <section id="servicios" className="py-24 bg-white border-y border-slate-200/80 px-4 sm:px-6 lg:px-8">
-        
-        <div className="max-w-7xl mx-auto space-y-16">
-          
-          <div className="text-center space-y-3 max-w-3xl mx-auto">
-            <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#00C8D4] uppercase block">
-              EXPERIENCIA EXCLUSIVA
-            </span>
-            <h2 className="text-3xl sm:text-5xl font-black font-serif text-slate-900">
-              Servicios e Instalaciones Incluidas
-            </h2>
-            <p className="text-slate-600 text-sm font-medium">
-              Todo lo que necesita para disfrutar de una estancia cómoda, segura y sin preocupaciones.
-            </p>
-          </div>
-
-          {/* Grilla de Servicios */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                icon: <Wifi className="w-6 h-6 text-white" />,
-                title: "Conexión Starlink High Speed",
-                desc: "WiFi de alta velocidad libre en todas las habitaciones y áreas comunes.",
-                bg: "bg-[#00C8D4]"
-              },
-              {
-                icon: <ShieldCheck className="w-6 h-6 text-white" />,
-                title: "Seguridad & Planta Eléctrica",
-                desc: "Vigilancia 24 horas y respaldo eléctrico continuo durante su estancia.",
-                bg: "bg-[#9B00CC]"
-              },
-              {
-                icon: <Coffee className="w-6 h-6 text-white" />,
-                title: "Atención de Desayunos",
-                desc: "Opciones gastronómicas locales y frescas servidas a diario.",
-                bg: "bg-[#FF0096]"
-              },
-              {
-                icon: <Car className="w-6 h-6 text-white" />,
-                title: "Estacionamiento Privado",
-                desc: "Espacio de aparcamiento cómodo y seguro dentro de las instalaciones.",
-                bg: "bg-emerald-600"
-              }
-            ].map((service, idx) => (
-              <div
-                key={idx}
-                className="p-6 rounded-3xl bg-slate-50 border border-slate-200/80 hover:border-[#00C8D4] hover:shadow-lg transition-all duration-300 space-y-4 group"
-              >
-                {/* Caja de Icono Sólida de Color con Vector Blanco Puro (Regla del Sistema) */}
-                <div className={`w-12 h-12 rounded-2xl ${service.bg} flex items-center justify-center shadow-md shrink-0 group-hover:scale-110 transition-transform`}>
-                  {service.icon}
-                </div>
-                <h3 className="text-lg font-bold text-slate-900 font-serif">{service.title}</h3>
-                <p className="text-slate-600 text-xs font-medium leading-relaxed">{service.desc}</p>
-              </div>
-            ))}
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* ── SECCIÓN: ÁREAS E INSTALACIONES DEL ESTABLECIMIENTO ── */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="text-center space-y-4 max-w-3xl mx-auto mb-12">
-          <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#FF0096] uppercase block">
-            INSTALACIONES & ESPACIOS DE DISTINCIÓN
-          </span>
-          <h2 className="text-3xl sm:text-5xl font-black font-serif text-slate-900 leading-tight">
-            Nuestras Diversas Áreas
-          </h2>
-          <p className="text-slate-600 text-sm font-medium">
-            Recorra cada rincón de {config.name}. Diseñado para brindarle máximo confort en cada espacio.
-          </p>
-        </div>
-
-        {/* Selector de Áreas */}
-        <div className="flex flex-wrap justify-center gap-2 mb-10">
-          {[
-            { id: "todas", label: "Todas las Áreas" },
-            { id: "piscina", label: "🏊 Piscina & Solárium" },
-            { id: "restaurante", label: "🍽️ Restaurante & Gastronomía" },
-            { id: "parque", label: "🌳 Parque & Recreación" },
-            { id: "fachada", label: "🏛️ Fachada & Exteriores" },
-            { id: "lobby", label: "🛋️ Lobby & Recepción" },
-            { id: "spa", label: "💆‍♀️ Spa & Bienestar" },
-            { id: "eventos", label: "🎭 Salón de Eventos" },
-            { id: "deportes", label: "🏋️ Gimnasio & Deportes" },
-            { id: "playa", label: "🏖️ Playa & Marina" }
-          ].filter(tab => tab.id === "todas" || (areaPhotos[tab.id] && areaPhotos[tab.id].length > 0)).map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveAreaTab(tab.id)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                activeAreaTab === tab.id
-                  ? "bg-[#00C8D4] text-slate-950 font-black shadow-md shadow-cyan-500/20"
-                  : "bg-white text-slate-700 hover:text-slate-900 border border-slate-200 hover:bg-slate-100"
-              }`}
-            >
-              {tab.label}
-            </button>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {rooms.map((room) => (
+            <RoomCard key={room.id} room={room} hotelName={config.name} whatsappPhone={whatsapp} onOpenDetail={setSelectedRoom} />
           ))}
         </div>
+      </section>
 
-        {/* Grilla de Fotos por Áreas */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {Object.entries(areaPhotos)
-            .filter(([key]) => activeAreaTab === "todas" || activeAreaTab === key)
-            .flatMap(([areaKey, urls]) => urls.map((url, i) => ({ areaKey, url, id: `${areaKey}-${i}` })))
-            .map(item => (
-              <div key={item.id} className="relative rounded-2xl overflow-hidden aspect-video border border-slate-200 group bg-slate-100 shadow-sm">
-                <img src={item.url} alt={item.areaKey} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
-                  <span className="text-[10px] font-black uppercase text-white tracking-widest bg-[#FF0096] px-2 py-0.5 rounded-md">
-                    {item.areaKey}
-                  </span>
-                </div>
-              </div>
-            ))}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <h2 className="text-3xl font-black font-serif text-center mb-12">Nuestras Instalaciones</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          {Object.entries(areaPhotos).flatMap(([areaKey, urls]) => urls.map((url, i) => ({ areaKey, url, id: `${areaKey}-${i}` }))).map(item => (
+            <div key={item.id} onClick={() => setActiveLightboxImg({ url: item.url, category: item.areaKey })} className="relative rounded-2xl overflow-hidden aspect-video border border-slate-200 cursor-pointer">
+              <img src={item.url} alt={item.areaKey} className="w-full h-full object-cover" />
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* ── SECCIÓN: SOBRE NOSOTROS Y UBICACIÓN CON MAPA SATELITAL ── */}
       <section id="sobre-nosotros" className="py-24 bg-white border-t border-slate-200/80 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
           <div className="lg:col-span-6 space-y-6">
-            <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#00C8D4] uppercase block">
-              CONOCE NUESTRO ESTABLECIMIENTO
-            </span>
-            <h2 className="text-3xl sm:text-5xl font-black font-serif text-slate-900 leading-tight">
-              Más que un Hospedaje, Su Casa en la Playa
-            </h2>
-            <p className="text-slate-700 text-sm sm:text-base font-normal leading-relaxed">
-              {description}
-            </p>
-
-            <div className="space-y-3 pt-2">
-              <div className="flex items-center gap-3 text-xs text-slate-800 font-medium">
-                <CheckCircle2 className="w-4 h-4 text-[#00C8D4]" />
-                <span>Atención personalizada las 24 horas del día.</span>
+            <h2 className="text-3xl font-black font-serif">Más que un Hospedaje</h2>
+            <p className="text-slate-700">{description}</p>
+            <div className="p-5 rounded-2xl bg-slate-900 text-white space-y-4">
+              <div className="flex items-center gap-3">
+                <MapPin className="w-4 h-4 text-[#00C8D4]" />
+                <span className="font-semibold text-xs">{address}</span>
               </div>
-              <div className="flex items-center gap-3 text-xs text-slate-800 font-medium">
-                <CheckCircle2 className="w-4 h-4 text-[#FF0096]" />
-                <span>Ubicación estratégica: {address} ({destName}).</span>
-              </div>
-              <div className="flex items-center gap-3 text-xs text-slate-800 font-medium">
-                <CheckCircle2 className="w-4 h-4 text-[#9B00CC]" />
-                <span>Reserva directa garantizada sin cargos ocultos.</span>
-              </div>
-            </div>
-
-            {/* Dirección Badge & Coordenadas GPS */}
-            <div className="p-5 rounded-2xl bg-slate-900 text-white space-y-3 shadow-md">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3 text-xs text-slate-200">
-                  <div className="p-2.5 bg-[#00C8D4] rounded-xl flex items-center justify-center shrink-0">
-                    <MapPin className="w-4 h-4 text-white" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-[#00C8D4] font-bold uppercase block">Ubicación GPS Verificada</span>
-                    <span className="font-semibold text-white truncate max-w-[220px] block">{address}</span>
-                  </div>
-                </div>
-
-                <a
-                  href={generalWaUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-slate-800 border border-white/15 hover:border-[#00C8D4] transition-colors shrink-0"
-                >
-                  Cómo Llegar
-                </a>
-              </div>
-
-              <div className="flex items-center justify-between pt-2 border-t border-white/10 text-[10px] text-slate-400 font-mono">
-                <span>📍 Coordenadas: {latStr}° N, {lngStr}° W</span>
-                <span className="text-[#00C8D4] font-bold uppercase">Estado {coords.state}, Venezuela</span>
+              <div className="flex items-center gap-3 pt-2 border-t border-white/10">
+                <a href={`https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lng}`} target="_blank" rel="noopener noreferrer" className="flex-1 py-2.5 px-3 rounded-xl text-xs font-extrabold bg-slate-800 border border-white/15 text-center">Google Maps</a>
+                <a href={`https://www.waze.com/ul?ll=${coords.lat},${coords.lng}&navigate=yes`} target="_blank" rel="noopener noreferrer" className="flex-1 py-2.5 px-3 rounded-xl text-xs font-extrabold bg-[#00C8D4] text-center">Abrir en Waze</a>
               </div>
             </div>
           </div>
-
-          {/* MAPA SATELITAL INTERACTIVO DEL ESTABLECIMIENTO */}
-          <div className="lg:col-span-6">
-            <div className="relative rounded-3xl overflow-hidden border border-slate-200 shadow-2xl bg-slate-900 space-y-0">
-              
-              {/* Barra de Control del Mapa Satelital */}
-              <div className="p-3.5 bg-slate-900 border-b border-white/10 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
-                  <span className="text-xs font-bold text-white font-serif">Mapa Satelital ({destName})</span>
-                </div>
-                <div className="flex bg-slate-950 rounded-xl p-1 border border-white/10 gap-1">
-                  <button
-                    onClick={() => setMapViewMode("satelite")}
-                    className={`px-3 py-1 rounded-lg text-[10px] font-extrabold uppercase transition-all cursor-pointer ${
-                      mapViewMode === "satelite" ? "bg-[#FF0096] text-white" : "text-slate-400 hover:text-white"
-                    }`}
-                  >
-                    🛰️ Satélite
-                  </button>
-                  <button
-                    onClick={() => setMapViewMode("estandar")}
-                    className={`px-3 py-1 rounded-lg text-[10px] font-extrabold uppercase transition-all cursor-pointer ${
-                      mapViewMode === "estandar" ? "bg-[#00C8D4] text-slate-950" : "text-slate-400 hover:text-white"
-                    }`}
-                  >
-                    🗺️ Terrestre
-                  </button>
-                </div>
-              </div>
-
-              {/* Contenedor del Mapa Satelital */}
-              <div className="relative h-[380px] w-full overflow-hidden bg-slate-950">
-                {mapViewMode === "satelite" ? (
-                  <div className="w-full h-full relative">
-                    <iframe
-                      title="Mapa Satelital del Establecimiento"
-                      width="100%"
-                      height="100%"
-                      frameBorder="0"
-                      scrolling="no"
-                      src={`https://maps.google.com/maps?q=${coords.lat},${coords.lng}&t=k&z=17&ie=UTF8&iwloc=&output=embed`}
-                      className="w-full h-full filter contrast-105 brightness-95"
-                    />
-                    <div className="absolute top-4 left-4 bg-slate-900/90 backdrop-blur px-3 py-1.5 rounded-xl border border-white/15 text-[10px] text-white font-bold flex items-center gap-2 shadow-lg">
-                      <span className="w-2 h-2 rounded-full bg-[#00C8D4]" />
-                      <span>Vista Aérea Satelital: {destName} ({coords.state})</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="w-full h-full relative">
-                    <iframe
-                      title="Mapa Terrestre del Establecimiento"
-                      width="100%"
-                      height="100%"
-                      frameBorder="0"
-                      scrolling="no"
-                      src={`https://maps.google.com/maps?q=${coords.lat},${coords.lng}&t=m&z=15&ie=UTF8&iwloc=&output=embed`}
-                      className="w-full h-full"
-                    />
-                  </div>
-                )}
-              </div>
-
-              <div className="p-4 bg-slate-900 border-t border-white/10 flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] text-slate-400 uppercase font-bold block">Sello de Calidad</span>
-                  <span className="text-xs font-bold text-white">{config.name} • Red Oficial Hoteles de Venezuela</span>
-                </div>
-                <Award className="w-5 h-5 text-[#FF0096]" />
-              </div>
-
-            </div>
+          <div className="lg:col-span-6 h-96 bg-slate-200 rounded-3xl overflow-hidden">
+            <iframe title="map" width="100%" height="100%" src={`https://maps.google.com/maps?q=${coords.lat},${coords.lng}&t=k&z=17&output=embed`} />
           </div>
-
         </div>
       </section>
 
-      {/* ── SECCIÓN DE CIERRE (BOTTOM CTA REGULARES DEL SISTEMA) ── */}
       <section id="contacto" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div 
-          className="relative overflow-hidden rounded-3xl p-8 sm:p-14 text-center text-white shadow-2xl space-y-6"
-          style={{ background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)" }}
+          className="relative overflow-hidden rounded-3xl p-8 sm:p-14 text-center text-white shadow-2xl shadow-pink-500/30 space-y-6"
+          style={{ background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 50%, #4F46E5 100%)" }}
         >
           <span className="text-xs font-extrabold tracking-[0.25em] text-pink-100 uppercase block drop-shadow-sm">
             RESERVA DIRECTA Y GARANTIZADA
@@ -774,7 +280,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               href={generalWaUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-4 rounded-2xl font-extrabold text-sm text-[#FF0096] bg-white hover:bg-slate-100 transition-all shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer"
+              className="px-8 py-4 rounded-2xl font-extrabold text-sm text-[#FF0096] bg-white hover:bg-slate-100 transition-all shadow-xl active:scale-95 flex items-center gap-2.5 cursor-pointer"
             >
               <MessageCircle className="w-5 h-5 fill-current" />
               <span>Contactar recepción por WhatsApp</span>
@@ -805,6 +311,60 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
 
         </div>
       </footer>
+
+      {/* ── BOTÓN FLOTANTE WHATSAPP PULSANTE (MANDATORY CRO TRIGGER) ── */}
+      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 group">
+        
+        {/* Tooltip informativo en Hover */}
+        <div className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-slate-900 text-white text-xs font-bold shadow-2xl border border-white/15 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+          <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse" />
+          <span>¡Chatea con Recepción ahora!</span>
+        </div>
+
+        {/* Pulsating Trigger Floating Button */}
+        <a
+          href={generalWaUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="relative flex items-center justify-center w-14 h-14 rounded-full bg-[#25D366] text-white shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer"
+          title="Atención Directa vía WhatsApp"
+        >
+          {/* Effect Pulsating Ping Radar */}
+          <span className="absolute -inset-2 rounded-full bg-[#25D366]/40 animate-ping pointer-events-none" />
+          
+          <MessageCircle className="w-7 h-7 fill-current relative z-10" />
+
+          {/* Online Status Badge */}
+          <span className="absolute -top-1 -right-1 flex h-4 w-4">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-white"></span>
+          </span>
+        </a>
+
+      </div>
+
+      {/* MODAL LIGHTBOX DE FOTOS */}
+      {activeLightboxImg && (
+        <div 
+          className="fixed inset-0 z-[999999] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-fade-in cursor-pointer"
+          onClick={() => setActiveLightboxImg(null)}
+        >
+          <div className="relative max-w-5xl w-full max-h-[90vh] flex flex-col items-center justify-center space-y-3" onClick={e => e.stopPropagation()}>
+            <button
+              onClick={() => setActiveLightboxImg(null)}
+              className="absolute -top-12 right-0 p-2 rounded-full bg-white/10 hover:bg-[#FF0096] text-white transition-colors cursor-pointer"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <div className="relative rounded-3xl overflow-hidden border border-white/20 shadow-2xl bg-black">
+              <img src={activeLightboxImg.url} alt={activeLightboxImg.category} className="max-h-[80vh] w-auto object-contain rounded-2xl" />
+              <div className="absolute bottom-4 left-4 bg-slate-900/90 backdrop-blur px-4 py-2 rounded-xl text-xs font-bold text-white uppercase border border-white/10">
+                🏷️ ÁREA: {activeLightboxImg.category}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* MODAL DETALLE HABITACIÓN */}
       <RoomDetailModal

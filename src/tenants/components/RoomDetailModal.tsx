@@ -41,36 +41,35 @@ export function RoomDetailModal({ room, hotelName, whatsappPhone, onClose }: Roo
 
   const cleanPhone = whatsappPhone.replace(/[^0-9]/g, "");
   const waMsg = encodeURIComponent(
-    `Hola ${hotelName}, deseo solicitar una reserva formal para la habitación:\n` +
-    `🏨 Habitación: *${room.name}*\n` +
-    `📅 Entrada: ${checkIn || "Por definir"}\n` +
-    `📅 Salida: ${checkOut || "Por definir"}\n` +
+    `Hola, deseo reservar la unidad: ${room.name} en ${hotelName}.\n` +
+    `📅 Check-in: ${checkIn || "Por definir"}\n` +
+    `📅 Check-out: ${checkOut || "Por definir"}\n` +
     `👥 Huéspedes: ${guestsCount}\n` +
     `💵 Estimado: $${totalPrice} USD (${nights} noche${nights > 1 ? "s" : ""})\n\n` +
-    `¿Tienen disponibilidad disponible para esas fechas?`
+    `¿Tienen disponibilidad disponible para estas fechas?`
   );
   const waUrl = `https://wa.me/${cleanPhone || "584141234567"}?text=${waMsg}`;
 
   const amenitiesList = room.amenities || room.features || [
-    "Aire Acondicionado Split",
-    "WiFi Fibra Óptica 200MB",
-    "Baño Privado con Agua Caliente",
-    "TV por Cable / Smart TV",
-    "Lencería de Algodón Premium",
-    "Servicio de Limpieza Diario",
+    "Aire Acondicionado Split 18.000 BTU",
+    "WiFi Fibra Óptica High-Speed",
+    "Baño Privado con Agua Caliente 24/7",
+    "TV por Cable / Smart TV 43''",
+    "Lencería de Algodón 400 Hilos",
+    "Nevera Ejecutiva & Cocineta Equipada",
     "Caja Fuerte Digital",
-    "Nevera Ejecutiva"
+    "Servicio de Limpieza Diario"
   ];
 
   return (
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto bg-black/80 backdrop-blur-md animate-fade-in">
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto bg-slate-950/75 backdrop-blur-md animate-fade-in">
       
-      <div className="relative w-full max-w-4xl bg-[#1a0533] border border-[#00C8D4]/40 rounded-3xl shadow-2xl overflow-hidden text-slate-100 my-8">
+      <div className="relative w-full max-w-4xl bg-white border border-slate-200/80 rounded-3xl shadow-2xl overflow-hidden text-slate-900 my-8">
         
         {/* BOTÓN CERRAR */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-[#0e011f]/80 text-slate-300 hover:text-white hover:bg-[#FF0096] transition-colors border border-white/10"
+          className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-slate-100/90 text-slate-700 hover:text-white hover:bg-[#FF0096] transition-colors border border-slate-200 shadow-md cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -78,21 +77,21 @@ export function RoomDetailModal({ room, hotelName, whatsappPhone, onClose }: Roo
         <div className="grid grid-cols-1 lg:grid-cols-12 max-h-[85vh] overflow-y-auto">
           
           {/* COLUMNA IZQUIERDA: GALERÍA DE FOTOS & DETALLES */}
-          <div className="lg:col-span-7 p-6 space-y-6 border-b lg:border-b-0 lg:border-r border-white/10">
+          <div className="lg:col-span-7 p-6 sm:p-8 space-y-6 border-b lg:border-b-0 lg:border-r border-slate-100">
             
             {/* Foto Principal */}
-            <div className="relative h-64 sm:h-80 rounded-2xl overflow-hidden border border-white/10 shadow-lg">
+            <div className="relative h-64 sm:h-80 rounded-2xl overflow-hidden border border-slate-200 shadow-md bg-slate-100">
               <img
                 src={photos[activePhotoIdx]}
                 alt={room.name}
                 className="w-full h-full object-cover transition-all duration-500"
               />
-              <div className="absolute top-3 left-3 bg-[#0e011f]/90 backdrop-blur px-3 py-1.5 rounded-full border border-white/10 text-xs font-bold text-[#00C8D4]">
+              <div className="absolute top-3 left-3 bg-slate-900/90 backdrop-blur px-3 py-1.5 rounded-full border border-white/10 text-xs font-bold text-[#00C8D4]">
                 {room.category || "Habitación Premium"}
               </div>
             </div>
 
-            {/* Miniaturas */}
+            {/* Miniaturas Carousel */}
             {photos.length > 1 && (
               <div className="flex items-center gap-2.5 overflow-x-auto pb-1">
                 {photos.map((photo, idx) => (
@@ -100,7 +99,7 @@ export function RoomDetailModal({ room, hotelName, whatsappPhone, onClose }: Roo
                     key={idx}
                     onClick={() => setActivePhotoIdx(idx)}
                     className={`relative w-20 h-14 rounded-xl overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${
-                      activePhotoIdx === idx ? "border-[#00C8D4] scale-105" : "border-transparent opacity-60 hover:opacity-100"
+                      activePhotoIdx === idx ? "border-[#00C8D4] scale-105 shadow-md" : "border-slate-200 opacity-60 hover:opacity-100"
                     }`}
                   >
                     <img src={photo} alt="" className="w-full h-full object-cover" />
@@ -112,30 +111,42 @@ export function RoomDetailModal({ room, hotelName, whatsappPhone, onClose }: Roo
             {/* Información Principal */}
             <div>
               <div className="flex items-center justify-between gap-2">
-                <h2 className="text-2xl sm:text-3xl font-black font-serif text-white">{room.name}</h2>
+                <h2 className="text-2xl sm:text-3xl font-black font-serif text-slate-900">{room.name}</h2>
                 <div className="text-right shrink-0">
                   <span className="text-[#00C8D4] text-2xl font-black">${displayPrice}</span>
-                  <span className="text-slate-400 text-xs block">/ noche</span>
+                  <span className="text-slate-500 text-xs block font-semibold">/ noche</span>
                 </div>
               </div>
 
               {room.description && (
-                <p className="text-slate-300 text-xs sm:text-sm font-light leading-relaxed mt-3">
+                <p className="text-slate-600 text-xs sm:text-sm font-normal leading-relaxed mt-3">
                   {room.description}
                 </p>
               )}
             </div>
 
+            {/* Ficha Técnica Detallada */}
+            <div className="grid grid-cols-2 gap-3 p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 text-xs font-medium text-slate-700">
+              <div className="flex items-center gap-2">
+                <Bed className="w-4 h-4 text-[#00C8D4]" />
+                <span>Camas: {room.beds_count || 1} ({room.bed_type || "Matrimonial / Queen"})</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-[#FF0096]" />
+                <span>Capacidad: hasta {room.capacity || 2} huéspedes</span>
+              </div>
+            </div>
+
             {/* Equipamiento Completo */}
             <div>
-              <h4 className="text-xs font-extrabold uppercase tracking-widest text-[#00C8D4] mb-3 flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-[#FF0096]" /> Equipamiento & Comodidades
+              <h4 className="text-xs font-extrabold uppercase tracking-widest text-[#FF0096] mb-3 flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-[#00C8D4]" /> Equipamiento & Comodidades Incluidas
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                 {amenitiesList.map((item, i) => (
-                  <div key={i} className="flex items-center gap-2 p-2 bg-[#0e011f] rounded-xl border border-white/5">
-                    <CheckCircle2 className="w-4 h-4 text-[#FF0096] shrink-0" />
-                    <span className="text-slate-200 font-medium">{item}</span>
+                  <div key={i} className="flex items-center gap-2 p-2.5 bg-slate-50 rounded-xl border border-slate-200/60">
+                    <CheckCircle2 className="w-4 h-4 text-[#00C8D4] shrink-0" />
+                    <span className="text-slate-800 font-medium">{item}</span>
                   </div>
                 ))}
               </div>
@@ -144,46 +155,46 @@ export function RoomDetailModal({ room, hotelName, whatsappPhone, onClose }: Roo
           </div>
 
           {/* COLUMNA DERECHA: CALCULADORA Y SOLICITUD WHATSAPP */}
-          <div className="lg:col-span-5 p-6 bg-[#0e011f]/60 flex flex-col justify-between space-y-6">
+          <div className="lg:col-span-5 p-6 sm:p-8 bg-slate-50 flex flex-col justify-between space-y-6">
             
             <div className="space-y-5">
-              <div className="p-4 rounded-2xl bg-[#1a0533] border border-[#9B00CC]/30 space-y-1">
-                <span className="text-[10px] uppercase tracking-widest text-[#00C8D4] font-black">
-                  GARANTÍA DE TARIFA DIRECTA
+              <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-1">
+                <span className="text-[10px] uppercase tracking-widest text-[#00C8D4] font-black block">
+                  🛡️ GARANTÍA DE TARIFA DIRECTA
                 </span>
-                <p className="text-xs text-slate-300 font-light">
-                  Reserva sin comisiones de intermediarios directamente con el equipo de atención del establecimiento.
+                <p className="text-xs text-slate-600 font-medium">
+                  Reserva directamente sin comisiones de intermediarios y con confirmación inmediata vía WhatsApp.
                 </p>
               </div>
 
               {/* Selector de Fechas */}
               <div className="space-y-3">
                 <div>
-                  <label className="text-xs font-bold text-slate-300 mb-1 block">Fecha de Llegada (Check-in)</label>
+                  <label className="text-xs font-bold text-slate-700 mb-1 block">Fecha de Llegada (Check-in)</label>
                   <input
                     type="date"
                     value={checkIn}
                     onChange={(e) => setCheckIn(e.target.value)}
-                    className="w-full bg-[#1a0533] border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#00C8D4]"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#00C8D4]"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-300 mb-1 block">Fecha de Salida (Check-out)</label>
+                  <label className="text-xs font-bold text-slate-700 mb-1 block">Fecha de Salida (Check-out)</label>
                   <input
                     type="date"
                     value={checkOut}
                     onChange={(e) => setCheckOut(e.target.value)}
-                    className="w-full bg-[#1a0533] border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#00C8D4]"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#00C8D4]"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-300 mb-1 block">Número de Huéspedes</label>
+                  <label className="text-xs font-bold text-slate-700 mb-1 block">Número de Huéspedes</label>
                   <select
                     value={guestsCount}
                     onChange={(e) => setGuestsCount(Number(e.target.value))}
-                    className="w-full bg-[#1a0533] border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#00C8D4]"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#00C8D4]"
                   >
                     {[...Array(room.capacity || 4)].map((_, i) => (
                       <option key={i + 1} value={i + 1}>
@@ -195,35 +206,35 @@ export function RoomDetailModal({ room, hotelName, whatsappPhone, onClose }: Roo
               </div>
 
               {/* Resumen de Tarifas */}
-              <div className="p-4 rounded-2xl bg-[#1a0533] border border-white/10 space-y-2">
-                <div className="flex justify-between text-xs text-slate-300">
+              <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-2 shadow-xs">
+                <div className="flex justify-between text-xs text-slate-600 font-medium">
                   <span>Precio por noche</span>
-                  <span className="font-bold">${displayPrice}</span>
+                  <span className="font-bold text-slate-900">${displayPrice} USD</span>
                 </div>
-                <div className="flex justify-between text-xs text-slate-300">
+                <div className="flex justify-between text-xs text-slate-600 font-medium">
                   <span>Estadía estimada</span>
-                  <span className="font-bold">{nights} noche{nights > 1 ? "s" : ""}</span>
+                  <span className="font-bold text-slate-900">{nights} noche{nights > 1 ? "s" : ""}</span>
                 </div>
-                <div className="pt-2 border-t border-white/10 flex justify-between items-center text-sm font-extrabold text-white">
-                  <span>Total Estímado</span>
+                <div className="pt-2 border-t border-slate-100 flex justify-between items-center text-sm font-extrabold text-slate-900">
+                  <span>Total Estimado</span>
                   <span className="text-[#00C8D4] text-xl font-black">${totalPrice} USD</span>
                 </div>
               </div>
             </div>
 
-            {/* BOTÓN WHATSAPP */}
+            {/* BOTÓN WHATSAPP PRE-FILLED */}
             <div>
               <a
                 href={waUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl font-extrabold text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 transition-all shadow-xl shadow-emerald-900/30 active:scale-95 text-center text-sm"
+                className="w-full flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl font-extrabold text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 transition-all shadow-lg shadow-emerald-500/20 active:scale-95 text-center text-xs sm:text-sm"
               >
                 <MessageCircle className="w-5 h-5 fill-current shrink-0" />
-                <span>Solicitar Reserva por WhatsApp</span>
+                <span>Reservar esta Habitación por WhatsApp</span>
               </a>
-              <span className="text-[10px] text-slate-400 text-center block mt-2">
-                Atención directa e inmediata por el equipo de recepción.
+              <span className="text-[10px] text-slate-500 text-center block mt-2 font-medium">
+                Respuesta inmediata por el equipo de recepción en menos de 5 min.
               </span>
             </div>
 
