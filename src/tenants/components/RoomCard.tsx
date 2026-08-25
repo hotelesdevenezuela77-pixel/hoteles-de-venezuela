@@ -41,16 +41,47 @@ interface RoomCardProps {
   onOpenDetail: (room: Room) => void;
 }
 
+export function resolveRoomImageUrl(room: any): string {
+  if (!room) return "";
+
+  const candidate =
+    (Array.isArray(room.fotos) && room.fotos.length > 0 ? room.fotos[0] : null) ||
+    (Array.isArray(room.galeria) && room.galeria.length > 0 ? room.galeria[0] : null) ||
+    (Array.isArray(room.galeria_fotos) && room.galeria_fotos.length > 0 ? room.galeria_fotos[0] : null) ||
+    (Array.isArray(room.photos) && room.photos.length > 0 ? room.photos[0] : null) ||
+    room.foto_principal ||
+    room.imagen_portada ||
+    room.cover_image ||
+    room.cover_url ||
+    room.primary_image ||
+    room.image_url ||
+    room.imagen ||
+    room.foto;
+
+  if (!candidate) return "";
+
+  if (typeof candidate === "string") {
+    if (candidate.startsWith("http://") || candidate.startsWith("https://") || candidate.startsWith("data:")) {
+      return candidate;
+    }
+    const cleanPath = candidate.replace(/^\/+/, "");
+    return `https://supabase.co/storage/v1/object/public/${cleanPath}`;
+  }
+
+  return "";
+}
+
 export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomCardProps) {
+  console.log("HABITACION DATA:", room);
+
   // Title Mapping: room.nombre || room.title || room.name
-  const roomTitle = room.nombre || room.title || room.name || "Habitación Premium";
+  const roomTitle = room.nombre || room.title || room.name || "Habitación";
 
   // Price Mapping: room.tarifa_base || room.price_usd || room.price_per_night || room.price || room.base_price
   const displayPrice = room.tarifa_base || room.price_usd || room.price_per_night || room.price || room.base_price || 70;
 
-  // Cover Image Mapping: room.cover_image || room.fotos?.[0] || room.primary_image || room.image_url || room.photos?.[0]
-  const image = room.cover_image || (room.fotos && room.fotos[0]) || room.primary_image || room.image_url || (room.photos && room.photos[0]) || 
-    "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800&auto=format&fit=crop";
+  // Lógica dinámica para la foto real de la habitación (arrays y nombres comunes de columnas)
+  const image = resolveRoomImageUrl(room);
 
   // Category Badge Mapping: room.categoria || room.tipo_unidad || room.category
   const category = room.categoria || room.tipo_unidad || room.category || "Habitación Premium";
