@@ -245,7 +245,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
   const generalWaUrl = `https://wa.me/${cleanWhatsapp || "584141234567"}?text=${generalWaMsg}`;
 
   return (
-    <div className="min-h-screen bg-[#0e011f] text-slate-100 selection:bg-[#FF0096] selection:text-white font-sans">
+    <div className="min-h-screen bg-white text-slate-900 selection:bg-[#FF0096] selection:text-white font-sans">
       
       <header className="sticky top-0 z-50 bg-[#0e011f]/95 backdrop-blur-md border-b border-[#9B00CC]/30 text-white shadow-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
@@ -293,22 +293,23 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         </div>
       </header>
 
-      <section id="inicio" className="relative w-full min-h-[85vh] flex items-center justify-center overflow-hidden">
+      <section id="inicio" className="relative w-full min-h-[85vh] flex items-center justify-center overflow-hidden bg-slate-950">
         
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 overflow-hidden">
           <img
             src={bannerImage}
             alt={config.name}
             className="w-full h-full object-cover scale-[1.08] filter brightness-95"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0e011f] via-[#0e011f]/65 to-black/40"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-white via-white/70 to-transparent"></div>
         </div>
 
         <div className="relative z-10 max-w-5xl mx-auto px-6 py-20 text-center space-y-8 animate-fade-in">
           
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#0e011f]/80 backdrop-blur border border-[#00C8D4]/40 text-[#00C8D4] text-[11px] font-extrabold tracking-[0.25em] uppercase shadow-2xl">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 backdrop-blur border border-[#00C8D4]/40 text-[#00C8D4] text-[11px] font-extrabold tracking-[0.25em] uppercase shadow-2xl">
             <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
-            HOSPEDAJE DE EXCELENCIA & DISTINCIÓN
+            EL PARAÍSO TE ESPERA • HOSPEDAJE DE EXCELENCIA
           </div>
 
           <h1 className="text-4xl sm:text-6xl md:text-7xl font-black font-serif text-white tracking-tight leading-tight drop-shadow-2xl">
@@ -317,7 +318,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
 
           <div className="flex flex-col items-center justify-center gap-3">
             <div className="inline-flex items-center gap-2.5 p-[2px] rounded-2xl bg-gradient-to-r from-[#FF0096] via-amber-400 to-[#00C8D4] shadow-2xl animate-pulse hover:scale-105 transition-all">
-              <div className="px-5 py-2 rounded-[14px] bg-[#0e011f]/90 backdrop-blur flex items-center gap-2.5">
+              <div className="px-5 py-2 rounded-[14px] bg-slate-900/90 backdrop-blur flex items-center gap-2.5">
                 <span className="relative flex h-3 w-3 shrink-0">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-400"></span>
@@ -328,27 +329,27 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               </div>
             </div>
 
-            <p className="text-base sm:text-xl text-slate-200 font-light max-w-3xl mx-auto leading-relaxed drop-shadow">
+            <p className="text-base sm:text-xl text-white font-medium max-w-3xl mx-auto leading-relaxed drop-shadow-lg">
               Más que un Hospedaje, su refugio perfecto. Disfrute de una experiencia inolvidable con atención personalizada y garantía directa de tarifa.
             </p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto pt-2">
-            <div className="p-3 bg-[#1a0533]/80 backdrop-blur rounded-2xl border border-white/10 text-center">
+            <div className="p-3 bg-slate-900/85 backdrop-blur rounded-2xl border border-white/10 text-center shadow-xl">
               <span className="text-lg font-black text-[#00C8D4] block font-serif">⭐ 4.9 / 5</span>
-              <span className="text-[10px] text-slate-300 font-medium uppercase">Valoración Huéspedes</span>
+              <span className="text-[10px] text-slate-200 font-medium uppercase">Valoración Huéspedes</span>
             </div>
-            <div className="p-3 bg-[#1a0533]/80 backdrop-blur rounded-2xl border border-white/10 text-center">
+            <div className="p-3 bg-slate-900/85 backdrop-blur rounded-2xl border border-white/10 text-center shadow-xl">
               <span className="text-lg font-black text-[#FF0096] block font-serif">100%</span>
-              <span className="text-[10px] text-slate-300 font-medium uppercase">Garantía Directa</span>
+              <span className="text-[10px] text-slate-200 font-medium uppercase">Garantía Directa</span>
             </div>
-            <div className="p-3 bg-[#1a0533]/80 backdrop-blur rounded-2xl border border-white/10 text-center">
+            <div className="p-3 bg-slate-900/85 backdrop-blur rounded-2xl border border-white/10 text-center shadow-xl">
               <span className="text-lg font-black text-white block font-serif">24/7</span>
-              <span className="text-[10px] text-slate-300 font-medium uppercase">Atención WhatsApp</span>
+              <span className="text-[10px] text-slate-200 font-medium uppercase">Atención WhatsApp</span>
             </div>
-            <div className="p-3 bg-[#1a0533]/80 backdrop-blur rounded-2xl border border-white/10 text-center">
+            <div className="p-3 bg-slate-900/85 backdrop-blur rounded-2xl border border-white/10 text-center shadow-xl">
               <span className="text-lg font-black text-[#00C8D4] block font-serif">Starlink</span>
-              <span className="text-[10px] text-slate-300 font-medium uppercase">WiFi Ultra Rápido</span>
+              <span className="text-[10px] text-slate-200 font-medium uppercase">WiFi Ultra Rápido</span>
             </div>
           </div>
 
@@ -356,7 +357,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             
             <a
               href="#habitaciones"
-              className="px-8 py-4 rounded-2xl font-extrabold text-sm text-white bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] hover:from-[#00C8D4]/90 hover:to-[#9B00CC]/90 transition-all shadow-xl shadow-cyan-500/20 active:scale-95 flex items-center gap-2"
+              className="px-8 py-4 rounded-2xl font-extrabold text-sm text-white bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] hover:from-[#00C8D4]/90 hover:to-[#9B00CC]/90 transition-all shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer"
             >
               <span>Ver Habitaciones & Tarifas</span>
               <ArrowRight className="w-4 h-4" />
@@ -366,7 +367,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               href={generalWaUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-4 rounded-2xl font-extrabold text-sm text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 transition-all shadow-xl shadow-emerald-900/30 active:scale-95 flex items-center gap-2"
+              className="px-8 py-4 rounded-2xl font-extrabold text-sm text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 transition-all shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer"
             >
               <MessageCircle className="w-4 h-4 fill-current" />
               <span>Reservar Directo por WhatsApp</span>
@@ -376,35 +377,29 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
 
         </div>
 
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 animate-bounce">
-          <a href="#habitaciones" className="text-slate-300 hover:text-white transition-colors">
-            <ChevronDown className="w-6 h-6" />
-          </a>
-        </div>
-
       </section>
 
-      <div className="bg-[#1a0533]/80 border-y border-[#9B00CC]/20 py-4 px-4 sm:px-6 lg:px-8">
+      <div className="bg-white border-b border-slate-200/80 py-4 px-4 sm:px-6 lg:px-8 shadow-xs">
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 text-center sm:text-left">
           <div className="flex items-center justify-center sm:justify-start gap-3 p-2">
             <span className="text-xl">🛡️</span>
             <div>
-              <span className="text-xs font-bold text-white block">Mejor Tarifa Oficial Garantizada</span>
-              <span className="text-[11px] text-slate-300 font-light">Sin comisiones de intermediarios</span>
+              <span className="text-xs font-bold text-slate-900 block">Mejor Tarifa Oficial Garantizada</span>
+              <span className="text-[11px] text-slate-500 font-medium">Sin comisiones de intermediarios</span>
             </div>
           </div>
-          <div className="flex items-center justify-center sm:justify-start gap-3 p-2 border-t sm:border-t-0 sm:border-l border-white/10">
+          <div className="flex items-center justify-center sm:justify-start gap-3 p-2 border-t sm:border-t-0 sm:border-l border-slate-100">
             <span className="text-xl">⚡</span>
             <div>
-              <span className="text-xs font-bold text-white block">Confirmación Inmediata</span>
-              <span className="text-[11px] text-slate-300 font-light">Vía WhatsApp Oficial directo</span>
+              <span className="text-xs font-bold text-slate-900 block">Confirmación Inmediata</span>
+              <span className="text-[11px] text-slate-500 font-medium">Vía WhatsApp Oficial directo</span>
             </div>
           </div>
-          <div className="flex items-center justify-center sm:justify-start gap-3 p-2 border-t sm:border-t-0 sm:border-l border-white/10">
+          <div className="flex items-center justify-center sm:justify-start gap-3 p-2 border-t sm:border-t-0 sm:border-l border-slate-100">
             <span className="text-xl">🌟</span>
             <div>
-              <span className="text-xs font-bold text-white block">Atención Personalizada 24/7</span>
-              <span className="text-[11px] text-slate-300 font-light">Atendidos por el equipo del hospedaje</span>
+              <span className="text-xs font-bold text-slate-900 block">Atención Personalizada 24/7</span>
+              <span className="text-[11px] text-slate-500 font-medium">Atendidos por el equipo del hospedaje</span>
             </div>
           </div>
         </div>
@@ -416,10 +411,10 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#00C8D4] uppercase block">
             SU REFUGIO DE DESCANSO
           </span>
-          <h2 className="text-3xl sm:text-5xl font-black font-serif text-white">
+          <h2 className="text-3xl sm:text-5xl font-black font-serif text-slate-900">
             Nuestras Habitaciones & Suites
           </h2>
-          <p className="text-slate-300 text-sm sm:text-base font-light leading-relaxed">
+          <p className="text-slate-600 text-sm sm:text-base font-normal leading-relaxed">
             Explore nuestras opciones de hospedaje completamente equipadas. Seleccione la opción ideal para su estadía y consulte disponibilidad en tiempo real.
           </p>
         </div>
@@ -427,7 +422,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         {loadingRooms ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-96 bg-[#1a0533] rounded-3xl animate-pulse border border-white/5"></div>
+              <div key={i} className="h-96 bg-slate-100 rounded-3xl animate-pulse border border-slate-200"></div>
             ))}
           </div>
         ) : (
@@ -446,7 +441,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
 
       </section>
 
-      <section id="servicios" className="py-20 bg-[#1a0533]/40 border-y border-[#9B00CC]/15 px-4 sm:px-6 lg:px-8">
+      <section id="servicios" className="py-20 bg-slate-50 border-y border-slate-200/80 px-4 sm:px-6 lg:px-8">
         
         <div className="max-w-7xl mx-auto space-y-16">
           
@@ -454,10 +449,10 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#FF0096] uppercase block">
               EXPERIENCIA EXCLUSIVA
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black font-serif text-white">
+            <h2 className="text-3xl sm:text-4xl font-black font-serif text-slate-900">
               Servicios e Instalaciones Incluidas
             </h2>
-            <p className="text-slate-300 text-sm font-light">
+            <p className="text-slate-600 text-sm font-normal">
               Todo lo que necesita para disfrutar de una estancia cómoda, segura y sin preocupaciones.
             </p>
           </div>
@@ -491,13 +486,13 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             ].map((service, idx) => (
               <div
                 key={idx}
-                className="p-6 rounded-3xl bg-[#0e011f] border border-white/10 hover:border-[#00C8D4]/40 transition-all duration-300 space-y-4 group"
+                className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 space-y-4 group"
               >
-                <div className={`w-12 h-12 rounded-2xl ${service.bg} flex items-center justify-center shadow-lg shrink-0 group-hover:scale-110 transition-transform`}>
+                <div className={`w-12 h-12 rounded-2xl ${service.bg} flex items-center justify-center shadow-md shrink-0 group-hover:scale-110 transition-transform`}>
                   {service.icon}
                 </div>
-                <h3 className="text-lg font-bold text-white font-serif">{service.title}</h3>
-                <p className="text-slate-300 text-xs font-light leading-relaxed">{service.desc}</p>
+                <h3 className="text-lg font-bold text-slate-900 font-serif">{service.title}</h3>
+                <p className="text-slate-600 text-xs font-normal leading-relaxed">{service.desc}</p>
               </div>
             ))}
           </div>
@@ -506,15 +501,15 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
 
       </section>
 
-      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/5">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-100">
         <div className="text-center space-y-4 max-w-3xl mx-auto mb-12">
           <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#FF0096] uppercase block">
             INSTALACIONES & ESPACIOS DE DISTINCIÓN
           </span>
-          <h2 className="text-3xl sm:text-5xl font-black font-serif text-white leading-tight">
+          <h2 className="text-3xl sm:text-5xl font-black font-serif text-slate-900 leading-tight">
             Nuestras Diversas Áreas
           </h2>
-          <p className="text-slate-300 text-sm font-light">
+          <p className="text-slate-600 text-sm font-normal">
             Recorra cada rincón de {config.name}. Haz clic en cualquier imagen para ampliarla en alta resolución.
           </p>
         </div>
@@ -537,8 +532,8 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               onClick={() => setActiveAreaTab(tab.id)}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 activeAreaTab === tab.id
-                  ? "bg-[#00C8D4] text-slate-950 font-black shadow-lg shadow-cyan-500/20"
-                  : "bg-[#1a0533] text-slate-300 hover:text-white border border-white/10"
+                  ? "bg-[#00C8D4] text-white font-black shadow-md"
+                  : "bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200"
               }`}
             >
               {tab.label}
@@ -554,7 +549,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               <div 
                 key={item.id} 
                 onClick={() => setActiveLightboxImg({ url: item.url, category: item.areaKey })}
-                className="relative rounded-2xl overflow-hidden aspect-video border border-white/10 group bg-slate-900 cursor-pointer hover:border-[#00C8D4] transition-all"
+                className="relative rounded-2xl overflow-hidden aspect-video border border-slate-200 group bg-slate-100 cursor-pointer hover:border-[#00C8D4] shadow-sm hover:shadow-lg transition-all"
               >
                 <img src={item.url} alt={item.areaKey} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-3">
@@ -568,36 +563,36 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         </div>
       </section>
 
-      <section id="sobre-nosotros" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <section id="sobre-nosotros" className="py-24 bg-white border-t border-slate-200/80 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           <div className="lg:col-span-6 space-y-6">
             <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#00C8D4] uppercase block">
               CONOCE NUESTRO ESTABLECIMIENTO
             </span>
-            <h2 className="text-3xl sm:text-5xl font-black font-serif text-white leading-tight">
+            <h2 className="text-3xl sm:text-5xl font-black font-serif text-slate-900 leading-tight">
               Más que un Hospedaje, Su Casa en la Playa
             </h2>
-            <p className="text-slate-300 text-sm sm:text-base font-light leading-relaxed">
+            <p className="text-slate-700 text-sm sm:text-base font-normal leading-relaxed">
               {description}
             </p>
 
             <div className="space-y-3 pt-2">
-              <div className="flex items-center gap-3 text-xs text-slate-200">
+              <div className="flex items-center gap-3 text-xs text-slate-700 font-medium">
                 <CheckCircle2 className="w-4 h-4 text-[#00C8D4]" />
                 <span>Atención personalizada las 24 horas del día.</span>
               </div>
-              <div className="flex items-center gap-3 text-xs text-slate-200">
+              <div className="flex items-center gap-3 text-xs text-slate-700 font-medium">
                 <CheckCircle2 className="w-4 h-4 text-[#FF0096]" />
                 <span>Ubicación estratégica: {address} ({destName}).</span>
               </div>
-              <div className="flex items-center gap-3 text-xs text-slate-200">
+              <div className="flex items-center gap-3 text-xs text-slate-700 font-medium">
                 <CheckCircle2 className="w-4 h-4 text-[#9B00CC]" />
                 <span>Reserva directa garantizada sin cargos ocultos.</span>
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-[#1a0533] border border-white/10 space-y-3">
+            <div className="p-4 rounded-2xl bg-slate-900 text-white space-y-3 shadow-lg">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3 text-xs text-slate-200">
                   <div className="p-2.5 bg-[#00C8D4] rounded-xl flex items-center justify-center shrink-0">
@@ -613,13 +608,13 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                   href={generalWaUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-[#0e011f] border border-white/15 hover:border-[#00C8D4] transition-colors shrink-0"
+                  className="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-slate-800 border border-white/15 hover:border-[#00C8D4] transition-colors shrink-0"
                 >
                   Cómo Llegar
                 </a>
               </div>
 
-              <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[10px] text-slate-400 font-mono">
+              <div className="flex items-center justify-between pt-2 border-t border-white/10 text-[10px] text-slate-400 font-mono">
                 <span>📍 Coordenadas: {latStr}° N, {lngStr}° W</span>
                 <span className="text-[#00C8D4] font-bold uppercase">Estado {coords.state}, Venezuela</span>
               </div>
@@ -629,7 +624,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                   href={`https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lng}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 py-2.5 px-3 rounded-xl text-xs font-extrabold text-white bg-[#0e011f] hover:bg-slate-900 border border-white/15 transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="flex-1 py-2.5 px-3 rounded-xl text-xs font-extrabold text-white bg-slate-800 hover:bg-slate-700 border border-white/15 transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <MapPin className="w-3.5 h-3.5 text-[#00C8D4]" />
                   <span>Google Maps</span>
@@ -648,14 +643,14 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           </div>
 
           <div className="lg:col-span-6">
-            <div className="relative rounded-3xl overflow-hidden border border-[#00C8D4]/40 shadow-2xl bg-[#0e011f] space-y-0">
+            <div className="relative rounded-3xl overflow-hidden border border-slate-200 shadow-2xl bg-white space-y-0">
               
-              <div className="p-3 bg-[#1a0533] border-b border-white/10 flex items-center justify-between">
+              <div className="p-3 bg-slate-900 border-b border-white/10 flex items-center justify-between text-white">
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
                   <span className="text-xs font-bold text-white font-serif">Mapa Satelital ({destName})</span>
                 </div>
-                <div className="flex bg-slate-900 rounded-xl p-1 border border-white/10 gap-1">
+                <div className="flex bg-slate-800 rounded-xl p-1 border border-white/10 gap-1">
                   <button
                     onClick={() => setMapViewMode("satelite")}
                     className={`px-3 py-1 rounded-lg text-[10px] font-extrabold uppercase transition-all cursor-pointer ${
@@ -667,7 +662,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                   <button
                     onClick={() => setMapViewMode("estandar")}
                     className={`px-3 py-1 rounded-lg text-[10px] font-extrabold uppercase transition-all cursor-pointer ${
-                      mapViewMode === "estandar" ? "bg-[#00C8D4] text-slate-950" : "text-slate-400 hover:text-white"
+                      mapViewMode === "estandar" ? "bg-[#00C8D4] text-white" : "text-slate-400 hover:text-white"
                     }`}
                   >
                     🗺️ Terrestre
@@ -675,7 +670,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                 </div>
               </div>
 
-              <div className="relative h-[380px] w-full overflow-hidden bg-slate-950">
+              <div className="relative h-[380px] w-full overflow-hidden bg-slate-100">
                 {mapViewMode === "satelite" ? (
                   <div className="w-full h-full relative">
                     <iframe
@@ -687,7 +682,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                       src={`https://maps.google.com/maps?q=${coords.lat},${coords.lng}&t=k&z=17&ie=UTF8&iwloc=&output=embed`}
                       className="w-full h-full filter contrast-105 brightness-95"
                     />
-                    <div className="absolute top-4 left-4 bg-[#0e011f]/90 backdrop-blur px-3 py-1.5 rounded-xl border border-white/15 text-[10px] text-white font-bold flex items-center gap-2 shadow-lg">
+                    <div className="absolute top-4 left-4 bg-slate-900/90 backdrop-blur px-3 py-1.5 rounded-xl border border-white/15 text-[10px] text-white font-bold flex items-center gap-2 shadow-lg">
                       <span className="w-2 h-2 rounded-full bg-[#00C8D4]" />
                       <span>Vista Aérea Satelital: {destName} ({coords.state})</span>
                     </div>
@@ -707,7 +702,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                 )}
               </div>
 
-              <div className="p-4 bg-[#0e011f] border-t border-white/10 flex items-center justify-between">
+              <div className="p-4 bg-slate-900 border-t border-white/10 flex items-center justify-between text-white">
                 <div>
                   <span className="text-[10px] text-slate-400 uppercase font-bold block">Sello de Calidad</span>
                   <span className="text-xs font-bold text-white">{config.name} • Red Oficial Hoteles de Venezuela</span>
@@ -721,7 +716,6 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         </div>
       </section>
 
-      {/* ── SECCIÓN DE CIERRE (BOTTOM CTA BANNER FULL-WIDTH CONTINUO) ── */}
       <section id="contacto" className="w-full m-0 bg-gradient-to-r from-[#D9008F] via-[#8B00D9] to-[#00D2FF] py-16 sm:py-20 px-4 sm:px-6 shadow-2xl">
         <div className="max-w-4xl mx-auto text-center text-white space-y-6">
           
