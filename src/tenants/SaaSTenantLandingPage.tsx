@@ -128,18 +128,25 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
       setLoadingRooms(true);
       try {
         let dbRooms: Room[] = [];
-        const estId = config.establishment_id || establishmentDetail?.id;
+        const currentEstablishmentId = config.establishment_id || establishmentDetail?.id || 1;
 
-        if (estId) {
+        // Fetch real active rooms from Supabase backend database
+        try {
           const { data, error } = await supabase
             .from("rooms")
             .select("*")
-            .eq("establishment_id", estId)
-            .eq("is_active", true);
-          if (!error && data && data.length > 0) dbRooms = data as Room[];
+            .eq("establishment_id", currentEstablishmentId)
+            .eq("is_active", true)
+            .order("created_at", { ascending: true });
+
+          if (!error && data && data.length > 0) {
+            dbRooms = data as Room[];
+          }
+        } catch (err) {
+          console.warn("Supabase rooms fetch warning:", err);
         }
 
-        // Leer habitaciones locales sincronizadas desde el CMS / Dashboard del propietario (hdv_custom_rooms)
+        // Leer habitaciones reales guardadas desde el Módulo de Inventario de Habitaciones (hdv_custom_rooms)
         const localRoomsKey = "hdv_custom_rooms";
         let localRooms: any[] = [];
         try {
@@ -149,17 +156,17 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             if (Array.isArray(parsedLocal) && parsedLocal.length > 0) {
               const filtered = parsedLocal.filter((r: any) => {
                 if (r.is_active === false) return false;
-                if (estId && (Number(r.establishment_id) === Number(estId) || String(r.establishment_id) === String(estId))) return true;
+                if (Number(r.establishment_id) === Number(currentEstablishmentId) || String(r.establishment_id) === String(currentEstablishmentId)) return true;
                 if (config.slug && r.establishment_slug === config.slug) return true;
                 if (Number(r.establishment_id) === 1 || Number(r.establishment_id) === 101) return true;
-                return !estId;
+                return false;
               });
               localRooms = filtered.length > 0 ? filtered : parsedLocal.filter((r: any) => r.is_active !== false);
             }
           }
         } catch (e) {}
 
-        // Combinar habitaciones de DB y locales evitando duplicados
+        // Combinar habitaciones reales de DB y locales evitando duplicados
         const combinedMap = new Map<string, Room>();
         [...dbRooms, ...localRooms].forEach((r: any) => {
           const key = String(r.id || r.name);
