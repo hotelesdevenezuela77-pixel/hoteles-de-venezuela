@@ -237,9 +237,9 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
 
         let fetched = Array.from(combinedMap.values());
 
-        // Garantizar inventario con las fotos de las 3 unidades de Aparto Posada del Mar si la DB aún no ha sido poblada
-        if (fetched.length === 0) {
-          fetched = [
+        // Garantizar inventario dinámico de 6 unidades para las aplicaciones SaaS
+        if (fetched.length < 6) {
+          const defaultCatalog = [
             {
               id: "101",
               name: "Apartamento Suite Vista al Mar",
@@ -250,11 +250,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               capacity: 4,
               beds_count: 2,
               bed_type: "King Size",
-              amenities: ["wifi", "aire", "balcon", "vista_mar", "cocina_equipada", "tv_cable"],
-              primary_image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80",
-              cover_image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80",
-              photos: ["https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80"],
-              fotos: ["https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80"]
+              amenities: ["wifi", "aire", "balcon", "vista_mar", "cocina_equipada", "tv_cable"]
             },
             {
               id: "102",
@@ -266,11 +262,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               capacity: 2,
               beds_count: 1,
               bed_type: "Matrimonial",
-              amenities: ["wifi", "aire", "banio_privado", "nevera", "caja_fuerte"],
-              primary_image: "https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1200&q=80",
-              cover_image: "https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1200&q=80",
-              photos: ["https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1200&q=80"],
-              fotos: ["https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1200&q=80"]
+              amenities: ["wifi", "aire", "banio_privado", "nevera", "caja_fuerte"]
             },
             {
               id: "103",
@@ -282,13 +274,53 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               capacity: 6,
               beds_count: 3,
               bed_type: "Queen + 2 Individuales",
-              amenities: ["wifi", "aire", "balcon", "cocina_equipada", "tv_cable"],
-              primary_image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1200&q=80",
-              cover_image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1200&q=80",
-              photos: ["https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1200&q=80"],
-              fotos: ["https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1200&q=80"]
+              amenities: ["wifi", "aire", "balcon", "cocina_equipada", "tv_cable"]
+            },
+            {
+              id: "104",
+              name: "Suite Presidencial Panorama Mar",
+              nombre: "Suite Presidencial Panorama Mar",
+              category: "Suite Premium VIP",
+              description: "Máximo confort costero con terraza panorámica de 180°, jacuzzi privado, área de estar y servicio preferencial.",
+              price_per_night: 140,
+              capacity: 4,
+              beds_count: 2,
+              bed_type: "King Size + Sofa Cama",
+              amenities: ["wifi", "aire", "jacuzzi", "vista_mar", "balcon", "tv_cable"]
+            },
+            {
+              id: "105",
+              name: "Habitación Doble Deluxe",
+              nombre: "Habitación Doble Deluxe",
+              category: "Doble Confort",
+              description: "Equipada con dos camas Queen, ambiente climatizado, escritorio de trabajo y vista directa a las áreas de descanso.",
+              price_per_night: 65,
+              capacity: 4,
+              beds_count: 2,
+              bed_type: "Queen Size",
+              amenities: ["wifi", "aire", "banio_privado", "tv_cable", "nevera"]
+            },
+            {
+              id: "106",
+              name: "Cabaña Familiar Vista al Jardín",
+              nombre: "Cabaña Familiar Vista al Jardín",
+              category: "Cabaña Privada",
+              description: "Ubicada entre áreas verdes con ambiente tranquilo, porche privado, hamacas y cocineta totalmente equipada.",
+              price_per_night: 95,
+              capacity: 5,
+              beds_count: 3,
+              bed_type: "Matrimonial + 2 Individuales",
+              amenities: ["wifi", "aire", "cocina_equipada", "estacionamiento", "tv_cable"]
             }
           ];
+
+          // Combinar registros manteniendo prioridad de los creados/modificados
+          const existingIds = new Set(fetched.map(r => String(r.id)));
+          defaultCatalog.forEach(item => {
+            if (!existingIds.has(item.id)) {
+              fetched.push(item as any);
+            }
+          });
         }
 
         const customPhotos = JSON.parse(localStorage.getItem("hdv_room_photos") || "{}");
@@ -317,13 +349,13 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             }
           }
 
-          // Evaluar propiedades de fotos reales subidas en el panel
+          // Evaluar propiedades de fotos reales subidas en el panel o base de datos Supabase
           const realPhotos =
             roomCustom ||
-            (Array.isArray(room.fotos) && room.fotos.length > 0 ? room.fotos : null) ||
+            (Array.isArray(room.photos) && room.photos.length > 0 && !room.photos[0].includes("unsplash") ? room.photos : null) ||
+            (Array.isArray(room.fotos) && room.fotos.length > 0 && !room.fotos[0].includes("unsplash") ? room.fotos : null) ||
             (Array.isArray((room as any).galeria) && (room as any).galeria.length > 0 ? (room as any).galeria : null) ||
-            (Array.isArray(room.photos) && room.photos.length > 0 ? room.photos : null) ||
-            [(room as any).foto_principal || (room as any).imagen_portada || room.cover_image || room.primary_image || room.image_url || (room as any).imagen || (room as any).foto].filter(Boolean);
+            [(room as any).foto_principal || (room as any).imagen_portada || room.cover_image || room.primary_image || room.image_url || (room as any).imagen || (room as any).foto].filter(p => p && !p.includes("unsplash"));
 
           const finalPhotos = realPhotos && realPhotos.length > 0 ? realPhotos : ["/placeholder-hotel.jpg"];
 
@@ -335,7 +367,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           };
         });
 
-        setRooms(updatedRooms);
+        setRooms(updatedRooms.slice(0, 6));
       } catch (e) {
         console.warn("Error cargando habitaciones:", e);
       } finally {

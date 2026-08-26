@@ -300,6 +300,36 @@ function App() {
     trackLocation(location);
   }, [location, trackLocation]);
 
+  useEffect(() => {
+    async function autoSyncLocalRoomPhotos() {
+      try {
+        const rawPhotos = localStorage.getItem("hdv_room_photos");
+        if (!rawPhotos) return;
+        const parsed = JSON.parse(rawPhotos);
+        for (const [roomId, photosList] of Object.entries(parsed)) {
+          if (Array.isArray(photosList) && photosList.length > 0) {
+            const primary = photosList[0];
+            await supabase
+              .from("rooms")
+              .update({
+                photos: photosList,
+                primary_image: primary,
+                cover_image: primary
+              })
+              .eq("id", roomId);
+          }
+        }
+      } catch (err) {
+        console.warn("AutoSync room photos warning:", err);
+      }
+    }
+    autoSyncLocalRoomPhotos();
+    if (typeof window !== "undefined") {
+      window.addEventListener("hdv_room_photos_updated", autoSyncLocalRoomPhotos);
+      return () => window.removeEventListener("hdv_room_photos_updated", autoSyncLocalRoomPhotos);
+    }
+  }, []);
+
   const { data: settings = [] } = useQuery<any[]>({
     queryKey: ["site-settings"],
     queryFn: async () => {

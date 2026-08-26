@@ -80,13 +80,13 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
 
   // Lógica dinámica para resolver la foto real de la habitación
   const rawPhoto =
+    (Array.isArray(room.photos) && room.photos.length > 0 ? room.photos[0] : null) ||
+    room.primary_image ||
+    room.cover_image ||
     (Array.isArray(room.fotos) && room.fotos.length > 0 ? room.fotos[0] : null) ||
     (Array.isArray((room as any).galeria) && (room as any).galeria.length > 0 ? (room as any).galeria[0] : null) ||
-    (Array.isArray(room.photos) && room.photos.length > 0 ? room.photos[0] : null) ||
     (room as any).foto_principal ||
     (room as any).imagen_portada ||
-    room.cover_image ||
-    room.primary_image ||
     room.image_url ||
     (room as any).imagen ||
     (room as any).foto;

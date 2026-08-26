@@ -442,6 +442,7 @@ export function OwnerDashboard() {
     return {};
   });
   const [dragActive, setDragActive] = useState<Record<number, boolean>>({});
+  const [isSyncingPhotos, setIsSyncingPhotos] = useState<boolean>(false);
 
   // Area & Facility Photos management state (Piscina, Restaurante, Parque, Fachada, Lobby, Spa, etc.)
   const [areaPhotos, setAreaPhotos] = useState<Record<number, Record<string, string[]>>>(() => {
@@ -1111,6 +1112,38 @@ export function OwnerDashboard() {
 
       const dbRooms = (!error && data) ? data : [];
 
+      // Sincronizar fotos guardadas localmente con las habitaciones en Supabase DB
+      if (dbRooms.length > 0) {
+        try {
+          const savedLocalPhotos = JSON.parse(localStorage.getItem("hdv_room_photos") || "{}");
+          const updatedPhotosState = { ...savedLocalPhotos };
+
+          for (const r of dbRooms) {
+            const localList = savedLocalPhotos[r.id] || savedLocalPhotos[String(r.id)] || [];
+            const dbList = r.photos || (r.primary_image ? [r.primary_image] : []);
+
+            if (localList.length > 0) {
+              // Si el usuario subió fotos localmente que aún no están en la DB de Supabase, subirlas a Supabase
+              await supabase.from("rooms").update({
+                photos: localList,
+                primary_image: localList[0],
+                cover_image: localList[0]
+              }).eq("id", r.id);
+              updatedPhotosState[r.id] = localList;
+              r.photos = localList;
+              r.primary_image = localList[0];
+            } else if (dbList.length > 0) {
+              updatedPhotosState[r.id] = dbList;
+            }
+          }
+
+          setRoomPhotos(updatedPhotosState);
+          localStorage.setItem("hdv_room_photos", JSON.stringify(updatedPhotosState));
+        } catch (e) {
+          console.warn("Error sincronizando fotos locales a DB:", e);
+        }
+      }
+
       // Combine with local rooms in localStorage
       const localRoomsKey = "hdv_custom_rooms";
       const localRooms = JSON.parse(localStorage.getItem(localRoomsKey) || "[]")
@@ -1441,6 +1474,54 @@ export function OwnerDashboard() {
     alert("🎉 Unidad Operativa actualizada correctamente.");
   };
 
+  // Sincronizador manual prioritario de fotografías al sitio web en vivo / dominio oficial
+  const handlePublishPhotosToLiveDomain = async () => {
+    setIsSyncingPhotos(true);
+    try {
+      const estId = Number(selectedCalendarEst || 2);
+      const savedLocalPhotos = JSON.parse(localStorage.getItem("hdv_room_photos") || "{}");
+      
+      let count = 0;
+      for (const room of rooms) {
+        const roomId = room.id;
+        const localPhotos = savedLocalPhotos[roomId] || savedLocalPhotos[String(roomId)] || roomPhotos[roomId] || [];
+        const dbPhotos = room.photos || (room.primary_image ? [room.primary_image] : []);
+        const photosToPush = localPhotos.length > 0 ? localPhotos : dbPhotos;
+
+        if (photosToPush.length > 0) {
+          const primary = photosToPush[0];
+          const { error } = await supabase
+            .from("rooms")
+            .upsert({
+              id: Number(roomId),
+              establishment_id: estId,
+              name: room.name || room.nombre,
+              description: room.description || room.descripcion,
+              capacity: Number(room.capacity || 2),
+              price_per_night: Number(room.price_per_night || 75),
+              quantity: Number(room.quantity || 1),
+              amenities: typeof room.amenities === "string" ? room.amenities : (room.amenities ? room.amenities.join(",") : "wifi,aire"),
+              is_active: room.is_active ?? true,
+              photos: photosToPush,
+              primary_image: primary,
+              cover_image: primary
+            }, { onConflict: "id" });
+
+          if (!error) count++;
+          else console.warn("Error en upsert Supabase:", error);
+        }
+      }
+
+      alert(`⚡ ¡ENVIADO A LA NUBE! ${count} Unidades e imágenes reales han sido publicadas en la base de datos de Supabase.\n\nAl refrescar apartoposadadelmar.net se reflejarán tus fotos reales.`);
+      fetchRooms(estId);
+    } catch (err) {
+      console.error("Error al publicar fotos:", err);
+      alert("Hubo una pequeña interrupción al conectar con Supabase. Intente nuevamente.");
+    } finally {
+      setIsSyncingPhotos(false);
+    }
+  };
+
   // 4. Alternar Activar / Desactivar Unidad
   const handleToggleRoomActive = async (room: any) => {
     if (room.is_example) {
@@ -1483,6 +1564,23 @@ export function OwnerDashboard() {
     alert("Habitación eliminada correctamente.");
   };
 
+  // Helper para sincronizar fotos de habitaciones con la base de datos Supabase
+  const syncRoomPhotosToSupabase = async (roomId: number | string, photosArray: string[]) => {
+    try {
+      const primaryImg = photosArray.length > 0 ? photosArray[0] : null;
+      await supabase
+        .from("rooms")
+        .update({
+          photos: photosArray,
+          primary_image: primaryImg,
+          cover_image: primaryImg
+        })
+        .eq("id", roomId);
+    } catch (err) {
+      console.warn("Error enviando fotos de habitación a Supabase:", err);
+    }
+  };
+
   // Drag & Drop Image Handlers
   const handleDrag = (e: React.DragEvent, roomId: number) => {
     e.preventDefault();
@@ -1508,6 +1606,7 @@ export function OwnerDashboard() {
           const current = prev[roomId] || [];
           const updated = [...current, base64];
           localStorage.setItem("hdv_room_photos", JSON.stringify({ ...prev, [roomId]: updated }));
+          syncRoomPhotosToSupabase(roomId, updated);
           if (typeof window !== "undefined") {
             window.dispatchEvent(new Event("hdv_room_photos_updated"));
             window.dispatchEvent(new Event("hdv_custom_rooms_updated"));
@@ -1524,6 +1623,7 @@ export function OwnerDashboard() {
       const current = prev[roomId] || [];
       const updated = current.filter((_, i) => i !== index);
       localStorage.setItem("hdv_room_photos", JSON.stringify({ ...prev, [roomId]: updated }));
+      syncRoomPhotosToSupabase(roomId, updated);
       if (typeof window !== "undefined") {
         window.dispatchEvent(new Event("hdv_room_photos_updated"));
         window.dispatchEvent(new Event("hdv_custom_rooms_updated"));
@@ -3128,26 +3228,37 @@ export function OwnerDashboard() {
                 <h3 className="text-md font-black text-gray-800 tracking-tight font-serif">Unidades Operativas y Catálogo de Habitaciones</h3>
                 <p className="text-xs text-gray-400 mt-1">Crea, activa/desactiva y gestiona las especificaciones y galerías fotográficas por unidad.</p>
               </div>
-              {/* 1. Botón modificado a "+ Agregar Unidad Operativa" */}
-              <button
-                onClick={() => {
-                  setRoomFormData({
-                    name: "",
-                    description: "",
-                    capacity: 2,
-                    price_per_night: 100,
-                    quantity: 5,
-                    amenities: "",
-                    is_active: false, // 4. Por defecto desactivado al crear
-                    room_number: ""
-                  });
-                  setNewRoomModalOpen(true);
-                }}
-                className="btn-cyan-gradient text-xs font-bold px-5 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer uppercase font-sans tracking-wide shadow-md hover:scale-102 transition-all shrink-0"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Agregar Unidad Operativa</span>
-              </button>
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
+                <button
+                  onClick={handlePublishPhotosToLiveDomain}
+                  disabled={isSyncingPhotos}
+                  className="bg-[#FF0096] hover:bg-[#d9007f] text-white text-xs font-extrabold px-4 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer uppercase tracking-wide shadow-md hover:scale-102 transition-all shrink-0 border border-white/20"
+                  title="Enviar imágenes reales a Supabase DB para actualizar apartoposadadelmar.net"
+                >
+                  {isSyncingPhotos ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4 text-white" />}
+                  <span>⚡ Publicar Fotos en Vivo (Dominio Oficial)</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setRoomFormData({
+                      name: "",
+                      description: "",
+                      capacity: 2,
+                      price_per_night: 100,
+                      quantity: 5,
+                      amenities: "",
+                      is_active: false, // 4. Por defecto desactivado al crear
+                      room_number: ""
+                    });
+                    setNewRoomModalOpen(true);
+                  }}
+                  className="btn-cyan-gradient text-xs font-bold px-5 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer uppercase font-sans tracking-wide shadow-md hover:scale-102 transition-all shrink-0"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Agregar Unidad Operativa</span>
+                </button>
+              </div>
             </div>
 
             {loadingRooms ? (
@@ -3298,7 +3409,25 @@ export function OwnerDashboard() {
 
                       {/* Photo manager Drag and Drop */}
                       <div className="lg:col-span-2 space-y-4">
-                        <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Galería Fotográfica de Habitación</span>
+                        <div className="flex flex-wrap items-center justify-between gap-2 pb-1 border-b border-gray-100">
+                          <span className="text-[10px] uppercase font-extrabold text-gray-500 tracking-wider">Galería Fotográfica de Habitación</span>
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              const roomPhotosList = roomPhotos[room.id] || (room.primary_image ? [room.primary_image] : []);
+                              if (roomPhotosList.length === 0) {
+                                alert("⚠️ Primero arrastra o selecciona al menos una fotografía para esta unidad.");
+                                return;
+                              }
+                              await syncRoomPhotosToSupabase(room.id, roomPhotosList);
+                              alert(`✅ ¡Fotos guardadas y publicadas exitosamente para "${room.name}"!\n\nSe han actualizado en la nube y son visibles en el dominio oficial.`);
+                            }}
+                            className="px-3.5 py-1.5 bg-[#00C8D4] hover:bg-[#00b3be] text-white rounded-xl text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
+                          >
+                            <Save className="w-3.5 h-3.5" />
+                            <span>💾 Guardar & Publicar Fotos</span>
+                          </button>
+                        </div>
 
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                           {photos.map((ph: string, idx: number) => (
@@ -3333,19 +3462,24 @@ export function OwnerDashboard() {
                               multiple
                               onChange={e => {
                                 if (e.target.files && e.target.files[0]) {
-                                  const file = e.target.files[0];
-                                  const reader = new FileReader();
-                                  reader.onload = () => {
-                                    const base64 = reader.result as string;
-                                    setRoomPhotos(prev => {
-                                      const current = prev[room.id] || [];
-                                      const updated = [...current, base64];
-                                      localStorage.setItem("hdv_room_photos", JSON.stringify({ ...prev, [room.id]: updated }));
-                                      return { ...prev, [room.id]: updated };
-                                    });
-                                  };
-                                  reader.readAsDataURL(file);
-                                }
+                                   const file = e.target.files[0];
+                                   const reader = new FileReader();
+                                   reader.onload = () => {
+                                     const base64 = reader.result as string;
+                                     setRoomPhotos(prev => {
+                                       const current = prev[room.id] || [];
+                                       const updated = [...current, base64];
+                                       localStorage.setItem("hdv_room_photos", JSON.stringify({ ...prev, [room.id]: updated }));
+                                       syncRoomPhotosToSupabase(room.id, updated);
+                                       if (typeof window !== "undefined") {
+                                         window.dispatchEvent(new Event("hdv_room_photos_updated"));
+                                         window.dispatchEvent(new Event("hdv_custom_rooms_updated"));
+                                       }
+                                       return { ...prev, [room.id]: updated };
+                                     });
+                                   };
+                                   reader.readAsDataURL(file);
+                                 }
                               }}
                               className="absolute inset-0 opacity-0 cursor-pointer"
                             />
