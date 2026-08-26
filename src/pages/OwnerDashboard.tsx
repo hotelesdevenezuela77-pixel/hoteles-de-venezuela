@@ -1512,6 +1512,34 @@ export function OwnerDashboard() {
     }
   };
 
+  const handlePublishAreaPhotosToLiveDomain = async () => {
+    setIsSyncingPhotos(true);
+    try {
+      const estId = Number(selectedCalendarEst || 2);
+      const savedAreaPhotos = JSON.parse(localStorage.getItem("hdv_area_photos") || "{}");
+      const estPhotos = savedAreaPhotos[estId] || savedAreaPhotos[String(estId)] || areaPhotos[estId] || {};
+
+      const { error } = await supabase
+        .from("establishments")
+        .update({ facility_photos: estPhotos })
+        .eq("id", estId);
+
+      if (error) console.warn("Error guardando facility_photos en Supabase:", error);
+
+      localStorage.setItem("hdv_area_photos", JSON.stringify({ ...savedAreaPhotos, [estId]: estPhotos }));
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("hdv_area_photos_updated"));
+      }
+
+      alert(`📸 ¡GALERÍA DE INSTALACIONES PUBLICADA! Se han guardado y publicado las fotografías de las instalaciones para la posada.\n\nYa son visibles en formato Collage en apartoposadadelmar.net.`);
+    } catch (err) {
+      console.error("Error al publicar fotos de instalaciones:", err);
+      alert("Hubo una pequeña interrupción al conectar con Supabase. Intente nuevamente.");
+    } finally {
+      setIsSyncingPhotos(false);
+    }
+  };
+
   // 4. Alternar Activar / Desactivar Unidad
   const handleToggleRoomActive = async (room: any) => {
     if (room.is_example) {
@@ -3220,13 +3248,23 @@ export function OwnerDashboard() {
               </div>
               <div className="flex flex-wrap items-center gap-2 shrink-0">
                 <button
+                  onClick={handlePublishAreaPhotosToLiveDomain}
+                  disabled={isSyncingPhotos}
+                  className="bg-[#00C8D4] hover:bg-[#00b3be] text-white text-xs font-extrabold px-4 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer uppercase tracking-wide shadow-md hover:scale-102 transition-all shrink-0 border border-white/20"
+                  title="Publicar fotos de Piscina, Fachada, Lobby y Áreas Comunes para verse en formato Collage en apartoposadadelmar.net"
+                >
+                  {isSyncingPhotos ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4 text-white" />}
+                  <span>📸 Publicar Galería de Instalaciones (Collage Vivo)</span>
+                </button>
+
+                <button
                   onClick={handlePublishPhotosToLiveDomain}
                   disabled={isSyncingPhotos}
                   className="bg-[#FF0096] hover:bg-[#d9007f] text-white text-xs font-extrabold px-4 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer uppercase tracking-wide shadow-md hover:scale-102 transition-all shrink-0 border border-white/20"
                   title="Enviar imágenes reales a Supabase DB para actualizar apartoposadadelmar.net"
                 >
                   {isSyncingPhotos ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4 text-white" />}
-                  <span>⚡ Publicar Fotos en Vivo (Dominio Oficial)</span>
+                  <span>⚡ Publicar Fotos de Habitaciones</span>
                 </button>
 
                 <button

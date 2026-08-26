@@ -460,6 +460,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-300">
             <a href="#inicio" className="hover:text-[#00C8D4] transition-colors">Inicio</a>
             <a href="#habitaciones" className="hover:text-[#00C8D4] transition-colors">Habitaciones & Tarifas</a>
+            <a href="#galeria" className="hover:text-[#00C8D4] transition-colors">Galería Instalaciones</a>
             <a href="#servicios" className="hover:text-[#00C8D4] transition-colors">Servicios</a>
             <a href="#sobre-nosotros" className="hover:text-[#00C8D4] transition-colors">Sobre Nosotros</a>
             <a href="#contacto" className="hover:text-[#00C8D4] transition-colors">Ubicación</a>
@@ -686,24 +687,24 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
 
       </section>
 
-      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-100">
+      <section id="galeria" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-100">
         <div className="text-center space-y-4 max-w-3xl mx-auto mb-12">
           <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#FF0096] uppercase block">
             INSTALACIONES & ESPACIOS DE DISTINCIÓN
           </span>
           <h2 className="text-3xl sm:text-5xl font-black font-serif text-slate-900 leading-tight">
-            Nuestras Diversas Áreas
+            Mosaico & Galería de Instalaciones
           </h2>
           <p className="text-slate-600 text-sm font-normal">
-            Recorra cada rincón de {config.name}. Haz clic en cualquier imagen para ampliarla en alta resolución.
+            Recorra cada rincón de {config.name}. Haz clic en cualquier imagen del collage para abrir la vista panorámica en alta resolución.
           </p>
         </div>
 
         <div className="flex flex-wrap justify-center gap-2 mb-10">
           {[
-            { id: "todas", label: "Todas las Áreas" },
+            { id: "todas", label: "✨ Todas las Áreas" },
             { id: "piscina", label: "🏊 Piscina & Solárium" },
-            { id: "restaurante", label: "🍽️ Restaurante & Gastronomía" },
+            { id: "restaurante", label: "🍽️ Restaurante & Bar" },
             { id: "parque", label: "🌳 Parque & Recreación" },
             { id: "fachada", label: "🏛️ Fachada & Exteriores" },
             { id: "lobby", label: "🛋️ Lobby & Recepción" },
@@ -726,25 +727,63 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {/* Dynamic Mosaic / Collage Layout Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[220px]">
           {Object.entries(areaPhotos)
             .filter(([key]) => activeAreaTab === "todas" || activeAreaTab === key)
             .flatMap(([areaKey, urls]) => urls.map((url, i) => ({ areaKey, url, id: `${areaKey}-${i}` })))
-            .map(item => (
-              <div 
-                key={item.id} 
-                onClick={() => setActiveLightboxImg({ url: item.url, category: item.areaKey })}
-                className="relative rounded-2xl overflow-hidden aspect-video border border-slate-200 group bg-slate-100 cursor-pointer hover:border-[#00C8D4] shadow-sm hover:shadow-lg transition-all"
-              >
-                <img src={item.url} alt={item.areaKey} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-3">
-                  <span className="text-[10px] font-black uppercase text-white tracking-widest bg-[#FF0096] px-2 py-0.5 rounded-md">
-                    {item.areaKey}
-                  </span>
-                  <span className="text-[10px] font-extrabold text-white bg-slate-900/80 px-2 py-0.5 rounded-md">🔍 Ampliar</span>
+            .map((item, idx) => {
+              const isHeroTile = idx === 0 && activeAreaTab === "todas";
+              const isWideTile = idx % 5 === 3;
+              const isTallTile = idx % 7 === 2;
+
+              let spanClasses = "col-span-1 row-span-1";
+              if (isHeroTile) {
+                spanClasses = "sm:col-span-2 sm:row-span-2 min-h-[440px]";
+              } else if (isWideTile) {
+                spanClasses = "sm:col-span-2 row-span-1";
+              } else if (isTallTile) {
+                spanClasses = "col-span-1 sm:row-span-2 min-h-[440px]";
+              }
+
+              const categoryLabels: Record<string, string> = {
+                piscina: "Piscina & Solárium",
+                restaurante: "Restaurante & Bar",
+                fachada: "Fachada & Exteriores",
+                lobby: "Lobby & Recepción",
+                parque: "Parque & Recreación",
+                playa: "Playa & Marina",
+                spa: "Spa & Bienestar",
+                eventos: "Salón de Eventos",
+                deportes: "Gimnasio & Deportes"
+              };
+
+              return (
+                <div 
+                  key={item.id} 
+                  onClick={() => setActiveLightboxImg({ url: item.url, category: categoryLabels[item.areaKey] || item.areaKey })}
+                  className={`relative rounded-3xl overflow-hidden border border-slate-200/90 group bg-slate-900 cursor-pointer hover:border-[#00C8D4] shadow-md hover:shadow-2xl transition-all duration-300 ${spanClasses}`}
+                >
+                  <img src={item.url} alt={item.areaKey} loading="lazy" className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out opacity-90 group-hover:opacity-100" />
+                  
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent opacity-80 group-hover:opacity-95 transition-opacity flex flex-col justify-between p-4">
+                    <div className="flex justify-end">
+                      <span className="text-[10px] font-black uppercase text-white tracking-widest bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity">
+                        🔍 Ampliar
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[10px] font-black uppercase text-white tracking-widest bg-gradient-to-r from-[#00C8D4] to-[#FF0096] px-3 py-1 rounded-full shadow-md">
+                        {categoryLabels[item.areaKey] || item.areaKey}
+                      </span>
+                      <span className="text-xs text-white/90 font-bold font-serif hidden sm:inline">
+                        {config.name}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
         </div>
       </section>
 
