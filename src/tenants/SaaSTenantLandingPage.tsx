@@ -542,7 +542,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             </div>
             <div className="p-3 bg-slate-900/85 backdrop-blur rounded-2xl border border-white/10 text-center shadow-xl">
               <span className="text-lg font-black text-white block font-serif">24/7</span>
-              <span className="text-[10px] text-slate-200 font-medium uppercase">Atención WhatsApp</span>
+              <span className="text-[10px] text-slate-200 font-medium uppercase">Atención directa por WhatsApp</span>
             </div>
             <div className="p-3 bg-slate-900/85 backdrop-blur rounded-2xl border border-white/10 text-center shadow-xl">
               <span className="text-lg font-black text-[#00C8D4] block font-serif">Starlink</span>
