@@ -1465,7 +1465,6 @@ export function OwnerDashboard() {
     alert("🎉 Unidad Operativa actualizada correctamente.");
   };
 
-  // Sincronizador manual prioritario de fotografías al sitio web en vivo / dominio oficial
   const handlePublishPhotosToLiveDomain = async () => {
     setIsSyncingPhotos(true);
     try {
