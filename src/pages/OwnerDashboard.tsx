@@ -3587,17 +3587,48 @@ export function OwnerDashboard() {
 
                   return (
                     <div className="bg-gray-50/50 border border-gray-150 rounded-2xl p-5 space-y-4">
-                      <div className="flex justify-between items-center">
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-gray-150">
                         <div>
                           <h4 className="text-xs font-black text-gray-800 uppercase tracking-wider flex items-center gap-2">
-                            <span>{activeCatObj.icon}</span>
+                            <span className="text-base">{activeCatObj.icon}</span>
                             <span>{activeCatObj.label}</span>
                           </h4>
                           <p className="text-[11px] text-gray-400 mt-0.5 font-medium">{activeCatObj.desc}</p>
                         </div>
-                        <span className="text-[10px] text-gray-400 font-bold">
-                          {currentPhotos.length} {currentPhotos.length === 1 ? "foto cargada" : "fotos cargadas"}
-                        </span>
+                        
+                        <div className="flex flex-wrap items-center gap-2 shrink-0">
+                          {/* Botón explícito para seleccionar múltiples fotos */}
+                          <label className="px-4 py-2 bg-[#FF0096] hover:bg-[#d9007f] text-white text-xs font-extrabold rounded-xl flex items-center gap-1.5 cursor-pointer uppercase tracking-wide shadow-md hover:scale-102 transition-all">
+                            <Upload className="w-4 h-4 text-white" />
+                            <span>➕ Seleccionar Varias Fotos</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              multiple
+                              onChange={e => {
+                                if (e.target.files && e.target.files.length > 0) {
+                                  handleAddAreaPhotos(estIdNum, selectedAreaCategory, e.target.files);
+                                }
+                              }}
+                              className="hidden"
+                            />
+                          </label>
+
+                          {/* Botón de Publicación directa */}
+                          <button
+                            type="button"
+                            onClick={handlePublishAreaPhotosToLiveDomain}
+                            disabled={isSyncingPhotos}
+                            className="px-4 py-2 bg-[#00C8D4] hover:bg-[#00b3be] text-white text-xs font-extrabold rounded-xl flex items-center gap-1.5 cursor-pointer uppercase tracking-wide shadow-md hover:scale-102 transition-all"
+                          >
+                            <Save className="w-4 h-4 text-white" />
+                            <span>💾 Guardar & Publicar Instalaciones</span>
+                          </button>
+
+                          <span className="text-[10px] font-extrabold text-gray-500 bg-gray-200/80 px-2.5 py-1 rounded-lg">
+                            {currentPhotos.length} {currentPhotos.length === 1 ? "foto" : "fotos"}
+                          </span>
+                        </div>
                       </div>
 
                       {/* Photo Grid & Drag/Drop Uploader */}
