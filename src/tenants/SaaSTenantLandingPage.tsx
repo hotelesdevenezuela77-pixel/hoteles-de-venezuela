@@ -538,15 +538,15 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             </div>
             <div className="p-3 bg-slate-900/85 backdrop-blur rounded-2xl border border-white/10 text-center shadow-xl">
               <span className="text-lg font-black text-[#FF0096] block font-serif">100%</span>
-              <span className="text-[10px] text-slate-200 font-medium uppercase">Garantía Directa</span>
+              <span className="text-[10px] text-slate-200 font-medium uppercase">Estacionamiento Privado</span>
             </div>
             <div className="p-3 bg-slate-900/85 backdrop-blur rounded-2xl border border-white/10 text-center shadow-xl">
-              <span className="text-lg font-black text-white block font-serif">24/7</span>
-              <span className="text-[10px] text-slate-200 font-medium uppercase">Atención directa por WhatsApp</span>
+              <span className="text-lg font-black text-[#00C8D4] block font-serif">WhatsApp</span>
+              <span className="text-[10px] text-slate-200 font-medium uppercase">Atención Directa</span>
             </div>
             <div className="p-3 bg-slate-900/85 backdrop-blur rounded-2xl border border-white/10 text-center shadow-xl">
-              <span className="text-lg font-black text-[#00C8D4] block font-serif">Starlink</span>
-              <span className="text-[10px] text-slate-200 font-medium uppercase">WiFi Ultra Rápido</span>
+              <span className="text-lg font-black text-[#00C8D4] block font-serif">Planta Eléctrica</span>
+              <span className="text-[10px] text-slate-200 font-medium uppercase">Respaldo 24/7</span>
             </div>
           </div>
 
