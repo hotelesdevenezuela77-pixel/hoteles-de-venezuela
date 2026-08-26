@@ -398,9 +398,9 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
   }, [config, establishmentDetail]);
 
   const bannerImage = config.branding?.banner_url || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1600&auto=format&fit=crop";
-  const phone = establishmentDetail?.phone || config.contact?.phone || "+58 412 000 0000";
-  const whatsapp = establishmentDetail?.whatsapp || establishmentDetail?.phone || config.contact?.whatsapp || phone;
-  const cleanWhatsapp = whatsapp.replace(/[^0-9]/g, "");
+  const phone = establishmentDetail?.phone || config.contact?.phone || "+584144815321";
+  const whatsapp = establishmentDetail?.whatsapp || establishmentDetail?.phone || config.contact?.whatsapp || "584144815321";
+  const cleanWhatsapp = whatsapp.replace(/[^0-9]/g, "") || "584144815321";
 
   const address = establishmentDetail?.address || "Carretera Principal, Sector Tucacas / Morrocoy";
   const description = establishmentDetail?.description || `En ${config.name} nos esmeramos por ofrecer una atención cálida, personalizada y de primer nivel. Nuestras instalaciones combinan la tranquilidad natural con el confort moderno para que su única preocupación sea descansar.`;
