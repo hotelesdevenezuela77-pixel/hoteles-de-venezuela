@@ -727,10 +727,10 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             <button
               key={tab.id}
               onClick={() => setActiveAreaTab(tab.id)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`px-4 py-2.5 rounded-2xl text-xs font-black transition-all cursor-pointer ${
                 activeAreaTab === tab.id
-                  ? "bg-[#00C8D4] text-white font-black shadow-md"
-                  : "bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200"
+                  ? "bg-[#00C8D4] text-white shadow-lg scale-102"
+                  : "bg-[#00C8D4]/20 text-[#009da7] hover:bg-[#00C8D4]/30 border border-[#00C8D4]/40"
               }`}
             >
               {tab.label}
@@ -779,12 +779,12 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                   
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent opacity-80 group-hover:opacity-95 transition-opacity flex flex-col justify-between p-4">
                     <div className="flex justify-end">
-                      <span className="text-[10px] font-black uppercase text-white tracking-widest bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span className="text-[10px] font-black uppercase text-white tracking-widest bg-[#00C8D4]/90 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/30 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
                         🔍 Ampliar
                       </span>
                     </div>
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-[10px] font-black uppercase text-white tracking-widest bg-gradient-to-r from-[#00C8D4] to-[#FF0096] px-3 py-1 rounded-full shadow-md">
+                      <span className="text-[10px] font-black uppercase text-white tracking-wider bg-[#00C8D4]/90 backdrop-blur-md px-3.5 py-1.5 rounded-full shadow-lg border border-white/30">
                         {categoryLabels[item.areaKey] || item.areaKey}
                       </span>
                       <span className="text-xs text-white/90 font-bold font-serif hidden sm:inline">
