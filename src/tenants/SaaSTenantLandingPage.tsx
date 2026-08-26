@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { 
   MapPin, Phone, Mail, Clock, Star, ShieldCheck, Wifi, Coffee, Compass, 
   Utensils, Car, Sparkles, CheckCircle2, MessageCircle, ExternalLink, Calendar,
-  Bed, Users, Award, ChevronDown, Layers, ArrowRight, Heart, Navigation, X
+  Bed, Users, Award, ChevronDown, Layers, ArrowRight, Heart, Navigation, X, ShoppingBag
 } from "lucide-react";
 import { type TenantConfig } from "./tenantContext";
 import { RoomCard, type Room } from "./components/RoomCard";
@@ -36,8 +36,17 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
   const [mapViewMode, setMapViewMode] = useState<"satelite" | "estandar">("satelite");
   const [activeLightboxImg, setActiveLightboxImg] = useState<{ url: string; category: string } | null>(null);
   const [rooms, setRooms] = useState<Room[]>([]);
+  const [cartRooms, setCartRooms] = useState<Room[]>([]);
   const [loadingRooms, setLoadingRooms] = useState<boolean>(true);
   const [areaPhotos, setAreaPhotos] = useState<Record<string, string[]>>({});
+
+  const toggleCartRoom = (room: Room) => {
+    setCartRooms(prev => {
+      const exists = prev.some(r => String(r.id) === String(room.id));
+      if (exists) return prev.filter(r => String(r.id) !== String(room.id));
+      return [...prev, room];
+    });
+  };
 
   useEffect(() => {
     async function fetchDetail() {
@@ -378,7 +387,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           };
         });
 
-        setRooms(updatedRooms.slice(0, 6));
+        setRooms(updatedRooms);
       } catch (e) {
         console.warn("Error cargando habitaciones:", e);
       } finally {
@@ -606,13 +615,13 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         
         <div className="text-center space-y-4 max-w-3xl mx-auto mb-16">
           <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#00C8D4] uppercase block">
-            SU REFUGIO DE DESCANSO
+            SU REFUGIO DE DESCANSO (BLOQUE 1)
           </span>
           <h2 className="text-3xl sm:text-5xl font-black font-serif text-slate-900">
-            Nuestras Habitaciones & Suites
+            Nuestras Habitaciones & Suites (Edificio Principal)
           </h2>
           <p className="text-slate-600 text-sm sm:text-base font-normal leading-relaxed">
-            Explore nuestras opciones de hospedaje completamente equipadas. Seleccione la opción ideal para su estadía y consulte disponibilidad en tiempo real.
+            Explore nuestras opciones de hospedaje completamente equipadas. Seleccione las habitaciones ideales para su grupo o familia.
           </p>
         </div>
 
@@ -624,13 +633,15 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {rooms.map((room) => (
+            {rooms.slice(0, 6).map((room) => (
               <RoomCard
                 key={room.id}
                 room={room}
                 hotelName={config.name}
                 whatsappPhone={whatsapp}
                 onOpenDetail={(r) => setSelectedRoom(r)}
+                onToggleCart={toggleCartRoom}
+                isInCart={cartRooms.some(cr => String(cr.id) === String(room.id))}
               />
             ))}
           </div>
@@ -638,6 +649,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
 
       </section>
 
+      {/* ── INTERSECCIÓN 1: SERVICIOS Y EXPERIENCIA EXCLUSIVA ── */}
       <section id="servicios" className="py-20 bg-slate-50 border-y border-slate-200/80 px-4 sm:px-6 lg:px-8">
         
         <div className="max-w-7xl mx-auto space-y-16">
@@ -698,6 +710,38 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
 
       </section>
 
+      {/* ── BLOQUE 2 DE HABITACIONES (EDIFICIO DE LA PISCINA) ── */}
+      {rooms.length > 6 && (
+        <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          <div className="text-center space-y-4 max-w-3xl mx-auto mb-16">
+            <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#00C8D4] uppercase block">
+              ÁREA PISCINA & CONFORT (BLOQUE 2)
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-black font-serif text-slate-900">
+              Habitaciones & Apartamentos (Edificio Piscina)
+            </h2>
+            <p className="text-slate-600 text-sm sm:text-base font-normal leading-relaxed">
+              Unidades acogedoras frente al solárium y la piscina con vistas privilegiadas.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {rooms.slice(6, 12).map((room) => (
+              <RoomCard
+                key={room.id}
+                room={room}
+                hotelName={config.name}
+                whatsappPhone={whatsapp}
+                onOpenDetail={(r) => setSelectedRoom(r)}
+                onToggleCart={toggleCartRoom}
+                isInCart={cartRooms.some(cr => String(cr.id) === String(room.id))}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── INTERSECCIÓN 2: MOSAICO Y GALERÍA DE INSTALACIONES ── */}
       <section id="galeria" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-100">
         <div className="text-center space-y-4 max-w-3xl mx-auto mb-12">
           <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#FF0096] uppercase block">
@@ -797,6 +841,37 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             })}
         </div>
       </section>
+
+      {/* ── BLOQUE 3 DE HABITACIONES (EDIFICIO DE RECEPCIÓN & APARTAMENTOS FAMILIARES) ── */}
+      {rooms.length > 12 && (
+        <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-100">
+          <div className="text-center space-y-4 max-w-3xl mx-auto mb-16">
+            <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#9B00CC] uppercase block">
+              EDIFICIO RECEPCIÓN & APARTAMENTOS (BLOQUE 3)
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-black font-serif text-slate-900">
+              Habitaciones & Apartamentos de Gran Capacidad
+            </h2>
+            <p className="text-slate-600 text-sm sm:text-base font-normal leading-relaxed">
+              Unidades amplias diseñadas para familias grandes y grupos en estadías prolongadas.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {rooms.slice(12).map((room) => (
+              <RoomCard
+                key={room.id}
+                room={room}
+                hotelName={config.name}
+                whatsappPhone={whatsapp}
+                onOpenDetail={(r) => setSelectedRoom(r)}
+                onToggleCart={toggleCartRoom}
+                isInCart={cartRooms.some(cr => String(cr.id) === String(room.id))}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       <section id="sobre-nosotros" className="py-24 bg-white border-t border-slate-200/80 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -1028,6 +1103,54 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         </a>
 
       </div>
+
+      {/* ── BARRA FLOTANTE DE MULTI-RESERVA ADAPTATIVA ── */}
+      {cartRooms.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-[99999] bg-slate-900/95 backdrop-blur-xl border-t border-[#00C8D4]/50 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.6)]">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-white">
+            
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-[#FF0096] rounded-2xl shrink-0 shadow-lg animate-bounce">
+                <ShoppingBag className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <span className="text-sm font-black block">
+                  🛒 {cartRooms.length} {cartRooms.length === 1 ? 'Habitación Seleccionada' : 'Habitaciones Seleccionadas'} para Reserva
+                </span>
+                <span className="text-xs text-[#00C8D4] font-extrabold">
+                  Total Estimado: ${cartRooms.reduce((sum, r) => sum + (r.price_per_night || r.tarifa_base || r.price || 70), 0)} / noche
+                </span>
+              </div>
+            </div>
+
+            {/* Pastillas de habitaciones elegidas */}
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 max-h-24 overflow-y-auto">
+              {cartRooms.map(r => (
+                <span key={r.id} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-extrabold bg-white/10 border border-white/20 text-white shadow-sm">
+                  {r.nombre || r.name || r.title} (${r.price_per_night || r.price || 70})
+                  <button onClick={() => toggleCartRoom(r)} className="hover:text-[#FF0096] font-black text-sm ml-1 cursor-pointer">✕</button>
+                </span>
+              ))}
+            </div>
+
+            {/* Botón Acción Checkout WhatsApp */}
+            <a
+              href={`https://wa.me/${cleanWhatsapp}?text=${encodeURIComponent(
+                `Hola ${config.name}, deseo consultar disponibilidad para la siguiente combinación de ${cartRooms.length} habitaciones:\n\n` +
+                cartRooms.map((r, idx) => `${idx + 1}. ${r.nombre || r.name} (Capacidad: ${r.capacity || 2} pers) - $${r.price_per_night || r.price || 70}/noche`).join('\n') +
+                `\n\nTotal estimado: $${cartRooms.reduce((sum, r) => sum + (r.price_per_night || r.tarifa_base || r.price || 70), 0)}/noche.\n\nPor favor asesórenme sobre las fechas disponibles.`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-3.5 rounded-2xl font-black text-xs text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-xl flex items-center gap-2 shrink-0 cursor-pointer uppercase tracking-wider hover:scale-105 active:scale-95 text-center"
+            >
+              <MessageCircle className="w-5 h-5 fill-current" />
+              <span>Reservar {cartRooms.length} Habitaciones por WhatsApp</span>
+            </a>
+
+          </div>
+        </div>
+      )}
 
       {activeLightboxImg && (
         <div 

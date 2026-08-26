@@ -39,6 +39,8 @@ interface RoomCardProps {
   hotelName: string;
   whatsappPhone: string;
   onOpenDetail: (room: Room) => void;
+  onToggleCart?: (room: Room) => void;
+  isInCart?: boolean;
 }
 
 // Función para construir la URL pública real de Supabase Storage
@@ -69,7 +71,7 @@ export function getPublicImageUrl(photo: any): string {
   return "/placeholder-hotel.jpg";
 }
 
-export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomCardProps) {
+export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail, onToggleCart, isInCart }: RoomCardProps) {
   console.log("HABITACION DATA:", room);
 
   // Title Mapping: room.nombre || room.title || room.name
@@ -221,29 +223,45 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail }: RoomC
           </div>
         </div>
 
-        {/* BOTONES DE ACCIÓN (DUAL CTA EN COLORES SÓLIDOS OFICIALES) */}
-        <div className="pt-4 border-t border-slate-100 grid grid-cols-2 gap-2.5">
+        {/* BOTONES DE ACCIÓN (DUAL CTA + MULTI-RESERVA) */}
+        <div className="pt-4 border-t border-slate-100 flex flex-col gap-2">
           
-          {/* Botón 1: WhatsApp Directo (Verde Sólido WhatsApp #25D366) */}
-          <a
-            href={waUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-2xl text-xs font-extrabold text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-md active:scale-95 text-center cursor-pointer"
-            title="Consultar por WhatsApp"
-          >
-            <MessageCircle className="w-4 h-4 fill-current shrink-0" />
-            <span className="truncate">WhatsApp</span>
-          </a>
+          <div className="grid grid-cols-2 gap-2">
+            {/* Botón 1: WhatsApp Directo (Verde Sólido WhatsApp #25D366) */}
+            <a
+              href={waUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-2xl text-xs font-extrabold text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-md active:scale-95 text-center cursor-pointer"
+              title="Consultar por WhatsApp"
+            >
+              <MessageCircle className="w-4 h-4 fill-current shrink-0" />
+              <span className="truncate">WhatsApp</span>
+            </a>
 
-          {/* Botón 2: Ver Ficha / Reservar (Azul Turquesa Sólido #00C8D4) */}
-          <button
-            onClick={() => onOpenDetail(room)}
-            className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-2xl text-xs font-extrabold text-white bg-[#00C8D4] hover:bg-[#00b3be] transition-all shadow-md active:scale-95 text-center cursor-pointer"
-          >
-            <Eye className="w-4 h-4 shrink-0" />
-            <span className="truncate">Ver Ficha</span>
-          </button>
+            {/* Botón 2: Ver Ficha / Reservar (Azul Turquesa Sólido #00C8D4) */}
+            <button
+              onClick={() => onOpenDetail(room)}
+              className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-2xl text-xs font-extrabold text-white bg-[#00C8D4] hover:bg-[#00b3be] transition-all shadow-md active:scale-95 text-center cursor-pointer"
+            >
+              <Eye className="w-4 h-4 shrink-0" />
+              <span className="truncate">Ver Ficha</span>
+            </button>
+          </div>
+
+          {/* Botón 3: Seleccionar para Multi-Reserva */}
+          {onToggleCart && (
+            <button
+              onClick={() => onToggleCart(room)}
+              className={`w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-2xl text-xs font-black transition-all cursor-pointer shadow-sm ${
+                isInCart
+                  ? "bg-[#FF0096] text-white shadow-md scale-[1.01]"
+                  : "bg-[#00C8D4]/15 text-[#009da7] border border-[#00C8D4]/30 hover:bg-[#00C8D4]/25"
+              }`}
+            >
+              {isInCart ? "✓ Añadida a Multi-Reserva" : "➕ Añadir a Reserva Múltiple"}
+            </button>
+          )}
 
         </div>
 
