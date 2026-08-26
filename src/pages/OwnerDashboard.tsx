@@ -3334,8 +3334,13 @@ export function OwnerDashboard() {
                           <div>
                             <span className="text-[9px] uppercase font-bold text-gray-400 tracking-wider block mb-1">Comodidades</span>
                             <div className="flex gap-1.5 flex-wrap">
-                              {room.amenities.split(",").map((am: string) => {
-                                const trimmed = am.trim();
+                              {(Array.isArray(room.amenities)
+                                ? room.amenities
+                                : typeof room.amenities === "string"
+                                ? room.amenities.split(",")
+                                : []
+                              ).map((am: any) => {
+                                const trimmed = String(am || "").trim();
                                 if (!trimmed) return null;
                                 return (
                                   <span key={trimmed} className="px-2 py-0.5 bg-brand-turquesa/10 text-brand-turquesa border border-brand-turquesa/10 rounded-full text-[9px] font-black uppercase">
