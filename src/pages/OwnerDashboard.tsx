@@ -3265,9 +3265,16 @@ export function OwnerDashboard() {
             ) : (
               <div className="space-y-8">
                 {rooms.map(room => {
-                  const photos = roomPhotos[room.id] || [];
-                  const isDragOver = dragActive[room.id] || false;
+                  const rawPhotos = roomPhotos[room.id] ?? room.photos ?? (room.primary_image ? [room.primary_image] : []);
+                  const photos: string[] = Array.isArray(rawPhotos)
+                    ? rawPhotos.map(p => String(p))
+                    : typeof rawPhotos === "string"
+                    ? [rawPhotos]
+                    : [];
+
+                  const isDragOver = Boolean(dragActive[room.id]);
                   const isExample = !!room.is_example;
+                  const mainThumb = room.primary_image || room.image_url || (Array.isArray(room.photos) ? room.photos[0] : typeof room.photos === "string" ? room.photos : null);
 
                   return (
                     <div key={room.id} className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -3275,11 +3282,11 @@ export function OwnerDashboard() {
                       {/* Room properties details */}
                       <div className="lg:col-span-1 space-y-4">
                         {/* Thumbnail principal de la habitación */}
-                        {(room.primary_image || room.image_url || (room.photos && room.photos[0])) && (
+                        {mainThumb && (
                           <div className="relative rounded-2xl overflow-hidden h-36 border border-gray-200 shadow-xs">
                             <img
-                              src={room.primary_image || room.image_url || room.photos[0]}
-                              alt={room.name}
+                              src={mainThumb}
+                              alt={room.name || "Habitación"}
                               className="w-full h-full object-cover"
                             />
                             <button
