@@ -595,7 +595,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           <div className="flex items-center justify-center sm:justify-start gap-3 p-2 border-t sm:border-t-0 sm:border-l border-slate-100">
             <span className="text-xl">🌟</span>
             <div>
-              <span className="text-xs font-bold text-slate-900 block">Atención Personalizada 24/7</span>
+              <span className="text-xs font-bold text-slate-900 block">Atención Personalizada</span>
               <span className="text-[11px] text-slate-500 font-medium">Atendidos por el equipo del hospedaje</span>
             </div>
           </div>
