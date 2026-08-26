@@ -9,7 +9,7 @@ import {
   Eye, Check, ListFilter, Tag, Sparkles, CalendarRange,
   Upload, Trash, FileText, ChevronRight, AlertCircle, RefreshCw,
   TrendingUp, Star, ShieldCheck, ArrowRight, Clipboard, Award, ShieldAlert, Download, ExternalLink, FileCheck,
-  Coffee, Edit3, Wrench, LifeBuoy, Cpu, Scale
+  Coffee, Edit3, Wrench, LifeBuoy, Cpu, Scale, Save
 } from "lucide-react";
 import { ScriptGenerator } from "../components/ScriptGenerator";
 import { AmenitiesSelector } from "@/components/admin/AmenitiesSelector";
