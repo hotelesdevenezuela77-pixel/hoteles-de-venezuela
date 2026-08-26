@@ -1112,36 +1112,27 @@ export function OwnerDashboard() {
 
       const dbRooms = (!error && data) ? data : [];
 
-      // Sincronizar fotos guardadas localmente con las habitaciones en Supabase DB
-      if (dbRooms.length > 0) {
-        try {
-          const savedLocalPhotos = JSON.parse(localStorage.getItem("hdv_room_photos") || "{}");
-          const updatedPhotosState = { ...savedLocalPhotos };
+      // Leer y sincronizar fotos de estado local de forma fluida sin bloquear la carga
+      try {
+        const savedLocalPhotos = JSON.parse(localStorage.getItem("hdv_room_photos") || "{}");
+        const updatedPhotosState = { ...savedLocalPhotos };
 
-          for (const r of dbRooms) {
-            const localList = savedLocalPhotos[r.id] || savedLocalPhotos[String(r.id)] || [];
-            const dbList = r.photos || (r.primary_image ? [r.primary_image] : []);
+        for (const r of dbRooms) {
+          const localList = savedLocalPhotos[r.id] || savedLocalPhotos[String(r.id)] || [];
+          const dbList = r.photos || (r.primary_image ? [r.primary_image] : []);
 
-            if (localList.length > 0) {
-              // Si el usuario subió fotos localmente que aún no están en la DB de Supabase, subirlas a Supabase
-              await supabase.from("rooms").update({
-                photos: localList,
-                primary_image: localList[0],
-                cover_image: localList[0]
-              }).eq("id", r.id);
-              updatedPhotosState[r.id] = localList;
-              r.photos = localList;
-              r.primary_image = localList[0];
-            } else if (dbList.length > 0) {
-              updatedPhotosState[r.id] = dbList;
-            }
+          if (localList.length > 0) {
+            updatedPhotosState[r.id] = localList;
+            r.photos = localList;
+            r.primary_image = localList[0];
+          } else if (dbList.length > 0) {
+            updatedPhotosState[r.id] = dbList;
           }
-
-          setRoomPhotos(updatedPhotosState);
-          localStorage.setItem("hdv_room_photos", JSON.stringify(updatedPhotosState));
-        } catch (e) {
-          console.warn("Error sincronizando fotos locales a DB:", e);
         }
+
+        setRoomPhotos(updatedPhotosState);
+      } catch (e) {
+        console.warn("Error leyendo fotos de localStorage:", e);
       }
 
       // Combine with local rooms in localStorage
