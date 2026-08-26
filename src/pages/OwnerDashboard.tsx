@@ -1517,7 +1517,12 @@ export function OwnerDashboard() {
     try {
       const estId = Number(selectedCalendarEst || 2);
       const savedAreaPhotos = JSON.parse(localStorage.getItem("hdv_area_photos") || "{}");
-      const estPhotos = savedAreaPhotos[estId] || savedAreaPhotos[String(estId)] || areaPhotos[estId] || {};
+      const estPhotos =
+        savedAreaPhotos[estId] ||
+        savedAreaPhotos[String(estId)] ||
+        (savedAreaPhotos.piscina || savedAreaPhotos.restaurante || savedAreaPhotos.fachada || savedAreaPhotos.lobby ? savedAreaPhotos : null) ||
+        areaPhotos[estId] ||
+        areaPhotos;
 
       const { error } = await supabase
         .from("establishments")
@@ -1663,6 +1668,12 @@ export function OwnerDashboard() {
           const updatedEst = { ...estData, [category]: updatedCat };
           const updatedAll = { ...prev, [estId]: updatedEst };
           localStorage.setItem("hdv_area_photos", JSON.stringify(updatedAll));
+          
+          supabase.from("establishments").update({ facility_photos: updatedEst }).eq("id", estId)
+            .then(({ error }) => {
+              if (error) console.warn("Error auto-syncing facility_photos:", error);
+            });
+
           if (typeof window !== "undefined") {
             window.dispatchEvent(new Event("hdv_area_photos_updated"));
           }
@@ -1681,6 +1692,12 @@ export function OwnerDashboard() {
       const updatedEst = { ...estData, [category]: updatedCat };
       const updatedAll = { ...prev, [estId]: updatedEst };
       localStorage.setItem("hdv_area_photos", JSON.stringify(updatedAll));
+
+      supabase.from("establishments").update({ facility_photos: updatedEst }).eq("id", estId)
+        .then(({ error }) => {
+          if (error) console.warn("Error auto-syncing facility_photos on remove:", error);
+        });
+
       if (typeof window !== "undefined") {
         window.dispatchEvent(new Event("hdv_area_photos_updated"));
       }

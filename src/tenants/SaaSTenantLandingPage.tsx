@@ -76,6 +76,17 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
 
   useEffect(() => {
     function loadAreaPhotos() {
+      // 1. Priorizar fotos de instalaciones reales guardadas en Supabase DB para este establecimiento
+      const dbFacilityPhotos = establishmentDetail?.facility_photos;
+      if (dbFacilityPhotos && typeof dbFacilityPhotos === "object" && Object.keys(dbFacilityPhotos).length > 0) {
+        const hasAnyPhoto = Object.values(dbFacilityPhotos).some((arr: any) => Array.isArray(arr) && arr.length > 0);
+        if (hasAnyPhoto) {
+          setAreaPhotos(dbFacilityPhotos as Record<string, string[]>);
+          return;
+        }
+      }
+
+      // 2. Probar estado local si está en el mismo dominio
       try {
         const saved = localStorage.getItem("hdv_area_photos");
         if (saved) {
