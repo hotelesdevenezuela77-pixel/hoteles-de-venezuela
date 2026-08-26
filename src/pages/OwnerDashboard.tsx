@@ -1425,6 +1425,14 @@ export function OwnerDashboard() {
     if (!editingRoomId) return;
 
     const imgUrl = roomFormData.primary_image;
+    const editingRoom = rooms.find(r => r.id === editingRoomId);
+    const existingPhotos = roomPhotos[editingRoomId] || (editingRoom?.photos && Array.isArray(editingRoom.photos) ? editingRoom.photos : []);
+    
+    let finalPhotos = [...existingPhotos];
+    if (imgUrl && !finalPhotos.includes(imgUrl)) {
+      finalPhotos = [imgUrl, ...finalPhotos];
+    }
+
     const payload = {
       name: roomFormData.name,
       description: roomFormData.description,
@@ -1434,9 +1442,9 @@ export function OwnerDashboard() {
       amenities: roomFormData.amenities,
       is_active: roomFormData.is_active,
       room_number: roomFormData.room_number,
-      primary_image: imgUrl,
-      image_url: imgUrl,
-      photos: imgUrl ? [imgUrl] : []
+      primary_image: finalPhotos[0] || imgUrl || null,
+      image_url: finalPhotos[0] || imgUrl || null,
+      photos: finalPhotos
     };
 
     try {
@@ -1459,10 +1467,18 @@ export function OwnerDashboard() {
     localStorage.setItem(localRoomsKey, JSON.stringify(updated));
     window.dispatchEvent(new CustomEvent("hdv_custom_rooms_updated"));
 
+    if (finalPhotos.length > 0) {
+      setRoomPhotos(prev => {
+        const next = { ...prev, [editingRoomId]: finalPhotos };
+        localStorage.setItem("hdv_room_photos", JSON.stringify(next));
+        return next;
+      });
+    }
+
     setRooms(prev => prev.map(r => r.id === editingRoomId ? { ...r, ...payload } : r));
     setEditingRoomModalOpen(false);
     setEditingRoomId(null);
-    alert("🎉 Unidad Operativa actualizada correctamente.");
+    alert("🎉 Unidad Operativa actualizada e imágenes guardadas correctamente.");
   };
 
   const handlePublishPhotosToLiveDomain = async () => {
