@@ -683,6 +683,20 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
             <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight font-serif" style={{ fontFamily: "'Playfair Display', 'Cinzel', serif" }}>
               {establishment.name}
             </h1>
+
+            {/* Pulsing Maintenance Badge para Establecimiento / Clientes SaaS */}
+            <div className="inline-flex items-center gap-2.5 p-[2px] rounded-2xl bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] shadow-2xl animate-pulse hover:scale-105 transition-all cursor-pointer my-1">
+              <div className="px-5 py-2 rounded-[14px] bg-slate-900/90 backdrop-blur flex items-center gap-2.5">
+                <span className="relative flex h-3 w-3 shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-400"></span>
+                </span>
+                <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-amber-300 drop-shadow">
+                  🛠️ SITIO WEB EN MANTENIMIENTO
+                </span>
+              </div>
+            </div>
+
             <p className="text-slate-300 text-sm md:text-base max-w-2xl leading-relaxed font-light">
               {establishment.description?.slice(0, 160) || "Disfruta de una experiencia inolvidable con la garantía y altos estándares de la Red Hoteles de Venezuela."}...
             </p>

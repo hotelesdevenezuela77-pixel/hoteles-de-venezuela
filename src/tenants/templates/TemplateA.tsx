@@ -47,6 +47,19 @@ export function TemplateA() {
             <h2 className="text-3xl md:text-5xl font-black font-serif text-white leading-tight">
               Disfruta la calidez de <span className="text-[#FF0096]">{config.name}</span>
             </h2>
+
+            {/* Pulsing Maintenance Badge */}
+            <div className="inline-flex items-center gap-2.5 p-[2px] rounded-2xl bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] shadow-2xl animate-pulse hover:scale-105 transition-all cursor-pointer">
+              <div className="px-5 py-2 rounded-[14px] bg-slate-900/90 backdrop-blur flex items-center gap-2.5">
+                <span className="relative flex h-3 w-3 shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-400"></span>
+                </span>
+                <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-amber-300 drop-shadow">
+                  🛠️ SITIO WEB EN MANTENIMIENTO
+                </span>
+              </div>
+            </div>
             <p className="text-slate-300 text-sm md:text-base leading-relaxed font-light">
               Ubicado en una de las zonas más privilegiadas del país, nuestro establecimiento combina el confort hogareño con servicios de primera clase. Nos enfocamos en ofrecer una experiencia de descanso óptima, ideal para parejas, familias y viajeros aventureros.
             </p>

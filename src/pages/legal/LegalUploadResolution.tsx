@@ -39,6 +39,7 @@ export interface LegalResolutionSubmission {
   timestamp_utc: string;
   status: "recibido" | "en_auditoria" | "validado" | "requiere_subsanacion";
   notes?: string;
+  file_url?: string;
 }
 
 export function LegalUploadResolution() {
@@ -132,7 +133,8 @@ export function LegalUploadResolution() {
       sha256_hash: generatedHash,
       timestamp_utc: utcTimestamp,
       status: "recibido",
-      notes
+      notes,
+      file_url: URL.createObjectURL(selectedFile)
     };
 
     try {
