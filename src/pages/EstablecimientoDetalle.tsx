@@ -622,10 +622,13 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
   const servicesList = parseServicesList(establishment.services);
 
   const tierColors: Record<string, string> = {
-    diamante: "from-purple-600 to-pink-600 text-white",
-    oro: "from-yellow-500 to-amber-600 text-white",
-    plata: "from-slate-400 to-slate-600 text-white",
-    bronce: "from-orange-600 to-orange-800 text-white",
+    diamante: "from-purple-600 via-pink-600 to-purple-800 text-white",
+    oro: "from-amber-500 via-yellow-500 to-amber-700 text-white",
+    plata: "from-slate-400 via-slate-500 to-slate-700 text-white",
+    bronce: "from-orange-600 via-amber-700 to-orange-900 text-white",
+    basico: "from-slate-700 via-slate-800 to-slate-900 text-white",
+    básico: "from-slate-700 via-slate-800 to-slate-900 text-white",
+    basic: "from-slate-700 via-slate-800 to-slate-900 text-white",
   };
 
   const isGastronomyCategory = (establishment.category_slug || establishment.category_name || "").toLowerCase().match(/(restaurante|bar|gastronomia|comida|market|cafeteria|lounge)/);
@@ -674,21 +677,35 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
 
         <div className="max-w-7xl mx-auto px-6 relative z-10 space-y-8">
           
-          {/* Eyebrow badge espaciado */}
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="text-[#00C8D4] text-[10px] md:text-xs font-black tracking-[0.25em] uppercase px-3.5 py-1.5 rounded-full bg-[#00C8D4]/10 border border-[#00C8D4]/30 shadow-xs">
-              {isGastronomyCategory ? "GASTRONOMÍA & ESPACIOS EXCLUSIVOS" : "HOSPEDAJE DE EXCELENCIA & DISTINCIÓN"}
-            </span>
-
-            <span className="bg-[#FF0096]/20 border border-[#FF0096]/40 text-[#FF0096] text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-full">
-              {establishment.category_name}
-            </span>
-
-            {establishment.membership_tier !== "basic" && (
-              <span className={`bg-gradient-to-r ${tierColors[establishment.membership_tier?.toLowerCase()] || "from-gray-500 to-gray-600"} text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-sm`}>
-                Socio {establishment.membership_tier}
+          {/* Eyebrow badge espaciado y navegación rápida */}
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-[#00C8D4] text-[10px] md:text-xs font-black tracking-[0.25em] uppercase px-3.5 py-1.5 rounded-full bg-[#00C8D4]/10 border border-[#00C8D4]/30 shadow-xs">
+                {isGastronomyCategory ? "GASTRONOMÍA & ESPACIOS EXCLUSIVOS" : "HOSPEDAJE DE EXCELENCIA & DISTINCIÓN"}
               </span>
-            )}
+
+              <span className="bg-[#FF0096]/20 border border-[#FF0096]/40 text-[#FF0096] text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-full">
+                {establishment.category_name}
+              </span>
+
+              {establishment.membership_tier && (
+                <span className={`bg-gradient-to-r ${tierColors[establishment.membership_tier?.toLowerCase()] || "from-slate-700 to-slate-800"} text-white font-black text-[10px] md:text-xs uppercase tracking-widest px-3.5 py-1.5 rounded-full border border-white/20 shadow-md flex items-center gap-1.5`}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00C8D4] animate-pulse" />
+                  Socio {establishment.membership_tier}
+                </span>
+              )}
+            </div>
+
+            {/* Botón de retorno al Panel de Propietarios */}
+            <Link href="/panel-propietario">
+              <button
+                type="button"
+                className="px-4 py-2 bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:from-[#9B00CC] hover:to-[#FF0096] text-white text-xs font-black uppercase tracking-wider rounded-2xl border border-white/20 shadow-xl transition-all hover:scale-105 active:scale-95 flex items-center gap-2 cursor-pointer group shrink-0"
+              >
+                <ArrowLeft className="w-4 h-4 text-white group-hover:-translate-x-1 transition-transform" />
+                <span>Regresar al Panel de Propietarios</span>
+              </button>
+            </Link>
           </div>
 
           {/* Título Principal en Playfair Display / Cinzel con palabra destacada en gradiente */}
@@ -1702,12 +1719,19 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
           </div>
         </div>
 
-        {/* Back Link */}
-        <div className="mt-10 text-left">
+        {/* Back Links */}
+        <div className="mt-10 text-left flex flex-wrap items-center justify-between gap-4">
           <Link href="/establecimientos">
-            <button className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors cursor-pointer bg-white border border-slate-200 rounded-xl px-4 py-2.5 shadow-2xs">
-              <ArrowLeft className="w-4 h-4" />
+            <button className="inline-flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-slate-900 transition-colors cursor-pointer bg-white border border-slate-200 rounded-xl px-4 py-2.5 shadow-2xs">
+              <ArrowLeft className="w-4 h-4 text-[#FF0096]" />
               <span>Volver al Catálogo General de Establecimientos</span>
+            </button>
+          </Link>
+
+          <Link href="/panel-propietario">
+            <button className="inline-flex items-center gap-2 text-xs font-extrabold text-white transition-colors cursor-pointer bg-gradient-to-r from-[#0e011f] to-[#1a0533] hover:from-[#FF0096] hover:to-[#9B00CC] border border-slate-700 rounded-xl px-5 py-2.5 shadow-md">
+              <ArrowLeft className="w-4 h-4 text-[#00C8D4]" />
+              <span>Regresar al Panel de Propietarios</span>
             </button>
           </Link>
         </div>
