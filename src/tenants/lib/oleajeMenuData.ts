@@ -30,7 +30,7 @@ export const OLEAJE_ZONES: OleajeZone[] = [
     capacityPerTable: 4,
     description: "Ambiente semi-sombreado rodeado de vegetación tropical y brisa marina constante.",
     badge: "Área Exclusiva",
-    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop"
+    image: "/images/oleaje/oleaje_2.jpg"
   },
   {
     id: "z2",
@@ -40,7 +40,7 @@ export const OLEAJE_ZONES: OleajeZone[] = [
     capacityPerTable: 4,
     description: "El corazón del restaurante con iluminación cálida, música en vivo y servicio prioritario.",
     badge: "Zona Principal",
-    image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop"
+    image: "/images/oleaje/oleaje_10.jpg"
   },
   {
     id: "z3",
@@ -50,7 +50,7 @@ export const OLEAJE_ZONES: OleajeZone[] = [
     capacityPerTable: 8,
     description: "Espacios amueblados de lujo para grupos grandes, familias y celebraciones privadas.",
     badge: "Reservado VIP",
-    image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop"
+    image: "/images/oleaje/oleaje_6.jpg"
   },
   {
     id: "z4",
@@ -60,7 +60,7 @@ export const OLEAJE_ZONES: OleajeZone[] = [
     capacityPerTable: 4,
     description: "Salones íntimos diseñados para cenas románticas y reuniones ejecutivas de alto nivel.",
     badge: "Íntimo Premium",
-    image: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?w=800&auto=format&fit=crop"
+    image: "/images/oleaje/oleaje_3.jpg"
   },
   {
     id: "z5",
@@ -70,7 +70,7 @@ export const OLEAJE_ZONES: OleajeZone[] = [
     capacityPerTable: 4,
     description: "Vista panorámica elevada hacia el mar Caribe y atardeceres espectaculares.",
     badge: "Vista al Mar",
-    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop"
+    image: "/images/oleaje/oleaje_7.jpg"
   },
   {
     id: "z6",
@@ -80,7 +80,7 @@ export const OLEAJE_ZONES: OleajeZone[] = [
     capacityPerTable: 4,
     description: "Mesas sobre la arena blanca con servicio de camastros, sombrillas y atención de bar.",
     badge: "Beach Club",
-    image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800&auto=format&fit=crop"
+    image: "/images/oleaje/oleaje_1.jpg"
   }
 ];
 

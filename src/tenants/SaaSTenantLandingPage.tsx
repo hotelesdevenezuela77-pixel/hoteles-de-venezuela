@@ -164,6 +164,37 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         return;
       }
 
+      if (isRestaurant) {
+        setAreaPhotos({
+          piscina: [
+            "/images/oleaje/oleaje_1.jpg",
+            "/images/oleaje/oleaje_2.jpg",
+            "/images/oleaje/oleaje_6.jpg",
+            "/images/oleaje/oleaje_7.jpg"
+          ],
+          restaurante: [
+            "/images/oleaje/oleaje_3.jpg",
+            "/images/oleaje/oleaje_4.jpg",
+            "/images/oleaje/oleaje_5.jpg",
+            "/images/oleaje/oleaje_8.jpg",
+            "/images/oleaje/oleaje_9.jpg",
+            "/images/oleaje/oleaje_10.jpg",
+            "/images/oleaje/oleaje_11.jpg",
+            "/images/oleaje/oleaje_12.jpg"
+          ],
+          lobby: [
+            "/images/oleaje/oleaje_13.jpg",
+            "/images/oleaje/oleaje_14.jpg",
+            "/images/oleaje/oleaje_15.jpg"
+          ],
+          fachada: [
+            "/images/oleaje/oleaje_1.jpg",
+            "/images/oleaje/oleaje_2.jpg"
+          ]
+        });
+        return;
+      }
+
       setAreaPhotos({
         piscina: [
           "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=1200&auto=format&fit=crop",
