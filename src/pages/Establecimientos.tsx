@@ -8,8 +8,10 @@ import {
   Search, MapPin, ChevronDown, ChevronUp, X, Filter, Grid, List, Compass, Loader2, 
   Wifi, Car, Waves, Wind, Palmtree, Zap, Droplets, Dog, Star, Sparkles, RotateCcw,
   ShieldCheck, Award, CreditCard, Coffee, Utensils, Bed, Users, Accessibility,
-  Sun, Tv, Bath, Flame, Wine, Heart, Smile, Check, DollarSign, Building2
+  Sun, Tv, Bath, Flame, Wine, Heart, Smile, Check, DollarSign, Building2, Map
 } from "lucide-react";
+import { PriceHistogramFilter } from "../components/filters/PriceHistogramFilter";
+import { ZoneMapFilter, InteractiveZoneMapView, TOURIST_ZONES } from "../components/filters/ZoneMapFilter";
 
 interface Category {
   id: number;
@@ -30,7 +32,8 @@ export function Establecimientos() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [loading, setLoading] = useState(false);
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "list" | "map">("grid");
+  const [selectedZone, setSelectedZone] = useState<string>("");
   const [showFilters, setShowFilters] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<"category" | "destination" | null>(null);
   const [comparedIds, setComparedIds] = useState<number[]>([]);
@@ -85,6 +88,7 @@ export function Establecimientos() {
   const handleClearFilters = () => {
     setSelectedCategory("");
     setSelectedDestination("");
+    setSelectedZone("");
     setMinPrice(0);
     setMaxPrice(1000);
     setMinRating(0);
@@ -499,6 +503,14 @@ export function Establecimientos() {
   const filtered = establishments.filter(est => {
     const matchesCategory = !selectedCategory || est.category_slug === selectedCategory;
     const matchesDestination = !selectedDestination || est.destination_slug === selectedDestination;
+    
+    // Filtro por Zona Turística Estratégica
+    const activeZoneObj = TOURIST_ZONES.find(z => z.id === selectedZone);
+    const matchesZone = !selectedZone || (activeZoneObj && (
+      activeZoneObj.destinations.includes(est.destination_slug || "") ||
+      activeZoneObj.destinations.some(d => (est.address || "").toLowerCase().includes(d))
+    ));
+
     const matchesQuery = !searchQuery || 
       est.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       est.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -625,7 +637,7 @@ export function Establecimientos() {
     const starsCount = getStarsCount();
     const matchesStars = selectedStars.length === 0 || selectedStars.includes(starsCount);
 
-    return matchesCategory && matchesDestination && matchesQuery && matchesPrice && matchesRating && matchesCapacity && matchesSubtype && matchesStars &&
+    return matchesCategory && matchesDestination && matchesZone && matchesQuery && matchesPrice && matchesRating && matchesCapacity && matchesSubtype && matchesStars &&
       matchesCertifications && matchesInfra && matchesPaymentMethods && matchesMeals && matchesFacilities && matchesRoomFeatures && matchesActivities && matchesGroupTypes && matchesAccessibility && matchesLocationDistances;
   });
 
@@ -635,6 +647,7 @@ export function Establecimientos() {
   const activeFiltersCount = 
     (selectedCategory ? 1 : 0) + 
     (selectedDestination ? 1 : 0) + 
+    (selectedZone ? 1 : 0) +
     (minPrice > 0 ? 1 : 0) + 
     (maxPrice < 1000 ? 1 : 0) + 
     (minRating > 0 ? 1 : 0) + 
@@ -754,33 +767,23 @@ export function Establecimientos() {
                   </select>
                 </div>
 
-                {/* Rango de Precios */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Rango de Tarifa (USD / Noche)</label>
-                  <div className="flex items-center gap-2">
-                    <div className="relative flex-1">
-                      <span className="absolute left-3 top-2 text-gray-400 text-xs font-bold">$</span>
-                      <input
-                        type="number"
-                        placeholder="Mín"
-                        value={minPrice || ""}
-                        onChange={(e) => setMinPrice(Math.max(0, Number(e.target.value)))}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-6 pr-2 py-2 text-xs font-semibold text-gray-700 outline-none focus:border-[#00C8D4]"
-                      />
-                    </div>
-                    <span className="text-gray-400 text-xs">—</span>
-                    <div className="relative flex-1">
-                      <span className="absolute left-3 top-2 text-gray-400 text-xs font-bold">$</span>
-                      <input
-                        type="number"
-                        placeholder="Máx"
-                        value={maxPrice || ""}
-                        onChange={(e) => setMaxPrice(Math.max(0, Number(e.target.value)))}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-6 pr-2 py-2 text-xs font-semibold text-gray-700 outline-none focus:border-[#00C8D4]"
-                      />
-                    </div>
-                  </div>
-                </div>
+                {/* Zonas Turísticas Estratégicas de Venezuela */}
+                <ZoneMapFilter
+                  establishments={establishments}
+                  selectedZone={selectedZone}
+                  onSelectZone={setSelectedZone}
+                  selectedDestination={selectedDestination}
+                  onSelectDestination={handleDestinationChange}
+                />
+
+                {/* Histograma Inteligente de Estadística & Rango de Precios */}
+                <PriceHistogramFilter
+                  establishments={establishments}
+                  minPrice={minPrice}
+                  maxPrice={maxPrice}
+                  setMinPrice={setMinPrice}
+                  setMaxPrice={setMaxPrice}
+                />
 
                 {/* Capacidad de Huéspedes */}
                 <div className="space-y-1.5">
@@ -1614,6 +1617,14 @@ export function Establecimientos() {
                   >
                     <List className="w-4 h-4" />
                   </button>
+                  <button
+                    onClick={() => setViewMode("map")}
+                    className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold ${viewMode === "map" ? "bg-gradient-to-r from-[#00C8D4] to-[#FF0096] text-white shadow-md font-bold" : "text-gray-400 hover:text-gray-600"}`}
+                    title="Vista Mapa Interactivo por Zona"
+                  >
+                    <Map className="w-4 h-4" />
+                    <span className="hidden sm:inline">Mapa por Zona</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -1694,6 +1705,12 @@ export function Establecimientos() {
                     Restablecer Búsqueda
                   </button>
                 </div>
+              ) : viewMode === "map" ? (
+                <InteractiveZoneMapView
+                  establishments={filtered}
+                  selectedZone={selectedZone}
+                  onSelectZone={setSelectedZone}
+                />
               ) : viewMode === "grid" ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {filtered.map((est) => (
