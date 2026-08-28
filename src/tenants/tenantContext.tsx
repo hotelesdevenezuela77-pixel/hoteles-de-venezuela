@@ -295,7 +295,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        // C3. Búsqueda por palabras clave en dominios personalizados (Oleaje, Perla Negra)
+        // C3. Búsqueda por palabras clave en dominios personalizados (Oleaje, Perla Negra, My Campers)
         if (cleanHost.includes("oleaje")) {
           const oleajeConfig = activeRegistry["oleaje-beach-club"] || activeRegistry["oleaje-tucacas"];
           if (oleajeConfig) {
@@ -311,6 +311,16 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
           if (perlaConfig) {
             console.log(`[Multi-tenant] Cargando Perla Negra por coincidencia de palabra clave en host: ${cleanHost}`);
             setConfig(perlaConfig);
+            setIsLoading(false);
+            return;
+          }
+        }
+
+        if (cleanHost.includes("bocetos") || cleanHost.includes("mycampers") || cleanHost.includes("campers")) {
+          const campersConfig = activeRegistry["my-campers"];
+          if (campersConfig) {
+            console.log(`[Multi-tenant] Cargando My Campers por coincidencia de dominio en host: ${cleanHost}`);
+            setConfig(campersConfig);
             setIsLoading(false);
             return;
           }
@@ -389,9 +399,9 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
           {error || "El establecimiento solicitado no pertenece a la red de Hoteles de Venezuela o no está configurado."}
         </p>
         <div className="mt-6 text-xs text-gray-500">
-          Intente acceder con un parámetro de prueba: <br />
+          Verifique la configuración del dominio en el Panel SaaS o intente acceder con el parámetro: <br />
           <code className="text-[#00C8D4] bg-[#1a0533] px-2 py-1 rounded inline-block mt-2 font-mono">
-            {window.location.origin}/?tenant=aparto-posada-del-mar
+            {window.location.origin}/?tenant=slug-del-establecimiento
           </code>
         </div>
       </div>
