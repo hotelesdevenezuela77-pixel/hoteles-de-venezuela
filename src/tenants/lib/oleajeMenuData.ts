@@ -94,7 +94,7 @@ export const OLEAJE_CATEGORIES = [
   { id: "pastas", name: "Pastas de Autor", icon: "ChefHat" },
   { id: "sopas", name: "Sopas & Asopados", icon: "Soup" },
   { id: "postres", name: "Postres Dulces", icon: "Cake" },
-  { id: "cocteles", name: "Cócteles & Bar", icon: "Cocktail" },
+  { id: "cocteles", name: "Cócteles & Bar", icon: "Wine" },
   { id: "bebidas", name: "Bebidas & Refrescos", icon: "Wine" }
 ];
 

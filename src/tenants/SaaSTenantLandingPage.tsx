@@ -3,7 +3,7 @@ import {
   MapPin, Phone, Mail, Clock, Star, ShieldCheck, Wifi, Coffee, Compass, 
   Utensils, Car, Sparkles, CheckCircle2, MessageCircle, ExternalLink, Calendar,
   Bed, Users, Award, ChevronDown, Layers, ArrowRight, Heart, Navigation, X, ShoppingBag,
-  ChefHat, Flame, Fish, Waves, Beef, Wine, Cake, Cocktail, Soup, Plus, Minus, Search
+  ChefHat, Flame, Fish, Waves, Beef, Wine, Cake, Soup, Plus, Minus, Search
 } from "lucide-react";
 import { type TenantConfig } from "./tenantContext";
 import { RoomCard, type Room } from "./components/RoomCard";

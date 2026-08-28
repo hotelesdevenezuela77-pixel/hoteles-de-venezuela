@@ -295,6 +295,27 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
+        // C3. Búsqueda por palabras clave en dominios personalizados (Oleaje, Perla Negra)
+        if (cleanHost.includes("oleaje")) {
+          const oleajeConfig = activeRegistry["oleaje-beach-club"] || activeRegistry["oleaje-tucacas"];
+          if (oleajeConfig) {
+            console.log(`[Multi-tenant] Cargando Oleaje por coincidencia de palabra clave en host: ${cleanHost}`);
+            setConfig(oleajeConfig);
+            setIsLoading(false);
+            return;
+          }
+        }
+
+        if (cleanHost.includes("perla") || cleanHost.includes("negra")) {
+          const perlaConfig = activeRegistry["perla-negra"];
+          if (perlaConfig) {
+            console.log(`[Multi-tenant] Cargando Perla Negra por coincidencia de palabra clave en host: ${cleanHost}`);
+            setConfig(perlaConfig);
+            setIsLoading(false);
+            return;
+          }
+        }
+
         // D. Fallback para desarrollo local (puerto de Vite local sin slug)
         if (hostname === "localhost" || hostname === "127.0.0.1") {
           console.warn("[Multi-tenant] Ejecutando en localhost. Se cargará Aparto Posada del Mar como tenant por defecto.");
