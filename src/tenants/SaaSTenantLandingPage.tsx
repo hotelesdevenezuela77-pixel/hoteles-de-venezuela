@@ -572,14 +572,14 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             </h1>
 
             <div className="flex flex-col items-center justify-center gap-3">
-              <div className="inline-flex items-center gap-2.5 p-[2px] rounded-2xl bg-[#FF0096] shadow-2xl animate-pulse hover:scale-105 transition-all">
+              <div className="inline-flex items-center gap-2.5 p-[2px] rounded-2xl bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] shadow-2xl animate-pulse hover:scale-105 transition-all">
                 <div className="px-5 py-2 rounded-[14px] bg-slate-900/90 backdrop-blur flex items-center gap-2.5">
                   <span className="relative flex h-3 w-3 shrink-0">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-400"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-400"></span>
                   </span>
-                  <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-emerald-300 drop-shadow">
-                    🍽️ ABIERTO TODOS LOS DÍAS • COCINA DE ALTA GAMA (11:00 AM - 11:00 PM)
+                  <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-amber-300 drop-shadow">
+                    🛠️ EN MANTENIMIENTO PROGRAMADO • PLATAFORMA WEB EN CONSTRUCCIÓN
                   </span>
                 </div>
               </div>
@@ -645,14 +645,14 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             </h1>
 
             <div className="flex flex-col items-center justify-center gap-3">
-              <div className="inline-flex items-center gap-2.5 p-[2px] rounded-2xl bg-[#FF0096] shadow-2xl animate-pulse hover:scale-105 transition-all">
+              <div className="inline-flex items-center gap-2.5 p-[2px] rounded-2xl bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] shadow-2xl animate-pulse hover:scale-105 transition-all">
                 <div className="px-5 py-2 rounded-[14px] bg-slate-900/90 backdrop-blur flex items-center gap-2.5">
                   <span className="relative flex h-3 w-3 shrink-0">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-400"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-400"></span>
                   </span>
-                  <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-emerald-300 drop-shadow">
-                    {isPerlaNegra ? "🏖️ SU CASA EN LA PLAYA • RESERVAS ABIERTAS 2026" : "🛠️ SITIO WEB EN MANTENIMIENTO"}
+                  <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-amber-300 drop-shadow">
+                    🛠️ EN MANTENIMIENTO PROGRAMADO • PLATAFORMA WEB EN CONSTRUCCIÓN
                   </span>
                 </div>
               </div>

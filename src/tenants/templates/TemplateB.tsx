@@ -63,7 +63,7 @@ export function TemplateB() {
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-400"></span>
                 </span>
                 <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-amber-300 drop-shadow">
-                  🛠️ SITIO WEB EN MANTENIMIENTO
+                  🛠️ EN MANTENIMIENTO PROGRAMADO • PLATAFORMA WEB EN CONSTRUCCIÓN
                 </span>
               </div>
             </div>
