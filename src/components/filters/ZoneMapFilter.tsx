@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "wouter";
-import { MapPin, Compass, Sparkles, Navigation, X, Star, Layers, ExternalLink } from "lucide-react";
+import { MapPin, Compass, Sparkles, Navigation, X, Star, Layers, ExternalLink, Map, DollarSign } from "lucide-react";
 import { Establishment, getVirtualPrice } from "../layout/EstablishmentCard";
 
 export interface ZoneRegion {
@@ -73,6 +73,7 @@ interface ZoneMapFilterProps {
   onSelectZone: (zoneId: string) => void;
   selectedDestination: string;
   onSelectDestination: (destSlug: string) => void;
+  onOpenMapView?: () => void;
 }
 
 export function ZoneMapFilter({
@@ -80,11 +81,9 @@ export function ZoneMapFilter({
   selectedZone,
   onSelectZone,
   selectedDestination,
-  onSelectDestination
+  onSelectDestination,
+  onOpenMapView
 }: ZoneMapFilterProps) {
-  const [activePin, setActivePin] = useState<Establishment | null>(null);
-  const [mapStyle, setMapStyle] = useState<"satelite" | "noche">("noche");
-
   // Helper para saber cuántas propiedades hay en una zona
   const getZoneCount = (zone: ZoneRegion) => {
     return establishments.filter(est => 
@@ -93,31 +92,64 @@ export function ZoneMapFilter({
     ).length;
   };
 
-  // Posicionar los establecimientos en el mapa interactivo simulado
-  const mapPins = establishments.slice(0, 20).map((est, idx) => {
-    // Determinar coordenada según su zona o dispersión sintética visual
-    const zone = TOURIST_ZONES.find(z => 
-      z.destinations.includes(est.destination_slug || "")
-    ) || TOURIST_ZONES[0];
-
-    const offsetAngle = (idx * 137.5) * (Math.PI / 180);
-    const radius = (idx % 4) * 3 + 2;
-    const x = Math.max(15, Math.min(85, zone.coordinates.x + Math.cos(offsetAngle) * radius));
-    const y = Math.max(15, Math.min(85, zone.coordinates.y + Math.sin(offsetAngle) * radius));
-
-    return {
-      est,
-      x,
-      y,
-      price: getVirtualPrice(est),
-      zone
-    };
-  });
-
   return (
     <div className="space-y-4">
-      {/* 1. Selector de Zonas Turísticas (Chips Horizontales / Sidebar Grid) */}
-      <div className="space-y-2">
+      {/* 1. Mini Widget Tarjeta de Mapa de Venezuela */}
+      <div className="relative rounded-2xl overflow-hidden border border-[#00C8D4]/40 bg-gradient-to-br from-slate-950 via-[#0e011f] to-slate-900 p-3.5 text-white shadow-xl space-y-2.5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-lg bg-[#00C8D4]/20 border border-[#00C8D4]/50 flex items-center justify-center text-[#00C8D4]">
+              <MapPin className="w-3.5 h-3.5 animate-bounce" />
+            </div>
+            <span className="text-xs font-black text-white uppercase tracking-wider font-sans">
+              Mapa Interactivo por Zona
+            </span>
+          </div>
+          <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-[#00C8D4] text-slate-950">
+            HDV Live
+          </span>
+        </div>
+
+        {/* Vista previa miniatura del mapa interactivo */}
+        <div 
+          onClick={onOpenMapView} 
+          className="relative h-28 rounded-xl overflow-hidden border border-slate-700/80 bg-slate-950 flex items-center justify-center cursor-pointer group"
+          title="Haz clic para abrir el Mapa Interactivo"
+        >
+          <div className="absolute inset-0 bg-gradient-to-tr from-cyan-950/40 via-purple-950/40 to-slate-950 opacity-90 group-hover:scale-105 transition-transform duration-500" />
+          
+          {/* Silueta vectorial de Venezuela */}
+          <svg viewBox="0 0 400 250" className="w-full h-full opacity-30 fill-[#00C8D4]/20 stroke-[#00C8D4]">
+            <path d="M 80 80 C 140 60, 240 50, 320 90 C 360 110, 380 160, 340 200 C 280 230, 180 220, 110 190 C 60 160, 50 110, 80 80 Z" />
+          </svg>
+
+          {/* Pins de precios neón simulados */}
+          <div className="absolute top-[35%] left-[65%] flex items-center gap-0.5 bg-[#FF0096] text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-lg shadow-[#FF0096]/50 animate-pulse">
+            <DollarSign className="w-2.5 h-2.5" />100
+          </div>
+          <div className="absolute top-[55%] left-[32%] flex items-center gap-0.5 bg-[#00C8D4] text-slate-950 text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-lg shadow-[#00C8D4]/50">
+            <DollarSign className="w-2.5 h-2.5" />75
+          </div>
+          <div className="absolute top-[40%] left-[45%] flex items-center gap-0.5 bg-[#9B00CC] text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-lg shadow-[#9B00CC]/50">
+            <DollarSign className="w-2.5 h-2.5" />150
+          </div>
+
+          {/* Botón flotante al hover */}
+          <div className="absolute inset-0 bg-slate-950/40 group-hover:bg-slate-950/20 flex items-center justify-center transition-colors">
+            <span className="px-3 py-1.5 bg-gradient-to-r from-[#00C8D4] via-[#9B00CC] to-[#FF0096] text-white text-[10px] font-black uppercase tracking-wider rounded-xl shadow-lg flex items-center gap-1.5 group-hover:scale-105 transition-transform">
+              <Map className="w-3.5 h-3.5" />
+              <span>Explorar Mapa en Vivo</span>
+            </span>
+          </div>
+        </div>
+
+        <p className="text-[10px] text-slate-300 font-medium">
+          Filtra hospedajes y posadas directamente haciendo clic en el mapa de Venezuela o en las zonas estratégicas.
+        </p>
+      </div>
+
+      {/* 2. Selector de Zonas Turísticas (Chips de Zonas) */}
+      <div className="space-y-2 pt-1">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Compass className="w-4 h-4 text-[#00C8D4]" />
@@ -181,7 +213,7 @@ export function ZoneMapFilter({
   );
 }
 
-// 2. Mapa Interactivo de Pantalla Completa o Modal Integrado con Pines de Precios
+// 3. Mapa Interactivo de Pantalla Completa o Modal Integrado con Pines de Precios
 export function InteractiveZoneMapView({
   establishments,
   selectedZone,
@@ -211,11 +243,11 @@ export function InteractiveZoneMapView({
       <div className="bg-slate-900/90 backdrop-blur-md px-4 py-3 border-b border-slate-800 flex items-center justify-between z-20 relative">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-r from-[#00C8D4] to-[#FF0096] flex items-center justify-center text-white font-black shadow-md">
-            <Compass className="w-4 h-4 animate-spin-slow" />
+            <Compass className="w-4 h-4" />
           </div>
           <div>
             <h3 className="text-xs font-black tracking-wide text-white uppercase font-sans">
-              Mapa de Precios & Zonas Turísticas
+              Mapa de Precios & Zonas Turísticas de Venezuela
             </h3>
             <p className="text-[10px] text-slate-400">
               {displayEsts.length} hospedajes geolocalizados con tarifas $/noche en vivo

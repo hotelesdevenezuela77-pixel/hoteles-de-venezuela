@@ -737,8 +737,27 @@ export function Establecimientos() {
               
               {/* Filtros Básicos de Categoría, Destino y Rango de Precios */}
               <div className="space-y-4 pb-4">
+                {/* Zonas Turísticas Estratégicas & Mini Mapa de Venezuela */}
+                <ZoneMapFilter
+                  establishments={establishments}
+                  selectedZone={selectedZone}
+                  onSelectZone={setSelectedZone}
+                  selectedDestination={selectedDestination}
+                  onSelectDestination={handleDestinationChange}
+                  onOpenMapView={() => setViewMode("map")}
+                />
+
+                {/* Histograma Inteligente & Slider Dual de Rango de Precios */}
+                <PriceHistogramFilter
+                  establishments={establishments}
+                  minPrice={minPrice}
+                  maxPrice={maxPrice}
+                  setMinPrice={setMinPrice}
+                  setMaxPrice={setMaxPrice}
+                />
+
                 {/* Categoría */}
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 pt-2">
                   <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Categoría de Negocio</label>
                   <select
                     value={selectedCategory}
@@ -766,24 +785,6 @@ export function Establecimientos() {
                     ))}
                   </select>
                 </div>
-
-                {/* Zonas Turísticas Estratégicas de Venezuela */}
-                <ZoneMapFilter
-                  establishments={establishments}
-                  selectedZone={selectedZone}
-                  onSelectZone={setSelectedZone}
-                  selectedDestination={selectedDestination}
-                  onSelectDestination={handleDestinationChange}
-                />
-
-                {/* Histograma Inteligente de Estadística & Rango de Precios */}
-                <PriceHistogramFilter
-                  establishments={establishments}
-                  minPrice={minPrice}
-                  maxPrice={maxPrice}
-                  setMinPrice={setMinPrice}
-                  setMaxPrice={setMaxPrice}
-                />
 
                 {/* Capacidad de Huéspedes */}
                 <div className="space-y-1.5">
