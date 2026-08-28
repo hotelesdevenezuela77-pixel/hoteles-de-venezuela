@@ -35,7 +35,7 @@ export const PERLA_NEGRA_ROOM_TYPES: PerlaNegraRoomTypeSummary[] = [
     capacity: 4,
     availableCount: 10,
     amenities: ['Camas Dobles', 'Aire Acondicionado', 'WiFi Starlink', 'TV HD', 'Baño Privado', 'Agua Caliente'],
-    image: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&auto=format&fit=crop'
+    image: '/images/perla-negra/room_1.jpg'
   },
   {
     type: 'Familiar Grande',
@@ -45,7 +45,7 @@ export const PERLA_NEGRA_ROOM_TYPES: PerlaNegraRoomTypeSummary[] = [
     capacity: 6,
     availableCount: 8,
     amenities: ['Camas Múltiples', 'Aire Acondicionado', 'WiFi Starlink', 'TV HD', 'Baño Privado', 'Espacio Extra', 'Nevera Ejecutiva'],
-    image: 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&auto=format&fit=crop'
+    image: '/images/perla-negra/room_2.jpg'
   },
   {
     type: 'Extrafamiliar',
@@ -55,7 +55,7 @@ export const PERLA_NEGRA_ROOM_TYPES: PerlaNegraRoomTypeSummary[] = [
     capacity: 8,
     availableCount: 2,
     amenities: ['Múltiples Camas', 'Aire Acondicionado', 'WiFi Starlink', 'Smart TV', 'Baños Múltiples', 'Sala Común'],
-    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&auto=format&fit=crop'
+    image: '/images/perla-negra/room_3.jpg'
   },
   {
     type: 'Ejecutiva',
@@ -65,7 +65,7 @@ export const PERLA_NEGRA_ROOM_TYPES: PerlaNegraRoomTypeSummary[] = [
     capacity: 2,
     availableCount: 1,
     amenities: ['Cama King Size', 'Aire Acondicionado VIP', 'WiFi Ultra Rápido', 'Smart TV 55"', 'Baño de Lujo', 'Minibar', 'Balcón Privado'],
-    image: 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&auto=format&fit=crop'
+    image: '/images/perla-negra/room_1.jpg'
   }
 ];
 

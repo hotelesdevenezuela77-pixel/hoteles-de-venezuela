@@ -154,6 +154,16 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         }
       } catch (e) {}
 
+      if (isPerlaNegra) {
+        setAreaPhotos({
+          piscina: ["/images/perla-negra/facade.jpg", "/images/perla-negra/room_1.jpg", "/images/perla-negra/room_2.jpg", "/images/perla-negra/room_3.jpg"],
+          restaurante: ["/images/perla-negra/room_1.jpg", "/images/perla-negra/room_2.jpg"],
+          lobby: ["/images/perla-negra/facade.jpg"],
+          fachada: ["/images/perla-negra/facade.jpg"],
+        });
+        return;
+      }
+
       setAreaPhotos({
         piscina: [
           "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=1200&auto=format&fit=crop",
