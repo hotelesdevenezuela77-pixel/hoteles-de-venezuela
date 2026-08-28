@@ -137,6 +137,19 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
     notes: ""
   });
 
+  // Listener para cerrar modales con la tecla Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setActiveDetailModal(null);
+        setActiveLightbox(null);
+        setTableReservationModalOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   useEffect(() => {
     if (establishment?.id) {
       const key = `hdv_surroundings_${establishment.id}`;
@@ -1701,61 +1714,97 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
 
         {/* ── MODAL INMERSIVO DE FICHA TÉCNICA (HABITACIÓN O ÁREA GASTRONÓMICA) ── */}
         {activeDetailModal && (
-          <div className="fixed inset-0 z-50 bg-[#0e011f]/95 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-            <div className="bg-white rounded-3xl max-w-3xl w-full p-6 md:p-8 space-y-6 text-left relative shadow-2xl my-8">
-              <button
-                type="button"
-                onClick={() => setActiveDetailModal(null)}
-                className="absolute top-4 right-4 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
+          <div
+            className="fixed inset-0 z-[99999] bg-[#0e011f]/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-fade-in"
+            onClick={() => setActiveDetailModal(null)}
+          >
+            {/* Botón flotante 'X' de cierre garantizado visible en la esquina superior de la pantalla */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveDetailModal(null);
+              }}
+              className="fixed top-4 right-4 sm:top-6 sm:right-6 z-[100000] p-3 rounded-full bg-white text-slate-800 hover:bg-[#FF0096] hover:text-white transition-all shadow-2xl cursor-pointer border border-slate-200 group"
+              title="Cerrar ventana (Esc)"
+              aria-label="Cerrar Ficha Técnica"
+            >
+              <X className="w-6 h-6 transition-transform group-hover:rotate-90" />
+            </button>
 
-              <div className="flex items-center gap-2">
-                <span className="px-3 py-1 bg-[#FF0096]/10 text-[#FF0096] text-[10px] font-black uppercase rounded-full">
-                  Ficha Técnica Detallada
-                </span>
-                {activeDetailModal.price && (
-                  <span className="text-sm font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-                    Tarifa: ${activeDetailModal.price} USD / Noche
-                  </span>
-                )}
-              </div>
-
-              <div>
-                <h3 className="text-2xl font-serif font-black text-slate-900">{activeDetailModal.title}</h3>
-                <p className="text-xs text-slate-500 mt-2 leading-relaxed">{activeDetailModal.description}</p>
-              </div>
-
-              <div className="aspect-[16/9] rounded-2xl overflow-hidden bg-slate-100">
-                <img src={activeDetailModal.image} alt={activeDetailModal.title} className="w-full h-full object-cover" />
-              </div>
-
-              {/* Grid de Especificaciones */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {activeDetailModal.specs.map((sp, idx) => (
-                  <div key={idx} className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                    <span className="text-[10px] font-bold uppercase text-slate-400 block">{sp.label}</span>
-                    <span className="text-xs font-black text-slate-800 block mt-0.5">{sp.value}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Lista de Amenidades */}
-              <div className="space-y-2">
-                <span className="text-xs font-black uppercase text-slate-800 block">Equipamiento e Infraestructura Incluida</span>
-                <div className="flex flex-wrap gap-2">
-                  {activeDetailModal.amenities.map((am, idx) => (
-                    <span key={idx} className="px-3 py-1.5 bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-[#00C8D4]" />
-                      {am}
+            <div
+              className="bg-white rounded-3xl max-w-3xl w-full p-6 md:p-8 space-y-6 text-left relative shadow-2xl my-auto max-h-[88vh] flex flex-col overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header fijo interno con título y botón 'X' */}
+              <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-100 shrink-0">
+                <div>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className="px-3 py-1 bg-[#FF0096]/10 text-[#FF0096] text-[10px] font-black uppercase rounded-full tracking-wider">
+                      Ficha Técnica Detallada
                     </span>
+                    {activeDetailModal.price && (
+                      <span className="text-xs sm:text-sm font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                        Tarifa: ${activeDetailModal.price} USD / Noche
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-serif font-black text-slate-900">{activeDetailModal.title}</h3>
+                  {activeDetailModal.description && (
+                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">{activeDetailModal.description}</p>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveDetailModal(null)}
+                  className="p-2.5 rounded-full bg-slate-100 hover:bg-[#FF0096] hover:text-white text-slate-700 transition-colors cursor-pointer shrink-0"
+                  title="Cerrar Ficha Técnica"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Cuerpo del modal con scroll interno */}
+              <div className="overflow-y-auto space-y-6 pr-1 custom-scrollbar">
+                {/* Imagen Principal */}
+                <div className="aspect-[16/9] rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
+                  <img src={activeDetailModal.image} alt={activeDetailModal.title} className="w-full h-full object-cover" />
+                </div>
+
+                {/* Grid de Especificaciones */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {activeDetailModal.specs.map((sp, idx) => (
+                    <div key={idx} className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                      <span className="text-[10px] font-bold uppercase text-slate-400 block">{sp.label}</span>
+                      <span className="text-xs font-black text-slate-800 block mt-0.5">{sp.value}</span>
+                    </div>
                   ))}
+                </div>
+
+                {/* Lista de Amenidades */}
+                <div className="space-y-2">
+                  <span className="text-xs font-black uppercase text-slate-800 block">Equipamiento e Infraestructura Incluida</span>
+                  <div className="flex flex-wrap gap-2">
+                    {activeDetailModal.amenities.map((am, idx) => (
+                      <span key={idx} className="px-3 py-1.5 bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-[#00C8D4]" />
+                        {am}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              {/* Botón de Confirmación por WhatsApp */}
-              <div className="pt-4 border-t border-slate-100 flex justify-end gap-3">
+              {/* Pie con Botones de Acción */}
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setActiveDetailModal(null)}
+                  className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer"
+                >
+                  Cerrar Ventana
+                </button>
                 <TrackedWhatsAppButton
                   whatsappNumber={establishment.whatsapp || establishment.phone}
                   establishmentId={establishment.id}
@@ -1771,8 +1820,14 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
 
         {/* Modal de Reserva de Mesa para Restaurantes */}
         {tableReservationModalOpen && (
-          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-[#0e011f]/80 backdrop-blur-md">
-            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+          <div
+            className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-[#0e011f]/80 backdrop-blur-md"
+            onClick={() => setTableReservationModalOpen(false)}
+          >
+            <div
+              className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="p-6 text-white text-left relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0e011f 0%, #1a0533 100%)" }}>
                 <div className="flex items-center justify-between gap-3 relative z-10">
                   <div className="flex items-center gap-3">
@@ -1890,16 +1945,26 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
 
         {/* Fullscreen Lightbox Modal */}
         {activeLightbox && (
-          <div className="fixed inset-0 z-50 bg-[#0e011f]/95 backdrop-blur-md flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 z-[99999] bg-[#0e011f]/95 backdrop-blur-md flex items-center justify-center p-4"
+            onClick={() => setActiveLightbox(null)}
+          >
             <button
               type="button"
-              onClick={() => setActiveLightbox(null)}
-              className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveLightbox(null);
+              }}
+              className="fixed top-4 right-4 sm:top-6 sm:right-6 z-[100000] w-12 h-12 rounded-full bg-white/20 hover:bg-[#FF0096] text-white flex items-center justify-center transition-colors shadow-2xl cursor-pointer"
+              title="Cerrar (Esc)"
             >
               <X className="w-6 h-6 text-white" />
             </button>
 
-            <div className="max-w-4xl w-full space-y-4 text-center">
+            <div
+              className="max-w-4xl w-full space-y-4 text-center"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="relative max-h-[75vh] mx-auto rounded-3xl overflow-hidden shadow-2xl border border-white/10">
                 <img
                   src={activeLightbox.url}
