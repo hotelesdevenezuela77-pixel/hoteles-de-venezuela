@@ -2,12 +2,15 @@ import React, { useEffect, useState } from "react";
 import { 
   MapPin, Phone, Mail, Clock, Star, ShieldCheck, Wifi, Coffee, Compass, 
   Utensils, Car, Sparkles, CheckCircle2, MessageCircle, ExternalLink, Calendar,
-  Bed, Users, Award, ChevronDown, Layers, ArrowRight, Heart, Navigation, X, ShoppingBag
+  Bed, Users, Award, ChevronDown, Layers, ArrowRight, Heart, Navigation, X, ShoppingBag,
+  ChefHat, Flame, Fish, Waves, Beef, Wine, Cake, Cocktail, Soup, Plus, Minus, Search
 } from "lucide-react";
 import { type TenantConfig } from "./tenantContext";
 import { RoomCard, type Room } from "./components/RoomCard";
 import { RoomDetailModal } from "./components/RoomDetailModal";
 import { supabase } from "../lib/supabase";
+import { OLEAJE_CATEGORIES, OLEAJE_MENU_ITEMS, OLEAJE_ZONES, type OleajeDish, type OleajeZone } from "./lib/oleajeMenuData";
+import { POSModule } from "./templates/components/POSModule";
 
 interface SaaSTenantLandingPageProps {
   config: TenantConfig;
@@ -39,6 +42,34 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
   const [cartRooms, setCartRooms] = useState<Room[]>([]);
   const [loadingRooms, setLoadingRooms] = useState<boolean>(true);
   const [areaPhotos, setAreaPhotos] = useState<Record<string, string[]>>({});
+
+  const isRestaurant = config.business_type === "restaurant" || (config.slug && config.slug.toLowerCase().includes("oleaje"));
+  const [activeMenuCategory, setActiveMenuCategory] = useState<string>("all");
+  const [orderCart, setOrderCart] = useState<{ dish: OleajeDish; count: number }[]>([]);
+
+  const addDishToCart = (dish: OleajeDish) => {
+    setOrderCart(prev => {
+      const idx = prev.findIndex(item => item.dish.id === dish.id);
+      if (idx !== -1) {
+        const updated = [...prev];
+        updated[idx] = { ...updated[idx], count: updated[idx].count + 1 };
+        return updated;
+      }
+      return [...prev, { dish, count: 1 }];
+    });
+  };
+
+  const removeDishFromCart = (dishId: string) => {
+    setOrderCart(prev => {
+      const existing = prev.find(item => item.dish.id === dishId);
+      if (existing && existing.count > 1) {
+        return prev.map(item => item.dish.id === dishId ? { ...item, count: item.count - 1 } : item);
+      }
+      return prev.filter(item => item.dish.id !== dishId);
+    });
+  };
+
+  const totalOrderPrice = orderCart.reduce((sum, i) => sum + i.dish.price * i.count, 0);
 
   const toggleCartRoom = (room: Room) => {
     setCartRooms(prev => {
@@ -477,14 +508,25 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             </div>
           </a>
 
-          <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-300">
-            <a href="#inicio" className="hover:text-[#00C8D4] transition-colors">Inicio</a>
-            <a href="#habitaciones" className="hover:text-[#00C8D4] transition-colors">Habitaciones & Tarifas</a>
-            <a href="#galeria" className="hover:text-[#00C8D4] transition-colors">Galería Instalaciones</a>
-            <a href="#servicios" className="hover:text-[#00C8D4] transition-colors">Servicios</a>
-            <a href="#sobre-nosotros" className="hover:text-[#00C8D4] transition-colors">Sobre Nosotros</a>
-            <a href="#contacto" className="hover:text-[#00C8D4] transition-colors">Ubicación</a>
-          </nav>
+          {isRestaurant ? (
+            <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-300">
+              <a href="#inicio" className="hover:text-[#00C8D4] transition-colors">Inicio</a>
+              <a href="#menu" className="hover:text-[#00C8D4] transition-colors">Carta Gastronómica</a>
+              <a href="#zonas" className="hover:text-[#00C8D4] transition-colors">Zonas & Mesas</a>
+              <a href="#pos-demo" className="hover:text-[#00C8D4] transition-colors">Punto de Venta POS</a>
+              <a href="#galeria" className="hover:text-[#00C8D4] transition-colors">Galería & Experiencias</a>
+              <a href="#contacto" className="hover:text-[#00C8D4] transition-colors">Ubicación</a>
+            </nav>
+          ) : (
+            <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-300">
+              <a href="#inicio" className="hover:text-[#00C8D4] transition-colors">Inicio</a>
+              <a href="#habitaciones" className="hover:text-[#00C8D4] transition-colors">Habitaciones & Tarifas</a>
+              <a href="#galeria" className="hover:text-[#00C8D4] transition-colors">Galería Instalaciones</a>
+              <a href="#servicios" className="hover:text-[#00C8D4] transition-colors">Servicios</a>
+              <a href="#sobre-nosotros" className="hover:text-[#00C8D4] transition-colors">Sobre Nosotros</a>
+              <a href="#contacto" className="hover:text-[#00C8D4] transition-colors">Ubicación</a>
+            </nav>
+          )}
 
           <a
             href={generalWaUrl}
@@ -511,77 +553,152 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-white via-white/70 to-transparent"></div>
         </div>
 
-        <div className="relative z-10 max-w-5xl mx-auto px-6 py-20 text-center space-y-8 animate-fade-in">
-          
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 backdrop-blur border border-[#00C8D4]/40 text-[#00C8D4] text-[11px] font-extrabold tracking-[0.25em] uppercase shadow-2xl">
-            <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
-            EL PARAÍSO TE ESPERA • HOSPEDAJE DE EXCELENCIA
-          </div>
+        {isRestaurant ? (
+          <div className="relative z-10 max-w-5xl mx-auto px-6 py-20 text-center space-y-8 animate-fade-in">
+            
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 backdrop-blur border border-[#00C8D4]/40 text-[#00C8D4] text-[11px] font-extrabold tracking-[0.25em] uppercase shadow-2xl">
+              <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
+              EL PARAÍSO GASTRONÓMICO DE TUCACAS • RESTAURANTE DE ALTA GAMA & CLUB DE PLAYA
+            </div>
 
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-black font-serif text-white tracking-tight leading-tight drop-shadow-2xl">
-            {config.name}
-          </h1>
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-black font-serif text-white tracking-tight leading-tight drop-shadow-2xl">
+              Oleaje Tucacas.
+            </h1>
 
-          <div className="flex flex-col items-center justify-center gap-3">
-            <div className="inline-flex items-center gap-2.5 p-[2px] rounded-2xl bg-[#FF0096] shadow-2xl animate-pulse hover:scale-105 transition-all">
-              <div className="px-5 py-2 rounded-[14px] bg-slate-900/90 backdrop-blur flex items-center gap-2.5">
-                <span className="relative flex h-3 w-3 shrink-0">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-400"></span>
-                </span>
-                <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-amber-300 drop-shadow">
-                  🛠️ SITIO WEB EN MANTENIMIENTO
-                </span>
+            <div className="flex flex-col items-center justify-center gap-3">
+              <div className="inline-flex items-center gap-2.5 p-[2px] rounded-2xl bg-[#FF0096] shadow-2xl animate-pulse hover:scale-105 transition-all">
+                <div className="px-5 py-2 rounded-[14px] bg-slate-900/90 backdrop-blur flex items-center gap-2.5">
+                  <span className="relative flex h-3 w-3 shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-400"></span>
+                  </span>
+                  <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-emerald-300 drop-shadow">
+                    🍽️ ABIERTO TODOS LOS DÍAS • COCINA DE ALTA GAMA (11:00 AM - 11:00 PM)
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-base sm:text-xl text-white font-medium max-w-3xl mx-auto leading-relaxed drop-shadow-lg font-serif">
+                Gastronomía marina de autor, ceviches frescos, paellas valencianas, cortes de carne premium y coctelería de autor frente al mar de Morrocoy.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto pt-2">
+              <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
+                <span className="text-lg font-black text-white block font-serif drop-shadow-sm">⭐ 4.9 / 5</span>
+                <span className="text-[10px] text-white font-bold uppercase tracking-wider">Alta Gastronomía</span>
+              </div>
+              <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
+                <span className="text-lg font-black text-white block font-serif drop-shadow-sm">6 Zonas</span>
+                <span className="text-[10px] text-white font-bold uppercase tracking-wider">Pérgolas, VIP, Playa</span>
+              </div>
+              <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
+                <span className="text-lg font-black text-white block font-serif drop-shadow-sm">POS Directo</span>
+                <span className="text-[10px] text-white font-bold uppercase tracking-wider">Gestión de Pedidos</span>
+              </div>
+              <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
+                <span className="text-lg font-black text-white block font-serif drop-shadow-sm">Planta Eléctrica</span>
+                <span className="text-[10px] text-white font-bold uppercase tracking-wider">Respaldo Automático</span>
               </div>
             </div>
 
-            <p className="text-base sm:text-xl text-white font-medium max-w-3xl mx-auto leading-relaxed drop-shadow-lg">
-              Más que un Hospedaje, su refugio perfecto. Disfrute de una experiencia inolvidable con atención personalizada y garantía directa de tarifa.
-            </p>
-          </div>
+            <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
+              
+              <a
+                href="#menu"
+                className="px-8 py-4 rounded-2xl font-extrabold text-sm text-white bg-[#00C8D4] hover:bg-[#00b0bc] transition-all shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer"
+              >
+                <Utensils className="w-4 h-4" />
+                <span>Ver Carta Gastronómica</span>
+                <ArrowRight className="w-4 h-4" />
+              </a>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto pt-2">
-            <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
-              <span className="text-lg font-black text-white block font-serif drop-shadow-sm">⭐ 4.9 / 5</span>
-              <span className="text-[10px] text-white font-bold uppercase tracking-wider">Valoración Huéspedes</span>
-            </div>
-            <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
-              <span className="text-lg font-black text-white block font-serif drop-shadow-sm">100%</span>
-              <span className="text-[10px] text-white font-bold uppercase tracking-wider">Estacionamiento Privado</span>
-            </div>
-            <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
-              <span className="text-lg font-black text-white block font-serif drop-shadow-sm">WhatsApp</span>
-              <span className="text-[10px] text-white font-bold uppercase tracking-wider">Atención Directa</span>
-            </div>
-            <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
-              <span className="text-lg font-black text-white block font-serif drop-shadow-sm">Planta Eléctrica</span>
-              <span className="text-[10px] text-white font-bold uppercase tracking-wider">Respaldo Automático</span>
-            </div>
-          </div>
+              <a
+                href={generalWaUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-8 py-4 rounded-2xl font-extrabold text-sm text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer"
+              >
+                <MessageCircle className="w-4 h-4 fill-current" />
+                <span>Reservar Mesa por WhatsApp</span>
+              </a>
 
-          <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
+            </div>
+
+          </div>
+        ) : (
+          <div className="relative z-10 max-w-5xl mx-auto px-6 py-20 text-center space-y-8 animate-fade-in">
             
-            <a
-              href="#habitaciones"
-              className="px-8 py-4 rounded-2xl font-extrabold text-sm text-white bg-[#00C8D4] hover:bg-[#00b0bc] transition-all shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer"
-            >
-              <span>Ver Habitaciones & Tarifas</span>
-              <ArrowRight className="w-4 h-4" />
-            </a>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 backdrop-blur border border-[#00C8D4]/40 text-[#00C8D4] text-[11px] font-extrabold tracking-[0.25em] uppercase shadow-2xl">
+              <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
+              EL PARAÍSO TE ESPERA • HOSPEDAJE DE EXCELENCIA
+            </div>
 
-            <a
-              href={generalWaUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-8 py-4 rounded-2xl font-extrabold text-sm text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer"
-            >
-              <MessageCircle className="w-4 h-4 fill-current" />
-              <span>Reservar Directo por WhatsApp</span>
-            </a>
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-black font-serif text-white tracking-tight leading-tight drop-shadow-2xl">
+              {config.name}
+            </h1>
+
+            <div className="flex flex-col items-center justify-center gap-3">
+              <div className="inline-flex items-center gap-2.5 p-[2px] rounded-2xl bg-[#FF0096] shadow-2xl animate-pulse hover:scale-105 transition-all">
+                <div className="px-5 py-2 rounded-[14px] bg-slate-900/90 backdrop-blur flex items-center gap-2.5">
+                  <span className="relative flex h-3 w-3 shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-400"></span>
+                  </span>
+                  <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-amber-300 drop-shadow">
+                    🛠️ SITIO WEB EN MANTENIMIENTO
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-base sm:text-xl text-white font-medium max-w-3xl mx-auto leading-relaxed drop-shadow-lg">
+                Más que un Hospedaje, su refugio perfecto. Disfrute de una experiencia inolvidable con atención personalizada y garantía directa de tarifa.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto pt-2">
+              <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
+                <span className="text-lg font-black text-white block font-serif drop-shadow-sm">⭐ 4.9 / 5</span>
+                <span className="text-[10px] text-white font-bold uppercase tracking-wider">Valoración Huéspedes</span>
+              </div>
+              <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
+                <span className="text-lg font-black text-white block font-serif drop-shadow-sm">100%</span>
+                <span className="text-[10px] text-white font-bold uppercase tracking-wider">Estacionamiento Privado</span>
+              </div>
+              <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
+                <span className="text-lg font-black text-white block font-serif drop-shadow-sm">WhatsApp</span>
+                <span className="text-[10px] text-white font-bold uppercase tracking-wider">Atención Directa</span>
+              </div>
+              <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
+                <span className="text-lg font-black text-white block font-serif drop-shadow-sm">Planta Eléctrica</span>
+                <span className="text-[10px] text-white font-bold uppercase tracking-wider">Respaldo Automático</span>
+              </div>
+            </div>
+
+            <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
+              
+              <a
+                href="#habitaciones"
+                className="px-8 py-4 rounded-2xl font-extrabold text-sm text-white bg-[#00C8D4] hover:bg-[#00b0bc] transition-all shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer"
+              >
+                <span>Ver Habitaciones & Tarifas</span>
+                <ArrowRight className="w-4 h-4" />
+              </a>
+
+              <a
+                href={generalWaUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-8 py-4 rounded-2xl font-extrabold text-sm text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer"
+              >
+                <MessageCircle className="w-4 h-4 fill-current" />
+                <span>Reservar Directo por WhatsApp</span>
+              </a>
+
+            </div>
 
           </div>
-
-        </div>
+        )}
 
       </section>
 
@@ -590,64 +707,246 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           <div className="flex items-center justify-center sm:justify-start gap-3 p-2">
             <span className="text-xl">🛡️</span>
             <div>
-              <span className="text-xs font-bold text-slate-900 block">Mejor Tarifa Oficial Garantizada</span>
+              <span className="text-xs font-bold text-slate-900 block">
+                {isRestaurant ? "Insumos Marinos Frescos del Día" : "Mejor Tarifa Oficial Garantizada"}
+              </span>
               <span className="text-[11px] text-slate-500 font-medium">Sin comisiones de intermediarios</span>
             </div>
           </div>
           <div className="flex items-center justify-center sm:justify-start gap-3 p-2 border-t sm:border-t-0 sm:border-l border-slate-100">
             <span className="text-xl">⚡</span>
             <div>
-              <span className="text-xs font-bold text-slate-900 block">Confirmación Inmediata</span>
+              <span className="text-xs font-bold text-slate-900 block">
+                {isRestaurant ? "Reserva de Mesas en Vivo" : "Confirmación Inmediata"}
+              </span>
               <span className="text-[11px] text-slate-500 font-medium">Vía WhatsApp Oficial directo</span>
             </div>
           </div>
           <div className="flex items-center justify-center sm:justify-start gap-3 p-2 border-t sm:border-t-0 sm:border-l border-slate-100">
             <span className="text-xl">🌟</span>
             <div>
-              <span className="text-xs font-bold text-slate-900 block">Atención Personalizada</span>
-              <span className="text-[11px] text-slate-500 font-medium">Atendidos por el equipo del hospedaje</span>
+              <span className="text-xs font-bold text-slate-900 block">
+                {isRestaurant ? "Experiencia Gourmet Frente al Mar" : "Atención Personalizada"}
+              </span>
+              <span className="text-[11px] text-slate-500 font-medium">Atendidos por el equipo del establecimiento</span>
             </div>
           </div>
         </div>
       </div>
 
-      <section id="habitaciones" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        
-        <div className="text-center space-y-4 max-w-3xl mx-auto mb-16">
-          <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#00C8D4] uppercase block">
-            SU REFUGIO DE DESCANSO (BLOQUE 1)
-          </span>
-          <h2 className="text-3xl sm:text-5xl font-black font-serif text-slate-900">
-            Nuestras Habitaciones & Suites (Edificio Principal)
-          </h2>
-          <p className="text-slate-600 text-sm sm:text-base font-normal leading-relaxed">
-            Explore nuestras opciones de hospedaje completamente equipadas. Seleccione las habitaciones ideales para su grupo o familia.
-          </p>
-        </div>
+      {isRestaurant ? (
+        <>
+          {/* ── SECCIÓN 1: CARTA GASTRONÓMICA DE ALTA GAMA ── */}
+          <section id="menu" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div className="text-center space-y-4 max-w-3xl mx-auto mb-12">
+              <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#00C8D4] uppercase block">
+                GASTRONOMÍA MARINA DE AUTOR
+              </span>
+              <h2 className="text-3xl sm:text-5xl font-black font-serif text-slate-900">
+                Nuestra Carta Gastronómica
+              </h2>
+              <p className="text-slate-600 text-sm sm:text-base font-normal leading-relaxed">
+                Selección de especialidades preparadas con pescados y mariscos frescos de Morrocoy, acompañados de maridaje exclusivo y alta coctelería.
+              </p>
+            </div>
 
-        {loadingRooms ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-96 bg-slate-100 rounded-3xl animate-pulse border border-slate-200"></div>
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {rooms.slice(0, 6).map((room) => (
-              <RoomCard
-                key={room.id}
-                room={room}
-                hotelName={config.name}
-                whatsappPhone={whatsapp}
-                onOpenDetail={(r) => setSelectedRoom(r)}
-                onToggleCart={toggleCartRoom}
-                isInCart={cartRooms.some(cr => String(cr.id) === String(room.id))}
-              />
-            ))}
-          </div>
-        )}
+            {/* Barra de Filtros por Categoría */}
+            <div className="flex flex-wrap items-center justify-center gap-2 mb-12">
+              {OLEAJE_CATEGORIES.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveMenuCategory(cat.id)}
+                  className={`px-4 py-2.5 rounded-2xl text-xs font-black transition-all cursor-pointer ${
+                    activeMenuCategory === cat.id
+                      ? "bg-[#00C8D4] text-white shadow-lg scale-105"
+                      : "bg-[#00C8D4]/10 text-[#009da7] hover:bg-[#00C8D4]/20 border border-[#00C8D4]/30"
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
 
-      </section>
+            {/* Grid de Platos */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {OLEAJE_MENU_ITEMS
+                .filter((item) => activeMenuCategory === "all" || item.category === activeMenuCategory)
+                .map((dish) => (
+                  <div
+                    key={dish.id}
+                    className="bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
+                  >
+                    <div>
+                      <div className="relative h-56 overflow-hidden bg-slate-900">
+                        <img
+                          src={dish.image}
+                          alt={dish.name}
+                          className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
+                        />
+                        <div className="absolute top-4 left-4 flex gap-2">
+                          <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase text-white bg-[#00C8D4] shadow-md">
+                            {dish.categoryName}
+                          </span>
+                          {dish.isRecommended && (
+                            <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase text-white bg-[#FF0096] shadow-md">
+                              Recomendado
+                            </span>
+                          )}
+                        </div>
+                        <div className="absolute bottom-4 right-4 bg-slate-950/85 backdrop-blur px-4 py-1.5 rounded-2xl border border-white/20 shadow-xl">
+                          <span className="text-base font-black text-[#00C8D4] font-serif">${dish.price.toFixed(2)} USD</span>
+                        </div>
+                      </div>
+
+                      <div className="p-6 space-y-3">
+                        <h3 className="text-xl font-bold font-serif text-slate-900 group-hover:text-[#00C8D4] transition-colors">
+                          {dish.name}
+                        </h3>
+                        <p className="text-slate-600 text-xs font-normal leading-relaxed line-clamp-3">
+                          {dish.description}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-6 pt-0 space-y-2">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => addDishToCart(dish)}
+                          className="flex-1 py-3 px-4 rounded-2xl bg-[#00C8D4]/15 hover:bg-[#00C8D4] text-[#009da7] hover:text-white border border-[#00C8D4]/40 font-extrabold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span>Agregar al Pedido</span>
+                        </button>
+
+                        <a
+                          href={`https://wa.me/${cleanWhatsapp}?text=${encodeURIComponent(
+                            `Hola Oleaje Tucacas, me interesa pedir el plato "${dish.name}" ($${dish.price.toFixed(2)} USD). ¿Podrían tomar mi orden?`
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="py-3 px-4 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-extrabold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
+                          title="Pedir por WhatsApp"
+                        >
+                          <MessageCircle className="w-4 h-4 fill-current" />
+                          <span className="hidden sm:inline">Pedir</span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </section>
+
+          {/* ── SECCIÓN 2: ZONAS DEL RESTAURANTE & RESERVA DE MESAS ── */}
+          <section id="zonas" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-100 bg-slate-50/50">
+            <div className="text-center space-y-4 max-w-3xl mx-auto mb-16">
+              <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#FF0096] uppercase block">
+                ESPACIOS Y AMBIENTES DE DISTINCIÓN
+              </span>
+              <h2 className="text-3xl sm:text-5xl font-black font-serif text-slate-900">
+                Zonas Exclusivas & Reserva de Mesas
+              </h2>
+              <p className="text-slate-600 text-sm sm:text-base font-normal leading-relaxed">
+                Seleccione la zona ideal para su visita. Contamos con 38 mesas distribuidas entre pérgolas, salones VIP, terraza panorámica y servicio frente a la playa.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {OLEAJE_ZONES.map((zone) => (
+                <div
+                  key={zone.id}
+                  className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
+                >
+                  <div>
+                    <div className="relative h-60 overflow-hidden bg-slate-900">
+                      <img
+                        src={zone.image}
+                        alt={zone.name}
+                        className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
+                      />
+                      <div className="absolute top-4 left-4">
+                        <span className="px-3.5 py-1 rounded-full text-[10px] font-black uppercase text-white bg-[#FF0096] shadow-md">
+                          {zone.badge}
+                        </span>
+                      </div>
+                      <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center bg-slate-950/80 backdrop-blur px-4 py-2 rounded-2xl border border-white/20">
+                        <span className="text-xs font-bold text-white">Mesas Disponibles: {zone.tableCount}</span>
+                        <span className="text-xs font-bold text-[#00C8D4]">Capacidad: {zone.capacityPerTable} pers/mesa</span>
+                      </div>
+                    </div>
+
+                    <div className="p-6 space-y-3">
+                      <h3 className="text-xl font-bold font-serif text-slate-900 group-hover:text-[#FF0096] transition-colors">
+                        Zona {zone.name}
+                      </h3>
+                      <p className="text-slate-600 text-xs font-normal leading-relaxed">
+                        {zone.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-6 pt-0">
+                    <a
+                      href={`https://wa.me/${cleanWhatsapp}?text=${encodeURIComponent(
+                        `Hola Oleaje Tucacas, me gustaría solicitar una reserva de mesa en la zona "${zone.name}". Somos un grupo de personas. ¿Tienen disponibilidad?`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:from-[#e00084] hover:to-[#8800b5] text-white font-extrabold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-98"
+                    >
+                      <Calendar className="w-4 h-4 text-white" />
+                      <span>Reservar Mesa en {zone.name}</span>
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* ── SECCIÓN 3: PUNTO DE VENTA POS INTEGRADO (SISTEMA DEMO OLEAJE) ── */}
+          <section id="pos-demo" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-100">
+            <POSModule customConfig={config} />
+          </section>
+        </>
+      ) : (
+        <section id="habitaciones" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          
+          <div className="text-center space-y-4 max-w-3xl mx-auto mb-16">
+            <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#00C8D4] uppercase block">
+              SU REFUGIO DE DESCANSO (BLOQUE 1)
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-black font-serif text-slate-900">
+              Nuestras Habitaciones & Suites (Edificio Principal)
+            </h2>
+            <p className="text-slate-600 text-sm sm:text-base font-normal leading-relaxed">
+              Explore nuestras opciones de hospedaje completamente equipadas. Seleccione las habitaciones ideales para su grupo o familia.
+            </p>
+          </div>
+
+          {loadingRooms ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-96 bg-slate-100 rounded-3xl animate-pulse border border-slate-200"></div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {rooms.slice(0, 6).map((room) => (
+                <RoomCard
+                  key={room.id}
+                  room={room}
+                  hotelName={config.name}
+                  whatsappPhone={whatsapp}
+                  onOpenDetail={(r) => setSelectedRoom(r)}
+                  onToggleCart={toggleCartRoom}
+                  isInCart={cartRooms.some(cr => String(cr.id) === String(room.id))}
+                />
+              ))}
+            </div>
+          )}
+
+        </section>
+      )}
 
       {/* ── INTERSECCIÓN 1: SERVICIOS Y EXPERIENCIA EXCLUSIVA ── */}
       <section id="servicios" className="py-20 bg-slate-50 border-y border-slate-200/80 px-4 sm:px-6 lg:px-8">
@@ -1103,6 +1402,50 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         </a>
 
       </div>
+
+      {/* ── BARRA FLOTANTE DE PEDIDO GASTRONÓMICO (RESTAURANTE) ── */}
+      {orderCart.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-[99999] bg-[#0e011f]/95 backdrop-blur-xl border-t border-[#00C8D4]/50 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.6)]">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-white">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-[#FF0096] rounded-2xl shrink-0 shadow-lg animate-bounce">
+                <Utensils className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <span className="text-sm font-black block">
+                  🍽️ {orderCart.reduce((acc, i) => acc + i.count, 0)} {orderCart.reduce((acc, i) => acc + i.count, 0) === 1 ? 'Plato Seleccionado' : 'Platos Seleccionados'} para Orden
+                </span>
+                <span className="text-xs text-[#00C8D4] font-extrabold">
+                  Total Estimado: ${totalOrderPrice.toFixed(2)} USD
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 max-h-24 overflow-y-auto">
+              {orderCart.map(({ dish, count }) => (
+                <span key={dish.id} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-extrabold bg-white/10 border border-white/20 text-white shadow-sm">
+                  {dish.name} (x{count}) - ${(dish.price * count).toFixed(2)}
+                  <button onClick={() => removeDishFromCart(dish.id)} className="hover:text-[#FF0096] font-black text-sm ml-1 cursor-pointer">✕</button>
+                </span>
+              ))}
+            </div>
+
+            <a
+              href={`https://wa.me/${cleanWhatsapp}?text=${encodeURIComponent(
+                `Hola ${config.name}, deseo realizar el siguiente pedido gastronómico:\n\n` +
+                orderCart.map((i, idx) => `${idx + 1}. ${i.dish.name} (x${i.count}) - $${(i.dish.price * i.count).toFixed(2)} USD`).join('\n') +
+                `\n\nTotal estimado: $${totalOrderPrice.toFixed(2)} USD.\n\nPor favor confirmen la recepción y tiempo estimado de preparación o mesa.`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-3.5 rounded-2xl font-black text-xs text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-xl flex items-center gap-2 shrink-0 cursor-pointer uppercase tracking-wider hover:scale-105 active:scale-95 text-center"
+            >
+              <MessageCircle className="w-5 h-5 fill-current" />
+              <span>Enviar Pedido (${totalOrderPrice.toFixed(2)} USD) por WhatsApp</span>
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* ── BARRA FLOTANTE DE MULTI-RESERVA ADAPTATIVA ── */}
       {cartRooms.length > 0 && (

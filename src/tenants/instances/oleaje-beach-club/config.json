@@ -3,6 +3,7 @@
   "slug": "oleaje-beach-club",
   "name": "Oleaje Beach Club",
   "template": "B",
+  "business_type": "restaurant",
   "domain": "oleajebeachclub.com",
   "branding": {
     "primary_color": "#00C8D4",

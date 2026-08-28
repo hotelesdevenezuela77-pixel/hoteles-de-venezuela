@@ -13,6 +13,7 @@ export interface TenantConfig {
   slug: string;
   name: string;
   template: "A" | "B";
+  business_type?: "hotel" | "restaurant" | string;
   domain: string;
   branding: {
     primary_color: string;
