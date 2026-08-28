@@ -10,6 +10,7 @@ import { RoomCard, type Room } from "./components/RoomCard";
 import { RoomDetailModal } from "./components/RoomDetailModal";
 import { supabase } from "../lib/supabase";
 import { OLEAJE_CATEGORIES, OLEAJE_MENU_ITEMS, OLEAJE_ZONES, type OleajeDish, type OleajeZone } from "./lib/oleajeMenuData";
+import { PERLA_NEGRA_ROOMS, PERLA_NEGRA_ROOM_TYPES } from "./lib/perlaNegraData";
 import { POSModule } from "./templates/components/POSModule";
 
 interface SaaSTenantLandingPageProps {
@@ -44,6 +45,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
   const [areaPhotos, setAreaPhotos] = useState<Record<string, string[]>>({});
 
   const isRestaurant = config.business_type === "restaurant" || (config.slug && config.slug.toLowerCase().includes("oleaje"));
+  const isPerlaNegra = (config.slug && config.slug.toLowerCase().includes("perla-negra")) || config.establishment_id === 102 || (config.name && config.name.toLowerCase().includes("perla negra"));
   const [activeMenuCategory, setActiveMenuCategory] = useState<string>("all");
   const [orderCart, setOrderCart] = useState<{ dish: OleajeDish; count: number }[]>([]);
 
@@ -287,6 +289,10 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         });
 
         let fetched = Array.from(combinedMap.values());
+
+        if (isPerlaNegra) {
+          fetched = PERLA_NEGRA_ROOMS as any[];
+        }
 
         // Garantizar inventario dinámico de 6 unidades para las aplicaciones SaaS
         if (fetched.length < 6) {
@@ -631,7 +637,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 backdrop-blur border border-[#00C8D4]/40 text-[#00C8D4] text-[11px] font-extrabold tracking-[0.25em] uppercase shadow-2xl">
               <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
-              EL PARAÍSO TE ESPERA • HOSPEDAJE DE EXCELENCIA
+              {isPerlaNegra ? "BIENVENIDOS A MORROCOY • POSADA PERLA NEGRA" : "EL PARAÍSO TE ESPERA • HOSPEDAJE DE EXCELENCIA"}
             </div>
 
             <h1 className="text-4xl sm:text-6xl md:text-7xl font-black font-serif text-white tracking-tight leading-tight drop-shadow-2xl">
@@ -642,36 +648,43 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               <div className="inline-flex items-center gap-2.5 p-[2px] rounded-2xl bg-[#FF0096] shadow-2xl animate-pulse hover:scale-105 transition-all">
                 <div className="px-5 py-2 rounded-[14px] bg-slate-900/90 backdrop-blur flex items-center gap-2.5">
                   <span className="relative flex h-3 w-3 shrink-0">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-400"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-400"></span>
                   </span>
-                  <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-amber-300 drop-shadow">
-                    🛠️ SITIO WEB EN MANTENIMIENTO
+                  <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-emerald-300 drop-shadow">
+                    {isPerlaNegra ? "🏖️ SU CASA EN LA PLAYA • RESERVAS ABIERTAS 2026" : "🛠️ SITIO WEB EN MANTENIMIENTO"}
                   </span>
                 </div>
               </div>
 
-              <p className="text-base sm:text-xl text-white font-medium max-w-3xl mx-auto leading-relaxed drop-shadow-lg">
-                Más que un Hospedaje, su refugio perfecto. Disfrute de una experiencia inolvidable con atención personalizada y garantía directa de tarifa.
+              <p className="text-base sm:text-xl text-white font-medium max-w-3xl mx-auto leading-relaxed drop-shadow-lg font-serif">
+                {isPerlaNegra 
+                  ? "Descubra el verdadero significado de descansar en Morrocoy. 21 habitaciones confortables con aire acondicionado 24/7, piscina iluminada, WiFi Starlink, planta eléctrica y paseos directos a los cayos."
+                  : "Más que un Hospedaje, su refugio perfecto. Disfrute de una experiencia inolvidable con atención personalizada y garantía directa de tarifa."
+                }
               </p>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto pt-2">
               <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
-                <span className="text-lg font-black text-white block font-serif drop-shadow-sm">⭐ 4.9 / 5</span>
-                <span className="text-[10px] text-white font-bold uppercase tracking-wider">Valoración Huéspedes</span>
+                <span className="text-lg font-black text-white block font-serif drop-shadow-sm">
+                  {isPerlaNegra ? "21 Unidades" : "⭐ 4.9 / 5"}
+                </span>
+                <span className="text-[10px] text-white font-bold uppercase tracking-wider">
+                  {isPerlaNegra ? "4 Tipos de Habitación" : "Valoración Huéspedes"}
+                </span>
               </div>
               <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
                 <span className="text-lg font-black text-white block font-serif drop-shadow-sm">100%</span>
-                <span className="text-[10px] text-white font-bold uppercase tracking-wider">Estacionamiento Privado</span>
+                <span className="text-[10px] text-white font-bold uppercase tracking-wider">Planta Eléctrica 24/7</span>
               </div>
               <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
-                <span className="text-lg font-black text-white block font-serif drop-shadow-sm">WhatsApp</span>
-                <span className="text-[10px] text-white font-bold uppercase tracking-wider">Atención Directa</span>
+                <span className="text-lg font-black text-white block font-serif drop-shadow-sm">Piscina</span>
+                <span className="text-[10px] text-white font-bold uppercase tracking-wider">Iluminación Nocturna</span>
               </div>
               <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
-                <span className="text-lg font-black text-white block font-serif drop-shadow-sm">Planta Eléctrica</span>
-                <span className="text-[10px] text-white font-bold uppercase tracking-wider">Respaldo Automático</span>
+                <span className="text-lg font-black text-white block font-serif drop-shadow-sm">Cayos Morrocoy</span>
+                <span className="text-[10px] text-white font-bold uppercase tracking-wider">Paseos en Peñero/Yate</span>
               </div>
             </div>
 
@@ -913,13 +926,13 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           
           <div className="text-center space-y-4 max-w-3xl mx-auto mb-16">
             <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#00C8D4] uppercase block">
-              SU REFUGIO DE DESCANSO (BLOQUE 1)
+              {isPerlaNegra ? "PLANTA BAJA & PLANTA ALTA (10 HABITACIONES)" : "SU REFUGIO DE DESCANSO (BLOQUE 1)"}
             </span>
             <h2 className="text-3xl sm:text-5xl font-black font-serif text-slate-900">
-              Nuestras Habitaciones & Suites (Edificio Principal)
+              {isPerlaNegra ? "Habitaciones Familiares Estándar (F1 a F6)" : "Nuestras Habitaciones & Suites (Edificio Principal)"}
             </h2>
             <p className="text-slate-600 text-sm sm:text-base font-normal leading-relaxed">
-              Explore nuestras opciones de hospedaje completamente equipadas. Seleccione las habitaciones ideales para su grupo o familia.
+              {isPerlaNegra ? "Habitaciones acogedoras para 4 personas equipadas con aire acondicionado split, WiFi Starlink, TV HD y baño privado." : "Explore nuestras opciones de hospedaje completamente equipadas. Seleccione las habitaciones ideales para su grupo o familia."}
             </p>
           </div>
 
@@ -1014,13 +1027,13 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <div className="text-center space-y-4 max-w-3xl mx-auto mb-16">
             <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#00C8D4] uppercase block">
-              ÁREA PISCINA & CONFORT (BLOQUE 2)
+              {isPerlaNegra ? "EDIFICIO B - VISTA PISCINA (HABITACIONES F7-F10 Y G1-G2)" : "ÁREA PISCINA & CONFORT (BLOQUE 2)"}
             </span>
             <h2 className="text-3xl sm:text-5xl font-black font-serif text-slate-900">
-              Habitaciones & Apartamentos (Edificio Piscina)
+              {isPerlaNegra ? "Habitaciones Familiares & Grandes (F7-F10 / G1-G2)" : "Habitaciones & Apartamentos (Edificio Piscina)"}
             </h2>
             <p className="text-slate-600 text-sm sm:text-base font-normal leading-relaxed">
-              Unidades acogedoras frente al solárium y la piscina con vistas privilegiadas.
+              {isPerlaNegra ? "Unidades de 4 a 6 puestos cercanas a la piscina iluminada de noche y áreas de solárium." : "Unidades acogedoras frente al solárium y la piscina con vistas privilegiadas."}
             </p>
           </div>
 
@@ -1146,13 +1159,13 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-100">
           <div className="text-center space-y-4 max-w-3xl mx-auto mb-16">
             <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#9B00CC] uppercase block">
-              EDIFICIO RECEPCIÓN & APARTAMENTOS (BLOQUE 3)
+              {isPerlaNegra ? "EDIFICIO B, C & PRINCIPAL (G3-G8, EXTRAFAMILIARES X1-X2 & EJECUTIVA E1)" : "EDIFICIO RECEPCIÓN & APARTAMENTOS (BLOQUE 3)"}
             </span>
             <h2 className="text-3xl sm:text-5xl font-black font-serif text-slate-900">
-              Habitaciones & Apartamentos de Gran Capacidad
+              {isPerlaNegra ? "Habitaciones Grandes, Extrafamiliares & Suite Ejecutiva" : "Habitaciones & Apartamentos de Gran Capacidad"}
             </h2>
             <p className="text-slate-600 text-sm sm:text-base font-normal leading-relaxed">
-              Unidades amplias diseñadas para familias grandes y grupos en estadías prolongadas.
+              {isPerlaNegra ? "Habitaciones de gran espacio para 6 a 8 personas y nuestra Suite Ejecutiva con balcón privado." : "Unidades amplias diseñadas para familias grandes y grupos en estadías prolongadas."}
             </p>
           </div>
 

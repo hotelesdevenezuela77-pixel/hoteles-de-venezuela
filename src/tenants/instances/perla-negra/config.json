@@ -1,8 +1,9 @@
 {
   "establishment_id": 102,
   "slug": "perla-negra",
-  "name": "Posada Perla Negra",
+  "name": "Posada Perla Negra - Morrocoy",
   "template": "A",
+  "business_type": "hotel",
   "domain": "posadaperlanegra.com",
   "branding": {
     "primary_color": "#FF0096",
@@ -20,9 +21,9 @@
     "contacto": true
   },
   "contact": {
-    "phone": "+58 412 987 6543",
-    "whatsapp": "+58 412 987 6543",
+    "phone": "+58 424 424 2766",
+    "whatsapp": "+58 424 424 2766",
     "email": "contacto@posadaperlanegra.com",
-    "instagram": "@posadaperlanegra"
+    "instagram": "@posada.perlanegra"
   }
 }
