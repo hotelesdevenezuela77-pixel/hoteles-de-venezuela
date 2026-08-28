@@ -9,7 +9,8 @@ import {
   TrendingUp, Award, ShieldCheck, Zap, BarChart3, Server, Cpu, Smartphone,
   Monitor, Tablet, Layers, Lock, CheckCircle2, Database, MessageSquare,
   CalendarCheck, CreditCard, Users, ExternalLink, Activity,
-  Globe, Building2, Check, Briefcase
+  Globe, Building2, Check, Briefcase, Bot, Radio, Headphones, Plane, MapPin,
+  Search, ShieldAlert, FileText, Anchor, DollarSign, Clock, KeyRound, Truck, Map, Phone
 } from "lucide-react";
 import { ConstellationBackground } from "../components/ConstellationBackground";
 
@@ -376,7 +377,7 @@ export function CustomPageViewer() {
         <div className="max-w-7xl mx-auto px-6 mt-12 mb-20 space-y-16">
           {/* Breadcrumb Navigation */}
           <div>
-            <Link href="/" className="inline-flex items-center gap-2 text-xs font-black text-gray-500 hover:text-brand-magenta transition-colors cursor-pointer">
+            <Link href="/" className="inline-flex items-center gap-2 text-xs font-black text-slate-500 hover:text-brand-magenta transition-colors cursor-pointer">
               <ArrowLeft className="w-4 h-4" />
               <span>INICIO</span>
             </Link>
@@ -393,30 +394,30 @@ export function CustomPageViewer() {
                 El Cerebro Operativo: Control Centralizado en Tiempo Real
               </h2>
               <p className="text-slate-600 text-sm md:text-base leading-relaxed">
-                Nuestra plataforma no es solo un portal estático; es una infraestructura viva impulsada por software de nivel corporativo que gestiona reservas, inventarios y análisis predictivo sin comisiones intermedias.
+                Nuestra plataforma es la infraestructura tecnológica número uno del país, impulsada por software de nivel corporativo que gestiona reservas, inventarios, telemetría satelital y análisis predictivo sin comisiones intermedias.
               </p>
             </div>
 
             {/* Dashboard Mockup Grid con Punteros Flotantes y Sidecard de Métricas */}
             <div className="grid lg:grid-cols-12 gap-8 items-stretch">
               {/* Main Interactive Dashboard View (8 cols) */}
-              <div className="lg:col-span-8 bg-slate-950 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden flex flex-col justify-between">
+              <div className="lg:col-span-8 bg-[#0e011f] border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden flex flex-col justify-between">
                 {/* Floating Pointer 1 */}
                 <div className="absolute top-6 left-6 z-20 hidden sm:flex items-center gap-2 bg-[#00C8D4]/90 backdrop-blur-md text-slate-950 text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg border border-[#00C8D4]">
                   <span className="w-2 h-2 rounded-full bg-white animate-ping" />
-                  <span>[CONTROL DE INVENTARIO EN TIEMPO REAL]</span>
+                  <span>[CONTROL DE INVENTARIO Y CHANNEL MANAGER]</span>
                 </div>
 
                 {/* Floating Pointer 2 */}
                 <div className="absolute top-6 right-6 z-20 hidden sm:flex items-center gap-2 bg-[#FF0096]/90 backdrop-blur-md text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg border border-[#FF0096]">
                   <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                  <span>[VERIFICACIÓN OPERATIVA]</span>
+                  <span>[VERIFICACIÓN KYC & AUDITORÍA LEGAL]</span>
                 </div>
 
                 {/* Floating Pointer 3 */}
                 <div className="absolute bottom-6 left-6 z-20 hidden sm:flex items-center gap-2 bg-[#9B00CC]/90 backdrop-blur-md text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg border border-[#9B00CC]">
                   <span className="w-2 h-2 rounded-full bg-white animate-bounce" />
-                  <span>[ANÁLISIS DE MERCADO Y DEMANDA]</span>
+                  <span>[TELEMETRÍA NASA & RUTA ANDRÓMEDA-X]</span>
                 </div>
 
                 {/* Mockup Top Bar */}
@@ -427,7 +428,7 @@ export function CustomPageViewer() {
                       <div className="w-3 h-3 rounded-full bg-amber-500/80" />
                       <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
                     </div>
-                    <span className="text-xs font-mono text-slate-400 font-bold hidden sm:inline">hdv-core.admin.console-v4.2</span>
+                    <span className="text-xs font-mono text-slate-400 font-bold hidden sm:inline">hdv-core.admin.console-v4.8</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -445,7 +446,7 @@ export function CustomPageViewer() {
                       <Building2 className="w-4 h-4 text-[#00C8D4]" />
                     </div>
                     <span className="text-2xl font-black text-white block">4,500 En Gestión</span>
-                    <span className="text-[10px] text-emerald-400 font-bold">↑ 100% En Proceso</span>
+                    <span className="text-[10px] text-emerald-400 font-bold">↑ 100% Verificados KYC</span>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2 text-left">
@@ -459,7 +460,7 @@ export function CustomPageViewer() {
 
                   <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2 text-left">
                     <div className="flex justify-between text-xs text-slate-400">
-                      <span>Telemetría NASA & Oleaje</span>
+                      <span>Telemetría NASA & Rutas</span>
                       <Activity className="w-4 h-4 text-[#9B00CC]" />
                     </div>
                     <span className="text-2xl font-black text-white block">24/7 Monitoreo</span>
@@ -487,12 +488,12 @@ export function CustomPageViewer() {
               </div>
 
               {/* Sidecard de Métricas Operativas en Vivo (4 cols) */}
-              <div className="lg:col-span-4 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl flex flex-col justify-between text-left space-y-6">
+              <div className="lg:col-span-4 bg-gradient-to-br from-[#0e011f] via-[#1a0533] to-[#0e011f] border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl flex flex-col justify-between text-left space-y-6">
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-xl bg-[#FF0096]/20 border border-[#FF0096]/30 flex items-center justify-center text-[#FF0096]">
-                        <BarChart3 className="w-5 h-5" />
+                      <div className="w-9 h-9 rounded-xl bg-[#FF0096] flex items-center justify-center text-white shadow-md">
+                        <BarChart3 className="w-5 h-5 text-white" />
                       </div>
                       <div>
                         <h3 className="text-sm font-bold text-white">Métricas Operativas</h3>
@@ -549,7 +550,170 @@ export function CustomPageViewer() {
             </div>
           </div>
 
-          {/* ── SECCIÓN 2: EL ECOSISTEMA TECH EN ACCIÓN (SHOWCASE DE APPS Y SOFTWARE) ── */}
+          {/* ── SECCIÓN 2: ECOSISTEMA INTEGRADO DE SISTEMAS (ANÁLISIS DE NIVEL EXPERTO) ── */}
+          <div className="space-y-8 pt-6">
+            <div className="text-center max-w-3xl mx-auto space-y-3">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-black bg-[#9B00CC]/10 text-[#9B00CC] border border-[#9B00CC]/20">
+                <Server className="w-3.5 h-3.5 text-[#00C8D4]" />
+                <span>ARQUITECTURA DE MÚLTIPLES SISTEMAS INTEGRADOS</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight font-serif">
+                Módulos Integrados del Ecosistema Tecnológico
+              </h2>
+              <p className="text-slate-600 text-sm md:text-base leading-relaxed">
+                Nuestra infraestructura conecta más de 30 subsistemas avanzados diseñados para potenciar la gestión turística, la seguridad legal, la finanza multimoneda y la experiencia del viajero.
+              </p>
+            </div>
+
+            {/* Grid 4x2 de subsistemas avanzados */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Card 1: Channel Manager */}
+              <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all text-left space-y-4 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="w-12 h-12 rounded-2xl bg-[#FF0096] text-white flex items-center justify-center shadow-md">
+                    <Layers className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-[10px] font-black text-[#FF0096] uppercase tracking-wider block">INVENTARIO MULTICANAL</span>
+                  <h3 className="text-base font-bold text-slate-900 font-serif">Channel Manager & PMS Sync</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Sincronización automatizada de disponibilidad, tarifas y calendarios entre Booking, Airbnb y la central directa sin comisiones.
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-[11px] text-slate-500">
+                  <span className="font-semibold text-slate-700">Evita Overbooking</span>
+                  <span className="text-[#FF0096] font-bold">100% Automático</span>
+                </div>
+              </div>
+
+              {/* Card 2: KYC & Auditoría Legal */}
+              <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all text-left space-y-4 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="w-12 h-12 rounded-2xl bg-[#00C8D4] text-white flex items-center justify-center shadow-md">
+                    <ShieldCheck className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-[10px] font-black text-[#00C8D4] uppercase tracking-wider block">SEGURIDAD Y NORMATIVA</span>
+                  <h3 className="text-base font-bold text-slate-900 font-serif">Verificación KYC & Auditoría Legal</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Validación de identidad para huéspedes y propietarios, encuestado Mintur y verificación documental de licencias turísticas.
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-[11px] text-slate-500">
+                  <span className="font-semibold text-slate-700">Cumplimiento Legal</span>
+                  <span className="text-[#00C8D4] font-bold">Sello Verificado</span>
+                </div>
+              </div>
+
+              {/* Card 3: Ruta Andrómeda-X & NASA */}
+              <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all text-left space-y-4 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="w-12 h-12 rounded-2xl bg-[#9B00CC] text-white flex items-center justify-center shadow-md">
+                    <Radio className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-[10px] font-black text-[#9B00CC] uppercase tracking-wider block">TELEMETRÍA SATELITAL</span>
+                  <h3 className="text-base font-bold text-slate-900 font-serif">Ruta Andrómeda-X & Clima NASA</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Predicción de condiciones de oleaje en cayos, fuerza del viento, clima en Parques Nacionales e inspección de rutas en tiempo real.
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-[11px] text-slate-500">
+                  <span className="font-semibold text-slate-700">Navegación Segura</span>
+                  <span className="text-[#9B00CC] font-bold">Telemetría 24/7</span>
+                </div>
+              </div>
+
+              {/* Card 4: Traslados, Flota y Logística */}
+              <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all text-left space-y-4 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-md">
+                    <Truck className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-[10px] font-black text-emerald-600 uppercase tracking-wider block">LOGÍSTICA INTEGRAL</span>
+                  <h3 className="text-base font-bold text-slate-900 font-serif">Traslados, Flota & Expediciones</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Gestión de transfers VIP, transporte marítimo a cayos, traslados ejecutivos aeropuerto-hotel y monitoreo de viajes.
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-[11px] text-slate-500">
+                  <span className="font-semibold text-slate-700">Conexión Nacional</span>
+                  <span className="text-emerald-600 font-bold">Rutas GPS</span>
+                </div>
+              </div>
+
+              {/* Card 5: AI Hub & Cotizaciones */}
+              <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all text-left space-y-4 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="w-12 h-12 rounded-2xl bg-[#00C8D4] text-white flex items-center justify-center shadow-md">
+                    <Bot className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-[10px] font-black text-[#00C8D4] uppercase tracking-wider block">INTELIGENCIA ARTIFICIAL</span>
+                  <h3 className="text-base font-bold text-slate-900 font-serif">AI Hub & Agente Conversacional</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Asistente de inteligencia artificial para respuesta inmediata de cotizaciones, atención a turistas y análisis predictivo de ventas.
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-[11px] text-slate-500">
+                  <span className="font-semibold text-slate-700">Respuesta en Segundos</span>
+                  <span className="text-[#00C8D4] font-bold">AI Chatbot 24/7</span>
+                </div>
+              </div>
+
+              {/* Card 6: Libro de Finanzas & BCV */}
+              <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all text-left space-y-4 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="w-12 h-12 rounded-2xl bg-[#FF0096] text-white flex items-center justify-center shadow-md">
+                    <CreditCard className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-[10px] font-black text-[#FF0096] uppercase tracking-wider block">FINANZAS & MULTIMONEDA</span>
+                  <h3 className="text-base font-bold text-slate-900 font-serif">Libro de Finanzas & Tasa BCV</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Conciliación automática de pagos en Bolívares, Zelle, Pago Móvil y tarjetas internacionales con sincronización oficial BCV.
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-[11px] text-slate-500">
+                  <span className="font-semibold text-slate-700">Tasa Oficial BCV</span>
+                  <span className="text-[#FF0096] font-bold">Cero Errores</span>
+                </div>
+              </div>
+
+              {/* Card 7: Planes SaaS & Licenciamiento */}
+              <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all text-left space-y-4 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="w-12 h-12 rounded-2xl bg-[#9B00CC] text-white flex items-center justify-center shadow-md">
+                    <Briefcase className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-[10px] font-black text-[#9B00CC] uppercase tracking-wider block">SOFTWARE COMO SERVICIO</span>
+                  <h3 className="text-base font-bold text-slate-900 font-serif">Gestión de Planes SaaS B2B</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Licenciamiento de marcas blancas y subdominios propios para posadas independientes, hoteles boutique y cadenas corporativas.
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-[11px] text-slate-500">
+                  <span className="font-semibold text-slate-700">Activos Propios</span>
+                  <span className="text-[#9B00CC] font-bold">Multitienda B2B</span>
+                </div>
+              </div>
+
+              {/* Card 8: Club de Cupones & POS */}
+              <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all text-left space-y-4 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-md">
+                    <Award className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-[10px] font-black text-emerald-600 uppercase tracking-wider block">FIDELIZACIÓN & EXPERIENCIAS</span>
+                  <h3 className="text-base font-bold text-slate-900 font-serif">Club de Cupones & POS Gastronómico</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Comercialización de experiencias en destino, paquetes turísticos exclusivos, cupones de descuento y POS para consumos internos.
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-[11px] text-slate-500">
+                  <span className="font-semibold text-slate-700">Ventas Adicionales</span>
+                  <span className="text-emerald-600 font-bold">Más Ingresos</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── SECCIÓN 3: EL ECOSISTEMA TECH EN ACCIÓN (SHOWCASE DE APPS Y SOFTWARE) ── */}
           <div className="space-y-8 pt-6">
             <div className="text-center max-w-3xl mx-auto space-y-3">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-black bg-[#FF0096]/10 text-[#FF0096] border border-[#FF0096]/20">
@@ -582,7 +746,7 @@ export function CustomPageViewer() {
                   </div>
                   <h3 className="text-lg font-black text-slate-900 font-serif">APP MÓVIL PROPIETARIA (B2C)</h3>
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    Reserva directa, mensajería integrada con el hotel y guías turísticas interactiva en tiempo real.
+                    Reserva directa, mensajería integrada con el hotel y guías turísticas interactivas en tiempo real.
                   </p>
                 </div>
               </div>
@@ -591,7 +755,7 @@ export function CustomPageViewer() {
               <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-xl space-y-4 hover:shadow-2xl transition-all group flex flex-col justify-between text-left">
                 <div className="space-y-3">
                   <div className="aspect-[9/14] bg-slate-900 rounded-2xl overflow-hidden relative border border-slate-800 shadow-md flex items-center justify-center p-4">
-                    <div className="w-full h-full rounded-xl bg-slate-950 p-4 border border-slate-800 text-left space-y-3 flex flex-col justify-between">
+                    <div className="w-full h-full rounded-xl bg-[#0e011f] p-4 border border-slate-800 text-left space-y-3 flex flex-col justify-between">
                       <div className="flex justify-between items-center border-b border-slate-800 pb-2">
                         <span className="text-xs font-bold text-[#00C8D4]">HOTEL PMS PANEL</span>
                         <span className="text-[9px] bg-emerald-500/20 text-emerald-400 font-bold px-2 py-0.5 rounded-full">EN VIVO</span>
@@ -704,14 +868,14 @@ export function CustomPageViewer() {
                   <h3 className="text-2xl font-black text-slate-900 font-serif">
                     ¿Quiénes Somos?
                   </h3>
-                  <p className="text-xs font-bold text-[#00C8D4] uppercase tracking-wider">Infraestructura Tecnológica Avanzada</p>
+                  <p className="text-xs font-bold text-[#00C8D4] uppercase tracking-wider">Directorio Tecnológico #1 del País</p>
                 </div>
                 <div className="lg:col-span-8 space-y-4 text-slate-700 text-sm leading-relaxed font-normal">
                   <p>
-                    En un ecosistema digital saturado de intermediarios y procesos burocráticos, <strong className="text-slate-900 font-bold">Hoteles de Venezuela</strong> surge no solo como un directorio, sino como la infraestructura tecnológica más robusta y avanzada del país. Somos la plataforma líder en posicionamiento orgánico, ocupando de forma indiscutible el puesto número 1 en Google, lo que nos convierte en la vitrina principal para el turismo nacional.
+                    En un ecosistema digital saturado de intermediarios y procesos burocráticos, <strong className="text-slate-900 font-bold">Hoteles de Venezuela</strong> surge no solo como un directorio, sino como el directorio tecnológico número uno del país y la infraestructura más avanzada de la industria turística. Somos la plataforma líder en posicionamiento orgánico, ocupando de forma indiscutible los primeros lugares en Google para conectar directamente al turista con los mejores hospedajes.
                   </p>
                   <p>
-                    Nuestra misión trasciende el simple listado de alojamientos; somos una <strong className="text-slate-900 font-bold">Application PWA (Progressive Web App)</strong> de alto rendimiento, diseñada para ofrecer una experiencia de usuario fluida, veloz y eficiente, capaz de conectar de forma orgánica a los prestadores de servicios con el turista moderno.
+                    Nuestra misión trasciende el simple listado de alojamientos; somos una <strong className="text-slate-900 font-bold">Application PWA (Progressive Web App)</strong> de alto rendimiento integrada con módulos de inteligencia artificial, telemetría meteorológica y verificación documental KYC que garantizan transacciones seguras y eficientes.
                   </p>
                 </div>
               </div>
@@ -727,7 +891,7 @@ export function CustomPageViewer() {
                     Un Modelo de Negocio Basado en Valores, No en Comisiones
                   </h3>
                   <p className="text-slate-600 text-sm">
-                    A diferencia de las grandes OTAs (Online Travel Agencies) internacionales que asfixian la rentabilidad del hotelero con altas tasas por reserva, Hoteles de Venezuela ha roto el paradigma. Creemos en el fortalecimiento del patrimonio del aliado.
+                    A diferencia de las grandes OTAs internacionales que asfixian la rentabilidad del hotelero con altas tasas por reserva, Hoteles de Venezuela ha roto el paradigma. Creemos en el fortalecimiento del patrimonio del aliado.
                   </p>
                 </div>
 
@@ -819,7 +983,7 @@ export function CustomPageViewer() {
                   </p>
                 </div>
 
-                <div className="p-6 rounded-3xl bg-gradient-to-br from-[#0e0120] to-[#1a0533] text-white space-y-3 border border-purple-900/50 shadow-xl">
+                <div className="p-6 rounded-3xl bg-gradient-to-br from-[#0e011f] to-[#1a0533] text-white space-y-3 border border-purple-900/50 shadow-xl">
                   <span className="text-[10px] font-mono font-bold text-[#00C8D4] uppercase tracking-widest">OBJETIVO FINAL DE POSICIONAMIENTO</span>
                   <h4 className="text-lg font-extrabold font-serif text-white">Conseguir Clientes a Nuestros Clientes</h4>
                   <p className="text-xs text-slate-300 leading-relaxed font-light">
@@ -837,7 +1001,7 @@ export function CustomPageViewer() {
           {/* ── SECCIÓN 3: CONFIANZA Y ALCANCE CORPORATIVO ── */}
           <div className="space-y-8 pt-6">
             {/* Badges de Verificación Institucional */}
-            <div className="bg-slate-900 text-white rounded-3xl p-8 md:p-10 shadow-2xl border border-slate-800 text-center space-y-6">
+            <div className="bg-[#0e011f] text-white rounded-3xl p-8 md:p-10 shadow-2xl border border-slate-800 text-center space-y-6">
               <div className="max-w-2xl mx-auto space-y-2">
                 <span className="text-[10px] font-black uppercase text-[#00C8D4] tracking-widest">RESPALDO LEGAL Y CORPORATIVO</span>
                 <h3 className="text-2xl md:text-3xl font-black font-serif">Certificación Institucional Internacional</h3>
@@ -877,7 +1041,7 @@ export function CustomPageViewer() {
                   <span>•</span>
                   <span className="hover:text-white transition-colors">WHATSAPP CLOUD API</span>
                   <span>•</span>
-                  <span className="hover:text-white transition-colors">VISA / MASTERCARD</span>
+                  <span className="hover:text-white transition-colors">BANCO CENTRAL DE VENEZUELA (BCV)</span>
                 </div>
               </div>
             </div>
@@ -948,14 +1112,14 @@ export function CustomPageViewer() {
                 </div>
               </div>
 
-              {/* Perfil 3 */}
+              {/* Perfil 3: Capitán Rogelio Robinson */}
               <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-lg text-center space-y-4 hover:shadow-xl transition-all">
                 <div className="w-20 h-20 rounded-full bg-slate-900 mx-auto border-2 border-[#9B00CC] overflow-hidden shadow-md flex items-center justify-center text-white text-xl font-bold font-serif">
-                  RR
+                  CR
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-slate-900 inline-flex items-center gap-1.5 justify-center">
-                    <span>Lcdo. Rogelio Robinson</span>
+                    <span>Capitán Rogelio Robinson</span>
                     <svg className="w-5 h-3.5 rounded-xs shadow-sm inline-block object-cover border border-gray-200 align-middle" viewBox="0 0 7410 3900" xmlns="http://www.w3.org/2000/svg" aria-label="EE.UU.">
                       <title>EE.UU.</title>
                       <rect width="7410" height="3900" fill="#b22234"/>
@@ -976,9 +1140,42 @@ export function CustomPageViewer() {
                       </g>
                     </svg>
                   </h3>
-                  <p className="text-xs text-[#9B00CC] font-bold">Director de Operaciones Turísticas</p>
-                  <p className="text-[11px] text-slate-500 mt-2">Gestor de alianzas estratégicas con hoteles, posadas y operadores turísticos en todo el país.</p>
+                  <p className="text-xs text-[#9B00CC] font-bold">Director de Operaciones Turísticas, Logística & Flota</p>
+                  <p className="text-[11px] text-slate-500 mt-2">Gestor de alianzas estratégicas, logística aérea y marítima con hoteles, posadas y operadores turísticos en todo el país.</p>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── SECCIÓN DE CIERRE (BOTTOM CTA CON GRADIENTE MAGENTA/PÚRPURA & BOTÓN WHATSAPP) ── */}
+          <div className="pt-6">
+            <div 
+              className="rounded-3xl p-8 md:p-12 text-white text-center space-y-6 shadow-2xl relative overflow-hidden"
+              style={{ background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)" }}
+            >
+              <div className="max-w-3xl mx-auto space-y-3 relative z-10">
+                <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-black bg-white/20 text-white backdrop-blur-md uppercase tracking-wider">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>ÚNETE AL DIRECTORIO TECNOLÓGICO #1</span>
+                </span>
+                <h2 className="text-3xl md:text-4xl font-black font-serif tracking-tight text-white drop-shadow-md">
+                  ¿Quieres Integrar tu Hotel o Posada en Nuestra Plataforma?
+                </h2>
+                <p className="text-white/90 text-sm md:text-base leading-relaxed font-light">
+                  Habla directamente con nuestro equipo de atención ejecutiva para incorporar tu establecimiento al ecosistema de Hoteles de Venezuela LLC sin comisiones intermedias.
+                </p>
+              </div>
+
+              <div className="pt-2 flex justify-center relative z-10">
+                <a
+                  href="https://wa.me/584145007744?text=Hola%2C%20me%20gustar%C3%ADa%20m%C3%A1s%20informaci%C3%B3n%20para%20afiliar%20mi%20establecimiento%20al%20Directorio%20Tecnol%C3%B3gico%20Hoteles%20de%20Venezuela."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white hover:bg-slate-100 text-[#FF0096] font-extrabold text-sm px-8 py-4 rounded-2xl shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-3 cursor-pointer group"
+                >
+                  <MessageSquare className="w-5 h-5 text-[#FF0096] fill-[#FF0096]/20 group-hover:scale-110 transition-transform" />
+                  <span>Contactar Asesoría por WhatsApp</span>
+                </a>
               </div>
             </div>
           </div>
