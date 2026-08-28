@@ -4423,52 +4423,138 @@ export function OwnerDashboard() {
         </div>
       )}
 
-      {/* Add Room Modal / Agregar Unidad Operativa */}
+      {/* Add Room Modal / Agregar Unidad Operativa (Ancho Completo Ampliado) */}
       {newRoomModalOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 my-8">
-            <div className="bg-gradient-to-r from-brand-purple-dark to-brand-purple-deep px-6 py-5 flex items-center justify-between text-white text-left">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-black/70 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-5xl overflow-hidden animate-in zoom-in-95 duration-200 my-6 border border-slate-200">
+            <div className="bg-gradient-to-r from-brand-purple-dark via-brand-purple-deep to-[#0e011f] px-6 md:px-8 py-5 flex items-center justify-between text-white text-left">
               <div className="flex items-center gap-3">
-                <Building2 className="w-6 h-6 text-brand-magenta" />
+                <div className="w-10 h-10 rounded-xl bg-[#00C8D4]/20 border border-[#00C8D4]/40 flex items-center justify-center text-[#00C8D4] shrink-0">
+                  <Building2 className="w-5 h-5" />
+                </div>
                 <div>
-                  <h3 className="font-extrabold text-sm tracking-wide">Agregar Nueva Unidad Operativa</h3>
-                  <p className="text-white/70 text-[10px] mt-0.5 font-bold">Configura las especificaciones de la nueva unidad operativa</p>
+                  <h3 className="font-black text-base tracking-wide text-white">Agregar Nueva Unidad Operativa</h3>
+                  <p className="text-white/70 text-xs mt-0.5 font-medium">Configura las especificaciones detalladas, tarifas y comodidades de la nueva unidad</p>
                 </div>
               </div>
-              <button onClick={() => setNewRoomModalOpen(false)} className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors cursor-pointer">
-                <X className="w-4 h-4" />
+              <button
+                type="button"
+                onClick={() => setNewRoomModalOpen(false)}
+                className="w-9 h-9 bg-white/10 hover:bg-[#FF0096] rounded-full flex items-center justify-center text-white transition-colors cursor-pointer"
+                title="Cerrar"
+              >
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateRoom} className="p-6 space-y-4 text-left">
-              <div>
-                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Nombre de la Unidad / Habitación *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Ej: Suite Deluxe Doble"
-                  value={roomFormData.name}
-                  onChange={e => setRoomFormData(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-magenta/20"
-                />
+            <form onSubmit={handleCreateRoom} className="p-6 md:p-8 max-h-[82vh] overflow-y-auto space-y-6 text-left custom-scrollbar">
+              {/* Grilla de Datos de la Unidad */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                <div className="md:col-span-8">
+                  <label className="block text-[10px] uppercase font-black text-slate-500 tracking-wider mb-1.5 font-bold">
+                    Nombre de la Unidad / Habitación *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ej: Suite Deluxe frente al Mar con Balcón Privado"
+                    value={roomFormData.name}
+                    onChange={e => setRoomFormData(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#00C8D4]/20 focus:border-[#00C8D4]"
+                  />
+                </div>
+
+                <div className="md:col-span-4">
+                  <label className="block text-[10px] uppercase font-black text-slate-500 tracking-wider mb-1.5 font-bold">
+                    Código / Números Identificadores
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Ej: Room 101-105 / Hab 2A"
+                    value={roomFormData.room_number}
+                    onChange={e => setRoomFormData(prev => ({ ...prev, room_number: e.target.value }))}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#00C8D4]/20 focus:border-[#00C8D4]"
+                  />
+                </div>
+
+                <div className="md:col-span-4">
+                  <label className="block text-[10px] uppercase font-black text-slate-500 tracking-wider mb-1.5 font-bold">
+                    Precio por Noche (USD) *
+                  </label>
+                  <div className="relative">
+                    <DollarSign className="absolute left-3 top-2.5 w-4 h-4 text-emerald-600" />
+                    <input
+                      type="number"
+                      required
+                      min={1}
+                      placeholder="Ej: 90"
+                      value={roomFormData.price_per_night}
+                      onChange={e => setRoomFormData(prev => ({ ...prev, price_per_night: Number(e.target.value) }))}
+                      className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="md:col-span-4">
+                  <label className="block text-[10px] uppercase font-black text-slate-500 tracking-wider mb-1.5 font-bold">
+                    Capacidad Máxima (Huéspedes) *
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min={1}
+                    placeholder="Ej: 2"
+                    value={roomFormData.capacity}
+                    onChange={e => setRoomFormData(prev => ({ ...prev, capacity: Number(e.target.value) }))}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#00C8D4]/20 focus:border-[#00C8D4]"
+                  />
+                </div>
+
+                <div className="md:col-span-4">
+                  <label className="block text-[10px] uppercase font-black text-slate-500 tracking-wider mb-1.5 font-bold">
+                    Cantidad Total de Unidades *
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min={1}
+                    placeholder="Ej: 5"
+                    value={roomFormData.quantity}
+                    onChange={e => setRoomFormData(prev => ({ ...prev, quantity: Number(e.target.value) }))}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#00C8D4]/20 focus:border-[#00C8D4]"
+                  />
+                </div>
+
+                <div className="md:col-span-12">
+                  <label className="block text-[10px] uppercase font-black text-slate-500 tracking-wider mb-1.5 font-bold">
+                    Descripción Corta y Detalles
+                  </label>
+                  <textarea
+                    placeholder="Detalles sobre tipo de camas, vistas al exterior, lencería de algodón, baño privado o comodidades exclusivas..."
+                    value={roomFormData.description}
+                    onChange={e => setRoomFormData(prev => ({ ...prev, description: e.target.value }))}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 resize-none font-sans"
+                    rows={3}
+                  />
+                </div>
               </div>
 
               {/* Fotografía Principal de la Habitación */}
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+              <div className="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
                 <label className="block text-[10px] uppercase font-extrabold text-slate-700 tracking-wider">
                   Fotografía Principal de la Habitación
                 </label>
 
                 {roomFormData.primary_image && (
-                  <div className="relative rounded-xl overflow-hidden h-32 border border-slate-300 bg-slate-900">
+                  <div className="relative rounded-xl overflow-hidden h-40 border border-slate-300 bg-slate-900 max-w-md">
                     <img src={roomFormData.primary_image} alt="Vista previa de la habitación" className="w-full h-full object-cover" />
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <label className="flex items-center justify-center gap-2 py-2 px-3 bg-[#00C8D4]/15 hover:bg-[#00C8D4]/25 border border-[#00C8D4]/30 rounded-xl text-xs font-extrabold text-[#00C8D4] cursor-pointer transition-all">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl">
+                  <label className="flex items-center justify-center gap-2 py-2.5 px-4 bg-[#00C8D4]/15 hover:bg-[#00C8D4]/25 border border-[#00C8D4]/30 rounded-xl text-xs font-extrabold text-[#00C8D4] cursor-pointer transition-all">
                     <Upload className="w-4 h-4" />
-                    <span>Subir Imagen</span>
+                    <span>Subir Imagen desde Dispositivo</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -4482,86 +4568,34 @@ export function OwnerDashboard() {
                     placeholder="O pega URL de imagen..."
                     value={(roomFormData.primary_image || "").startsWith("data:") ? "" : (roomFormData.primary_image || "")}
                     onChange={e => setRoomFormData(prev => ({ ...prev, primary_image: e.target.value }))}
-                    className="px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:border-[#00C8D4]"
+                    className="px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-[#00C8D4]"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Precio Noche (USD) *</label>
-                  <input
-                    type="number"
-                    required
-                    placeholder="Ej: 90"
-                    value={roomFormData.price_per_night}
-                    onChange={e => setRoomFormData(prev => ({ ...prev, price_per_night: Number(e.target.value) }))}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Capacidad Máxima *</label>
-                  <input
-                    type="number"
-                    required
-                    placeholder="Ej: 2"
-                    value={roomFormData.capacity}
-                    onChange={e => setRoomFormData(prev => ({ ...prev, capacity: Number(e.target.value) }))}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Cantidad Total *</label>
-                  <input
-                    type="number"
-                    required
-                    placeholder="Ej: 5"
-                    value={roomFormData.quantity}
-                    onChange={e => setRoomFormData(prev => ({ ...prev, quantity: Number(e.target.value) }))}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Código / Números</label>
-                  <input
-                    type="text"
-                    placeholder="Ej: Room 101-105"
-                    value={roomFormData.room_number}
-                    onChange={e => setRoomFormData(prev => ({ ...prev, room_number: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700"
-                  />
-                </div>
-              </div>
-
+              {/* Servicios y Amenities en Cuadrícula Ancha de 3 Columnas */}
               <div>
-                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Descripción Corta</label>
-                <textarea
-                  placeholder="Detalles sobre las camas, comodidades exclusivas..."
-                  value={roomFormData.description}
-                  onChange={e => setRoomFormData(prev => ({ ...prev, description: e.target.value }))}
-                  className="w-full px-4 py-2 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700 resize-none font-sans"
-                  rows={3}
-                />
-              </div>
-
-              <div>
-                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-2 font-bold font-bold">Servicios y Amenities</label>
-                <div className="space-y-4 max-h-48 overflow-y-auto p-4 bg-gray-50 border border-gray-150 rounded-2xl">
+                <label className="block text-[10px] uppercase font-black text-slate-700 tracking-wider mb-2 font-bold">
+                  Equipamiento, Servicios y Comodidades Incluidas
+                </label>
+                <div className="space-y-5 max-h-72 overflow-y-auto p-5 bg-slate-50 border border-slate-200 rounded-2xl custom-scrollbar">
                   {ROOM_AMENITIES_CATEGORIES.map(cat => (
-                    <div key={cat.id} className="space-y-1.5">
-                      <span className="text-[10px] font-black text-brand-turquesa uppercase tracking-wider block">{cat.label}</span>
-                      <div className="grid grid-cols-2 gap-2">
+                    <div key={cat.id} className="space-y-2">
+                      <span className="text-[11px] font-black text-[#00C8D4] uppercase tracking-wider block border-b border-slate-200 pb-1">
+                        {cat.label}
+                      </span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
                         {cat.items.map(item => {
                           const active = (typeof roomFormData.amenities === "string" ? roomFormData.amenities : "").split(",").map(s => s.trim()).includes(item.key);
                           return (
-                            <label key={item.key} className="flex items-center gap-2 text-[11px] font-semibold text-gray-600 cursor-pointer select-none">
+                            <label key={item.key} className="flex items-center gap-2.5 p-2.5 bg-white rounded-xl border border-slate-200/80 hover:border-[#00C8D4]/50 transition-all text-xs font-semibold text-slate-700 cursor-pointer select-none">
                               <input
                                 type="checkbox"
                                 checked={active}
                                 onChange={() => handleToggleRoomAmenity(item.key)}
-                                className="accent-brand-magenta w-3.5 h-3.5"
+                                className="accent-[#FF0096] w-4 h-4 rounded shrink-0"
                               />
-                              <span>{item.label}</span>
+                              <span className="truncate">{item.label}</span>
                             </label>
                           );
                         })}
@@ -4571,29 +4605,36 @@ export function OwnerDashboard() {
                 </div>
               </div>
 
-              {/* 4. Notificación y toggle de estado de activación inicial */}
-              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 flex items-center justify-between gap-3">
+              {/* Notificación y toggle de estado de activación */}
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center justify-between gap-4">
                 <div className="text-left">
-                  <span className="text-[10px] font-black text-amber-900 uppercase block">Estado Inicial: {roomFormData.is_active ? "Activa" : "Desactivada (Recomendado)"}</span>
-                  <span className="text-[9px] text-amber-700 block font-semibold">Recuerda activar la unidad para hacerla pública.</span>
+                  <span className="text-xs font-black text-amber-900 uppercase block">Estado Inicial: {roomFormData.is_active ? "Activa" : "Desactivada (Recomendado)"}</span>
+                  <span className="text-[11px] text-amber-700 block font-semibold">Recuerda activar la unidad cuando esté lista para ser visible en el catálogo público.</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setRoomFormData(prev => ({ ...prev, is_active: !prev.is_active }))}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase transition-all cursor-pointer ${roomFormData.is_active
+                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase transition-all cursor-pointer ${roomFormData.is_active
                       ? "bg-green-600 text-white"
-                      : "bg-gray-200 text-gray-700"
+                      : "bg-slate-200 text-slate-700"
                     }`}
                 >
                   {roomFormData.is_active ? "Activa" : "Desactivada"}
                 </button>
               </div>
 
-              <div className="flex gap-3 pt-4 border-t border-gray-100">
-                <button type="button" onClick={() => setNewRoomModalOpen(false)} className="flex-1 bg-white border border-gray-250 hover:bg-gray-50 text-gray-600 text-xs font-bold py-3.5 rounded-xl cursor-pointer">
+              <div className="flex gap-4 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setNewRoomModalOpen(false)}
+                  className="flex-1 bg-white border border-slate-250 hover:bg-slate-100 text-slate-700 text-xs font-bold py-3.5 rounded-xl cursor-pointer"
+                >
                   Cancelar
                 </button>
-                <button type="submit" className="flex-1 btn-cyan-gradient text-white text-xs font-bold py-3.5 rounded-xl cursor-pointer shadow-md uppercase">
+                <button
+                  type="submit"
+                  className="flex-1 bg-gradient-to-r from-[#00C8D4] via-[#9B00CC] to-[#FF0096] hover:opacity-95 text-white text-xs font-black py-3.5 rounded-xl cursor-pointer shadow-lg uppercase tracking-wider"
+                >
                   Crear Unidad Operativa
                 </button>
               </div>
@@ -4602,51 +4643,132 @@ export function OwnerDashboard() {
         </div>
       )}
 
-      {/* 3. Modal Editar Unidad Operativa */}
+      {/* 3. Modal Editar Unidad Operativa (Ancho Completo Ampliado) */}
       {editingRoomModalOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 my-8">
-            <div className="bg-gradient-to-r from-brand-purple-dark to-brand-purple-deep px-6 py-5 flex items-center justify-between text-white text-left">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-black/70 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-5xl overflow-hidden animate-in zoom-in-95 duration-200 my-6 border border-slate-200">
+            <div className="bg-gradient-to-r from-brand-purple-dark via-brand-purple-deep to-[#0e011f] px-6 md:px-8 py-5 flex items-center justify-between text-white text-left">
               <div className="flex items-center gap-3">
-                <FileText className="w-6 h-6 text-brand-turquesa" />
+                <div className="w-10 h-10 rounded-xl bg-[#FF0096]/20 border border-[#FF0096]/40 flex items-center justify-center text-[#FF0096] shrink-0">
+                  <FileText className="w-5 h-5" />
+                </div>
                 <div>
-                  <h3 className="font-extrabold text-sm tracking-wide">Editar Unidad Operativa</h3>
-                  <p className="text-white/70 text-[10px] mt-0.5 font-bold">Modifica las tarifas, capacidades y detalles de esta unidad</p>
+                  <h3 className="font-black text-base tracking-wide text-white">Editar Unidad Operativa</h3>
+                  <p className="text-white/70 text-xs mt-0.5 font-medium">Modifica las tarifas, capacidades, descripción e inventario de esta unidad</p>
                 </div>
               </div>
-              <button onClick={() => setEditingRoomModalOpen(false)} className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors cursor-pointer">
-                <X className="w-4 h-4" />
+              <button
+                type="button"
+                onClick={() => setEditingRoomModalOpen(false)}
+                className="w-9 h-9 bg-white/10 hover:bg-[#FF0096] rounded-full flex items-center justify-center text-white transition-colors cursor-pointer"
+                title="Cerrar"
+              >
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveEditRoom} className="p-6 space-y-4 text-left">
-              <div>
-                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Nombre de la Unidad *</label>
-                <input
-                  type="text"
-                  required
-                  value={roomFormData.name}
-                  onChange={e => setRoomFormData(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-turquesa/20"
-                />
+            <form onSubmit={handleSaveEditRoom} className="p-6 md:p-8 max-h-[82vh] overflow-y-auto space-y-6 text-left custom-scrollbar">
+              {/* Grilla de Datos de la Unidad */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                <div className="md:col-span-8">
+                  <label className="block text-[10px] uppercase font-black text-slate-500 tracking-wider mb-1.5 font-bold">
+                    Nombre de la Unidad *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={roomFormData.name}
+                    onChange={e => setRoomFormData(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#00C8D4]/20 focus:border-[#00C8D4]"
+                  />
+                </div>
+
+                <div className="md:col-span-4">
+                  <label className="block text-[10px] uppercase font-black text-slate-500 tracking-wider mb-1.5 font-bold">
+                    Código / Números Identificadores
+                  </label>
+                  <input
+                    type="text"
+                    value={roomFormData.room_number}
+                    onChange={e => setRoomFormData(prev => ({ ...prev, room_number: e.target.value }))}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#00C8D4]/20 focus:border-[#00C8D4]"
+                  />
+                </div>
+
+                <div className="md:col-span-4">
+                  <label className="block text-[10px] uppercase font-black text-slate-500 tracking-wider mb-1.5 font-bold">
+                    Precio por Noche (USD) *
+                  </label>
+                  <div className="relative">
+                    <DollarSign className="absolute left-3 top-2.5 w-4 h-4 text-emerald-600" />
+                    <input
+                      type="number"
+                      required
+                      min={1}
+                      value={roomFormData.price_per_night}
+                      onChange={e => setRoomFormData(prev => ({ ...prev, price_per_night: Number(e.target.value) }))}
+                      className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="md:col-span-4">
+                  <label className="block text-[10px] uppercase font-black text-slate-500 tracking-wider mb-1.5 font-bold">
+                    Capacidad Máxima (Huéspedes) *
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min={1}
+                    value={roomFormData.capacity}
+                    onChange={e => setRoomFormData(prev => ({ ...prev, capacity: Number(e.target.value) }))}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#00C8D4]/20 focus:border-[#00C8D4]"
+                  />
+                </div>
+
+                <div className="md:col-span-4">
+                  <label className="block text-[10px] uppercase font-black text-slate-500 tracking-wider mb-1.5 font-bold">
+                    Cantidad Total de Unidades *
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min={1}
+                    value={roomFormData.quantity}
+                    onChange={e => setRoomFormData(prev => ({ ...prev, quantity: Number(e.target.value) }))}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#00C8D4]/20 focus:border-[#00C8D4]"
+                  />
+                </div>
+
+                <div className="md:col-span-12">
+                  <label className="block text-[10px] uppercase font-black text-slate-500 tracking-wider mb-1.5 font-bold">
+                    Descripción Corta y Detalles
+                  </label>
+                  <textarea
+                    value={roomFormData.description}
+                    onChange={e => setRoomFormData(prev => ({ ...prev, description: e.target.value }))}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 resize-none font-sans"
+                    rows={3}
+                  />
+                </div>
               </div>
 
               {/* Fotografía Principal de la Habitación */}
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+              <div className="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
                 <label className="block text-[10px] uppercase font-extrabold text-slate-700 tracking-wider">
                   Fotografía Principal de la Habitación
                 </label>
 
                 {roomFormData.primary_image && (
-                  <div className="relative rounded-xl overflow-hidden h-32 border border-slate-300 bg-slate-900">
+                  <div className="relative rounded-xl overflow-hidden h-40 border border-slate-300 bg-slate-900 max-w-md">
                     <img src={roomFormData.primary_image} alt="Vista previa de la habitación" className="w-full h-full object-cover" />
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <label className="flex items-center justify-center gap-2 py-2 px-3 bg-[#00C8D4]/15 hover:bg-[#00C8D4]/25 border border-[#00C8D4]/30 rounded-xl text-xs font-extrabold text-[#00C8D4] cursor-pointer transition-all">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl">
+                  <label className="flex items-center justify-center gap-2 py-2.5 px-4 bg-[#00C8D4]/15 hover:bg-[#00C8D4]/25 border border-[#00C8D4]/30 rounded-xl text-xs font-extrabold text-[#00C8D4] cursor-pointer transition-all">
                     <Upload className="w-4 h-4" />
-                    <span>Subir Imagen</span>
+                    <span>Subir Imagen desde Dispositivo</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -4660,81 +4782,34 @@ export function OwnerDashboard() {
                     placeholder="O pega URL de imagen..."
                     value={(roomFormData.primary_image || "").startsWith("data:") ? "" : (roomFormData.primary_image || "")}
                     onChange={e => setRoomFormData(prev => ({ ...prev, primary_image: e.target.value }))}
-                    className="px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:border-[#00C8D4]"
+                    className="px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-[#00C8D4]"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Precio Noche (USD) *</label>
-                  <input
-                    type="number"
-                    required
-                    value={roomFormData.price_per_night}
-                    onChange={e => setRoomFormData(prev => ({ ...prev, price_per_night: Number(e.target.value) }))}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Capacidad Máxima *</label>
-                  <input
-                    type="number"
-                    required
-                    value={roomFormData.capacity}
-                    onChange={e => setRoomFormData(prev => ({ ...prev, capacity: Number(e.target.value) }))}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Cantidad Total *</label>
-                  <input
-                    type="number"
-                    required
-                    value={roomFormData.quantity}
-                    onChange={e => setRoomFormData(prev => ({ ...prev, quantity: Number(e.target.value) }))}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Código / Números</label>
-                  <input
-                    type="text"
-                    value={roomFormData.room_number}
-                    onChange={e => setRoomFormData(prev => ({ ...prev, room_number: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700"
-                  />
-                </div>
-              </div>
-
+              {/* Servicios y Amenities en Cuadrícula Ancha de 3-4 Columnas */}
               <div>
-                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Descripción Corta</label>
-                <textarea
-                  value={roomFormData.description}
-                  onChange={e => setRoomFormData(prev => ({ ...prev, description: e.target.value }))}
-                  className="w-full px-4 py-2 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700 resize-none font-sans"
-                  rows={3}
-                />
-              </div>
-
-              <div>
-                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-2 font-bold">Servicios y Amenities</label>
-                <div className="space-y-4 max-h-48 overflow-y-auto p-4 bg-gray-50 border border-gray-150 rounded-2xl">
+                <label className="block text-[10px] uppercase font-black text-slate-700 tracking-wider mb-2 font-bold">
+                  Equipamiento, Servicios y Comodidades Incluidas
+                </label>
+                <div className="space-y-5 max-h-72 overflow-y-auto p-5 bg-slate-50 border border-slate-200 rounded-2xl custom-scrollbar">
                   {ROOM_AMENITIES_CATEGORIES.map(cat => (
-                    <div key={cat.id} className="space-y-1.5">
-                      <span className="text-[10px] font-black text-brand-turquesa uppercase tracking-wider block">{cat.label}</span>
-                      <div className="grid grid-cols-2 gap-2">
+                    <div key={cat.id} className="space-y-2">
+                      <span className="text-[11px] font-black text-[#00C8D4] uppercase tracking-wider block border-b border-slate-200 pb-1">
+                        {cat.label}
+                      </span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
                         {cat.items.map(item => {
                           const active = (typeof roomFormData.amenities === "string" ? roomFormData.amenities : "").split(",").map(s => s.trim()).includes(item.key);
                           return (
-                            <label key={item.key} className="flex items-center gap-2 text-[11px] font-semibold text-gray-600 cursor-pointer select-none">
+                            <label key={item.key} className="flex items-center gap-2.5 p-2.5 bg-white rounded-xl border border-slate-200/80 hover:border-[#00C8D4]/50 transition-all text-xs font-semibold text-slate-700 cursor-pointer select-none">
                               <input
                                 type="checkbox"
                                 checked={active}
                                 onChange={() => handleToggleRoomAmenity(item.key)}
-                                className="accent-brand-magenta w-3.5 h-3.5"
+                                className="accent-[#FF0096] w-4 h-4 rounded shrink-0"
                               />
-                              <span>{item.label}</span>
+                              <span className="truncate">{item.label}</span>
                             </label>
                           );
                         })}
@@ -4744,27 +4819,35 @@ export function OwnerDashboard() {
                 </div>
               </div>
 
-              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 flex items-center justify-between gap-3">
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex items-center justify-between gap-4">
                 <div className="text-left">
-                  <span className="text-[10px] font-black text-slate-800 uppercase block">Estado de Publicación: {roomFormData.is_active ? "Activa" : "Desactivada"}</span>
-                  <span className="text-[9px] text-slate-500 block font-semibold">Las unidades activas son visibles públicamente.</span>
+                  <span className="text-xs font-black text-slate-800 uppercase block">Estado de Publicación: {roomFormData.is_active ? "Activa" : "Desactivada"}</span>
+                  <span className="text-[11px] text-slate-500 block font-semibold">Las unidades activas son visibles públicamente en la ficha del establecimiento.</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setRoomFormData(prev => ({ ...prev, is_active: !prev.is_active }))}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase transition-all cursor-pointer ${roomFormData.is_active
+                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase transition-all cursor-pointer ${roomFormData.is_active
                       ? "bg-green-600 text-white"
-                      : "bg-gray-300 text-gray-700"
+                      : "bg-slate-300 text-slate-700"
                     }`}
                 >
                   {roomFormData.is_active ? "Activa" : "Desactivada"}
                 </button>
               </div>
-              <div className="flex gap-3 pt-4 border-t border-gray-100">
-                <button type="button" onClick={() => setEditingRoomModalOpen(false)} className="flex-1 bg-white border border-gray-250 hover:bg-gray-50 text-gray-600 text-xs font-bold py-3.5 rounded-xl cursor-pointer">
+
+              <div className="flex gap-4 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setEditingRoomModalOpen(false)}
+                  className="flex-1 bg-white border border-slate-250 hover:bg-slate-100 text-slate-700 text-xs font-bold py-3.5 rounded-xl cursor-pointer"
+                >
                   Cancelar
                 </button>
-                <button type="submit" className="flex-1 btn-magenta-gradient text-white text-xs font-bold py-3.5 rounded-xl cursor-pointer shadow-md uppercase">
+                <button
+                  type="submit"
+                  className="flex-1 bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] hover:opacity-95 text-white text-xs font-black py-3.5 rounded-xl cursor-pointer shadow-lg uppercase tracking-wider"
+                >
                   Guardar Cambios
                 </button>
               </div>
