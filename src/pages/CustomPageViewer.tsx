@@ -1035,9 +1035,9 @@ export function CustomPageViewer() {
                 <div className="flex flex-wrap justify-center items-center gap-6 md:gap-10 text-slate-400 font-mono text-xs font-bold">
                   <span className="hover:text-white transition-colors">SUPABASE CLOUD</span>
                   <span>•</span>
-                  <span className="hover:text-white transition-colors">AWS AMAZON</span>
+                  <span className="hover:text-white transition-colors">LA RED EDGE DE CLOUD FLARE</span>
                   <span>•</span>
-                  <span className="hover:text-white transition-colors">STRIPE PAYMENTS</span>
+                  <span className="hover:text-white transition-colors">WEBMASTERPRO ENTERTAINMENT</span>
                   <span>•</span>
                   <span className="hover:text-white transition-colors">WHATSAPP CLOUD API</span>
                   <span>•</span>
