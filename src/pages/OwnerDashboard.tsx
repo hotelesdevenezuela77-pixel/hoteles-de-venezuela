@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { ScriptGenerator } from "../components/ScriptGenerator";
 import { AmenitiesSelector } from "@/components/admin/AmenitiesSelector";
+import { PROPERTY_TYPES_DOCUMENT77 } from "@/lib/amenitiesList";
 import { AvailabilityCalendar } from "../components/AvailabilityCalendar";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area, Legend } from "recharts";
 import { jsPDF } from "jspdf";
@@ -4262,17 +4263,26 @@ export function OwnerDashboard() {
                 </div>
 
                 <div className="lg:col-span-1">
-                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Categoría *</label>
+                  <label className="block text-[10px] uppercase font-bold text-gray-500 tracking-wider mb-1.5 font-black">Tipo de Establecimiento * (Documento 77 V.5 C05.1)</label>
                   <select
                     required
                     value={formData.category_id}
                     onChange={e => setFormData(prev => ({ ...prev, category_id: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-magenta/20 focus:border-brand-magenta cursor-pointer"
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700 font-extrabold focus:outline-none focus:ring-2 focus:ring-brand-magenta/20 focus:border-brand-magenta cursor-pointer"
                   >
-                    <option value="">Selecciona</option>
-                    {categories.map(c => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
+                    <option value="">Selecciona Tipo de Establecimiento...</option>
+                    <optgroup label="📋 Ramas Oficiales Documento 77 V.5">
+                      {PROPERTY_TYPES_DOCUMENT77.map(pt => (
+                        <option key={pt.id} value={pt.id}>{pt.label} ({pt.code})</option>
+                      ))}
+                    </optgroup>
+                    {categories.length > 0 && (
+                      <optgroup label="📁 Categorías Registradas en Sistema">
+                        {categories.map(c => (
+                          <option key={c.id} value={c.id}>{c.name}</option>
+                        ))}
+                      </optgroup>
+                    )}
                   </select>
                 </div>
 
@@ -4370,10 +4380,19 @@ export function OwnerDashboard() {
                 </div>
               </div>
 
-              <AmenitiesSelector
-                selectedServices={formData.services}
-                onChange={(newServices) => setFormData(prev => ({ ...prev, services: newServices }))}
-              />
+              {(() => {
+                const selectedCategoryObj = categories.find(c => String(c.id) === String(formData.category_id));
+                const selectedDoc77Obj = PROPERTY_TYPES_DOCUMENT77.find(pt => pt.id === formData.category_id);
+                const activeCategoryName = selectedDoc77Obj?.label || selectedCategoryObj?.name || formData.category_id;
+
+                return (
+                  <AmenitiesSelector
+                    selectedServices={formData.services}
+                    onChange={(newServices) => setFormData(prev => ({ ...prev, services: newServices }))}
+                    selectedCategory={activeCategoryName}
+                  />
+                );
+              })()}
 
               <div className="flex gap-3 pt-6 border-t border-gray-100">
                 <button

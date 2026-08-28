@@ -801,7 +801,7 @@ export function AdminEstablecimientoNuevo() {
               <h2 className="font-bold text-gray-900 text-sm pb-2 border-b flex items-center gap-2">
                 <Building2 className="w-4 h-4 text-[#00C8D4]" /> PASO 4: Zonas Comunes e Instalaciones del Establecimiento (C01.3)
               </h2>
-              <AmenitiesSelector selectedServices={services} onChange={setServices} />
+              <AmenitiesSelector selectedServices={services} onChange={setServices} selectedCategory={propertyType} />
             </div>
           )}
 
@@ -811,7 +811,7 @@ export function AdminEstablecimientoNuevo() {
               <h2 className="font-bold text-gray-900 text-sm pb-2 border-b flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-[#FF0096]" /> PASO 5: Servicios y Experiencias (C02)
               </h2>
-              <AmenitiesSelector selectedServices={services} onChange={setServices} />
+              <AmenitiesSelector selectedServices={services} onChange={setServices} selectedCategory={propertyType} />
             </div>
           )}
 
@@ -819,9 +819,9 @@ export function AdminEstablecimientoNuevo() {
           {currentStep === 6 && (
             <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-xs space-y-4">
               <h2 className="font-bold text-gray-900 text-sm pb-2 border-b flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-[#9B00CC]" /> PASO 6: Gestión, Políticas y Logística (C03)
+                <ShieldCheck className="w-4 h-4 text-[#9B00CC]" /> PASO 6: Gestión, Políticas y Logística (C03 & C04)
               </h2>
-              <AmenitiesSelector selectedServices={services} onChange={setServices} />
+              <AmenitiesSelector selectedServices={services} onChange={setServices} selectedCategory={propertyType} />
             </div>
           )}
 

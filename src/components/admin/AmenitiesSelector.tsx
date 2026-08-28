@@ -21,7 +21,35 @@ import {
 interface AmenitiesSelectorProps {
   selectedServices: string[];
   onChange: (services: string[]) => void;
+  selectedCategory?: string;
 }
+
+const getCategoryModule = (categoryStr: string | undefined): {
+  type: "barco" | "camping" | "love_hotel" | "montana" | "restaurante" | "general";
+  label: string;
+  subCategoryFilter: string | null;
+} => {
+  if (!categoryStr) return { type: "general", label: "Hospedaje General", subCategoryFilter: null };
+  const lower = categoryStr.toLowerCase();
+
+  if (lower.includes("barco") || lower.includes("yate") || lower.includes("marina") || lower.includes("catamaran") || lower.includes("houseboat") || lower.includes("velero")) {
+    return { type: "barco", label: "⛵ Barcos, Veleros, Yates & Marinas", subCategoryFilter: "Barcos" };
+  }
+  if (lower.includes("camping") || lower.includes("glamping") || lower.includes("eco-lodge")) {
+    return { type: "camping", label: "🏕️ Campings, Glamping & Eco-Lodges", subCategoryFilter: "Campings" };
+  }
+  if (lower.includes("love") || lower.includes("motel")) {
+    return { type: "love_hotel", label: "💖 Love Hotels & Moteles", subCategoryFilter: "Love Hotels" };
+  }
+  if (lower.includes("chalet") || lower.includes("esqui") || lower.includes("esquí") || lower.includes("nieve") || lower.includes("montaña") || lower.includes("montana")) {
+    return { type: "montana", label: "🏔️ Chalets de Montaña & Esquí", subCategoryFilter: "Chalets de Montaña" };
+  }
+  if (lower.includes("restaurante") || lower.includes("gastronomia") || lower.includes("gastronomía") || lower.includes("bar") || lower.includes("cafeteria") || lower.includes("comida")) {
+    return { type: "restaurante", label: "🍽️ Restaurantes & Gastronomía", subCategoryFilter: "Restaurantes" };
+  }
+
+  return { type: "general", label: "🏨 Hospedaje General", subCategoryFilter: null };
+};
 
 const ICON_MAP: Record<string, any> = {
   Wifi, Wind, Car, Zap, Droplets, ShieldCheck, Clock, Dog, Accessibility, ArrowUpSquare,
@@ -31,11 +59,13 @@ const ICON_MAP: Record<string, any> = {
   Box, Tent, Ship, Heart, Mountain, FileText, Globe, VolumeX, EyeOff, Footprints, IceCream, Ban, Building2, Users
 };
 
-export function AmenitiesSelector({ selectedServices, onChange }: AmenitiesSelectorProps) {
+export function AmenitiesSelector({ selectedServices, onChange, selectedCategory }: AmenitiesSelectorProps) {
   const [activePillar, setActivePillar] = useState<string>("all");
   const [activeScope, setActiveScope] = useState<string>("all");
   const [search, setSearch] = useState<string>("");
   const [customInput, setCustomInput] = useState<string>("");
+
+  const activeModule = useMemo(() => getCategoryModule(selectedCategory), [selectedCategory]);
 
   const currentList = useMemo(() => parseServicesList(selectedServices), [selectedServices]);
 
@@ -97,7 +127,7 @@ export function AmenitiesSelector({ selectedServices, onChange }: AmenitiesSelec
     onChange([]);
   };
 
-  // Filter master amenities by pillar, scope, and search term (label/code/category)
+  // Filter master amenities by pillar, scope, search term, and smart category module (C04)
   const filteredAmenities = useMemo(() => {
     return MASTER_AMENITIES.filter(item => {
       const matchesPillar = activePillar === "all" || item.pillar === activePillar;
@@ -109,12 +139,39 @@ export function AmenitiesSelector({ selectedServices, onChange }: AmenitiesSelec
         item.code.toLowerCase().includes(searchLower) ||
         item.subCategory.toLowerCase().includes(searchLower);
 
-      return matchesPillar && matchesScope && matchesSearch;
+      // Smart Category Filtering for C04 Specifics:
+      // If a specific category is selected (e.g. Barco, Camping, Love Hotel, Chalet, Restaurante),
+      // ONLY show the C04 items that match this category's subCategory!
+      let matchesCategoryModule = true;
+      if (item.pillar === "C04" && activeModule.subCategoryFilter) {
+        matchesCategoryModule = item.subCategory === activeModule.subCategoryFilter;
+      }
+
+      return matchesPillar && matchesScope && matchesSearch && matchesCategoryModule;
     });
-  }, [activePillar, activeScope, search]);
+  }, [activePillar, activeScope, search, activeModule]);
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5">
+      {/* Banner de Módulo Inteligente por Categoría */}
+      {activeModule.subCategoryFilter && (
+        <div className="bg-gradient-to-r from-[#00C8D4]/10 via-[#FF0096]/10 to-[#9B00CC]/10 border border-[#00C8D4]/30 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fade-in">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00C8D4] to-[#9B00CC] text-white flex items-center justify-center font-bold text-base shadow-md shrink-0">
+              ⚡
+            </div>
+            <div className="text-left">
+              <span className="text-[10px] font-black uppercase text-[#00C8D4] tracking-widest block">Módulo Dinámico Adaptativo Documento 77 V.5</span>
+              <h4 className="text-xs sm:text-sm font-extrabold text-slate-900">{activeModule.label}</h4>
+              <p className="text-[11px] text-slate-500 font-medium">Formulario inteligente configurado automáticamente. Se muestran instalaciones específicas para esta tipología.</p>
+            </div>
+          </div>
+          <span className="px-3 py-1 bg-white text-[#FF0096] text-[10px] font-black uppercase rounded-full border border-[#FF0096]/30 shadow-xs shrink-0 self-start sm:self-center">
+            Filtrado Activo
+          </span>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
         <div>
