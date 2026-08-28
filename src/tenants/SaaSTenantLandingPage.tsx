@@ -46,6 +46,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
 
   const isRestaurant = config.business_type === "restaurant" || (config.slug && config.slug.toLowerCase().includes("oleaje"));
   const isPerlaNegra = (config.slug && config.slug.toLowerCase().includes("perla-negra")) || config.establishment_id === 102 || (config.name && config.name.toLowerCase().includes("perla negra"));
+  const isMyCampers = (config.slug && config.slug.toLowerCase().includes("my-campers")) || config.establishment_id === 103 || (config.name && config.name.toLowerCase().includes("my campers"));
   const [activeMenuCategory, setActiveMenuCategory] = useState<string>("all");
   const [orderCart, setOrderCart] = useState<{ dish: OleajeDish; count: number }[]>([]);
 
@@ -153,6 +154,16 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           }
         }
       } catch (e) {}
+
+      if (isMyCampers) {
+        setAreaPhotos({
+          piscina: ["/images/my-campers/camper_1.jpg", "/images/my-campers/camper_2.jpg", "/images/my-campers/camper_3.jpg", "/images/my-campers/camper_4.jpg", "/images/my-campers/camper_5.jpg"],
+          restaurante: ["/images/my-campers/camper_6.jpg", "/images/my-campers/camper_7.jpg", "/images/my-campers/camper_8.jpg", "/images/my-campers/camper_9.jpg", "/images/my-campers/camper_10.jpg"],
+          lobby: ["/images/my-campers/camper_11.jpg", "/images/my-campers/camper_12.jpg", "/images/my-campers/camper_13.jpg"],
+          fachada: ["/images/my-campers/banner.jpg", "/images/my-campers/camper_14.jpg", "/images/my-campers/camper_15.jpg"],
+        });
+        return;
+      }
 
       if (isPerlaNegra) {
         setAreaPhotos({
@@ -678,7 +689,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 backdrop-blur border border-[#00C8D4]/40 text-[#00C8D4] text-[11px] font-extrabold tracking-[0.25em] uppercase shadow-2xl">
               <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
-              {isPerlaNegra ? "BIENVENIDOS A MORROCOY • POSADA PERLA NEGRA" : "EL PARAÍSO TE ESPERA • HOSPEDAJE DE EXCELENCIA"}
+              {isMyCampers ? "DONDE EL SILENCIO SE VUELVE MÚSICA • CUBIRO, LARA" : isPerlaNegra ? "BIENVENIDOS A MORROCOY • POSADA PERLA NEGRA" : "EL PARAÍSO TE ESPERA • HOSPEDAJE DE EXCELENCIA"}
             </div>
 
             <h1 className="text-4xl sm:text-6xl md:text-7xl font-black font-serif text-white tracking-tight leading-tight drop-shadow-2xl">
@@ -699,9 +710,11 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               </div>
 
               <p className="text-base sm:text-xl text-white font-medium max-w-3xl mx-auto leading-relaxed drop-shadow-lg font-serif">
-                {isPerlaNegra 
-                  ? "Descubra el verdadero significado de descansar en Morrocoy. 21 habitaciones confortables con aire acondicionado 24/7, piscina iluminada, WiFi Starlink, planta eléctrica y paseos directos a los cayos."
-                  : "Más que un Hospedaje, su refugio perfecto. Disfrute de una experiencia inolvidable con atención personalizada y garantía directa de tarifa."
+                {isMyCampers
+                  ? "Vive la experiencia de hospedarte en un Camper exclusivo rodeado del clima fresco y paisajes icónicos de Cubiro, Estado Lara. Confort de alta gama, fogatas nocturnas, vistas impresionantes y tranquilidad absoluta."
+                  : isPerlaNegra 
+                    ? "Descubra el verdadero significado de descansar en Morrocoy. 21 habitaciones confortables con aire acondicionado 24/7, piscina iluminada, WiFi Starlink, planta eléctrica y paseos directos a los cayos."
+                    : "Más que un Hospedaje, su refugio perfecto. Disfrute de una experiencia inolvidable con atención personalizada y garantía directa de tarifa."
                 }
               </p>
             </div>
