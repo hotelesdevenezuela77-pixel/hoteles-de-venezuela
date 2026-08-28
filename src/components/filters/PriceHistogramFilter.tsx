@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { DollarSign, BarChart2, RefreshCw } from "lucide-react";
-import { Establishment, getVirtualPrice } from "../layout/EstablishmentCard";
+import type { Establishment } from "../layout/EstablishmentCard";
+import { getVirtualPrice } from "../layout/EstablishmentCard";
 
 interface PriceHistogramFilterProps {
   establishments: Establishment[];

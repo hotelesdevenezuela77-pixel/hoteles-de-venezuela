@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "wouter";
 import { MapPin, Compass, Sparkles, Navigation, X, Star, Layers, ExternalLink, Map, DollarSign } from "lucide-react";
-import { Establishment, getVirtualPrice } from "../layout/EstablishmentCard";
+import type { Establishment } from "../layout/EstablishmentCard";
+import { getVirtualPrice } from "../layout/EstablishmentCard";
 
 export interface ZoneRegion {
   id: string;
