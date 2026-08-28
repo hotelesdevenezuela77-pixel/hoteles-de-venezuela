@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { DollarSign, BarChart2, TrendingUp, Sparkles, RefreshCw } from "lucide-react";
+import { DollarSign, BarChart2, RefreshCw } from "lucide-react";
 import { Establishment, getVirtualPrice } from "../layout/EstablishmentCard";
 
 interface PriceHistogramFilterProps {
@@ -31,11 +31,12 @@ export function PriceHistogramFilter({
     return Math.round(sum / prices.length);
   }, [prices]);
 
-  // Construir 12 barras de histograma entre $0 y $600+
+  const sliderMax = useMemo(() => Math.max(maxAvailable, 500), [maxAvailable]);
+
+  // Construir 12 barras de histograma entre $0 y sliderMax
   const histogramBins = useMemo(() => {
     const binCount = 12;
-    const maxLimit = Math.max(maxAvailable, 500);
-    const binWidth = Math.ceil(maxLimit / binCount);
+    const binWidth = Math.ceil(sliderMax / binCount);
 
     const bins = Array.from({ length: binCount }, (_, i) => {
       const start = i * binWidth;
@@ -60,7 +61,7 @@ export function PriceHistogramFilter({
       ...bin,
       heightPercent: Math.max((bin.count / maxCount) * 100, 8)
     }));
-  }, [prices, maxAvailable]);
+  }, [prices, sliderMax]);
 
   // Cuántos establecimientos caen dentro del rango actual [minPrice, maxPrice]
   const countInRange = useMemo(() => {
@@ -71,6 +72,10 @@ export function PriceHistogramFilter({
     setMinPrice(min);
     setMaxPrice(max);
   };
+
+  // Posiciones porcentuales para la barra del slider dual
+  const leftPercent = Math.min(Math.max(0, (minPrice / sliderMax) * 100), 98);
+  const rightPercent = Math.min(Math.max(0, 100 - (maxPrice / sliderMax) * 100), 98);
 
   return (
     <div className="bg-gradient-to-br from-slate-900 via-[#1a0533] to-[#0e011f] p-4 sm:p-5 rounded-2xl border border-purple-500/20 text-white shadow-xl space-y-4">
@@ -84,7 +89,7 @@ export function PriceHistogramFilter({
             <h4 className="text-xs font-black tracking-wider uppercase text-white font-sans">
               Estadística & Rango de Precio
             </h4>
-            <p className="text-[10px] text-slate-300 font-medium">Distribución interactiva en dólares ($ / noche)</p>
+            <p className="text-[10px] text-slate-300 font-medium">Desliza la barra para ajustar precios mínimo y máximo</p>
           </div>
         </div>
 
@@ -152,17 +157,70 @@ export function PriceHistogramFilter({
             );
           })}
         </div>
+      </div>
+
+      {/* SLIDER INTERACTIVO DUAL DE RANGO DE PRECIOS */}
+      <div className="space-y-3 pt-2">
+        {/* Etiqueta de Valores Seleccionados */}
+        <div className="flex items-center justify-between text-xs font-black">
+          <span className="px-2.5 py-1 rounded-lg bg-[#00C8D4]/20 border border-[#00C8D4]/50 text-[#00C8D4]">
+            Mín: ${minPrice} USD
+          </span>
+          <span className="text-slate-400 text-[10px] uppercase font-bold">Rango Deslizable</span>
+          <span className="px-2.5 py-1 rounded-lg bg-[#FF0096]/20 border border-[#FF0096]/50 text-[#FF0096]">
+            Máx: ${maxPrice >= 1000 ? "1000+" : `${maxPrice} USD`}
+          </span>
+        </div>
+
+        {/* Pista y Tiradores del Slider Dual */}
+        <div className="relative h-6 flex items-center justify-center select-none touch-none">
+          {/* Fondo Inactivo de la Pista */}
+          <div className="absolute left-0 right-0 h-2.5 rounded-full bg-slate-800 border border-slate-700" />
+
+          {/* Tramo Activo con Gradiente Neón */}
+          <div
+            style={{ left: `${leftPercent}%`, right: `${rightPercent}%` }}
+            className="absolute h-2.5 rounded-full bg-gradient-to-r from-[#00C8D4] via-[#9B00CC] to-[#FF0096] shadow-md shadow-[#00C8D4]/30"
+          />
+
+          {/* Slider Izquierdo (Mínimo) */}
+          <input
+            type="range"
+            min={0}
+            max={sliderMax}
+            step={5}
+            value={minPrice}
+            onChange={(e) => {
+              const val = Math.min(Number(e.target.value), maxPrice - 10);
+              setMinPrice(val);
+            }}
+            className="dual-range-input accent-[#00C8D4]"
+          />
+
+          {/* Slider Derecho (Máximo) */}
+          <input
+            type="range"
+            min={0}
+            max={sliderMax}
+            step={5}
+            value={maxPrice}
+            onChange={(e) => {
+              const val = Math.max(Number(e.target.value), minPrice + 10);
+              setMaxPrice(val);
+            }}
+            className="dual-range-input accent-[#FF0096]"
+          />
+        </div>
 
         <div className="flex justify-between text-[9px] font-bold text-slate-400 px-1">
-          <span>$0</span>
-          <span>$150</span>
-          <span>$300</span>
-          <span>$450+</span>
+          <span>$0 (Económico)</span>
+          <span>${Math.round(sliderMax / 2)}</span>
+          <span>${sliderMax}+ (Lujo)</span>
         </div>
       </div>
 
-      {/* Inputs Numéricos de Rango Mín y Máx */}
-      <div className="space-y-2">
+      {/* Inputs Numéricos de Rango Mín y Máx para Entrada Precisa */}
+      <div className="space-y-2 pt-1 border-t border-white/10">
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
             <span className="absolute left-3 top-2.5 text-slate-400 text-xs font-black">$</span>
@@ -216,6 +274,56 @@ export function PriceHistogramFilter({
           })}
         </div>
       </div>
+
+      {/* Estilos CSS para el Control Dual Range */}
+      <style>{`
+        .dual-range-input {
+          position: absolute;
+          width: 100%;
+          height: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: none;
+          pointer-events: none;
+          -webkit-appearance: none;
+          appearance: none;
+          margin: 0;
+          z-index: 10;
+        }
+
+        .dual-range-input::-webkit-slider-thumb {
+          pointer-events: auto;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: #ffffff;
+          border: 3px solid currentColor;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+          cursor: pointer;
+          -webkit-appearance: none;
+          transition: transform 0.15s ease;
+        }
+
+        .dual-range-input::-webkit-slider-thumb:hover {
+          transform: scale(1.2);
+        }
+
+        .dual-range-input::-moz-range-thumb {
+          pointer-events: auto;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: #ffffff;
+          border: 3px solid currentColor;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+          cursor: pointer;
+          transition: transform 0.15s ease;
+        }
+
+        .dual-range-input::-moz-range-thumb:hover {
+          transform: scale(1.2);
+        }
+      `}</style>
     </div>
   );
 }
