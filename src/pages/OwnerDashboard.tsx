@@ -185,6 +185,8 @@ export function OwnerDashboard() {
   const [, setLocation] = useLocation();
 
   const isAdmin = profile?.role === 'admin' || user?.email?.toLowerCase() === "hotelesdevenezuela77@gmail.com";
+  const isOwnerOrAdmin = profile?.role === 'owner' || profile?.role === 'business_owner' || isAdmin;
+
 
   const [impersonateId, setImpersonateId] = useState<string | null>(() => {
     if (typeof window !== "undefined") {
@@ -2405,7 +2407,49 @@ export function OwnerDashboard() {
       </div>
 
       {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-6 mt-8">
+      {!isOwnerOrAdmin && establishments.length === 0 && !loading ? (
+        <main className="max-w-7xl mx-auto px-6 py-12">
+          <div className="bg-gradient-to-br from-[#0e011f] via-[#1a0533] to-[#9B00CC] p-8 md:p-12 rounded-3xl border border-white/10 shadow-2xl space-y-6 text-white text-left relative overflow-hidden font-sans">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-[#00C8D4]/20 border border-[#00C8D4]/40 flex items-center justify-center text-[#00C8D4] shrink-0">
+                <ShieldAlert className="w-6 h-6 text-[#00C8D4]" />
+              </div>
+              <div>
+                <span className="text-[10px] font-black uppercase text-[#00C8D4] tracking-widest block">
+                  Acceso Exclusivo para Socios Hoteleros & Náuticos
+                </span>
+                <h2 className="text-xl md:text-2xl font-black text-white tracking-tight">
+                  Panel de Control Ejecutivo de Propietarios
+                </h2>
+              </div>
+            </div>
+
+            <p className="text-xs md:text-sm text-slate-300 font-medium leading-relaxed">
+              Has iniciado sesión con la cuenta de Turista (<strong className="text-white">{user?.email}</strong>). Los paneles de gestión ejecutiva, control de tarifas, disponibilidad y reservaciones directas están reservados exclusivamente para los propietarios de establecimientos turísticos y náuticos afiliados a Hoteles de Venezuela LLC.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-white/10">
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:opacity-95 text-white text-xs font-black px-6 py-4 rounded-xl flex items-center justify-center gap-2 shadow-xl hover:scale-102 transition-all cursor-pointer uppercase tracking-wider"
+              >
+                <Plus className="w-4 h-4 stroke-[3]" />
+                <span>Registrar mi Establecimiento</span>
+              </button>
+
+              <Link
+                href="/panel-turista"
+                className="bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-6 py-4 rounded-xl flex items-center justify-center gap-2 border border-white/20 transition-all cursor-pointer uppercase tracking-wider text-center"
+              >
+                <User className="w-4 h-4 text-[#00C8D4]" />
+                <span>Ir a mi Panel de Turista</span>
+              </Link>
+            </div>
+          </div>
+        </main>
+      ) : (
+        <main className="max-w-7xl mx-auto px-6 mt-8">
+
 
         {/* DASHBOARD EJECUTIVO TAB */}
         {activeTab === "resumen" && (
@@ -4230,6 +4274,8 @@ export function OwnerDashboard() {
         )}
 
       </main>
+      )}
+
 
       {/* Add Establishment Modal (Nuevas Directrices PDF 1, 2 y 3) */}
       <AddEstablishmentWizardModal

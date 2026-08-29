@@ -268,7 +268,15 @@ export function AddEstablishmentWizardModal({
         has_reservations_enabled: false
       };
 
+      // Actualizar el rol del usuario en la tabla profiles a 'owner' si era turista
+      try {
+        await supabase.from("profiles").update({ role: "owner" }).eq("id", activeOwnerId);
+      } catch (roleErr) {
+        console.warn("No se pudo actualizar el rol en profiles:", roleErr);
+      }
+
       const categoryObj = categories.find(c => c.id === categoryId);
+
       const destinationObj = destinations.find(d => d.id === parseInt(formData.destination_id));
 
       const { error } = await supabase.from("establishments").insert([payload]);
