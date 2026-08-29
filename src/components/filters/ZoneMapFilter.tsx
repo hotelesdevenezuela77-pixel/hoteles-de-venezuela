@@ -227,7 +227,8 @@ export function InteractiveZoneMapView({
   onClose?: () => void;
 }) {
   const [selectedPin, setSelectedPin] = useState<{ est: Establishment; price: number } | null>(null);
-  const [mapMode, setMapMode] = useState<"satelite" | "noche">("noche");
+  const [mapMode, setMapMode] = useState<"satelite" | "noche">("satelite");
+
 
   // Filtrar según zona activa si existe
   const activeZoneObj = TOURIST_ZONES.find(z => z.id === selectedZone);
