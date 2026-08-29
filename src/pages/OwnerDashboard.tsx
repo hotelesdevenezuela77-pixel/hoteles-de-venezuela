@@ -26,6 +26,8 @@ import { FinanceModule } from "../tenants/templates/components/FinanceModule";
 import { AnalyticsModule } from "../tenants/templates/components/AnalyticsModule";
 import { OwnerAgendaModule } from "@/components/owner/OwnerAgendaModule";
 import { OwnerTechnicalSupportModule } from "@/components/owner/OwnerTechnicalSupportModule";
+import { AddEstablishmentWizardModal } from "@/components/owner/AddEstablishmentWizardModal";
+
 
 interface Establishment {
   id: number;
@@ -4229,199 +4231,17 @@ export function OwnerDashboard() {
 
       </main>
 
-      {/* Add Establishment Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl lg:max-w-5xl overflow-hidden animate-in zoom-in-95 duration-200 my-8">
-            <div className="bg-gradient-to-r from-brand-purple-dark to-brand-purple-deep px-6 py-5 flex items-center justify-between text-white">
-              <div className="flex items-center gap-3">
-                <Building2 className="w-6 h-6 text-brand-magenta" />
-                <div className="text-left">
-                  <h3 className="font-extrabold text-sm tracking-wide">Registrar Nuevo Establecimiento</h3>
-                  <p className="text-white/70 text-[10px] mt-0.5">Sujeto a verificación y aprobación de la administración</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+      {/* Add Establishment Modal (Nuevas Directrices PDF 1, 2 y 3) */}
+      <AddEstablishmentWizardModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        destinations={destinations}
+        categories={categories}
+        activeOwnerId={activeOwnerId}
+        onSuccess={fetchDashboardData}
+      />
 
-            <form onSubmit={handleAddSubmit} className="p-6 max-h-[75vh] overflow-y-auto space-y-4 text-left">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="lg:col-span-2">
-                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Nombre del Establecimiento *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Ej: Posada Galápagos"
-                    value={formData.name}
-                    onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-magenta/20 focus:border-brand-magenta transition-all"
-                  />
-                </div>
 
-                <div className="lg:col-span-1">
-                  <label className="block text-[10px] uppercase font-bold text-gray-500 tracking-wider mb-1.5 font-black">Tipo de Establecimiento * (Documento 77 V.5 C05.1)</label>
-                  <select
-                    required
-                    value={formData.category_id}
-                    onChange={e => setFormData(prev => ({ ...prev, category_id: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700 font-extrabold focus:outline-none focus:ring-2 focus:ring-brand-magenta/20 focus:border-brand-magenta cursor-pointer"
-                  >
-                    <option value="">Selecciona Tipo de Establecimiento...</option>
-                    <optgroup label="📋 Ramas Oficiales Documento 77 V.5">
-                      {PROPERTY_TYPES_DOCUMENT77.map(pt => (
-                        <option key={pt.id} value={pt.id}>{pt.label} ({pt.code})</option>
-                      ))}
-                    </optgroup>
-                    {categories.length > 0 && (
-                      <optgroup label="📁 Categorías Registradas en Sistema">
-                        {categories.map(c => (
-                          <option key={c.id} value={c.id}>{c.name}</option>
-                        ))}
-                      </optgroup>
-                    )}
-                  </select>
-                </div>
-
-                <div className="lg:col-span-1">
-                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Destino Turístico *</label>
-                  <select
-                    required
-                    value={formData.destination_id}
-                    onChange={e => setFormData(prev => ({ ...prev, destination_id: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-magenta/20 focus:border-brand-magenta cursor-pointer"
-                  >
-                    <option value="">Selecciona</option>
-                    {destinations.map(d => (
-                      <option key={d.id} value={d.id}>{d.name} ({d.state})</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="lg:col-span-1">
-                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Nivel de Precios</label>
-                  <select
-                    value={formData.price_level}
-                    onChange={e => setFormData(prev => ({ ...prev, price_level: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-magenta/20 focus:border-brand-magenta cursor-pointer"
-                  >
-                    <option value="$">$ (Económico)</option>
-                    <option value="$$">$$ (Moderado)</option>
-                    <option value="$$$">$$$ (Premium)</option>
-                    <option value="$$$$">$$$$ (Lujo)</option>
-                  </select>
-                </div>
-
-                <div className="lg:col-span-1">
-                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Teléfono Comercial</label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                    <input
-                      type="tel"
-                      placeholder="+58 212 1234567"
-                      value={formData.phone}
-                      onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                      className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-155 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-magenta/20 focus:border-brand-magenta transition-all"
-                    />
-                  </div>
-                </div>
-
-                <div className="lg:col-span-1">
-                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">WhatsApp Directo</label>
-                  <div className="relative">
-                    <MessageSquare className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                    <input
-                      type="tel"
-                      placeholder="+58 414 1234567"
-                      value={formData.whatsapp}
-                      onChange={e => setFormData(prev => ({ ...prev, whatsapp: e.target.value }))}
-                      className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-155 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-magenta/20 focus:border-brand-magenta transition-all"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2 lg:col-span-2">
-                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Sitio Web / Enlace a Red Social</label>
-                  <div className="relative">
-                    <Globe className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="https://ejemplo.com o link de instagram"
-                      value={formData.website}
-                      onChange={e => setFormData(prev => ({ ...prev, website: e.target.value }))}
-                      className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-155 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-magenta/20 focus:border-brand-magenta transition-all"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2 lg:col-span-3">
-                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Dirección Física Completa</label>
-                  <input
-                    type="text"
-                    placeholder="Ej: Calle Principal del Gran Roque, a dos cuadras de la plaza"
-                    value={formData.address}
-                    onChange={e => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-magenta/20 focus:border-brand-magenta transition-all"
-                  />
-                </div>
-
-                <div className="sm:col-span-2 lg:col-span-3">
-                  <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1.5 font-bold">Descripción o Reseña Comercial</label>
-                  <textarea
-                    rows={4}
-                    placeholder="Describe los servicios, habitaciones, comidas o atractivos especiales de tu negocio..."
-                    value={formData.description}
-                    onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-150 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-magenta/20 focus:border-brand-magenta transition-all resize-none font-sans"
-                  />
-                </div>
-              </div>
-
-              {(() => {
-                const selectedCategoryObj = categories.find(c => String(c.id) === String(formData.category_id));
-                const selectedDoc77Obj = PROPERTY_TYPES_DOCUMENT77.find(pt => pt.id === formData.category_id);
-                const activeCategoryName = selectedDoc77Obj?.label || selectedCategoryObj?.name || formData.category_id;
-
-                return (
-                  <AmenitiesSelector
-                    selectedServices={formData.services}
-                    onChange={(newServices) => setFormData(prev => ({ ...prev, services: newServices }))}
-                    selectedCategory={activeCategoryName}
-                  />
-                );
-              })()}
-
-              <div className="flex gap-3 pt-6 border-t border-gray-100">
-                <button
-                  type="button"
-                  onClick={() => setShowAddModal(false)}
-                  className="flex-1 bg-white border border-gray-250 hover:bg-gray-50 text-gray-600 text-xs font-bold py-3.5 rounded-xl cursor-pointer text-center"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="flex-1 bg-gradient-to-r from-brand-purple-dark to-brand-purple-deep hover:opacity-95 text-white text-xs font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-md"
-                >
-                  {submitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Registrando...</span>
-                    </>
-                  ) : (
-                    <span>Registrar Negocio</span>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* Add Room Modal / Agregar Unidad Operativa (Ancho Completo Ampliado) */}
       {newRoomModalOpen && (
