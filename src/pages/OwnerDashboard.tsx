@@ -1109,6 +1109,12 @@ export function OwnerDashboard() {
 
   // Fetch Rooms
   const fetchRooms = async (estId: number) => {
+    // Guardia de Seguridad: Validar que el estId pertenezca a los establecimientos del usuario logueado
+    if (!isAdmin && establishments.length > 0 && !establishments.some(e => Number(e.id) === Number(estId))) {
+      console.warn("[Security Guard] Bloqueado intento de consulta en establecimiento ajeno:", estId);
+      return;
+    }
+
     try {
       setLoadingRooms(true);
       const { data, error } = await supabase
@@ -1215,10 +1221,17 @@ export function OwnerDashboard() {
   };
 
   useEffect(() => {
-    if (selectedCalendarEst) {
+    if (selectedCalendarEst && establishments.length > 0) {
+      const isOwned = isAdmin || establishments.some(e => Number(e.id) === Number(selectedCalendarEst));
+      if (!isOwned) {
+        // Redirigir la selección al primer establecimiento propio del usuario
+        setSelectedCalendarEst(establishments[0].id);
+        return;
+      }
       fetchRooms(Number(selectedCalendarEst));
     }
-  }, [selectedCalendarEst]);
+  }, [selectedCalendarEst, establishments, isAdmin]);
+
 
   // Fetch & Sync Tenant Config (SaaS Modules) for active establishment
   useEffect(() => {
