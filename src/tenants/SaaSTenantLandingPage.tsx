@@ -49,6 +49,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
   const [loadingRooms, setLoadingRooms] = useState<boolean>(true);
   const [areaPhotos, setAreaPhotos] = useState<Record<string, string[]>>({});
   const [copiedCoords, setCopiedCoords] = useState<boolean>(false);
+  const [logoError, setLogoError] = useState<boolean>(false);
 
   const isRestaurant = config.business_type === "restaurant" || (config.slug && config.slug.toLowerCase().includes("oleaje"));
   const isPerlaNegra = (config.slug && config.slug.toLowerCase().includes("perla-negra")) || config.establishment_id === 102 || (config.name && config.name.toLowerCase().includes("perla negra"));
@@ -553,25 +554,16 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
           
           <a href="#inicio" className="flex items-center gap-3 group">
-            {config.branding?.logo_url ? (
+            {config.branding?.logo_url && !logoError ? (
               <img
                 src={config.branding.logo_url}
                 alt={config.name}
                 className="h-10 w-auto object-contain max-w-[160px]"
-                onError={(e) => {
-                  (e.target as HTMLElement).style.display = "none";
-                  const parent = (e.target as HTMLElement).parentElement;
-                  if (parent && !parent.querySelector('.header-logo-fallback')) {
-                    const fallback = document.createElement('div');
-                    fallback.className = 'header-logo-fallback w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#00C8D4] to-[#9B00CC] flex items-center justify-center text-white font-black font-serif text-lg shadow-lg shrink-0';
-                    fallback.innerText = (config.name || 'H').charAt(0);
-                    parent.insertBefore(fallback, e.target as HTMLElement);
-                  }
-                }}
+                onError={() => setLogoError(true)}
               />
             ) : (
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#00C8D4] to-[#9B00CC] flex items-center justify-center text-white font-black font-serif text-lg shadow-lg">
-                {config.name.charAt(0)}
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#00C8D4] to-[#9B00CC] flex items-center justify-center text-white font-black font-serif text-lg shadow-lg shrink-0">
+                {(config.name || 'H').charAt(0)}
               </div>
             )}
             <div>
