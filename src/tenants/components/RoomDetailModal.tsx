@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { 
   X, Users, Bed, Calendar, CheckCircle2, MessageCircle, Star, Sparkles, DollarSign, Clock, ShieldCheck
 } from "lucide-react";
-import { type Room } from "./RoomCard";
+import { type Room, getPublicImageUrl } from "./RoomCard";
 
 interface RoomDetailModalProps {
   room: Room | null;
@@ -21,7 +21,8 @@ export function RoomDetailModal({ room, hotelName, whatsappPhone, onClose }: Roo
     (Array.isArray(room.photos) && room.photos.length > 0 ? room.photos : null) ||
     [(room as any).foto_principal || (room as any).imagen_portada || room.cover_image || room.primary_image || room.image_url || (room as any).imagen || (room as any).foto].filter(Boolean);
 
-  const photos = rawModalPhotos && rawModalPhotos.length > 0 ? rawModalPhotos : ["/placeholder-hotel.jpg"];
+  const rawPhotosList = rawModalPhotos && rawModalPhotos.length > 0 ? rawModalPhotos : ["/placeholder-hotel.jpg"];
+  const photos = rawPhotosList.map(getPublicImageUrl);
 
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
   const [checkIn, setCheckIn] = useState("");

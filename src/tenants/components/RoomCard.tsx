@@ -43,14 +43,21 @@ interface RoomCardProps {
   isInCart?: boolean;
 }
 
-// Función para construir la URL pública real de Supabase Storage
+// Función para construir la URL pública real de Supabase Storage o devolver assets locales
 export function getPublicImageUrl(photo: any): string {
   if (!photo) return "/placeholder-hotel.jpg";
 
-  // Si ya viene con http o https completa:
   if (typeof photo === "string") {
     const trimmed = photo.trim();
-    if (trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("data:")) {
+    // Si es una URL completa (http/https), data URI, o asset estático local (/ o ./ o images/)
+    if (
+      trimmed.startsWith("http://") || 
+      trimmed.startsWith("https://") || 
+      trimmed.startsWith("data:") ||
+      trimmed.startsWith("/") ||
+      trimmed.startsWith("./") ||
+      trimmed.startsWith("images/")
+    ) {
       return trimmed;
     }
     // Si solo viene el path o nombre de archivo guardado en el bucket de Supabase:
