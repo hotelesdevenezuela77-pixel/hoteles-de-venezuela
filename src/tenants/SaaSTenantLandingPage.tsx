@@ -3,7 +3,8 @@ import {
   MapPin, Phone, Mail, Clock, Star, ShieldCheck, Wifi, Coffee, Compass, 
   Utensils, Car, Sparkles, CheckCircle2, MessageCircle, ExternalLink, Calendar,
   Bed, Users, Award, ChevronDown, Layers, ArrowRight, Heart, Navigation, X, ShoppingBag,
-  ChefHat, Flame, Fish, Waves, Beef, Wine, Cake, Soup, Plus, Minus, Search
+  ChefHat, Flame, Fish, Waves, Beef, Wine, Cake, Soup, Plus, Minus, Search,
+  Copy, Check, Radio, Globe
 } from "lucide-react";
 import { type TenantConfig } from "./tenantContext";
 import { RoomCard, type Room } from "./components/RoomCard";
@@ -47,6 +48,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
   const [cartRooms, setCartRooms] = useState<Room[]>([]);
   const [loadingRooms, setLoadingRooms] = useState<boolean>(true);
   const [areaPhotos, setAreaPhotos] = useState<Record<string, string[]>>({});
+  const [copiedCoords, setCopiedCoords] = useState<boolean>(false);
 
   const isRestaurant = config.business_type === "restaurant" || (config.slug && config.slug.toLowerCase().includes("oleaje"));
   const isPerlaNegra = (config.slug && config.slug.toLowerCase().includes("perla-negra")) || config.establishment_id === 102 || (config.name && config.name.toLowerCase().includes("perla negra"));
@@ -1259,114 +1261,196 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         </section>
       )}
 
-      <section id="sobre-nosotros" className="py-24 bg-white border-t border-slate-200/80 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      {/* ── SECCIÓN DE UBICACIÓN & MAPA INTERACTIVO (ULTRA PREMIUM DARK DESIGN ALIANZA ESTRATÉGICA) ── */}
+      <section id="sobre-nosotros" className="py-24 bg-gradient-to-b from-slate-950 via-[#0e011f] to-slate-950 text-white relative overflow-hidden border-t border-slate-800/80">
+        
+        {/* Glows de fondo ambiente (Fucsia y Turquesa sobre el púrpura profundo #0e011f) */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#9B00CC]/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#00C8D4]/15 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-12">
           
-          <div className="lg:col-span-6 space-y-6">
-            <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#00C8D4] uppercase block">
-              CONOCE NUESTRO ESTABLECIMIENTO
-            </span>
-            <h2 className="text-3xl sm:text-5xl font-black font-serif text-slate-900 leading-tight">
+          <div className="text-center space-y-3 max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#0e011f] border border-[#00C8D4]/40 text-[#00C8D4] text-[11px] font-extrabold tracking-[0.25em] uppercase shadow-2xl">
+              <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
+              <span>UBICACIÓN ESTRATÉGICA & ACCESO DIRECTO</span>
+            </div>
+            <h2 className="text-3xl sm:text-5xl font-black font-serif text-white leading-tight drop-shadow-md">
               {isMyCampers ? "Más que un Hospedaje, Su Refugio en las Montañas" : "Más que un Hospedaje, Su Casa en la Playa"}
             </h2>
-            <p className="text-slate-700 text-sm sm:text-base font-normal leading-relaxed">
+            <p className="text-slate-300 text-sm sm:text-base font-normal max-w-2xl mx-auto leading-relaxed">
               {description}
             </p>
+          </div>
 
-            <div className="space-y-3 pt-2">
-              <div className="flex items-center gap-3 text-xs text-slate-700 font-medium">
-                <CheckCircle2 className="w-4 h-4 text-[#00C8D4]" />
-                <span>Atención personalizada y directa.</span>
-              </div>
-              <div className="flex items-center gap-3 text-xs text-slate-700 font-medium">
-                <CheckCircle2 className="w-4 h-4 text-[#FF0096]" />
-                <span>Ubicación estratégica: {address} ({destName}).</span>
-              </div>
-              <div className="flex items-center gap-3 text-xs text-slate-700 font-medium">
-                <CheckCircle2 className="w-4 h-4 text-[#9B00CC]" />
-                <span>Reserva directa garantizada sin cargos ocultos.</span>
-              </div>
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+            
+            {/* ── TARJETA IZQUIERDA: UBICACIÓN GPS EN VIVO (COLOR OSCURO PREMIUM ALIANZA ESTRATÉGICA) ── */}
+            <div className="lg:col-span-6 rounded-3xl bg-gradient-to-br from-[#0e011f] via-[#1a0533] to-[#090114] border border-white/15 p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-2xl hover:border-[#FF0096]/50 transition-all duration-500 relative overflow-hidden group">
+              
+              {/* Resplandor interno sutil */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[#FF0096]/10 via-transparent to-transparent rounded-full blur-xl pointer-events-none" />
 
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-[#00C8D4] to-[#009da7] text-white space-y-3 shadow-xl border border-[#00C8D4]/30">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3 text-xs text-white">
-                  <div className="p-2.5 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center shrink-0">
-                    <MapPin className="w-4 h-4 text-white" />
+              <div className="space-y-6 relative z-10">
+                
+                {/* Badge Pulsante de GPS */}
+                <div className="flex items-center justify-between gap-2">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 backdrop-blur border border-[#00C8D4]/50 text-[#00C8D4] text-[10px] font-black uppercase tracking-widest shadow-lg">
+                    <span className="relative flex h-2.5 w-2.5 shrink-0">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00C8D4] opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00C8D4]"></span>
+                    </span>
+                    <span>SISTEMA GPS EN VIVO • RADAR ONLINE</span>
                   </div>
-                  <div>
-                    <span className="text-[10px] text-white font-extrabold uppercase block tracking-wider">Ubicación GPS Verificada</span>
-                    <span className="font-extrabold text-white truncate max-w-[200px] block">{address}</span>
+
+                  <span className="text-[10px] font-black uppercase text-pink-300 tracking-wider bg-[#FF0096]/20 px-3 py-1 rounded-full border border-[#FF0096]/30">
+                    Sello de Excelencia
+                  </span>
+                </div>
+
+                {/* Título & Dirección con Icono de Mapa */}
+                <div className="flex items-start gap-4 pt-2">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FF0096] to-[#9B00CC] flex items-center justify-center text-white shadow-xl shrink-0 group-hover:scale-105 transition-transform border border-white/20">
+                    <MapPin className="w-7 h-7 text-white animate-bounce" />
                   </div>
+                  <div className="space-y-1">
+                    <span className="text-xs text-[#00C8D4] font-extrabold uppercase tracking-widest block font-mono">
+                      {destName} • ESTADO {coords.state}
+                    </span>
+                    <h3 className="text-xl sm:text-2xl font-black font-serif text-white leading-snug">
+                      {config.name}
+                    </h3>
+                    <p className="text-slate-300 text-xs font-normal leading-relaxed pt-1">
+                      📍 {address}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Badge Coordenadas Exactas interactivo con Copiar */}
+                <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-white/15 flex items-center justify-between gap-3 text-xs font-mono">
+                  <div className="flex items-center gap-2 text-slate-200 truncate">
+                    <Globe className="w-4 h-4 text-[#00C8D4] shrink-0 animate-pulse" />
+                    <span className="truncate">GPS: <strong className="text-white">{latStr}° N, {lngStr}° W</strong></span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(`${coords.lat}, ${coords.lng}`);
+                      setCopiedCoords(true);
+                      setTimeout(() => setCopiedCoords(false), 2000);
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-[10px] font-extrabold text-white transition-all flex items-center gap-1.5 shrink-0 cursor-pointer active:scale-95"
+                  >
+                    {copiedCoords ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="text-emerald-400">¡Copiadas!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5 text-[#00C8D4]" />
+                        <span>Copiar Coordenadas</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Beneficios / Características Destacadas de la Zona */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-2">
+                  <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-2.5 text-xs text-slate-200">
+                    <ShieldCheck className="w-4 h-4 text-[#00C8D4] shrink-0" />
+                    <span className="text-[11px] font-semibold">Vigilancia 24/7</span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-2.5 text-xs text-slate-200">
+                    <Car className="w-4 h-4 text-[#FF0096] shrink-0" />
+                    <span className="text-[11px] font-semibold">Acceso Asfaltado</span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-2.5 text-xs text-slate-200">
+                    <Compass className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span className="text-[11px] font-semibold">Ruta Directa</span>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Botones de Acción (Navegación GPS & WhatsApp Directo) */}
+              <div className="pt-6 border-t border-white/15 space-y-3 relative z-10">
+                <div className="grid grid-cols-2 gap-3">
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lng}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="py-3 px-4 rounded-2xl text-xs font-extrabold text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-all text-center flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-95"
+                  >
+                    <MapPin className="w-4 h-4 text-[#00C8D4]" />
+                    <span>Google Maps</span>
+                  </a>
+                  <a
+                    href={`https://www.waze.com/ul?ll=${coords.lat},${coords.lng}&navigate=yes`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="py-3 px-4 rounded-2xl text-xs font-extrabold text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-all text-center flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-95"
+                  >
+                    <Navigation className="w-4 h-4 text-cyan-400" />
+                    <span>Navegar en Waze</span>
+                  </a>
                 </div>
 
                 <a
                   href={generalWaUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3.5 py-2 rounded-xl text-xs font-black text-[#009da7] bg-white hover:bg-slate-50 transition-colors shrink-0 shadow-md"
+                  className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:from-[#e00084] hover:to-[#8800b5] text-white font-extrabold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xl shadow-[#FF0096]/20 active:scale-98"
                 >
-                  Cómo Llegar
+                  <MessageCircle className="w-4 h-4 fill-current text-white" />
+                  <span>Solicitar Guía de Llegada por WhatsApp</span>
                 </a>
               </div>
 
-              <div className="flex items-center justify-between pt-2 border-t border-white/20 text-[10px] text-white/90 font-mono font-semibold">
-                <span>📍 Coordenadas: {latStr}° N, {lngStr}° W</span>
-                <span className="text-white font-black uppercase">Estado {coords.state}, Venezuela</span>
-              </div>
-
-              <div className="flex items-center justify-between gap-3 pt-2 border-t border-white/20">
-                <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lng}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 py-2.5 px-3 rounded-xl text-xs font-black text-white bg-white/20 hover:bg-white/30 border border-white/30 transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
-                >
-                  <MapPin className="w-3.5 h-3.5 text-white" />
-                  <span>Google Maps</span>
-                </a>
-                <a
-                  href={`https://www.waze.com/ul?ll=${coords.lat},${coords.lng}&navigate=yes`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 py-2.5 px-3 rounded-xl text-xs font-black text-[#009da7] bg-white hover:bg-slate-50 transition-all text-center flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
-                >
-                  <Navigation className="w-3.5 h-3.5 text-[#009da7]" />
-                  <span>Abrir en Waze</span>
-                </a>
-              </div>
             </div>
-          </div>
 
-          <div className="lg:col-span-6">
-            <div className="relative rounded-3xl overflow-hidden border border-[#00C8D4]/40 shadow-2xl bg-white space-y-0">
+            {/* ── TARJETA DERECHA: MARCO DEL MAPA SATELITAL DE ALTA DEFINICIÓN (COLOR OSCURO PREMIUM ALIANZA ESTRATÉGICA) ── */}
+            <div className="lg:col-span-6 rounded-3xl overflow-hidden border-2 border-white/15 shadow-2xl bg-gradient-to-br from-[#0e011f] via-[#1a0533] to-[#090114] flex flex-col justify-between hover:border-[#00C8D4]/50 transition-all duration-500 group">
               
-              <div className="p-3 bg-[#00C8D4] border-b border-white/20 flex items-center justify-between text-white">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-white animate-ping" />
-                  <span className="text-xs font-extrabold text-white font-serif uppercase tracking-wider">Mapa Satelital ({destName})</span>
+              {/* Cabecera del Mapa */}
+              <div className="p-4 bg-gradient-to-r from-[#0e011f] via-[#1a0533] to-[#0e011f] border-b border-white/15 flex items-center justify-between text-white shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-3 h-3 rounded-full bg-[#00C8D4] animate-ping" />
+                  <div>
+                    <span className="text-xs font-extrabold text-white font-serif uppercase tracking-wider block">
+                      MAPA INTERACTIVO & VISOR SATELITAL
+                    </span>
+                    <span className="text-[10px] text-[#00C8D4] font-mono block">
+                      FEED {destName.toUpperCase()}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex bg-[#009da7] rounded-xl p-1 border border-white/20 gap-1">
+
+                <div className="flex bg-slate-900/90 rounded-2xl p-1 border border-white/20 gap-1 shadow-inner">
                   <button
                     onClick={() => setMapViewMode("satelite")}
-                    className={`px-3 py-1 rounded-lg text-[10px] font-extrabold uppercase transition-all cursor-pointer ${
-                      mapViewMode === "satelite" ? "bg-[#FF0096] text-white shadow-md" : "text-white/80 hover:text-white"
+                    className={`px-3.5 py-1.5 rounded-xl text-[10px] font-black uppercase transition-all cursor-pointer ${
+                      mapViewMode === "satelite" 
+                        ? "bg-gradient-to-r from-[#FF0096] to-[#9B00CC] text-white shadow-md shadow-[#FF0096]/30" 
+                        : "text-slate-300 hover:text-white"
                     }`}
                   >
-                    🛰️ Satélite
+                    🛰️ Satélite HD
                   </button>
                   <button
                     onClick={() => setMapViewMode("estandar")}
-                    className={`px-3 py-1 rounded-lg text-[10px] font-extrabold uppercase transition-all cursor-pointer ${
-                      mapViewMode === "estandar" ? "bg-white text-[#009da7] shadow-md" : "text-white/80 hover:text-white"
+                    className={`px-3.5 py-1.5 rounded-xl text-[10px] font-black uppercase transition-all cursor-pointer ${
+                      mapViewMode === "estandar" 
+                        ? "bg-[#00C8D4] text-white shadow-md shadow-[#00C8D4]/30" 
+                        : "text-slate-300 hover:text-white"
                     }`}
                   >
-                    🗺️ Terrestre
+                    🗺️ Terrestre GPS
                   </button>
                 </div>
               </div>
 
-              <div className="relative h-[380px] w-full overflow-hidden bg-slate-100">
+              {/* Viewport del Mapa Iframe */}
+              <div className="relative h-[380px] sm:h-[420px] w-full overflow-hidden bg-slate-900 flex-1">
                 {mapViewMode === "satelite" ? (
                   <div className="w-full h-full relative">
                     <iframe
@@ -1378,9 +1462,20 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                       src={`https://maps.google.com/maps?q=${coords.lat},${coords.lng}&t=k&z=17&ie=UTF8&iwloc=&output=embed`}
                       className="w-full h-full filter contrast-105 brightness-95"
                     />
-                    <div className="absolute top-4 left-4 bg-[#00C8D4]/95 backdrop-blur px-3 py-1.5 rounded-xl border border-white/30 text-[10px] text-white font-black flex items-center gap-2 shadow-lg">
-                      <span className="w-2 h-2 rounded-full bg-white" />
-                      <span>Vista Aérea Satelital: {destName} ({coords.state})</span>
+                    
+                    {/* Insignia Flotante Superior Izquierda */}
+                    <div className="absolute top-4 left-4 bg-[#0e011f]/90 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-white/20 text-[10px] text-white font-black flex items-center gap-2 shadow-2xl">
+                      <span className="relative flex h-2.5 w-2.5 shrink-0">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+                      </span>
+                      <span>VISTA AÉREA EN TIEMPO REAL: {destName}</span>
+                    </div>
+
+                    {/* Radar Pulse Overlay Indicator */}
+                    <div className="absolute bottom-4 right-4 bg-[#0e011f]/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20 text-[10px] font-mono text-[#00C8D4] flex items-center gap-2 shadow-xl">
+                      <Radio className="w-3.5 h-3.5 text-[#FF0096] animate-pulse" />
+                      <span>SAT-FEED 100% ONLINE</span>
                     </div>
                   </div>
                 ) : (
@@ -1394,19 +1489,31 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                       src={`https://maps.google.com/maps?q=${coords.lat},${coords.lng}&t=m&z=15&ie=UTF8&iwloc=&output=embed`}
                       className="w-full h-full"
                     />
+                    <div className="absolute top-4 left-4 bg-[#0e011f]/90 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-white/20 text-[10px] text-white font-black flex items-center gap-2 shadow-2xl">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#00C8D4] animate-pulse" />
+                      <span>NAVEGACIÓN TERRESTRE Y ACCESOS</span>
+                    </div>
                   </div>
                 )}
               </div>
 
-              <div className="p-4 bg-[#00C8D4] border-t border-white/20 flex items-center justify-between text-white">
+              {/* Pie de Página del Marco del Mapa */}
+              <div className="p-4 bg-gradient-to-r from-[#0e011f] via-[#1a0533] to-[#0e011f] border-t border-white/15 flex items-center justify-between text-white shrink-0">
                 <div>
-                  <span className="text-[10px] text-white/80 uppercase font-extrabold block tracking-wider">Sello de Calidad</span>
-                  <span className="text-xs font-black text-white">{config.name} • Red Oficial Hoteles de Venezuela</span>
+                  <span className="text-[10px] text-[#00C8D4] uppercase font-extrabold block tracking-wider font-mono">
+                    SELLO DE CALIDAD & VERIFICACIÓN GPS
+                  </span>
+                  <span className="text-xs font-black text-white">
+                    {config.name} • Red Oficial Hoteles de Venezuela
+                  </span>
                 </div>
-                <Award className="w-5 h-5 text-[#FF0096]" />
+                <div className="p-2 rounded-xl bg-[#FF0096]/20 border border-[#FF0096]/40 text-[#FF0096]">
+                  <Award className="w-5 h-5 text-[#FF0096]" />
+                </div>
               </div>
 
             </div>
+
           </div>
 
         </div>
