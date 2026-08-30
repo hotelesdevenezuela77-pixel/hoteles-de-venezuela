@@ -558,6 +558,16 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                 src={config.branding.logo_url}
                 alt={config.name}
                 className="h-10 w-auto object-contain max-w-[160px]"
+                onError={(e) => {
+                  (e.target as HTMLElement).style.display = "none";
+                  const parent = (e.target as HTMLElement).parentElement;
+                  if (parent && !parent.querySelector('.header-logo-fallback')) {
+                    const fallback = document.createElement('div');
+                    fallback.className = 'header-logo-fallback w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#00C8D4] to-[#9B00CC] flex items-center justify-center text-white font-black font-serif text-lg shadow-lg shrink-0';
+                    fallback.innerText = (config.name || 'H').charAt(0);
+                    parent.insertBefore(fallback, e.target as HTMLElement);
+                  }
+                }}
               />
             ) : (
               <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#00C8D4] to-[#9B00CC] flex items-center justify-center text-white font-black font-serif text-lg shadow-lg">

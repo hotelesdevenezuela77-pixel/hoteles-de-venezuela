@@ -273,13 +273,29 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
       try {
         const { data: dbEst } = await supabase
           .from("establishments")
-          .select("id")
+          .select("id, facility_photos")
           .or(`slug.eq.${config.slug},id.eq.${config.establishment_id || 0}`)
           .maybeSingle();
 
         const targetEstId = dbEst?.id || config.establishment_id;
 
         if (targetEstId) {
+          const currentFacilityPhotos = typeof dbEst?.facility_photos === "object" && dbEst?.facility_photos !== null ? dbEst.facility_photos : {};
+          const updatedFacilityPhotos = {
+            ...currentFacilityPhotos,
+            logo_url: logoUrl,
+            banner_url: bannerUrl,
+            branding: {
+              ...(currentFacilityPhotos.branding || {}),
+              logo_url: logoUrl,
+              banner_url: bannerUrl,
+              primary_color: primaryColor,
+              secondary_color: secondaryColor,
+              accent_color: accentColor
+            },
+            area_photos: areaPhotosState
+          };
+
           await supabase
             .from("establishments")
             .update({
@@ -289,6 +305,7 @@ export function CMSModule({ config, onConfigChange, primaryColor, secondaryColor
               whatsapp: whatsapp,
               email: email,
               instagram: instagram,
+              facility_photos: updatedFacilityPhotos,
               updated_at: new Date().toISOString()
             })
             .eq("id", targetEstId);

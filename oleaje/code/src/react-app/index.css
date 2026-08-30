@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+@layer base {
+  :root {
+    --background: 200 20% 98%;
+    --foreground: 200 25% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 200 25% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 200 25% 10%;
+    --primary: 187 70% 40%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 40 60% 94%;
+    --secondary-foreground: 40 30% 20%;
+    --muted: 200 15% 94%;
+    --muted-foreground: 200 10% 45%;
+    --accent: 187 60% 92%;
+    --accent-foreground: 187 70% 25%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 200 15% 88%;
+    --input: 200 15% 88%;
+    --ring: 187 70% 40%;
+    --radius: 0.5rem;
+    --chart-1: 187 70% 50%;
+    --chart-2: 40 70% 55%;
+    --chart-3: 160 50% 45%;
+    --chart-4: 200 60% 55%;
+    --chart-5: 30 80% 55%;
+    --sidebar: 187 25% 97%;
+    --sidebar-foreground: 200 25% 10%;
+    --sidebar-primary: 187 70% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 187 60% 92%;
+    --sidebar-accent-foreground: 187 70% 25%;
+    --sidebar-border: 200 15% 88%;
+    --sidebar-ring: 187 70% 40%;
+    
+    /* POS specific */
+    --ocean: 187 70% 40%;
+    --ocean-light: 187 60% 92%;
+    --sand: 40 60% 94%;
+    --sand-dark: 40 30% 70%;
+    --success: 160 60% 45%;
+    --warning: 40 90% 50%;
+  }
+
+  .dark {
+    --background: 200 25% 8%;
+    --foreground: 200 10% 98%;
+    --card: 200 20% 12%;
+    --card-foreground: 200 10% 98%;
+    --popover: 200 20% 12%;
+    --popover-foreground: 200 10% 98%;
+    --primary: 187 65% 50%;
+    --primary-foreground: 200 25% 8%;
+    --secondary: 200 15% 18%;
+    --secondary-foreground: 200 10% 90%;
+    --muted: 200 15% 18%;
+    --muted-foreground: 200 10% 60%;
+    --accent: 187 40% 20%;
+    --accent-foreground: 187 60% 80%;
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 200 15% 20%;
+    --input: 200 15% 20%;
+    --ring: 187 65% 50%;
+    --chart-1: 187 65% 55%;
+    --chart-2: 40 65% 55%;
+    --chart-3: 160 45% 50%;
+    --chart-4: 200 55% 55%;
+    --chart-5: 30 75% 55%;
+    --sidebar: 200 20% 10%;
+    --sidebar-foreground: 200 10% 98%;
+    --sidebar-primary: 187 65% 50%;
+    --sidebar-primary-foreground: 200 25% 8%;
+    --sidebar-accent: 187 40% 20%;
+    --sidebar-accent-foreground: 187 60% 80%;
+    --sidebar-border: 200 15% 20%;
+    --sidebar-ring: 187 65% 50%;
+    
+    --ocean: 187 65% 50%;
+    --ocean-light: 187 40% 20%;
+    --sand: 40 30% 18%;
+    --sand-dark: 40 20% 30%;
+    --success: 160 55% 50%;
+    --warning: 40 85% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: "DM Sans", system-ui, sans-serif;
+  }
+
+  button:not([disabled]),
+  [role="button"]:not([disabled]) {
+    cursor: pointer;
+  }
+}

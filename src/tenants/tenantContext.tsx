@@ -77,14 +77,20 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
         try {
           const { data: dbEsts, error: dbError } = await supabase
             .from("establishments")
-            .select("id, slug, name, website, phone, whatsapp, email, instagram, establishment_images(image_url, is_primary)");
+            .select("id, slug, name, website, phone, whatsapp, email, instagram, facility_photos, establishment_images(image_url, is_primary)");
 
           if (!dbError && dbEsts && dbEsts.length > 0) {
             dbEsts.forEach((est: any) => {
               const primaryImgObj = est.establishment_images?.find((img: any) => img.is_primary) || est.establishment_images?.[0];
-              const bannerImg = primaryImgObj?.image_url;
+              const bannerImgFromImages = primaryImgObj?.image_url;
 
               const matchingStatic = TENANTS_REGISTRY[est.slug];
+              const facilityPhotosObj = typeof est.facility_photos === "object" && est.facility_photos !== null ? est.facility_photos : {};
+              const savedBranding = facilityPhotosObj.branding || facilityPhotosObj;
+
+              const logoUrlResolved = savedBranding.logo_url || facilityPhotosObj.logo_url || matchingStatic?.branding?.logo_url || "https://r2.hotelesdevenezuela.com/default/logo.png";
+              const bannerUrlResolved = savedBranding.banner_url || facilityPhotosObj.banner_url || bannerImgFromImages || matchingStatic?.branding?.banner_url || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1600&auto=format&fit=crop";
+
               const mergedTenant: TenantConfig = {
                 establishment_id: est.id,
                 slug: est.slug,
@@ -92,13 +98,13 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
                 template: matchingStatic?.template || "A",
                 domain: est.website ? est.website.replace(/^https?:\/\//, "").replace(/\/$/, "").split("/")[0] : matchingStatic?.domain || `${est.slug}.com`,
                 branding: {
-                  primary_color: matchingStatic?.branding?.primary_color || "#00C8D4",
-                  secondary_color: matchingStatic?.branding?.secondary_color || "#9B00CC",
-                  accent_color: matchingStatic?.branding?.accent_color || "#FF0096",
-                  font_title: matchingStatic?.branding?.font_title || "Playfair Display",
-                  font_body: matchingStatic?.branding?.font_body || "Montserrat",
-                  logo_url: matchingStatic?.branding?.logo_url || "https://r2.hotelesdevenezuela.com/default/logo.png",
-                  banner_url: bannerImg || matchingStatic?.branding?.banner_url || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1600&auto=format&fit=crop"
+                  primary_color: savedBranding.primary_color || matchingStatic?.branding?.primary_color || "#00C8D4",
+                  secondary_color: savedBranding.secondary_color || matchingStatic?.branding?.secondary_color || "#9B00CC",
+                  accent_color: savedBranding.accent_color || matchingStatic?.branding?.accent_color || "#FF0096",
+                  font_title: savedBranding.font_title || matchingStatic?.branding?.font_title || "Playfair Display",
+                  font_body: savedBranding.font_body || matchingStatic?.branding?.font_body || "Montserrat",
+                  logo_url: logoUrlResolved,
+                  banner_url: bannerUrlResolved
                 },
                 modules: matchingStatic?.modules || {
                   reservas: true,

@@ -262,24 +262,48 @@ export function OwnerDashboard() {
       console.error("[Tenant Sync] Error parsing localStorage:", localErr);
     }
 
-    // 2. Intentar consultar la base de datos Supabase
+    // 2. Intentar consultar la base de datos Supabase (tabla establishments y facility_photos)
     try {
       const { data, error } = await supabase
-        .from("tenant_configurations")
-        .select("*")
-        .or(`establishment_id.eq.${est.id},slug.eq.${est.slug}`);
+        .from("establishments")
+        .select("id, slug, name, website, phone, whatsapp, email, instagram, facility_photos, establishment_images(image_url, is_primary)")
+        .or(`id.eq.${est.id},slug.eq.${est.slug}`);
 
       if (!error && data && data.length > 0) {
-        const t = data[0];
+        const estData = data[0];
+        const primaryImgObj = estData.establishment_images?.find((img: any) => img.is_primary) || estData.establishment_images?.[0];
+        const matchingStatic = TENANTS_REGISTRY[estData.slug];
+        const facilityPhotosObj = typeof estData.facility_photos === "object" && estData.facility_photos !== null ? estData.facility_photos : {};
+        const savedBranding = facilityPhotosObj.branding || facilityPhotosObj;
+
         const dbConfig: TenantConfig = {
-          establishment_id: t.establishment_id,
-          slug: t.slug,
-          name: t.name,
-          template: t.template,
-          domain: t.domain,
-          branding: typeof t.branding === "string" ? JSON.parse(t.branding) : t.branding,
-          modules: typeof t.modules === "string" ? JSON.parse(t.modules) : t.modules,
-          contact: typeof t.contact === "string" ? JSON.parse(t.contact) : t.contact
+          establishment_id: estData.id,
+          slug: estData.slug,
+          name: estData.name || matchingStatic?.name || est.name,
+          template: matchingStatic?.template || "A",
+          domain: estData.website ? estData.website.replace(/^https?:\/\//, "").replace(/\/$/, "").split("/")[0] : matchingStatic?.domain || `${estData.slug}.com`,
+          branding: {
+            primary_color: savedBranding.primary_color || matchingStatic?.branding?.primary_color || "#00C8D4",
+            secondary_color: savedBranding.secondary_color || matchingStatic?.branding?.secondary_color || "#9B00CC",
+            accent_color: savedBranding.accent_color || matchingStatic?.branding?.accent_color || "#FF0096",
+            font_title: savedBranding.font_title || matchingStatic?.branding?.font_title || "Playfair Display",
+            font_body: savedBranding.font_body || matchingStatic?.branding?.font_body || "Montserrat",
+            logo_url: savedBranding.logo_url || matchingStatic?.branding?.logo_url || "https://r2.hotelesdevenezuela.com/default/logo.png",
+            banner_url: savedBranding.banner_url || primaryImgObj?.image_url || matchingStatic?.branding?.banner_url || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1600&auto=format&fit=crop"
+          },
+          modules: matchingStatic?.modules || {
+            reservas: true,
+            pos: true,
+            galeria: true,
+            contacto: true,
+            cms: true
+          },
+          contact: {
+            phone: estData.phone || matchingStatic?.contact?.phone || "+58 412 000 0000",
+            whatsapp: estData.whatsapp || matchingStatic?.contact?.whatsapp || estData.phone || "+58 412 000 0000",
+            email: estData.email || matchingStatic?.contact?.email || `contacto@${estData.slug}.com`,
+            instagram: estData.instagram || matchingStatic?.contact?.instagram || `@${estData.slug}`
+          }
         };
         setCurrentTenantConfig(dbConfig);
         return;
