@@ -71,6 +71,14 @@ export const CERTIFICATIONS_DOCUMENT77 = [
   { id: "circuito_excelencia", code: "C04.2.3", label: "Circuito de Excelencia HDV", badgeColor: "bg-[#FF0096] text-white" },
 ];
 
+export const STAR_CATEGORIES_DOCUMENT77 = [
+  { id: "1_estrella", code: "C05.3.1", label: "C05.3.1 - 1 Estrella", value: "1 estrella" },
+  { id: "2_estrellas", code: "C05.3.2", label: "C05.3.2 - 2 Estrellas", value: "2 estrellas" },
+  { id: "3_estrellas", code: "C05.3.3", label: "C05.3.3 - 3 Estrellas", value: "3 estrellas" },
+  { id: "4_estrellas", code: "C05.3.4", label: "C05.3.4 - 4 Estrellas", value: "4 estrellas" },
+  { id: "5_estrellas", code: "C05.3.5", label: "C05.3.5 - 5 Estrellas", value: "5 estrellas" },
+];
+
 export const RATINGS_CATEGORIES_DOCUMENT77 = [
   { id: "C05-1", label: "Inolvidable: 9 o más", minScore: 9.0 },
   { id: "C05-2", label: "Excelente elección: 8 o más", minScore: 8.0 },

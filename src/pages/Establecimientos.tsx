@@ -1030,7 +1030,7 @@ export function Establecimientos() {
 
                     <div className="space-y-1">
                       <span className="text-[9px] uppercase font-bold text-gray-400 tracking-wider block">Estrellas</span>
-                      {[5, 4, 3, 2].map(stars => {
+                      {[5, 4, 3, 2, 1].map(stars => {
                         const count = getFilterOptionCount("stars", stars);
                         return (
                           <label key={stars} className="flex items-center justify-between text-xs font-semibold text-gray-600 cursor-pointer select-none">

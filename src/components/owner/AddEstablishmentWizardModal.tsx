@@ -919,6 +919,7 @@ export function AddEstablishmentWizardModal({
                           <option value="2 estrellas">C05.3.2 - 2 Estrellas</option>
                           <option value="3 estrellas">C05.3.3 - 3 Estrellas</option>
                           <option value="4 estrellas">C05.3.4 - 4 Estrellas</option>
+                          <option value="5 estrellas">C05.3.5 - 5 Estrellas</option>
                         </select>
                       </div>
                       <div>
