@@ -11,6 +11,7 @@ import { RoomDetailModal } from "./components/RoomDetailModal";
 import { supabase } from "../lib/supabase";
 import { OLEAJE_CATEGORIES, OLEAJE_MENU_ITEMS, OLEAJE_ZONES, type OleajeDish, type OleajeZone } from "./lib/oleajeMenuData";
 import { PERLA_NEGRA_ROOMS, PERLA_NEGRA_ROOM_TYPES } from "./lib/perlaNegraData";
+import { MY_CAMPERS_ROOMS } from "./lib/myCampersData";
 import { POSModule } from "./templates/components/POSModule";
 
 interface SaaSTenantLandingPageProps {
@@ -21,6 +22,9 @@ const DESTINATION_MAP_INFO: Record<string, { lat: number; lng: number; state: st
   "morrocoy": { lat: 10.7933, lng: -68.3214, state: "Falcón", name: "Morrocoy / Tucacas" },
   "tucacas": { lat: 10.7933, lng: -68.3214, state: "Falcón", name: "Tucacas / Morrocoy" },
   "chichiriviche": { lat: 10.8931, lng: -68.2717, state: "Falcón", name: "Chichiriviche / Morrocoy" },
+  "cubiro": { lat: 9.8092, lng: -69.5775, state: "Lara", name: "Cubiro / Lomas de Cubiro" },
+  "lara": { lat: 9.8092, lng: -69.5775, state: "Lara", name: "Cubiro / Lomas de Cubiro" },
+  "camper": { lat: 9.8092, lng: -69.5775, state: "Lara", name: "Cubiro / Lomas de Cubiro" },
   "roques": { lat: 11.9519, lng: -66.6719, state: "Dependencias Federales", name: "Archipiélago Los Roques" },
   "margarita": { lat: 10.9577, lng: -63.8697, state: "Nueva Esparta", name: "Isla de Margarita" },
   "porlamar": { lat: 10.9577, lng: -63.8697, state: "Nueva Esparta", name: "Porlamar, Margarita" },
@@ -157,10 +161,10 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
 
       if (isMyCampers) {
         setAreaPhotos({
-          piscina: ["/images/my-campers/camper_1.jpg", "/images/my-campers/camper_2.jpg", "/images/my-campers/camper_3.jpg", "/images/my-campers/camper_4.jpg", "/images/my-campers/camper_5.jpg"],
-          restaurante: ["/images/my-campers/camper_6.jpg", "/images/my-campers/camper_7.jpg", "/images/my-campers/camper_8.jpg", "/images/my-campers/camper_9.jpg", "/images/my-campers/camper_10.jpg"],
-          lobby: ["/images/my-campers/camper_11.jpg", "/images/my-campers/camper_12.jpg", "/images/my-campers/camper_13.jpg"],
-          fachada: ["/images/my-campers/banner.jpg", "/images/my-campers/camper_14.jpg", "/images/my-campers/camper_15.jpg"],
+          campers: ["/images/my-campers/camper_1.jpg", "/images/my-campers/camper_2.jpg", "/images/my-campers/camper_3.jpg", "/images/my-campers/camper_4.jpg", "/images/my-campers/camper_5.jpg"],
+          suites: ["/images/my-campers/camper_6.jpg", "/images/my-campers/camper_7.jpg", "/images/my-campers/camper_8.jpg", "/images/my-campers/camper_9.jpg", "/images/my-campers/camper_10.jpg", "/images/my-campers/camper_11.jpg", "/images/my-campers/camper_12.jpg"],
+          fogata: ["/images/my-campers/camper_13.jpg", "/images/my-campers/camper_14.jpg", "/images/my-campers/camper_15.jpg", "/images/my-campers/camper_16.jpg", "/images/my-campers/camper_17.jpg", "/images/my-campers/camper_18.jpg"],
+          fachada: ["/images/my-campers/banner.jpg", "/images/my-campers/camper_19.jpg", "/images/my-campers/camper_20.jpg", "/images/my-campers/camper_21.jpg", "/images/my-campers/camper_22.jpg", "/images/my-campers/camper_23.jpg", "/images/my-campers/camper_24.jpg", "/images/my-campers/camper_25.jpg"],
         });
         return;
       }
@@ -344,6 +348,8 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
 
         if (isPerlaNegra) {
           fetched = PERLA_NEGRA_ROOMS as any[];
+        } else if (isMyCampers) {
+          fetched = MY_CAMPERS_ROOMS as any[];
         }
 
         // Garantizar inventario dinámico de 6 unidades para las aplicaciones SaaS
@@ -500,10 +506,10 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
   const whatsapp = establishmentDetail?.whatsapp || establishmentDetail?.phone || config.contact?.whatsapp || "584144815321";
   const cleanWhatsapp = whatsapp.replace(/[^0-9]/g, "") || "584144815321";
 
-  const address = establishmentDetail?.address || "Carretera Principal, Sector Tucacas / Morrocoy";
-  const description = establishmentDetail?.description || `En ${config.name} nos esmeramos por ofrecer una atención cálida, personalizada y de primer nivel. Nuestras instalaciones combinan la tranquilidad natural con el confort moderno para que su única preocupación sea descansar.`;
-  const destName = establishmentDetail?.destinations?.name || establishmentDetail?.destination_name || "Tucacas / Morrocoy";
-  const stateName = establishmentDetail?.destinations?.state || establishmentDetail?.state || "Falcón";
+  const address = establishmentDetail?.address || (isMyCampers ? "Lomas de Cubiro, Municipio Jiménez, Estado Lara" : isPerlaNegra ? "Calle Principal Sector Playa Sur, Chichiriviche, Estado Falcón" : "Carretera Principal, Sector Tucacas / Morrocoy");
+  const description = establishmentDetail?.description || (isMyCampers ? "En My Campers Venezuela ofrecemos hospedajes únicos en campers acondicionados, cabañas alpinas y suites VIP rodeadas del clima fresco y paisajes panorámicos de Cubiro, Estado Lara." : `En ${config.name} nos esmeramos por ofrecer una atención cálida, personalizada y de primer nivel. Nuestras instalaciones combinan la tranquilidad natural con el confort moderno para que su única preocupación sea descansar.`);
+  const destName = establishmentDetail?.destinations?.name || establishmentDetail?.destination_name || (isMyCampers ? "Cubiro / Lomas de Cubiro" : isPerlaNegra ? "Chichiriviche / Morrocoy" : "Tucacas / Morrocoy");
+  const stateName = establishmentDetail?.destinations?.state || establishmentDetail?.state || (isMyCampers ? "Lara" : "Falcón");
 
   const resolveCoordinates = () => {
     if (establishmentDetail?.latitude && establishmentDetail?.longitude) {
@@ -697,14 +703,14 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             </h1>
 
             <div className="flex flex-col items-center justify-center gap-3">
-              <div className="inline-flex items-center gap-2.5 p-[2px] rounded-2xl bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] shadow-2xl animate-pulse hover:scale-105 transition-all">
+              <div className="inline-flex items-center gap-2.5 p-[2px] rounded-2xl bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] shadow-2xl hover:scale-105 transition-all">
                 <div className="px-5 py-2 rounded-[14px] bg-slate-900/90 backdrop-blur flex items-center gap-2.5">
                   <span className="relative flex h-3 w-3 shrink-0">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-400"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-400"></span>
                   </span>
-                  <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-amber-300 drop-shadow">
-                    🛠️ EN MANTENIMIENTO PROGRAMADO • PLATAFORMA WEB EN CONSTRUCCIÓN
+                  <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-emerald-300 drop-shadow">
+                    {isMyCampers ? "✨ SELLO OFICIAL DE EXCELENCIA • CUBIRO, LARA" : isPerlaNegra ? "✨ SELLO OFICIAL DE EXCELENCIA • CHICHIRIVICHE" : "✨ HOSPEDAJE DE EXCELENCIA • RESERVA DIRECTA"}
                   </span>
                 </div>
               </div>
@@ -722,10 +728,10 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto pt-2">
               <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
                 <span className="text-lg font-black text-white block font-serif drop-shadow-sm">
-                  {isPerlaNegra ? "21 Unidades" : "⭐ 4.9 / 5"}
+                  {isMyCampers ? "6 Unidades VIP" : isPerlaNegra ? "21 Unidades" : "⭐ 4.9 / 5"}
                 </span>
                 <span className="text-[10px] text-white font-bold uppercase tracking-wider">
-                  {isPerlaNegra ? "4 Tipos de Habitación" : "Valoración Huéspedes"}
+                  {isMyCampers ? "Campers & Suites" : isPerlaNegra ? "4 Tipos de Habitación" : "Valoración Huéspedes"}
                 </span>
               </div>
               <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
@@ -733,12 +739,20 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                 <span className="text-[10px] text-white font-bold uppercase tracking-wider">Planta Eléctrica 24/7</span>
               </div>
               <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
-                <span className="text-lg font-black text-white block font-serif drop-shadow-sm">Piscina</span>
-                <span className="text-[10px] text-white font-bold uppercase tracking-wider">Iluminación Nocturna</span>
+                <span className="text-lg font-black text-white block font-serif drop-shadow-sm">
+                  {isMyCampers ? "1,500m Altitud" : "Piscina"}
+                </span>
+                <span className="text-[10px] text-white font-bold uppercase tracking-wider">
+                  {isMyCampers ? "Clima Fresco de Montaña" : "Iluminación Nocturna"}
+                </span>
               </div>
               <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
-                <span className="text-lg font-black text-white block font-serif drop-shadow-sm">Cayos Morrocoy</span>
-                <span className="text-[10px] text-white font-bold uppercase tracking-wider">Paseos en Peñero/Yate</span>
+                <span className="text-lg font-black text-white block font-serif drop-shadow-sm">
+                  {isMyCampers ? "WiFi Starlink" : "Cayos Morrocoy"}
+                </span>
+                <span className="text-[10px] text-white font-bold uppercase tracking-wider">
+                  {isMyCampers ? "High Speed Montaña" : "Paseos en Peñero/Yate"}
+                </span>
               </div>
             </div>
 
@@ -980,13 +994,13 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           
           <div className="text-center space-y-4 max-w-3xl mx-auto mb-16">
             <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#00C8D4] uppercase block">
-              {isPerlaNegra ? "PLANTA BAJA & PLANTA ALTA (10 HABITACIONES)" : "SU REFUGIO DE DESCANSO (BLOQUE 1)"}
+              {isMyCampers ? "EXPERIENCIA GLAMPING & SUITES VIP EN CUBIRO" : isPerlaNegra ? "PLANTA BAJA & PLANTA ALTA (10 HABITACIONES)" : "SU REFUGIO DE DESCANSO (BLOQUE 1)"}
             </span>
             <h2 className="text-3xl sm:text-5xl font-black font-serif text-slate-900">
-              {isPerlaNegra ? "Habitaciones Familiares Estándar (F1 a F6)" : "Nuestras Habitaciones & Suites (Edificio Principal)"}
+              {isMyCampers ? "Nuestros Campers, Cabañas & Suites de Montaña" : isPerlaNegra ? "Habitaciones Familiares Estándar (F1 a F6)" : "Nuestras Habitaciones & Suites (Edificio Principal)"}
             </h2>
             <p className="text-slate-600 text-sm sm:text-base font-normal leading-relaxed">
-              {isPerlaNegra ? "Habitaciones acogedoras para 4 personas equipadas con aire acondicionado split, WiFi Starlink, TV HD y baño privado." : "Explore nuestras opciones de hospedaje completamente equipadas. Seleccione las habitaciones ideales para su grupo o familia."}
+              {isMyCampers ? "Explore nuestras exclusivas opciones de hospedaje en las lomas de Cubiro. Campers equipados, suites VIP con vista al valle y cabañas para familias." : isPerlaNegra ? "Habitaciones acogedoras para 4 personas equipadas con aire acondicionado split, WiFi Starlink, TV HD y baño privado." : "Explore nuestras opciones de hospedaje completamente equipadas. Seleccione las habitaciones ideales para su grupo o familia."}
             </p>
           </div>
 
@@ -1124,6 +1138,9 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         <div className="flex flex-wrap justify-center gap-2 mb-10">
           {[
             { id: "todas", label: "✨ Todas las Áreas" },
+            { id: "campers", label: "🚐 Campers VIP & Kombis" },
+            { id: "suites", label: "🏡 Suites & Cabañas" },
+            { id: "fogata", label: "🔥 Fogatas & Jardines" },
             { id: "piscina", label: "🏊 Piscina & Solárium" },
             { id: "restaurante", label: "🍽️ Restaurante & Bar" },
             { id: "parque", label: "🌳 Parque & Recreación" },
@@ -1168,6 +1185,9 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               }
 
               const categoryLabels: Record<string, string> = {
+                campers: "Campers VIP & Kombis",
+                suites: "Suites & Cabañas",
+                fogata: "Fogatas & Jardines",
                 piscina: "Piscina & Solárium",
                 restaurante: "Restaurante & Bar",
                 fachada: "Fachada & Exteriores",
@@ -1247,7 +1267,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               CONOCE NUESTRO ESTABLECIMIENTO
             </span>
             <h2 className="text-3xl sm:text-5xl font-black font-serif text-slate-900 leading-tight">
-              Más que un Hospedaje, Su Casa en la Playa
+              {isMyCampers ? "Más que un Hospedaje, Su Refugio en las Montañas" : "Más que un Hospedaje, Su Casa en la Playa"}
             </h2>
             <p className="text-slate-700 text-sm sm:text-base font-normal leading-relaxed">
               {description}

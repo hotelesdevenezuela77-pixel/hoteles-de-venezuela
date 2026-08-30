@@ -2,67 +2,67 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://hotelesdevenezuela.com/</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-08-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/establecimientos</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-08-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/destinos</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-08-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/mapa</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-08-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/parques</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-08-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/servicios-b2b</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-08-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/comparar</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-08-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/paquetes</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-08-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/links</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-08-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/membresias</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-08-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/prestigio-2026</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-08-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -711,6 +711,42 @@
   <url>
     <loc>https://hotelesdevenezuela.com/blog/ruta-del-agua-las-cascadas-mas-fascinantes-de-venezuela</loc>
     <lastmod>2026-08-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/el-secreto-mejor-guardado-del-caribe-por-que-el-mundo-esta-redescubriendo-a-venezuela-en-esta-nueva-era</loc>
+    <lastmod>2026-08-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/el-milagro-nocturno-del-caribe-por-que-los-biologos-del-mundo-estan-mirando-las-costas-de-venezuela</loc>
+    <lastmod>2026-08-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/merida-se-viste-de-blanco-el-regreso-milagroso-de-la-nieve-y-por-que-es-mas-importante-de-lo-que-crees</loc>
+    <lastmod>2026-08-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/la-tormenta-eterna-por-que-el-espectaculo-de-luces-mas-salvaje-del-planeta-esta-en-un-rincon-oculto-de-venezuela</loc>
+    <lastmod>2026-08-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/el-pais-de-las-nubes-de-colores-por-que-venezuela-es-el-paraiso-secreto-de-los-adictos-a-las-aves-y-la-fotografia-salvaje</loc>
+    <lastmod>2026-08-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/turismo-con-proposito-la-espiritualidad-consciente-como-motor-de-transformacion-social-en-la-hoteleria</loc>
+    <lastmod>2026-08-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>

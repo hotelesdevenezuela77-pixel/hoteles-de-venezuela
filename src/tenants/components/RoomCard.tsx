@@ -132,6 +132,21 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail, onToggl
     ];
   }
 
+  const [imgSrc, setImgSrc] = React.useState<string>(finalImageUrl);
+  const [hasError, setHasError] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    setImgSrc(finalImageUrl);
+    setHasError(false);
+  }, [finalImageUrl]);
+
+  const handleImageError = () => {
+    if (!hasError) {
+      setHasError(true);
+      setImgSrc("/placeholder-hotel.jpg");
+    }
+  };
+
   // Formatear mensaje directo dinámico para WhatsApp
   const cleanPhone = whatsappPhone.replace(/[^0-9]/g, "");
   const waText = encodeURIComponent(
@@ -146,15 +161,11 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail, onToggl
       <div className="relative h-64 overflow-hidden shrink-0 bg-slate-100">
         {/* Lógica dinámica para la foto real de la habitación */}
         <img
-          src={finalImageUrl}
+          src={imgSrc}
           alt={roomTitle}
           loading="lazy"
           className="w-full h-full object-cover scale-[1.03] group-hover:scale-110 transition-transform duration-700"
-          onError={(e) => {
-            // Si la URL falla (ej. error 404 de Supabase), mostramos una imagen neutra NUNCA una foto de Unsplash
-            e.currentTarget.src = "/placeholder-hotel.jpg";
-            console.error(`Error cargando imagen para: ${room.nombre || room.name || roomTitle}`);
-          }}
+          onError={handleImageError}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-black/30 pointer-events-none z-0"></div>
 
