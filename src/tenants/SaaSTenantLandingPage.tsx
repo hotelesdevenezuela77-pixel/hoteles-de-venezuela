@@ -129,9 +129,15 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
       // 1. Priorizar fotos de instalaciones reales guardadas en Supabase DB para este establecimiento
       const dbFacilityPhotos = establishmentDetail?.facility_photos;
       if (dbFacilityPhotos && typeof dbFacilityPhotos === "object" && Object.keys(dbFacilityPhotos).length > 0) {
-        const hasAnyPhoto = Object.values(dbFacilityPhotos).some((arr: any) => Array.isArray(arr) && arr.length > 0);
-        if (hasAnyPhoto) {
-          setAreaPhotos(dbFacilityPhotos as Record<string, string[]>);
+        const source = (dbFacilityPhotos as any).area_photos || dbFacilityPhotos;
+        const filteredPhotos: Record<string, string[]> = {};
+        Object.entries(source).forEach(([k, v]) => {
+          if (Array.isArray(v) && v.length > 0 && typeof v[0] === "string") {
+            filteredPhotos[k] = v;
+          }
+        });
+        if (Object.keys(filteredPhotos).length > 0) {
+          setAreaPhotos(filteredPhotos);
           return;
         }
       }
@@ -148,16 +154,16 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                           parsed[config.slug] || 
                           (establishmentDetail?.slug && parsed[establishmentDetail.slug]);
           if (matched && Object.keys(matched).length > 0) {
-            setAreaPhotos(matched);
-            return;
-          }
-
-          const anyWithPhotos = Object.values(parsed).find((val: any) => 
-            val && typeof val === "object" && Object.values(val).some((arr: any) => Array.isArray(arr) && arr.length > 0)
-          );
-          if (anyWithPhotos) {
-            setAreaPhotos(anyWithPhotos as Record<string, string[]>);
-            return;
+            const filteredMatched: Record<string, string[]> = {};
+            Object.entries(matched).forEach(([k, v]) => {
+              if (Array.isArray(v) && v.length > 0 && typeof v[0] === "string") {
+                filteredMatched[k] = v;
+              }
+            });
+            if (Object.keys(filteredMatched).length > 0) {
+              setAreaPhotos(filteredMatched);
+              return;
+            }
           }
         }
       } catch (e) {}
@@ -1154,7 +1160,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             { id: "eventos", label: "🎭 Salón de Eventos" },
             { id: "deportes", label: "🏋️ Gimnasio & Deportes" },
             { id: "playa", label: "🏖️ Playa & Marina" }
-          ].filter(tab => tab.id === "todas" || (areaPhotos[tab.id] && areaPhotos[tab.id].length > 0)).map(tab => (
+          ].filter(tab => tab.id === "todas" || (Array.isArray(areaPhotos[tab.id]) && areaPhotos[tab.id].length > 0)).map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveAreaTab(tab.id)}
@@ -1172,8 +1178,8 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         {/* Dynamic Mosaic / Collage Layout Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[220px]">
           {Object.entries(areaPhotos)
-            .filter(([key]) => activeAreaTab === "todas" || activeAreaTab === key)
-            .flatMap(([areaKey, urls]) => urls.map((url, i) => ({ areaKey, url, id: `${areaKey}-${i}` })))
+            .filter(([key, urls]) => (activeAreaTab === "todas" || activeAreaTab === key) && Array.isArray(urls))
+            .flatMap(([areaKey, urls]) => (Array.isArray(urls) ? urls : []).map((url, i) => ({ areaKey, url, id: `${areaKey}-${i}` })))
             .map((item, idx) => {
               const isHeroTile = idx === 0 && activeAreaTab === "todas";
               const isWideTile = idx % 5 === 3;
