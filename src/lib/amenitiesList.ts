@@ -39,44 +39,99 @@ export const AMENITY_CATEGORIES = [
 ];
 
 export const PROPERTY_TYPES_DOCUMENT77 = [
-  { id: "apartamentos", label: "Apartamentos", icon: "Building", code: "C05.1.1" },
-  { id: "casas_apartamentos_enteros", label: "Casas y apartamentos enteros", icon: "Home", code: "C05.1.2" },
-  { id: "hoteles", label: "Hoteles", icon: "Hotel", code: "C05.1.3" },
-  { id: "hostales_pensiones", label: "Hostales y pensiones", icon: "Bed", code: "C05.1.4" },
-  { id: "posadas", label: "Posadas", icon: "TreePine", code: "C05.1.5" },
-  { id: "habitaciones_casas_particulares", label: "Habitaciones en casas particulares", icon: "UserCheck", code: "C05.1.6" },
-  { id: "apartahoteles", label: "Apartahoteles", icon: "Building2", code: "C05.1.7" },
-  { id: "albergues_turisticos", label: "Albergues turísticos", icon: "Users", code: "C05.1.8" },
-  { id: "bed_and_breakfasts", label: "Bed and breakfasts", icon: "Coffee", code: "C05.1.9" },
-  { id: "casas_chalets_rurales", label: "Casas y chalets rurales", icon: "Home", code: "C05.1.10" },
-  { id: "residencias_estudiantes", label: "Residencias de estudiantes", icon: "GraduationCap", code: "C05.1.11" },
-  { id: "hoteles_capsula", label: "Hoteles cápsula", icon: "Box", code: "C05.1.12" },
-  { id: "campings", label: "Campings", icon: "Tent", code: "C05.1.13" },
-  { id: "glamping", label: "Glamping & Eco-Lodges", icon: "Tent", code: "C05.1.13b" },
-  { id: "villas", label: "Villas", icon: "Palmtree", code: "C05.1.14" },
-  { id: "barcos", label: "Barcos (veleros, yates, catamaranes o houseboats)", icon: "Ship", code: "C05.1.15" },
-  { id: "love_hotels", label: "Love hotels", icon: "Heart", code: "C05.1.16" },
-  { id: "chalets_montana", label: "Chalets de montaña", icon: "Mountain", code: "C05.1.17" },
-  { id: "resorts", label: "Resorts & Complejos Vacacionales", icon: "Palmtree", code: "C05.1.18" },
-  { id: "agencias_viaje", label: "Agencias de viaje", icon: "Briefcase", code: "C05.1.19" },
-  { id: "alquiler_carros", label: "Alquiler de carros", icon: "Car", code: "C05.1.20" },
-  { id: "alquiler_yates", label: "Alquiler de Yates", icon: "Ship", code: "C05.1.21" },
-  { id: "marinas", label: "Marinas", icon: "Anchor", code: "C05.1.22" },
-  { id: "restaurantes", label: "Restaurantes", icon: "Utensils", code: "C05.1.23" },
+  { id: "apartamentos", label: "Apartamentos", icon: "Building", code: "C00.1.1" },
+  { id: "casas_chalets_rurales", label: "Casas y Chalets rurales", icon: "Home", code: "C00.1.2" },
+  { id: "hoteles", label: "Hoteles", icon: "Hotel", code: "C00.1.3" },
+  { id: "hostales_posadas_pensiones", label: "Hostales, Posadas y Pensiones", icon: "TreePine", code: "C00.1.4" },
+  { id: "habitaciones_casas_particulares", label: "Habitaciones en casas particulares", icon: "UserCheck", code: "C00.1.5" },
+  { id: "apartahotel", label: "Apartahotel", icon: "Building2", code: "C00.1.6" },
+  { id: "albergues_turisticos", label: "Albergues turísticos", icon: "Users", code: "C00.1.7" },
+  { id: "residencias_estudiantes", label: "Residencias de estudiantes", icon: "GraduationCap", code: "C00.1.8" },
+  { id: "bed_and_breakfast", label: "Bed and breakfast", icon: "Coffee", code: "C00.1.9" },
+  { id: "villas", label: "Villas", icon: "Palmtree", code: "C00.1.10" },
+  { id: "hoteles_capsula", label: "Hoteles cápsula", icon: "Box", code: "C00.1.11" },
+  { id: "campings", label: "Campings", icon: "Tent", code: "C00.1.12" },
+  { id: "barcos", label: "Barcos (veleros, yates, catamaranes o houseboats)", icon: "Ship", code: "C00.1.14" },
+  { id: "love_hotels", label: "Love hotels", icon: "Heart", code: "C00.1.15" },
+  { id: "chalets_montana", label: "Chalets de montaña", icon: "Mountain", code: "C00.1.16" },
+  { id: "restaurantes", label: "Restaurantes", icon: "Utensils", code: "C00.1.22" },
+  { id: "glamping", label: "Glampings & Eco-Lodges (Pendiente)", icon: "Tent", code: "C05.1.13" },
+  { id: "resorts", label: "Resorts & Complejos Vacacionales (Pendiente)", icon: "Palmtree", code: "C05.1.17" },
+  { id: "agencias_viaje", label: "Agencias de viaje (Pendiente)", icon: "Briefcase", code: "C05.1.18" },
+  { id: "alquiler_carros", label: "Alquiler de carros (Pendiente)", icon: "Car", code: "C05.1.19" },
+  { id: "alquiler_yates", label: "Alquiler de Yates (Pendiente)", icon: "Ship", code: "C05.1.20" },
+  { id: "marinas", label: "Marinas (Pendiente)", icon: "Anchor", code: "C05.1.21" },
 ];
 
 export const CERTIFICATIONS_DOCUMENT77 = [
-  { id: "sostenibilidad", code: "C04.2.1", label: "Certificación de Sostenibilidad", badgeColor: "bg-emerald-500 text-white" },
-  { id: "sello_legal_hdv", code: "C04.2.2", label: "Sello de Garantía Legal HDV", badgeColor: "bg-[#00C8D4] text-white" },
-  { id: "circuito_excelencia", code: "C04.2.3", label: "Circuito de Excelencia HDV", badgeColor: "bg-[#FF0096] text-white" },
+  { id: "sostenibilidad", code: "C00.2.1", label: "Certificación de sostenibilidad", badgeColor: "bg-emerald-500 text-white" },
+  { id: "sello_legal_hdv", code: "C00.2.2", label: "Sello de garantía Legal HDV", badgeColor: "bg-[#00C8D4] text-white" },
+  { id: "circuito_excelencia", code: "C00.2.3", label: "Circuito de Excelencia", badgeColor: "bg-[#9B00CC] text-white" },
+  { id: "estrellas_michelin", code: "C00.2.4", label: "Estrellas Michelin", badgeColor: "bg-[#FF0096] text-white" },
 ];
 
+export const REGIONS_DOCUMENT77 = [
+  { id: "mar", code: "C00.4.1", label: "Mar" },
+  { id: "campana", code: "C00.4.2", label: "Campaña" },
+  { id: "bosque", code: "C00.4.3", label: "Bosque" },
+  { id: "montana", code: "C00.4.4", label: "Montaña" },
+  { id: "rio_o_lago", code: "C00.4.5", label: "Río o lago" },
+  { id: "zona_urbana", code: "C00.4.6", label: "Zona urbana" },
+  { id: "llanos", code: "C00.4.7", label: "Llanos" },
+  { id: "sabana", code: "C00.4.8", label: "Sabana" },
+  { id: "desierto", code: "C00.4.9", label: "Desierto" },
+];
+
+export const POINT_OF_INTEREST_TYPES = [
+  { id: "restaurantes_bares_cafeterias", code: "C00.5.1.1", label: "Restaurantes, Bares y Cafeterías" },
+  { id: "centros_comerciales", code: "C00.5.1.1b", label: "Centros comerciales" },
+  { id: "playas", code: "C00.5.1.2", label: "Playas" },
+  { id: "transporte", code: "C00.5.1.3", label: "Aeropuerto, estación de tren/autobús" },
+  { id: "patrimonio_historico", code: "C00.5.1.4", label: "Patrimonio histórico (Edificios históricos, restos arqueológicos...)" },
+  { id: "museos", code: "C00.5.1.5", label: "Museos" },
+  { id: "parques_naturales", code: "C00.5.1.6", label: "Parques naturales" },
+  { id: "resto_atracciones", code: "C00.5.1.7", label: "Resto de atracciones turísticas (Zoológicos, parques recreativos...)" },
+  { id: "hospitales_medicos", code: "C00.5.1.8", label: "Hospitales, clínicas, centros médicos" },
+  { id: "policia", code: "C00.5.1.8b", label: "Estación de policía" },
+];
+
+export const BOTON_CATEGORIES_MAPPING = {
+  boton1: [
+    { id: "hoteles", label: "Hoteles", code: "C00.1.3" },
+    { id: "hostales_posadas_pensiones", label: "Hostales, Posadas y Pensiones", code: "C00.1.4" },
+    { id: "habitaciones_casas_particulares", label: "Habitaciones en casas particulares", code: "C00.1.5" },
+    { id: "albergues_turisticos", label: "Albergues turísticos", code: "C00.1.7" },
+    { id: "residencias_estudiantes", label: "Residencias de estudiantes", code: "C00.1.8" },
+    { id: "bed_and_breakfast", label: "Bed and breakfast", code: "C00.1.9" },
+    { id: "hoteles_capsula", label: "Hoteles cápsula", code: "C00.1.11" },
+  ],
+  boton2: [
+    { id: "apartamentos", label: "Apartamentos", code: "C00.1.1" },
+    { id: "casas_chalets_rurales", label: "Casas y Chalets rurales", code: "C00.1.2" },
+    { id: "apartahotel", label: "Apartahotel", code: "C00.1.6" },
+    { id: "villas", label: "Villas", code: "C00.1.10" },
+    { id: "chalets_montana", label: "Chalets de montaña", code: "C00.1.16" },
+  ],
+  boton3: [
+    { id: "campings", label: "Campings", code: "C00.1.12" },
+  ],
+  boton4: [
+    { id: "love_hotels", label: "Love hotels", code: "C00.1.15" },
+  ],
+  boton5: [
+    { id: "barcos", label: "Barcos (veleros, yates, catamaranes o houseboats)", code: "C00.1.14" },
+  ],
+  boton6: [
+    { id: "restaurantes", label: "Restaurantes", code: "C00.1.22" },
+  ],
+};
+
 export const STAR_CATEGORIES_DOCUMENT77 = [
-  { id: "1_estrella", code: "C05.3.1", label: "C05.3.1 - 1 Estrella", value: "1 estrella" },
-  { id: "2_estrellas", code: "C05.3.2", label: "C05.3.2 - 2 Estrellas", value: "2 estrellas" },
-  { id: "3_estrellas", code: "C05.3.3", label: "C05.3.3 - 3 Estrellas", value: "3 estrellas" },
-  { id: "4_estrellas", code: "C05.3.4", label: "C05.3.4 - 4 Estrellas", value: "4 estrellas" },
-  { id: "5_estrellas", code: "C05.3.5", label: "C05.3.5 - 5 Estrellas", value: "5 estrellas" },
+  { id: "1_estrella", code: "C00.3.1", label: "C00.3.1 - 1 Estrella", value: "1 estrella" },
+  { id: "2_estrellas", code: "C00.3.2", label: "C00.3.2 - 2 Estrellas", value: "2 estrellas" },
+  { id: "3_estrellas", code: "C00.3.3", label: "C00.3.3 - 3 Estrellas", value: "3 estrellas" },
+  { id: "4_estrellas", code: "C00.3.4", label: "C00.3.4 - 4 Estrellas", value: "4 estrellas" },
+  { id: "5_estrellas", code: "C00.3.5", label: "C00.3.5 - 5 Estrellas", value: "5 estrellas" },
 ];
 
 export const RATINGS_CATEGORIES_DOCUMENT77 = [
