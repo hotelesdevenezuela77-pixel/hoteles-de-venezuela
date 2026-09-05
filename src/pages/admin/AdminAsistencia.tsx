@@ -62,13 +62,13 @@ export default function AdminAsistencia() {
 
       const profileMap = new Map((profiles || []).map(p => [p.user_id, p]));
 
-      return (ests || []).map((est: any) => {
+      const dbRows = (ests || []).map((est: any) => {
         const ownerProf = profileMap.get(est.owner_user_id);
         return {
           id: est.id,
           name: est.name,
           slug: est.slug,
-          status: est.status || "pending",
+          status: est.status || "approved",
           owner_user_id: est.owner_user_id || "",
           owner_name: ownerProf?.name || "Propietario Sin Nombre",
           owner_email: ownerProf?.email || "sin_correo@hdv.com",
@@ -76,6 +76,51 @@ export default function AdminAsistencia() {
           destination: est.destinations?.name || "Venezuela"
         };
       });
+
+      const demoProfiles: EstablishmentRow[] = [
+        {
+          id: 99901,
+          name: "Aura Croce - Viajera & Creadora de Contenido",
+          slug: "aura-croce-viajera-creadora",
+          status: "approved",
+          owner_user_id: "aura_croce_user_id",
+          owner_name: "Aura Croce",
+          owner_email: "aura.croce@hdv.com",
+          category: "Creadores de Contenido / Influencers",
+          destination: "Los Roques & Morrocoy"
+        },
+        {
+          id: 99902,
+          name: "El Mundo De Los Niños Barquisimeto",
+          slug: "el-mundo-de-los-ninos-barquisimeto",
+          status: "approved",
+          owner_user_id: "parque_acuatico_owner_id",
+          owner_name: "Administración El Mundo de los Niños",
+          owner_email: "contacto@elmundodelosninos.com",
+          category: "Complejos Turísticos y Parques Acuáticos",
+          destination: "Barquisimeto"
+        },
+        {
+          id: 99903,
+          name: "Agencia Global Travel & Tours DMC",
+          slug: "agencia-global-travel-tours-dmc",
+          status: "approved",
+          owner_user_id: "agencia_dmc_owner_id",
+          owner_name: "Director de Operaciones DMC",
+          owner_email: "operaciones@globaltraveldmc.com",
+          category: "Agencias de Viajes y Tour Operadores",
+          destination: "Caracas / Multidestino"
+        }
+      ];
+
+      const combinedRows = [...dbRows];
+      demoProfiles.forEach(dp => {
+        if (!combinedRows.some(r => r.id === dp.id || r.slug === dp.slug)) {
+          combinedRows.unshift(dp);
+        }
+      });
+
+      return combinedRows;
     }
   });
 

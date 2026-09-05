@@ -972,10 +972,79 @@ export function OwnerDashboard() {
       const localEsts = JSON.parse(localStorage.getItem(localEstsKey) || "[]")
         .filter((e: any) => e.owner_user_id === activeOwnerId);
 
+      const builtInDemoEsts: Establishment[] = [
+        {
+          id: 99901,
+          name: "Aura Croce - Viajera & Creadora de Contenido",
+          slug: "aura-croce-viajera-creadora",
+          status: "approved",
+          category_name: "Creadores de Contenido / Influencers",
+          category_id: 991,
+          destination_name: "Los Roques & Morrocoy",
+          destination_id: 1,
+          rating_avg: 5.0,
+          review_count: 48,
+          created_at: new Date().toISOString(),
+          address: "Caracas / Expediciones Nacionales",
+          phone: "+58 414-1234567",
+          whatsapp: "+58 414-1234567",
+          website: "https://instagram.com/auracroce",
+          description: "Desk Hub de expediciones post-viaje, alianzas de canje/monetización y bitácora multimedia de Aura Croce.",
+          membership_tier: "premium",
+          services: ["Rutas Satelitales", "Canjes B2B", "Auditoría de Posadas", "Agenda Drag&Drop"]
+        },
+        {
+          id: 99902,
+          name: "El Mundo De Los Niños Barquisimeto",
+          slug: "el-mundo-de-los-ninos-barquisimeto",
+          status: "approved",
+          category_name: "Complejos Turísticos y Parques Acuáticos",
+          category_id: 12,
+          destination_name: "Barquisimeto",
+          destination_id: 2,
+          rating_avg: 4.9,
+          review_count: 124,
+          created_at: new Date().toISOString(),
+          address: "Av. Ribereña, Barquisimeto, Lara",
+          phone: "+58 251-0000000",
+          whatsapp: "+58 414-0000000",
+          website: "https://elmundodelosninos.com",
+          description: "Parque acuático y centro de recreación familiar en Barquisimeto.",
+          membership_tier: "premium",
+          services: ["Piscinas", "Toboganes", "FastPass", "Puntos POS"]
+        },
+        {
+          id: 99903,
+          name: "Agencia Global Travel & Tours DMC",
+          slug: "agencia-global-travel-tours-dmc",
+          status: "approved",
+          category_name: "Agencias de Viajes y Tour Operadores",
+          category_id: 11,
+          destination_name: "Caracas / Multidestino",
+          destination_id: 3,
+          rating_avg: 4.8,
+          review_count: 89,
+          created_at: new Date().toISOString(),
+          address: "Av. Francisco de Miranda, Caracas",
+          phone: "+58 212-0000000",
+          whatsapp: "+58 412-0000000",
+          website: "https://globaltraveldmc.com",
+          description: "Agencia de viajes integradora y tour operador DMC con cotización multimodular.",
+          membership_tier: "premium",
+          services: ["Cotizador B2B", "Lotes de Cupos", "Gestión de Guías", "Vouchers PDF"]
+        }
+      ];
+
       mappedEsts = [...mappedEsts, ...localEsts];
 
       if (isAdmin && impersonateEstablishmentId) {
-        mappedEsts = mappedEsts.filter(e => e.id === impersonateEstablishmentId);
+        const found = mappedEsts.find(e => Number(e.id) === Number(impersonateEstablishmentId));
+        if (found) {
+          mappedEsts = [found];
+        } else {
+          const demoFound = builtInDemoEsts.find(e => Number(e.id) === Number(impersonateEstablishmentId));
+          mappedEsts = demoFound ? [demoFound] : [];
+        }
       }
 
       setEstablishments(mappedEsts);
