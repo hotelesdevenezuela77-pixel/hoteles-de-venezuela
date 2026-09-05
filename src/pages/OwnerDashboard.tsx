@@ -2292,34 +2292,6 @@ export function OwnerDashboard() {
   const isAgencyMode = viewModeOverride === 'agency' || (viewModeOverride === 'auto' && isTravelAgencyOrTourOperator(activeEstablishment));
   const isCreatorMode = viewModeOverride === 'creator' || (viewModeOverride === 'auto' && isCreatorOrInfluencer(activeEstablishment));
 
-  if (isCreatorMode) {
-    return (
-      <CreatorDashboard
-        establishment={activeEstablishment}
-        onSwitchToTraditionalDashboard={() => setViewModeOverride('traditional')}
-      />
-    );
-  }
-
-  if (isAgencyMode) {
-    return (
-      <AgencyDashboard
-        establishment={activeEstablishment}
-        onSwitchToTraditionalDashboard={() => setViewModeOverride('traditional')}
-      />
-    );
-  }
-
-
-  if (isParkComplexMode) {
-    return (
-      <ParkComplexDashboard
-        establishment={activeEstablishment}
-        onSwitchToTraditionalDashboard={() => setViewModeOverride('traditional')}
-      />
-    );
-  }
-
 
   return (
     <div className="min-h-screen bg-gray-50/30 pb-20">
@@ -2419,31 +2391,41 @@ export function OwnerDashboard() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setViewModeOverride('park')}
-                className="flex items-center gap-2 bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] text-white px-3.5 py-2.5 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border border-white/20"
+                className={`flex items-center gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border ${
+                  isParkComplexMode
+                    ? "bg-[#00C8D4] text-slate-950 border-white ring-2 ring-[#00C8D4]/50 shadow-[#00C8D4]/30 font-black"
+                    : "bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] text-white border-white/20"
+                }`}
               >
-                <Waves className="w-4 h-4 text-white" />
+                <Waves className="w-4 h-4" />
                 <span className="hidden sm:inline">Vista Parque Acuático</span>
               </button>
 
               <button
                 onClick={() => setViewModeOverride('agency')}
-                className="flex items-center gap-2 bg-gradient-to-r from-[#9B00CC] to-[#00C8D4] text-white px-3.5 py-2.5 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border border-white/20"
+                className={`flex items-center gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border ${
+                  isAgencyMode
+                    ? "bg-[#9B00CC] text-white border-white ring-2 ring-[#9B00CC]/50 shadow-[#9B00CC]/30 font-black"
+                    : "bg-gradient-to-r from-[#9B00CC] to-[#00C8D4] text-white border-white/20"
+                }`}
               >
-                <Compass className="w-4 h-4 text-white" />
+                <Compass className="w-4 h-4" />
                 <span className="hidden sm:inline">Vista Agencia / DMC</span>
               </button>
 
               <button
                 onClick={() => setViewModeOverride('creator')}
-                className="flex items-center gap-2 bg-gradient-to-r from-[#FF0096] to-[#00C8D4] text-white px-3.5 py-2.5 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border border-white/20"
+                className={`flex items-center gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border ${
+                  isCreatorMode
+                    ? "bg-[#FF0096] text-white border-white ring-2 ring-[#FF0096]/50 shadow-[#FF0096]/30 font-black"
+                    : "bg-gradient-to-r from-[#FF0096] to-[#00C8D4] text-white border-white/20"
+                }`}
               >
-                <Camera className="w-4 h-4 text-white" />
+                <Camera className="w-4 h-4" />
                 <span className="hidden sm:inline">Vista Creador / Desk Hub</span>
               </button>
 
-
               <div className="flex items-center gap-3 bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl px-4 py-2.5 text-xs text-white shrink-0 shadow-lg">
-
                 <div className="text-right">
                   <p className="text-[9px] uppercase font-black text-[#00C8D4] tracking-wider">CONECTADO</p>
                   <p className="font-bold text-white text-xs truncate max-w-[180px]">{user?.email || "hotelesdevenezuela"}</p>
@@ -2456,6 +2438,25 @@ export function OwnerDashboard() {
           </div>
         </div>
       </div>
+
+      {/* BODY DISPATCHER FOR SPECIALIZED PANELS */}
+      {isCreatorMode ? (
+        <CreatorDashboard
+          establishment={activeEstablishment}
+          onSwitchToTraditionalDashboard={() => setViewModeOverride('traditional')}
+        />
+      ) : isAgencyMode ? (
+        <AgencyDashboard
+          establishment={activeEstablishment}
+          onSwitchToTraditionalDashboard={() => setViewModeOverride('traditional')}
+        />
+      ) : isParkComplexMode ? (
+        <ParkComplexDashboard
+          establishment={activeEstablishment}
+          onSwitchToTraditionalDashboard={() => setViewModeOverride('traditional')}
+        />
+      ) : (
+        <>
 
 
       {/* Recuadro Degradado Fucsia Magenta/Púrpura - Panel de Control Ejecutivo */}
@@ -5547,6 +5548,8 @@ export function OwnerDashboard() {
             </form>
           </div>
         </div>
+      )}
+        </>
       )}
 
     </div>
