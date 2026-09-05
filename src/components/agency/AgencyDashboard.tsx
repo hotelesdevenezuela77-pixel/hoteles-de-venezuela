@@ -186,19 +186,19 @@ export const AgencyDashboard: React.FC<AgencyDashboardProps> = ({
 
         {/* Tab Content */}
         {activeTab === "paquetes" && (
-          <AgencyPackagingEngine packages={packages} onCreatePackage={createPackage} />
+          <AgencyPackagingEngine packages={packages || []} onCreatePackage={createPackage} />
         )}
 
         {activeTab === "itinerarios" && (
-          <AgencyItineraryBuilder quotes={quotes} itineraries={itineraries} onAddItineraryDay={addItineraryDay} />
+          <AgencyItineraryBuilder quotes={quotes || []} itineraries={itineraries || []} onAddItineraryDay={addItineraryDay} />
         )}
 
         {activeTab === "liquidaciones" && (
-          <AgencySupplierSettlement payments={supplierPayments} expenses={expeditionExpenses} onPaySupplier={paySupplier} onAddExpense={addExpeditionExpense} />
+          <AgencySupplierSettlement supplierPayments={supplierPayments || []} expeditionExpenses={expeditionExpenses || []} onPaySupplier={paySupplier} onAddExpense={addExpeditionExpense} />
         )}
 
         {activeTab === "manifiesto" && (
-          <AgencyPassengerManifest passengers={passengers} onAddPassenger={addPassenger} />
+          <AgencyPassengerManifest quotes={quotes || []} passengers={passengers || []} onAddPassenger={addPassenger} />
         )}
 
         {activeTab === "agenda" && (

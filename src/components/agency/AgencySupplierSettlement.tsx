@@ -3,8 +3,8 @@ import { Wallet, AlertTriangle, CheckCircle2, DollarSign, FileText, Plus, ArrowU
 import type { SupplierPayment, ExpeditionExpense, ExpenseCategory } from "../../types/agencyTourOperator";
 
 interface AgencySupplierSettlementProps {
-  supplierPayments: SupplierPayment[];
-  expeditionExpenses: ExpeditionExpense[];
+  supplierPayments?: SupplierPayment[];
+  expeditionExpenses?: ExpeditionExpense[];
   onPaySupplier: (paymentId: string, bankRef: string) => void;
   onAddExpeditionExpense: (expense: Partial<ExpeditionExpense>) => void;
 }
@@ -19,8 +19,8 @@ const CATEGORY_LABELS: { [key in ExpenseCategory]: string } = {
 };
 
 export const AgencySupplierSettlement: React.FC<AgencySupplierSettlementProps> = ({
-  supplierPayments,
-  expeditionExpenses,
+  supplierPayments = [],
+  expeditionExpenses = [],
   onPaySupplier,
   onAddExpeditionExpense
 }) => {
@@ -36,11 +36,14 @@ export const AgencySupplierSettlement: React.FC<AgencySupplierSettlementProps> =
   const [amountUsd, setAmountUsd] = useState("");
   const [loggedBy, setLoggedBy] = useState("Coordinador de Ruta");
 
-  const pendingPayments = supplierPayments.filter((sp) => sp.status === "pending");
-  const paidPayments = supplierPayments.filter((sp) => sp.status === "paid");
+  const safePayments = supplierPayments || [];
+  const safeExpenses = expeditionExpenses || [];
 
-  const totalPendingUsd = pendingPayments.reduce((acc, sp) => acc + sp.amount_usd, 0);
-  const totalExpensesUsd = expeditionExpenses.reduce((acc, exp) => acc + exp.amount_usd, 0);
+  const pendingPayments = safePayments.filter((sp) => sp.status === "pending");
+  const paidPayments = safePayments.filter((sp) => sp.status === "paid");
+
+  const totalPendingUsd = pendingPayments.reduce((acc, sp) => acc + (sp.amount_usd || 0), 0);
+  const totalExpensesUsd = safeExpenses.reduce((acc, exp) => acc + (exp.amount_usd || 0), 0);
 
   const handleExecutePayment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -319,7 +322,7 @@ export const AgencySupplierSettlement: React.FC<AgencySupplierSettlementProps> =
             </h4>
 
             <div className="space-y-2 max-h-[350px] overflow-y-auto pr-1">
-              {expeditionExpenses.map((exp) => (
+              {safeExpenses.map((exp) => (
                 <div
                   key={exp.id}
                   className="p-3.5 rounded-2xl bg-slate-900/70 border border-white/10 text-xs flex items-center justify-between hover:border-[#FF0096]/30 transition-all"

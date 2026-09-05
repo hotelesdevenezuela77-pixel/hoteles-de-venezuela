@@ -3,18 +3,21 @@ import { Compass, Clock, MapPin, Plus, FileText, QrCode, Download, ShieldCheck, 
 import type { AgencyQuote, AgencyItineraryDay } from "../../types/agencyTourOperator";
 
 interface AgencyItineraryBuilderProps {
-  quotes: AgencyQuote[];
-  itineraries: AgencyItineraryDay[];
+  quotes?: AgencyQuote[];
+  itineraries?: AgencyItineraryDay[];
   onAddItineraryDay: (day: Partial<AgencyItineraryDay>) => void;
 }
 
 export const AgencyItineraryBuilder: React.FC<AgencyItineraryBuilderProps> = ({
-  quotes,
-  itineraries,
+  quotes = [],
+  itineraries = [],
   onAddItineraryDay
 }) => {
-  const [selectedQuoteId, setSelectedQuoteId] = useState<string>(quotes[0]?.id || "");
-  const selectedQuote = quotes.find((q) => q.id === selectedQuoteId) || quotes[0];
+  const safeQuotes = quotes || [];
+  const safeItineraries = itineraries || [];
+
+  const [selectedQuoteId, setSelectedQuoteId] = useState<string>(safeQuotes[0]?.id || "");
+  const selectedQuote = safeQuotes.find((q) => q.id === selectedQuoteId) || safeQuotes[0];
 
   const [dayNumber, setDayNumber] = useState(1);
   const [timeSchedule, setTimeSchedule] = useState("08:30 AM");
@@ -23,7 +26,7 @@ export const AgencyItineraryBuilder: React.FC<AgencyItineraryBuilderProps> = ({
   const [locationName, setLocationName] = useState("");
   const [outfit, setOutfit] = useState("");
 
-  const quoteItineraries = itineraries.filter((it) => it.quote_id === selectedQuoteId);
+  const quoteItineraries = safeItineraries.filter((it) => it.quote_id === selectedQuoteId);
 
   const handleAddDay = (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,7 +71,7 @@ export const AgencyItineraryBuilder: React.FC<AgencyItineraryBuilderProps> = ({
             onChange={(e) => setSelectedQuoteId(e.target.value)}
             className="w-full sm:w-72 bg-slate-900 border border-white/20 rounded-xl py-2 px-3 text-white text-xs font-bold focus:outline-none focus:border-[#9B00CC]"
           >
-            {quotes.map((q) => (
+            {safeQuotes.map((q) => (
               <option key={q.id} value={q.id}>
                 {q.quote_number} - {q.client_name} ({q.package_title})
               </option>

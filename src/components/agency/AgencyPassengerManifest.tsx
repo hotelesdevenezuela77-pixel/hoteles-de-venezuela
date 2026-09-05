@@ -3,18 +3,21 @@ import { Users, Plus, FileText, Download, ShieldCheck, Heart, AlertCircle } from
 import type { AgencyPassenger, AgencyQuote } from "../../types/agencyTourOperator";
 
 interface AgencyPassengerManifestProps {
-  quotes: AgencyQuote[];
-  passengers: AgencyPassenger[];
+  quotes?: AgencyQuote[];
+  passengers?: AgencyPassenger[];
   onAddPassenger: (passenger: Partial<AgencyPassenger>) => void;
 }
 
 export const AgencyPassengerManifest: React.FC<AgencyPassengerManifestProps> = ({
-  quotes,
-  passengers,
+  quotes = [],
+  passengers = [],
   onAddPassenger
 }) => {
-  const [selectedQuoteId, setSelectedQuoteId] = useState<string>(quotes[0]?.id || "");
-  const selectedQuote = quotes.find((q) => q.id === selectedQuoteId) || quotes[0];
+  const safeQuotes = quotes || [];
+  const safePassengers = passengers || [];
+
+  const [selectedQuoteId, setSelectedQuoteId] = useState<string>(safeQuotes[0]?.id || "");
+  const selectedQuote = safeQuotes.find((q) => q.id === selectedQuoteId) || safeQuotes[0];
 
   const [fullName, setFullName] = useState("");
   const [docType, setDocType] = useState("Cédula");
@@ -25,7 +28,7 @@ export const AgencyPassengerManifest: React.FC<AgencyPassengerManifestProps> = (
   const [medical, setMedical] = useState("Ninguna");
   const [emergency, setEmergency] = useState("");
 
-  const manifestPassengers = passengers.filter((p) => p.quote_id === selectedQuoteId);
+  const manifestPassengers = safePassengers.filter((p) => p.quote_id === selectedQuoteId);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,7 +75,7 @@ export const AgencyPassengerManifest: React.FC<AgencyPassengerManifestProps> = (
             onChange={(e) => setSelectedQuoteId(e.target.value)}
             className="w-full sm:w-72 bg-slate-900 border border-white/20 rounded-xl py-2 px-3 text-white text-xs font-bold focus:outline-none focus:border-[#FF0096]"
           >
-            {quotes.map((q) => (
+            {safeQuotes.map((q) => (
               <option key={q.id} value={q.id}>
                 {q.quote_number} - {q.client_name} ({q.package_title})
               </option>

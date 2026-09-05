@@ -3,7 +3,7 @@ import { Package, Plus, DollarSign, Percent, Sparkles, CheckCircle2, Tag, Layers
 import type { AgencyPackage, ServiceType } from "../../types/agencyTourOperator";
 
 interface AgencyPackagingEngineProps {
-  packages: AgencyPackage[];
+  packages?: AgencyPackage[];
   onCreatePackage: (pkg: Partial<AgencyPackage>) => void;
 }
 
@@ -18,9 +18,10 @@ const SERVICE_TYPE_LABELS: { [key in ServiceType]: string } = {
 };
 
 export const AgencyPackagingEngine: React.FC<AgencyPackagingEngineProps> = ({
-  packages,
+  packages = [],
   onCreatePackage
 }) => {
+  const safePackages = packages || [];
   const [title, setTitle] = useState("");
   const [destination, setDestination] = useState("Archipiélago Los Roques");
   const [durationDays, setDurationDays] = useState(3);
@@ -220,11 +221,11 @@ export const AgencyPackagingEngine: React.FC<AgencyPackagingEngineProps> = ({
         {/* CATÁLOGO DE PAQUETES ACTIVOS (Col 6) */}
         <div className="lg:col-span-6 space-y-4">
           <h4 className="font-extrabold text-white text-sm uppercase tracking-wider flex items-center">
-            <Layers className="w-4 h-4 text-[#FF0096] mr-1.5" /> Catálogo de Paquetes Activos ({packages.length})
+            <Layers className="w-4 h-4 text-[#FF0096] mr-1.5" /> Catálogo de Paquetes Activos ({safePackages.length})
           </h4>
 
           <div className="space-y-3 max-h-[520px] overflow-y-auto pr-1">
-            {packages.map((pkg) => (
+            {safePackages.map((pkg) => (
               <div
                 key={pkg.id}
                 className="p-4 rounded-2xl bg-slate-900/70 border border-white/10 space-y-2 hover:border-[#00C8D4]/40 transition-all"
