@@ -27,6 +27,15 @@ import { AnalyticsModule } from "../tenants/templates/components/AnalyticsModule
 import { OwnerAgendaModule } from "@/components/owner/OwnerAgendaModule";
 import { OwnerTechnicalSupportModule } from "@/components/owner/OwnerTechnicalSupportModule";
 import { AddEstablishmentWizardModal } from "@/components/owner/AddEstablishmentWizardModal";
+import { ParkComplexDashboard } from "@/components/park/ParkComplexDashboard";
+import { isTouristComplexOrWaterPark } from "@/types/parkComplex";
+import { AgencyDashboard } from "@/components/agency/AgencyDashboard";
+import { isTravelAgencyOrTourOperator } from "@/types/agencyTourOperator";
+import { CreatorDashboard } from "@/components/creator/CreatorDashboard";
+import { isCreatorOrInfluencer } from "@/types/creatorInfluencer";
+import { Waves, Compass, Camera } from "lucide-react";
+
+
 
 
 interface Establishment {
@@ -239,6 +248,9 @@ export function OwnerDashboard() {
   }, []);
   const [operacionesSubTab, setOperacionesSubTab] = useState<"reservas" | "disponibilidad" | "timeline">("reservas");
   const [marketingSubTab, setMarketingSubTab] = useState<"descuentos" | "leads" | "reviews" | "channel-manager">("leads");
+  const [viewModeOverride, setViewModeOverride] = useState<'auto' | 'park' | 'agency' | 'creator' | 'traditional'>('auto');
+
+
 
   const [selectedCalendarEst, setSelectedCalendarEst] = useState<number | "">("");
   const [currentTenantConfig, setCurrentTenantConfig] = useState<TenantConfig | null>(null);
@@ -2201,14 +2213,42 @@ export function OwnerDashboard() {
     { name: "Semana 4", ingresos: monthlyRevenue }
   ];
 
-  const channelData = activeReservations.length > 0 ? [
-    { name: "Reserva Directa", value: 100, color: "#00C8D4" }
-  ] : [
-    { name: "Sin Reservas Aún", value: 100, color: "#94A3B8" }
-  ];
+  const isParkComplexMode = viewModeOverride === 'park' || (viewModeOverride === 'auto' && isTouristComplexOrWaterPark(activeEstablishment));
+  const isAgencyMode = viewModeOverride === 'agency' || (viewModeOverride === 'auto' && isTravelAgencyOrTourOperator(activeEstablishment));
+  const isCreatorMode = viewModeOverride === 'creator' || (viewModeOverride === 'auto' && isCreatorOrInfluencer(activeEstablishment));
+
+  if (isCreatorMode) {
+    return (
+      <CreatorDashboard
+        establishment={activeEstablishment}
+        onSwitchToTraditionalDashboard={() => setViewModeOverride('traditional')}
+      />
+    );
+  }
+
+  if (isAgencyMode) {
+    return (
+      <AgencyDashboard
+        establishment={activeEstablishment}
+        onSwitchToTraditionalDashboard={() => setViewModeOverride('traditional')}
+      />
+    );
+  }
+
+
+  if (isParkComplexMode) {
+    return (
+      <ParkComplexDashboard
+        establishment={activeEstablishment}
+        onSwitchToTraditionalDashboard={() => setViewModeOverride('traditional')}
+      />
+    );
+  }
+
 
   return (
     <div className="min-h-screen bg-gray-50/30 pb-20">
+
       {/* Impersonate Assistance Bar */}
       {isAdmin && impersonateId && (
         <div className="bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] p-3 text-center text-xs font-bold text-white flex items-center justify-between gap-3 shadow-md relative z-30">
@@ -2301,18 +2341,47 @@ export function OwnerDashboard() {
             </div>
 
             {/* Status CONECTADO (Estilo idéntico a Print 1 del Panel Admin) */}
-            <div className="flex items-center gap-3 bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl px-4 py-2.5 text-xs text-white shrink-0 shadow-lg">
-              <div className="text-right">
-                <p className="text-[9px] uppercase font-black text-[#00C8D4] tracking-wider">CONECTADO</p>
-                <p className="font-bold text-white text-xs truncate max-w-[180px]">{user?.email || "hotelesdevenezuela"}</p>
-              </div>
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#FF0096] to-[#9B00CC] flex items-center justify-center text-white font-black text-sm uppercase shadow-sm">
-                {(user?.email || "H").charAt(0)}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setViewModeOverride('park')}
+                className="flex items-center gap-2 bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] text-white px-3.5 py-2.5 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border border-white/20"
+              >
+                <Waves className="w-4 h-4 text-white" />
+                <span className="hidden sm:inline">Vista Parque Acuático</span>
+              </button>
+
+              <button
+                onClick={() => setViewModeOverride('agency')}
+                className="flex items-center gap-2 bg-gradient-to-r from-[#9B00CC] to-[#00C8D4] text-white px-3.5 py-2.5 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border border-white/20"
+              >
+                <Compass className="w-4 h-4 text-white" />
+                <span className="hidden sm:inline">Vista Agencia / DMC</span>
+              </button>
+
+              <button
+                onClick={() => setViewModeOverride('creator')}
+                className="flex items-center gap-2 bg-gradient-to-r from-[#FF0096] to-[#00C8D4] text-white px-3.5 py-2.5 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border border-white/20"
+              >
+                <Camera className="w-4 h-4 text-white" />
+                <span className="hidden sm:inline">Vista Creador / Desk Hub</span>
+              </button>
+
+
+              <div className="flex items-center gap-3 bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl px-4 py-2.5 text-xs text-white shrink-0 shadow-lg">
+
+                <div className="text-right">
+                  <p className="text-[9px] uppercase font-black text-[#00C8D4] tracking-wider">CONECTADO</p>
+                  <p className="font-bold text-white text-xs truncate max-w-[180px]">{user?.email || "hotelesdevenezuela"}</p>
+                </div>
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#FF0096] to-[#9B00CC] flex items-center justify-center text-white font-black text-sm uppercase shadow-sm">
+                  {(user?.email || "H").charAt(0)}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
 
       {/* Recuadro Degradado Fucsia Magenta/Púrpura - Panel de Control Ejecutivo */}
       <div className="max-w-7xl mx-auto px-6 pt-6 pb-2">
