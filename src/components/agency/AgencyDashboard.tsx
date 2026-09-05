@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   Compass, ShieldCheck, Ticket, Package, Wallet, Users,
-  RefreshCw, Building2, Activity, Layers, FileCheck
+  RefreshCw, Building2, Activity, Layers, FileCheck, Calendar
 } from "lucide-react";
 import { useAgencyTourOperatorRealtime } from "../../hooks/useAgencyTourOperatorRealtime";
 import { AgencyKpiHeader } from "./AgencyKpiHeader";
@@ -11,6 +11,7 @@ import { AgencySupplierSettlement } from "./AgencySupplierSettlement";
 import { AgencyPassengerManifest } from "./AgencyPassengerManifest";
 import { AgencyNewQuoteModal } from "./AgencyNewQuoteModal";
 import { AgencyQuickActions } from "./AgencyQuickActions";
+import { DashboardAgendaCalendar } from "../agenda/DashboardAgendaCalendar";
 import { ConstellationBackground } from "../ConstellationBackground";
 
 interface AgencyDashboardProps {
@@ -48,7 +49,7 @@ export const AgencyDashboard: React.FC<AgencyDashboardProps> = ({
     refresh
   } = useAgencyTourOperatorRealtime(estId);
 
-  const [activeTab, setActiveTab] = useState<"paquetes" | "itinerarios" | "liquidaciones" | "manifiesto">("paquetes");
+  const [activeTab, setActiveTab] = useState<"paquetes" | "itinerarios" | "liquidaciones" | "manifiesto" | "agenda">("paquetes");
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
 
   return (
@@ -169,6 +170,18 @@ export const AgencyDashboard: React.FC<AgencyDashboardProps> = ({
             <Users className="w-4 h-4" />
             <span>Manifiesto de Pasajeros (Rooming)</span>
           </button>
+
+          <button
+            onClick={() => setActiveTab("agenda")}
+            className={`px-5 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center space-x-2 shrink-0 ${
+              activeTab === "agenda"
+                ? "bg-gradient-to-r from-[#00C8D4] to-[#FF0096] text-white shadow-lg shadow-[#00C8D4]/20"
+                : "bg-slate-900/60 border border-white/10 text-slate-400 hover:text-white"
+            }`}
+          >
+            <Calendar className="w-4 h-4" />
+            <span>Agenda & Salidas Drag & Drop</span>
+          </button>
         </div>
 
         {/* Tab Content */}
@@ -181,16 +194,15 @@ export const AgencyDashboard: React.FC<AgencyDashboardProps> = ({
         )}
 
         {activeTab === "liquidaciones" && (
-          <AgencySupplierSettlement
-            supplierPayments={supplierPayments}
-            expeditionExpenses={expeditionExpenses}
-            onPaySupplier={paySupplier}
-            onAddExpeditionExpense={addExpeditionExpense}
-          />
+          <AgencySupplierSettlement payments={supplierPayments} expenses={expeditionExpenses} onPaySupplier={paySupplier} onAddExpense={addExpeditionExpense} />
         )}
 
         {activeTab === "manifiesto" && (
-          <AgencyPassengerManifest quotes={quotes} passengers={passengers} onAddPassenger={addPassenger} />
+          <AgencyPassengerManifest passengers={passengers} onAddPassenger={addPassenger} />
+        )}
+
+        {activeTab === "agenda" && (
+          <DashboardAgendaCalendar establishmentId={estId} portalTitle="Agenda de Salidas, Itinerarios & Operaciones DMC" themeColor="#9B00CC" />
         )}
 
       </div>

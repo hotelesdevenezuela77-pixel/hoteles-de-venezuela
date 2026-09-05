@@ -7,6 +7,8 @@ import { useCreatorInfluencerRealtime } from "../../hooks/useCreatorInfluencerRe
 import { CreatorKpiHeader } from "./CreatorKpiHeader";
 import { CreatorMapHub } from "./CreatorMapHub";
 import { CreatorEditorialCalendar } from "./CreatorEditorialCalendar";
+import { CreatorRouteExpeditionMap } from "./CreatorRouteExpeditionMap";
+import { DashboardAgendaCalendar } from "../agenda/DashboardAgendaCalendar";
 import { CreatorDealsManager } from "./CreatorDealsManager";
 import { CreatorRouteExpenses } from "./CreatorRouteExpenses";
 import { CreatorAuditHub } from "./CreatorAuditHub";
@@ -29,7 +31,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
   onSwitchToTraditionalDashboard
 }) => {
   const estId = establishment?.id || 1;
-  const creatorName = establishment?.name || "Creador de Contenido & Embajador de Viajes VIP";
+  const creatorName = establishment?.name || "Aura Croce";
 
   const {
     expeditions,
@@ -85,7 +87,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
                   {creatorName}
                 </h1>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Trazador de Coordenadas GPS • Calendario Editorial Drag & Drop • Auditorías Técnicas de Posadas
+                  Trazador de Coordenadas GPS en Vivo • Calendario Editorial Drag & Drop • Auditorías Técnicas de Posadas
                 </p>
               </div>
             </div>
@@ -145,7 +147,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
             }`}
           >
             <Calendar className="w-4 h-4" />
-            <span>Calendario Editorial Drag & Drop</span>
+            <span>Agenda & Calendario Drag & Drop</span>
           </button>
 
           <button
@@ -187,11 +189,11 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
 
         {/* Tab Content */}
         {activeTab === "rutas" && (
-          <CreatorMapHub expeditions={expeditions} waypoints={waypoints} onImportWaypoints={importWaypoints} />
+          <CreatorRouteExpeditionMap establishmentId={estId} creatorName={creatorName} />
         )}
 
         {activeTab === "editorial" && (
-          <CreatorEditorialCalendar tasks={tasks} onAddTask={addEditorialTask} onUpdateStatus={updateTaskStatus} />
+          <DashboardAgendaCalendar establishmentId={estId} portalTitle={`Agenda Editorial & Entregables de ${creatorName}`} themeColor="#FF0096" />
         )}
 
         {activeTab === "marcas" && (

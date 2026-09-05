@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   Waves, ShieldCheck, QrCode, ShoppingBag, Ship, Wallet,
-  Utensils, RefreshCw, Sparkles, Building2, ExternalLink, Activity
+  Utensils, RefreshCw, Sparkles, Building2, ExternalLink, Activity, Calendar
 } from "lucide-react";
 import { useParkComplexRealtime } from "../../hooks/useParkComplexRealtime";
 import { ParkKpiHeader } from "./ParkKpiHeader";
@@ -12,6 +12,7 @@ import { ParkFoodAndBeverage } from "./ParkFoodAndBeverage";
 import { ParkExpensesModule } from "./ParkExpensesModule";
 import { ParkBoatDispatchModal } from "./ParkBoatDispatchModal";
 import { ParkQuickActions } from "./ParkQuickActions";
+import { DashboardAgendaCalendar } from "../agenda/DashboardAgendaCalendar";
 import { ConstellationBackground } from "../ConstellationBackground";
 
 interface ParkComplexDashboardProps {
@@ -56,7 +57,7 @@ export const ParkComplexDashboard: React.FC<ParkComplexDashboardProps> = ({
   const [isBoatModalOpen, setIsBoatModalOpen] = useState(false);
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<"operaciones" | "restaurante" | "gastos">("operaciones");
+  const [activeTab, setActiveTab] = useState<"operaciones" | "restaurante" | "gastos" | "agenda">("operaciones");
 
   return (
     <div className="relative min-h-screen bg-[#0e011f] text-slate-100 font-sans pb-28">
@@ -162,7 +163,19 @@ export const ParkComplexDashboard: React.FC<ParkComplexDashboardProps> = ({
             }`}
           >
             <Wallet className="w-4 h-4" />
-            <span>Gastos Operativos del Día</span>
+            <span>Control de Gastos & Cajas</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("agenda")}
+            className={`px-5 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center space-x-2 shrink-0 ${
+              activeTab === "agenda"
+                ? "bg-gradient-to-r from-[#9B00CC] to-[#00C8D4] text-white shadow-lg shadow-[#9B00CC]/20"
+                : "bg-slate-900/60 border border-white/10 text-slate-400 hover:text-white"
+            }`}
+          >
+            <Calendar className="w-4 h-4" />
+            <span>Agenda & Eventos Drag & Drop</span>
           </button>
         </div>
 
@@ -183,6 +196,10 @@ export const ParkComplexDashboard: React.FC<ParkComplexDashboardProps> = ({
 
         {activeTab === "gastos" && (
           <ParkExpensesModule expenses={expenses} onAddExpense={addExpense} />
+        )}
+
+        {activeTab === "agenda" && (
+          <DashboardAgendaCalendar establishmentId={estId} portalTitle="Agenda de Eventos & Operaciones del Parque Acuático" themeColor="#00C8D4" />
         )}
 
       </div>
