@@ -723,19 +723,19 @@ export function AddEstablishmentWizardModal({
                       />
                     </div>
 
-                    {/* Descripción Comercial (máx 150-200 car) */}
+                    {/* Descripción Comercial (máx 150-200 car para Botón 1, 500 car para Botón 2) */}
                     <div className="md:col-span-3">
                       <div className="flex justify-between items-center mb-1">
                         <label className="block text-[10px] uppercase font-black text-slate-500 tracking-wider">
-                          Descripción o Reseña Comercial (Máximo 200 caracteres)
+                          Descripción o Reseña Comercial ({selectedType === "boton2" ? "Máximo 500 caracteres" : "Máximo 200 caracteres"})
                         </label>
-                        <span className={`text-[10px] font-bold ${formData.description.length > 200 ? 'text-red-500' : 'text-slate-400'}`}>
-                          {formData.description.length} / 200
+                        <span className={`text-[10px] font-bold ${formData.description.length > (selectedType === "boton2" ? 500 : 200) ? 'text-red-500' : 'text-slate-400'}`}>
+                          {formData.description.length} / {selectedType === "boton2" ? 500 : 200}
                         </span>
                       </div>
                       <textarea
                         rows={2}
-                        maxLength={200}
+                        maxLength={selectedType === "boton2" ? 500 : 200}
                         placeholder="Resumen atractivo sobre el establecimiento, virtudes de su entorno y servicios destacados..."
                         value={formData.description}
                         onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
@@ -1516,6 +1516,41 @@ export function AddEstablishmentWizardModal({
                               onClick={() => handleToggleService(item)}
                               className={`p-2.5 rounded-xl border text-[11px] font-bold text-left flex items-center justify-between transition-all cursor-pointer ${
                                 active ? "bg-amber-600 text-white border-amber-600" : "bg-white text-slate-700 border-amber-200"
+                              }`}
+                            >
+                              <span className="line-clamp-1">{item}</span>
+                              {active ? <Check className="w-3.5 h-3.5 shrink-0" /> : <Plus className="w-3.5 h-3.5 shrink-0 text-slate-400" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  {(selectedType === "boton2" || formData.accommodation_type === "chalets_montana") && (
+                    <div className="space-y-3 pt-3 border-t border-slate-200 bg-[#00C8D4]/10 p-4 rounded-2xl border border-[#00C8D4]/30">
+                      <h5 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                        <Sparkles className="w-4 h-4 text-[#00C8D4]" />
+                        <span>C04.4 Instalaciones Específicas para Chalets de Montaña / Esquí</span>
+                      </h5>
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                        {[
+                          "Chimenea de leña", "Estufa de pellets o casete térmico", "Ropa de cama térmica/nórdica alto gramaje",
+                          "Revestimientos y suelos de madera noble", "Bañera profunda / Jacuzzi privado", "Toalleros eléctricos calefactados en baños",
+                          "Set de Fondue", "Raclette", "Despensa gran capacidad nieve", "Calefacción suelo radiante / radiadores",
+                          "Termostatos programables por plantas", "Jacuzzi exterior / Bañera nórdica (Hot Tub)", "Balcón o terraza panorámica pistas/montaña",
+                          "Terraza con estufas de exterior", "Zona almacenamiento leña cubierta", "Guardaesquís (Ski Room)",
+                          "Secador de botas de esquí", "Zona vestuario térmico (Mudroom)", "Acceso Ski-in / Ski-out", "Garaje privado cubierto calefactado",
+                          "Sauna finlandesa / Baño turco privado", "Sauna finlandesa / Baño turco compartido", "Shuttle privado transfer telecabinas",
+                          "Venta o entrega de Forfaits en chalet", "Reserva de clases de esquí", "Chef privado a domicilio post-esquí",
+                          "Entrega diaria de pan fresco y repostería", "Alquiler / provisión raquetas de nieve", "Trineos para niños", "Guías de montaña esquí de travesía / heliesquí"
+                        ].map(item => {
+                          const active = formData.services.includes(item);
+                          return (
+                            <button
+                              key={item}
+                              type="button"
+                              onClick={() => handleToggleService(item)}
+                              className={`p-2.5 rounded-xl border text-[11px] font-bold text-left flex items-center justify-between transition-all cursor-pointer ${
+                                active ? "bg-[#00C8D4] text-white border-[#00C8D4]" : "bg-white text-slate-700 border-slate-200 hover:border-slate-300"
                               }`}
                             >
                               <span className="line-clamp-1">{item}</span>

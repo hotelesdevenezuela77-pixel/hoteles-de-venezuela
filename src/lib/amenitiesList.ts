@@ -97,6 +97,7 @@ export const POINT_OF_INTEREST_TYPES = [
 
 export const BOTON_CATEGORIES_MAPPING = {
   boton1: [
+    { id: "apartamentos", label: "Apartamentos", code: "C00.1.1" },
     { id: "hoteles", label: "Hoteles", code: "C00.1.3" },
     { id: "hostales_posadas_pensiones", label: "Hostales, Posadas y Pensiones", code: "C00.1.4" },
     { id: "habitaciones_casas_particulares", label: "Habitaciones en casas particulares", code: "C00.1.5" },
@@ -110,19 +111,19 @@ export const BOTON_CATEGORIES_MAPPING = {
     { id: "casas_chalets_rurales", label: "Casas y Chalets rurales", code: "C00.1.2" },
     { id: "apartahotel", label: "Apartahotel", code: "C00.1.6" },
     { id: "villas", label: "Villas", code: "C00.1.10" },
-    { id: "chalets_montana", label: "Chalets de montaña", code: "C00.1.16" },
+    { id: "chalets_montana", label: "Casas / Chalets de montaña", code: "C00.1.16" },
   ],
   boton3: [
-    { id: "campings", label: "Campings", code: "C00.1.12" },
+    { id: "campings", label: "Campings, Glampings & Eco-Lodges", code: "C00.1.12" },
   ],
   boton4: [
-    { id: "love_hotels", label: "Love hotels", code: "C00.1.15" },
+    { id: "love_hotels", label: "Love hotels", code: "C00.1.14" },
   ],
   boton5: [
-    { id: "barcos", label: "Barcos (veleros, yates, catamaranes o houseboats)", code: "C00.1.14" },
+    { id: "barcos", label: "Barcos (veleros, yates, catamaranes o houseboats)", code: "C00.1.13" },
   ],
   boton6: [
-    { id: "restaurantes", label: "Restaurantes", code: "C00.1.22" },
+    { id: "restaurantes", label: "Restaurantes", code: "C00.1.16" },
   ],
 };
 
