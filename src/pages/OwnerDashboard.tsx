@@ -925,16 +925,22 @@ export function OwnerDashboard() {
     try {
       setLoading(true);
 
-      // 1. Get establishments owned by this user
-      const { data: estData, error: estError } = await supabase
+      // 1. Get establishments owned by this user or impersonated establishment
+      let estQuery = supabase
         .from("establishments")
         .select(`
           *,
           categories (name),
           destinations (name)
-        `)
-        .eq("owner_user_id", activeOwnerId)
-        .order("created_at", { ascending: false });
+        `);
+
+      if (isAdmin && impersonateEstablishmentId) {
+        estQuery = estQuery.eq("id", impersonateEstablishmentId);
+      } else {
+        estQuery = estQuery.eq("owner_user_id", activeOwnerId);
+      }
+
+      const { data: estData, error: estError } = await estQuery.order("created_at", { ascending: false });
 
       if (estError) throw estError;
 

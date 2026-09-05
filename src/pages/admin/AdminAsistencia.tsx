@@ -80,17 +80,15 @@ export default function AdminAsistencia() {
   });
 
   const handleStartAssistance = (row: EstablishmentRow) => {
-    if (!row.owner_user_id) {
-      alert("Este establecimiento no posee un Owner User ID válido para asistencia.");
-      return;
-    }
+    const targetOwnerId = row.owner_user_id || "admin_assistance_mode";
     // Set local storage variables
-    localStorage.setItem("hdv_impersonate_owner_user_id", row.owner_user_id);
+    localStorage.setItem("hdv_impersonate_owner_user_id", targetOwnerId);
     localStorage.setItem("hdv_impersonate_owner_user_name", row.name);
     localStorage.setItem("hdv_impersonate_establishment_id", String(row.id));
     // Redirect to Owner Dashboard (mapped as /mis-negocios)
     setLocation("/mis-negocios");
   };
+
 
   const filteredRows = (rows || []).filter(r => {
     if (!r) return false;
