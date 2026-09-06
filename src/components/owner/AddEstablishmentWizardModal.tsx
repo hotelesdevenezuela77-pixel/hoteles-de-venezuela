@@ -62,12 +62,25 @@ export function AddEstablishmentWizardModal({
   onSuccess
 }: AddEstablishmentWizardModalProps) {
   // Estado para la ventana previa (6 Botones) o Wizard activo
-  const [selectedType, setSelectedType] = useState<"boton1" | "boton2" | "boton3" | "boton4" | "boton5" | "boton6" | null>(null);
-  const [currentStep, setCurrentStep] = useState<number>(1);
+  const [selectedType, setSelectedType] = useState<"boton1" | "boton2" | "boton3" | "boton4" | "boton5" | "boton6" | null>(() => {
+    if (typeof window !== "undefined") {
+      const saved = sessionStorage.getItem("hdv_wizard_draft_type");
+      if (saved) return saved as any;
+    }
+    return null;
+  });
+
+  const [currentStep, setCurrentStep] = useState<number>(() => {
+    if (typeof window !== "undefined") {
+      const saved = sessionStorage.getItem("hdv_wizard_draft_step");
+      if (saved) return Number(saved) || 1;
+    }
+    return 1;
+  });
+
   const [submitting, setSubmitting] = useState<boolean>(false);
 
-  // Estado del formulario Wizard
-  const [formData, setFormData] = useState({
+  const defaultFormData = {
     // SECCIÓN 1: DATOS GENERALES, UBICACIÓN & CERTIFICACIONES
     name: "",
     accommodation_type: "hoteles",
@@ -155,7 +168,41 @@ export function AddEstablishmentWizardModal({
     poi_name: "",
     poi_distance: "",
     points_of_interest: [] as PointOfInterestItem[]
+  };
+
+  // Estado del formulario Wizard con auto-recuperación de borrador
+  const [formData, setFormData] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = sessionStorage.getItem("hdv_wizard_draft_formData");
+      if (saved) {
+        try {
+          return { ...defaultFormData, ...JSON.parse(saved) };
+        } catch (e) {
+          console.warn("Error leyendo borrador del asistente:", e);
+        }
+      }
+    }
+    return defaultFormData;
   });
+
+  // Guardar automáticamente el borrador en sessionStorage al modificar cualquier campo o paso
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (selectedType) {
+        sessionStorage.setItem("hdv_wizard_draft_type", selectedType);
+        sessionStorage.setItem("hdv_wizard_draft_step", String(currentStep));
+        sessionStorage.setItem("hdv_wizard_draft_formData", JSON.stringify(formData));
+      }
+    }
+  }, [selectedType, currentStep, formData]);
+
+  const clearWizardDraft = () => {
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem("hdv_wizard_draft_type");
+      sessionStorage.removeItem("hdv_wizard_draft_step");
+      sessionStorage.removeItem("hdv_wizard_draft_formData");
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -215,8 +262,10 @@ export function AddEstablishmentWizardModal({
   };
 
   const handleResetModal = () => {
+    clearWizardDraft();
     setSelectedType(null);
     setCurrentStep(1);
+    setFormData(defaultFormData);
     onClose();
   };
 
@@ -1525,6 +1574,8 @@ export function AddEstablishmentWizardModal({
                         })}
                       </div>
                     </div>
+                  )}
+
                   {(selectedType === "boton2" || formData.accommodation_type === "chalets_montana") && (
                     <div className="space-y-3 pt-3 border-t border-slate-200 bg-[#00C8D4]/10 p-4 rounded-2xl border border-[#00C8D4]/30">
                       <h5 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">

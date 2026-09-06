@@ -78,6 +78,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const userRef = React.useRef<any>(user);
+  userRef.current = user;
+
   useEffect(() => {
     // 1. Obtener sesión activa al cargar
     const storedBypass = localStorage.getItem("hdv_admin_bypass");
@@ -120,7 +123,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (localStorage.getItem("hdv_admin_bypass")) {
         return;
       }
-      setLoading(true);
+      
+      // Evitar desmontar la aplicación mostrando la pantalla de carga cuando el usuario ya está autenticado
+      // (por ejemplo al cambiar de pestaña o refrescar token en segundo plano)
+      const isBackgroundSync = !!userRef.current && (_event === "TOKEN_REFRESHED" || _event === "USER_UPDATED" || !!session);
+      
+      if (!isBackgroundSync) {
+        setLoading(true);
+      }
+
       if (session) {
         setUser(session.user);
         await fetchProfile(
@@ -143,7 +154,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(null);
         setProfile(null);
       }
-      setLoading(false);
+
+      if (!isBackgroundSync) {
+        setLoading(false);
+      }
     });
 
     return () => subscription.unsubscribe();
