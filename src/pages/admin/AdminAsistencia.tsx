@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { useQuery } from "@tanstack/react-query";
 import {
   Building2, Users, Search, ExternalLink, HelpCircle,
-  ShieldAlert, Loader2, CheckCircle, Clock
+  ShieldAlert, Loader2, CheckCircle, Clock, Link as LinkIcon
 } from "lucide-react";
 
 interface EstablishmentRow {
@@ -28,6 +28,15 @@ export default function AdminAsistencia() {
   const { user, profile, loading: authLoading } = useAuth();
   const [, setLocation] = useLocation();
   const [search, setSearch] = useState("");
+  const [copiedId, setCopiedId] = useState<number | null>(null);
+
+  const handleCopyClaimLink = (row: EstablishmentRow) => {
+    const claimSlug = row.slug || (row.name.toLowerCase().includes("aura") ? "aura-croce" : String(row.id));
+    const link = `${window.location.origin}/mis-negocios?claim=${claimSlug}`;
+    navigator.clipboard.writeText(link);
+    setCopiedId(row.id);
+    setTimeout(() => setCopiedId(null), 3000);
+  };
 
   // Redirect if not admin
   useEffect(() => {
@@ -298,16 +307,38 @@ export default function AdminAsistencia() {
                     
                     {/* Botón Acción */}
                     <td className="p-4 text-right">
-                      <button
-                        onClick={() => handleStartAssistance(row)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-white transition-all hover:scale-103 active:scale-97 cursor-pointer shadow-lg shadow-pink-500/10"
-                        style={{
-                          background: `linear-gradient(135deg, ${FUCSIA} 0%, ${PURPURA} 100%)`
-                        }}
-                      >
-                        <span>Asistir Propietario</span>
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleCopyClaimLink(row)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-[#00C8D4] bg-[#00C8D4]/10 border border-[#00C8D4]/30 hover:bg-[#00C8D4]/20 transition-all cursor-pointer shadow-sm"
+                          title="Copiar enlace de invitación especial para que se loguee con Gmail y vincule este perfil"
+                        >
+                          {copiedId === row.id ? (
+                            <>
+                              <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                              <span className="text-emerald-400">¡Link Copiado!</span>
+                            </>
+                          ) : (
+                            <>
+                              <LinkIcon className="w-3.5 h-3.5" />
+                              <span>Copiar Link Gmail</span>
+                            </>
+                          )}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleStartAssistance(row)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-white transition-all hover:scale-103 active:scale-97 cursor-pointer shadow-lg shadow-pink-500/10"
+                          style={{
+                            background: `linear-gradient(135deg, ${FUCSIA} 0%, ${PURPURA} 100%)`
+                          }}
+                        >
+                          <span>Asistir Propietario</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))

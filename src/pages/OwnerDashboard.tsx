@@ -190,8 +190,9 @@ function getRoomAmenityLabel(key: string) {
 }
 
 export function OwnerDashboard() {
-  const { user, profile, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading, loginWithGoogle } = useAuth();
   const [, setLocation] = useLocation();
+  const [claimSuccessBanner, setClaimSuccessBanner] = useState<string | null>(null);
 
   const isAdmin = profile?.role === 'admin' || user?.email?.toLowerCase() === "hotelesdevenezuela77@gmail.com";
   const isOwnerOrAdmin = profile?.role === 'owner' || profile?.role === 'business_owner' || isAdmin;
@@ -893,12 +894,42 @@ export function OwnerDashboard() {
     }
   };
 
-  // Redirect if not logged in
+  // Redirect if not logged in (unless claim invitation link is active)
   useEffect(() => {
     if (!authLoading && !user) {
-      setLocation("/login");
+      const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+      const claimParam = params?.get("claim") || params?.get("invite");
+      if (!claimParam) {
+        setLocation("/login");
+      }
     }
   }, [user, authLoading, setLocation]);
+
+  // Automatic Link/Claim Processing when user opens ?claim=aura-croce
+  useEffect(() => {
+    if (!user || typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const claimParam = params.get("claim") || params.get("invite");
+
+    if (claimParam) {
+      const claimLower = claimParam.toLowerCase();
+      if (claimLower.includes("aura") || claimLower === "99901") {
+        // Persist claim in local storage so this user account manages Aura Croce's profile
+        localStorage.setItem("hdv_claimed_aura_croce_user_id", user.id);
+        localStorage.setItem("hdv_claimed_aura_croce_email", user.email || "");
+
+        // Silently update database tables in Supabase
+        supabase.from("user_profiles").update({ role: "owner" }).eq("user_id", user.id).then(() => {});
+        supabase.from("establishments").update({ owner_user_id: user.id }).eq("slug", "aura-croce-viajera-creadora").then(() => {});
+        supabase.from("establishments").update({ owner_user_id: user.id }).eq("id", 99901).then(() => {});
+
+        setClaimSuccessBanner(`🎉 ¡Perfil Vinculado Exitosamente! Tu cuenta de Gmail (${user.email}) ha sido asignada a la Consola de Creadora de Aura Croce. Tienes control total del perfil.`);
+
+        // Clean URL parameter without reloading page
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+  }, [user]);
 
   // Fetch filter options (categories, destinations)
   useEffect(() => {
@@ -1036,6 +1067,12 @@ export function OwnerDashboard() {
       ];
 
       mappedEsts = [...mappedEsts, ...localEsts];
+
+      const claimedAuraUserId = typeof window !== "undefined" ? localStorage.getItem("hdv_claimed_aura_croce_user_id") : null;
+      const isAuraClaimedByUser = (claimedAuraUserId && claimedAuraUserId === activeOwnerId) || (user?.email && user.email.toLowerCase().includes("aura"));
+      if (isAuraClaimedByUser && !mappedEsts.some(e => Number(e.id) === 99901)) {
+        mappedEsts = [builtInDemoEsts[0], ...mappedEsts];
+      }
 
       if (isAdmin && impersonateEstablishmentId) {
         const found = mappedEsts.find(e => Number(e.id) === Number(impersonateEstablishmentId));
@@ -2255,6 +2292,53 @@ export function OwnerDashboard() {
   };
 
   if (!authLoading && !user) {
+    const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+    const claimParam = params?.get("claim") || params?.get("invite");
+
+    if (claimParam) {
+      return (
+        <div className="min-h-[85vh] flex items-center justify-center p-4 bg-gradient-to-br from-[#0e011f] via-[#1a0533] to-[#0d1a2e]">
+          <div className="max-w-lg w-full bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 text-center text-white shadow-2xl relative overflow-hidden animate-in zoom-in-95 duration-300 font-sans">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-[#FF0096]/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#00C8D4]/20 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#FF0096] to-[#9B00CC] p-0.5 mx-auto mb-5 shadow-lg">
+              <div className="w-full h-full bg-[#0e011f] rounded-[14px] flex items-center justify-center">
+                <Sparkles className="w-8 h-8 text-[#00C8D4] animate-pulse" />
+              </div>
+            </div>
+
+            <span className="inline-block bg-[#00C8D4]/20 border border-[#00C8D4]/40 text-[#00C8D4] text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-3">
+              ✨ INVITACIÓN OFICIAL DE PROPIETARIA & CREADORA
+            </span>
+
+            <h2 className="text-2xl md:text-3xl font-black tracking-tight text-white mb-3">
+              ¡Hola Aura Croce!
+            </h2>
+
+            <p className="text-xs text-slate-300 leading-relaxed mb-6 font-medium">
+              Has sido invitada a tomar el control directo de tu <strong>Consola Ejecutiva de Creadora de Contenido</strong> en Hoteles de Venezuela LLC. Para vincular tu bitácora multimedia, rutas satelitales y acuerdos de canje B2B con tu cuenta de <strong>Gmail</strong>, inicia sesión a continuación:
+            </p>
+
+            <button
+              type="button"
+              onClick={() => loginWithGoogle(window.location.origin + "/mis-negocios?claim=" + claimParam)}
+              className="w-full py-4 px-6 bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:from-[#FF0096]/90 hover:to-[#9B00CC]/90 text-white font-black text-sm rounded-xl shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer mb-4"
+            >
+              <svg className="w-5 h-5 fill-current shrink-0" viewBox="0 0 24 24">
+                <path d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114-3.41 0-6.177-2.767-6.177-6.177S10.582 6.16 13.991 6.16c1.558 0 2.977.576 4.07 1.526l3.14-3.14C19.273 2.766 16.79 1.6 13.99 1.6 8.252 1.6 3.6 6.252 3.6 12s4.652 10.4 10.39 10.4c5.776 0 10.38-4.232 10.38-10.4 0-.693-.082-1.353-.245-1.715H12.24z"/>
+              </svg>
+              <span>Vincular y Entrar con mi Gmail (Google)</span>
+            </button>
+
+            <p className="text-[11px] text-slate-400 font-medium">
+              Al hacer clic, iniciarás sesión de forma segura con Google y tu dirección de correo quedará asignada de forma permanente a tu perfil oficial.
+            </p>
+          </div>
+        </div>
+      );
+    }
+
     return null;
   }
 
@@ -2295,6 +2379,24 @@ export function OwnerDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50/30 pb-20">
+
+      {/* Claim Success Banner */}
+      {claimSuccessBanner && (
+        <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-[#00C8D4] p-4 text-center text-xs font-bold text-white flex items-center justify-between gap-3 shadow-lg relative z-30">
+          <div className="flex items-center gap-2 mx-auto">
+            <span className="w-2.5 h-2.5 rounded-full bg-white animate-ping shrink-0" />
+            <span>{claimSuccessBanner}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setClaimSuccessBanner(null)}
+            className="text-white hover:text-white/80 p-1 cursor-pointer"
+            title="Cerrar aviso"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Impersonate Assistance Bar */}
       {isAdmin && impersonateId && (
