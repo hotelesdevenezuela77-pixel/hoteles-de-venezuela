@@ -50,17 +50,15 @@ export const PROPERTY_TYPES_DOCUMENT77 = [
   { id: "bed_and_breakfast", label: "Bed and breakfast", icon: "Coffee", code: "C00.1.9" },
   { id: "villas", label: "Villas", icon: "Palmtree", code: "C00.1.10" },
   { id: "hoteles_capsula", label: "Hoteles cápsula", icon: "Box", code: "C00.1.11" },
-  { id: "campings", label: "Campings", icon: "Tent", code: "C00.1.12" },
-  { id: "barcos", label: "Barcos (veleros, yates, catamaranes o houseboats)", icon: "Ship", code: "C00.1.14" },
-  { id: "love_hotels", label: "Love hotels", icon: "Heart", code: "C00.1.15" },
-  { id: "chalets_montana", label: "Chalets de montaña", icon: "Mountain", code: "C00.1.16" },
-  { id: "restaurantes", label: "Restaurantes", icon: "Utensils", code: "C00.1.22" },
-  { id: "glamping", label: "Glampings & Eco-Lodges (Pendiente)", icon: "Tent", code: "C05.1.13" },
+  { id: "campings", label: "Campings, Glampings & Eco-Lodges", icon: "Tent", code: "C00.1.12" },
+  { id: "barcos", label: "Barcos (veleros, yates, catamaranes o houseboats)", icon: "Ship", code: "C00.1.13" },
+  { id: "love_hotels", label: "Love hotels", icon: "Heart", code: "C00.1.14" },
+  { id: "chalets_montana", label: "Chalets de montaña", icon: "Mountain", code: "C00.1.15" },
+  { id: "restaurantes", label: "Restaurantes", icon: "Utensils", code: "C00.1.16" },
   { id: "resorts", label: "Resorts & Complejos Vacacionales (Pendiente)", icon: "Palmtree", code: "C05.1.17" },
   { id: "agencias_viaje", label: "Agencias de viaje (Pendiente)", icon: "Briefcase", code: "C05.1.18" },
   { id: "alquiler_carros", label: "Alquiler de carros (Pendiente)", icon: "Car", code: "C05.1.19" },
-  { id: "alquiler_yates", label: "Alquiler de Yates (Pendiente)", icon: "Ship", code: "C05.1.20" },
-  { id: "marinas", label: "Marinas (Pendiente)", icon: "Anchor", code: "C05.1.21" },
+  { id: "marinas", label: "Marinas (Pendiente)", icon: "Anchor", code: "C05.1.20" },
 ];
 
 export const CERTIFICATIONS_DOCUMENT77 = [
@@ -68,6 +66,13 @@ export const CERTIFICATIONS_DOCUMENT77 = [
   { id: "sello_legal_hdv", code: "C00.2.2", label: "Sello de garantía Legal HDV", badgeColor: "bg-[#00C8D4] text-white" },
   { id: "circuito_excelencia", code: "C00.2.3", label: "Circuito de Excelencia", badgeColor: "bg-[#9B00CC] text-white" },
   { id: "estrellas_michelin", code: "C00.2.4", label: "Estrellas Michelin", badgeColor: "bg-[#FF0096] text-white" },
+  { id: "llave_verde", code: "C00.2.5", label: "Llave verde", badgeColor: "bg-green-600 text-white" },
+  { id: "etiqueta_ecologica", code: "C00.2.6", label: "Etiqueta ecológica", badgeColor: "bg-teal-600 text-white" },
+  { id: "etiqueta_qualidog", code: "C00.2.7", label: "Etiqueta Qualidog", badgeColor: "bg-amber-600 text-white" },
+  { id: "accueil_velo", code: "C00.2.8", label: "Reconocimiento Accueil Vélo", badgeColor: "bg-cyan-600 text-white" },
+  { id: "turismo_discapacidad", code: "C00.2.9", label: "Turismo y discapacidad", badgeColor: "bg-blue-600 text-white" },
+  { id: "destination_excellence", code: "C00.2.10", label: "Marca Destination d'Excellence", badgeColor: "bg-indigo-600 text-white" },
+  { id: "alojamiento_pesca", code: "C00.2.11", label: "Alojamiento para la pesca", badgeColor: "bg-sky-600 text-white" },
 ];
 
 export const REGIONS_DOCUMENT77 = [
@@ -84,7 +89,7 @@ export const REGIONS_DOCUMENT77 = [
 
 export const POINT_OF_INTEREST_TYPES = [
   { id: "restaurantes_bares_cafeterias", code: "C00.5.1.1", label: "Restaurantes, Bares y Cafeterías" },
-  { id: "centros_comerciales", code: "C00.5.1.1b", label: "Centros comerciales" },
+  { id: "centros_comerciales", code: "C00.5.1.1b", label: "Centros comerciales / mercados" },
   { id: "playas", code: "C00.5.1.2", label: "Playas" },
   { id: "transporte", code: "C00.5.1.3", label: "Aeropuerto, estación de tren/autobús" },
   { id: "patrimonio_historico", code: "C00.5.1.4", label: "Patrimonio histórico (Edificios históricos, restos arqueológicos...)" },
@@ -92,7 +97,7 @@ export const POINT_OF_INTEREST_TYPES = [
   { id: "parques_naturales", code: "C00.5.1.6", label: "Parques naturales" },
   { id: "resto_atracciones", code: "C00.5.1.7", label: "Resto de atracciones turísticas (Zoológicos, parques recreativos...)" },
   { id: "hospitales_medicos", code: "C00.5.1.8", label: "Hospitales, clínicas, centros médicos" },
-  { id: "policia", code: "C00.5.1.8b", label: "Estación de policía" },
+  { id: "policia", code: "C00.5.1.9", label: "Estación de policía" },
 ];
 
 export const BOTON_CATEGORIES_MAPPING = {
@@ -111,7 +116,7 @@ export const BOTON_CATEGORIES_MAPPING = {
     { id: "casas_chalets_rurales", label: "Casas y Chalets rurales", code: "C00.1.2" },
     { id: "apartahotel", label: "Apartahotel", code: "C00.1.6" },
     { id: "villas", label: "Villas", code: "C00.1.10" },
-    { id: "chalets_montana", label: "Casas / Chalets de montaña", code: "C00.1.16" },
+    { id: "chalets_montana", label: "Casas / Chalets de montaña", code: "C00.1.15" },
   ],
   boton3: [
     { id: "campings", label: "Campings, Glampings & Eco-Lodges", code: "C00.1.12" },
@@ -126,6 +131,49 @@ export const BOTON_CATEGORIES_MAPPING = {
     { id: "restaurantes", label: "Restaurantes", code: "C00.1.16" },
   ],
 };
+
+export const STREET_TYPES_V9 = [
+  "AÑADIR OTRO", "ACCESO", "AGREGADO", "ALDEA", "ALAMEDA", "ANDADOR", "AREA", "ARRABAL",
+  "ARROYO", "ASENTAMIENTO", "AUTOPISTA", "AUTOVIA", "AVENIDA", "BAJADA", "BARRANCO",
+  "BARRIO", "BLOQUE", "BULEVAR", "CALLE", "CALLEJA", "CALLEJON", "CALZADA", "CAMINO",
+  "CAMPA", "CAMPING", "CASCO CENTRAL/HISTÓRICO", "CASERIO", "CIGARRAL", "CANAL", "CAÑADA",
+  "CARRETERA", "CARRERA", "CASA", "CENTRO COMERCIAL", "CENTRO EMPRESARIAL", "CERRADA",
+  "CHALET", "CINTURON", "CIRCUITO", "CIRCUNVALACIÓN", "COLONIA", "COMUNIDAD", "CONCEJO",
+  "CONJUNTO", "CONJUNTO CERRADO", "CONJUNTO RESIDENCIAL", "CUESTA/COSTANILLA", "DETRÁS",
+  "DIAGONAL", "DISEMINADOS", "DISTRIBUIDOR", "EDIFICIO", "ESCALERAS/ESCALINATA", "ESQUINA",
+  "ETAPA", "FASE", "FINCA", "FUNDO", "GLORIETA", "GRAN VIA", "GRANJA", "GRUPO", "HACIENDA",
+  "HATO", "JARDINES", "LADERA", "LOMA", "LOTE", "MANZANA", "MALECON", "MERCADO", "MONTE",
+  "MUELLE", "MUNICIPIO", "PARCELA", "PARQUE", "PARTIDA", "PASADIZO", "PASAJE", "PASARELA",
+  "PASEO", "PASEO DEL MAR", "PASEO MARITIMO", "PEATONAL", "PERIMETRAL", "PLAZA", "PLAZUELA",
+  "POBLADO", "POLIGONO", "PRIVADA", "PROLONGACION", "PUENTE", "QUINTA", "RAMAL", "RAMBLA",
+  "RAMPA", "REDOMA", "RESIDENCIA", "RETORNO", "RINCON/RINCONADA", "RONDA", "ROTONDA",
+  "RUA", "SECTOR", "SENDA", "SOLAR", "SUBIDA", "TERRENOS", "TORRE", "TORRENTE", "TRANSVERSAL",
+  "TRAVESIA", "TROCHA", "URBANIZACION", "VEREDA", "VIA", "VIADUCTO", "VIA PEATONAL",
+  "VIVIENDA", "ZONA INDUSTRIAL"
+];
+
+export const CAMPING_SUBTYPES_V9 = [
+  { id: "mobil_home", label: "Mobil-home", code: "C04.1.1.1" },
+  { id: "bungalow", label: "Bungalow", code: "C04.1.1.2" },
+  { id: "tienda_lona", label: "Tienda de lona", code: "C04.1.1.3" },
+  { id: "tiendas_safari", label: "Tiendas safari", code: "C04.1.1.4" },
+  { id: "tiendas_tipi", label: "Tiendas tipi", code: "C04.1.1.5" },
+  { id: "casas_arboles", label: "Casas en los árboles", code: "C04.1.1.6" },
+  { id: "yurtas", label: "Yurtas", code: "C04.1.1.7" },
+  { id: "cg_casa_chalet_cabana", label: "C/G Casa, Chalet, Cabaña", code: "C04.1.1.8" },
+  { id: "cg_apartamento", label: "C - Apartamento", code: "C04.1.1.9" },
+  { id: "parcela_tienda", label: "Parcela para tienda", code: "C04.1.1.10" },
+  { id: "parcela_caravana", label: "Parcela para caravana", code: "C04.1.1.11" },
+  { id: "parcela_autocaravana", label: "Parcela para autocaravana", code: "C04.1.1.12" }
+];
+
+export const ONLINE_PAYMENT_METHODS_V9 = [
+  { id: "tarjeta_visa_mc", code: "C03.3.6.1", label: "Tarjeta (VISA, MC)" },
+  { id: "bizum_espana", code: "C03.3.6.2", label: "Bizum (España)" },
+  { id: "binance_usdt_crypto", code: "C03.3.6.3", label: "Binance USDT / Crypto" },
+  { id: "pago_movil_ves", code: "C03.3.6.4", label: "Pago Móvil (Bs. VES)" },
+  { id: "zelle_usd_venezuela", code: "C03.3.6.5", label: "Zelle (USD) (Venezuela)" }
+];
 
 export const STAR_CATEGORIES_DOCUMENT77 = [
   { id: "1_estrella", code: "C00.3.1", label: "C00.3.1 - 1 Estrella", value: "1 estrella" },
