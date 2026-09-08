@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { ScriptGenerator } from "../components/ScriptGenerator";
 import { AmenitiesSelector } from "@/components/admin/AmenitiesSelector";
+import { PropertyRegistrationSelectorModal } from "@/components/admin/PropertyRegistrationSelectorModal";
 import { PROPERTY_TYPES_DOCUMENT77 } from "@/lib/amenitiesList";
 import { AvailabilityCalendar } from "../components/AvailabilityCalendar";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area, Legend } from "recharts";
@@ -4560,18 +4561,11 @@ export function OwnerDashboard() {
       </main>
       )}
 
-
-      {/* Add Establishment Modal (Nuevas Directrices PDF 1, 2 y 3) */}
-      <AddEstablishmentWizardModal
+      {/* Add Establishment Modal: Selector con los 6 Botones Oficiales (Doc 77 V.10) */}
+      <PropertyRegistrationSelectorModal
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
-        destinations={destinations}
-        categories={categories}
-        activeOwnerId={activeOwnerId}
-        onSuccess={fetchDashboardData}
       />
-
-
 
       {/* Add Room Modal / Agregar Unidad Operativa (Ancho Completo Ampliado) */}
       {newRoomModalOpen && (

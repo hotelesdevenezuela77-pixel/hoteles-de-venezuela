@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { AdminTabBar } from "@/components/admin/AdminTabBar";
+import { PropertyRegistrationSelectorModal } from "@/components/admin/PropertyRegistrationSelectorModal";
 import {
   PlusCircle, Search, Building2, Eye, Edit2, Trash2,
   Star, Award, Calendar, Megaphone, MessageSquare,
@@ -82,6 +83,7 @@ export function AdminEstablecimientos() {
   const [, setLocation] = useLocation();
   const [search, setSearch] = useState("");
   const [statusTab, setStatusTab] = useState("");
+  const [showSelectorModal, setShowSelectorModal] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
   const qc = useQueryClient();
 
@@ -228,14 +230,13 @@ export function AdminEstablecimientos() {
               </p>
             </div>
           </div>
-          <Link href="/admin/establecimientos/nuevo">
-            <button
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-xs font-bold border border-pink-700 cursor-pointer transition-transform hover:scale-102"
-              style={{ background: "linear-gradient(90deg, #FF0096, #9B00CC)" }}
-            >
-              <PlusCircle className="w-4 h-4" /> Agregar Establecimiento
-            </button>
-          </Link>
+          <button
+            onClick={() => setShowSelectorModal(true)}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-xs font-bold border border-pink-700 cursor-pointer transition-transform hover:scale-102"
+            style={{ background: "linear-gradient(90deg, #FF0096, #9B00CC)" }}
+          >
+            <PlusCircle className="w-4 h-4" /> Agregar Establecimiento
+          </button>
         </div>
       </div>
 
@@ -445,6 +446,11 @@ export function AdminEstablecimientos() {
           </div>
         )}
       </div>
+
+      <PropertyRegistrationSelectorModal
+        isOpen={showSelectorModal}
+        onClose={() => setShowSelectorModal(false)}
+      />
     </div>
   );
 }
