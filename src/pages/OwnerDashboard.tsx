@@ -1694,6 +1694,38 @@ export function OwnerDashboard() {
     loadTenantConfig();
   }, [selectedCalendarEst, establishments]);
 
+  // Sector classification helpers for view mode routing
+  const hasHotels = establishments.some(e => !isTouristComplexOrWaterPark(e) && !isTravelAgencyOrTourOperator(e) && !isCreatorOrInfluencer(e) && !isRestaurantOrGastronomy(e) && !isMarinaOrNauticalClub(e) && !isCarRentalOrFleet(e) && !isYachtCharterOrBoatRental(e));
+  const hasParks = establishments.some(e => isTouristComplexOrWaterPark(e));
+  const hasAgencies = establishments.some(e => isTravelAgencyOrTourOperator(e));
+  const hasCreators = establishments.some(e => isCreatorOrInfluencer(e));
+  const hasRestaurants = establishments.some(e => isRestaurantOrGastronomy(e));
+  const hasMarinas = establishments.some(e => isMarinaOrNauticalClub(e));
+  const hasCarRentals = establishments.some(e => isCarRentalOrFleet(e));
+  const hasYachtCharters = establishments.some(e => isYachtCharterOrBoatRental(e));
+
+  useEffect(() => {
+    if (establishments.length > 0 && viewModeOverride !== 'matriz') {
+      if (viewModeOverride === 'park' && !hasParks && (!isAdmin || !impersonateEstablishmentId)) {
+        setViewModeOverride('matriz');
+      } else if (viewModeOverride === 'agency' && !hasAgencies && (!isAdmin || !impersonateEstablishmentId)) {
+        setViewModeOverride('matriz');
+      } else if (viewModeOverride === 'creator' && !hasCreators && (!isAdmin || !impersonateEstablishmentId)) {
+        setViewModeOverride('matriz');
+      } else if (viewModeOverride === 'restaurant' && !hasRestaurants && (!isAdmin || !impersonateEstablishmentId)) {
+        setViewModeOverride('matriz');
+      } else if (viewModeOverride === 'marina' && !hasMarinas && (!isAdmin || !impersonateEstablishmentId)) {
+        setViewModeOverride('matriz');
+      } else if (viewModeOverride === 'car_rental' && !hasCarRentals && (!isAdmin || !impersonateEstablishmentId)) {
+        setViewModeOverride('matriz');
+      } else if (viewModeOverride === 'yacht_charter' && !hasYachtCharters && (!isAdmin || !impersonateEstablishmentId)) {
+        setViewModeOverride('matriz');
+      } else if (viewModeOverride === 'hotel' && !hasHotels && (!isAdmin || !impersonateEstablishmentId)) {
+        setViewModeOverride('matriz');
+      }
+    }
+  }, [establishments, viewModeOverride, hasParks, hasAgencies, hasCreators, hasRestaurants, hasMarinas, hasCarRentals, hasYachtCharters, hasHotels, isAdmin, impersonateEstablishmentId]);
+
   const compressImage = (file: File, maxWidth: number, quality: number = 0.8): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -2643,37 +2675,6 @@ export function OwnerDashboard() {
     { name: "Semana 3", ingresos: Math.round(monthlyRevenue * 0.8) },
     { name: "Semana 4", ingresos: monthlyRevenue }
   ];
-
-  const hasHotels = establishments.some(e => !isTouristComplexOrWaterPark(e) && !isTravelAgencyOrTourOperator(e) && !isCreatorOrInfluencer(e) && !isRestaurantOrGastronomy(e) && !isMarinaOrNauticalClub(e) && !isCarRentalOrFleet(e) && !isYachtCharterOrBoatRental(e));
-  const hasParks = establishments.some(e => isTouristComplexOrWaterPark(e));
-  const hasAgencies = establishments.some(e => isTravelAgencyOrTourOperator(e));
-  const hasCreators = establishments.some(e => isCreatorOrInfluencer(e));
-  const hasRestaurants = establishments.some(e => isRestaurantOrGastronomy(e));
-  const hasMarinas = establishments.some(e => isMarinaOrNauticalClub(e));
-  const hasCarRentals = establishments.some(e => isCarRentalOrFleet(e));
-  const hasYachtCharters = establishments.some(e => isYachtCharterOrBoatRental(e));
-
-  useEffect(() => {
-    if (establishments.length > 0 && viewModeOverride !== 'matriz') {
-      if (viewModeOverride === 'park' && !hasParks && (!isAdmin || !!impersonateEstablishmentId)) {
-        setViewModeOverride('matriz');
-      } else if (viewModeOverride === 'agency' && !hasAgencies && (!isAdmin || !!impersonateEstablishmentId)) {
-        setViewModeOverride('matriz');
-      } else if (viewModeOverride === 'creator' && !hasCreators && (!isAdmin || !!impersonateEstablishmentId)) {
-        setViewModeOverride('matriz');
-      } else if (viewModeOverride === 'restaurant' && !hasRestaurants && (!isAdmin || !!impersonateEstablishmentId)) {
-        setViewModeOverride('matriz');
-      } else if (viewModeOverride === 'marina' && !hasMarinas && (!isAdmin || !!impersonateEstablishmentId)) {
-        setViewModeOverride('matriz');
-      } else if (viewModeOverride === 'car_rental' && !hasCarRentals && (!isAdmin || !!impersonateEstablishmentId)) {
-        setViewModeOverride('matriz');
-      } else if (viewModeOverride === 'yacht_charter' && !hasYachtCharters && (!isAdmin || !!impersonateEstablishmentId)) {
-        setViewModeOverride('matriz');
-      } else if (viewModeOverride === 'hotel' && !hasHotels && (!isAdmin || !!impersonateEstablishmentId)) {
-        setViewModeOverride('matriz');
-      }
-    }
-  }, [establishments, viewModeOverride, hasParks, hasAgencies, hasCreators, hasRestaurants, hasMarinas, hasCarRentals, hasYachtCharters, hasHotels, isAdmin, impersonateEstablishmentId]);
 
   const isParkComplexMode = viewModeOverride === 'park' || (viewModeOverride === 'auto' && isTouristComplexOrWaterPark(activeEstablishment));
   const isAgencyMode = viewModeOverride === 'agency' || (viewModeOverride === 'auto' && isTravelAgencyOrTourOperator(activeEstablishment));
