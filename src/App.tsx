@@ -27,6 +27,22 @@ class AppErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryS
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("AppErrorBoundary capturó un error:", error, errorInfo);
+    const msg = String(error?.message || "");
+    // Si el error es por actualización de chunks de Vite tras despliegue, auto-recargar de forma transparente una vez
+    if (
+      msg.includes("Failed to fetch dynamically imported module") ||
+      msg.includes("Importing a module script failed") ||
+      msg.includes("error loading dynamically imported module") ||
+      msg.includes("Loading chunk") ||
+      msg.includes("is not valid JSON")
+    ) {
+      const reloadKey = "hdv_chunk_autofix_reload";
+      const hasReloaded = typeof window !== "undefined" && sessionStorage.getItem(reloadKey);
+      if (!hasReloaded && typeof window !== "undefined") {
+        sessionStorage.setItem(reloadKey, "true");
+        window.location.reload();
+      }
+    }
   }
 
   handleReload = () => {

@@ -7,6 +7,7 @@ import {
   Building2, Users, Search, ExternalLink, HelpCircle,
   ShieldAlert, Loader2, CheckCircle, Clock, Link as LinkIcon
 } from "lucide-react";
+import { TENANTS_REGISTRY } from "@/tenants/tenantContext";
 
 interface EstablishmentRow {
   id: number;
@@ -126,6 +127,22 @@ export default function AdminAsistencia() {
       demoProfiles.forEach(dp => {
         if (!combinedRows.some(r => r.id === dp.id || r.slug === dp.slug)) {
           combinedRows.unshift(dp);
+        }
+      });
+
+      Object.values(TENANTS_REGISTRY).forEach(t => {
+        if (!combinedRows.some(r => r.id === t.establishment_id || r.slug === t.slug)) {
+          combinedRows.push({
+            id: t.establishment_id,
+            name: t.name,
+            slug: t.slug,
+            status: "approved",
+            owner_user_id: `owner_user_${t.slug}`,
+            owner_name: `Propietario ${t.name}`,
+            owner_email: `contacto@${t.slug}.com`,
+            category: t.business_type === "restaurant" ? "Restaurantes y Gastronomía" : "Hoteles & Posadas",
+            destination: "Venezuela"
+          });
         }
       });
 

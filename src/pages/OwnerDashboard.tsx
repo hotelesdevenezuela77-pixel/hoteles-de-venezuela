@@ -348,11 +348,11 @@ export function OwnerDashboard() {
   }, []);
   const [operacionesSubTab, setOperacionesSubTab] = useState<"reservas" | "disponibilidad" | "timeline">("reservas");
   const [marketingSubTab, setMarketingSubTab] = useState<"descuentos" | "leads" | "reviews" | "channel-manager">("leads");
-  const [viewModeOverride, setViewModeOverride] = useState<'matriz' | 'hotel' | 'park' | 'agency' | 'creator' | 'restaurant' | 'marina' | 'car_rental'>(() => {
+  const [viewModeOverride, setViewModeOverride] = useState<'matriz' | 'hotel' | 'park' | 'agency' | 'creator' | 'restaurant' | 'marina' | 'car_rental' | 'yacht_charter'>(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const viewParam = params.get("view");
-      if (viewParam && ['matriz', 'hotel', 'park', 'agency', 'creator', 'restaurant', 'marina', 'car_rental'].includes(viewParam)) {
+      if (viewParam && ['matriz', 'hotel', 'park', 'agency', 'creator', 'restaurant', 'marina', 'car_rental', 'yacht_charter'].includes(viewParam)) {
         return viewParam as any;
       }
     }
@@ -1250,7 +1250,10 @@ export function OwnerDashboard() {
           (te.slug === "complejo-los-roques" && userEmailLower.includes("losroques"))
         );
 
-        const isImpersonatedMatch = isAdmin && impersonateEstablishmentId && (Number(te.id) === Number(impersonateEstablishmentId) || te.slug === String(impersonateEstablishmentId));
+        const isImpersonatedMatch = isAdmin && (
+          (impersonateEstablishmentId && (Number(te.id) === Number(impersonateEstablishmentId) || te.slug === String(impersonateEstablishmentId))) ||
+          (impersonateName && (te.name.toLowerCase().includes(impersonateName.toLowerCase()) || impersonateName.toLowerCase().includes(te.name.toLowerCase())))
+        );
 
         if (isClaimedByUser || isEmailMatch || isImpersonatedMatch) {
           if (!mappedEsts.some(e => e.id === te.id || e.slug === te.slug)) {
@@ -1271,7 +1274,10 @@ export function OwnerDashboard() {
           (de.id === 99903 && (userEmailLower.includes("globaltravel") || userEmailLower.includes("agencia")))
         );
 
-        const isImpersonatedMatch = isAdmin && impersonateEstablishmentId && (Number(de.id) === Number(impersonateEstablishmentId) || de.slug === String(impersonateEstablishmentId));
+        const isImpersonatedMatch = isAdmin && (
+          (impersonateEstablishmentId && (Number(de.id) === Number(impersonateEstablishmentId) || de.slug === String(impersonateEstablishmentId))) ||
+          (impersonateName && (de.name.toLowerCase().includes(impersonateName.toLowerCase()) || impersonateName.toLowerCase().includes(de.name.toLowerCase())))
+        );
 
         if (isClaimedByUser || isEmailMatch || isImpersonatedMatch) {
           if (!mappedEsts.some(e => e.id === de.id || e.slug === de.slug)) {
@@ -2554,16 +2560,16 @@ export function OwnerDashboard() {
 
   // Dashboard calculation variables
   const activeEstablishment = establishments.find(e => e.id === Number(selectedCalendarEst)) || establishments[0];
-  const activeReservations = reservations.filter(r => r.status === "confirmed");
-  const monthlyRevenue = activeReservations.reduce((sum, r) => sum + r.total_price, 0);
-  const totalRooms = rooms.reduce((sum, r) => sum + (r.quantity || 1), 0);
+  const activeReservations = (reservations || []).filter(r => r.status === "confirmed");
+  const monthlyRevenue = activeReservations.reduce((sum, r) => sum + (r.total_price || 0), 0);
+  const totalRooms = (rooms || []).reduce((sum, r) => sum + (r.quantity || 1), 0);
 
   // Dynamic occupancy count for today
   const todayStr = new Date().toISOString().split("T")[0];
-  const occupiedRoomsCount = reservations.filter(r => r.status === "confirmed" && todayStr >= r.check_in_date && todayStr < r.check_out_date).length;
+  const occupiedRoomsCount = (reservations || []).filter(r => r.status === "confirmed" && todayStr >= r.check_in_date && todayStr < r.check_out_date).length;
   const occupancyRate = totalRooms > 0 ? Math.round((occupiedRoomsCount / totalRooms) * 100) : 0;
 
-  const adr = rooms.length > 0 ? Math.round(rooms.reduce((sum, r) => sum + r.price_per_night, 0) / rooms.length) : 0;
+  const adr = (rooms || []).length > 0 ? Math.round((rooms || []).reduce((sum, r) => sum + (r.price_per_night || 0), 0) / rooms.length) : 0;
 
   // Recharts metric datasets strictly reflecting real numbers
   const monthlyRevenueData = [
