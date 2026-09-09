@@ -34,7 +34,13 @@ import { AgencyDashboard } from "@/components/agency/AgencyDashboard";
 import { isTravelAgencyOrTourOperator } from "@/types/agencyTourOperator";
 import { CreatorDashboard } from "@/components/creator/CreatorDashboard";
 import { isCreatorOrInfluencer } from "@/types/creatorInfluencer";
-import { Waves, Compass, Camera } from "lucide-react";
+import { RestaurantDashboard } from "@/components/restaurant/RestaurantDashboard";
+import { isRestaurantOrGastronomy } from "@/types/restaurantGastronomy";
+import { MarinaDashboard } from "@/components/marina/MarinaDashboard";
+import { isMarinaOrNauticalClub } from "@/types/marinaNautical";
+import { CarRentalDashboard } from "@/components/car_rental/CarRentalDashboard";
+import { isCarRentalOrFleet } from "@/types/carRentalFleet";
+import { Waves, Compass, Camera, Utensils, Anchor, Car } from "lucide-react";
 
 
 
@@ -197,11 +203,14 @@ export function getEstablishmentDashboardMode(est?: {
   slug?: string;
   name?: string;
   property_type?: string;
-} | null): 'hotel' | 'park' | 'agency' | 'creator' {
+} | null): 'hotel' | 'park' | 'agency' | 'creator' | 'restaurant' | 'marina' | 'car_rental' {
   if (!est) return 'hotel';
   if (isTouristComplexOrWaterPark(est)) return 'park';
   if (isTravelAgencyOrTourOperator(est)) return 'agency';
   if (isCreatorOrInfluencer(est)) return 'creator';
+  if (isRestaurantOrGastronomy(est)) return 'restaurant';
+  if (isMarinaOrNauticalClub(est)) return 'marina';
+  if (isCarRentalOrFleet(est)) return 'car_rental';
   return 'hotel';
 }
 
@@ -232,10 +241,34 @@ export function getEstablishmentCategoryBadge(est: Establishment) {
         icon: Camera,
         actionLabel: "Abrir Desk Hub Creador"
       };
+    case 'restaurant':
+      return {
+        label: "Restaurante & Beach Club",
+        badgeClass: "bg-pink-50 text-pink-800 border border-pink-200",
+        btnClass: "bg-gradient-to-r from-[#FF0096] to-[#9B00CC] text-white hover:opacity-95 shadow-md",
+        icon: Utensils,
+        actionLabel: "Abrir Dashboard Restaurante"
+      };
+    case 'marina':
+      return {
+        label: "Marina & Club Náutico",
+        badgeClass: "bg-cyan-50 text-cyan-800 border border-cyan-200",
+        btnClass: "bg-gradient-to-r from-[#00C8D4] to-[#0e011f] text-white hover:opacity-95 shadow-md",
+        icon: Anchor,
+        actionLabel: "Abrir Dashboard Marina"
+      };
+    case 'car_rental':
+      return {
+        label: "Rent-a-Car & Flota",
+        badgeClass: "bg-cyan-50 text-cyan-800 border border-cyan-200",
+        btnClass: "bg-gradient-to-r from-[#00C8D4] to-[#FF0096] text-white hover:opacity-95 shadow-md",
+        icon: Car,
+        actionLabel: "Abrir Dashboard Rent-a-Car"
+      };
     case 'hotel':
     default:
       return {
-        label: est.category_name || "Hotel / Posada",
+        label: est.category_name || "Hotel / Posada / Camping",
         badgeClass: "bg-pink-50 text-pink-800 border border-pink-200",
         btnClass: "bg-gradient-to-r from-[#FF0096] to-[#9B00CC] text-white hover:opacity-95 shadow-md",
         icon: Building2,
@@ -304,11 +337,11 @@ export function OwnerDashboard() {
   }, []);
   const [operacionesSubTab, setOperacionesSubTab] = useState<"reservas" | "disponibilidad" | "timeline">("reservas");
   const [marketingSubTab, setMarketingSubTab] = useState<"descuentos" | "leads" | "reviews" | "channel-manager">("leads");
-  const [viewModeOverride, setViewModeOverride] = useState<'matriz' | 'hotel' | 'park' | 'agency' | 'creator'>(() => {
+  const [viewModeOverride, setViewModeOverride] = useState<'matriz' | 'hotel' | 'park' | 'agency' | 'creator' | 'restaurant' | 'marina' | 'car_rental'>(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const viewParam = params.get("view");
-      if (viewParam && ['matriz', 'hotel', 'park', 'agency', 'creator'].includes(viewParam)) {
+      if (viewParam && ['matriz', 'hotel', 'park', 'agency', 'creator', 'restaurant', 'marina', 'car_rental'].includes(viewParam)) {
         return viewParam as any;
       }
     }
@@ -2529,10 +2562,13 @@ export function OwnerDashboard() {
     { name: "Semana 4", ingresos: monthlyRevenue }
   ];
 
-  const hasHotels = establishments.some(e => !isTouristComplexOrWaterPark(e) && !isTravelAgencyOrTourOperator(e) && !isCreatorOrInfluencer(e));
+  const hasHotels = establishments.some(e => !isTouristComplexOrWaterPark(e) && !isTravelAgencyOrTourOperator(e) && !isCreatorOrInfluencer(e) && !isRestaurantOrGastronomy(e) && !isMarinaOrNauticalClub(e) && !isCarRentalOrFleet(e));
   const hasParks = establishments.some(e => isTouristComplexOrWaterPark(e));
   const hasAgencies = establishments.some(e => isTravelAgencyOrTourOperator(e));
   const hasCreators = establishments.some(e => isCreatorOrInfluencer(e));
+  const hasRestaurants = establishments.some(e => isRestaurantOrGastronomy(e));
+  const hasMarinas = establishments.some(e => isMarinaOrNauticalClub(e));
+  const hasCarRentals = establishments.some(e => isCarRentalOrFleet(e));
 
   useEffect(() => {
     if (establishments.length > 0 && viewModeOverride !== 'matriz') {
@@ -2542,11 +2578,17 @@ export function OwnerDashboard() {
         setViewModeOverride('matriz');
       } else if (viewModeOverride === 'creator' && !hasCreators && (!isAdmin || !!impersonateEstablishmentId)) {
         setViewModeOverride('matriz');
+      } else if (viewModeOverride === 'restaurant' && !hasRestaurants && (!isAdmin || !!impersonateEstablishmentId)) {
+        setViewModeOverride('matriz');
+      } else if (viewModeOverride === 'marina' && !hasMarinas && (!isAdmin || !!impersonateEstablishmentId)) {
+        setViewModeOverride('matriz');
+      } else if (viewModeOverride === 'car_rental' && !hasCarRentals && (!isAdmin || !!impersonateEstablishmentId)) {
+        setViewModeOverride('matriz');
       } else if (viewModeOverride === 'hotel' && !hasHotels && (!isAdmin || !!impersonateEstablishmentId)) {
         setViewModeOverride('matriz');
       }
     }
-  }, [establishments, viewModeOverride, hasParks, hasAgencies, hasCreators, hasHotels, isAdmin, impersonateEstablishmentId]);
+  }, [establishments, viewModeOverride, hasParks, hasAgencies, hasCreators, hasRestaurants, hasMarinas, hasCarRentals, hasHotels, isAdmin, impersonateEstablishmentId]);
 
   const isParkComplexMode = viewModeOverride === 'park' || (viewModeOverride === 'auto' && isTouristComplexOrWaterPark(activeEstablishment));
   const isAgencyMode = viewModeOverride === 'agency' || (viewModeOverride === 'auto' && isTravelAgencyOrTourOperator(activeEstablishment));
@@ -2616,7 +2658,10 @@ export function OwnerDashboard() {
                    viewModeOverride === 'hotel' ? `PANEL HOTELERO & POSADAS · ${activeEstablishment?.name || ''}` :
                    viewModeOverride === 'park' ? `SUITE PARQUE ACUÁTICO · ${activeEstablishment?.name || ''}` :
                    viewModeOverride === 'agency' ? `SUITE AGENCIA & DMC · ${activeEstablishment?.name || ''}` :
-                   `DESK HUB CREADOR · ${activeEstablishment?.name || ''}`}
+                   viewModeOverride === 'creator' ? `DESK HUB CREADOR · ${activeEstablishment?.name || ''}` :
+                   viewModeOverride === 'restaurant' ? `SUITE RESTAURANTE & BEACH CLUB · ${activeEstablishment?.name || ''}` :
+                   viewModeOverride === 'marina' ? `SUITE MARINA & CLUB NÁUTICO · ${activeEstablishment?.name || ''}` :
+                   `SUITE RENT-A-CAR & FLOTA · ${activeEstablishment?.name || ''}`}
                 </span>
               </div>
 
@@ -2689,7 +2734,7 @@ export function OwnerDashboard() {
               {(hasHotels || (isAdmin && !impersonateEstablishmentId)) && (
                 <button
                   onClick={() => {
-                    const firstHotel = establishments.find(e => !isTouristComplexOrWaterPark(e) && !isTravelAgencyOrTourOperator(e) && !isCreatorOrInfluencer(e));
+                    const firstHotel = establishments.find(e => !isTouristComplexOrWaterPark(e) && !isTravelAgencyOrTourOperator(e) && !isCreatorOrInfluencer(e) && !isRestaurantOrGastronomy(e) && !isMarinaOrNauticalClub(e) && !isCarRentalOrFleet(e));
                     if (firstHotel) setSelectedCalendarEst(firstHotel.id);
                     setViewModeOverride('hotel');
                   }}
@@ -2758,6 +2803,60 @@ export function OwnerDashboard() {
                 </button>
               )}
 
+              {(hasRestaurants || (isAdmin && !impersonateEstablishmentId)) && (
+                <button
+                  onClick={() => {
+                    const firstRest = establishments.find(e => isRestaurantOrGastronomy(e));
+                    if (firstRest) setSelectedCalendarEst(firstRest.id);
+                    setViewModeOverride('restaurant');
+                  }}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
+                    viewModeOverride === 'restaurant'
+                      ? "bg-[#FF0096] text-white border-white ring-2 ring-[#FF0096]/50 shadow-[#FF0096]/30 font-black"
+                      : "bg-white/10 hover:bg-white/20 text-white border-white/20"
+                  }`}
+                >
+                  <Utensils className="w-4 h-4" />
+                  <span className="hidden sm:inline">Vista Restaurante</span>
+                </button>
+              )}
+
+              {(hasMarinas || (isAdmin && !impersonateEstablishmentId)) && (
+                <button
+                  onClick={() => {
+                    const firstMarina = establishments.find(e => isMarinaOrNauticalClub(e));
+                    if (firstMarina) setSelectedCalendarEst(firstMarina.id);
+                    setViewModeOverride('marina');
+                  }}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
+                    viewModeOverride === 'marina'
+                      ? "bg-[#00C8D4] text-slate-950 border-white ring-2 ring-[#00C8D4]/50 shadow-[#00C8D4]/30 font-black"
+                      : "bg-white/10 hover:bg-white/20 text-white border-white/20"
+                  }`}
+                >
+                  <Anchor className="w-4 h-4" />
+                  <span className="hidden sm:inline">Vista Marina</span>
+                </button>
+              )}
+
+              {(hasCarRentals || (isAdmin && !impersonateEstablishmentId)) && (
+                <button
+                  onClick={() => {
+                    const firstCar = establishments.find(e => isCarRentalOrFleet(e));
+                    if (firstCar) setSelectedCalendarEst(firstCar.id);
+                    setViewModeOverride('car_rental');
+                  }}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
+                    viewModeOverride === 'car_rental'
+                      ? "bg-[#00C8D4] text-slate-950 border-white ring-2 ring-[#00C8D4]/50 shadow-[#00C8D4]/30 font-black"
+                      : "bg-white/10 hover:bg-white/20 text-white border-white/20"
+                  }`}
+                >
+                  <Car className="w-4 h-4" />
+                  <span className="hidden sm:inline">Vista Rent-a-Car</span>
+                </button>
+              )}
+
               <div className="flex items-center gap-3 bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl px-4 py-2 text-xs text-white shrink-0 shadow-lg">
                 <div className="text-right">
                   <p className="text-[9px] uppercase font-black text-[#00C8D4] tracking-wider">CONECTADO</p>
@@ -2785,6 +2884,21 @@ export function OwnerDashboard() {
         />
       ) : viewModeOverride === 'park' ? (
         <ParkComplexDashboard
+          establishment={activeEstablishment}
+          onSwitchToTraditionalDashboard={() => setViewModeOverride('matriz')}
+        />
+      ) : viewModeOverride === 'restaurant' ? (
+        <RestaurantDashboard
+          establishment={activeEstablishment}
+          onSwitchToTraditionalDashboard={() => setViewModeOverride('matriz')}
+        />
+      ) : viewModeOverride === 'marina' ? (
+        <MarinaDashboard
+          establishment={activeEstablishment}
+          onSwitchToTraditionalDashboard={() => setViewModeOverride('matriz')}
+        />
+      ) : viewModeOverride === 'car_rental' ? (
+        <CarRentalDashboard
           establishment={activeEstablishment}
           onSwitchToTraditionalDashboard={() => setViewModeOverride('matriz')}
         />
