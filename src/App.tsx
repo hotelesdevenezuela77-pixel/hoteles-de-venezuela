@@ -13,6 +13,7 @@ import { AdminLayout } from "./components/admin/AdminLayout";
 interface ErrorBoundaryState {
   hasError: boolean;
   error?: Error;
+  errorInfo?: ErrorInfo;
 }
 
 class AppErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryState> {
@@ -27,8 +28,9 @@ class AppErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryS
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("AppErrorBoundary capturó un error:", error, errorInfo);
+    this.setState({ errorInfo });
     const msg = String(error?.message || "");
-    // Si el error es por actualización de chunks de Vite tras despliegue, auto-recargar de forma transparente una vez
+    // Si el error es por actualización de chunks de Vite tras despliegue, auto-recargar de forma transparente una vez con cache-buster
     if (
       msg.includes("Failed to fetch dynamically imported module") ||
       msg.includes("Importing a module script failed") ||
@@ -40,7 +42,7 @@ class AppErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryS
       const hasReloaded = typeof window !== "undefined" && sessionStorage.getItem(reloadKey);
       if (!hasReloaded && typeof window !== "undefined") {
         sessionStorage.setItem(reloadKey, "true");
-        window.location.reload();
+        window.location.href = window.location.origin + window.location.pathname + "?_nocache=" + Date.now();
       }
     }
   }
@@ -48,29 +50,100 @@ class AppErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryS
   handleReload = () => {
     if (typeof window !== "undefined") {
       sessionStorage.clear();
-      window.location.href = window.location.origin + window.location.pathname + "?v=" + Date.now();
+      window.location.href = window.location.origin + window.location.pathname + "?_nocache=" + Date.now();
+    }
+  };
+
+  handleExitImpersonation = () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("hdv_impersonate_owner_user_id");
+      localStorage.removeItem("hdv_impersonate_owner_user_name");
+      localStorage.removeItem("hdv_impersonate_establishment_id");
+      sessionStorage.clear();
+      window.location.href = window.location.origin + "/admin/asistencia?_t=" + Date.now();
+    }
+  };
+
+  handleResetAll = () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("hdv_impersonate_owner_user_id");
+      localStorage.removeItem("hdv_impersonate_owner_user_name");
+      localStorage.removeItem("hdv_impersonate_establishment_id");
+      sessionStorage.clear();
+      window.location.href = window.location.origin + "/?_t=" + Date.now();
     }
   };
 
   render() {
     if (this.state.hasError) {
+      const isImpersonating = typeof window !== "undefined" && (
+        localStorage.getItem("hdv_impersonate_owner_user_id") ||
+        localStorage.getItem("hdv_impersonate_establishment_id")
+      );
+      const isChunkError = this.state.error?.message?.includes("dynamically imported module") ||
+        this.state.error?.message?.includes("Importing a module") ||
+        this.state.error?.message?.includes("Loading chunk");
+
       return (
-        <div style={{ minHeight: "80vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "2rem", textAlign: "center", fontFamily: "system-ui, -apple-system, sans-serif", backgroundColor: "#ffffff" }}>
-          <div style={{ width: "64px", height: "64px", backgroundColor: "#e6f9fa", border: "1px solid #00C8D4", borderRadius: "16px", display: "flex", alignItems: "center", justifyContent: "center", color: "#00C8D4", marginBottom: "1rem" }}>
-            <svg style={{ width: "32px", height: "32px" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div style={{ minHeight: "80vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "2.5rem 1.5rem", textAlign: "center", fontFamily: "Montserrat, system-ui, -apple-system, sans-serif", backgroundColor: "#f8fafc" }}>
+          <div style={{ width: "68px", height: "68px", backgroundColor: "#e6f9fa", border: "2px solid #00C8D4", borderRadius: "20px", display: "flex", alignItems: "center", justifyContent: "center", color: "#00C8D4", marginBottom: "1.25rem", boxShadow: "0 10px 25px -5px rgba(0, 200, 212, 0.25)" }}>
+            <svg style={{ width: "34px", height: "34px" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
           </div>
-          <h2 style={{ fontSize: "1.25rem", fontWeight: "900", color: "#0f172a", marginBottom: "0.5rem", textTransform: "uppercase" }}>Sincronizando Nueva Versión</h2>
-          <p style={{ fontSize: "0.875rem", color: "#64748b", maxWidth: "420px", marginBottom: "1.5rem", lineHeight: "1.5" }}>
-            Se ha desplegado una actualización de rendimiento en la plataforma. Haz clic abajo para refrescar tu panel de control de manera segura.
+          
+          <span style={{ fontSize: "11px", fontWeight: "900", color: "#FF0096", textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: "0.5rem" }}>
+            {isChunkError ? "Actualización de Plataforma" : "Aviso de Seguridad y Carga"}
+          </span>
+          
+          <h2 style={{ fontSize: "1.5rem", fontWeight: "900", color: "#0f172a", marginBottom: "0.75rem", fontFamily: "Playfair Display, serif" }}>
+            {isChunkError ? "Sincronizando Nueva Versión de Software" : "Recuperación de Estado del Panel"}
+          </h2>
+          
+          <p style={{ fontSize: "0.875rem", color: "#64748b", maxWidth: "520px", marginBottom: "1.5rem", lineHeight: "1.6" }}>
+            {isChunkError 
+              ? "Se han desplegado módulos optimizados en la infraestructura. Haz clic en actualizar para cargar los componentes más recientes de manera limpia."
+              : (this.state.error?.message || "Se detectó un cambio de estado en la sesión. Puedes reintentar la carga o reiniciar los parámetros de forma segura.")}
           </p>
-          <button
-            onClick={this.handleReload}
-            style={{ padding: "12px 28px", borderRadius: "12px", background: "linear-gradient(to right, #00C8D4, #FF0096)", color: "#ffffff", fontWeight: "900", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em", border: "none", cursor: "pointer", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
-          >
-            Actualizar y Cargar Panel
-          </button>
+
+          <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "10px", justifyContent: "center", maxWidth: "600px" }}>
+            <button
+              onClick={this.handleReload}
+              style={{ padding: "12px 24px", borderRadius: "14px", background: "linear-gradient(135deg, #00C8D4 0%, #0284c7 100%)", color: "#ffffff", fontWeight: "800", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", border: "none", cursor: "pointer", boxShadow: "0 10px 20px -5px rgba(0, 200, 212, 0.4)" }}
+            >
+              🔄 Reintentar y Cargar
+            </button>
+
+            {isImpersonating && (
+              <button
+                onClick={this.handleExitImpersonation}
+                style={{ padding: "12px 24px", borderRadius: "14px", background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)", color: "#ffffff", fontWeight: "800", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", border: "none", cursor: "pointer", boxShadow: "0 10px 20px -5px rgba(255, 0, 150, 0.35)" }}
+              >
+                🛡️ Salir de Asistencia y Volver al Panel Admin
+              </button>
+            )}
+
+            <button
+              onClick={this.handleResetAll}
+              style={{ padding: "12px 20px", borderRadius: "14px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", color: "#475569", fontWeight: "700", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", cursor: "pointer" }}
+            >
+              🧹 Limpiar Caché y Volver al Inicio
+            </button>
+          </div>
+
+          {/* Detalles técnicos colapsables para diagnóstico */}
+          {this.state.error && (
+            <details style={{ marginTop: "2rem", maxWidth: "650px", width: "100%", textAlign: "left", backgroundColor: "#0f172a", borderRadius: "12px", padding: "12px 16px", color: "#94a3b8", fontSize: "11px" }}>
+              <summary style={{ cursor: "pointer", fontWeight: "bold", color: "#00C8D4" }}>
+                Ver Diagnóstico Técnico
+              </summary>
+              <pre style={{ marginTop: "8px", overflowX: "auto", whiteSpace: "pre-wrap", color: "#f1f5f9" }}>
+                {this.state.error.toString()}
+                {"\n"}
+                {this.state.error.stack}
+              </pre>
+            </details>
+          )}
         </div>
       );
     }
@@ -97,7 +170,7 @@ function lazyNamed<T extends Record<string, any>>(
       
       if (typeof window !== "undefined" && !alreadyReloaded) {
         sessionStorage.setItem(key, "true");
-        window.location.reload();
+        window.location.href = window.location.origin + window.location.pathname + "?_nocache=" + Date.now();
         return new Promise<never>(() => {});
       }
       
@@ -115,7 +188,7 @@ function lazyWithRetry(importFn: () => Promise<any>) {
       console.error("Error al cargar chunk dinámico:", error);
       if (typeof window !== "undefined" && !sessionStorage.getItem("hdv_chunk_retry")) {
         sessionStorage.setItem("hdv_chunk_retry", "true");
-        window.location.reload();
+        window.location.href = window.location.origin + window.location.pathname + "?_nocache=" + Date.now();
         return new Promise<never>(() => {});
       }
       throw error;
