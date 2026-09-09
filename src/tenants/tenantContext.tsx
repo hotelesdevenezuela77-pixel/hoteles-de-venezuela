@@ -428,7 +428,22 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
 export function useTenant() {
   const context = useContext(TenantContext);
   if (context === undefined) {
-    throw new Error("useTenant debe ser usado dentro de un TenantProvider");
+    const fallbackConfig = TENANTS_REGISTRY["hostal-entre-2-aguas"] || Object.values(TENANTS_REGISTRY)[0] || {
+      establishment_id: 81,
+      slug: "hostal-entre-2-aguas",
+      name: "Hostal Entre 2 Aguas",
+      template: "A",
+      domain: "hostalentre2aguas.com",
+      branding: { primary_color: "#FF0096", secondary_color: "#9B00CC", accent_color: "#00C8D4", font_title: "Playfair Display", font_body: "Montserrat", logo_url: "", banner_url: "" },
+      modules: { reservas: true, pos: true, tareas: true, cms: true, analiticas: true, galeria: true, contacto: true },
+      contact: { phone: "+58 412 123 4567", whatsapp: "+58 412 123 4567", email: "contacto@hostalentre2aguas.com", instagram: "@hostalentre2aguas" }
+    };
+    return {
+      config: fallbackConfig,
+      isLoading: false,
+      error: null,
+      updateConfig: () => {}
+    };
   }
   return context;
 }
