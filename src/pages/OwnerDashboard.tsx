@@ -1104,10 +1104,10 @@ export function OwnerDashboard() {
             destinations (name)
           `);
 
-        if (isAdmin && impersonateEstablishmentId) {
-          estQuery = estQuery.eq("id", impersonateEstablishmentId);
-        } else if (isAdmin && impersonateId) {
+        if (isAdmin && impersonateId && impersonateId !== "admin_assistance_mode" && impersonateId !== "owner_user_hostal-entre-2-aguas") {
           estQuery = estQuery.eq("owner_user_id", impersonateId);
+        } else if (isAdmin && impersonateEstablishmentId) {
+          estQuery = estQuery.eq("id", impersonateEstablishmentId);
         } else {
           estQuery = estQuery.eq("owner_user_id", activeOwnerId);
         }
