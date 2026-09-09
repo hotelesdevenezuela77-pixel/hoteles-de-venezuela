@@ -2619,7 +2619,42 @@ export function OwnerDashboard() {
       );
     }
 
-    return null;
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center p-6 bg-gradient-to-br from-[#0e011f] via-[#1a0533] to-[#0d1a2e]">
+        <div className="max-w-md w-full bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 text-center text-white shadow-2xl relative overflow-hidden font-sans">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#FF0096] to-[#00C8D4] p-0.5 mx-auto mb-5 shadow-lg">
+            <div className="w-full h-full bg-[#0e011f] rounded-[14px] flex items-center justify-center">
+              <Building2 className="w-8 h-8 text-[#00C8D4]" />
+            </div>
+          </div>
+          <span className="inline-block bg-[#00C8D4]/20 border border-[#00C8D4]/40 text-[#00C8D4] text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-3">
+            CONSOLA DE PROPIETARIOS
+          </span>
+          <h2 className="text-2xl font-black tracking-tight text-white mb-2 font-serif">
+            Acceso a tu Panel de Propietario
+          </h2>
+          <p className="text-xs text-slate-300 leading-relaxed mb-6 font-medium">
+            Inicia sesión con tu cuenta oficial para gestionar tus establecimientos, tarifas, calendario y servicios SaaS.
+          </p>
+          <button
+            type="button"
+            onClick={() => loginWithGoogle(window.location.origin + "/mis-negocios")}
+            className="w-full py-3.5 px-6 bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:from-[#FF0096]/90 hover:to-[#9B00CC]/90 text-white font-black text-xs rounded-xl shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer mb-3"
+          >
+            <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+              <path d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114-3.41 0-6.177-2.767-6.177-6.177S10.582 6.16 13.991 6.16c1.558 0 2.977.576 4.07 1.526l3.14-3.14C19.273 2.766 16.79 1.6 13.99 1.6 8.252 1.6 3.6 6.252 3.6 12s4.652 10.4 10.39 10.4c5.776 0 10.38-4.232 10.38-10.4 0-.693-.082-1.353-.245-1.715H12.24z"/>
+            </svg>
+            <span>Iniciar Sesión con Google</span>
+          </button>
+          <Link
+            to="/login"
+            className="inline-block text-[11px] text-slate-400 hover:text-white font-semibold underline transition-colors"
+          >
+            Acceder con Correo y Contraseña
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   if (authLoading || loading) {

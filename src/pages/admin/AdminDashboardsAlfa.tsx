@@ -13,6 +13,7 @@ import { RestaurantDashboard } from "@/components/restaurant/RestaurantDashboard
 import { MarinaDashboard } from "@/components/marina/MarinaDashboard";
 import { CarRentalDashboard } from "@/components/car_rental/CarRentalDashboard";
 import { YachtCharterDashboard } from "@/components/yacht_charter/YachtCharterDashboard";
+import { HotelPMSDashboard } from "@/components/hotel/HotelPMSDashboard";
 import { ConstellationBackground } from "@/components/ConstellationBackground";
 
 interface DashboardAlfaMeta {
@@ -391,31 +392,10 @@ export function AdminDashboardsAlfa() {
 
           <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
             {selectedDashboard.id === "hotel" ? (
-              <div className="space-y-6 text-center py-12">
-                <div className="w-16 h-16 rounded-3xl bg-[#FF0096] text-white flex items-center justify-center mx-auto shadow-xl">
-                  <Building2 className="w-8 h-8 stroke-[2.5]" />
-                </div>
-                <div className="max-w-xl mx-auto space-y-2">
-                  <h3 className="text-2xl font-black text-slate-900 font-serif">Suite Hotelera & PMS Tradicional</h3>
-                  <p className="text-xs text-slate-500 leading-relaxed">
-                    Este dashboard incluye las pestañas clásicas de control de inventario de habitaciones, tarifario masivo, calendario de disponibilidad, timeline PMS con drag & drop, CMS Web Builder y Club POS.
-                  </p>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto text-left text-xs">
-                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
-                    <strong className="text-slate-900 block">📅 Calendario Pro & Tarifas</strong>
-                    <p className="text-slate-500 text-[11px]">Modificador masivo de precios por temporada y canal.</p>
-                  </div>
-                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
-                    <strong className="text-slate-900 block">🛏️ Inventario Habitaciones</strong>
-                    <p className="text-slate-500 text-[11px]">Configuración de camas, amenidades y unidades operativas.</p>
-                  </div>
-                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
-                    <strong className="text-slate-900 block">☕ Club POS Gastronómico</strong>
-                    <p className="text-slate-500 text-[11px]">Manejo de cuentas y comandas para huéspedes internos.</p>
-                  </div>
-                </div>
-              </div>
+              <HotelPMSDashboard
+                establishment={selectedDashboard.demoEstablishment as any}
+                onSwitchToTraditionalDashboard={() => alert("Simulación: Regresar al Dashboard Matriz")}
+              />
             ) : selectedDashboard.id === "agency" ? (
               <AgencyDashboard
                 establishment={selectedDashboard.demoEstablishment as any}
