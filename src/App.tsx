@@ -163,6 +163,7 @@ const AdminSaaS = lazyNamed(() => import("./pages/admin/AdminSaaS"), "AdminSaaS"
 const AdminLogs = lazyNamed(() => import("./pages/admin/AdminLogs"), "AdminLogs");
 const AdminGuiones = lazyNamed(() => import("./pages/admin/AdminGuiones"), "AdminGuiones");
 const AdminChannelManager = lazyNamed(() => import("./pages/admin/AdminChannelManager"), "AdminChannelManager");
+const AdminDashboardsAlfa = lazyNamed(() => import("./pages/admin/AdminDashboardsAlfa"), "AdminDashboardsAlfa");
 const AdminKYC = lazyNamed(() => import("./pages/admin/AdminKYC"), "AdminKYC");
 const AdminTransfers = lazyNamed(() => import("./pages/admin/AdminTransfers"), "AdminTransfers");
 const AdminExperiences = lazyNamed(() => import("./pages/admin/AdminExperiences"), "AdminExperiences");
@@ -248,6 +249,7 @@ function AdminShell() {
         <Route path="/admin/expedicion-rutas" component={AdminExpedicionRutas} />
         <Route path="/admin/asistencia" component={AdminAsistencia} />
         <Route path="/admin/contabilidad" component={AdminContabilidad} />
+        <Route path="/admin/dashboards-alfa" component={AdminDashboardsAlfa} />
       </Switch>
     </AdminLayout>
   );

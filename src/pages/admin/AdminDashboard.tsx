@@ -14,7 +14,7 @@ import {
   Package, BarChart3, Tag, Newspaper, CheckCircle, Clock,
   XCircle, Star, MessageSquare, Settings, Globe,
   ShieldCheck, TrendingUp, Wrench, Eye, Loader2, DollarSign, ClipboardList,
-  AlertCircle, Award, Activity
+  AlertCircle, Award, Activity, Layers
 } from "lucide-react";
 
 const C = {
@@ -39,6 +39,7 @@ const STATUS_ICON: Record<string, { icon: typeof CheckCircle; color: string; lab
 };
 
 const NAV_CARDS = [
+  { href: "/admin/dashboards-alfa",   icon: Layers,    label: "Dashboards Alfa HDV", desc: "Showcase y sandbox de 8 suites", color: C.teal   },
   { href: "/admin/establecimientos", icon: Building2, label: "Establecimientos", desc: "Hoteles y posadas",       color: C.fucsia },
   { href: "/admin/destinos",         icon: MapPin,    label: "Destinos",          desc: "Destinos turísticos",    color: C.teal   },
   { href: "/admin/reservas",         icon: Calendar,  label: "Reservas",          desc: "Ver y gestionar",        color: C.purple },

@@ -7,7 +7,7 @@ import {
   Sparkles, Bot, Network, Shield, Car, Compass, AlertTriangle, Ticket, LayoutDashboard,
   Search, Bell, ChevronLeft, ChevronRight, X, ShieldAlert, Menu,
   ArrowUpDown, Receipt, MessageSquare, Star, Mail, Link2, LogOut, ChevronDown,
-  Calendar, TrendingUp, Activity, Edit3, Briefcase, HelpCircle, BookOpen, Cpu, LifeBuoy, Scale
+  Calendar, TrendingUp, Activity, Edit3, Briefcase, HelpCircle, BookOpen, Cpu, LifeBuoy, Scale, Layers
 } from "lucide-react";
 
 // Colores Oficiales (Sistemas de Contraste)
@@ -119,6 +119,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       name: "Operaciones",
       items: [
         { label: "Resumen", href: "/admin", icon: LayoutDashboard },
+        { label: "Dashboards Alfa HDV", href: "/admin/dashboards-alfa", icon: Layers },
         { label: "Establecimientos", href: "/admin/establecimientos", icon: Building2 },
         { label: "Asistencia Propietario", href: "/admin/asistencia", icon: HelpCircle },
         { label: "Aprobaciones", href: "/admin/aprobaciones", icon: ShieldCheck },
