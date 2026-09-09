@@ -40,7 +40,9 @@ import { MarinaDashboard } from "@/components/marina/MarinaDashboard";
 import { isMarinaOrNauticalClub } from "@/types/marinaNautical";
 import { CarRentalDashboard } from "@/components/car_rental/CarRentalDashboard";
 import { isCarRentalOrFleet } from "@/types/carRentalFleet";
-import { Waves, Compass, Camera, Utensils, Anchor, Car } from "lucide-react";
+import { YachtCharterDashboard } from "@/components/yacht_charter/YachtCharterDashboard";
+import { isYachtCharterOrBoatRental } from "@/types/yachtCharter";
+import { Waves, Compass, Camera, Utensils, Anchor, Car, Ship } from "lucide-react";
 
 
 
@@ -203,7 +205,7 @@ export function getEstablishmentDashboardMode(est?: {
   slug?: string;
   name?: string;
   property_type?: string;
-} | null): 'hotel' | 'park' | 'agency' | 'creator' | 'restaurant' | 'marina' | 'car_rental' {
+} | null): 'hotel' | 'park' | 'agency' | 'creator' | 'restaurant' | 'marina' | 'car_rental' | 'yacht_charter' {
   if (!est) return 'hotel';
   if (isTouristComplexOrWaterPark(est)) return 'park';
   if (isTravelAgencyOrTourOperator(est)) return 'agency';
@@ -211,6 +213,7 @@ export function getEstablishmentDashboardMode(est?: {
   if (isRestaurantOrGastronomy(est)) return 'restaurant';
   if (isMarinaOrNauticalClub(est)) return 'marina';
   if (isCarRentalOrFleet(est)) return 'car_rental';
+  if (isYachtCharterOrBoatRental(est)) return 'yacht_charter';
   return 'hotel';
 }
 
@@ -264,6 +267,14 @@ export function getEstablishmentCategoryBadge(est: Establishment) {
         btnClass: "bg-gradient-to-r from-[#00C8D4] to-[#FF0096] text-white hover:opacity-95 shadow-md",
         icon: Car,
         actionLabel: "Abrir Dashboard Rent-a-Car"
+      };
+    case 'yacht_charter':
+      return {
+        label: "Alquiler de Yates & Embarcaciones",
+        badgeClass: "bg-cyan-50 text-cyan-800 border border-cyan-200",
+        btnClass: "bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] text-white hover:opacity-95 shadow-md",
+        icon: Ship,
+        actionLabel: "Abrir Dashboard Alquiler de Yates"
       };
     case 'hotel':
     default:
@@ -2562,13 +2573,14 @@ export function OwnerDashboard() {
     { name: "Semana 4", ingresos: monthlyRevenue }
   ];
 
-  const hasHotels = establishments.some(e => !isTouristComplexOrWaterPark(e) && !isTravelAgencyOrTourOperator(e) && !isCreatorOrInfluencer(e) && !isRestaurantOrGastronomy(e) && !isMarinaOrNauticalClub(e) && !isCarRentalOrFleet(e));
+  const hasHotels = establishments.some(e => !isTouristComplexOrWaterPark(e) && !isTravelAgencyOrTourOperator(e) && !isCreatorOrInfluencer(e) && !isRestaurantOrGastronomy(e) && !isMarinaOrNauticalClub(e) && !isCarRentalOrFleet(e) && !isYachtCharterOrBoatRental(e));
   const hasParks = establishments.some(e => isTouristComplexOrWaterPark(e));
   const hasAgencies = establishments.some(e => isTravelAgencyOrTourOperator(e));
   const hasCreators = establishments.some(e => isCreatorOrInfluencer(e));
   const hasRestaurants = establishments.some(e => isRestaurantOrGastronomy(e));
   const hasMarinas = establishments.some(e => isMarinaOrNauticalClub(e));
   const hasCarRentals = establishments.some(e => isCarRentalOrFleet(e));
+  const hasYachtCharters = establishments.some(e => isYachtCharterOrBoatRental(e));
 
   useEffect(() => {
     if (establishments.length > 0 && viewModeOverride !== 'matriz') {
@@ -2584,11 +2596,13 @@ export function OwnerDashboard() {
         setViewModeOverride('matriz');
       } else if (viewModeOverride === 'car_rental' && !hasCarRentals && (!isAdmin || !!impersonateEstablishmentId)) {
         setViewModeOverride('matriz');
+      } else if (viewModeOverride === 'yacht_charter' && !hasYachtCharters && (!isAdmin || !!impersonateEstablishmentId)) {
+        setViewModeOverride('matriz');
       } else if (viewModeOverride === 'hotel' && !hasHotels && (!isAdmin || !!impersonateEstablishmentId)) {
         setViewModeOverride('matriz');
       }
     }
-  }, [establishments, viewModeOverride, hasParks, hasAgencies, hasCreators, hasRestaurants, hasMarinas, hasCarRentals, hasHotels, isAdmin, impersonateEstablishmentId]);
+  }, [establishments, viewModeOverride, hasParks, hasAgencies, hasCreators, hasRestaurants, hasMarinas, hasCarRentals, hasYachtCharters, hasHotels, isAdmin, impersonateEstablishmentId]);
 
   const isParkComplexMode = viewModeOverride === 'park' || (viewModeOverride === 'auto' && isTouristComplexOrWaterPark(activeEstablishment));
   const isAgencyMode = viewModeOverride === 'agency' || (viewModeOverride === 'auto' && isTravelAgencyOrTourOperator(activeEstablishment));
@@ -2661,7 +2675,8 @@ export function OwnerDashboard() {
                    viewModeOverride === 'creator' ? `DESK HUB CREADOR · ${activeEstablishment?.name || ''}` :
                    viewModeOverride === 'restaurant' ? `SUITE RESTAURANTE & BEACH CLUB · ${activeEstablishment?.name || ''}` :
                    viewModeOverride === 'marina' ? `SUITE MARINA & CLUB NÁUTICO · ${activeEstablishment?.name || ''}` :
-                   `SUITE RENT-A-CAR & FLOTA · ${activeEstablishment?.name || ''}`}
+                   viewModeOverride === 'car_rental' ? `SUITE RENT-A-CAR & FLOTA · ${activeEstablishment?.name || ''}` :
+                   `SUITE CHARTER & ALQUILER DE YATES · ${activeEstablishment?.name || ''}`}
                 </span>
               </div>
 
@@ -2857,6 +2872,24 @@ export function OwnerDashboard() {
                 </button>
               )}
 
+              {(hasYachtCharters || (isAdmin && !impersonateEstablishmentId)) && (
+                <button
+                  onClick={() => {
+                    const firstYacht = establishments.find(e => isYachtCharterOrBoatRental(e));
+                    if (firstYacht) setSelectedCalendarEst(firstYacht.id);
+                    setViewModeOverride('yacht_charter');
+                  }}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
+                    viewModeOverride === 'yacht_charter'
+                      ? "bg-[#00C8D4] text-slate-950 border-white ring-2 ring-[#00C8D4]/50 shadow-[#00C8D4]/30 font-black"
+                      : "bg-white/10 hover:bg-white/20 text-white border-white/20"
+                  }`}
+                >
+                  <Ship className="w-4 h-4" />
+                  <span className="hidden sm:inline">Vista Alquiler de Yates</span>
+                </button>
+              )}
+
               <div className="flex items-center gap-3 bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl px-4 py-2 text-xs text-white shrink-0 shadow-lg">
                 <div className="text-right">
                   <p className="text-[9px] uppercase font-black text-[#00C8D4] tracking-wider">CONECTADO</p>
@@ -2899,6 +2932,11 @@ export function OwnerDashboard() {
         />
       ) : viewModeOverride === 'car_rental' ? (
         <CarRentalDashboard
+          establishment={activeEstablishment}
+          onSwitchToTraditionalDashboard={() => setViewModeOverride('matriz')}
+        />
+      ) : viewModeOverride === 'yacht_charter' ? (
+        <YachtCharterDashboard
           establishment={activeEstablishment}
           onSwitchToTraditionalDashboard={() => setViewModeOverride('matriz')}
         />
