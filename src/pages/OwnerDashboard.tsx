@@ -967,29 +967,59 @@ export function OwnerDashboard() {
     }
   }, [user, authLoading, setLocation]);
 
-  // Automatic Link/Claim Processing when user opens ?claim=aura-croce
+  // Automatic Link/Claim Processing when user opens ?claim=slug-or-id
   useEffect(() => {
     if (!user || typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
     const claimParam = params.get("claim") || params.get("invite");
 
     if (claimParam) {
-      const claimLower = claimParam.toLowerCase();
-      if (claimLower.includes("aura") || claimLower === "99901") {
-        // Persist claim in local storage so this user account manages Aura Croce's profile
-        localStorage.setItem("hdv_claimed_aura_croce_user_id", user.id);
-        localStorage.setItem("hdv_claimed_aura_croce_email", user.email || "");
+      const claimLower = claimParam.toLowerCase().trim();
+      let matchedName = claimParam;
 
-        // Silently update database tables in Supabase
-        supabase.from("user_profiles").update({ role: "owner" }).eq("user_id", user.id).then(() => {});
-        supabase.from("establishments").update({ owner_user_id: user.id }).eq("slug", "aura-croce-viajera-creadora").then(() => {});
-        supabase.from("establishments").update({ owner_user_id: user.id }).eq("id", 99901).then(() => {});
+      const staticMatch = Object.values(TENANTS_REGISTRY).find(
+        t => t.slug.toLowerCase() === claimLower || String(t.establishment_id) === claimLower
+      );
+      const demoMatch = [
+        { id: 99901, slug: "aura-croce-viajera-creadora", name: "Aura Croce - Viajera & Creadora de Contenido" },
+        { id: 99902, slug: "el-mundo-de-los-ninos-barquisimeto", name: "El Mundo De Los Niños Barquisimeto" },
+        { id: 99903, slug: "agencia-global-travel-tours-dmc", name: "Agencia Global Travel & Tours DMC" }
+      ].find(d => d.slug.toLowerCase() === claimLower || String(d.id) === claimLower || (claimLower.includes("aura") && d.id === 99901));
 
-        setClaimSuccessBanner(`🎉 ¡Perfil Vinculado Exitosamente! Tu cuenta de Gmail (${user.email}) ha sido asignada a la Consola de Creadora de Aura Croce. Tienes control total del perfil.`);
-
-        // Clean URL parameter without reloading page
-        window.history.replaceState({}, document.title, window.location.pathname);
+      if (staticMatch) {
+        matchedName = staticMatch.name;
+        localStorage.setItem(`hdv_claimed_tenant_${staticMatch.slug}`, user.id);
+        localStorage.setItem(`hdv_claimed_tenant_${staticMatch.establishment_id}`, user.id);
+      } else if (demoMatch) {
+        matchedName = demoMatch.name;
+        localStorage.setItem(`hdv_claimed_tenant_${demoMatch.slug}`, user.id);
+        localStorage.setItem(`hdv_claimed_tenant_${demoMatch.id}`, user.id);
+        if (demoMatch.id === 99901) {
+          localStorage.setItem("hdv_claimed_aura_croce_user_id", user.id);
+          localStorage.setItem("hdv_claimed_aura_croce_email", user.email || "");
+        }
+      } else {
+        localStorage.setItem(`hdv_claimed_tenant_${claimLower}`, user.id);
       }
+
+      // Add to claimed list for this specific user
+      const userClaimsKey = `hdv_claimed_tenants_${user.id}`;
+      const existingClaims: string[] = JSON.parse(localStorage.getItem(userClaimsKey) || "[]");
+      if (!existingClaims.includes(claimLower)) {
+        existingClaims.push(claimLower);
+        if (staticMatch) existingClaims.push(staticMatch.slug, String(staticMatch.establishment_id));
+        if (demoMatch) existingClaims.push(demoMatch.slug, String(demoMatch.id));
+        localStorage.setItem(userClaimsKey, JSON.stringify(existingClaims));
+      }
+
+      // Silently update database tables in Supabase
+      supabase.from("user_profiles").update({ role: "owner" }).eq("user_id", user.id).then(() => {});
+      supabase.from("establishments").update({ owner_user_id: user.id }).or(`slug.eq.${claimLower},id.eq.${Number(claimLower) || 0}`).then(() => {});
+
+      setClaimSuccessBanner(`🎉 ¡Establecimiento Vinculado Exitosamente! Tu cuenta (${user.email}) ha sido asignada como Propietaria de "${matchedName}".`);
+
+      // Clean URL parameter without reloading page
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [user]);
 
@@ -1029,6 +1059,8 @@ export function OwnerDashboard() {
 
       if (isAdmin && impersonateEstablishmentId) {
         estQuery = estQuery.eq("id", impersonateEstablishmentId);
+      } else if (isAdmin && impersonateId) {
+        estQuery = estQuery.eq("owner_user_id", impersonateId);
       } else {
         estQuery = estQuery.eq("owner_user_id", activeOwnerId);
       }
@@ -1060,11 +1092,36 @@ export function OwnerDashboard() {
         is_circuito_excelencia: !!e.is_circuito_excelencia
       }));
 
-      // Merge local mock establishments created when RLS policy blocks insertion
+      // Merge local mock establishments created when RLS policy blocks insertion (strictly filtered by activeOwnerId)
       const localEstsKey = "hdv_mock_establishments";
       const localEsts = JSON.parse(localStorage.getItem(localEstsKey) || "[]")
         .filter((e: any) => e.owner_user_id === activeOwnerId);
 
+      mappedEsts = [...mappedEsts, ...localEsts];
+
+      // Pool of static tenants from TENANTS_REGISTRY
+      const tenantEsts: Establishment[] = Object.values(TENANTS_REGISTRY).map(t => ({
+        id: t.establishment_id,
+        name: t.name,
+        slug: t.slug,
+        status: "approved",
+        category_name: t.business_type === "restaurant" ? "Restaurantes" : "Posadas & Hoteles",
+        category_id: 2,
+        destination_name: "Venezuela",
+        destination_id: 1,
+        rating_avg: 4.9,
+        review_count: 28,
+        created_at: new Date().toISOString(),
+        address: "Venezuela",
+        phone: t.contact?.phone || "+58 412-0000000",
+        whatsapp: t.contact?.whatsapp || "+58 412-0000000",
+        website: `https://${t.domain}`,
+        description: `Nodo SaaS Corporativo - ${t.name}`,
+        membership_tier: "premium",
+        services: ["Reservas Online", "POS", "CMS", "Finanzas"]
+      }));
+
+      // Pool of demo establishments
       const builtInDemoEsts: Establishment[] = [
         {
           id: 99901,
@@ -1128,56 +1185,60 @@ export function OwnerDashboard() {
         }
       ];
 
-      // Merge tenant establishments from TENANTS_REGISTRY (Hostal Entre 2 Aguas, Aparto Posada Del Mar, etc.)
-      const tenantEsts: Establishment[] = Object.values(TENANTS_REGISTRY).map(t => ({
-        id: t.establishment_id,
-        name: t.name,
-        slug: t.slug,
-        status: "approved",
-        category_name: t.business_type === "restaurant" ? "Restaurantes" : "Posadas & Hoteles",
-        category_id: 2,
-        destination_name: "Venezuela",
-        destination_id: 1,
-        rating_avg: 4.9,
-        review_count: 28,
-        created_at: new Date().toISOString(),
-        address: "Venezuela",
-        phone: t.contact?.phone || "+58 412-0000000",
-        whatsapp: t.contact?.whatsapp || "+58 412-0000000",
-        website: `https://${t.domain}`,
-        description: `Nodo SaaS Corporativo - ${t.name}`,
-        membership_tier: "premium",
-        services: ["Reservas Online", "POS", "CMS", "Finanzas"]
-      }));
-
-      mappedEsts = [...mappedEsts, ...localEsts];
-
-      tenantEsts.forEach(te => {
-        if (!mappedEsts.some(e => e.id === te.id || e.slug === te.slug)) {
-          mappedEsts.push(te);
-        }
-      });
-
-      builtInDemoEsts.forEach(de => {
-        if (!mappedEsts.some(e => e.id === de.id || e.slug === de.slug)) {
-          mappedEsts.push(de);
-        }
-      });
-
+      // Multi-tenant strict isolation: ONLY load static tenants or demo establishments that belong to THIS user
+      const userClaimsKey = `hdv_claimed_tenants_${activeOwnerId}`;
+      const userClaimedSlugs: string[] = typeof window !== "undefined" ? JSON.parse(localStorage.getItem(userClaimsKey) || "[]") : [];
       const claimedAuraUserId = typeof window !== "undefined" ? localStorage.getItem("hdv_claimed_aura_croce_user_id") : null;
-      const isAuraClaimedByUser = (claimedAuraUserId && claimedAuraUserId === activeOwnerId) || (user?.email && user.email.toLowerCase().includes("aura"));
-      if (isAuraClaimedByUser && !mappedEsts.some(e => Number(e.id) === 99901)) {
-        mappedEsts = [builtInDemoEsts[0], ...mappedEsts.filter(e => Number(e.id) !== 99901)];
-      }
+      const userEmailLower = (user?.email || "").toLowerCase().trim();
 
-      if (isAdmin && impersonateEstablishmentId) {
-        const found = mappedEsts.find(e => Number(e.id) === Number(impersonateEstablishmentId));
-        if (found) {
-          mappedEsts = [found, ...mappedEsts.filter(e => Number(e.id) !== Number(impersonateEstablishmentId))];
-        } else {
-          const demoFound = builtInDemoEsts.find(e => Number(e.id) === Number(impersonateEstablishmentId));
-          if (demoFound) mappedEsts = [demoFound, ...mappedEsts];
+      // Only match static tenants explicitly belonging/claimed to active user
+      tenantEsts.forEach(te => {
+        const isClaimedByUser = userClaimedSlugs.includes(te.slug.toLowerCase()) ||
+                                userClaimedSlugs.includes(String(te.id)) ||
+                                (typeof window !== "undefined" && (localStorage.getItem(`hdv_claimed_tenant_${te.slug}`) === activeOwnerId || localStorage.getItem(`hdv_claimed_tenant_${te.id}`) === activeOwnerId));
+
+        const isEmailMatch = userEmailLower !== "" && (
+          (te.slug === "hostal-entre-2-aguas" && (userEmailLower.includes("entre2aguas") || userEmailLower.includes("entredosaguas") || userEmailLower.includes("entre-2-aguas"))) ||
+          (te.slug === "aparto-posada-del-mar" && userEmailLower.includes("apartoposadadelmar")) ||
+          (te.slug === "perla-negra" && userEmailLower.includes("perlanegra")) ||
+          (te.slug === "my-campers" && userEmailLower.includes("mycampers")) ||
+          (te.slug === "oleaje-beach-club" && userEmailLower.includes("oleaje")) ||
+          (te.slug === "complejo-los-roques" && userEmailLower.includes("losroques"))
+        );
+
+        const isImpersonatedMatch = isAdmin && impersonateEstablishmentId && (Number(te.id) === Number(impersonateEstablishmentId) || te.slug === String(impersonateEstablishmentId));
+
+        if (isClaimedByUser || isEmailMatch || isImpersonatedMatch) {
+          if (!mappedEsts.some(e => e.id === te.id || e.slug === te.slug)) {
+            mappedEsts.push(te);
+          }
         }
+      });
+
+      // Only match demo establishments explicitly belonging/claimed to active user
+      builtInDemoEsts.forEach(de => {
+        const isClaimedByUser = userClaimedSlugs.includes(de.slug.toLowerCase()) ||
+                                userClaimedSlugs.includes(String(de.id)) ||
+                                (de.id === 99901 && ((claimedAuraUserId && claimedAuraUserId === activeOwnerId) || userEmailLower.includes("aura"))) ||
+                                (typeof window !== "undefined" && (localStorage.getItem(`hdv_claimed_tenant_${de.slug}`) === activeOwnerId || localStorage.getItem(`hdv_claimed_tenant_${de.id}`) === activeOwnerId));
+
+        const isEmailMatch = userEmailLower !== "" && (
+          (de.id === 99902 && (userEmailLower.includes("elmundodelosninos") || userEmailLower.includes("parque"))) ||
+          (de.id === 99903 && (userEmailLower.includes("globaltravel") || userEmailLower.includes("agencia")))
+        );
+
+        const isImpersonatedMatch = isAdmin && impersonateEstablishmentId && (Number(de.id) === Number(impersonateEstablishmentId) || de.slug === String(impersonateEstablishmentId));
+
+        if (isClaimedByUser || isEmailMatch || isImpersonatedMatch) {
+          if (!mappedEsts.some(e => e.id === de.id || e.slug === de.slug)) {
+            mappedEsts.push(de);
+          }
+        }
+      });
+
+      // For Super-Admin in non-impersonation mode: if they haven't registered personal properties, provide access to testing catalogue
+      if (isAdmin && !impersonateEstablishmentId && !impersonateId && mappedEsts.length === 0) {
+        mappedEsts = [...tenantEsts, ...builtInDemoEsts];
       }
 
       setEstablishments(mappedEsts);
@@ -2468,6 +2529,25 @@ export function OwnerDashboard() {
     { name: "Semana 4", ingresos: monthlyRevenue }
   ];
 
+  const hasHotels = establishments.some(e => !isTouristComplexOrWaterPark(e) && !isTravelAgencyOrTourOperator(e) && !isCreatorOrInfluencer(e));
+  const hasParks = establishments.some(e => isTouristComplexOrWaterPark(e));
+  const hasAgencies = establishments.some(e => isTravelAgencyOrTourOperator(e));
+  const hasCreators = establishments.some(e => isCreatorOrInfluencer(e));
+
+  useEffect(() => {
+    if (establishments.length > 0 && viewModeOverride !== 'matriz') {
+      if (viewModeOverride === 'park' && !hasParks && (!isAdmin || !!impersonateEstablishmentId)) {
+        setViewModeOverride('matriz');
+      } else if (viewModeOverride === 'agency' && !hasAgencies && (!isAdmin || !!impersonateEstablishmentId)) {
+        setViewModeOverride('matriz');
+      } else if (viewModeOverride === 'creator' && !hasCreators && (!isAdmin || !!impersonateEstablishmentId)) {
+        setViewModeOverride('matriz');
+      } else if (viewModeOverride === 'hotel' && !hasHotels && (!isAdmin || !!impersonateEstablishmentId)) {
+        setViewModeOverride('matriz');
+      }
+    }
+  }, [establishments, viewModeOverride, hasParks, hasAgencies, hasCreators, hasHotels, isAdmin, impersonateEstablishmentId]);
+
   const isParkComplexMode = viewModeOverride === 'park' || (viewModeOverride === 'auto' && isTouristComplexOrWaterPark(activeEstablishment));
   const isAgencyMode = viewModeOverride === 'agency' || (viewModeOverride === 'auto' && isTravelAgencyOrTourOperator(activeEstablishment));
   const isCreatorMode = viewModeOverride === 'creator' || (viewModeOverride === 'auto' && isCreatorOrInfluencer(activeEstablishment));
@@ -2606,53 +2686,77 @@ export function OwnerDashboard() {
                 <span>Dashboard Matriz</span>
               </button>
 
-              <button
-                onClick={() => setViewModeOverride('hotel')}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
-                  viewModeOverride === 'hotel'
-                    ? "bg-[#FF0096] text-white border-white ring-2 ring-[#FF0096]/50 shadow-[#FF0096]/30 font-black"
-                    : "bg-white/10 hover:bg-white/20 text-white border-white/20"
-                }`}
-              >
-                <Building2 className="w-4 h-4" />
-                <span className="hidden sm:inline">Vista Hotel / Posadas</span>
-              </button>
+              {(hasHotels || (isAdmin && !impersonateEstablishmentId)) && (
+                <button
+                  onClick={() => {
+                    const firstHotel = establishments.find(e => !isTouristComplexOrWaterPark(e) && !isTravelAgencyOrTourOperator(e) && !isCreatorOrInfluencer(e));
+                    if (firstHotel) setSelectedCalendarEst(firstHotel.id);
+                    setViewModeOverride('hotel');
+                  }}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
+                    viewModeOverride === 'hotel'
+                      ? "bg-[#FF0096] text-white border-white ring-2 ring-[#FF0096]/50 shadow-[#FF0096]/30 font-black"
+                      : "bg-white/10 hover:bg-white/20 text-white border-white/20"
+                  }`}
+                >
+                  <Building2 className="w-4 h-4" />
+                  <span className="hidden sm:inline">Vista Hotel / Posadas</span>
+                </button>
+              )}
 
-              <button
-                onClick={() => setViewModeOverride('park')}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
-                  viewModeOverride === 'park'
-                    ? "bg-[#00C8D4] text-slate-950 border-white ring-2 ring-[#00C8D4]/50 shadow-[#00C8D4]/30 font-black"
-                    : "bg-white/10 hover:bg-white/20 text-white border-white/20"
-                }`}
-              >
-                <Waves className="w-4 h-4" />
-                <span className="hidden sm:inline">Vista Parque Acuático</span>
-              </button>
+              {(hasParks || (isAdmin && !impersonateEstablishmentId)) && (
+                <button
+                  onClick={() => {
+                    const firstPark = establishments.find(e => isTouristComplexOrWaterPark(e));
+                    if (firstPark) setSelectedCalendarEst(firstPark.id);
+                    setViewModeOverride('park');
+                  }}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
+                    viewModeOverride === 'park'
+                      ? "bg-[#00C8D4] text-slate-950 border-white ring-2 ring-[#00C8D4]/50 shadow-[#00C8D4]/30 font-black"
+                      : "bg-white/10 hover:bg-white/20 text-white border-white/20"
+                  }`}
+                >
+                  <Waves className="w-4 h-4" />
+                  <span className="hidden sm:inline">Vista Parque Acuático</span>
+                </button>
+              )}
 
-              <button
-                onClick={() => setViewModeOverride('agency')}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
-                  viewModeOverride === 'agency'
-                    ? "bg-[#9B00CC] text-white border-white ring-2 ring-[#9B00CC]/50 shadow-[#9B00CC]/30 font-black"
-                    : "bg-white/10 hover:bg-white/20 text-white border-white/20"
-                }`}
-              >
-                <Compass className="w-4 h-4" />
-                <span className="hidden sm:inline">Vista Agencia / DMC</span>
-              </button>
+              {(hasAgencies || (isAdmin && !impersonateEstablishmentId)) && (
+                <button
+                  onClick={() => {
+                    const firstAgency = establishments.find(e => isTravelAgencyOrTourOperator(e));
+                    if (firstAgency) setSelectedCalendarEst(firstAgency.id);
+                    setViewModeOverride('agency');
+                  }}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
+                    viewModeOverride === 'agency'
+                      ? "bg-[#9B00CC] text-white border-white ring-2 ring-[#9B00CC]/50 shadow-[#9B00CC]/30 font-black"
+                      : "bg-white/10 hover:bg-white/20 text-white border-white/20"
+                  }`}
+                >
+                  <Compass className="w-4 h-4" />
+                  <span className="hidden sm:inline">Vista Agencia / DMC</span>
+                </button>
+              )}
 
-              <button
-                onClick={() => setViewModeOverride('creator')}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
-                  viewModeOverride === 'creator'
-                    ? "bg-[#FF0096] text-white border-white ring-2 ring-[#FF0096]/50 shadow-[#FF0096]/30 font-black"
-                    : "bg-white/10 hover:bg-white/20 text-white border-white/20"
-                }`}
-              >
-                <Camera className="w-4 h-4" />
-                <span className="hidden sm:inline">Vista Creador / Desk Hub</span>
-              </button>
+              {(hasCreators || (isAdmin && !impersonateEstablishmentId)) && (
+                <button
+                  onClick={() => {
+                    const firstCreator = establishments.find(e => isCreatorOrInfluencer(e));
+                    if (firstCreator) setSelectedCalendarEst(firstCreator.id);
+                    setViewModeOverride('creator');
+                  }}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
+                    viewModeOverride === 'creator'
+                      ? "bg-[#FF0096] text-white border-white ring-2 ring-[#FF0096]/50 shadow-[#FF0096]/30 font-black"
+                      : "bg-white/10 hover:bg-white/20 text-white border-white/20"
+                  }`}
+                >
+                  <Camera className="w-4 h-4" />
+                  <span className="hidden sm:inline">Vista Creador / Desk Hub</span>
+                </button>
+              )}
 
               <div className="flex items-center gap-3 bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl px-4 py-2 text-xs text-white shrink-0 shadow-lg">
                 <div className="text-right">
