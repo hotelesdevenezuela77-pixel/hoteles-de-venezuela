@@ -117,9 +117,6 @@ export interface CreatorKpiSummary {
   urgentDeliverablesCount: number;
 }
 
-/**
- * Evaluador Condicional Despachador para Creadores de Contenido e Influencers
- */
 export function isCreatorOrInfluencer(est?: {
   id?: number;
   category_name?: string;
@@ -129,15 +126,32 @@ export function isCreatorOrInfluencer(est?: {
   property_type?: string;
 } | null): boolean {
   if (!est) return false;
-  const combined = `${est.category_name || ''} ${est.category_slug || ''} ${est.slug || ''} ${est.name || ''} ${est.property_type || ''}`.toLowerCase();
-  return (
-    combined.includes("creador") ||
-    combined.includes("influencer") ||
-    combined.includes("viajero") ||
-    combined.includes("embajador") ||
-    combined.includes("contenido") ||
-    combined.includes("media") ||
-    combined.includes("blog") ||
-    combined.includes("nomad")
-  );
+
+  const catName = (est.category_name || '').toLowerCase();
+  const catSlug = (est.category_slug || '').toLowerCase();
+  const propType = (est.property_type || '').toLowerCase();
+  const slug = (est.slug || '').toLowerCase();
+  const name = (est.name || '').toLowerCase();
+
+  // 1. Verificación explícita de categoría o tipo de propiedad especializado
+  const isExplicitCreatorCategory =
+    catName.includes("creadores de contenido") ||
+    catName.includes("creador de contenido") ||
+    catName.includes("influencers") ||
+    catName.includes("influencer") ||
+    catSlug === "creadores-de-contenido" ||
+    catSlug === "influencers" ||
+    propType === "creador_contenido" ||
+    propType === "influencer";
+
+  if (isExplicitCreatorCategory) return true;
+
+  // 2. Verificación por slug/nombre de creadores conocidos
+  const isKnownCreator =
+    slug.includes("aura-croce") ||
+    slug.includes("viajera-creadora") ||
+    name.includes("aura croce") ||
+    (name.includes("creadora de contenido") || name.includes("creador de contenido"));
+
+  return isKnownCreator;
 }

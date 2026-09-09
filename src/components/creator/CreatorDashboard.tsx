@@ -110,10 +110,10 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
               {onSwitchToTraditionalDashboard && (
                 <button
                   onClick={onSwitchToTraditionalDashboard}
-                  className="px-3.5 py-2 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-slate-300 font-semibold text-xs transition-all flex items-center space-x-1.5"
+                  className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:opacity-90 text-white font-extrabold text-xs shadow-lg transition-all flex items-center space-x-2 cursor-pointer border border-white/20 hover:scale-[1.02]"
                 >
-                  <Building2 className="w-4 h-4 text-purple-400" />
-                  <span>Vista Posada / Hotel</span>
+                  <Building2 className="w-4 h-4 text-white" />
+                  <span>⬅ Volver al Dashboard Matriz</span>
                 </button>
               )}
             </div>

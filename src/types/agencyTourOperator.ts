@@ -132,9 +132,6 @@ export interface AgencyKpiSummary {
   urgentDeadlinesCount: number; // Pagos vencen < 72h
 }
 
-/**
- * Evaluador Condicional Despachador para Agencias de Viajes, Tour Operadores y DMCs
- */
 export function isTravelAgencyOrTourOperator(est?: {
   id?: number;
   category_name?: string;
@@ -144,16 +141,34 @@ export function isTravelAgencyOrTourOperator(est?: {
   property_type?: string;
 } | null): boolean {
   if (!est) return false;
-  const combined = `${est.category_name || ''} ${est.category_slug || ''} ${est.slug || ''} ${est.name || ''} ${est.property_type || ''}`.toLowerCase();
-  return (
-    combined.includes("agencia") ||
-    combined.includes("agencia_viajes") ||
-    combined.includes("tour") ||
-    combined.includes("operador") ||
-    combined.includes("dmc") ||
-    combined.includes("expedicion") ||
-    combined.includes("expedición") ||
-    combined.includes("charter") ||
-    combined.includes("travel")
-  );
+
+  const catName = (est.category_name || '').toLowerCase();
+  const catSlug = (est.category_slug || '').toLowerCase();
+  const propType = (est.property_type || '').toLowerCase();
+  const slug = (est.slug || '').toLowerCase();
+  const name = (est.name || '').toLowerCase();
+
+  // 1. Verificación explícita de categoría o tipo de propiedad especializado
+  const isExplicitAgencyCategory =
+    catName.includes("agencias de viajes") ||
+    catName.includes("agencia de viajes") ||
+    catName.includes("tour operador") ||
+    catName.includes("tour operadores") ||
+    catName.includes("mayorista de turismo") ||
+    catSlug === "agencias-de-viajes" ||
+    catSlug === "tour-operadores" ||
+    catSlug === "dmc" ||
+    propType === "agencia_viajes" ||
+    propType === "tour_operador" ||
+    propType === "dmc";
+
+  if (isExplicitAgencyCategory) return true;
+
+  // 2. Verificación por slug/nombre de establecimientos de agencias conocidas
+  const isKnownAgency =
+    slug.includes("agencia-global-travel") ||
+    slug.includes("global-travel-tours-dmc") ||
+    (name.includes("agencia") && (name.includes("viajes") || name.includes("dmc") || name.includes("tours")));
+
+  return isKnownAgency;
 }

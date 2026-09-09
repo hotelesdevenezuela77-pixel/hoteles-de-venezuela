@@ -190,6 +190,60 @@ function getRoomAmenityLabel(key: string) {
   return ROOM_AMENITIES_MAP[normalized] || key.charAt(0).toUpperCase() + key.slice(1);
 }
 
+export function getEstablishmentDashboardMode(est?: {
+  id?: number;
+  category_name?: string;
+  category_slug?: string;
+  slug?: string;
+  name?: string;
+  property_type?: string;
+} | null): 'hotel' | 'park' | 'agency' | 'creator' {
+  if (!est) return 'hotel';
+  if (isTouristComplexOrWaterPark(est)) return 'park';
+  if (isTravelAgencyOrTourOperator(est)) return 'agency';
+  if (isCreatorOrInfluencer(est)) return 'creator';
+  return 'hotel';
+}
+
+export function getEstablishmentCategoryBadge(est: Establishment) {
+  const mode = getEstablishmentDashboardMode(est);
+  switch (mode) {
+    case 'park':
+      return {
+        label: "Parque Acuático & Complejo",
+        badgeClass: "bg-cyan-50 text-cyan-800 border border-cyan-200",
+        btnClass: "bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] text-white hover:opacity-95 shadow-md",
+        icon: Waves,
+        actionLabel: "Abrir Dashboard Parque Acuático"
+      };
+    case 'agency':
+      return {
+        label: "Agencia de Viajes / DMC",
+        badgeClass: "bg-purple-50 text-purple-800 border border-purple-200",
+        btnClass: "bg-gradient-to-r from-[#9B00CC] to-[#00C8D4] text-white hover:opacity-95 shadow-md",
+        icon: Compass,
+        actionLabel: "Abrir Dashboard Agencia / DMC"
+      };
+    case 'creator':
+      return {
+        label: "Creador de Contenido / Desk Hub",
+        badgeClass: "bg-pink-50 text-pink-800 border border-pink-200",
+        btnClass: "bg-gradient-to-r from-[#FF0096] to-[#00C8D4] text-white hover:opacity-95 shadow-md",
+        icon: Camera,
+        actionLabel: "Abrir Desk Hub Creador"
+      };
+    case 'hotel':
+    default:
+      return {
+        label: est.category_name || "Hotel / Posada",
+        badgeClass: "bg-pink-50 text-pink-800 border border-pink-200",
+        btnClass: "bg-gradient-to-r from-[#FF0096] to-[#9B00CC] text-white hover:opacity-95 shadow-md",
+        icon: Building2,
+        actionLabel: "Abrir Panel Hotelero"
+      };
+  }
+}
+
 export function OwnerDashboard() {
   const { user, profile, loading: authLoading, loginWithGoogle } = useAuth();
   const [, setLocation] = useLocation();
@@ -250,9 +304,16 @@ export function OwnerDashboard() {
   }, []);
   const [operacionesSubTab, setOperacionesSubTab] = useState<"reservas" | "disponibilidad" | "timeline">("reservas");
   const [marketingSubTab, setMarketingSubTab] = useState<"descuentos" | "leads" | "reviews" | "channel-manager">("leads");
-  const [viewModeOverride, setViewModeOverride] = useState<'auto' | 'park' | 'agency' | 'creator' | 'traditional'>('auto');
-
-
+  const [viewModeOverride, setViewModeOverride] = useState<'matriz' | 'hotel' | 'park' | 'agency' | 'creator'>(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const viewParam = params.get("view");
+      if (viewParam && ['matriz', 'hotel', 'park', 'agency', 'creator'].includes(viewParam)) {
+        return viewParam as any;
+      }
+    }
+    return 'matriz';
+  });
 
   const [selectedCalendarEst, setSelectedCalendarEst] = useState<number | "">("");
   const [currentTenantConfig, setCurrentTenantConfig] = useState<TenantConfig | null>(null);
@@ -1067,21 +1128,55 @@ export function OwnerDashboard() {
         }
       ];
 
+      // Merge tenant establishments from TENANTS_REGISTRY (Hostal Entre 2 Aguas, Aparto Posada Del Mar, etc.)
+      const tenantEsts: Establishment[] = Object.values(TENANTS_REGISTRY).map(t => ({
+        id: t.establishment_id,
+        name: t.name,
+        slug: t.slug,
+        status: "approved",
+        category_name: t.business_type === "restaurant" ? "Restaurantes" : "Posadas & Hoteles",
+        category_id: 2,
+        destination_name: "Venezuela",
+        destination_id: 1,
+        rating_avg: 4.9,
+        review_count: 28,
+        created_at: new Date().toISOString(),
+        address: "Venezuela",
+        phone: t.contact?.phone || "+58 412-0000000",
+        whatsapp: t.contact?.whatsapp || "+58 412-0000000",
+        website: `https://${t.domain}`,
+        description: `Nodo SaaS Corporativo - ${t.name}`,
+        membership_tier: "premium",
+        services: ["Reservas Online", "POS", "CMS", "Finanzas"]
+      }));
+
       mappedEsts = [...mappedEsts, ...localEsts];
+
+      tenantEsts.forEach(te => {
+        if (!mappedEsts.some(e => e.id === te.id || e.slug === te.slug)) {
+          mappedEsts.push(te);
+        }
+      });
+
+      builtInDemoEsts.forEach(de => {
+        if (!mappedEsts.some(e => e.id === de.id || e.slug === de.slug)) {
+          mappedEsts.push(de);
+        }
+      });
 
       const claimedAuraUserId = typeof window !== "undefined" ? localStorage.getItem("hdv_claimed_aura_croce_user_id") : null;
       const isAuraClaimedByUser = (claimedAuraUserId && claimedAuraUserId === activeOwnerId) || (user?.email && user.email.toLowerCase().includes("aura"));
       if (isAuraClaimedByUser && !mappedEsts.some(e => Number(e.id) === 99901)) {
-        mappedEsts = [builtInDemoEsts[0], ...mappedEsts];
+        mappedEsts = [builtInDemoEsts[0], ...mappedEsts.filter(e => Number(e.id) !== 99901)];
       }
 
       if (isAdmin && impersonateEstablishmentId) {
         const found = mappedEsts.find(e => Number(e.id) === Number(impersonateEstablishmentId));
         if (found) {
-          mappedEsts = [found];
+          mappedEsts = [found, ...mappedEsts.filter(e => Number(e.id) !== Number(impersonateEstablishmentId))];
         } else {
           const demoFound = builtInDemoEsts.find(e => Number(e.id) === Number(impersonateEstablishmentId));
-          mappedEsts = demoFound ? [demoFound] : [];
+          if (demoFound) mappedEsts = [demoFound, ...mappedEsts];
         }
       }
 
@@ -2436,7 +2531,13 @@ export function OwnerDashboard() {
               <div className="flex items-center gap-2 text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-2">
                 <span>PANEL DE PROPIETARIOS</span>
                 <span>/</span>
-                <span className="text-[#00C8D4]">CONSOLA EJECUTIVA</span>
+                <span className="text-[#00C8D4]">
+                  {viewModeOverride === 'matriz' ? 'DASHBOARD MATRIZ DE PROPIETARIOS' :
+                   viewModeOverride === 'hotel' ? `PANEL HOTELERO & POSADAS · ${activeEstablishment?.name || ''}` :
+                   viewModeOverride === 'park' ? `SUITE PARQUE ACUÁTICO · ${activeEstablishment?.name || ''}` :
+                   viewModeOverride === 'agency' ? `SUITE AGENCIA & DMC · ${activeEstablishment?.name || ''}` :
+                   `DESK HUB CREADOR · ${activeEstablishment?.name || ''}`}
+                </span>
               </div>
 
               <div className="flex items-center gap-3 mb-1.5">
@@ -2490,14 +2591,39 @@ export function OwnerDashboard() {
               </div>
             </div>
 
-            {/* Status CONECTADO (Estilo idéntico a Print 1 del Panel Admin) */}
-            <div className="flex items-center gap-3">
+            {/* Status CONECTADO y Selector de Dashboard Matriz / Vistas */}
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <button
+                onClick={() => setViewModeOverride('matriz')}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-black shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
+                  viewModeOverride === 'matriz'
+                    ? "bg-[#00C8D4] text-slate-950 border-white ring-2 ring-[#00C8D4]/50 shadow-[#00C8D4]/30"
+                    : "bg-white/10 hover:bg-white/20 text-white border-white/20"
+                }`}
+                title="Ir al Dashboard Matriz Multinegocio"
+              >
+                <Building2 className="w-4 h-4" />
+                <span>Dashboard Matriz</span>
+              </button>
+
+              <button
+                onClick={() => setViewModeOverride('hotel')}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
+                  viewModeOverride === 'hotel'
+                    ? "bg-[#FF0096] text-white border-white ring-2 ring-[#FF0096]/50 shadow-[#FF0096]/30 font-black"
+                    : "bg-white/10 hover:bg-white/20 text-white border-white/20"
+                }`}
+              >
+                <Building2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Vista Hotel / Posadas</span>
+              </button>
+
               <button
                 onClick={() => setViewModeOverride('park')}
-                className={`flex items-center gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border ${
-                  isParkComplexMode
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
+                  viewModeOverride === 'park'
                     ? "bg-[#00C8D4] text-slate-950 border-white ring-2 ring-[#00C8D4]/50 shadow-[#00C8D4]/30 font-black"
-                    : "bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] text-white border-white/20"
+                    : "bg-white/10 hover:bg-white/20 text-white border-white/20"
                 }`}
               >
                 <Waves className="w-4 h-4" />
@@ -2506,10 +2632,10 @@ export function OwnerDashboard() {
 
               <button
                 onClick={() => setViewModeOverride('agency')}
-                className={`flex items-center gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border ${
-                  isAgencyMode
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
+                  viewModeOverride === 'agency'
                     ? "bg-[#9B00CC] text-white border-white ring-2 ring-[#9B00CC]/50 shadow-[#9B00CC]/30 font-black"
-                    : "bg-gradient-to-r from-[#9B00CC] to-[#00C8D4] text-white border-white/20"
+                    : "bg-white/10 hover:bg-white/20 text-white border-white/20"
                 }`}
               >
                 <Compass className="w-4 h-4" />
@@ -2518,22 +2644,22 @@ export function OwnerDashboard() {
 
               <button
                 onClick={() => setViewModeOverride('creator')}
-                className={`flex items-center gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border ${
-                  isCreatorMode
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
+                  viewModeOverride === 'creator'
                     ? "bg-[#FF0096] text-white border-white ring-2 ring-[#FF0096]/50 shadow-[#FF0096]/30 font-black"
-                    : "bg-gradient-to-r from-[#FF0096] to-[#00C8D4] text-white border-white/20"
+                    : "bg-white/10 hover:bg-white/20 text-white border-white/20"
                 }`}
               >
                 <Camera className="w-4 h-4" />
                 <span className="hidden sm:inline">Vista Creador / Desk Hub</span>
               </button>
 
-              <div className="flex items-center gap-3 bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl px-4 py-2.5 text-xs text-white shrink-0 shadow-lg">
+              <div className="flex items-center gap-3 bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl px-4 py-2 text-xs text-white shrink-0 shadow-lg">
                 <div className="text-right">
                   <p className="text-[9px] uppercase font-black text-[#00C8D4] tracking-wider">CONECTADO</p>
                   <p className="font-bold text-white text-xs truncate max-w-[180px]">{user?.email || "hotelesdevenezuela"}</p>
                 </div>
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#FF0096] to-[#9B00CC] flex items-center justify-center text-white font-black text-sm uppercase shadow-sm">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#FF0096] to-[#9B00CC] flex items-center justify-center text-white font-black text-sm uppercase shadow-sm">
                   {(user?.email || "H").charAt(0)}
                 </div>
               </div>
@@ -2543,23 +2669,51 @@ export function OwnerDashboard() {
       </div>
 
       {/* BODY DISPATCHER FOR SPECIALIZED PANELS */}
-      {isCreatorMode ? (
+      {viewModeOverride === 'creator' ? (
         <CreatorDashboard
           establishment={activeEstablishment}
-          onSwitchToTraditionalDashboard={() => setViewModeOverride('traditional')}
+          onSwitchToTraditionalDashboard={() => setViewModeOverride('matriz')}
         />
-      ) : isAgencyMode ? (
+      ) : viewModeOverride === 'agency' ? (
         <AgencyDashboard
           establishment={activeEstablishment}
-          onSwitchToTraditionalDashboard={() => setViewModeOverride('traditional')}
+          onSwitchToTraditionalDashboard={() => setViewModeOverride('matriz')}
         />
-      ) : isParkComplexMode ? (
+      ) : viewModeOverride === 'park' ? (
         <ParkComplexDashboard
           establishment={activeEstablishment}
-          onSwitchToTraditionalDashboard={() => setViewModeOverride('traditional')}
+          onSwitchToTraditionalDashboard={() => setViewModeOverride('matriz')}
         />
       ) : (
         <>
+          {/* Sub-banner contextual si estamos en Vista Hotel / Posadas */}
+          {viewModeOverride === 'hotel' && (
+            <div className="max-w-7xl mx-auto px-6 pt-4 pb-2">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-gradient-to-r from-[#0e011f] via-[#1a0533] to-[#0e011f] border border-[#00C8D4]/40 rounded-2xl p-4 text-white shadow-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#FF0096] to-[#00C8D4] flex items-center justify-center text-white shrink-0 shadow-md">
+                    <Building2 className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase text-white tracking-wider bg-[#FF0096]">
+                        PANEL HOTELERO & POSADAS
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-semibold">{activeEstablishment?.category_name || "Alojamiento"}</span>
+                    </div>
+                    <h2 className="text-lg font-black text-white font-serif">{activeEstablishment?.name}</h2>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setViewModeOverride('matriz')}
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:opacity-90 border border-white/20 text-white font-black text-xs transition-all flex items-center gap-2 cursor-pointer shrink-0 shadow-sm hover:scale-[1.02]"
+                >
+                  <Building2 className="w-4 h-4 text-white" />
+                  <span>⬅ Volver al Dashboard Matriz</span>
+                </button>
+              </div>
+            </div>
+          )}
 
 
       {/* Recuadro Degradado Fucsia Magenta/Púrpura - Panel de Control Ejecutivo */}
@@ -2568,13 +2722,15 @@ export function OwnerDashboard() {
           <div className="space-y-2.5 max-w-3xl">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black bg-white/20 text-white border border-white/30 tracking-widest uppercase shadow-sm">
               <Briefcase className="w-3.5 h-3.5" />
-              <span>Portal de Socios Hoteleros</span>
+              <span>{viewModeOverride === 'matriz' ? "Consola Central Multinegocio" : "Portal de Socios Hoteleros & Posadas"}</span>
             </span>
             <h2 className="text-2xl md:text-3xl font-serif font-black tracking-tight text-white drop-shadow-sm">
-              Panel de Control Ejecutivo
+              {viewModeOverride === 'matriz' ? "Dashboard Matriz de Propietario" : `Panel Ejecutivo · ${activeEstablishment?.name || "Alojamiento"}`}
             </h2>
             <p className="text-xs text-white/90 font-medium leading-relaxed max-w-2xl">
-              Administra tarifas, inventario de habitaciones, facturas de membresía y comunicación directa de leads para tu cartera comercial.
+              {viewModeOverride === 'matriz'
+                ? "Panel maestro centralizado. Administra todas tus unidades de negocio (hoteles, posadas, parques acuáticos, agencias y expediciones) desde una sola consola unificada."
+                : "Administra tarifas, inventario de habitaciones, facturas de membresía y comunicación directa de leads para tu propiedad."}
             </p>
 
             {/* Botón titilante de seguridad y mensaje de tranquilidad */}
@@ -2591,7 +2747,7 @@ export function OwnerDashboard() {
 
               <p className="text-xs text-white/95 font-semibold leading-relaxed flex items-center gap-1.5">
                 <ShieldAlert className="w-3.5 h-3.5 text-white shrink-0 inline" />
-                <span>Gestiona tu propiedad con la tranquilidad de que tus datos están encriptados en una de las plataformas más blindadas del globo.</span>
+                <span>Gestiona tus negocios con la tranquilidad de que tus datos están encriptados en una de las plataformas más blindadas del globo.</span>
               </p>
             </div>
           </div>
@@ -3118,97 +3274,119 @@ export function OwnerDashboard() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {establishments.map(est => (
-                  <div key={est.id} className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between text-left">
-                    <div>
-                      <div className="flex justify-between items-start gap-4 mb-2">
-                        <h4 className="font-black text-gray-800 text-lg leading-tight font-serif">{est.name}</h4>
-                        {getStatusBadge(est.status)}
+                {establishments.map(est => {
+                  const badgeInfo = getEstablishmentCategoryBadge(est);
+                  const IconComponent = badgeInfo.icon;
+                  return (
+                    <div key={est.id} className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between text-left hover:border-gray-300 transition-all">
+                      <div>
+                        <div className="flex justify-between items-start gap-4 mb-2">
+                          <div>
+                            <h4 className="font-black text-gray-800 text-lg leading-tight font-serif">{est.name}</h4>
+                            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                              <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${badgeInfo.badgeClass}`}>
+                                <IconComponent className="w-3 h-3" />
+                                <span>{badgeInfo.label}</span>
+                              </span>
+                              <span className="text-[10px] font-bold text-gray-400">• {est.destination_name}</span>
+                            </div>
+                          </div>
+                          {getStatusBadge(est.status)}
+                        </div>
+
+                        <div className="space-y-1.5 text-xs text-gray-500 mb-4 mt-3">
+                          {est.address && <p><span className="font-bold text-gray-400 uppercase text-[9px] tracking-wider block">Dirección:</span> {est.address}</p>}
+                          {est.phone && <p><span className="font-bold text-gray-400 uppercase text-[9px] tracking-wider block">Contacto:</span> {est.phone}</p>}
+                          {est.website && <p><span className="font-bold text-gray-400 uppercase text-[9px] tracking-wider block">Sitio Web:</span> <a href={est.website} target="_blank" className="text-brand-turquesa underline">{est.website}</a></p>}
+                        </div>
+
+                        {/* Verification Status & Action Box */}
+                        {est.status === "approved" ? (
+                          <div className="bg-green-50 border border-green-200 rounded-2xl p-3.5 mb-5 flex items-center justify-between gap-3">
+                            <div className="text-left">
+                              <span className="text-[10px] font-black text-green-900 uppercase block flex items-center gap-1">
+                                <CheckCircle className="w-3.5 h-3.5 text-green-600" />
+                                Verificación Comercial Completa
+                              </span>
+                              <span className="text-[9px] text-green-700 block font-semibold mt-0.5">Sello de garantía y ficha pública activos en plataforma.</span>
+                            </div>
+                            <span className="text-[9px] font-black uppercase text-green-700 bg-green-200/60 px-2 py-1 rounded-lg">Oficial</span>
+                          </div>
+                        ) : est.status === "under_review" ? (
+                          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3.5 mb-5 flex items-center justify-between gap-3">
+                            <div className="text-left">
+                              <span className="text-[10px] font-black text-blue-900 uppercase block flex items-center gap-1">
+                                <Clock className="w-3.5 h-3.5 text-blue-600 animate-pulse" />
+                                Documentos en Auditoría Legal
+                              </span>
+                              <span className="text-[9px] text-blue-700 block font-semibold mt-0.5">El equipo comercial está validando RIF y Licencia consignados.</span>
+                            </div>
+                            <button
+                              onClick={() => handleOpenVerificationModal(est)}
+                              className="text-[9px] font-black uppercase text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-xl cursor-pointer transition-all shrink-0"
+                            >
+                              Actualizar Recaudos
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 mb-5 flex items-center justify-between gap-3">
+                            <div className="text-left">
+                              <span className="text-[10px] font-black text-amber-900 uppercase block flex items-center gap-1">
+                                <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
+                                Proceso Pre-Aprobado (Pendiente Documentación)
+                              </span>
+                              <span className="text-[9px] text-amber-700 block font-semibold mt-0.5">Consigna tu RIF y Registro Mercantil para validación oficial.</span>
+                            </div>
+                            <button
+                              onClick={() => handleOpenVerificationModal(est)}
+                              className="text-[9px] font-black uppercase text-white bg-amber-600 hover:bg-amber-700 px-3 py-1.5 rounded-xl cursor-pointer transition-all shrink-0 shadow-xs"
+                            >
+                              Consignar Documentos
+                            </button>
+                          </div>
+                        )}
                       </div>
-                      <p className="text-[11px] font-bold text-brand-magenta uppercase tracking-wider mb-4">{est.category_name} • {est.destination_name}</p>
 
-                      <div className="space-y-2 text-xs text-gray-500 mb-4">
-                        {est.address && <p><span className="font-bold text-gray-400 uppercase text-[9px] tracking-wider block">Dirección:</span> {est.address}</p>}
-                        {est.phone && <p><span className="font-bold text-gray-400 uppercase text-[9px] tracking-wider block">Contacto:</span> {est.phone}</p>}
-                        {est.website && <p><span className="font-bold text-gray-400 uppercase text-[9px] tracking-wider block">Sitio Web:</span> <a href={est.website} target="_blank" className="text-brand-turquesa underline">{est.website}</a></p>}
-                      </div>
-
-                      {/* Verification Status & Action Box */}
-                      {est.status === "approved" ? (
-                        <div className="bg-green-50 border border-green-200 rounded-2xl p-3.5 mb-5 flex items-center justify-between gap-3">
-                          <div className="text-left">
-                            <span className="text-[10px] font-black text-green-900 uppercase block flex items-center gap-1">
-                              <CheckCircle className="w-3.5 h-3.5 text-green-600" />
-                              Verificación Comercial Completa
-                            </span>
-                            <span className="text-[9px] text-green-700 block font-semibold mt-0.5">Sello de garantía y ficha pública activos en plataforma.</span>
-                          </div>
-                          <span className="text-[9px] font-black uppercase text-green-700 bg-green-200/60 px-2 py-1 rounded-lg">Oficial</span>
-                        </div>
-                      ) : est.status === "under_review" ? (
-                        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3.5 mb-5 flex items-center justify-between gap-3">
-                          <div className="text-left">
-                            <span className="text-[10px] font-black text-blue-900 uppercase block flex items-center gap-1">
-                              <Clock className="w-3.5 h-3.5 text-blue-600 animate-pulse" />
-                              Documentos en Auditoría Legal
-                            </span>
-                            <span className="text-[9px] text-blue-700 block font-semibold mt-0.5">El equipo comercial está validando RIF y Licencia consignados.</span>
-                          </div>
-                          <button
-                            onClick={() => handleOpenVerificationModal(est)}
-                            className="text-[9px] font-black uppercase text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-xl cursor-pointer transition-all shrink-0"
-                          >
-                            Actualizar Recaudos
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 mb-5 flex items-center justify-between gap-3">
-                          <div className="text-left">
-                            <span className="text-[10px] font-black text-amber-900 uppercase block flex items-center gap-1">
-                              <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
-                              Proceso Pre-Aprobado (Pendiente Documentación)
-                            </span>
-                            <span className="text-[9px] text-amber-700 block font-semibold mt-0.5">Consigna tu RIF y Registro Mercantil para validación oficial.</span>
-                          </div>
-                          <button
-                            onClick={() => handleOpenVerificationModal(est)}
-                            className="text-[9px] font-black uppercase text-white bg-amber-600 hover:bg-amber-700 px-3 py-1.5 rounded-xl cursor-pointer transition-all shrink-0 shadow-xs"
-                          >
-                            Consignar Documentos
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex gap-2 pt-4 border-t border-gray-100 flex-wrap">
-                      <button
-                        onClick={() => handleOpenEditEstModal(est)}
-                        className="px-4 bg-[#00C8D4]/10 hover:bg-[#00C8D4]/20 text-[#00C8D4] border border-[#00C8D4]/30 font-extrabold text-xs py-2.5 rounded-xl cursor-pointer flex items-center gap-1.5"
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                        <span>Editar Negocio</span>
-                      </button>
-                      <Link href={`/establecimiento/${est.slug}`} className="flex-1 min-w-[120px]">
-                        <button className="w-full bg-white border border-gray-200 text-gray-600 font-bold text-xs py-2.5 rounded-xl hover:bg-gray-50 cursor-pointer">
-                          Ver Ficha Pública
+                      <div className="space-y-2 pt-4 border-t border-gray-100">
+                        {/* Botón Principal para Abrir el Dashboard Especializado correspondiente */}
+                        <button
+                          onClick={() => {
+                            setSelectedCalendarEst(est.id);
+                            const mode = getEstablishmentDashboardMode(est);
+                            setViewModeOverride(mode);
+                            if (mode === 'hotel') setActiveTab('inventario');
+                          }}
+                          className={`w-full ${badgeInfo.btnClass} font-black text-xs py-3 px-4 rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-[1.01]`}
+                        >
+                          <IconComponent className="w-4 h-4" />
+                          <span>{badgeInfo.actionLabel}</span>
                         </button>
-                      </Link>
-                      <button
-                        onClick={() => { setSelectedCalendarEst(est.id); setActiveTab("inventario"); }}
-                        className="flex-1 min-w-[120px] bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold text-xs py-2.5 rounded-xl border border-gray-250 cursor-pointer"
-                      >
-                        Gestionar Inventario
-                      </button>
-                      <button
-                        onClick={() => handleOpenVerificationModal(est)}
-                        className="px-3 bg-brand-magenta/10 hover:bg-brand-magenta/20 text-brand-magenta border border-brand-magenta/20 font-bold text-xs py-2.5 rounded-xl cursor-pointer"
-                        title="Consignación de Documentos y Verificación"
-                      >
-                        <FileText className="w-4 h-4" />
-                      </button>
+
+                        <div className="flex gap-2 flex-wrap">
+                          <button
+                            onClick={() => handleOpenEditEstModal(est)}
+                            className="px-3.5 bg-[#00C8D4]/10 hover:bg-[#00C8D4]/20 text-[#00C8D4] border border-[#00C8D4]/30 font-extrabold text-xs py-2 rounded-xl cursor-pointer flex items-center gap-1.5"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>Editar</span>
+                          </button>
+                          <Link href={`/establecimiento/${est.slug}`} className="flex-1 min-w-[110px]">
+                            <button className="w-full bg-white border border-gray-200 text-gray-600 font-bold text-xs py-2 rounded-xl hover:bg-gray-50 cursor-pointer">
+                              Ficha Pública
+                            </button>
+                          </Link>
+                          <button
+                            onClick={() => handleOpenVerificationModal(est)}
+                            className="px-3 bg-brand-magenta/10 hover:bg-brand-magenta/20 text-brand-magenta border border-brand-magenta/20 font-bold text-xs py-2 rounded-xl cursor-pointer"
+                            title="Consignación de Documentos y Verificación"
+                          >
+                            <FileText className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

@@ -130,10 +130,6 @@ export interface ParkKpiSummary {
   netBalanceBs: number;
 }
 
-/**
- * Función Despachadora Condicional
- * Identifica si un establecimiento es un Complejo Turístico, Parque Acuático o Centro de Recreación.
- */
 export function isTouristComplexOrWaterPark(est?: {
   id?: number;
   category_name?: string;
@@ -143,16 +139,46 @@ export function isTouristComplexOrWaterPark(est?: {
   property_type?: string;
 } | null): boolean {
   if (!est) return false;
-  const combined = `${est.category_name || ''} ${est.category_slug || ''} ${est.slug || ''} ${est.name || ''} ${est.property_type || ''}`.toLowerCase();
-  return (
-    combined.includes("parque") ||
-    combined.includes("complejo") ||
-    combined.includes("acuatico") ||
-    combined.includes("acuático") ||
-    combined.includes("recreacion") ||
-    combined.includes("recreación") ||
-    combined.includes("mundo de los niños") ||
-    combined.includes("waterpark") ||
-    combined.includes("amusement")
-  );
+
+  const catName = (est.category_name || '').toLowerCase();
+  const catSlug = (est.category_slug || '').toLowerCase();
+  const propType = (est.property_type || '').toLowerCase();
+  const slug = (est.slug || '').toLowerCase();
+  const name = (est.name || '').toLowerCase();
+
+  // 1. Verificación explícita de categoría o tipo de propiedad especializado
+  const isExplicitParkCategory =
+    catName.includes("parque acuático") ||
+    catName.includes("parque acuatico") ||
+    catName.includes("parques acuáticos") ||
+    catName.includes("parques acuaticos") ||
+    catName.includes("parque de atracciones") ||
+    catName.includes("parque temático") ||
+    catName.includes("parque tematico") ||
+    catName.includes("centro recreativo") ||
+    catName.includes("complejos turísticos y parques") ||
+    catName.includes("complejos turisticos y parques") ||
+    catSlug === "parque-acuatico" ||
+    catSlug === "parques-acuaticos" ||
+    catSlug === "waterpark" ||
+    catSlug === "theme-park" ||
+    propType === "parque_acuatico" ||
+    propType === "parque_tematico" ||
+    propType === "centro_recreativo";
+
+  if (isExplicitParkCategory) return true;
+
+  // 2. Verificación por slug/nombre de establecimientos de parques conocidos
+  const isKnownParkEstablishment =
+    slug.includes("el-mundo-de-los-ninos") ||
+    slug.includes("mundo-de-los-ninos") ||
+    slug.includes("parque-el-agua") ||
+    slug.includes("parque-acuatico") ||
+    slug.includes("aquapark") ||
+    name.includes("el mundo de los niños") ||
+    name.includes("parque el agua") ||
+    name.includes("parque acuático") ||
+    name.includes("parque acuatico");
+
+  return isKnownParkEstablishment;
 }
