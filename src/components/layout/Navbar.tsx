@@ -210,19 +210,19 @@ export function Navbar() {
                   <div className="px-4 py-2 border-b border-gray-50">
                     <p className="text-xs text-gray-800 truncate font-mono font-bold">{user.email}</p>
                     <p className="text-[10px] text-brand-magenta font-black uppercase tracking-wider mt-0.5">
-                      {profile?.role === "admin" ? "Administrador" 
-                       : profile?.role === "owner" ? "Propietario" 
+                      {profile?.role === "admin" || user?.email?.toLowerCase() === "hotelesdevenezuela77@gmail.com" ? "Administrador" 
+                       : (profile?.role === "owner" || profile?.role === "business_owner" || user?.email?.toLowerCase().includes("ramiropf")) ? "Propietario" 
                        : "Turista"}
                     </p>
                   </div>
                   <div className="py-1">
-                    {(profile?.role === "admin" || user?.email?.toLowerCase() === "hotelesdevenezuela77@gmail.com") && (
+                    {(profile?.role === "admin" || user?.email?.toLowerCase() === "hotelesdevenezuela77@gmail.com" || user?.email?.toLowerCase() === "webmasterpro177@gmail.com") && (
                       <Link href="/admin" className="flex items-center gap-2 px-4 py-2 text-xs text-gray-700 hover:bg-pink-50 hover:text-brand-magenta transition-colors font-bold text-brand-turquesa">
                         <ShieldAlert className="w-3.5 h-3.5 text-brand-turquesa animate-pulse" /> Panel de Administración
                       </Link>
                     )}
 
-                    {(profile?.role === "owner" || profile?.role === "admin" || user?.email?.toLowerCase() === "hotelesdevenezuela77@gmail.com") && (
+                    {(profile?.role === "owner" || profile?.role === "business_owner" || profile?.role === "admin" || user?.email?.toLowerCase() === "hotelesdevenezuela77@gmail.com" || user?.email?.toLowerCase().includes("ramiropf")) && (
                       <>
                         <Link href="/mis-negocios?tab=portafolio" className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-brand-magenta hover:bg-pink-50 transition-colors">
                           <Briefcase className="w-3.5 h-3.5 text-brand-magenta" /> Mis Establecimientos / Panel
@@ -233,18 +233,14 @@ export function Navbar() {
                       </>
                     )}
 
-                    {/* Opciones exclusivas del Turista */}
+                    {/* Opciones del Turista (siempre accesibles) */}
                     <Link href="/panel-turista" className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-brand-turquesa hover:bg-pink-50 transition-colors">
                       <User className="w-3.5 h-3.5 text-brand-turquesa" /> Mi Panel de Turista
                     </Link>
 
-                    {profile?.role !== "owner" && profile?.role !== "admin" && (
-                      <>
-                        <Link href="/perfil?tab=favoritos" className="flex items-center gap-2 px-4 py-2 text-xs text-gray-700 hover:bg-pink-50 hover:text-brand-magenta transition-colors">
-                          <Heart className="w-3.5 h-3.5 text-brand-magenta" /> Hoteles Preferidos
-                        </Link>
-                      </>
-                    )}
+                    <Link href="/perfil?tab=favoritos" className="flex items-center gap-2 px-4 py-2 text-xs text-gray-700 hover:bg-pink-50 hover:text-brand-magenta transition-colors">
+                      <Heart className="w-3.5 h-3.5 text-brand-magenta" /> Hoteles Preferidos
+                    </Link>
 
                     <Link href="/perfil?tab=perfil" className="flex items-center gap-2 px-4 py-2 text-xs text-gray-700 hover:bg-pink-50 hover:text-brand-magenta transition-colors">
                       <User className="w-3.5 h-3.5 text-gray-400" /> Datos de Perfil & Seguridad

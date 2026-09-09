@@ -74,14 +74,15 @@ export default function AdminAsistencia() {
 
       const dbRows = (ests || []).map((est: any) => {
         const ownerProf = profileMap.get(est.owner_user_id);
+        const isEntre2Aguas = est.slug === "hostal-entre-2-aguas" || est.id === 81 || (est.owner_user_id === "f5fedca0-7394-449b-af79-cb4378f5e919");
         return {
           id: est.id,
           name: est.name,
           slug: est.slug,
           status: est.status || "approved",
-          owner_user_id: est.owner_user_id || "",
-          owner_name: ownerProf?.name || "Propietario Sin Nombre",
-          owner_email: ownerProf?.email || "sin_correo@hdv.com",
+          owner_user_id: est.owner_user_id || (isEntre2Aguas ? "f5fedca0-7394-449b-af79-cb4378f5e919" : ""),
+          owner_name: ownerProf?.name || (isEntre2Aguas ? "Ramiro Pastor" : "Propietario Sin Nombre"),
+          owner_email: ownerProf?.email || (isEntre2Aguas ? "ramiropf26@gmail.com" : "sin_correo@hdv.com"),
           category: est.categories?.name || "General",
           destination: est.destinations?.name || "Venezuela"
         };
@@ -132,14 +133,15 @@ export default function AdminAsistencia() {
 
       Object.values(TENANTS_REGISTRY).forEach(t => {
         if (!combinedRows.some(r => r.id === t.establishment_id || r.slug === t.slug)) {
+          const isEntre2Aguas = t.slug === "hostal-entre-2-aguas" || t.establishment_id === 81;
           combinedRows.push({
             id: t.establishment_id,
             name: t.name,
             slug: t.slug,
             status: "approved",
-            owner_user_id: `owner_user_${t.slug}`,
-            owner_name: `Propietario ${t.name}`,
-            owner_email: `contacto@${t.slug}.com`,
+            owner_user_id: isEntre2Aguas ? "f5fedca0-7394-449b-af79-cb4378f5e919" : `owner_user_${t.slug}`,
+            owner_name: isEntre2Aguas ? "Ramiro Pastor" : `Propietario ${t.name}`,
+            owner_email: isEntre2Aguas ? "ramiropf26@gmail.com" : `contacto@${t.slug}.com`,
             category: t.business_type === "restaurant" ? "Restaurantes y Gastronomía" : "Hoteles & Posadas",
             destination: "Venezuela"
           });

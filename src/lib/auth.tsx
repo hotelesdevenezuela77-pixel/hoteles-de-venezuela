@@ -32,7 +32,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Cargar perfil desde la base de datos pública a partir del user_id de Supabase
   const fetchProfile = async (userId: string, email: string, nameFallback: string, roleFallback?: string) => {
-    const isAdminGeneral = email.toLowerCase() === "hotelesdevenezuela77@gmail.com" || email.toLowerCase().includes("admin");
+    const emailLower = email.toLowerCase().trim();
+    const isAdminGeneral = emailLower === "hotelesdevenezuela77@gmail.com" || emailLower.includes("admin") || emailLower === "webmasterpro177@gmail.com";
+    const isKnownOwner = emailLower.includes("ramiropf") || emailLower.includes("entre2aguas") || emailLower.includes("partner@hotelesdevenezuela.com");
+
     try {
       const { data, error } = await supabase
         .from("user_profiles")
@@ -46,20 +49,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const userProfile = data as UserProfile;
         if (isAdminGeneral && userProfile.role !== "admin") {
           userProfile.role = "admin";
-          // Actualizar el rol en la DB relacional silenciosamente
           await supabase.from("user_profiles").update({ role: "admin" }).eq("user_id", userId);
+        } else if (!isAdminGeneral && (isKnownOwner || userProfile.role === "business_owner") && userProfile.role !== "owner") {
+          userProfile.role = "owner";
+          await supabase.from("user_profiles").update({ role: "owner" }).eq("user_id", userId);
         }
         setProfile(userProfile);
       } else {
         // Si no existe, crear el perfil automáticamente en la base de datos pública
-        const pendingRole = localStorage.getItem("hdv_pending_signup_role") || "user";
+        const pendingRole = localStorage.getItem("hdv_pending_signup_role") || (isKnownOwner ? "owner" : "user");
         localStorage.removeItem("hdv_pending_signup_role");
+
+        const initialRole = isAdminGeneral ? "admin" : (isKnownOwner ? "owner" : (roleFallback || pendingRole));
 
         const newProfile: UserProfile = {
           user_id: userId,
           email: email,
           name: nameFallback || email.split("@")[0],
-          role: isAdminGeneral ? "admin" : (roleFallback || pendingRole)
+          role: initialRole
         };
 
         const { data: insertedData, error: insertError } = await supabase

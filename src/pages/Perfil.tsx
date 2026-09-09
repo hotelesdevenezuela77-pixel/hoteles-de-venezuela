@@ -282,22 +282,39 @@ export function Perfil() {
       {/* Contenedor Principal */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20 space-y-8">
         {/* Banner informativo si el usuario también es Propietario */}
-        {profile?.role === "owner" && (
-          <div className="bg-slate-900 text-white rounded-2xl p-4 border border-slate-800 shadow-lg flex flex-col md:flex-row items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[#00C8D4]/20 text-[#00C8D4] flex items-center justify-center shrink-0">
-                <Building2 className="w-5 h-5" />
+        {(profile?.role === "owner" || profile?.role === "business_owner" || profile?.role === "admin" || user?.email?.toLowerCase().includes("ramiropf")) && (
+          <div className="bg-gradient-to-r from-[#0e011f] via-[#1a0533] to-[#0e011f] text-white rounded-3xl p-6 border border-[#00C8D4]/30 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-5 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-[#FF0096]/15 rounded-full blur-2xl pointer-events-none" />
+            <div className="flex items-center gap-4 relative z-10">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#00C8D4] to-[#FF0096] p-0.5 shrink-0 shadow-lg">
+                <div className="w-full h-full bg-[#0e011f] rounded-[14px] flex items-center justify-center">
+                  <Building2 className="w-6 h-6 text-[#00C8D4]" />
+                </div>
               </div>
-              <p className="text-xs text-slate-300">
-                <strong className="text-white">Modo Turista Activo:</strong> Estás visualizando tu panel personal de viajes. ¿Deseas gestionar tus propiedades registradas?
-              </p>
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#00C8D4]/20 text-[#00C8D4] border border-[#00C8D4]/30 mb-1">
+                  <Sparkles className="w-3 h-3" />
+                  <span>Consola de Propietario / Hotel Asociado</span>
+                </div>
+                <h3 className="text-base font-bold text-white">
+                  {user?.email?.toLowerCase().includes("ramiropf") 
+                    ? "¡Hola Ramiro! Tienes asignado el Hostal Entre 2 Aguas" 
+                    : "Tienes asignado acceso de Propietario"}
+                </h3>
+                <p className="text-xs text-slate-300 max-w-xl leading-relaxed mt-0.5">
+                  Estás en el modo turista de viajes. Puedes cambiar a tu panel corporativo para gestionar reservas, tarifas, inventario PMS y tu aplicación web de hotel independiente.
+                </p>
+              </div>
             </div>
-            <Link
-              href="/mis-negocios"
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#00C8D4] to-[#FF0096] text-white font-bold text-xs uppercase tracking-wider shrink-0 hover:scale-105 transition-all cursor-pointer"
-            >
-              Ir al Panel de Propietario
-            </Link>
+            <div className="flex items-center gap-3 shrink-0 relative z-10 w-full md:w-auto">
+              <Link
+                href="/mis-negocios"
+                className="w-full md:w-auto px-5 py-3 rounded-xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] text-white font-black text-xs uppercase tracking-wider shadow-lg hover:scale-105 transition-all text-center flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Building2 className="w-4 h-4" />
+                <span>Ir a Mi Panel de Propietario</span>
+              </Link>
+            </div>
           </div>
         )}
 
@@ -314,9 +331,15 @@ export function Perfil() {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-xl font-bold font-serif text-slate-900">{profile?.name || user?.email?.split("@")[0]}</h2>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#00C8D4]/15 text-[#00C8D4] border border-[#00C8D4]/30">
-                  Turista Élite
-                </span>
+                {(profile?.role === "owner" || profile?.role === "business_owner" || profile?.role === "admin" || user?.email?.toLowerCase().includes("ramiropf")) ? (
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-[#FF0096] to-[#9B00CC] text-white shadow-sm">
+                    Propietario VIP
+                  </span>
+                ) : (
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#00C8D4]/15 text-[#00C8D4] border border-[#00C8D4]/30">
+                    Turista Élite
+                  </span>
+                )}
               </div>
               <p className="text-xs text-slate-500 mt-0.5">{user?.email}</p>
             </div>

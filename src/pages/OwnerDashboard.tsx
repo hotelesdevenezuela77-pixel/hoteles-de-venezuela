@@ -293,8 +293,8 @@ export function OwnerDashboard() {
   const [, setLocation] = useLocation();
   const [claimSuccessBanner, setClaimSuccessBanner] = useState<string | null>(null);
 
-  const isAdmin = profile?.role === 'admin' || user?.email?.toLowerCase() === "hotelesdevenezuela77@gmail.com";
-  const isOwnerOrAdmin = profile?.role === 'owner' || profile?.role === 'business_owner' || isAdmin;
+  const isAdmin = profile?.role === 'admin' || user?.email?.toLowerCase() === "hotelesdevenezuela77@gmail.com" || user?.email?.toLowerCase() === "webmasterpro177@gmail.com";
+  const isOwnerOrAdmin = profile?.role === 'owner' || profile?.role === 'business_owner' || user?.email?.toLowerCase().includes("ramiropf") || isAdmin;
 
 
   const [impersonateId, setImpersonateId] = useState<string | null>(() => {
@@ -1251,7 +1251,7 @@ export function OwnerDashboard() {
                                 (typeof window !== "undefined" && (localStorage.getItem(`hdv_claimed_tenant_${te.slug}`) === activeOwnerId || localStorage.getItem(`hdv_claimed_tenant_${te.id}`) === activeOwnerId));
 
         const isEmailMatch = userEmailLower !== "" && (
-          (te.slug === "hostal-entre-2-aguas" && (userEmailLower.includes("entre2aguas") || userEmailLower.includes("entredosaguas") || userEmailLower.includes("entre-2-aguas"))) ||
+          (te.slug === "hostal-entre-2-aguas" && (userEmailLower.includes("entre2aguas") || userEmailLower.includes("entredosaguas") || userEmailLower.includes("entre-2-aguas") || userEmailLower.includes("ramiropf") || userEmailLower === "ramiropf26@gmail.com" || userEmailLower === "ramiropf15@gmail.com")) ||
           (te.slug === "aparto-posada-del-mar" && userEmailLower.includes("apartoposadadelmar")) ||
           (te.slug === "perla-negra" && userEmailLower.includes("perlanegra")) ||
           (te.slug === "my-campers" && userEmailLower.includes("mycampers")) ||
