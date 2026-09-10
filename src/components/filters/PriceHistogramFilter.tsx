@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { DollarSign, BarChart2, RefreshCw } from "lucide-react";
+import { DollarSign, BarChart2, RefreshCw, Zap, Star, Sparkles, Award } from "lucide-react";
 import type { Establishment } from "../layout/EstablishmentCard";
 import { getVirtualPrice } from "../layout/EstablishmentCard";
 
@@ -251,24 +251,30 @@ export function PriceHistogramFilter({
         {/* Presets Rápidos */}
         <div className="grid grid-cols-4 gap-1.5 pt-1">
           {[
-            { label: "Económico", min: 0, max: 50, icon: "💡" },
-            { label: "Moderado", min: 50, max: 120, icon: "⭐" },
-            { label: "Premium", min: 120, max: 250, icon: "💎" },
-            { label: "Lujo", min: 250, max: 1000, icon: "👑" }
+            { label: "Económico", min: 0, max: 50, icon: Zap, solidBg: "#00C8D4" },
+            { label: "Moderado", min: 50, max: 120, icon: Star, solidBg: "#f59e0b" },
+            { label: "Premium", min: 120, max: 250, icon: Sparkles, solidBg: "#9B00CC" },
+            { label: "Lujo", min: 250, max: 1000, icon: Award, solidBg: "#FF0096" }
           ].map(preset => {
+            const PresetIcon = preset.icon;
             const isSelected = minPrice === preset.min && maxPrice === preset.max;
             return (
               <button
                 key={preset.label}
                 type="button"
                 onClick={() => setPreset(preset.min, preset.max)}
-                className={`py-1.5 px-1 rounded-xl text-[9px] font-black uppercase transition-all cursor-pointer border text-center ${
+                className={`py-2 px-1 rounded-xl text-[9px] font-black uppercase transition-all cursor-pointer border flex flex-col items-center justify-center gap-1 ${
                   isSelected
                     ? "bg-[#FF0096] text-white border-[#FF0096] shadow-md shadow-[#FF0096]/30 scale-[1.02]"
                     : "bg-white/5 text-slate-300 border-white/10 hover:bg-white/10 hover:text-white"
                 }`}
               >
-                <span className="block text-[10px]">{preset.icon}</span>
+                <div 
+                  className="w-5 h-5 rounded-md flex items-center justify-center text-white shrink-0 shadow-xs"
+                  style={{ backgroundColor: preset.solidBg }}
+                >
+                  <PresetIcon className="w-3 h-3 text-white stroke-[2.2]" />
+                </div>
                 <span className="truncate block mt-0.5">{preset.label}</span>
               </button>
             );

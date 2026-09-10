@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Link } from "wouter";
-import { MapPin, Compass, Sparkles, Navigation, X, Star, Layers, ExternalLink, Map, DollarSign } from "lucide-react";
+import { 
+  MapPin, Compass, Sparkles, Navigation, X, Star, Layers, ExternalLink, Map, DollarSign,
+  Palmtree, Mountain, Building2, Trees, Anchor, LucideIcon
+} from "lucide-react";
 import type { Establishment } from "../layout/EstablishmentCard";
 import { getVirtualPrice } from "../layout/EstablishmentCard";
 
@@ -8,7 +11,8 @@ export interface ZoneRegion {
   id: string;
   name: string;
   subtitle: string;
-  icon: string;
+  icon: LucideIcon;
+  solidBg: string;
   color: string;
   borderColor: string;
   destinations: string[]; // slugs
@@ -20,7 +24,8 @@ export const TOURIST_ZONES: ZoneRegion[] = [
     id: "caribe",
     name: "Caribe & Archipiélagos",
     subtitle: "Los Roques, Margarita, Coche, Morrocoy, Mochima",
-    icon: "🌴",
+    icon: Palmtree,
+    solidBg: "#00C8D4",
     color: "from-cyan-500 to-blue-600",
     borderColor: "#00C8D4",
     destinations: ["los-roques", "margarita", "morrocoy", "mochima", "coche"],
@@ -30,7 +35,8 @@ export const TOURIST_ZONES: ZoneRegion[] = [
     id: "andes",
     name: "Andes & Montaña",
     subtitle: "Mérida, Sanare, Cubiro, Colonia Tovar, Galipán",
-    icon: "⛰️",
+    icon: Mountain,
+    solidBg: "#10b981",
     color: "from-emerald-500 to-teal-700",
     borderColor: "#10b981",
     destinations: ["merida", "sanare", "cubiro", "colonia-tovar", "galipan"],
@@ -40,7 +46,8 @@ export const TOURIST_ZONES: ZoneRegion[] = [
     id: "centro",
     name: "Centro & Capital",
     subtitle: "Caracas, Maracay, Valencia",
-    icon: "🌆",
+    icon: Building2,
+    solidBg: "#9B00CC",
     color: "from-purple-600 to-indigo-800",
     borderColor: "#9B00CC",
     destinations: ["caracas", "maracay", "valencia"],
@@ -50,7 +57,8 @@ export const TOURIST_ZONES: ZoneRegion[] = [
     id: "llanos",
     name: "Gran Sabana & Llanos",
     subtitle: "Canaima, Amazonas, Apure, Barinas",
-    icon: "🌿",
+    icon: Trees,
+    solidBg: "#f59e0b",
     color: "from-amber-500 to-orange-600",
     borderColor: "#f59e0b",
     destinations: ["canaima", "amazonas", "apure", "barinas"],
@@ -60,7 +68,8 @@ export const TOURIST_ZONES: ZoneRegion[] = [
     id: "nautica",
     name: "Ruta Náutica & Marinas",
     subtitle: "Tucacas, Chichiriviche, Higuerote, Puerto La Cruz",
-    icon: "🚢",
+    icon: Anchor,
+    solidBg: "#FF0096",
     color: "from-pink-500 to-rose-600",
     borderColor: "#FF0096",
     destinations: ["tucacas", "chichiriviche", "higuerote", "puerto-la-cruz"],
@@ -173,6 +182,7 @@ export function ZoneMapFilter({
           {TOURIST_ZONES.map(zone => {
             const isSelected = selectedZone === zone.id;
             const count = getZoneCount(zone);
+            const IconComponent = zone.icon;
             return (
               <button
                 key={zone.id}
@@ -185,7 +195,12 @@ export function ZoneMapFilter({
                 }`}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="text-base shrink-0">{zone.icon}</span>
+                  <div
+                    className="w-7 h-7 rounded-lg flex items-center justify-center text-white shrink-0 shadow-xs transition-transform group-hover:scale-105"
+                    style={{ backgroundColor: zone.solidBg }}
+                  >
+                    <IconComponent className="w-4 h-4 text-white stroke-[2.2]" />
+                  </div>
                   <div className="min-w-0">
                     <span className={`text-xs font-black block truncate ${isSelected ? "text-[#00C8D4]" : "text-slate-800"}`}>
                       {zone.name}
@@ -323,6 +338,7 @@ export function InteractiveZoneMapView({
         {/* Nodos / Zonas Destacadas en Mapa */}
         {TOURIST_ZONES.map(zone => {
           const isZoneActive = selectedZone === zone.id;
+          const IconComponent = zone.icon;
           return (
             <div
               key={zone.id}
@@ -338,7 +354,12 @@ export function InteractiveZoneMapView({
                     : "bg-slate-900/80 text-white hover:bg-slate-800 hover:scale-105"
                 }`}
               >
-                <span className="text-sm">{zone.icon}</span>
+                <div
+                  className="w-5 h-5 rounded-md flex items-center justify-center text-white shrink-0 shadow-xs"
+                  style={{ backgroundColor: zone.solidBg }}
+                >
+                  <IconComponent className="w-3 h-3 text-white stroke-[2.2]" />
+                </div>
                 <span className="text-[10px] font-black uppercase tracking-wider">{zone.name}</span>
               </div>
             </div>
