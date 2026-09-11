@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { 
   Search, MapPin, Building2, Compass, ShieldCheck, Zap, Wifi, Dog, Sparkles, Layers 
 } from "lucide-react";
+import { supabase } from "../../lib/supabase";
 
 interface HeroSectionV2Props {
   onSearch?: (destination: string, category: string, experience: string) => void;
@@ -13,6 +14,39 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
   const [destination, setDestination] = useState("");
   const [category, setCategory] = useState("");
   const [experience, setExperience] = useState("");
+
+  const [heroConfig, setHeroConfig] = useState({
+    badge: "EL PARAÍSO VENEZOLANO A UN CLIC",
+    titleLine1: "Descubre Hospedajes de Selección",
+    titleLine2: "Directo con sus Anfitriones",
+    subtitle: "Posadas boutique, resorts y hoteles en Los Roques, Canaima, Morrocoy y Mérida. Contacto directo por WhatsApp sin comisiones ni intermediarios.",
+    bgImage: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=85"
+  });
+
+  useEffect(() => {
+    async function loadHeroConfig() {
+      try {
+        const { data, error } = await supabase
+          .from("site_sections")
+          .select("*")
+          .eq("section_key", "hero_v2")
+          .single();
+
+        if (!error && data) {
+          setHeroConfig(prev => ({
+            badge: data.button_text || prev.badge,
+            titleLine1: data.title || prev.titleLine1,
+            titleLine2: data.subtitle || prev.titleLine2,
+            subtitle: data.description || prev.subtitle,
+            bgImage: data.image_url || prev.bgImage
+          }));
+        }
+      } catch (err) {
+        console.warn("HeroSectionV2: Usando configuración Hero por defecto:", err);
+      }
+    }
+    loadHeroConfig();
+  }, []);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +75,7 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
       {/* Background Image full-bleed con lazy loading y scale */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <img
-          src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=85"
+          src={heroConfig.bgImage}
           alt="Playas y Posadas de Venezuela"
           loading="lazy"
           className="w-full h-full object-cover scale-[1.08] filter brightness-90 transition-transform duration-1000"
@@ -59,18 +93,18 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
             <div className="w-4 h-4 rounded-md bg-[#00C8D4] flex items-center justify-center text-slate-950 shrink-0">
               <Compass className="w-2.5 h-2.5 text-slate-950 stroke-[2.5]" />
             </div>
-            <span>EL PARAÍSO VENEZOLANO A UN CLIC</span>
+            <span>{heroConfig.badge}</span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-display font-extrabold tracking-tight leading-tight md:leading-[1.15] drop-shadow-md">
-            <span className="text-white block">Descubre Hospedajes de Selección</span>
+            <span className="text-white block">{heroConfig.titleLine1}</span>
             <span className="bg-gradient-to-r from-[#00C8D4] to-[#FF0096] bg-clip-text text-transparent block mt-1">
-              Directo con sus Anfitriones
+              {heroConfig.titleLine2}
             </span>
           </h1>
 
           <p className="text-sm sm:text-base text-slate-200 font-sans font-medium max-w-2xl mx-auto leading-relaxed opacity-95 pt-0.5">
-            Posadas boutique, resorts y hoteles en Los Roques, Canaima, Morrocoy y Mérida. Contacto directo por WhatsApp sin comisiones ni intermediarios.
+            {heroConfig.subtitle}
           </p>
         </div>
 

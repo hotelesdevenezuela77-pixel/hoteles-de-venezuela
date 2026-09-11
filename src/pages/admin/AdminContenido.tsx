@@ -267,85 +267,182 @@ export function AdminContenido() {
           ))}
         </div>
 
-        {/* TAB 1: HERO CONTROL */}
+        {/* TAB 1: HERO CONTROL (HOME 1 & HOME V2) */}
         {tab === "hero" && (
-          <div className="bg-[#100921] border border-slate-800/80 rounded-2xl p-7 max-w-3xl shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#9B00CC] to-[#FF0096]" />
-            <h2 className="font-black text-white text-xs uppercase tracking-widest mb-6 flex items-center gap-2"><Image className="w-4 h-4 text-[#FF0096]" /> Configuración del Banner de Impacto</h2>
-            
-            {editSection && (editSection.sectionKey === "hero" || editSection.sectionKey === "HERO_BANNER") ? (
-              <div className="space-y-5">
-                <div>
-                  <label className="text-[10px] uppercase font-black text-slate-400 block mb-1.5 tracking-widest">Título Supreme</label>
-                  <input value={editSection.title || ""} onChange={e => setEditSection({ ...editSection, title: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] rounded-xl px-4 py-3 text-xs font-bold text-white outline-none" />
-                </div>
-                <div>
-                  <label className="text-[10px] uppercase font-black text-slate-400 block mb-1.5 tracking-widest">Subtítulo Descriptivo</label>
-                  <input value={editSection.subtitle || ""} onChange={e => setEditSection({ ...editSection, subtitle: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] rounded-xl px-4 py-3 text-xs font-bold text-white outline-none" />
-                </div>
-                <div>
-                  <label className="text-[10px] uppercase font-black text-slate-400 block mb-1.5 tracking-widest">Activo Digital / Imagen de Fondo</label>
-                  <div className="flex gap-2">
-                    <input value={editSection.imageUrl || ""} onChange={e => setEditSection({ ...editSection, imageUrl: e.target.value })} className="flex-1 bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] rounded-xl px-4 py-3 text-xs font-bold text-white outline-none" placeholder="https://url-de-la-imagen.jpg" />
-                    <label className="flex items-center justify-center px-4 py-3 border border-dashed border-purple-500/40 bg-[#1e123a] hover:bg-[#251747] rounded-xl text-xs font-black uppercase text-white tracking-wider cursor-pointer transition-colors">
-                      <Upload className="w-4 h-4 text-[#FF0096] mr-1" /> Subir Archivo
-                      <input type="file" accept="image/*" className="hidden" onChange={(e) => {
-                        const file = e.target.files?.[0]; if (!file) return;
-                        const r = new FileReader(); r.onload = () => setEditSection({ ...editSection, imageUrl: r.result as string }); r.readAsDataURL(file);
-                      }} />
-                    </label>
+          <div className="space-y-6 max-w-3xl">
+            {/* HERO 1 (HOME PRINCIPAL) */}
+            <div className="bg-[#100921] border border-slate-800/80 rounded-2xl p-7 shadow-xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#9B00CC] to-[#FF0096]" />
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="font-black text-white text-xs uppercase tracking-widest flex items-center gap-2">
+                  <Image className="w-4 h-4 text-[#FF0096]" /> Configuración Hero Principal (Home 1 - "/")
+                </h2>
+                <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black bg-[#FF0096]/20 text-[#FF0096] border border-[#FF0096]/30">
+                  Home Actual
+                </span>
+              </div>
+              
+              {editSection && (editSection.sectionKey === "hero" || editSection.sectionKey === "HERO_BANNER") ? (
+                <div className="space-y-5">
+                  <div>
+                    <label className="text-[10px] uppercase font-black text-slate-400 block mb-1.5 tracking-widest">Título Supreme</label>
+                    <input value={editSection.title || ""} onChange={e => setEditSection({ ...editSection, title: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] rounded-xl px-4 py-3 text-xs font-bold text-white outline-none" />
                   </div>
-                  {editSection.imageUrl && (
-                    <div className="mt-3 relative inline-block">
-                      <img src={editSection.imageUrl} alt="preview" className="h-20 w-auto object-cover rounded-xl border border-slate-800" />
+                  <div>
+                    <label className="text-[10px] uppercase font-black text-slate-400 block mb-1.5 tracking-widest">Subtítulo Descriptivo</label>
+                    <input value={editSection.subtitle || ""} onChange={e => setEditSection({ ...editSection, subtitle: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] rounded-xl px-4 py-3 text-xs font-bold text-white outline-none" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] uppercase font-black text-slate-400 block mb-1.5 tracking-widest">Activo Digital / Imagen de Fondo</label>
+                    <div className="flex gap-2">
+                      <input value={editSection.imageUrl || ""} onChange={e => setEditSection({ ...editSection, imageUrl: e.target.value })} className="flex-1 bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] rounded-xl px-4 py-3 text-xs font-bold text-white outline-none" placeholder="https://url-de-la-imagen.jpg" />
+                      <label className="flex items-center justify-center px-4 py-3 border border-dashed border-purple-500/40 bg-[#1e123a] hover:bg-[#251747] rounded-xl text-xs font-black uppercase text-white tracking-wider cursor-pointer transition-colors">
+                        <Upload className="w-4 h-4 text-[#FF0096] mr-1" /> Subir Archivo
+                        <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                          const file = e.target.files?.[0]; if (!file) return;
+                          const r = new FileReader(); r.onload = () => setEditSection({ ...editSection, imageUrl: r.result as string }); r.readAsDataURL(file);
+                        }} />
+                      </label>
                     </div>
-                  )}
-                </div>
-                <div className="flex gap-3 pt-3">
-                  <button type="button" disabled={updateSection.isPending} onClick={() => setEditSection(null)} className="flex-1 py-3 bg-[#170e2e] hover:bg-[#221544] border border-slate-800 rounded-xl text-xs font-black uppercase text-slate-300 tracking-wider transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">Cancelar</button>
-                  <button type="button" disabled={updateSection.isPending} onClick={() => updateSection.mutate(editSection)} className="flex-1 py-3 text-white rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-[#9B00CC] to-[#FF0096] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-                    {updateSection.isPending ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin text-white" />
-                        <span>Sincronizando...</span>
-                      </>
-                    ) : (
-                      <span>Sincronizar Cambios</span>
+                    {editSection.imageUrl && (
+                      <div className="mt-3 relative inline-block">
+                        <img src={editSection.imageUrl} alt="preview" className="h-20 w-auto object-cover rounded-xl border border-slate-800" />
+                      </div>
                     )}
+                  </div>
+                  <div className="flex gap-3 pt-3">
+                    <button type="button" disabled={updateSection.isPending} onClick={() => setEditSection(null)} className="flex-1 py-3 bg-[#170e2e] hover:bg-[#221544] border border-slate-800 rounded-xl text-xs font-black uppercase text-slate-300 tracking-wider transition-colors cursor-pointer">Cancelar</button>
+                    <button type="button" disabled={updateSection.isPending} onClick={() => updateSection.mutate(editSection)} className="flex-1 py-3 text-white rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-[#9B00CC] to-[#FF0096] cursor-pointer flex items-center justify-center gap-2">
+                      {updateSection.isPending ? <Loader2 className="w-4 h-4 animate-spin text-white" /> : <span>Sincronizar Home 1</span>}
+                    </button>
+                  </div>
+                </div>
+              ) : heroSection ? (
+                <div className="space-y-6">
+                  <div className="p-5 bg-[#0a0418] border border-slate-900 rounded-xl space-y-3">
+                    <p className="text-xs text-slate-400 font-bold uppercase tracking-wide"><strong>Título Actual:</strong> <span className="text-white ml-2">{heroSection.title}</span></p>
+                    <p className="text-xs text-slate-400 font-bold uppercase tracking-wide"><strong>Subtítulo:</strong> <span className="text-white ml-2">{heroSection.subtitle}</span></p>
+                    {heroSection.imageUrl && (
+                      <div className="pt-2">
+                        <span className="text-xs text-slate-400 font-bold uppercase tracking-wide block mb-1.5">Fondo Activo:</span>
+                        <img src={heroSection.imageUrl} alt="Fondo Hero" className="h-24 w-auto object-cover rounded-xl border border-slate-800" />
+                      </div>
+                    )}
+                  </div>
+                  <button type="button" onClick={() => setEditSection({ ...heroSection })} className="w-full py-3.5 rounded-xl text-xs font-black uppercase tracking-widest text-white bg-gradient-to-r from-[#FF0096] to-[#9B00CC] cursor-pointer">Modificar Hero Home 1</button>
+                </div>
+              ) : (
+                <div className="text-center py-6 bg-[#0a0418] rounded-xl border border-slate-900/60 p-4">
+                  <button type="button" onClick={() => setEditSection({
+                    sectionKey: "HERO_BANNER",
+                    title: "Hoteles de Venezuela",
+                    subtitle: "Reserva Sin Intermediarios",
+                    description: "Encuentra los mejores hoteles y posadas.",
+                    imageUrl: "",
+                    buttonText: "Ver Destinos",
+                    buttonUrl: "/destinos",
+                    isActive: true
+                  })} className="px-5 py-3 bg-gradient-to-r from-[#9B00CC] to-[#FF0096] text-white text-xs font-black uppercase tracking-wider rounded-xl cursor-pointer">
+                    Configurar Hero Home 1
                   </button>
                 </div>
+              )}
+            </div>
+
+            {/* HERO 2 (HOME V2 EXPERIMENTAL) */}
+            <div className="bg-[#100921] border border-slate-800/80 rounded-2xl p-7 shadow-xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#00C8D4] to-[#FF0096]" />
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="font-black text-white text-xs uppercase tracking-widest flex items-center gap-2">
+                  <Image className="w-4 h-4 text-[#00C8D4]" /> Configuración Hero Rediseño (Home V2 - "/home-v2")
+                </h2>
+                <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black bg-[#00C8D4]/20 text-[#00C8D4] border border-[#00C8D4]/30">
+                  Home V2 Experimental
+                </span>
               </div>
-            ) : heroSection ? (
-              <div className="space-y-6">
-                <div className="p-5 bg-[#0a0418] border border-slate-900 rounded-xl space-y-3">
-                  <p className="text-xs text-slate-400 font-bold uppercase tracking-wide"><strong>Título Actual:</strong> <span className="text-white ml-2">{heroSection.title}</span></p>
-                  <p className="text-xs text-slate-400 font-bold uppercase tracking-wide"><strong>Subtítulo:</strong> <span className="text-white ml-2">{heroSection.subtitle}</span></p>
-                  {heroSection.imageUrl && (
-                    <div className="pt-2">
-                      <span className="text-xs text-slate-400 font-bold uppercase tracking-wide block mb-1.5">Fondo Activo:</span>
-                      <img src={heroSection.imageUrl} alt="Fondo Hero" className="h-24 w-auto object-cover rounded-xl border border-slate-800" />
-                    </div>
-                  )}
-                </div>
-                <button type="button" onClick={() => setEditSection({ ...heroSection })} className="w-full py-3.5 rounded-xl text-xs font-black uppercase tracking-widest text-white bg-gradient-to-r from-[#FF0096] to-[#9B00CC] cursor-pointer">Desplegar Consola de Edición</button>
-              </div>
-            ) : (
-              <div className="text-center py-10 bg-[#0a0418] rounded-xl border border-slate-900/60 p-6">
-                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-4">No se detectó registro para el Banner en la base de datos.</p>
-                <button type="button" onClick={() => setEditSection({
-                  sectionKey: "HERO_BANNER",
-                  title: "Hoteles de Venezuela",
-                  subtitle: "Reserva Sin Intermediarios ¡Simplemente Maravilloso!",
-                  description: "Encuentra los mejores hoteles y posadas.",
-                  imageUrl: "",
-                  buttonText: "Ver Destinos",
-                  buttonUrl: "/destinos",
+
+              {(() => {
+                const heroV2Section = sections.find(s => s.sectionKey === "hero_v2") || {
+                  sectionKey: "hero_v2",
+                  title: "Descubre Hospedajes de Selección",
+                  subtitle: "Directo con sus Anfitriones",
+                  description: "Posadas boutique, resorts y hoteles en Los Roques, Canaima, Morrocoy y Mérida. Contacto directo por WhatsApp sin comisiones ni intermediarios.",
+                  buttonText: "EL PARAÍSO VENEZOLANO A UN CLIC",
+                  buttonUrl: "/establecimientos",
+                  imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=85",
                   isActive: true
-                })} className="px-5 py-3 bg-gradient-to-r from-[#9B00CC] to-[#FF0096] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-lg transition-transform active:scale-95 cursor-pointer">
-                  Forzar Apertura y Crear Formulario
-                </button>
-              </div>
-            )}
+                };
+
+                const isEditing = editSection?.sectionKey === "hero_v2";
+
+                if (isEditing && editSection) {
+                  return (
+                    <div className="space-y-5">
+                      <div>
+                        <label className="text-[10px] uppercase font-black text-slate-400 block mb-1.5 tracking-widest">Badge Superior (Pre-header)</label>
+                        <input value={editSection.buttonText || ""} onChange={e => setEditSection({ ...editSection, buttonText: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#00C8D4] rounded-xl px-4 py-3 text-xs font-bold text-white outline-none" placeholder="EL PARAÍSO VENEZOLANO A UN CLIC" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] uppercase font-black text-slate-400 block mb-1.5 tracking-widest">Título Línea 1 (Blanco)</label>
+                        <input value={editSection.title || ""} onChange={e => setEditSection({ ...editSection, title: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#00C8D4] rounded-xl px-4 py-3 text-xs font-bold text-white outline-none" placeholder="Descubre Hospedajes de Selección" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] uppercase font-black text-slate-400 block mb-1.5 tracking-widest">Título Línea 2 (Acento Gradiente)</label>
+                        <input value={editSection.subtitle || ""} onChange={e => setEditSection({ ...editSection, subtitle: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#00C8D4] rounded-xl px-4 py-3 text-xs font-bold text-white outline-none" placeholder="Directo con sus Anfitriones" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] uppercase font-black text-slate-400 block mb-1.5 tracking-widest">Párrafo Descriptivo (Subtítulo)</label>
+                        <textarea rows={3} value={editSection.description || ""} onChange={e => setEditSection({ ...editSection, description: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#00C8D4] rounded-xl px-4 py-3 text-xs font-bold text-white outline-none resize-none" placeholder="Posadas boutique, resorts y hoteles..." />
+                      </div>
+                      <div>
+                        <label className="text-[10px] uppercase font-black text-slate-400 block mb-1.5 tracking-widest">Imagen de Fondo (URL o Archivo)</label>
+                        <div className="flex gap-2">
+                          <input value={editSection.imageUrl || ""} onChange={e => setEditSection({ ...editSection, imageUrl: e.target.value })} className="flex-1 bg-[#170e2e] border border-slate-800 focus:border-[#00C8D4] rounded-xl px-4 py-3 text-xs font-bold text-white outline-none" placeholder="https://images.unsplash.com/..." />
+                          <label className="flex items-center justify-center px-4 py-3 border border-dashed border-cyan-500/40 bg-[#122c38] hover:bg-[#163747] rounded-xl text-xs font-black uppercase text-white tracking-wider cursor-pointer transition-colors">
+                            <Upload className="w-4 h-4 text-[#00C8D4] mr-1" /> Subir
+                            <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                              const file = e.target.files?.[0]; if (!file) return;
+                              const r = new FileReader(); r.onload = () => setEditSection({ ...editSection, imageUrl: r.result as string }); r.readAsDataURL(file);
+                            }} />
+                          </label>
+                        </div>
+                        {editSection.imageUrl && (
+                          <div className="mt-3 relative inline-block">
+                            <img src={editSection.imageUrl} alt="preview v2" className="h-20 w-auto object-cover rounded-xl border border-slate-800" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex gap-3 pt-3">
+                        <button type="button" disabled={updateSection.isPending} onClick={() => setEditSection(null)} className="flex-1 py-3 bg-[#170e2e] hover:bg-[#221544] border border-slate-800 rounded-xl text-xs font-black uppercase text-slate-300 tracking-wider transition-colors cursor-pointer">Cancelar</button>
+                        <button type="button" disabled={updateSection.isPending} onClick={() => updateSection.mutate(editSection)} className="flex-1 py-3 text-slate-950 rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-[#00C8D4] to-[#00b2be] cursor-pointer flex items-center justify-center gap-2">
+                          {updateSection.isPending ? <Loader2 className="w-4 h-4 animate-spin text-slate-950" /> : <span>Guardar Hero Home V2</span>}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="space-y-6">
+                    <div className="p-5 bg-[#0a0418] border border-slate-900 rounded-xl space-y-3">
+                      <p className="text-xs text-slate-400 font-bold uppercase tracking-wide"><strong>Badge:</strong> <span className="text-[#00C8D4] ml-2">{heroV2Section.buttonText || "EL PARAÍSO VENEZOLANO A UN CLIC"}</span></p>
+                      <p className="text-xs text-slate-400 font-bold uppercase tracking-wide"><strong>Título Línea 1:</strong> <span className="text-white ml-2">{heroV2Section.title}</span></p>
+                      <p className="text-xs text-slate-400 font-bold uppercase tracking-wide"><strong>Título Línea 2:</strong> <span className="text-brand-magenta ml-2">{heroV2Section.subtitle}</span></p>
+                      <p className="text-xs text-slate-400 font-bold uppercase tracking-wide"><strong>Subtítulo:</strong> <span className="text-slate-300 ml-2">{heroV2Section.description}</span></p>
+                      {heroV2Section.imageUrl && (
+                        <div className="pt-2">
+                          <span className="text-xs text-slate-400 font-bold uppercase tracking-wide block mb-1.5">Fondo Activo:</span>
+                          <img src={heroV2Section.imageUrl} alt="Fondo Hero V2" className="h-24 w-auto object-cover rounded-xl border border-slate-800" />
+                        </div>
+                      )}
+                    </div>
+                    <button type="button" onClick={() => setEditSection({ ...heroV2Section })} className="w-full py-3.5 rounded-xl text-xs font-black uppercase tracking-widest text-slate-950 bg-gradient-to-r from-[#00C8D4] to-[#00b2be] cursor-pointer shadow-lg shadow-cyan-950/40">
+                      Modificar Hero Home V2
+                    </button>
+                  </div>
+                );
+              })()}
+            </div>
           </div>
         )}
 
