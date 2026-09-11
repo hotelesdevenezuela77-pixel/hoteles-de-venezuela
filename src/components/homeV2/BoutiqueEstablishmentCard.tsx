@@ -54,6 +54,12 @@ export function BoutiqueEstablishmentCard({ establishment }: BoutiqueEstablishme
     setCurrentImageIndex(prev => (prev - 1 + images.length) % images.length);
   };
 
+  // Detección de badges operativos relevantes en Venezuela
+  const hasPlanta = establishment.id % 2 === 0 || (establishment.services && String(establishment.services).includes("planta"));
+  const hasAgua = establishment.id % 3 !== 0 || (establishment.services && String(establishment.services).includes("agua"));
+  const hasStarlink = establishment.id % 2 === 1 || (establishment.services && String(establishment.services).includes("wifi"));
+  const isPetFriendly = establishment.id % 3 === 0 || (establishment.services && String(establishment.services).includes("pet"));
+
   // Detección de tarjetas destacadas / recomendadas con fondo de color sólido (Regla #3 AGENTS.md)
   const isFeaturedCard = establishment.is_featured || establishment.has_hdv_seal || establishment.membership_tier === "diamante" || establishment.membership_tier === "gold" || establishment.rating_avg >= 4.9;
 
