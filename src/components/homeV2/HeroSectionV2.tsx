@@ -179,11 +179,11 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
                   className="w-full bg-transparent text-xs font-extrabold text-slate-900 outline-none cursor-pointer truncate"
                 >
                   <option value="">Cualquier experiencia</option>
-                  <option value="playa">🏝️ Playa & Cayos</option>
-                  <option value="montana">⛰️ Montaña & Frío</option>
-                  <option value="selva">🌿 Selva & Aventura</option>
-                  <option value="ciudad">🌆 Ciudad & Negocios</option>
-                  <option value="wellness">🧘 Relax & Wellness</option>
+                  <option value="playa">Playa & Cayos</option>
+                  <option value="montana">Montaña & Frío</option>
+                  <option value="selva">Selva & Aventura</option>
+                  <option value="ciudad">Ciudad & Negocios</option>
+                  <option value="wellness">Relax & Wellness</option>
                 </select>
               </div>
             </div>

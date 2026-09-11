@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "wouter";
-import { Star, ChevronLeft, ChevronRight, MessageSquareQuote, ShieldCheck, Heart } from "lucide-react";
+import { Star, ChevronLeft, ChevronRight, MessageSquareQuote, ShieldCheck, Heart, MapPin } from "lucide-react";
 
 interface Review {
   id: number;
@@ -119,9 +119,12 @@ export function ReviewsCarouselV2() {
 
               <Link
                 href={`/establecimiento/${REVIEWS[currentIndex].establishmentSlug}`}
-                className="block text-xs font-black text-slate-900 hover:text-[#00C8D4] transition-colors truncate"
+                className="inline-flex items-center gap-1.5 text-xs font-black text-slate-900 hover:text-[#00C8D4] transition-colors truncate"
               >
-                📍 {REVIEWS[currentIndex].establishmentName}
+                <div className="w-4 h-4 rounded-full bg-[#FF0096] flex items-center justify-center text-white shrink-0 shadow-xs">
+                  <MapPin className="w-2.5 h-2.5 text-white stroke-[2.5]" />
+                </div>
+                <span>{REVIEWS[currentIndex].establishmentName}</span>
               </Link>
             </div>
 
