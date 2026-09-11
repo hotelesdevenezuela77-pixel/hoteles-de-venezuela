@@ -20,7 +20,7 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
     titleLine1: "Descubre Hospedajes de Selección",
     titleLine2: "Directo con sus Anfitriones",
     subtitle: "Posadas boutique, resorts y hoteles en Los Roques, Canaima, Morrocoy y Mérida. Contacto directo por WhatsApp sin comisiones ni intermediarios.",
-    bgImage: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=85"
+    bgImage: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=2000&q=90"
   });
 
   useEffect(() => {
@@ -76,12 +76,12 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <img
           src={heroConfig.bgImage}
-          alt="Playas y Posadas de Venezuela"
+          alt="Salto Ángel - Parque Nacional Canaima"
           loading="lazy"
-          className="w-full h-full object-cover scale-[1.08] filter brightness-90 transition-transform duration-1000"
+          className="w-full h-full object-cover scale-[1.08] filter brightness-105 transition-transform duration-1000"
         />
-        {/* Capa de degradado con tonos morados de marca y fundido suave */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0e011f]/90 via-[#1a0533]/75 to-slate-950 z-10" />
+        {/* Capa de degradado ligera y cristalina para máxima visibilidad de la imagen del Salto Ángel */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/20 to-slate-950/80 z-10" />
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent z-15" />
       </div>
 
@@ -89,21 +89,21 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
         
         {/* Pre-header badge & Titular Optimizado (Máximo 2 líneas, sin saturación) */}
         <div className="max-w-3xl mx-auto space-y-2.5 mb-2 sm:mb-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#00C8D4] text-[11px] font-black tracking-widest uppercase shadow-md">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-950/50 backdrop-blur-md border border-white/25 text-[#00C8D4] text-[11px] font-black tracking-widest uppercase shadow-lg">
             <div className="w-4 h-4 rounded-md bg-[#00C8D4] flex items-center justify-center text-slate-950 shrink-0">
               <Compass className="w-2.5 h-2.5 text-slate-950 stroke-[2.5]" />
             </div>
             <span>{heroConfig.badge}</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-display font-extrabold tracking-tight leading-tight md:leading-[1.15] drop-shadow-md">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-display font-extrabold tracking-tight leading-tight md:leading-[1.15] drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]">
             <span className="text-white block">{heroConfig.titleLine1}</span>
-            <span className="bg-gradient-to-r from-[#00C8D4] to-[#FF0096] bg-clip-text text-transparent block mt-1">
+            <span className="bg-gradient-to-r from-[#00C8D4] via-cyan-300 to-[#FF0096] bg-clip-text text-transparent block mt-1 drop-shadow-lg">
               {heroConfig.titleLine2}
             </span>
           </h1>
 
-          <p className="text-sm sm:text-base text-slate-200 font-sans font-medium max-w-2xl mx-auto leading-relaxed opacity-95 pt-0.5">
+          <p className="text-sm sm:text-base text-slate-100 font-sans font-semibold max-w-2xl mx-auto leading-relaxed drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)] pt-0.5">
             {heroConfig.subtitle}
           </p>
         </div>
