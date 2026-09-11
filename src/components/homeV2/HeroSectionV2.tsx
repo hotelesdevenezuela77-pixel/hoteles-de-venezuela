@@ -36,7 +36,7 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
   };
 
   return (
-    <section className="relative w-full overflow-hidden bg-slate-950 text-white min-h-[640px] lg:min-h-[720px] flex items-center justify-center pt-24 pb-16">
+    <section className="relative w-full overflow-hidden bg-slate-950 text-white min-h-[560px] lg:min-h-[620px] flex items-center justify-center pt-20 pb-12">
       
       {/* Background Image full-bleed con lazy loading y scale */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -51,25 +51,25 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent z-15" />
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-20 w-full text-center space-y-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-20 w-full text-center space-y-4 sm:space-y-6">
         
-        {/* Pre-header badge & Titular con Alto Impacto */}
-        <div className="space-y-4 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#00C8D4] text-xs font-black tracking-widest uppercase shadow-lg animate-pulse">
-            <div className="w-5 h-5 rounded-md bg-[#00C8D4] flex items-center justify-center text-slate-950 shrink-0">
-              <Compass className="w-3 h-3 text-slate-950 stroke-[2.5]" />
+        {/* Pre-header badge & Titular Optimizado (Máximo 2 líneas, sin saturación) */}
+        <div className="max-w-3xl mx-auto space-y-2.5 mb-2 sm:mb-3">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#00C8D4] text-[11px] font-black tracking-widest uppercase shadow-md">
+            <div className="w-4 h-4 rounded-md bg-[#00C8D4] flex items-center justify-center text-slate-950 shrink-0">
+              <Compass className="w-2.5 h-2.5 text-slate-950 stroke-[2.5]" />
             </div>
             <span>EL PARAÍSO VENEZOLANO A UN CLIC</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-display font-black tracking-tight text-white leading-tight drop-shadow-md">
-            Descubre Hospedajes de Selección <br className="hidden sm:block" />
-            <span className="bg-gradient-to-r from-[#00C8D4] via-[#FF0096] to-amber-300 bg-clip-text text-transparent uppercase">
-              DIRECTO CON SUS ANFITRIONES
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-display font-extrabold tracking-tight leading-tight md:leading-[1.15] drop-shadow-md">
+            <span className="text-white block">Descubre Hospedajes de Selección</span>
+            <span className="bg-gradient-to-r from-[#00C8D4] to-[#FF0096] bg-clip-text text-transparent block mt-1">
+              Directo con sus Anfitriones
             </span>
           </h1>
 
-          <p className="text-slate-200 text-xs sm:text-base font-sans font-medium max-w-2xl mx-auto leading-relaxed opacity-95">
+          <p className="text-sm sm:text-base text-slate-200 font-sans font-medium max-w-2xl mx-auto leading-relaxed opacity-95 pt-0.5">
             Posadas boutique, resorts y hoteles en Los Roques, Canaima, Morrocoy y Mérida. Contacto directo por WhatsApp sin comisiones ni intermediarios.
           </p>
         </div>
