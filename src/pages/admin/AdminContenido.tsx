@@ -370,7 +370,7 @@ export function AdminContenido() {
                   description: "Posadas boutique, resorts y hoteles en Los Roques, Canaima, Morrocoy y Mérida. Contacto directo por WhatsApp sin comisiones ni intermediarios.",
                   buttonText: "EL PARAÍSO VENEZOLANO A UN CLIC",
                   buttonUrl: "/establecimientos",
-                  imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=85",
+                  imageUrl: "https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public/establecimientos/destinos/salto-angel-hero-v2.jpg",
                   isActive: true
                 };
 

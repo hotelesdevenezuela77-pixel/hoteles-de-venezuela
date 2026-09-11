@@ -20,7 +20,7 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
     titleLine1: "Descubre Hospedajes de Selección",
     titleLine2: "Directo con sus Anfitriones",
     subtitle: "Posadas boutique, resorts y hoteles en Los Roques, Canaima, Morrocoy y Mérida. Contacto directo por WhatsApp sin comisiones ni intermediarios.",
-    bgImage: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=2000&q=90"
+    bgImage: "https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public/establecimientos/destinos/salto-angel-hero-v2.jpg"
   });
 
   useEffect(() => {
