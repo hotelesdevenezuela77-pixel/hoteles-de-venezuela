@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "wouter";
 import { 
   MapPin, Compass, Sparkles, Navigation, X, Star, Layers, ExternalLink, Map, DollarSign,
-  Palmtree, Mountain, Building2, Trees, Anchor, LucideIcon
+  Palmtree, Mountain, Building2, Trees, Anchor
 } from "lucide-react";
 import type { Establishment } from "../layout/EstablishmentCard";
 import { getVirtualPrice } from "../layout/EstablishmentCard";
@@ -11,7 +11,7 @@ export interface ZoneRegion {
   id: string;
   name: string;
   subtitle: string;
-  icon: LucideIcon;
+  icon: React.ComponentType<{ className?: string }>;
   solidBg: string;
   color: string;
   borderColor: string;
