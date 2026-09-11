@@ -54,14 +54,15 @@ export function BoutiqueEstablishmentCard({ establishment }: BoutiqueEstablishme
     setCurrentImageIndex(prev => (prev - 1 + images.length) % images.length);
   };
 
-  // Detección de badges operativos relevantes en Venezuela
-  const hasPlanta = establishment.id % 2 === 0 || (establishment.services && String(establishment.services).includes("planta"));
-  const hasAgua = establishment.id % 3 !== 0 || (establishment.services && String(establishment.services).includes("agua"));
-  const hasStarlink = establishment.id % 2 === 1 || (establishment.services && String(establishment.services).includes("wifi"));
-  const isPetFriendly = establishment.id % 3 === 0 || (establishment.services && String(establishment.services).includes("pet"));
+  // Detección de tarjetas destacadas / recomendadas con fondo de color sólido (Regla #3 AGENTS.md)
+  const isFeaturedCard = establishment.is_featured || establishment.has_hdv_seal || establishment.membership_tier === "diamante" || establishment.membership_tier === "gold" || establishment.rating_avg >= 4.9;
 
   return (
-    <div className="group bg-white border border-slate-200/80 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-cyan-950/10 transition-all duration-300 flex flex-col h-full text-slate-800 relative">
+    <div className={`group rounded-3xl overflow-hidden transition-all duration-300 flex flex-col h-full relative ${
+      isFeaturedCard
+        ? "bg-gradient-to-br from-[#0e011f] via-[#15062c] to-[#1a0533] text-white border border-[#9B00CC]/50 shadow-xl shadow-purple-950/30 hover:shadow-2xl hover:shadow-cyan-950/40"
+        : "bg-white border border-slate-200/80 text-slate-800 shadow-sm hover:shadow-2xl hover:shadow-cyan-950/10"
+    }`}>
       
       {/* Contenedor Superior: Carrusel Integrado en Foto */}
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-900 select-none">
@@ -118,7 +119,7 @@ export function BoutiqueEstablishmentCard({ establishment }: BoutiqueEstablishme
               <div className="w-3 h-3 rounded-full bg-white/20 flex items-center justify-center">
                 <ShieldCheck className="w-2 h-2 text-white stroke-[2.5]" />
               </div>
-              <span>VERIFICADO HDV</span>
+              <span>RECOMENDADO HDV</span>
             </span>
           )}
 
@@ -165,9 +166,9 @@ export function BoutiqueEstablishmentCard({ establishment }: BoutiqueEstablishme
         <div className="space-y-1.5">
           
           {/* Categoría & Destino */}
-          <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-slate-400">
+          <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider">
             <span className="text-[#00C8D4] font-extrabold">{establishment.category_name || "Hospedaje"}</span>
-            <div className="flex items-center gap-1 text-slate-500">
+            <div className={`flex items-center gap-1 ${isFeaturedCard ? "text-slate-300" : "text-slate-500"}`}>
               <MapPin className="w-3 h-3 text-[#FF0096]" />
               <span className="truncate max-w-[130px]">{establishment.destination_name || "Venezuela"}</span>
             </div>
@@ -175,19 +176,23 @@ export function BoutiqueEstablishmentCard({ establishment }: BoutiqueEstablishme
 
           {/* Nombre del Establecimiento */}
           <Link href={`/establecimiento/${establishment.slug}`}>
-            <h3 className="text-sm sm:text-base font-black text-slate-900 group-hover:text-[#00C8D4] transition-colors line-clamp-1 cursor-pointer">
+            <h3 className={`text-sm sm:text-base font-black transition-colors line-clamp-1 cursor-pointer ${
+              isFeaturedCard ? "text-white group-hover:text-[#00C8D4]" : "text-slate-900 group-hover:text-[#00C8D4]"
+            }`}>
               {establishment.name}
             </h3>
           </Link>
 
           {/* Descripción corta */}
-          <p className="text-xs text-slate-500 font-medium line-clamp-2 leading-relaxed">
+          <p className={`text-xs font-medium line-clamp-2 leading-relaxed ${
+            isFeaturedCard ? "text-slate-300" : "text-slate-500"
+          }`}>
             {establishment.description || "Posada boutique exclusiva con atención personalizada y reservación directa."}
           </p>
         </div>
 
         {/* Sección de Precio & CTA Buttons */}
-        <div className="pt-2 border-t border-slate-100 space-y-3">
+        <div className={`pt-2 border-t space-y-3 ${isFeaturedCard ? "border-slate-800" : "border-slate-100"}`}>
           
           {/* Tarifa Desde $/noche */}
           <div className="flex items-baseline justify-between">
@@ -195,7 +200,7 @@ export function BoutiqueEstablishmentCard({ establishment }: BoutiqueEstablishme
             <div>
               <span className="text-xs text-slate-400 font-bold">Desde </span>
               <span className="text-lg font-black text-[#FF0096]">${price}</span>
-              <span className="text-[10px] text-slate-500 font-normal"> / noche</span>
+              <span className={`text-[10px] font-normal ${isFeaturedCard ? "text-slate-400" : "text-slate-500"}`}> / noche</span>
             </div>
           </div>
 
@@ -215,7 +220,11 @@ export function BoutiqueEstablishmentCard({ establishment }: BoutiqueEstablishme
             {/* CTA Secundario: Ver Ficha / Detalle */}
             <Link
               href={`/establecimiento/${establishment.slug}`}
-              className="w-full bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-slate-950 border border-slate-200 text-[11px] font-black py-2.5 px-2 rounded-xl flex items-center justify-center gap-1 transition-colors cursor-pointer"
+              className={`w-full text-[11px] font-black py-2.5 px-2 rounded-xl flex items-center justify-center gap-1 transition-colors cursor-pointer ${
+                isFeaturedCard
+                  ? "bg-white/10 hover:bg-white/20 text-white border border-white/20"
+                  : "bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-slate-950 border border-slate-200"
+              }`}
             >
               <Eye className="w-3.5 h-3.5 text-[#00C8D4]" />
               <span>Ver Ficha</span>

@@ -16,14 +16,24 @@ interface DestinationItem {
 
 const DEFAULT_DESTINATIONS: DestinationItem[] = [
   {
+    id: "bahia-de-cata",
+    slug: "bahia-de-cata",
+    name: "Bahía de Cata",
+    subtitle: "Aragua • Costa de Oro",
+    description: "Aguas turquesas, arenas doradas y cocoteros rodeados de la majestuosa Cordillera de la Costa.",
+    image: "https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public/establecimientos/destinos/main-1783185384396-m528d.jpg",
+    count: "Bahía & Playa",
+    solidBg: "#00C8D4"
+  },
+  {
     id: "los-roques",
     slug: "los-roques",
     name: "Los Roques",
     subtitle: "Dependencias Federales",
     description: "Cayos de aguas turquesas cristalinas y posadas exclusivas en Gran Roque.",
-    image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1000&auto=format&fit=crop",
+    image: "https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public/establecimientos/destinos/main-1783186885340-wqclx.jpg",
     count: "Posadas & Cayos",
-    solidBg: "#00C8D4"
+    solidBg: "#FF0096"
   },
   {
     id: "canaima",
@@ -31,7 +41,7 @@ const DEFAULT_DESTINATIONS: DestinationItem[] = [
     name: "Canaima & Tepuyes",
     subtitle: "Bolívar • Gran Sabana",
     description: "El Salto Ángel y paisajes milenarios de la Amazonía venezolana.",
-    image: "https://images.unsplash.com/photo-1586375300773-8384e3e4916f?w=800&auto=format&fit=crop",
+    image: "https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public/establecimientos/destinos/main-1783185563983-25j2c.jpg",
     count: "Campamentos",
     solidBg: "#10b981"
   },
@@ -41,9 +51,9 @@ const DEFAULT_DESTINATIONS: DestinationItem[] = [
     name: "Parque Nacional Morrocoy",
     subtitle: "Falcón • Tucacas & Chichiriviche",
     description: "Cayo Sombrero, Cayo Muerto y marinas náuticas con acceso a lancha.",
-    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop",
+    image: "https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public/establecimientos/destinos/main-1783187512226-p6tmz.jpg",
     count: "Marinas & Hospedajes",
-    solidBg: "#FF0096"
+    solidBg: "#9B00CC"
   },
   {
     id: "merida",
@@ -51,9 +61,9 @@ const DEFAULT_DESTINATIONS: DestinationItem[] = [
     name: "Andes & Mérida",
     subtitle: "Mérida • Cordillera Andina",
     description: "Picos con nieve, pueblos de montaña y posadas acogedoras con chimenea.",
-    image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=800&auto=format&fit=crop",
+    image: "https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public/establecimientos/destinos/main-1783187454493-boqoa.jpg",
     count: "Posadas Andinas",
-    solidBg: "#9B00CC"
+    solidBg: "#f59e0b"
   },
   {
     id: "colonia-tovar",
@@ -61,18 +71,8 @@ const DEFAULT_DESTINATIONS: DestinationItem[] = [
     name: "Colonia Tovar & Galipán",
     subtitle: "Aragua • Montañas del Ávila",
     description: "Clima frío, gastronomía artesanal y cabañas boutique a minutos de la ciudad.",
-    image: "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&auto=format&fit=crop",
+    image: "https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public/establecimientos/destinos/main-1783186388404-ep90d.jpg",
     count: "Cabañas Boutique",
-    solidBg: "#f59e0b"
-  },
-  {
-    id: "isla-de-margarita",
-    slug: "isla-de-margarita",
-    name: "Isla de Margarita",
-    subtitle: "Nueva Esparta",
-    description: "Playas paradisíacas, resorts All-Inclusive y vida nocturna caribeña.",
-    image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&auto=format&fit=crop",
-    count: "Resorts & Posadas",
     solidBg: "#00C8D4"
   }
 ];
@@ -80,17 +80,17 @@ const DEFAULT_DESTINATIONS: DestinationItem[] = [
 function getDestinationPhoto(slug: string, name: string, dbPhoto?: string | null): string {
   if (dbPhoto && dbPhoto.startsWith("http") && !dbPhoto.includes("localhost")) return dbPhoto;
   const lower = (slug + " " + name).toLowerCase();
-  if (lower.includes("roques")) return "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800";
-  if (lower.includes("canaima") || lower.includes("salto")) return "https://images.unsplash.com/photo-1586375300773-8384e3e4916f?w=800";
-  if (lower.includes("morrocoy") || lower.includes("tucacas") || lower.includes("cata") || lower.includes("choroni")) return "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800";
-  if (lower.includes("merida") || lower.includes("andes") || lower.includes("cubiro") || lower.includes("sanare")) return "https://images.unsplash.com/photo-1548013146-72479768bada?w=800";
-  if (lower.includes("tovar") || lower.includes("galipan") || lower.includes("avila")) return "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800";
-  if (lower.includes("margarita") || lower.includes("coche")) return "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800";
-  if (lower.includes("caracas") || lower.includes("maracaibo") || lower.includes("valencia")) return "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800";
+  if (lower.includes("cata")) return "https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public/establecimientos/destinos/main-1783185384396-m528d.jpg";
+  if (lower.includes("roques")) return "https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public/establecimientos/destinos/main-1783186885340-wqclx.jpg";
+  if (lower.includes("canaima") || lower.includes("salto")) return "https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public/establecimientos/destinos/main-1783185563983-25j2c.jpg";
+  if (lower.includes("morrocoy") || lower.includes("tucacas")) return "https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public/establecimientos/destinos/main-1783187512226-p6tmz.jpg";
+  if (lower.includes("merida") || lower.includes("andes")) return "https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public/establecimientos/destinos/main-1783187454493-boqoa.jpg";
+  if (lower.includes("tovar") || lower.includes("galipan")) return "https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public/establecimientos/destinos/main-1783186388404-ep90d.jpg";
+  if (lower.includes("margarita")) return "https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public/establecimientos/destinos/main-1783186579172-mi21g.jpg";
   return "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800";
 }
 
-const SOLID_COLORS = ["#00C8D4", "#10b981", "#FF0096", "#9B00CC", "#f59e0b"];
+const SOLID_COLORS = ["#00C8D4", "#FF0096", "#10b981", "#9B00CC", "#f59e0b"];
 
 export function InteractiveDestinationsGallery() {
   const [destinations, setDestinations] = useState<DestinationItem[]>(DEFAULT_DESTINATIONS);
@@ -102,12 +102,21 @@ export function InteractiveDestinationsGallery() {
           .from("destinations")
           .select("*")
           .order("id", { ascending: true })
-          .limit(8);
+          .limit(12);
 
         if (error) throw error;
 
         if (data && data.length > 0) {
-          const mapped: DestinationItem[] = data.map((item: any, idx: number) => ({
+          // Ordenar para garantizar que Bahía de Cata sea SIEMPRE el primer destino (índice 0)
+          const sorted = [...data].sort((a, b) => {
+            const aIsCata = a.slug.includes("cata") || a.name.toLowerCase().includes("cata");
+            const bIsCata = b.slug.includes("cata") || b.name.toLowerCase().includes("cata");
+            if (aIsCata) return -1;
+            if (bIsCata) return 1;
+            return 0;
+          });
+
+          const mapped: DestinationItem[] = sorted.slice(0, 6).map((item: any, idx: number) => ({
             id: item.id,
             slug: item.slug,
             name: item.name,
@@ -143,7 +152,7 @@ export function InteractiveDestinationsGallery() {
               Explora los Destinos más <span className="bg-gradient-to-r from-[#00C8D4] to-[#FF0096] bg-clip-text text-transparent">Emblemáticos</span>
             </h2>
             <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-              De los cayos cristalinos de Los Roques a los milenarios tepuyes de Canaima. Selecciona la zona de tus próximas vacaciones.
+              Fotografía real de las costas, montañas y parques naturales de Venezuela. Selecciona la zona de tus próximas vacaciones.
             </p>
           </div>
 
@@ -171,16 +180,16 @@ export function InteractiveDestinationsGallery() {
                 href={`/destinos/${dest.slug}`}
                 className={`group relative rounded-3xl overflow-hidden shadow-xl border border-white/10 block transition-transform duration-500 hover:scale-[1.01] ${gridClass}`}
               >
-                {/* Image */}
+                {/* Image sin filtro oscuro ni opacidades */}
                 <img
                   src={dest.image}
                   alt={dest.name}
                   loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  className="w-full h-full object-cover filter brightness-105 contrast-105 transition-transform duration-700 group-hover:scale-105"
                 />
 
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+                {/* Gradient overlay ultra ligero solo abajo para legibilidad del texto */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
 
                 {/* Top Count Pill */}
                 <div className="absolute top-4 left-4 z-10">
@@ -193,19 +202,19 @@ export function InteractiveDestinationsGallery() {
                 </div>
 
                 {/* Top Arrow Icon */}
-                <div className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white/10 group-hover:bg-white/30 backdrop-blur-md flex items-center justify-center text-white transition-colors">
-                  <ArrowUpRight className="w-4 h-4 text-white" />
+                <div className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white/20 group-hover:bg-white/40 backdrop-blur-md flex items-center justify-center text-white transition-colors">
+                  <ArrowUpRight className="w-4 h-4 text-white stroke-[2.5]" />
                 </div>
 
                 {/* Bottom Content */}
                 <div className="absolute bottom-0 left-0 right-0 p-5 z-10 space-y-1 text-left">
-                  <span className="text-[10px] uppercase font-black tracking-wider text-[#00C8D4]">
+                  <span className="text-[10px] uppercase font-black tracking-wider text-[#00C8D4] drop-shadow-md">
                     {dest.subtitle}
                   </span>
-                  <h3 className="text-xl sm:text-2xl font-display font-black text-white group-hover:text-amber-300 transition-colors">
+                  <h3 className="text-xl sm:text-2xl font-display font-black text-white group-hover:text-[#00C8D4] transition-colors drop-shadow-md">
                     {dest.name}
                   </h3>
-                  <p className="text-xs text-slate-300 font-medium line-clamp-2 leading-relaxed opacity-90">
+                  <p className="text-xs text-slate-200 font-semibold line-clamp-2 leading-relaxed drop-shadow-md">
                     {dest.description}
                   </p>
                 </div>
