@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Star, ChevronLeft, ChevronRight, MessageSquareQuote, ShieldCheck, Heart, MapPin } from "lucide-react";
+import { supabase } from "../../lib/supabase";
 
-interface Review {
+export interface Review {
   id: number;
   author: string;
   location: string;
@@ -15,7 +16,7 @@ interface Review {
   comment: string;
 }
 
-const REVIEWS: Review[] = [
+const DEFAULT_REVIEWS: Review[] = [
   {
     id: 1,
     author: "Valeria & Carlos M.",
@@ -68,14 +69,58 @@ const REVIEWS: Review[] = [
 
 export function ReviewsCarouselV2() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [reviews, setReviews] = useState<Review[]>(DEFAULT_REVIEWS);
+  const [headerConfig, setHeaderConfig] = useState({
+    badge: "TESTIMONIOS VERIFICADOS",
+    title: "Experiencias de Viajeros Reales",
+    subtitle: "Descubre las historias de personas que planificaron sus vacaciones en Venezuela contactando directo a las posadas."
+  });
+
+  useEffect(() => {
+    async function loadReviewsSection() {
+      try {
+        const { data, error } = await supabase
+          .from("site_sections")
+          .select("*")
+          .eq("section_key", "reviews_v2")
+          .single();
+
+        if (!error && data) {
+          setHeaderConfig({
+            badge: data.button_text || "TESTIMONIOS VERIFICADOS",
+            title: data.title || "Experiencias de Viajeros Reales",
+            subtitle: data.description || "Descubre las historias de personas que planificaron sus vacaciones en Venezuela contactando directo a las posadas."
+          });
+
+          if (data.button_url) {
+            try {
+              const parsed = JSON.parse(data.button_url);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                setReviews(parsed);
+              }
+            } catch (e) {
+              console.warn("ReviewsCarouselV2: No se pudo parsear JSON de testimonios:", e);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn("ReviewsCarouselV2: Usando configuración de testimonios por defecto:", err);
+      }
+    }
+    loadReviewsSection();
+  }, []);
 
   const nextReview = () => {
-    setCurrentIndex(prev => (prev + 1) % REVIEWS.length);
+    if (reviews.length === 0) return;
+    setCurrentIndex(prev => (prev + 1) % reviews.length);
   };
 
   const prevReview = () => {
-    setCurrentIndex(prev => (prev - 1 + REVIEWS.length) % REVIEWS.length);
+    if (reviews.length === 0) return;
+    setCurrentIndex(prev => (prev - 1 + reviews.length) % reviews.length);
   };
+
+  const currentReview = reviews[currentIndex] || DEFAULT_REVIEWS[0];
 
   return (
     <section className="py-20 bg-slate-50 text-slate-800 relative">
@@ -85,13 +130,13 @@ export function ReviewsCarouselV2() {
         <div className="space-y-3 max-w-2xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#FF0096]/10 text-[#FF0096] border border-[#FF0096]/20 text-xs font-black uppercase tracking-wider">
             <MessageSquareQuote className="w-3.5 h-3.5" />
-            <span>TESTIMONIOS VERIFICADOS</span>
+            <span>{headerConfig.badge}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-display font-black text-slate-900 tracking-tight">
-            Experiencias de <span className="text-gradient-brand">Viajeros Reales</span>
+            {headerConfig.title}
           </h2>
           <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
-            Descubre las historias de personas que planificaron sus vacaciones en Venezuela contactando directo a las posadas.
+            {headerConfig.subtitle}
           </p>
         </div>
 
@@ -105,8 +150,8 @@ export function ReviewsCarouselV2() {
             <div className="w-full md:w-5/12 shrink-0 space-y-3">
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-md">
                 <img
-                  src={REVIEWS[currentIndex].establishmentImage}
-                  alt={REVIEWS[currentIndex].establishmentName}
+                  src={currentReview.establishmentImage}
+                  alt={currentReview.establishmentName}
                   loading="lazy"
                   className="w-full h-full object-cover"
                 />
@@ -118,13 +163,13 @@ export function ReviewsCarouselV2() {
               </div>
 
               <Link
-                href={`/establecimiento/${REVIEWS[currentIndex].establishmentSlug}`}
+                href={`/establecimiento/${currentReview.establishmentSlug}`}
                 className="inline-flex items-center gap-1.5 text-xs font-black text-slate-900 hover:text-[#00C8D4] transition-colors truncate"
               >
                 <div className="w-4 h-4 rounded-full bg-[#FF0096] flex items-center justify-center text-white shrink-0 shadow-xs">
                   <MapPin className="w-2.5 h-2.5 text-white stroke-[2.5]" />
                 </div>
-                <span>{REVIEWS[currentIndex].establishmentName}</span>
+                <span>{currentReview.establishmentName}</span>
               </Link>
             </div>
 
@@ -133,30 +178,30 @@ export function ReviewsCarouselV2() {
               
               {/* Stars */}
               <div className="flex items-center gap-1 text-amber-400">
-                {Array.from({ length: REVIEWS[currentIndex].rating }).map((_, i) => (
+                {Array.from({ length: currentReview.rating || 5 }).map((_, i) => (
                   <Star key={i} className="w-4 h-4 fill-amber-400" />
                 ))}
-                <span className="ml-2 text-xs font-black text-slate-700">5.0 / 5.0 Excelente</span>
+                <span className="ml-2 text-xs font-black text-slate-700">{currentReview.rating ? currentReview.rating.toFixed(1) : "5.0"} / 5.0 Excelente</span>
               </div>
 
               {/* Comment */}
               <blockquote className="text-sm sm:text-base font-medium text-slate-700 leading-relaxed italic">
-                "{REVIEWS[currentIndex].comment}"
+                "{currentReview.comment}"
               </blockquote>
 
               {/* Author Info */}
               <div className="flex items-center gap-3 pt-3 border-t border-slate-100">
                 <img
-                  src={REVIEWS[currentIndex].avatar}
-                  alt={REVIEWS[currentIndex].author}
+                  src={currentReview.avatar}
+                  alt={currentReview.author}
                   className="w-11 h-11 rounded-full object-cover border-2 border-[#00C8D4] shadow-xs"
                 />
                 <div>
                   <h4 className="text-xs sm:text-sm font-black text-slate-900">
-                    {REVIEWS[currentIndex].author}
+                    {currentReview.author}
                   </h4>
                   <p className="text-[10px] text-slate-500 font-medium">
-                    {REVIEWS[currentIndex].location} • {REVIEWS[currentIndex].date}
+                    {currentReview.location} • {currentReview.date}
                   </p>
                 </div>
               </div>
@@ -188,7 +233,7 @@ export function ReviewsCarouselV2() {
 
             {/* Dots */}
             <div className="flex gap-1.5">
-              {REVIEWS.map((_, i) => (
+              {reviews.map((_, i) => (
                 <button
                   key={i}
                   type="button"

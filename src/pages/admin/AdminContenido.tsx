@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { AdminTabBar } from "@/components/admin/AdminTabBar";
 import {
   FileText, Globe, Layers, Settings, Image, Edit2, X, Check,
-  Plus, Trash2, Eye, Save, ExternalLink, ToggleLeft, ToggleRight, Loader2, Upload, Star, Search
+  Plus, Trash2, Eye, Save, ExternalLink, ToggleLeft, ToggleRight, Loader2, Upload, Star, Search, MessageSquareQuote
 } from "lucide-react";
 import { TOP10_HOTELS_STATIC_DATA } from "@/config/top10Hoteles";
 
@@ -33,6 +33,7 @@ const SECTION_META: Record<string, { label: string; icon: string; color: string 
   testimonials:         { label: "Testimonios",       icon: "💬", color: "#10B981" },
   partners:             { label: "Nuestros Aliados",  icon: "🤝", color: "#6366F1" },
   prestigio:            { label: "Campaña Prestigio (Alta Gama)", icon: "✨", color: "#FF0096" },
+  reviews_v2:           { label: "Experiencias de Viajeros (Home V2)", icon: "💬", color: "#FF0096" },
 };
 
 const SETTINGS_META: Record<string, { label: string; group: string; type: "text" | "url" | "tel" | "toggle" }> = {
@@ -438,6 +439,180 @@ export function AdminContenido() {
                     </div>
                     <button type="button" onClick={() => setEditSection({ ...heroV2Section })} className="w-full py-3.5 rounded-xl text-xs font-black uppercase tracking-widest text-slate-950 bg-gradient-to-r from-[#00C8D4] to-[#00b2be] cursor-pointer shadow-lg shadow-cyan-950/40">
                       Modificar Hero Home V2
+                    </button>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* SECCIÓN EXPERIENCIAS / TESTIMONIOS (HOME V2) */}
+            <div className="bg-[#100921] border border-slate-800/80 rounded-2xl p-7 shadow-xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#FF0096] to-[#9B00CC]" />
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="font-black text-white text-xs uppercase tracking-widest flex items-center gap-2">
+                  <MessageSquareQuote className="w-4 h-4 text-[#FF0096]" /> Sección "Experiencias de Viajeros Reales" (Home V2)
+                </h2>
+                <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black bg-[#FF0096]/20 text-[#FF0096] border border-[#FF0096]/30">
+                  Carrusel V2
+                </span>
+              </div>
+
+              {(() => {
+                const reviewsV2Section = sections.find(s => s.sectionKey === "reviews_v2") || {
+                  sectionKey: "reviews_v2",
+                  title: "Experiencias de Viajeros Reales",
+                  subtitle: "Testimonios Verificados",
+                  description: "Descubre las historias de personas que planificaron sus vacaciones en Venezuela contactando directo a las posadas.",
+                  buttonText: "TESTIMONIOS VERIFICADOS",
+                  buttonUrl: JSON.stringify([
+                    {
+                      id: 1,
+                      author: "Valeria & Carlos M.",
+                      location: "Caracas, Venezuela",
+                      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop",
+                      rating: 5,
+                      date: "Agosto 2026",
+                      establishmentName: "Posada La Ardileña",
+                      establishmentSlug: "posada-la-ardilena",
+                      establishmentImage: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=400",
+                      comment: "Contactamos al dueño directo por WhatsApp a través de la plataforma. La posada en Morrocoy tenía la planta eléctrica encendida 100% y la comida fue espectacular. Sin ningún cobro extra ni sorpresas."
+                    },
+                    {
+                      id: 2,
+                      author: "Ing. Roberto Benítez",
+                      location: "Valencia, Carabobo",
+                      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop",
+                      rating: 5,
+                      date: "Julio 2026",
+                      establishmentName: "Campamento Canaima Sello HDV",
+                      establishmentSlug: "campamento-canaima",
+                      establishmentImage: "https://images.unsplash.com/photo-1586375300773-8384e3e4916f?w=400",
+                      comment: "Pudimos coordinar todo el paquete de vuelo y excursión al Salto Ángel con el operador directo. Excelente atención y la garantía de estar tratando con el equipo real."
+                    }
+                  ]),
+                  isActive: true
+                };
+
+                const isEditing = editSection?.sectionKey === "reviews_v2";
+
+                if (isEditing && editSection) {
+                  let parsedReviews: any[] = [];
+                  try {
+                    parsedReviews = JSON.parse(editSection.buttonUrl || "[]");
+                  } catch (e) {
+                    parsedReviews = [];
+                  }
+
+                  const updateReviewField = (index: number, field: string, value: any) => {
+                    const copy = [...parsedReviews];
+                    copy[index] = { ...copy[index], [field]: value };
+                    setEditSection({ ...editSection, buttonUrl: JSON.stringify(copy) });
+                  };
+
+                  const addReviewItem = () => {
+                    const newReview = {
+                      id: Date.now(),
+                      author: "Nuevo Viajero",
+                      location: "Venezuela",
+                      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop",
+                      rating: 5,
+                      date: "Septiembre 2026",
+                      establishmentName: "Posada Boutique",
+                      establishmentSlug: "posada-boutique",
+                      establishmentImage: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=400",
+                      comment: "Excelente experiencia reservando directo sin intermediarios."
+                    };
+                    const updated = [...parsedReviews, newReview];
+                    setEditSection({ ...editSection, buttonUrl: JSON.stringify(updated) });
+                  };
+
+                  const removeReviewItem = (index: number) => {
+                    const updated = parsedReviews.filter((_, i) => i !== index);
+                    setEditSection({ ...editSection, buttonUrl: JSON.stringify(updated) });
+                  };
+
+                  return (
+                    <div className="space-y-6">
+                      <div>
+                        <label className="text-[10px] uppercase font-black text-slate-400 block mb-1.5 tracking-widest">Badge Superior (Pill)</label>
+                        <input value={editSection.buttonText || ""} onChange={e => setEditSection({ ...editSection, buttonText: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] rounded-xl px-4 py-3 text-xs font-bold text-white outline-none" placeholder="TESTIMONIOS VERIFICADOS" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] uppercase font-black text-slate-400 block mb-1.5 tracking-widest">Título Principal de la Sección</label>
+                        <input value={editSection.title || ""} onChange={e => setEditSection({ ...editSection, title: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] rounded-xl px-4 py-3 text-xs font-bold text-white outline-none" placeholder="Experiencias de Viajeros Reales" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] uppercase font-black text-slate-400 block mb-1.5 tracking-widest">Subtítulo Descriptivo</label>
+                        <textarea rows={2} value={editSection.description || ""} onChange={e => setEditSection({ ...editSection, description: e.target.value })} className="w-full bg-[#170e2e] border border-slate-800 focus:border-[#FF0096] rounded-xl px-4 py-3 text-xs font-bold text-white outline-none resize-none" placeholder="Descubre las historias de personas..." />
+                      </div>
+
+                      {/* LISTA DE TESTIMONIOS INDIVIDUALES */}
+                      <div className="space-y-4 pt-3 border-t border-slate-800">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] uppercase font-black text-[#FF0096] tracking-widest">Lista de Testimonios / Reseñas ({parsedReviews.length})</span>
+                          <button type="button" onClick={addReviewItem} className="px-3 py-1.5 bg-[#FF0096]/20 hover:bg-[#FF0096]/30 text-[#FF0096] border border-[#FF0096]/40 rounded-xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1 cursor-pointer">
+                            <Plus className="w-3.5 h-3.5" /> Agregar Testimonio
+                          </button>
+                        </div>
+
+                        {parsedReviews.map((rev: any, idx: number) => (
+                          <div key={rev.id || idx} className="p-4 bg-[#0a0418] border border-slate-800 rounded-xl space-y-3 relative">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-black text-slate-400 uppercase">Testimonio #{idx + 1}</span>
+                              <button type="button" onClick={() => removeReviewItem(idx)} className="text-red-400 hover:text-red-300 p-1 cursor-pointer" title="Eliminar testimonio">
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              <div>
+                                <label className="text-[9px] uppercase font-black text-slate-400 block mb-1">Nombre del Viajero(s)</label>
+                                <input value={rev.author || ""} onChange={e => updateReviewField(idx, "author", e.target.value)} className="w-full bg-[#170e2e] border border-slate-800 rounded-lg p-2 text-xs font-bold text-white" />
+                              </div>
+                              <div>
+                                <label className="text-[9px] uppercase font-black text-slate-400 block mb-1">Ubicación (Origen)</label>
+                                <input value={rev.location || ""} onChange={e => updateReviewField(idx, "location", e.target.value)} className="w-full bg-[#170e2e] border border-slate-800 rounded-lg p-2 text-xs font-bold text-white" />
+                              </div>
+                              <div>
+                                <label className="text-[9px] uppercase font-black text-slate-400 block mb-1">Nombre de la Posada</label>
+                                <input value={rev.establishmentName || ""} onChange={e => updateReviewField(idx, "establishmentName", e.target.value)} className="w-full bg-[#170e2e] border border-slate-800 rounded-lg p-2 text-xs font-bold text-white" />
+                              </div>
+                              <div>
+                                <label className="text-[9px] uppercase font-black text-slate-400 block mb-1">Slug de la Posada (URL)</label>
+                                <input value={rev.establishmentSlug || ""} onChange={e => updateReviewField(idx, "establishmentSlug", e.target.value)} className="w-full bg-[#170e2e] border border-slate-800 rounded-lg p-2 text-xs font-bold text-white" />
+                              </div>
+                              <div className="md:col-span-2">
+                                <label className="text-[9px] uppercase font-black text-slate-400 block mb-1">Imagen de la Posada (URL)</label>
+                                <input value={rev.establishmentImage || ""} onChange={e => updateReviewField(idx, "establishmentImage", e.target.value)} className="w-full bg-[#170e2e] border border-slate-800 rounded-lg p-2 text-xs font-bold text-white" />
+                              </div>
+                              <div className="md:col-span-2">
+                                <label className="text-[9px] uppercase font-black text-slate-400 block mb-1">Comentario / Reseña</label>
+                                <textarea rows={2} value={rev.comment || ""} onChange={e => updateReviewField(idx, "comment", e.target.value)} className="w-full bg-[#170e2e] border border-slate-800 rounded-lg p-2 text-xs font-bold text-white resize-none" />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="flex gap-3 pt-3">
+                        <button type="button" disabled={updateSection.isPending} onClick={() => setEditSection(null)} className="flex-1 py-3 bg-[#170e2e] hover:bg-[#221544] border border-slate-800 rounded-xl text-xs font-black uppercase text-slate-300 tracking-wider transition-colors cursor-pointer">Cancelar</button>
+                        <button type="button" disabled={updateSection.isPending} onClick={() => updateSection.mutate(editSection)} className="flex-1 py-3 text-white rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-[#FF0096] to-[#9B00CC] cursor-pointer flex items-center justify-center gap-2">
+                          {updateSection.isPending ? <Loader2 className="w-4 h-4 animate-spin text-white" /> : <span>Guardar Sección Reseñas</span>}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="space-y-6">
+                    <div className="p-5 bg-[#0a0418] border border-slate-900 rounded-xl space-y-3">
+                      <p className="text-xs text-slate-400 font-bold uppercase tracking-wide"><strong>Badge:</strong> <span className="text-[#FF0096] ml-2">{reviewsV2Section.buttonText || "TESTIMONIOS VERIFICADOS"}</span></p>
+                      <p className="text-xs text-slate-400 font-bold uppercase tracking-wide"><strong>Título Principal:</strong> <span className="text-white ml-2">{reviewsV2Section.title}</span></p>
+                      <p className="text-xs text-slate-400 font-bold uppercase tracking-wide"><strong>Subtítulo:</strong> <span className="text-slate-300 ml-2">{reviewsV2Section.description}</span></p>
+                    </div>
+                    <button type="button" onClick={() => setEditSection({ ...reviewsV2Section })} className="w-full py-3.5 rounded-xl text-xs font-black uppercase tracking-widest text-white bg-gradient-to-r from-[#FF0096] to-[#9B00CC] cursor-pointer shadow-lg shadow-purple-950/40">
+                      Modificar Sección Reseñas de Viajeros
                     </button>
                   </div>
                 );
