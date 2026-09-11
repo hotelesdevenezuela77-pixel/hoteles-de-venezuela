@@ -129,7 +129,7 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
   const SelectedExpIcon = selectedExpObj.icon;
 
   return (
-    <section className="relative w-full overflow-hidden bg-slate-950 text-white min-h-[560px] lg:min-h-[620px] flex items-center justify-center pt-20 pb-12">
+    <section className="relative w-full bg-slate-950 text-white min-h-[560px] lg:min-h-[620px] flex items-center justify-center pt-20 pb-12">
       
       {/* Background Image full-bleed con lazy loading y scale */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -168,7 +168,7 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
         </div>
 
         {/* BARRA DE BÚSQUEDA FLOTANTE UNIFICADA CON DESPLEGABLES INTERACTIVOS DE ICONOS UNICOLOR */}
-        <div className="max-w-5xl mx-auto bg-white/95 backdrop-blur-xl p-2.5 sm:p-3.5 rounded-2xl md:rounded-full border border-white/50 shadow-2xl shadow-cyan-950/30 text-slate-800 relative z-30">
+        <div className="max-w-5xl mx-auto bg-white/95 backdrop-blur-xl p-2.5 sm:p-3.5 rounded-2xl md:rounded-full border border-white/50 shadow-2xl shadow-cyan-950/30 text-slate-800 relative z-40">
           <form onSubmit={handleSearchSubmit} className="flex flex-col md:flex-row items-center gap-2 md:gap-0 divide-y md:divide-y-0 md:divide-x divide-slate-200">
             
             {/* SEGMENTO 1: ¿A DÓNDE QUIERES IR? (Ubicación) */}
@@ -196,7 +196,7 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
 
               {/* Menu Desplegable Segmento 1 */}
               {destOpen && (
-                <div className="absolute top-full left-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-slate-200 py-2 z-50 max-h-64 overflow-y-auto">
+                <div className="absolute top-full left-0 mt-2.5 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl shadow-slate-950/40 border border-slate-200/90 py-2 z-[100] max-h-96 overflow-y-auto">
                   {DESTINATIONS_LIST.map((item) => {
                     const IconC = item.icon;
                     const isSelected = destination === item.val;
@@ -205,13 +205,13 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
                         key={item.val}
                         type="button"
                         onClick={() => { setDestination(item.val); setDestOpen(false); }}
-                        className={`w-full px-3.5 py-2.5 flex items-center justify-between text-xs font-extrabold transition-colors text-left ${
-                          isSelected ? "bg-[#00C8D4]/10 text-[#00C8D4]" : "text-slate-800 hover:bg-slate-100"
+                        className={`w-full px-4 py-3 flex items-center justify-between text-xs font-bold transition-all text-left ${
+                          isSelected ? "bg-[#00C8D4]/10 text-[#00C8D4] font-extrabold" : "text-slate-900 hover:bg-slate-100/80"
                         }`}
                       >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div className="w-6 h-6 rounded-full flex items-center justify-center text-white shrink-0 shadow-xs" style={{ backgroundColor: item.solidBg }}>
-                            <IconC className="w-3.5 h-3.5 text-white stroke-[2.5]" />
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-7 h-7 rounded-full flex items-center justify-center text-white shrink-0 shadow-xs" style={{ backgroundColor: item.solidBg }}>
+                            <IconC className="w-4 h-4 text-white stroke-[2.5]" />
                           </div>
                           <span className="truncate">{item.label}</span>
                         </div>
@@ -248,7 +248,7 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
 
               {/* Menu Desplegable Segmento 2 */}
               {catOpen && (
-                <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200 py-2 z-50 max-h-64 overflow-y-auto">
+                <div className="absolute top-full left-0 md:left-1/2 md:-translate-x-1/2 mt-2.5 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl shadow-slate-950/40 border border-slate-200/90 py-2 z-[100] overflow-hidden">
                   {CATEGORIES_LIST.map((item) => {
                     const IconC = item.icon;
                     const isSelected = category === item.val;
@@ -257,13 +257,13 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
                         key={item.val}
                         type="button"
                         onClick={() => { setCategory(item.val); setCatOpen(false); }}
-                        className={`w-full px-3.5 py-2.5 flex items-center justify-between text-xs font-extrabold transition-colors text-left ${
-                          isSelected ? "bg-[#FF0096]/10 text-[#FF0096]" : "text-slate-800 hover:bg-slate-100"
+                        className={`w-full px-4 py-3 flex items-center justify-between text-xs font-bold transition-all text-left ${
+                          isSelected ? "bg-[#FF0096]/10 text-[#FF0096] font-extrabold" : "text-slate-900 hover:bg-slate-100/80"
                         }`}
                       >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div className="w-6 h-6 rounded-full flex items-center justify-center text-white shrink-0 shadow-xs" style={{ backgroundColor: item.solidBg }}>
-                            <IconC className="w-3.5 h-3.5 text-white stroke-[2.5]" />
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-7 h-7 rounded-full flex items-center justify-center text-white shrink-0 shadow-xs" style={{ backgroundColor: item.solidBg }}>
+                            <IconC className="w-4 h-4 text-white stroke-[2.5]" />
                           </div>
                           <span className="truncate">{item.label}</span>
                         </div>
@@ -300,7 +300,7 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
 
               {/* Menu Desplegable Segmento 3 con Iconos Unicolor */}
               {expOpen && (
-                <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200 py-2 z-50 max-h-64 overflow-y-auto">
+                <div className="absolute top-full left-0 md:left-auto md:right-0 mt-2.5 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl shadow-slate-950/40 border border-slate-200/90 py-2 z-[100] overflow-hidden">
                   {EXPERIENCES_LIST.map((item) => {
                     const IconC = item.icon;
                     const isSelected = experience === item.val;
@@ -309,13 +309,13 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
                         key={item.val}
                         type="button"
                         onClick={() => { setExperience(item.val); setExpOpen(false); }}
-                        className={`w-full px-3.5 py-2.5 flex items-center justify-between text-xs font-extrabold transition-colors text-left ${
-                          isSelected ? "bg-[#9B00CC]/10 text-[#9B00CC]" : "text-slate-800 hover:bg-slate-100"
+                        className={`w-full px-4 py-3 flex items-center justify-between text-xs font-bold transition-all text-left ${
+                          isSelected ? "bg-[#9B00CC]/10 text-[#9B00CC] font-extrabold" : "text-slate-900 hover:bg-slate-100/80"
                         }`}
                       >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div className="w-6 h-6 rounded-full flex items-center justify-center text-white shrink-0 shadow-xs" style={{ backgroundColor: item.solidBg }}>
-                            <IconC className="w-3.5 h-3.5 text-white stroke-[2.5]" />
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-7 h-7 rounded-full flex items-center justify-center text-white shrink-0 shadow-xs" style={{ backgroundColor: item.solidBg }}>
+                            <IconC className="w-4 h-4 text-white stroke-[2.5]" />
                           </div>
                           <span className="truncate">{item.label}</span>
                         </div>
