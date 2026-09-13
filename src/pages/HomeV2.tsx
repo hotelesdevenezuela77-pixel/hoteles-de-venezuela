@@ -684,8 +684,6 @@ export function HomeV2() {
           ))}
         </div>
       </section>
-
-      {/* 9. LUGARES EMBLEMÁTICOS: SITIOS TURÍSTICOS RECOMENDADOS */}
       <section className="py-20 bg-slate-100/70 border-y border-slate-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-10">
           <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4">
@@ -710,7 +708,7 @@ export function HomeV2() {
             </Link>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {sites.map((site) => (
               <article key={site.id} className="group bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 border border-slate-200/80 text-left flex flex-col justify-between h-full">
                 <div>
@@ -787,7 +785,7 @@ export function HomeV2() {
           </Link>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {blogs.map((blog) => (
             <article key={blog.id} className="group flex flex-col justify-between bg-white border border-slate-200/80 rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300 h-full text-left">
               <div>
@@ -842,7 +840,7 @@ export function HomeV2() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {programs.map((site) => {
               const IconComponent = site.icon;
               return (
