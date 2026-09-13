@@ -134,72 +134,20 @@ export function OwnerTechnicalSupportModule({ establishmentId, establishmentName
       console.warn("DB Support tickets fetch error, using local storage fallback", err);
     }
 
-    // 2. Fallback to localStorage
+    // 2. Fallback to localStorage (filter out any old demo tickets)
     const saved = localStorage.getItem(localKey);
     if (saved) {
       try {
-        setTickets(JSON.parse(saved));
+        const parsed = JSON.parse(saved).filter((t: any) => !t.id?.startsWith("tk-demo-"));
+        setTickets(parsed);
+        localStorage.setItem(localKey, JSON.stringify(parsed));
         setLoading(false);
         return;
       } catch (e) {}
     }
 
-    // 3. Demo Initial Data if empty
-    const nowStr = new Date().toISOString().slice(0, 10);
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowStr = tomorrow.toISOString().slice(0, 10);
-
-    const initialDemos: SupportTicket[] = [
-      {
-        id: "tk-demo-1",
-        code: "TK-2026-8102",
-        establishment_id: establishmentId,
-        establishment_name: establishmentName,
-        client_name: "Habitación 104 - Roberto Gómez",
-        client_phone: "+58 414 5550192",
-        client_email: "roberto@ejemplo.com",
-        subject: "Falla de señal WiFi en router de pasillo oeste",
-        description: "El huésped indica fluctuación de velocidad en el enlace inalámbrico 5GHz durante la tarde.",
-        category: "wifi",
-        priority: "alta",
-        status: "en_proceso",
-        scheduled_date: nowStr,
-        created_at: new Date().toISOString()
-      },
-      {
-        id: "tk-demo-2",
-        code: "TK-2026-7491",
-        establishment_id: establishmentId,
-        establishment_name: establishmentName,
-        client_name: "Recepción Principal",
-        client_phone: "+58 212 9998822",
-        subject: "Ajuste de termostato en salón VIP de eventos",
-        description: "Revisar sistema de climatización central 22°C para conferencia nocturna.",
-        category: "infraestructura",
-        priority: "media",
-        status: "en_proceso",
-        scheduled_date: tomorrowStr,
-        created_at: new Date().toISOString()
-      },
-      {
-        id: "tk-demo-3",
-        code: "TK-2026-6210",
-        establishment_id: establishmentId,
-        establishment_name: establishmentName,
-        client_name: "Administración / Elena Silva",
-        client_phone: "+58 412 3334411",
-        subject: "Actualización de POS y lector de tarjetas internacional",
-        description: "Mantenimiento preventivo e instalación de controladores para terminal de pagos.",
-        category: "facturacion",
-        priority: "baja",
-        status: "solucionado",
-        scheduled_date: nowStr,
-        created_at: new Date().toISOString(),
-        resolution_notes: "Firmware actualizado correctamente. Pruebas de transacción exitosas.",
-        resolved_at: new Date().toISOString()
-      }
-    ];
+    // 3. Initial state is empty for new establishments
+    const initialDemos: SupportTicket[] = [];
 
     setTickets(initialDemos);
     localStorage.setItem(localKey, JSON.stringify(initialDemos));
