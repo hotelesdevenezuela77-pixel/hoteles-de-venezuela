@@ -335,6 +335,10 @@ export function HomeV2({ isMainHome = false }: { isMainHome?: boolean }) {
       description: "Conecta tu agencia de viajes con la red de hospedajes más grande de Venezuela y obtén beneficios.",
       gradient: "from-[#9B00CC] to-[#4f46e5]",
       shadow: "shadow-[#9B00CC]/25",
+      icon: Compass
+    }
+  ];
+
   // Complete JSON-LD structured data array for Google & Search Engine Dominance
   const jsonLdSchemas = React.useMemo(() => {
     const orgSchema = {
