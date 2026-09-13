@@ -1104,10 +1104,17 @@ export function OwnerDashboard() {
             destinations (name)
           `);
 
-        if (isAdmin && impersonateId && impersonateId !== "admin_assistance_mode" && impersonateId !== "owner_user_hostal-entre-2-aguas") {
-          estQuery = estQuery.eq("owner_user_id", impersonateId);
-        } else if (isAdmin && impersonateEstablishmentId) {
-          estQuery = estQuery.eq("id", impersonateEstablishmentId);
+        const isImpersonatingMode = isAdmin && (!!impersonateId || !!impersonateEstablishmentId || !!impersonateName);
+
+        if (isImpersonatingMode) {
+          if (impersonateEstablishmentId) {
+            const numId = Number(impersonateEstablishmentId) || 0;
+            estQuery = estQuery.or(`id.eq.${numId},slug.eq.${impersonateEstablishmentId}`);
+          } else if (impersonateId && impersonateId !== "admin_assistance_mode" && impersonateId !== "owner_user_hostal-entre-2-aguas") {
+            estQuery = estQuery.eq("owner_user_id", impersonateId);
+          } else if (impersonateName) {
+            estQuery = estQuery.ilike("name", `%${impersonateName}%`);
+          }
         } else {
           estQuery = estQuery.eq("owner_user_id", activeOwnerId);
         }
@@ -1253,7 +1260,7 @@ export function OwnerDashboard() {
         const isEmailMatch = userEmailLower !== "" && (
           (te.slug === "hostal-entre-2-aguas" && (userEmailLower.includes("entre2aguas") || userEmailLower.includes("entredosaguas") || userEmailLower.includes("entre-2-aguas") || userEmailLower.includes("ramiropf") || userEmailLower === "ramiropf26@gmail.com" || userEmailLower === "ramiropf15@gmail.com")) ||
           (te.slug === "aparto-posada-del-mar" && userEmailLower.includes("apartoposadadelmar")) ||
-          (te.slug === "perla-negra" && userEmailLower.includes("perlanegra")) ||
+          (te.slug === "perla-negra" && (userEmailLower.includes("perlanegra") || userEmailLower.includes("posadaperlanegra"))) ||
           (te.slug === "my-campers" && userEmailLower.includes("mycampers")) ||
           (te.slug === "oleaje-beach-club" && userEmailLower.includes("oleaje")) ||
           (te.slug === "complejo-los-roques" && userEmailLower.includes("losroques"))
@@ -1324,8 +1331,9 @@ export function OwnerDashboard() {
         }
       }
 
-      // For Super-Admin in non-impersonation mode: if they haven't registered personal properties, provide access to testing catalogue
-      if (isAdmin && !impersonateEstablishmentId && !impersonateId && mappedEsts.length === 0) {
+      // ONLY for Super-Admin when NOT impersonating any specific establishment and no personal properties exist:
+      const isImpersonatingAny = isAdmin && (!!impersonateEstablishmentId || !!impersonateId || !!impersonateName);
+      if (isAdmin && !isImpersonatingAny && mappedEsts.length === 0) {
         mappedEsts = [...tenantEsts, ...builtInDemoEsts];
       }
 
@@ -3167,46 +3175,57 @@ export function OwnerDashboard() {
             )}
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-            {[
-              { id: "resumen", label: "Dashboard Ejecutivo", icon: BarChart3, enabled: true },
-              { id: "agenda", label: "Agenda & Calendario", icon: Calendar, enabled: true, badge: "Drag & Drop" },
-              { id: "soporte", label: "Soporte Técnico", icon: Wrench, enabled: true, badge: "Tickets D&D" },
-              { id: "webapp_cms", label: "Aplicación Web & CMS", icon: Globe, enabled: currentTenantConfig?.modules?.cms !== false, badge: "Web Builder" },
-              { id: "tareas", label: "Gestión de Tareas", icon: Clipboard, enabled: !!currentTenantConfig?.modules?.tareas, badge: "SaaS" },
-              { id: "pos", label: "Club POS", icon: Coffee, enabled: !!currentTenantConfig?.modules?.pos, badge: "SaaS" },
-              { id: "finanzas", label: "Finanzas & Membresías", icon: DollarSign, enabled: !!currentTenantConfig?.modules?.finanzas },
-              { id: "analiticas_saas", label: "Analíticas SaaS", icon: TrendingUp, enabled: !!currentTenantConfig?.modules?.analiticas, badge: "SaaS" },
-              { id: "portafolio", label: `Mi Portafolio (${establishments.length})`, icon: Building2, enabled: true },
-              { id: "operaciones", label: "Operaciones Diarias", icon: CalendarRange, enabled: currentTenantConfig?.modules?.reservas !== false },
-              { id: "inventario", label: "Inventario Habitaciones", icon: ListFilter, enabled: true },
-              { id: "marketing", label: "Marketing & Canales", icon: Tag, enabled: true }
-            ].filter(tab => tab.enabled).map(tab => {
-              const active = activeTab === tab.id;
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer text-left border ${active
-                      ? "bg-[#0e011f] text-white border-[#FF0096] shadow-md scale-[1.02]"
-                      : "bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200/80 hover:border-slate-300"
-                    }`}
-                >
-                  <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${active ? "bg-[#FF0096] text-white" : "bg-white text-slate-600 border border-slate-200"
-                    }`}>
-                    <Icon className="w-3.5 h-3.5" />
-                  </div>
-                  <span className="truncate leading-tight font-sans text-[11px]">{tab.label}</span>
-                  {tab.badge && (
-                    <span className="ml-auto px-1.5 py-0.5 rounded text-[7px] font-black uppercase tracking-wider bg-cyan-100 text-cyan-800 shrink-0">
-                      {tab.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
+          {(() => {
+            const activeEstObj = establishments.find(e => Number(e.id) === Number(selectedCalendarEst)) || establishments[0];
+            const activeSlug = activeEstObj?.slug || "";
+            const currentTenantConfig = TENANTS_REGISTRY[activeSlug] || Object.values(TENANTS_REGISTRY).find(t => Number(t.establishment_id) === Number(activeEstObj?.id));
+
+            const isRestaurantType = currentTenantConfig?.business_type === "restaurant" || activeEstObj?.category_name?.toLowerCase().includes("restaurante");
+            const isPosEnabled = currentTenantConfig?.modules?.pos === true || (currentTenantConfig?.modules?.pos !== false && isRestaurantType);
+
+            return (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                {[
+                  { id: "resumen", label: "Dashboard Ejecutivo", icon: BarChart3, enabled: true },
+                  { id: "agenda", label: "Agenda & Calendario", icon: Calendar, enabled: true, badge: "Drag & Drop" },
+                  { id: "soporte", label: "Soporte Técnico", icon: Wrench, enabled: true, badge: "Tickets D&D" },
+                  { id: "webapp_cms", label: "Aplicación Web & CMS", icon: Globe, enabled: currentTenantConfig?.modules?.cms !== false, badge: "Web Builder" },
+                  { id: "tareas", label: "Gestión de Tareas", icon: Clipboard, enabled: !!currentTenantConfig?.modules?.tareas, badge: "SaaS" },
+                  { id: "pos", label: "Club POS", icon: Coffee, enabled: isPosEnabled, badge: "SaaS" },
+                  { id: "finanzas", label: "Finanzas & Membresías", icon: DollarSign, enabled: !!currentTenantConfig?.modules?.finanzas },
+                  { id: "analiticas_saas", label: "Analíticas SaaS", icon: TrendingUp, enabled: !!currentTenantConfig?.modules?.analiticas, badge: "SaaS" },
+                  { id: "portafolio", label: `Mi Portafolio (${establishments.length})`, icon: Building2, enabled: true },
+                  { id: "operaciones", label: "Operaciones Diarias", icon: CalendarRange, enabled: currentTenantConfig?.modules?.reservas !== false },
+                  { id: "inventario", label: "Inventario Habitaciones", icon: ListFilter, enabled: true },
+                  { id: "marketing", label: "Marketing & Canales", icon: Tag, enabled: true }
+                ].filter(tab => tab.enabled).map(tab => {
+                  const active = activeTab === tab.id;
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id as any)}
+                      className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer text-left border ${active
+                          ? "bg-[#0e011f] text-white border-[#FF0096] shadow-md scale-[1.02]"
+                          : "bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200/80 hover:border-slate-300"
+                        }`}
+                    >
+                      <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${active ? "bg-[#FF0096] text-white" : "bg-white text-slate-600 border border-slate-200"
+                        }`}>
+                        <Icon className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="truncate leading-tight font-sans text-[11px]">{tab.label}</span>
+                      {tab.badge && (
+                        <span className="ml-auto px-1.5 py-0.5 rounded text-[7px] font-black uppercase tracking-wider bg-cyan-100 text-cyan-800 shrink-0">
+                          {tab.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </div>
       </div>
 
@@ -3468,40 +3487,49 @@ export function OwnerDashboard() {
               <div className="space-y-6">
 
                 {/* Channel manager summary */}
-                <div className="bg-[#0e011f] border border-white/5 rounded-3xl p-6 text-white text-left">
-                  <h3 className="text-xs font-black uppercase tracking-wider mb-4 text-brand-turquesa">Distribución por Canales</h3>
-                  <div className="h-40 w-full flex items-center justify-center">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={channelData}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={45}
-                          outerRadius={60}
-                          paddingAngle={3}
-                          dataKey="value"
-                        >
-                          {channelData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip formatter={(value) => `${value}%`} />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                  <div className="space-y-2 mt-4 text-[10px] font-bold">
-                    {channelData.map((ch, i) => (
-                      <div key={i} className="flex justify-between items-center">
-                        <span className="flex items-center gap-2">
-                          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: ch.color }} />
-                          {ch.name}
-                        </span>
-                        <span>{ch.value}%</span>
+                {(() => {
+                  const channelData = [
+                    { name: "Directo WhatsApp (0% com)", value: 65, color: "#FF0096" },
+                    { name: "Portal HDV Directo", value: 25, color: "#00C8D4" },
+                    { name: "OTAs & Booking", value: 10, color: "#9B00CC" }
+                  ];
+                  return (
+                    <div className="bg-[#0e011f] border border-white/5 rounded-3xl p-6 text-white text-left">
+                      <h3 className="text-xs font-black uppercase tracking-wider mb-4 text-brand-turquesa">Distribución por Canales</h3>
+                      <div className="h-40 w-full flex items-center justify-center">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={channelData}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={45}
+                              outerRadius={60}
+                              paddingAngle={3}
+                              dataKey="value"
+                            >
+                              {channelData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} />
+                              ))}
+                            </Pie>
+                            <Tooltip formatter={(value) => `${value}%`} />
+                          </PieChart>
+                        </ResponsiveContainer>
                       </div>
-                    ))}
-                  </div>
-                </div>
+                      <div className="space-y-2 mt-4 text-[10px] font-bold">
+                        {channelData.map((ch, i) => (
+                          <div key={i} className="flex justify-between items-center">
+                            <span className="flex items-center gap-2">
+                              <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: ch.color }} />
+                              {ch.name}
+                            </span>
+                            <span>{ch.value}%</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 {/* System Alerts */}
                 <div className="bg-white border border-gray-200 rounded-3xl p-5 shadow-xs text-left">
