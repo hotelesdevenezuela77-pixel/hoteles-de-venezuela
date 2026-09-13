@@ -129,7 +129,7 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
   const SelectedExpIcon = selectedExpObj.icon;
 
   return (
-    <section className="relative w-full bg-slate-950 text-white min-h-[560px] lg:min-h-[620px] flex items-center justify-center pt-20 pb-12">
+    <section className="relative w-full bg-slate-950 text-white min-h-[560px] lg:min-h-[620px] flex items-center justify-center pt-20 pb-12 overflow-hidden">
       
       {/* Background Image full-bleed con lazy loading y scale */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -142,6 +142,37 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
         {/* Capa de degradado ligera y cristalina para máxima visibilidad de la imagen del Salto Ángel */}
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/20 to-slate-950/80 z-10" />
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent z-15" />
+      </div>
+
+      {/* BANDERAS VERTICALES ANIMADAS LADO IZQUIERDO Y DERECHO */}
+      {/* Lado Izquierdo: Movimiento de abajo hacia arriba */}
+      <div className="absolute left-1 sm:left-3 md:left-5 top-0 bottom-0 z-20 pointer-events-none select-none flex items-center justify-center overflow-hidden hidden min-[480px]:flex border-r border-[#00C8D4]/20 pr-1 sm:pr-2">
+        <div className="animate-marquee-vertical-up flex flex-col items-center">
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <div 
+              key={`v-left-${i}`}
+              className="py-5 font-mono font-black text-[9px] sm:text-[11px] tracking-[0.25em] uppercase text-transparent bg-clip-text bg-gradient-to-b from-[#00C8D4] via-white to-[#FF0096] writing-mode-vertical rotate-180 flex items-center gap-3 drop-shadow-[0_0_8px_rgba(0,200,212,0.35)] opacity-85"
+            >
+              <span className="text-[#00C8D4] text-[10px]">✦</span>
+              <span>¡Próximo lanzamiento!</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Lado Derecho: Movimiento de arriba hacia abajo */}
+      <div className="absolute right-1 sm:right-3 md:right-5 top-0 bottom-0 z-20 pointer-events-none select-none flex items-center justify-center overflow-hidden hidden min-[480px]:flex border-l border-[#FF0096]/20 pl-1 sm:pl-2">
+        <div className="animate-marquee-vertical-down flex flex-col items-center">
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <div 
+              key={`v-right-${i}`}
+              className="py-5 font-mono font-black text-[9px] sm:text-[11px] tracking-[0.25em] uppercase text-transparent bg-clip-text bg-gradient-to-b from-[#FF0096] via-white to-[#00C8D4] writing-mode-vertical flex items-center gap-3 drop-shadow-[0_0_8px_rgba(255,0,150,0.35)] opacity-85"
+            >
+              <span className="text-[#FF0096] text-[10px]">✦</span>
+              <span>¡Próximo lanzamiento!</span>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-20 w-full text-center space-y-4 sm:space-y-6">
@@ -331,9 +362,9 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
             <div className="w-full md:w-auto p-1 text-right shrink-0">
               <button
                 type="submit"
-                className="w-full md:w-auto px-7 py-3.5 rounded-xl md:rounded-full bg-gradient-to-r from-[#00C8D4] to-[#00b2be] hover:from-[#00b2be] hover:to-[#00C8D4] text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#00C8D4]/30 hover:scale-[1.03] transition-all cursor-pointer"
+                className="w-full md:w-auto px-7 py-3.5 rounded-xl md:rounded-full bg-gradient-to-r from-[#00C8D4] to-[#00b2be] hover:from-[#00b2be] hover:to-[#00C8D4] text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#00C8D4]/30 hover:scale-[1.03] transition-all cursor-pointer"
               >
-                <Search className="w-4 h-4 text-slate-950 stroke-[2.5]" />
+                <Search className="w-4 h-4 text-white stroke-[2.5]" />
                 <span>Buscar</span>
               </button>
             </div>
