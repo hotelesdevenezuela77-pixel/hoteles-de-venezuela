@@ -7,7 +7,7 @@ import type { Establishment } from "../components/layout/EstablishmentCard";
 import { HeroSectionV2 } from "../components/homeV2/HeroSectionV2";
 import { BoutiqueEstablishmentCard } from "../components/homeV2/BoutiqueEstablishmentCard";
 import { InteractiveDestinationsGallery } from "../components/homeV2/InteractiveDestinationsGallery";
-import { ReviewsCarouselV2 } from "../components/homeV2/ReviewsCarouselV2";
+import { AnimatedReviewsSection } from "../components/home/AnimatedReviewsSection";
 import { DirectBookingAuthorityBanner } from "../components/homeV2/DirectBookingAuthorityBanner";
 import { B2BOwnerBannerV2 } from "../components/homeV2/B2BOwnerBannerV2";
 
@@ -201,14 +201,14 @@ export function HomeV2() {
 
       </section>
 
-      {/* 3. Sección de Destinos / Exploración Interactiva (Sección C) */}
+      {/* 3. Sección de Experiencias Reales de Viajeros (Lo que Dicen Nuestros Turistas) */}
+      <AnimatedReviewsSection />
+
+      {/* 4. Sección de Destinos / Exploración Interactiva (Sección C) */}
       <InteractiveDestinationsGallery />
 
-      {/* 4. Banner de Autoridad y Trato Directo (Sección E) */}
+      {/* 5. Banner de Autoridad y Trato Directo (Sección E) */}
       <DirectBookingAuthorityBanner />
-
-      {/* 5. Carrusel Interactivo de Testimonios (Sección D) */}
-      <ReviewsCarouselV2 />
 
       {/* 6. Optimización B2B - Propietarios (Sección F) */}
       <B2BOwnerBannerV2 />
