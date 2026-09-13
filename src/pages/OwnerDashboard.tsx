@@ -2709,7 +2709,15 @@ export function OwnerDashboard() {
   const occupiedRoomsCount = (reservations || []).filter(r => r.status === "confirmed" && todayStr >= r.check_in_date && todayStr < r.check_out_date).length;
   const occupancyRate = totalRooms > 0 ? Math.round((occupiedRoomsCount / totalRooms) * 100) : 0;
 
-  const adr = (rooms || []).length > 0 ? Math.round((rooms || []).reduce((sum, r) => sum + (r.price_per_night || 0), 0) / rooms.length) : 0;
+  const totalNights = activeReservations.reduce((sum, r) => {
+    if (!r.check_in_date || !r.check_out_date) return sum + 1;
+    const checkIn = new Date(r.check_in_date).getTime();
+    const checkOut = new Date(r.check_out_date).getTime();
+    const diffDays = Math.max(1, Math.round((checkOut - checkIn) / (1000 * 60 * 60 * 24)));
+    return sum + (isNaN(diffDays) ? 1 : diffDays);
+  }, 0);
+
+  const adr = totalNights > 0 ? Math.round(monthlyRevenue / totalNights) : 0;
 
   // Recharts metric datasets strictly reflecting real numbers
   const monthlyRevenueData = [
