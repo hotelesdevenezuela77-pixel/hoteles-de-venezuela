@@ -12,6 +12,7 @@ import { InteractiveDestinationsGallery } from "../components/homeV2/Interactive
 import { AnimatedReviewsSection } from "../components/home/AnimatedReviewsSection";
 import { DirectBookingAuthorityBanner } from "../components/homeV2/DirectBookingAuthorityBanner";
 import { B2BOwnerBannerV2 } from "../components/homeV2/B2BOwnerBannerV2";
+import { SeoHead } from "../components/seo/SeoHead";
 
 import { 
   Sparkles, ArrowRight, Compass, ShieldCheck, Waves, Mountain, Trees, Building2, Flame,
@@ -140,12 +141,19 @@ export function HomeV2() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<string>("all");
 
+  const [seoConfig, setSeoConfig] = useState({
+    title: "Hoteles de Venezuela | Reservas Directas sin Intermediarios | Guía Turística Oficial",
+    description: "Directorio y guía turística oficial de hoteles, posadas boutique, resorts y campamentos en Venezuela. Contacto directo por WhatsApp con los anfitriones y 0% comisiones.",
+    keywords: "hoteles venezuela, posadas venezuela, reservas sin intermediarios, turismo venezuela, los roques, canaima, morrocoy, merida, posadas boutique, resorts venezuela, campamentos turismo",
+    ogImage: "https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public/establecimientos/destinos/salto-angel-hero-v2.jpg"
+  });
+
   // Concurrent database loading for maximum speed
   useEffect(() => {
     async function loadHomeV2Data() {
       try {
         setLoading(true);
-        const [estRes, destRes, sectionRes, blogRes, siteRes] = await Promise.all([
+        const [estRes, destRes, sectionRes, blogRes, siteRes, seoRes] = await Promise.all([
           supabase.from("establishments").select(`
             *,
             categories (name, slug),
@@ -155,7 +163,8 @@ export function HomeV2() {
           supabase.from("destinations").select("id, name, slug, state, image_url, description, is_featured, status"),
           supabase.from("site_sections").select("*").order("id"),
           supabase.from("blog_posts").select("id, title, slug, excerpt, featured_image, published_at, reading_time").order("published_at", { ascending: false }).limit(3),
-          supabase.from("tourist_sites").select("id, name, slug, short_description, image_url, category, highlights").order("sort_order").limit(3)
+          supabase.from("tourist_sites").select("id, name, slug, short_description, image_url, category, highlights").order("sort_order").limit(3),
+          supabase.from("seo_settings").select("*").in("page_key", ["home-v2", "home"])
         ]);
 
         if (estRes.data && estRes.data.length > 0) {
@@ -205,6 +214,17 @@ export function HomeV2() {
         }
         if (siteRes.data && siteRes.data.length > 0) {
           setSites(siteRes.data as TouristSite[]);
+        }
+        if (seoRes.data && seoRes.data.length > 0) {
+          const match = seoRes.data.find((s: any) => (s.page_key || s.pageKey) === "home-v2") || seoRes.data[0];
+          if (match) {
+            setSeoConfig(prev => ({
+              title: match.page_title || match.pageTitle || prev.title,
+              description: match.meta_description || match.metaDescription || prev.description,
+              keywords: match.meta_keywords || match.metaKeywords || prev.keywords,
+              ogImage: match.og_image || match.ogImage || prev.ogImage
+            }));
+          }
         }
 
       } catch (err) {
@@ -315,13 +335,134 @@ export function HomeV2() {
       description: "Conecta tu agencia de viajes con la red de hospedajes más grande de Venezuela y obtén beneficios.",
       gradient: "from-[#9B00CC] to-[#4f46e5]",
       shadow: "shadow-[#9B00CC]/25",
-      icon: Compass
-    }
-  ];
+  // Complete JSON-LD structured data array for Google & Search Engine Dominance
+  const jsonLdSchemas = React.useMemo(() => {
+    const orgSchema = {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Hoteles de Venezuela LLC",
+      "altName": "Hoteles de Venezuela",
+      "url": "https://hotelesdevenezuela.com",
+      "logo": "https://hotelesdevenezuela.com/logo.png",
+      "description": "Directorio oficial y guía turística de hospedajes verificados en Venezuela. Reservas directas sin intermediarios ni comisiones.",
+      "foundingLocation": {
+        "@type": "Place",
+        "name": "Caracas, Venezuela"
+      },
+      "sameAs": [
+        "https://instagram.com/hotelesdevenezuela",
+        "https://facebook.com/hotelesdevenezuela"
+      ]
+    };
+
+    const websiteSchema = {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Hoteles de Venezuela",
+      "url": "https://hotelesdevenezuela.com/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://hotelesdevenezuela.com/establecimientos?destination={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    };
+
+    const itemListSchema = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "Posadas y Hoteles Destacados en Venezuela",
+      "description": "Catálogo auditado de posadas boutique, resorts y hospedajes de selección en Venezuela con contacto directo por WhatsApp.",
+      "itemListElement": (establishments.length > 0 ? establishments.slice(0, 6) : ESTABLISHMENTS_MOCK.slice(0, 6)).map((item, idx) => ({
+        "@type": "ListItem",
+        "position": idx + 1,
+        "item": {
+          "@type": "Hotel",
+          "name": item.name,
+          "description": item.description,
+          "url": `https://hotelesdevenezuela.com/establecimiento/${item.slug}`,
+          "image": item.primary_image || "https://images.unsplash.com/photo-1540555700478-4be289fbecef",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": item.destination_name || "Venezuela",
+            "addressCountry": "VE"
+          },
+          "starRating": {
+            "@type": "Rating",
+            "ratingValue": item.rating_avg || 4.8
+          }
+        }
+      }))
+    };
+
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "¿Cómo funciona la reserva sin intermediarios en Hoteles de Venezuela?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Hoteles de Venezuela te conecta directamente con el dueño o gerente del hospedaje a través de WhatsApp oficial. No cobramos comisiones de servicio ni recargos por reserva, garantizando la mejor tarifa directa."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Qué es el Sello de Verificación e Inspección HDV?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Es una acreditación que certifica que nuestro staff ha visitado presencialmente el hotel o posada, verificando su operatividad, limpieza, planta eléctrica de respaldo y conectividad Starlink."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cuáles son las mejores opciones de alojamiento en Los Roques y Canaima?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "En Los Roques destacan posadas boutique con servicio todo incluido como Posada Galápagos o Macanao Lodge. En Canaima, campamentos de lujo como Wakü Lodge y Ara Merú frente a la laguna de Canaima."
+          }
+        }
+      ]
+    };
+
+    const breadcrumbSchema = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Inicio",
+          "item": "https://hotelesdevenezuela.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Directorio de Hospedajes V2",
+          "item": "https://hotelesdevenezuela.com/home-v2"
+        }
+      ]
+    };
+
+    return [orgSchema, websiteSchema, itemListSchema, faqSchema, breadcrumbSchema];
+  }, [establishments]);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-[#00C8D4] selection:text-slate-950">
       
+      {/* Dynamic SEO Head with Open Graph & JSON-LD Structured Data */}
+      <SeoHead
+        title={seoConfig.title}
+        description={seoConfig.description}
+        keywords={seoConfig.keywords}
+        ogImage={seoConfig.ogImage}
+        canonicalUrl="https://hotelesdevenezuela.com/home-v2"
+        schemas={jsonLdSchemas}
+      />
+
       {/* 1. Hero Section & Buscador Modular (Sección A) */}
       <HeroSectionV2 />
 

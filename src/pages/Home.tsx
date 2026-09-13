@@ -7,6 +7,7 @@ import { DESTINOS_MOCK } from "../lib/destinosMock";
 import { EstablishmentCard } from "../components/layout/EstablishmentCard";
 import type { Establishment } from "../components/layout/EstablishmentCard";
 import { AnimatedReviewsSection } from "../components/home/AnimatedReviewsSection";
+import { SeoHead } from "../components/seo/SeoHead";
 import { 
   Search, 
   MapPin, 
@@ -554,6 +555,11 @@ export function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
+      <SeoHead
+        title="Hoteles de Venezuela | Reservas sin Intermediarios | Guía Turística"
+        description="Directorio oficial de hoteles, posadas boutique y campamentos en Venezuela. Reserva directo con el propietario vía WhatsApp con 0% comisiones."
+        canonicalUrl="https://hotelesdevenezuela.com/"
+      />
       
       {/* 1. HERO BANNER PRINCIPAL */}
       <section 
