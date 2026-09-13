@@ -358,7 +358,7 @@ export const ESTABLISHMENTS_MOCK: Establishment[] = [
     has_hdv_seal: false
   },
 
-  // OTROS (RESTAURANTE)
+  // OTROS & DESTACADOS (RESTAURANTE / PARQUE COMPLEJO)
   {
     id: 6,
     slug: "restaurante-alto-gastronomia",
@@ -380,5 +380,71 @@ export const ESTABLISHMENTS_MOCK: Establishment[] = [
     services: "[\"wifi\", \"estacionamiento\", \"restaurante\"]",
     membership_tier: "oro",
     has_hdv_seal: false
+  },
+  {
+    id: 99902,
+    slug: "el-mundo-de-los-ninos-barquisimeto",
+    name: "El Mundo de los Niños - Parque & Complejo Turístico",
+    description: "Espectacular complejo de atracciones acuáticas, piscinas con olas, toboganes y actividades recreativas en Barquisimeto.",
+    address: "Valle del Río Turbio, Barquisimeto, Lara",
+    phone: "+58 251 9998877",
+    whatsapp: "+58 414 5556677",
+    website: "https://elmundodelosninos.com",
+    category_name: "Complejos",
+    category_slug: "complejos",
+    destination_name: "Barquisimeto",
+    destination_slug: "barquisimeto",
+    primary_image: "https://images.unsplash.com/photo-1582650625119-3a31f8fa2699?w=800&auto=format&fit=crop",
+    rating_avg: 5.0,
+    review_count: 284,
+    price_level: "$$$",
+    is_featured: true,
+    services: "[\"wifi\", \"estacionamiento\", \"piscina\", \"restaurante\", \"parque_acuatico\"]",
+    membership_tier: "diamante",
+    has_hdv_seal: true
+  },
+  {
+    id: 99903,
+    slug: "waku-lodge-canaima",
+    name: "Wakü Lodge Canaima",
+    description: "Campamento y resort ecológico de ultra-lujo frente a la mítica Laguna de Canaima con vistas directas a los saltos y tepuyes.",
+    address: "Laguna de Canaima, Parque Nacional Canaima, Bolívar",
+    phone: "+58 286 9621100",
+    whatsapp: "+58 414 8882233",
+    website: "https://wakulodge.com",
+    category_name: "Complejos",
+    category_slug: "complejos",
+    destination_name: "Canaima",
+    destination_slug: "canaima",
+    primary_image: "https://images.unsplash.com/photo-1586375300773-8384e3e4916f?w=800&auto=format&fit=crop",
+    rating_avg: 4.9,
+    review_count: 312,
+    price_level: "$$$$",
+    is_featured: true,
+    services: "[\"wifi\", \"restaurante\", \"excursiones\", \"spa\", \"starlink\"]",
+    membership_tier: "diamante",
+    has_hdv_seal: true
+  },
+  {
+    id: 99904,
+    slug: "oleaje-beach-club",
+    name: "Oleaje Restaurante de Alta Gama & Beach Club",
+    description: "Exclusiva experiencia gastronómica de alta gama frente al mar. Coctelería de autor, marisquería gourmet y ambiente paradisíaco.",
+    address: "Sector Punta Bravo, Tucacas / Morrocoy, Falcón",
+    phone: "+58 259 8887766",
+    whatsapp: "+58 424 7776655",
+    website: "https://oleaje.com",
+    category_name: "Restaurantes",
+    category_slug: "restaurantes",
+    destination_name: "Morrocoy",
+    destination_slug: "morrocoy",
+    primary_image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop",
+    rating_avg: 4.9,
+    review_count: 198,
+    price_level: "$$$$",
+    is_featured: true,
+    services: "[\"wifi\", \"estacionamiento\", \"restaurante\", \"playa\", \"marisqueria\"]",
+    membership_tier: "diamante",
+    has_hdv_seal: true
   }
 ];

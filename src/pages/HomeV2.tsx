@@ -264,19 +264,37 @@ export function HomeV2({ isMainHome = false }: { isMainHome?: boolean }) {
     return establishments;
   }, [establishments, activeTab]);
 
-  // Filter Complexes for Section 1
+  // Filter Complexes for Section 1 (Resorts & Multiactividad: El Mundo de los Niños, Wakü Lodge, Oleaje Restaurante)
   const complexes = React.useMemo(() => {
-    const list = establishments.filter(e => 
+    const mundo = establishments.find(e => e.slug?.includes("mundo-de-los-ninos") || e.name?.toLowerCase().includes("mundo de los niños")) ||
+      ESTABLISHMENTS_MOCK.find(e => e.slug === "el-mundo-de-los-ninos-barquisimeto");
+
+    const waku = establishments.find(e => e.slug?.includes("waku") || e.name?.toLowerCase().includes("waku")) ||
+      ESTABLISHMENTS_MOCK.find(e => e.slug === "waku-lodge-canaima");
+
+    const oleaje = establishments.find(e => e.slug?.includes("oleaje") || e.name?.toLowerCase().includes("oleaje")) ||
+      ESTABLISHMENTS_MOCK.find(e => e.slug === "oleaje-beach-club");
+
+    const curatedList = [mundo, waku, oleaje].filter(Boolean) as Establishment[];
+
+    if (curatedList.length === 3) {
+      return curatedList;
+    }
+
+    const fallbackList = establishments.filter(e => 
       e.category_slug === "complejos" || 
       e.category_name?.toLowerCase().includes("complejo") ||
       e.category_name?.toLowerCase().includes("resort") ||
-      e.name.toLowerCase().includes("resort") ||
-      e.name.toLowerCase().includes("complejo") ||
-      e.name.toLowerCase().includes("eurobuilding") ||
-      e.name.toLowerCase().includes("waku") ||
-      e.name.toLowerCase().includes("sabbia")
+      e.name.toLowerCase().includes("resort")
     );
-    return list.length > 0 ? list : establishments;
+
+    const combined = [...curatedList];
+    for (const item of fallbackList) {
+      if (!combined.some(c => c.id === item.id || c.slug === item.slug)) {
+        combined.push(item);
+      }
+    }
+    return combined.length > 0 ? combined : ESTABLISHMENTS_MOCK;
   }, [establishments]);
 
   // Prestigio section content from DB or default fallback
