@@ -12,7 +12,8 @@ interface SeoSetting {
 }
 
 const PAGE_LABELS: Record<string, { label: string; url: string; emoji: string }> = {
-  home:           { label: "Página Principal",     url: "/",                emoji: "🏠" },
+  home:           { label: "Página Principal (Home 1)", url: "/",                emoji: "🏠" },
+  "home-v2":       { label: "Portada Rediseño (Home V2)",url: "/home-v2",         emoji: "✨" },
   destinations:   { label: "Destinos",             url: "/destinos",        emoji: "🗺️" },
   establishments: { label: "Establecimientos",     url: "/establecimientos",emoji: "🏨" },
   blog:           { label: "Blog",                 url: "/blog",            emoji: "📝" },
@@ -66,8 +67,9 @@ export function AdminSeoHome() {
       const localKey = "hdv_mock_seo_settings";
       const fallback = [
         { id: 1, page_key: "home", page_title: "Hoteles de Venezuela | Directorio de Alojamientos", meta_description: "Directorio oficial de hoteles y posadas de Venezuela. Encuentra y reserva tu estadía.", meta_keywords: "hoteles venezuela, posadas, turismo", og_image: "" },
-        { id: 2, page_key: "destinations", page_title: "Destinos en Venezuela | Dónde viajar", meta_description: "Explora los mejores destinos turísticos de Venezuela desde las playas hasta los Andes.", meta_keywords: "destinos, turismo venezuela, playas", og_image: "" },
-        { id: 3, page_key: "establishments", page_title: "Establecimientos | Dónde Hospedarse", meta_description: "Catálogo completo de hoteles, resorts, posadas y cabañas en toda Venezuela.", meta_keywords: "hoteles, hospedaje, posadas, alojamiento", og_image: "" }
+        { id: 2, page_key: "home-v2", page_title: "Hoteles de Venezuela | Descubre Hospedajes de Selección", meta_description: "Posadas boutique, resorts y hoteles en Los Roques, Canaima, Morrocoy y Mérida. Contacto directo por WhatsApp sin comisiones ni intermediarios.", meta_keywords: "hospedajes de seleccion, posadas boutique venezuela, waku lodge, salto angel, los roques, morrocoy, merida", og_image: "https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public/establecimientos/destinos/salto-angel-hero-v2.jpg" },
+        { id: 3, page_key: "destinations", page_title: "Destinos en Venezuela | Dónde viajar", meta_description: "Explora los mejores destinos turísticos de Venezuela desde las playas hasta los Andes.", meta_keywords: "destinos, turismo venezuela, playas", og_image: "" },
+        { id: 4, page_key: "establishments", page_title: "Establecimientos | Dónde Hospedarse", meta_description: "Catálogo completo de hoteles, resorts, posadas y cabañas en toda Venezuela.", meta_keywords: "hoteles, hospedaje, posadas, alojamiento", og_image: "" }
       ];
 
       let local = localStorage.getItem(localKey);
