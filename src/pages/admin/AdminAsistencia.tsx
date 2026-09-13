@@ -33,7 +33,9 @@ export default function AdminAsistencia() {
 
   const handleCopyClaimLink = (row: EstablishmentRow) => {
     const claimSlug = row.slug || (row.name.toLowerCase().includes("aura") ? "aura-croce" : String(row.id));
-    const link = `${window.location.origin}/mis-negocios?claim=${claimSlug}`;
+    const isPerla = row.slug === "perla-negra" || row.id === 102 || row.name.toLowerCase().includes("perla negra");
+    const ownerEmail = isPerla ? "Posadaperlanegra@gmail.com" : row.owner_email;
+    const link = `${window.location.origin}/mis-negocios?claim=${claimSlug}&email=${encodeURIComponent(ownerEmail)}`;
     navigator.clipboard.writeText(link);
     setCopiedId(row.id);
     setTimeout(() => setCopiedId(null), 3000);
@@ -75,16 +77,18 @@ export default function AdminAsistencia() {
       const dbRows = (ests || []).map((est: any) => {
         const ownerProf = profileMap.get(est.owner_user_id);
         const isEntre2Aguas = est.slug === "hostal-entre-2-aguas" || est.id === 81 || (est.owner_user_id === "f5fedca0-7394-449b-af79-cb4378f5e919");
+        const isPerlaNegra = est.slug === "perla-negra" || est.id === 102 || est.name?.toLowerCase().includes("perla negra");
+
         return {
           id: est.id,
-          name: est.name,
-          slug: est.slug,
+          name: isPerlaNegra ? "Posada Perla Negra - Morrocoy" : est.name,
+          slug: isPerlaNegra ? "perla-negra" : est.slug,
           status: est.status || "approved",
-          owner_user_id: est.owner_user_id || (isEntre2Aguas ? "f5fedca0-7394-449b-af79-cb4378f5e919" : ""),
-          owner_name: ownerProf?.name || (isEntre2Aguas ? "Ramiro Pastor" : "Propietario Sin Nombre"),
-          owner_email: ownerProf?.email || (isEntre2Aguas ? "ramiropf26@gmail.com" : "sin_correo@hdv.com"),
-          category: est.categories?.name || "General",
-          destination: est.destinations?.name || "Venezuela"
+          owner_user_id: est.owner_user_id || (isEntre2Aguas ? "f5fedca0-7394-449b-af79-cb4378f5e919" : isPerlaNegra ? "perla_negra_antonio_owner" : ""),
+          owner_name: isPerlaNegra ? "Antonio (Perla Negra)" : (ownerProf?.name || (isEntre2Aguas ? "Ramiro Pastor" : "Propietario Sin Nombre")),
+          owner_email: isPerlaNegra ? "Posadaperlanegra@gmail.com" : (ownerProf?.email || (isEntre2Aguas ? "ramiropf26@gmail.com" : "sin_correo@hdv.com")),
+          category: est.categories?.name || (isPerlaNegra ? "Hoteles & Posadas" : "General"),
+          destination: est.destinations?.name || (isPerlaNegra ? "Morrocoy" : "Venezuela")
         };
       });
 
@@ -124,7 +128,30 @@ export default function AdminAsistencia() {
         }
       ];
 
-      const combinedRows = [...dbRows];
+      const combinedRows: EstablishmentRow[] = [];
+
+      // Deduplicar e insertar filas de DB
+      dbRows.forEach(r => {
+        const isPerla = r.slug === "perla-negra" || r.name.toLowerCase().includes("perla negra") || r.id === 102;
+        if (isPerla) {
+          if (!combinedRows.some(x => x.slug === "perla-negra" || x.name.toLowerCase().includes("perla negra") || x.id === 102)) {
+            combinedRows.push({
+              id: 102,
+              name: "Posada Perla Negra - Morrocoy",
+              slug: "perla-negra",
+              status: "approved",
+              owner_user_id: "perla_negra_antonio_owner",
+              owner_name: "Antonio (Perla Negra)",
+              owner_email: "Posadaperlanegra@gmail.com",
+              category: "Hoteles & Posadas",
+              destination: "Morrocoy"
+            });
+          }
+        } else {
+          combinedRows.push(r);
+        }
+      });
+
       demoProfiles.forEach(dp => {
         if (!combinedRows.some(r => r.id === dp.id || r.slug === dp.slug)) {
           combinedRows.unshift(dp);
@@ -132,19 +159,26 @@ export default function AdminAsistencia() {
       });
 
       Object.values(TENANTS_REGISTRY).forEach(t => {
-        if (!combinedRows.some(r => r.id === t.establishment_id || r.slug === t.slug)) {
-          const isEntre2Aguas = t.slug === "hostal-entre-2-aguas" || t.establishment_id === 81;
-          combinedRows.push({
-            id: t.establishment_id,
-            name: t.name,
-            slug: t.slug,
-            status: "approved",
-            owner_user_id: isEntre2Aguas ? "f5fedca0-7394-449b-af79-cb4378f5e919" : `owner_user_${t.slug}`,
-            owner_name: isEntre2Aguas ? "Ramiro Pastor" : `Propietario ${t.name}`,
-            owner_email: isEntre2Aguas ? "ramiropf26@gmail.com" : `contacto@${t.slug}.com`,
-            category: t.business_type === "restaurant" ? "Restaurantes y Gastronomía" : "Hoteles & Posadas",
-            destination: "Venezuela"
-          });
+        const isPerla = t.slug === "perla-negra" || t.establishment_id === 102 || t.name.toLowerCase().includes("perla negra");
+        const existingIdx = combinedRows.findIndex(r => r.id === t.establishment_id || r.slug === t.slug || (isPerla && (r.slug === "perla-negra" || r.name.toLowerCase().includes("perla negra"))));
+
+        const isEntre2Aguas = t.slug === "hostal-entre-2-aguas" || t.establishment_id === 81;
+        const tenantRow: EstablishmentRow = {
+          id: t.establishment_id,
+          name: isPerla ? "Posada Perla Negra - Morrocoy" : t.name,
+          slug: t.slug,
+          status: "approved",
+          owner_user_id: isPerla ? "perla_negra_antonio_owner" : (isEntre2Aguas ? "f5fedca0-7394-449b-af79-cb4378f5e919" : `owner_user_${t.slug}`),
+          owner_name: isPerla ? "Antonio (Perla Negra)" : (isEntre2Aguas ? "Ramiro Pastor" : `Propietario ${t.name}`),
+          owner_email: isPerla ? "Posadaperlanegra@gmail.com" : (isEntre2Aguas ? "ramiropf26@gmail.com" : `contacto@${t.slug}.com`),
+          category: t.business_type === "restaurant" ? "Restaurantes y Gastronomía" : "Hoteles & Posadas",
+          destination: isPerla ? "Morrocoy" : "Venezuela"
+        };
+
+        if (existingIdx !== -1) {
+          combinedRows[existingIdx] = tenantRow;
+        } else {
+          combinedRows.push(tenantRow);
         }
       });
 
