@@ -131,7 +131,7 @@ function getCleanedImageUrl(imageUrl: string | null | undefined, title: string):
   return defaultImage;
 }
 
-export function HomeV2() {
+export function HomeV2({ isMainHome = false }: { isMainHome?: boolean }) {
   const [, setLocation] = useLocation();
   const [establishments, setEstablishments] = useState<Establishment[]>([]);
   const [destinations, setDestinations] = useState<Destination[]>(DEFAULT_DESTINOS_MOCK);
@@ -459,7 +459,7 @@ export function HomeV2() {
         description={seoConfig.description}
         keywords={seoConfig.keywords}
         ogImage={seoConfig.ogImage}
-        canonicalUrl="https://hotelesdevenezuela.com/home-v2"
+        canonicalUrl={isMainHome ? "https://hotelesdevenezuela.com/" : "https://hotelesdevenezuela.com/home-v2"}
         schemas={jsonLdSchemas}
       />
 

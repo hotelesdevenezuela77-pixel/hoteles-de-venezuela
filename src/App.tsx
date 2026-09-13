@@ -198,6 +198,7 @@ function lazyWithRetry(importFn: () => Promise<any>) {
 
 // Importaciones dinámicas (React.lazy) para optimización masiva de rendimiento
 const NotFound = lazyNamed(() => import("./pages/NotFound"), "NotFound");
+const MainHomeWrapper = lazyNamed(() => import("./components/home/MainHomeWrapper"), "MainHomeWrapper");
 const HomeV2 = lazyNamed(() => import("./pages/HomeV2"), "HomeV2");
 const Login = lazyNamed(() => import("./pages/Login"), "Login");
 const Registro = lazyNamed(() => import("./pages/Registro"), "Registro");
@@ -465,8 +466,9 @@ function App() {
         }>
           <Switch>
             {/* Rutas Públicas */}
-            <Route path="/" component={Home} />
+            <Route path="/" component={MainHomeWrapper} />
             <Route path="/home-v2" component={HomeV2} />
+            <Route path="/home-v1" component={Home} />
             <Route path="/login" component={Login} />
             <Route path="/registro" component={Registro} />
             <Route path="/perfil" component={Perfil} />

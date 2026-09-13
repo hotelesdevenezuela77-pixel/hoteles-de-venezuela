@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { AdminTabBar } from "@/components/admin/AdminTabBar";
 import {
   FileText, Globe, Layers, Settings, Image, Edit2, X, Check,
-  Plus, Trash2, Eye, Save, ExternalLink, ToggleLeft, ToggleRight, Loader2, Upload, Star, Search, MessageSquareQuote
+  Plus, Trash2, Eye, Save, ExternalLink, ToggleLeft, ToggleRight, Loader2, Upload, Star, Search, MessageSquareQuote, Sparkles
 } from "lucide-react";
 import { TOP10_HOTELS_STATIC_DATA } from "@/config/top10Hoteles";
 
@@ -74,6 +74,48 @@ export function AdminContenido() {
   const [settingsDraft, setSettingsDraft] = useState<Record<string, string>>({});
   const [savedKeys, setSavedKeys] = useState<Record<string, boolean>>({});
   const [pagesSearchQuery, setPagesSearchQuery] = useState("");
+
+  const [activeHomeVersion, setActiveHomeVersion] = useState<string>(() => {
+    return localStorage.getItem("hdv_active_home_version") || "v2";
+  });
+
+  useEffect(() => {
+    async function loadActiveVersion() {
+      try {
+        const { data } = await supabase
+          .from("site_settings")
+          .select("setting_value")
+          .eq("setting_key", "active_home_version")
+          .single();
+        if (data && data.setting_value) {
+          setActiveHomeVersion(data.setting_value);
+          localStorage.setItem("hdv_active_home_version", data.setting_value);
+        }
+      } catch (e) {}
+    }
+    loadActiveVersion();
+  }, []);
+
+  const handleHomeVersionChange = async (ver: "v1" | "v2") => {
+    setActiveHomeVersion(ver);
+    localStorage.setItem("hdv_active_home_version", ver);
+    window.dispatchEvent(new Event("hdv_home_version_changed"));
+
+    try {
+      await supabase.from("site_settings").upsert(
+        {
+          setting_key: "active_home_version",
+          setting_value: ver,
+          setting_label: "Versión Activa de Portada (/)",
+          setting_group: "general"
+        },
+        { onConflict: "setting_key" }
+      );
+      qc.invalidateQueries({ queryKey: ["site-settings"] });
+    } catch (err) {
+      console.warn("Error guardando active_home_version en Supabase:", err);
+    }
+  };
 
   useEffect(() => {
     if (!authLoading && (!user || (profile?.role !== "admin" && user?.email?.toLowerCase() !== "hotelesdevenezuela77@gmail.com"))) {
@@ -271,6 +313,80 @@ export function AdminContenido() {
         {/* TAB 1: HERO CONTROL (HOME 1 & HOME V2) */}
         {tab === "hero" && (
           <div className="space-y-6 max-w-3xl">
+            {/* SELECTOR DE PORTADA PRINCIPAL OFICIAL (RUTA /) */}
+            <div className="bg-[#0e071e] border border-slate-800 rounded-3xl p-7 shadow-2xl space-y-5 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-[#00C8D4] via-[#FF0096] to-[#9B00CC]" />
+              
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00C8D4]/15 text-[#00C8D4] border border-[#00C8D4]/30 text-[10px] font-black uppercase tracking-wider mb-2">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>PORTADA OFICIAL DEL SITIO (RUTA /)</span>
+                  </div>
+                  <h3 className="text-lg font-black text-white">
+                    Selección de Versión de Home Principal
+                  </h3>
+                  <p className="text-xs text-slate-400 font-semibold mt-1">
+                    Elige qué diseño de portada verán los visitantes al ingresar a <strong className="text-white">hotelesdevenezuela.com/</strong>
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                {/* Opción Home V2 (Rediseño Luxe) */}
+                <button
+                  type="button"
+                  onClick={() => handleHomeVersionChange("v2")}
+                  className={`p-5 rounded-2xl border text-left transition-all cursor-pointer space-y-3 relative ${
+                    activeHomeVersion === "v2"
+                      ? "bg-gradient-to-br from-[#00C8D4]/20 to-[#9B00CC]/20 border-[#00C8D4] ring-2 ring-[#00C8D4]/50 shadow-xl"
+                      : "bg-[#140b2b] border-slate-800 hover:border-slate-700 opacity-60 hover:opacity-100"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black uppercase tracking-wider text-[#00C8D4] flex items-center gap-1.5">
+                      <Sparkles className="w-4 h-4" />
+                      Home Rediseño (V2)
+                    </span>
+                    {activeHomeVersion === "v2" && (
+                      <span className="px-2.5 py-0.5 rounded-full bg-[#00C8D4] text-slate-950 text-[9px] font-black uppercase shadow-xs">
+                        ✓ OFICIAL ACTIVA
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-slate-300 font-semibold leading-relaxed">
+                    Experiencia Luxe con buscador modular de desplegables, hero full-bleed del Salto Ángel, banderas laterales animadas e integración completa de las 6 secciones.
+                  </p>
+                </button>
+
+                {/* Opción Home Clásica (V1) */}
+                <button
+                  type="button"
+                  onClick={() => handleHomeVersionChange("v1")}
+                  className={`p-5 rounded-2xl border text-left transition-all cursor-pointer space-y-3 relative ${
+                    activeHomeVersion === "v1"
+                      ? "bg-gradient-to-br from-[#FF0096]/20 to-[#9B00CC]/20 border-[#FF0096] ring-2 ring-[#FF0096]/50 shadow-xl"
+                      : "bg-[#140b2b] border-slate-800 hover:border-slate-700 opacity-60 hover:opacity-100"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black uppercase tracking-wider text-[#FF0096] flex items-center gap-1.5">
+                      <Globe className="w-4 h-4" />
+                      Home Clásica (V1)
+                    </span>
+                    {activeHomeVersion === "v1" && (
+                      <span className="px-2.5 py-0.5 rounded-full bg-[#FF0096] text-white text-[9px] font-black uppercase shadow-xs">
+                        ✓ ACTIVA
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-slate-300 font-semibold leading-relaxed">
+                    Diseño original de la plataforma con sellos de garantía en 3 columnas y héroe estático centrado.
+                  </p>
+                </button>
+              </div>
+            </div>
+
             {/* HERO 1 (HOME PRINCIPAL) */}
             <div className="bg-[#100921] border border-slate-800/80 rounded-2xl p-7 shadow-xl relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#9B00CC] to-[#FF0096]" />
