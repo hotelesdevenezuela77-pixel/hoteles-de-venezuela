@@ -86,7 +86,7 @@ export function AdminContenido() {
           .from("site_settings")
           .select("setting_value")
           .eq("setting_key", "active_home_version")
-          .single();
+          .maybeSingle();
         if (data && data.setting_value) {
           setActiveHomeVersion(data.setting_value);
           localStorage.setItem("hdv_active_home_version", data.setting_value);

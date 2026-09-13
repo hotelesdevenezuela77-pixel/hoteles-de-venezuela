@@ -5,7 +5,8 @@ import { supabase } from "../../lib/supabase";
 
 export function MainHomeWrapper() {
   const [activeVersion, setActiveVersion] = useState<string>(() => {
-    return localStorage.getItem("hdv_active_home_version") || "v2";
+    const stored = localStorage.getItem("hdv_active_home_version");
+    return stored === "v1" ? "v1" : "v2";
   });
 
   useEffect(() => {
@@ -15,22 +16,27 @@ export function MainHomeWrapper() {
           .from("site_settings")
           .select("setting_value")
           .eq("setting_key", "active_home_version")
-          .single();
+          .maybeSingle();
 
         if (!error && data && data.setting_value) {
           setActiveVersion(data.setting_value);
           localStorage.setItem("hdv_active_home_version", data.setting_value);
+        } else {
+          // Si no existe la configuración en la base de datos, forzar V2 por defecto
+          setActiveVersion("v2");
+          localStorage.setItem("hdv_active_home_version", "v2");
         }
       } catch (err) {
         console.warn("MainHomeWrapper: Usando versión por defecto (v2):", err);
+        setActiveVersion("v2");
       }
     }
 
     fetchActiveHomeVersion();
 
     const handleSync = () => {
-      const current = localStorage.getItem("hdv_active_home_version") || "v2";
-      setActiveVersion(current);
+      const current = localStorage.getItem("hdv_active_home_version");
+      setActiveVersion(current === "v1" ? "v1" : "v2");
     };
 
     window.addEventListener("hdv_home_version_changed", handleSync);
