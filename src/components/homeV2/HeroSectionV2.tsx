@@ -27,18 +27,26 @@ const CATEGORIES_LIST = [
   { val: "", label: "Cualquier categoría", icon: Building2, solidBg: "#FF0096" },
   { val: "posadas", label: "Posadas Boutique", icon: Home, solidBg: "#FF0096" },
   { val: "hoteles", label: "Hoteles & Resorts", icon: Building2, solidBg: "#9B00CC" },
+  { val: "complejos", label: "Complejos Turísticos", icon: Layers, solidBg: "#00C8D4" },
   { val: "campamentos", label: "Campamentos & Lodges", icon: Tent, solidBg: "#f59e0b" },
   { val: "glamping", label: "Glamping & Domos", icon: Sparkles, solidBg: "#00C8D4" },
-  { val: "casas", label: "Casas & Aptos Vacacionales", icon: Home, solidBg: "#10b981" }
+  { val: "casas", label: "Casas & Aptos Vacacionales", icon: Home, solidBg: "#10b981" },
+  { val: "restaurantes", label: "Restaurantes & Gastronomía", icon: Sparkles, solidBg: "#FF0096" },
+  { val: "parques", label: "Parques Acuáticos & Temáticos", icon: Waves, solidBg: "#00C8D4" },
+  { val: "ecolodges", label: "Eco-Lodges & Ranchos", icon: Trees, solidBg: "#10b981" }
 ];
 
 const EXPERIENCES_LIST = [
   { val: "", label: "Cualquier experiencia", icon: Compass, solidBg: "#9B00CC" },
   { val: "playa", label: "Playa & Cayos", icon: Palmtree, solidBg: "#00C8D4" },
   { val: "montana", label: "Montaña & Frío", icon: Mountain, solidBg: "#10b981" },
-  { val: "selva", label: "Selva & Aventura", icon: Trees, solidBg: "#f59e0b" },
+  { val: "selva", label: "Selva & Tepuyes", icon: Trees, solidBg: "#f59e0b" },
   { val: "ciudad", label: "Ciudad & Negocios", icon: Building2, solidBg: "#9B00CC" },
-  { val: "wellness", label: "Relax & Wellness", icon: Sparkles, solidBg: "#FF0096" }
+  { val: "wellness", label: "Relax & Wellness Spa", icon: Sparkles, solidBg: "#FF0096" },
+  { val: "gastronomia", label: "Gastronomía & Coctelería", icon: Sparkles, solidBg: "#FF0096" },
+  { val: "nautica", label: "Náutica & Paseos en Yate", icon: Waves, solidBg: "#00C8D4" },
+  { val: "aventura", label: "Aventura & Ecoturismo", icon: Zap, solidBg: "#f59e0b" },
+  { val: "todo-incluido", label: "All Inclusive & Todo Incluido", icon: ShieldCheck, solidBg: "#00C8D4" }
 ];
 
 export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
@@ -279,7 +287,7 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
 
               {/* Menu Desplegable Segmento 2 */}
               {catOpen && (
-                <div className="absolute top-full left-0 md:left-1/2 md:-translate-x-1/2 mt-2.5 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl shadow-slate-950/40 border border-slate-200/90 py-2 z-[100] overflow-hidden">
+                <div className="absolute top-full left-0 md:left-1/2 md:-translate-x-1/2 mt-2.5 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl shadow-slate-950/40 border border-slate-200/90 py-2 z-[100] max-h-96 overflow-y-auto">
                   {CATEGORIES_LIST.map((item) => {
                     const IconC = item.icon;
                     const isSelected = category === item.val;
@@ -331,7 +339,7 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
 
               {/* Menu Desplegable Segmento 3 con Iconos Unicolor */}
               {expOpen && (
-                <div className="absolute top-full left-0 md:left-auto md:right-0 mt-2.5 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl shadow-slate-950/40 border border-slate-200/90 py-2 z-[100] overflow-hidden">
+                <div className="absolute top-full left-0 md:left-auto md:right-0 mt-2.5 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl shadow-slate-950/40 border border-slate-200/90 py-2 z-[100] max-h-96 overflow-y-auto">
                   {EXPERIENCES_LIST.map((item) => {
                     const IconC = item.icon;
                     const isSelected = experience === item.val;
