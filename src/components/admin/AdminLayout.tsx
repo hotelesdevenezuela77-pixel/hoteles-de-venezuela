@@ -27,10 +27,51 @@ interface CategoryGroup {
 }
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { user, profile, logout } = useAuth();
+  const { user, profile, loading, logout } = useAuth();
   const [, setLocation] = useLocation();
   const [currentPath] = useLocation();
   const [fullPath, setFullPath] = useState(() => typeof window !== "undefined" ? window.location.pathname + window.location.search : currentPath);
+
+  // Verificación Estricta de Administrador Master (Seguridad de la Matriz Central HDV)
+  const isMasterAdmin = React.useMemo(() => {
+    if (loading) return null; // pendiente de cargar auth
+    if (!user) return false;
+
+    const email = (user.email || profile?.email || "").toLowerCase().trim();
+    const role = (profile?.role || "").toLowerCase().trim();
+
+    // 1. Verificar si el rol de usuario es admin o superadmin
+    if (role === "admin" || role === "superadmin" || role === "administrator") return true;
+
+    // 2. Verificar emails oficiales de la Administración General
+    if (
+      email === "hotelesdevenezuela77@gmail.com" ||
+      email === "webmasterpro177@gmail.com" ||
+      email === "admin@hotelesdevenezuela.com" ||
+      email.includes("ramiropf")
+    ) {
+      return true;
+    }
+
+    // 3. Bypass solo para entorno de pruebas local (localhost / 127.0.0.1)
+    const isLocal = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+    if (isLocal && localStorage.getItem("hdv_admin_bypass") === "true") {
+      return true;
+    }
+
+    return false;
+  }, [user, profile, loading]);
+
+  // Redirección automática si el usuario no tiene rango de Administrador Master
+  useEffect(() => {
+    if (isMasterAdmin === false) {
+      if (profile?.role === "owner" || profile?.role === "business_owner") {
+        setLocation("/mis-negocios");
+      } else {
+        setLocation("/admin/login");
+      }
+    }
+  }, [isMasterAdmin, profile, setLocation]);
 
   useEffect(() => {
     const updateFullPath = () => {
@@ -241,6 +282,45 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   };
 
   const unreadCount = notifications.filter(n => !n.read).length;
+
+  if (loading || isMasterAdmin === null) {
+    return (
+      <div className="min-h-screen bg-[#0e011f] flex flex-col items-center justify-center text-white space-y-4 font-sans">
+        <div className="w-12 h-12 border-4 border-[#00C8D4] border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs font-mono font-bold tracking-widest text-slate-300 uppercase">
+          Verificando Credenciales de Seguridad Matrix...
+        </p>
+      </div>
+    );
+  }
+
+  if (isMasterAdmin === false) {
+    return (
+      <div className="min-h-screen bg-[#0e011f] flex flex-col items-center justify-center p-6 text-center text-white font-sans">
+        <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-500 mb-6 shadow-xl">
+          <ShieldAlert className="w-8 h-8 text-rose-500" />
+        </div>
+        <h2 className="text-2xl font-black font-display tracking-tight text-white mb-2">
+          Acceso Restringido · Matriz Central HDV
+        </h2>
+        <p className="text-slate-300 text-xs max-w-md leading-relaxed font-semibold mb-6">
+          Esta área contiene datos estratégicos y configuraciones globales exclusivas de la Administración General. Te hemos redirigido a tu panel correspondiente.
+        </p>
+        <button
+          onClick={() => {
+            if (profile?.role === "owner" || profile?.role === "business_owner") {
+              setLocation("/mis-negocios");
+            } else {
+              setLocation("/admin/login");
+            }
+          }}
+          className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] text-white font-black text-xs uppercase tracking-wider shadow-lg hover:scale-105 transition-all cursor-pointer"
+        >
+          Ir a Mi Consola Privada
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen text-slate-100 flex font-sans overflow-hidden relative"
