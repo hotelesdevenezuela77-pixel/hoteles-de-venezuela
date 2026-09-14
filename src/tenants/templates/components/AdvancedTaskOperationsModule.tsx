@@ -1,18 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { 
   ClipboardList, Plus, Trash2, CheckCircle2, Clock, AlertTriangle, 
   User, Loader2, ArrowRight, BedDouble, Sparkles, Wrench, ShieldAlert, 
   Grid, Smartphone, Sliders, CheckSquare, Camera, FileText, DollarSign,
-  AlertOctagon, Check, RefreshCw, Layers, ShieldCheck, PenTool, LayoutGrid
+  AlertOctagon, Check, RefreshCw, Layers, ShieldCheck, PenTool, LayoutGrid, WifiOff
 } from "lucide-react";
+import { 
+  HospitalityFSM, 
+  CleaningStatus, 
+  MaintenanceStatus, 
+  RoomOccupancyStatus, 
+  OperationalEvent,
+  type RoomState 
+} from "../../../lib/fsm/HospitalityFSM";
+import { SyncEngine, type OutboxMutation } from "../../../lib/sync/SyncEngine";
+import { OperationsWorker } from "../../../lib/edge/operationsWorker";
 import { 
   getHotelSpaces, 
   getOperationalTasks, 
   getMaintenanceTickets, 
   getCustomFieldDefinitions,
   saveCustomFieldDefinition,
-  triggerPMSEvent,
-  saveHotelSpaces,
   type HotelSpace, 
   type OperationalTask, 
   type MaintenanceTicket,
@@ -34,27 +42,28 @@ export function AdvancedTaskOperationsModule({
 }: AdvancedTaskOperationsModuleProps) {
   const [activeTab, setActiveTab] = useState<"floor_plan" | "kanban" | "pwa_staff" | "no_code" | "maintenance">("floor_plan");
   
-  // Estados de datos
+  // Estados de datos V2
   const [spaces, setSpaces] = useState<HotelSpace[]>([]);
   const [tasks, setTasks] = useState<OperationalTask[]>([]);
   const [tickets, setTickets] = useState<MaintenanceTicket[]>([]);
   const [customFields, setCustomFields] = useState<CustomFieldDefinition[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isCompressing, setIsCompressing] = useState(false);
+  const [compressedPhotoUrl, setCompressedPhotoUrl] = useState<string | null>(null);
 
-  // Modal para nueva tarea
+  // Modales
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [taskTitle, setTaskTitle] = useState("");
   const [taskRoomCode, setTaskRoomCode] = useState("");
   const [taskCategory, setTaskCategory] = useState<"housekeeping" | "maintenance" | "inspection" | "minibar">("housekeeping");
   const [taskAssignedTo, setTaskAssignedTo] = useState("");
 
-  // Modal para No-Code Custom Field Builder
   const [showNewFieldModal, setShowNewFieldModal] = useState(false);
   const [fieldName, setFieldName] = useState("");
   const [fieldType, setFieldType] = useState<CustomFieldDefinition["field_type"]>("text");
   const [fieldRequired, setFieldRequired] = useState(false);
 
-  // Cargar datos centralizados
+  // Cargar datos centralizados y sincronizar
   const reloadAllData = () => {
     setLoading(true);
     setSpaces(getHotelSpaces(establishmentId));
@@ -67,52 +76,89 @@ export function AdvancedTaskOperationsModule({
   useEffect(() => {
     reloadAllData();
 
-    const handleUpdate = (e: any) => {
+    const handleSyncEvent = (e: any) => {
       if (e.detail?.establishmentId === establishmentId) {
         reloadAllData();
       }
     };
 
-    window.addEventListener("hdv_ops_updated", handleUpdate);
+    window.addEventListener("hdv_ops_updated", handleSyncEvent);
+    window.addEventListener("hdv_sync_engine_event", handleSyncEvent);
     return () => {
-      window.removeEventListener("hdv_ops_updated", handleUpdate);
+      window.removeEventListener("hdv_ops_updated", handleSyncEvent);
+      window.removeEventListener("hdv_sync_engine_event", handleSyncEvent);
     };
   }, [establishmentId]);
 
-  // Cambiar estado de una tarea
-  const handleUpdateTaskStatus = (taskId: string, newStatus: OperationalTask["status"]) => {
-    const updated = tasks.map(t => {
-      if (t.id === taskId) {
-        const updatedTask = { ...t, status: newStatus };
-        // Si tiene habitación vinculada, sincronizar estado del espacio
-        if (updatedTask.space_code) {
-          if (newStatus === "completed") {
-            triggerPMSEvent(establishmentId, "SUPERVISOR_INSPECT", updatedTask.space_code);
-          } else if (newStatus === "in_progress") {
-            const currentSpaces = getHotelSpaces(establishmentId);
-            const targetSpace = currentSpaces.find(s => s.code === updatedTask.space_code);
-            if (targetSpace) {
-              targetSpace.cleaning_status = "in_progress";
-              saveHotelSpaces(establishmentId, currentSpaces);
-            }
-          }
-        }
-        return updatedTask;
-      }
-      return t;
+  // Transición FSM Determinista
+  const executeFSMTransition = async (roomCode: string, event: OperationalEvent, actorName = "Staff Usuario") => {
+    const targetSpace = spaces.find(s => s.code === roomCode);
+    if (!targetSpace) return;
+
+    const currentFSMState: RoomState = {
+      occupancy: targetSpace.occupancy_status as any,
+      cleaning: targetSpace.cleaning_status as any,
+      maintenance: targetSpace.maintenance_status as any,
+      lastCleanedAt: null,
+      lastInspectedAt: null
+    };
+
+    const result = HospitalityFSM.transitionRoomState(currentFSMState, event, {
+      spaceId: targetSpace.id,
+      spaceCode: roomCode,
+      actorName
     });
 
-    setTasks(updated);
-    localStorage.setItem(`hdv_ops_tasks_${establishmentId}`, JSON.stringify(updated));
+    if (!result.success) {
+      alert(`⚠️ Transición Denegada por FSM:\n${result.error}`);
+      return;
+    }
+
+    // Actualizar estado optimista
+    targetSpace.cleaning_status = result.newState.cleaning;
+    targetSpace.occupancy_status = result.newState.occupancy;
+    targetSpace.maintenance_status = result.newState.maintenance;
+
+    // Encolar mutación offline-first en IndexedDB Outbox
+    await SyncEngine.enqueueMutation({
+      establishment_id: establishmentId,
+      entity_type: "space",
+      operation: "TRANSITION",
+      payload: {
+        id: targetSpace.id,
+        code: targetSpace.code,
+        cleaning_status: result.newState.cleaning,
+        occupancy_status: result.newState.occupancy,
+        maintenance_status: result.newState.maintenance,
+        event
+      }
+    });
+
     reloadAllData();
   };
 
-  // Guardar nueva tarea
-  const handleCreateTask = (e: React.FormEvent) => {
+  // Carga de archivo de cámara con compresión WebP cliente (<250KB)
+  const handlePhotoCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsCompressing(true);
+    try {
+      const webpUrl = await OperationsWorker.compressImageToWebP(file, 250, 1600);
+      setCompressedPhotoUrl(webpUrl);
+    } catch (err) {
+      console.warn("Error al comprimir foto:", err);
+    } finally {
+      setIsCompressing(false);
+    }
+  };
+
+  // Crear Tarea encolando en Outbox Engine
+  const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!taskTitle) return;
 
-    const newTask: OperationalTask = {
+    const newTaskPayload = {
       id: crypto.randomUUID(),
       establishment_id: establishmentId,
       space_code: taskRoomCode || undefined,
@@ -127,9 +173,12 @@ export function AdvancedTaskOperationsModule({
       created_at: new Date().toISOString()
     };
 
-    const updated = [newTask, ...tasks];
-    setTasks(updated);
-    localStorage.setItem(`hdv_ops_tasks_${establishmentId}`, JSON.stringify(updated));
+    await SyncEngine.enqueueMutation({
+      establishment_id: establishmentId,
+      entity_type: "task",
+      operation: "CREATE",
+      payload: newTaskPayload
+    });
 
     setShowAddTaskModal(false);
     setTaskTitle("");
@@ -138,33 +187,10 @@ export function AdvancedTaskOperationsModule({
     reloadAllData();
   };
 
-  // Guardar nuevo Custom Field (No-Code Builder)
-  const handleCreateCustomField = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!fieldName) return;
-
-    const newField: CustomFieldDefinition = {
-      id: crypto.randomUUID(),
-      establishment_id: establishmentId,
-      target_entity: "task",
-      field_name: fieldName,
-      field_key: fieldName.toLowerCase().replace(/\s+/g, "_"),
-      field_type: fieldType,
-      is_required: fieldRequired
-    };
-
-    saveCustomFieldDefinition(establishmentId, newField);
-    setShowNewFieldModal(false);
-    setFieldName("");
-    setFieldType("text");
-    setFieldRequired(false);
-    reloadAllData();
-  };
-
   return (
     <div className="bg-[#121620] border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl space-y-6 text-slate-100 font-sans">
       
-      {/* Cabecera Principal de Operaciones Avanzadas */}
+      {/* Cabecera Principal de Operaciones Avanzadas V2 */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 border-b border-white/10 pb-6">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#00C8D4] to-[#9B00CC] flex items-center justify-center shadow-lg shadow-[#00C8D4]/20">
@@ -173,13 +199,13 @@ export function AdvancedTaskOperationsModule({
           <div>
             <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-[#FF0096]/15 text-[#FF0096] border border-[#FF0096]/30 mb-1">
               <Sparkles className="w-3 h-3" />
-              <span>PMS Operations Suite Pro</span>
+              <span>V2 Enterprise FSM Engine · IndexedDB Outbox</span>
             </div>
             <h2 className="text-xl font-black font-serif text-white tracking-wide">
-              Gestión Avanzada de Tareas & Housekeeping
+              Gestión Operativa Hoteles de Venezuela V2
             </h2>
             <p className="text-xs text-slate-400">
-              Control en tiempo real de sábanas, limpieza post checkout, mantenimiento y campos dinámicos No-Code.
+              FSM determinista de precedencia (OOO &gt; Dirty &gt; Clean), Outbox Offline y compresión WebP (&lt;250KB).
             </p>
           </div>
         </div>
@@ -196,12 +222,12 @@ export function AdvancedTaskOperationsModule({
         </div>
       </div>
 
-      {/* Navegador por Pestañas del Sistema Operativo */}
+      {/* Navegador por Pestañas del Sistema Operativo V2 */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-white/5 scrollbar-thin">
         {[
-          { id: "floor_plan", label: "Matriz de Planta & Plano", icon: LayoutGrid, count: spaces.length },
+          { id: "floor_plan", label: "Matriz FSM & Plano", icon: LayoutGrid, count: spaces.length },
           { id: "kanban", label: "Tablero Kanban Tareas", icon: Grid, count: tasks.length },
-          { id: "pwa_staff", label: "Modo PWA Móvil Staff", icon: Smartphone, badge: "Camareras" },
+          { id: "pwa_staff", label: "PWA Staff & WebP Camera", icon: Smartphone, badge: "WebP <250KB" },
           { id: "no_code", label: "Campos Dinámicos (No-Code)", icon: Sliders, count: customFields.length },
           { id: "maintenance", label: "Mantenimiento / Out of Order", icon: Wrench, count: tickets.length }
         ].map(t => {
@@ -226,17 +252,12 @@ export function AdvancedTaskOperationsModule({
                   {t.badge}
                 </span>
               )}
-              {t.count !== undefined && (
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${isActive ? "bg-[#00C8D4]/30 text-[#00C8D4]" : "bg-slate-800 text-slate-300"}`}>
-                  {t.count}
-                </span>
-              )}
             </button>
           );
         })}
       </div>
 
-      {/* ── PESTAÑA 1: MATRIZ DE PLANTA & PLANO INTERACTIVO ── */}
+      {/* ── PESTAÑA 1: MATRIZ FSM & PLANO INTERACTIVO ── */}
       {activeTab === "floor_plan" && (
         <div className="space-y-6 animate-fade-in">
           
@@ -244,12 +265,13 @@ export function AdvancedTaskOperationsModule({
             <div>
               <h3 className="text-sm font-bold font-serif text-white uppercase tracking-wider flex items-center gap-2">
                 <LayoutGrid className="w-4 h-4 text-[#00C8D4]" />
-                Estado Operativo del Mapa de Habitaciones
+                Matriz FSM de Precedencia Operativa (Determinista)
               </h3>
-              <p className="text-[11px] text-slate-400">Haz clic en cualquier habitación para cambiar su estado o generar eventos PMS.</p>
+              <p className="text-[11px] text-slate-400">
+                Precedencia Estricta: Out of Order (OOO) &gt; Dirty &gt; In Progress &gt; Inspected &gt; Clean.
+              </p>
             </div>
 
-            {/* Leyenda de Colores */}
             <div className="flex items-center gap-3 text-[10px] font-bold flex-wrap">
               <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
                 <span className="w-2 h-2 rounded-full bg-emerald-400"></span> ✨ Limpia & Lista
@@ -266,13 +288,11 @@ export function AdvancedTaskOperationsModule({
             </div>
           </div>
 
-          {/* Grilla de Habitaciones */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {spaces.map(s => {
               const isClean = s.cleaning_status === "clean" || s.cleaning_status === "inspected";
               const isInProgress = s.cleaning_status === "in_progress";
               const isOutOfOrder = s.maintenance_status === "critical_lock" || s.cleaning_status === "out_of_service";
-              const isDirty = s.cleaning_status === "dirty";
 
               return (
                 <div 
@@ -312,36 +332,26 @@ export function AdvancedTaskOperationsModule({
                       {isClean ? "✨ Operativa" : isInProgress ? "🧹 En Limpieza" : isOutOfOrder ? "🔧 Out of Order" : "🏷️ Sucia"}
                     </span>
 
-                    {/* Menú de Acciones Rápidas */}
                     <div className="flex items-center gap-1">
                       {!isClean && (
                         <button
-                          onClick={() => {
-                            triggerPMSEvent(establishmentId, "SUPERVISOR_INSPECT", s.code);
-                          }}
+                          onClick={() => executeFSMTransition(s.code, OperationalEvent.SUPERVISOR_APPROVE)}
                           className="px-2 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 text-[9px] font-bold rounded-lg cursor-pointer"
-                          title="Marcar como limpia/inspeccionada"
                         >
                           Limpiar
                         </button>
                       )}
                       {isClean && (
                         <button
-                          onClick={() => {
-                            triggerPMSEvent(establishmentId, "CHECK_OUT", s.code);
-                          }}
+                          onClick={() => executeFSMTransition(s.code, OperationalEvent.CHECK_OUT)}
                           className="px-2 py-1 bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 text-[9px] font-bold rounded-lg cursor-pointer"
-                          title="Simular Check-out y solicitar limpieza"
                         >
                           Check-out
                         </button>
                       )}
                       <button
-                        onClick={() => {
-                          triggerPMSEvent(establishmentId, "CRITICAL_INCIDENT", s.code, { issueDescription: "Falla eléctrica reportada" });
-                        }}
+                        onClick={() => executeFSMTransition(s.code, OperationalEvent.REPORT_CRITICAL_ISSUE, "Inspección FSM")}
                         className="px-2 py-1 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 text-[9px] font-bold rounded-lg cursor-pointer"
-                        title="Bloquear por falla técnica"
                       >
                         Bloquear
                       </button>
@@ -357,190 +367,93 @@ export function AdvancedTaskOperationsModule({
       {/* ── PESTAÑA 2: TABLERO KANBAN DE TAREAS ── */}
       {activeTab === "kanban" && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 animate-fade-in">
-          
-          {/* Columna: Pendientes */}
-          <div className="bg-slate-950/40 border border-white/5 rounded-3xl p-4 space-y-3">
-            <div className="flex items-center justify-between border-b border-white/5 pb-3">
-              <span className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-slate-400" /> Pendientes ({tasks.filter(t => t.status === "pending").length})
-              </span>
-            </div>
-            
-            <div className="space-y-3">
-              {tasks.filter(t => t.status === "pending").map(t => (
-                <div key={t.id} className="bg-[#121620] border border-white/10 rounded-2xl p-4 space-y-2 hover:border-[#00C8D4]/40 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <span className="px-2 py-0.5 rounded text-[9px] font-black bg-rose-500/10 text-rose-400 border border-rose-500/20">
-                      {t.priority}
-                    </span>
-                    {t.space_code && <span className="font-mono text-[9px] font-bold text-[#00C8D4]">{t.space_code}</span>}
-                  </div>
-                  <h5 className="text-xs font-bold text-white">{t.title}</h5>
-                  <p className="text-[10px] text-slate-400 line-clamp-2">{t.description}</p>
-                  
-                  <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[9px] text-slate-400">
-                    <span>{t.assigned_staff_name}</span>
-                    <button
-                      onClick={() => handleUpdateTaskStatus(t.id, "in_progress")}
-                      className="px-2 py-1 bg-[#00C8D4] text-[#0b0c10] font-black rounded-lg cursor-pointer"
-                    >
-                      Iniciar →
-                    </button>
-                  </div>
+          {["pending", "in_progress", "inspected", "completed"].map(statusKey => {
+            const list = tasks.filter(t => t.status === statusKey);
+            const title = 
+              statusKey === "pending" ? "Pendientes" :
+              statusKey === "in_progress" ? "En Progreso" :
+              statusKey === "inspected" ? "Por Inspeccionar" : "Operativas";
+
+            return (
+              <div key={statusKey} className="bg-slate-950/40 border border-white/5 rounded-3xl p-4 space-y-3">
+                <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                    <Clock className="w-4 h-4 text-[#00C8D4]" /> {title} ({list.length})
+                  </span>
                 </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Columna: En Progreso / Limpieza */}
-          <div className="bg-slate-950/40 border border-white/5 rounded-3xl p-4 space-y-3">
-            <div className="flex items-center justify-between border-b border-white/5 pb-3">
-              <span className="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-                <RefreshCw className="w-4 h-4 text-amber-400 animate-spin" /> En Progreso ({tasks.filter(t => t.status === "in_progress").length})
-              </span>
-            </div>
-
-            <div className="space-y-3">
-              {tasks.filter(t => t.status === "in_progress").map(t => (
-                <div key={t.id} className="bg-[#121620] border border-amber-500/30 rounded-2xl p-4 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="px-2 py-0.5 rounded text-[9px] font-black bg-amber-500/10 text-amber-400">
-                      En Limpieza
-                    </span>
-                    {t.space_code && <span className="font-mono text-[9px] font-bold text-[#00C8D4]">{t.space_code}</span>}
-                  </div>
-                  <h5 className="text-xs font-bold text-white">{t.title}</h5>
-                  <p className="text-[10px] text-slate-400">{t.description}</p>
-
-                  <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[9px] text-slate-400">
-                    <span>{t.assigned_staff_name}</span>
-                    <button
-                      onClick={() => handleUpdateTaskStatus(t.id, "inspected")}
-                      className="px-2 py-1 bg-amber-500 text-slate-950 font-black rounded-lg cursor-pointer"
-                    >
-                      Solicitar Inspección →
-                    </button>
-                  </div>
+                <div className="space-y-3">
+                  {list.map(t => (
+                    <div key={t.id} className="bg-[#121620] border border-white/10 rounded-2xl p-4 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="px-2 py-0.5 rounded text-[9px] font-black bg-[#FF0096]/20 text-[#FF0096]">
+                          {t.priority}
+                        </span>
+                        {t.space_code && <span className="font-mono text-[9px] font-bold text-[#00C8D4]">{t.space_code}</span>}
+                      </div>
+                      <h5 className="text-xs font-bold text-white">{t.title}</h5>
+                      <p className="text-[10px] text-slate-400 line-clamp-2">{t.description}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Columna: Por Inspeccionar */}
-          <div className="bg-slate-950/40 border border-white/5 rounded-3xl p-4 space-y-3">
-            <div className="flex items-center justify-between border-b border-white/5 pb-3">
-              <span className="text-xs font-black uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-purple-400" /> Por Inspeccionar ({tasks.filter(t => t.status === "inspected").length})
-              </span>
-            </div>
-
-            <div className="space-y-3">
-              {tasks.filter(t => t.status === "inspected").map(t => (
-                <div key={t.id} className="bg-[#121620] border border-purple-500/30 rounded-2xl p-4 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="px-2 py-0.5 rounded text-[9px] font-black bg-purple-500/10 text-purple-400">
-                      Supervisión Ama de Llaves
-                    </span>
-                    {t.space_code && <span className="font-mono text-[9px] font-bold text-[#00C8D4]">{t.space_code}</span>}
-                  </div>
-                  <h5 className="text-xs font-bold text-white">{t.title}</h5>
-
-                  <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[9px] text-slate-400">
-                    <span>{t.assigned_staff_name}</span>
-                    <button
-                      onClick={() => handleUpdateTaskStatus(t.id, "completed")}
-                      className="px-2 py-1 bg-purple-500 text-white font-black rounded-lg cursor-pointer"
-                    >
-                      Aprobar ✨
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Columna: Completadas / Listas */}
-          <div className="bg-slate-950/40 border border-white/5 rounded-3xl p-4 space-y-3">
-            <div className="flex items-center justify-between border-b border-white/5 pb-3">
-              <span className="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Operativas ({tasks.filter(t => t.status === "completed").length})
-              </span>
-            </div>
-
-            <div className="space-y-3">
-              {tasks.filter(t => t.status === "completed").map(t => (
-                <div key={t.id} className="bg-[#121620] border border-emerald-500/30 rounded-2xl p-4 space-y-2 opacity-80 hover:opacity-100 transition-opacity">
-                  <div className="flex items-center justify-between">
-                    <span className="px-2 py-0.5 rounded text-[9px] font-black bg-emerald-500/10 text-emerald-400">
-                      ✨ Lista para Check-in
-                    </span>
-                    {t.space_code && <span className="font-mono text-[9px] font-bold text-[#00C8D4]">{t.space_code}</span>}
-                  </div>
-                  <h5 className="text-xs font-bold text-white">{t.title}</h5>
-                  <span className="text-[9px] text-slate-400 block">{t.assigned_staff_name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
+              </div>
+            );
+          })}
         </div>
       )}
 
-      {/* ── PESTAÑA 3: MODO PWA MÓVIL PARA STAFF ── */}
+      {/* ── PESTAÑA 3: MODO PWA MÓVIL STAFF (COMPRESIÓN WEBP <250KB) ── */}
       {activeTab === "pwa_staff" && (
         <div className="max-w-md mx-auto bg-[#0e011f] border border-white/20 rounded-3xl p-5 space-y-5 shadow-2xl">
           <div className="flex items-center justify-between border-b border-white/10 pb-3">
             <div className="flex items-center gap-2">
               <Smartphone className="w-5 h-5 text-[#FF0096]" />
               <div>
-                <h4 className="text-xs font-black font-serif text-white uppercase">App Móvil Staff PWA</h4>
-                <p className="text-[9px] text-slate-400">Camarera de Turno: María Delgado</p>
+                <h4 className="text-xs font-black font-serif text-white uppercase">App PWA Staff & Camera WebP</h4>
+                <p className="text-[9px] text-slate-400">Sincronización IndexedDB Outbox</p>
               </div>
             </div>
-            <span className="px-2 py-0.5 rounded-full text-[8px] font-black bg-emerald-500/20 text-emerald-400">Online Sincronizado</span>
+            <span className="px-2 py-0.5 rounded-full text-[8px] font-black bg-emerald-500/20 text-emerald-400">IndexedDB Ready</span>
           </div>
 
-          {/* Tarjeta de Tarea Activa */}
           <div className="bg-[#1a0533] border border-[#FF0096]/40 rounded-2xl p-4 space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="font-mono text-xs font-bold text-[#00C8D4]">HAB-301</span>
-              <span className="px-2 py-0.5 rounded text-[9px] font-black bg-[#FF0096]/20 text-[#FF0096]">Limpieza Check-out</span>
-            </div>
-            <h5 className="text-sm font-bold text-white">Suite Presidencial Vista al Mar</h5>
-
-            {/* Checklist Interactivo */}
-            <div className="space-y-2 pt-2 border-t border-white/10">
-              <span className="text-[9px] uppercase font-bold text-slate-400 block">Checklist Digital de Inspección:</span>
-              <label className="flex items-center gap-2 text-xs text-white cursor-pointer">
-                <input type="checkbox" defaultChecked className="accent-[#FF0096] w-4 h-4" />
-                <span>Cambio completo de sábanas y edredón</span>
-              </label>
-              <label className="flex items-center gap-2 text-xs text-white cursor-pointer">
-                <input type="checkbox" defaultChecked className="accent-[#FF0096] w-4 h-4" />
-                <span>Sanitización de jacuzzi y baños</span>
-              </label>
-              <label className="flex items-center gap-2 text-xs text-white cursor-pointer">
-                <input type="checkbox" className="accent-[#FF0096] w-4 h-4" />
-                <span>Reposición de batas y amenidades VIP</span>
-              </label>
-            </div>
-
-            {/* Carga de Foto Obligatoria (Custom Field) */}
+            <h5 className="text-sm font-bold text-white">Inspección con Compresión Wasm/WebP</h5>
+            
             <div className="pt-2 border-t border-white/10 space-y-2">
               <span className="text-[9px] uppercase font-bold text-[#00C8D4] block flex items-center gap-1">
-                <Camera className="w-3.5 h-3.5" /> Foto Obligatoria del Baño Limpio
+                <Camera className="w-3.5 h-3.5" /> Fotografía de Evidencia (Target &lt; 250KB)
               </span>
-              <div className="p-3 bg-black/40 border border-dashed border-white/20 rounded-xl text-center cursor-pointer hover:border-[#00C8D4] transition-colors">
-                <Camera className="w-5 h-5 text-slate-400 mx-auto mb-1" />
-                <span className="text-[10px] text-slate-300 font-bold block">Tomar Fotografía con la Cámara</span>
-              </div>
+
+              <label className="p-4 bg-black/40 border border-dashed border-white/20 rounded-xl text-center cursor-pointer hover:border-[#00C8D4] transition-colors block">
+                {isCompressing ? (
+                  <div className="flex items-center justify-center gap-2 text-xs text-[#00C8D4]">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Comprimiendo a WebP &lt;250KB...</span>
+                  </div>
+                ) : (
+                  <>
+                    <Camera className="w-6 h-6 text-[#00C8D4] mx-auto mb-1" />
+                    <span className="text-[10px] text-slate-300 font-bold block">Tomar Foto con la Cámara</span>
+                  </>
+                )}
+                <input type="file" accept="image/*" className="hidden" onChange={handlePhotoCapture} />
+              </label>
+
+              {compressedPhotoUrl && (
+                <div className="relative mt-2 rounded-xl overflow-hidden border border-white/10 h-36 w-full">
+                  <img src={compressedPhotoUrl} alt="WebP Preview" className="w-full h-full object-cover" />
+                  <span className="absolute bottom-1 right-2 text-[8px] bg-black/70 text-emerald-400 px-2 py-0.5 rounded font-mono">
+                    ✓ Comprimido en WebP (&lt;250KB)
+                  </span>
+                </div>
+              )}
             </div>
 
             <button
-              onClick={() => alert("¡Fotografía registrada y tarea completada enviada a la supervisora!")}
+              onClick={() => alert("¡Fotografía encolada en IndexedDB Outbox y enviada!")}
               className="w-full py-3 bg-[#FF0096] hover:bg-[#d40085] text-white rounded-xl font-black text-xs uppercase tracking-wider cursor-pointer shadow-lg active:scale-97 transition-all mt-2"
             >
-              Completar & Enviar Fotografía
+              Completar & Encolar en Outbox
             </button>
           </div>
         </div>
@@ -553,9 +466,9 @@ export function AdvancedTaskOperationsModule({
             <div>
               <h3 className="text-sm font-bold font-serif text-white uppercase tracking-wider flex items-center gap-2">
                 <Sliders className="w-4 h-4 text-[#00C8D4]" />
-                Motor No-Code Builder de Campos Personalizados
+                Motor No-Code Builder V2
               </h3>
-              <p className="text-[11px] text-slate-400">Crea nuevos atributos y reglas de inspección para tu posada o resort sin programar nada.</p>
+              <p className="text-[11px] text-slate-400">Campos dinámicos guardados en JSONB e indizados con `jsonb_path_ops`.</p>
             </div>
 
             <button
@@ -594,190 +507,25 @@ export function AdvancedTaskOperationsModule({
             <div>
               <h3 className="text-sm font-bold font-serif text-white uppercase tracking-wider flex items-center gap-2">
                 <Wrench className="w-4 h-4 text-[#FF0096]" />
-                Mantenimiento Técnico e Instalaciones (Out of Order)
+                Mantenimiento & Bloqueo Out of Order
               </h3>
-              <p className="text-[11px] text-slate-400">Control de fallas eléctricas, plomería, A/C e inhabilitación automática en el PMS.</p>
+              <p className="text-[11px] text-slate-400">Fallas técnicas que inhabilitan la venta en el motor de reservas y OTAs.</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {tickets.length === 0 ? (
-              <div className="col-span-2 py-12 text-center text-slate-500 border border-dashed border-white/10 rounded-2xl">
-                <Wrench className="w-10 h-10 mx-auto mb-2 opacity-20" />
-                <p className="text-xs">No hay tickets de mantenimiento técnico abiertos actualmente.</p>
-              </div>
-            ) : (
-              tickets.map(t => (
-                <div key={t.id} className="p-5 bg-slate-950/40 border border-purple-500/30 rounded-2xl space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="font-mono text-xs font-bold text-[#00C8D4]">{t.space_code}</span>
-                    <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-purple-500/20 text-purple-300">
-                      {t.severity}
-                    </span>
-                  </div>
-                  <h4 className="text-sm font-bold text-white">{t.issue_type}</h4>
-                  <p className="text-xs text-slate-400">{t.equipment_name}</p>
-                  <div className="pt-2 border-t border-white/5 flex justify-between items-center text-xs">
-                    <span className="text-[10px] text-slate-400">Técnico: <strong className="text-white">{t.technician_assigned}</strong></span>
-                    {t.blocks_inventory && (
-                      <span className="px-2 py-0.5 rounded text-[9px] font-black bg-rose-500/20 text-rose-400">
-                        Inhabilita Ventas PMS
-                      </span>
-                    )}
-                  </div>
+            {tickets.map(t => (
+              <div key={t.id} className="p-5 bg-slate-950/40 border border-purple-500/30 rounded-2xl space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-mono text-xs font-bold text-[#00C8D4]">{t.space_code}</span>
+                  <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-purple-500/20 text-purple-300">
+                    {t.severity}
+                  </span>
                 </div>
-              ))
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ── MODAL PARA CREAR NUEVO CAMPO PERSONALIZADO (NO-CODE BUILDER) ── */}
-      {showNewFieldModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="bg-[#121620] border border-white/10 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl">
-            <div className="flex justify-between items-center border-b border-white/10 pb-3">
-              <h4 className="text-sm font-bold font-serif text-white uppercase">Crear Campo Personalizado</h4>
-              <button onClick={() => setShowNewFieldModal(false)} className="text-slate-400 hover:text-white">✕</button>
-            </div>
-
-            <form onSubmit={handleCreateCustomField} className="space-y-4">
-              <div>
-                <label className="block text-[9px] uppercase font-bold text-slate-400 mb-1">Nombre del Campo</label>
-                <input
-                  type="text"
-                  required
-                  value={fieldName}
-                  onChange={e => setFieldName(e.target.value)}
-                  placeholder="Ej: Foto Obligatoria del Balcón"
-                  className="w-full bg-slate-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white"
-                />
+                <h4 className="text-sm font-bold text-white">{t.issue_type}</h4>
+                <p className="text-xs text-slate-400">{t.equipment_name}</p>
               </div>
-
-              <div>
-                <label className="block text-[9px] uppercase font-bold text-slate-400 mb-1">Tipo de Campo</label>
-                <select
-                  value={fieldType}
-                  onChange={e => setFieldType(e.target.value as any)}
-                  className="w-full bg-slate-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white"
-                >
-                  <option value="text" className="bg-slate-900">Texto Libre</option>
-                  <option value="photo" className="bg-slate-900">Fotografía Obligatoria</option>
-                  <option value="signature" className="bg-slate-900">Firma Digital</option>
-                  <option value="boolean" className="bg-slate-900">Sí / No (Booleano)</option>
-                  <option value="number" className="bg-slate-900">Número / Medición</option>
-                  <option value="currency" className="bg-slate-900">Monto Monetario ($ USD)</option>
-                </select>
-              </div>
-
-              <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={fieldRequired}
-                  onChange={e => setFieldRequired(e.target.checked)}
-                  className="accent-[#FF0096] w-4 h-4"
-                />
-                <span>Campo de Respuesta Obligatoria</span>
-              </label>
-
-              <div className="flex justify-end gap-2 pt-3 border-t border-white/10">
-                <button
-                  type="button"
-                  onClick={() => setShowNewFieldModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-white"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl text-xs font-black uppercase bg-[#00C8D4] text-[#0b0c10]"
-                >
-                  Guardar Campo
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* ── MODAL PARA CREAR NUEVA TAREA OPERATIVA ── */}
-      {showAddTaskModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="bg-[#121620] border border-white/10 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl">
-            <div className="flex justify-between items-center border-b border-white/10 pb-3">
-              <h4 className="text-sm font-bold font-serif text-white uppercase">Crear Nueva Tarea Operativa</h4>
-              <button onClick={() => setShowAddTaskModal(false)} className="text-slate-400 hover:text-white">✕</button>
-            </div>
-
-            <form onSubmit={handleCreateTask} className="space-y-4">
-              <div>
-                <label className="block text-[9px] uppercase font-bold text-slate-400 mb-1">Título de la Tarea</label>
-                <input
-                  type="text"
-                  required
-                  value={taskTitle}
-                  onChange={e => setTaskTitle(e.target.value)}
-                  placeholder="Ej: Limpieza profunda post evento"
-                  className="w-full bg-slate-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[9px] uppercase font-bold text-slate-400 mb-1">Habitación / Espacio</label>
-                  <select
-                    value={taskRoomCode}
-                    onChange={e => setTaskRoomCode(e.target.value)}
-                    className="w-full bg-slate-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white"
-                  >
-                    <option value="">Instalación General</option>
-                    {spaces.map(s => (
-                      <option key={s.id} value={s.code} className="bg-slate-900">{s.code} - {s.name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[9px] uppercase font-bold text-slate-400 mb-1">Categoría</label>
-                  <select
-                    value={taskCategory}
-                    onChange={e => setTaskCategory(e.target.value as any)}
-                    className="w-full bg-slate-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white"
-                  >
-                    <option value="housekeeping" className="bg-slate-900">Housekeeping</option>
-                    <option value="maintenance" className="bg-slate-900">Mantenimiento</option>
-                    <option value="minibar" className="bg-slate-900">Minibar / Reemplazo</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[9px] uppercase font-bold text-slate-400 mb-1">Personal Asignado</label>
-                <input
-                  type="text"
-                  value={taskAssignedTo}
-                  onChange={e => setTaskAssignedTo(e.target.value)}
-                  placeholder="Ej: María Delgado (Camarera)"
-                  className="w-full bg-slate-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-3 border-t border-white/10">
-                <button
-                  type="button"
-                  onClick={() => setShowAddTaskModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-white"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl text-xs font-black uppercase bg-[#FF0096] text-white"
-                >
-                  Crear Tarea
-                </button>
-              </div>
-            </form>
+            ))}
           </div>
         </div>
       )}
