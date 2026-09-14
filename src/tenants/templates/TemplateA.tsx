@@ -11,6 +11,7 @@ import { AdvancedTaskOperationsModule } from "./components/AdvancedTaskOperation
 import { FinanceModule } from "./components/FinanceModule";
 import { CMSModule } from "./components/CMSModule";
 import { AnalyticsModule } from "./components/AnalyticsModule";
+import { OwnerAgendaModule } from "../../components/owner/OwnerAgendaModule";
 
 export function TemplateA() {
   const { config, updateConfig } = useTenant();
@@ -19,7 +20,7 @@ export function TemplateA() {
   const [showStaffPanel, setShowStaffPanel] = useState(false);
   const [staffPassword, setStaffPassword] = useState("");
   const [isAuthorized, setIsAuthorized] = useState(false);
-  const [activeTab, setActiveTab] = useState<"tareas" | "finanzas" | "cms" | "analiticas">("cms");
+  const [activeTab, setActiveTab] = useState<"reservas" | "tareas" | "finanzas" | "cms" | "analiticas">("reservas");
 
   // Mapeo de iconos para servicios comunes (cajas de fondo sólido de color con SVG blanco puro)
   const serviceItems = [
@@ -208,7 +209,8 @@ export function TemplateA() {
             onClick={() => {
               setShowStaffPanel(true);
               const m = config.modules;
-              if (m.cms) setActiveTab("cms");
+              if (m.reservas) setActiveTab("reservas");
+              else if (m.cms) setActiveTab("cms");
               else if (m.tareas) setActiveTab("tareas");
               else if (m.finanzas) setActiveTab("finanzas");
               else if (m.analiticas) setActiveTab("analiticas");
@@ -265,6 +267,16 @@ export function TemplateA() {
                   </div>
                   
                   <div className="flex flex-wrap gap-2">
+                    {config.modules.reservas && (
+                      <button
+                        onClick={() => setActiveTab("reservas")}
+                        className={`px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                          activeTab === "reservas" ? "bg-[#00C8D4] text-[#0b0c10]" : "bg-white/5 text-gray-400 hover:text-white"
+                        }`}
+                      >
+                        📅 Agenda Reservas & Timeline
+                      </button>
+                    )}
                     {config.modules.cms && (
                       <button
                         onClick={() => setActiveTab("cms")}
@@ -319,6 +331,12 @@ export function TemplateA() {
                 </div>
 
                 <div className="animate-fade-in">
+                  {activeTab === "reservas" && config.modules.reservas && (
+                    <OwnerAgendaModule 
+                      establishmentId={config.establishment_id}
+                      establishmentName={config.name}
+                    />
+                  )}
                   {activeTab === "cms" && config.modules.cms && (
                     <CMSModule 
                       config={config} 
