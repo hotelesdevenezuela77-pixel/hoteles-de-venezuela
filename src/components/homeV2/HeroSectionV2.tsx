@@ -201,8 +201,26 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
             </span>
           </h1>
 
+          {/* Botón Titilante estilo Oleaje Tucacas: Próximo Lanzamiento */}
+          <div className="pt-2 pb-1 flex justify-center">
+            <div className="inline-flex items-center gap-2.5 p-[2px] rounded-full bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] shadow-2xl animate-pulse hover:scale-105 transition-all cursor-pointer">
+              <div className="px-5 py-2 rounded-full bg-slate-950/90 backdrop-blur-md flex items-center gap-2.5">
+                <span className="relative flex h-3 w-3 shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00C8D4] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-[#00C8D4]"></span>
+                </span>
+                <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-[#00C8D4] drop-shadow">
+                  🚀 PRÓXIMO LANZAMIENTO! • PLATAFORMA WEB EN CONSTRUCCIÓN
+                </span>
+              </div>
+            </div>
+          </div>
+
           <p className="text-sm sm:text-base text-slate-100 font-sans font-semibold max-w-2xl mx-auto leading-relaxed drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)] pt-0.5">
-            {heroConfig.subtitle}
+            {heroConfig.subtitle
+              .replace(/^Próximo Lanzamiento!\s*/i, "")
+              .replace(/^En mantenimiento Programado,?\s*/i, "")
+              .trim()}
           </p>
         </div>
 
