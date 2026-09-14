@@ -22,6 +22,7 @@ import { ConstellationBackground } from "../components/ConstellationBackground";
 import { TENANTS_REGISTRY, type TenantConfig } from "../tenants/tenantContext";
 import { CMSModule } from "../tenants/templates/components/CMSModule";
 import { TaskModule } from "../tenants/templates/components/TaskModule";
+import { AdvancedTaskOperationsModule } from "../tenants/templates/components/AdvancedTaskOperationsModule";
 import { POSModule } from "../tenants/templates/components/POSModule";
 import { FinanceModule } from "../tenants/templates/components/FinanceModule";
 import { AnalyticsModule } from "../tenants/templates/components/AnalyticsModule";
@@ -371,7 +372,7 @@ export function OwnerDashboard() {
       const localData = localStorage.getItem("hdv_tenants_configurations");
       if (localData) {
         const list: TenantConfig[] = JSON.parse(localData);
-        const matched = list.find(t => t.establishment_id === est.id || t.slug === est.slug);
+        const matched = list.find(t => Number(t.establishment_id) === Number(est.id) || (t.slug && est.slug && t.slug.toLowerCase() === est.slug.toLowerCase()));
         if (matched) {
           setCurrentTenantConfig(matched);
           return;
@@ -379,6 +380,51 @@ export function OwnerDashboard() {
       }
     } catch (localErr) {
       console.error("[Tenant Sync] Error parsing localStorage:", localErr);
+    }
+
+    // 1b. Intentar consultar la base de datos Supabase (tabla tenant_configurations)
+    try {
+      const { data: tenantRows, error: tenantErr } = await supabase
+        .from("tenant_configurations")
+        .select("*")
+        .or(`establishment_id.eq.${est.id},slug.eq.${est.slug}`);
+
+      if (!tenantErr && tenantRows && tenantRows.length > 0) {
+        const row = tenantRows[0];
+        const parsedModules = typeof row.modules === "string" ? JSON.parse(row.modules) : (row.modules || {});
+        const parsedBranding = typeof row.branding === "string" ? JSON.parse(row.branding) : (row.branding || {});
+        const parsedContact = typeof row.contact === "string" ? JSON.parse(row.contact) : (row.contact || {});
+        const matchingStatic = TENANTS_REGISTRY[row.slug] || TENANTS_REGISTRY[est.slug];
+
+        const dbTenantConfig: TenantConfig = {
+          establishment_id: Number(row.establishment_id || est.id),
+          slug: row.slug || est.slug,
+          name: row.name || matchingStatic?.name || est.name,
+          template: row.template || matchingStatic?.template || "A",
+          domain: row.domain || matchingStatic?.domain || `${est.slug}.com`,
+          branding: {
+            primary_color: parsedBranding.primary_color || matchingStatic?.branding?.primary_color || "#00C8D4",
+            secondary_color: parsedBranding.secondary_color || matchingStatic?.branding?.secondary_color || "#9B00CC",
+            accent_color: parsedBranding.accent_color || matchingStatic?.branding?.accent_color || "#FF0096",
+            font_title: parsedBranding.font_title || matchingStatic?.branding?.font_title || "Playfair Display",
+            font_body: parsedBranding.font_body || matchingStatic?.branding?.font_body || "Montserrat",
+            logo_url: parsedBranding.logo_url || matchingStatic?.branding?.logo_url || "https://r2.hotelesdevenezuela.com/default/logo.png",
+            banner_url: parsedBranding.banner_url || matchingStatic?.branding?.banner_url || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1600&auto=format&fit=crop"
+          },
+          modules: {
+            ...(matchingStatic?.modules || {}),
+            ...parsedModules
+          },
+          contact: {
+            ...(matchingStatic?.contact || {}),
+            ...parsedContact
+          }
+        };
+        setCurrentTenantConfig(dbTenantConfig);
+        return;
+      }
+    } catch (tDbErr) {
+      console.warn("[Tenant Sync] Error fetching tenant_configurations from DB:", tDbErr);
     }
 
     // 2. Intentar consultar la base de datos Supabase (tabla establishments y facility_photos)
@@ -498,18 +544,37 @@ export function OwnerDashboard() {
   // Safety fallback if activeTab is disabled by SaaS configuration or belongs to Super-Admin
   useEffect(() => {
     const disabledSuperAdminTabs = ["andromeda_ops", "legal", "guiones"];
-    const isExplicitlyDisabled = 
-      (activeTab === "tareas" && !currentTenantConfig?.modules?.tareas) ||
-      (activeTab === "pos" && !currentTenantConfig?.modules?.pos) ||
-      (activeTab === "webapp_cms" && !currentTenantConfig?.modules?.cms) ||
-      (activeTab === "finanzas" && !currentTenantConfig?.modules?.finanzas) ||
-      (activeTab === "analiticas_saas" && !currentTenantConfig?.modules?.analiticas) ||
-      (activeTab === "operaciones" && currentTenantConfig?.modules?.reservas === false);
+    
+    let modules = currentTenantConfig?.modules;
+    if (!modules && typeof window !== "undefined") {
+      try {
+        const rawLocal = localStorage.getItem("hdv_tenants_configurations");
+        if (rawLocal && establishments.length > 0) {
+          const activeEst = establishments.find(e => Number(e.id) === Number(selectedCalendarEst)) || establishments[0];
+          const list: TenantConfig[] = JSON.parse(rawLocal);
+          const matched = list.find(t => Number(t.establishment_id) === Number(activeEst.id) || (t.slug && activeEst.slug && t.slug.toLowerCase() === activeEst.slug.toLowerCase()));
+          if (matched?.modules) {
+            modules = matched.modules;
+          }
+        }
+      } catch (e) {
+        console.warn("[Tenant Fallback]", e);
+      }
+    }
+
+    const isExplicitlyDisabled = modules ? (
+      (activeTab === "tareas" && !modules.tareas) ||
+      (activeTab === "pos" && !modules.pos) ||
+      (activeTab === "webapp_cms" && modules.cms === false) ||
+      (activeTab === "finanzas" && !modules.finanzas) ||
+      (activeTab === "analiticas_saas" && !modules.analiticas) ||
+      (activeTab === "operaciones" && modules.reservas === false)
+    ) : false;
 
     if (disabledSuperAdminTabs.includes(activeTab) || isExplicitlyDisabled) {
       setActiveTab("resumen");
     }
-  }, [activeTab, currentTenantConfig]);
+  }, [activeTab, currentTenantConfig, selectedCalendarEst, establishments]);
 
   const [discountCodes, setDiscountCodes] = useState<any[]>([]);
   const [showAddDiscountModal, setShowAddDiscountModal] = useState(false);
@@ -3186,10 +3251,24 @@ export function OwnerDashboard() {
           {(() => {
             const activeEstObj = establishments.find(e => Number(e.id) === Number(selectedCalendarEst)) || establishments[0];
             const activeSlug = activeEstObj?.slug || "";
-            const currentTenantConfig = TENANTS_REGISTRY[activeSlug] || Object.values(TENANTS_REGISTRY).find(t => Number(t.establishment_id) === Number(activeEstObj?.id));
+            const dynamicOrStatic = currentTenantConfig || TENANTS_REGISTRY[activeSlug] || Object.values(TENANTS_REGISTRY).find(t => Number(t.establishment_id) === Number(activeEstObj?.id));
 
-            const isRestaurantType = currentTenantConfig?.business_type === "restaurant" || activeEstObj?.category_name?.toLowerCase().includes("restaurante");
-            const isPosEnabled = currentTenantConfig?.modules?.pos === true || (currentTenantConfig?.modules?.pos !== false && isRestaurantType);
+            let effectiveModules = dynamicOrStatic?.modules;
+            try {
+              const rawLocal = localStorage.getItem("hdv_tenants_configurations");
+              if (rawLocal) {
+                const list: TenantConfig[] = JSON.parse(rawLocal);
+                const localMatch = list.find(t => Number(t.establishment_id) === Number(activeEstObj?.id) || (t.slug && activeSlug && t.slug.toLowerCase() === activeSlug.toLowerCase()));
+                if (localMatch?.modules) {
+                  effectiveModules = { ...effectiveModules, ...localMatch.modules };
+                }
+              }
+            } catch (e) {
+              console.warn("Error reading local tenant config in owner tab bar:", e);
+            }
+
+            const isRestaurantType = dynamicOrStatic?.business_type === "restaurant" || activeEstObj?.category_name?.toLowerCase().includes("restaurante");
+            const isPosEnabled = effectiveModules?.pos === true || (effectiveModules?.pos !== false && isRestaurantType);
 
             return (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
@@ -3197,13 +3276,13 @@ export function OwnerDashboard() {
                   { id: "resumen", label: "Dashboard Ejecutivo", icon: BarChart3, enabled: true },
                   { id: "agenda", label: "Agenda & Calendario", icon: Calendar, enabled: true, badge: "Drag & Drop" },
                   { id: "soporte", label: "Soporte Técnico", icon: Wrench, enabled: true, badge: "Tickets D&D" },
-                  { id: "webapp_cms", label: "Aplicación Web & CMS", icon: Globe, enabled: currentTenantConfig?.modules?.cms !== false, badge: "Web Builder" },
-                  { id: "tareas", label: "Gestión de Tareas", icon: Clipboard, enabled: !!currentTenantConfig?.modules?.tareas, badge: "SaaS" },
+                  { id: "webapp_cms", label: "Aplicación Web & CMS", icon: Globe, enabled: effectiveModules?.cms !== false, badge: "Web Builder" },
+                  { id: "tareas", label: "Gestión de Tareas", icon: Clipboard, enabled: !!effectiveModules?.tareas, badge: "SaaS" },
                   { id: "pos", label: "Club POS", icon: Coffee, enabled: isPosEnabled, badge: "SaaS" },
-                  { id: "finanzas", label: "Finanzas & Membresías", icon: DollarSign, enabled: !!currentTenantConfig?.modules?.finanzas },
-                  { id: "analiticas_saas", label: "Analíticas SaaS", icon: TrendingUp, enabled: !!currentTenantConfig?.modules?.analiticas, badge: "SaaS" },
+                  { id: "finanzas", label: "Finanzas & Membresías", icon: DollarSign, enabled: !!effectiveModules?.finanzas },
+                  { id: "analiticas_saas", label: "Analíticas SaaS", icon: TrendingUp, enabled: !!effectiveModules?.analiticas, badge: "SaaS" },
                   { id: "portafolio", label: `Mi Portafolio (${establishments.length})`, icon: Building2, enabled: true },
-                  { id: "operaciones", label: "Operaciones Diarias", icon: CalendarRange, enabled: currentTenantConfig?.modules?.reservas !== false },
+                  { id: "operaciones", label: "Operaciones Diarias", icon: CalendarRange, enabled: effectiveModules?.reservas !== false },
                   { id: "inventario", label: "Inventario Habitaciones", icon: ListFilter, enabled: true },
                   { id: "marketing", label: "Marketing & Canales", icon: Tag, enabled: true }
                 ].filter(tab => tab.enabled).map(tab => {
@@ -3636,11 +3715,8 @@ export function OwnerDashboard() {
 
         {/* GESTIÓN DE TAREAS TAB */}
         {activeTab === "tareas" && (
-          <TaskModule
+          <AdvancedTaskOperationsModule
             establishmentId={selectedCalendarEst ? Number(selectedCalendarEst) : (establishments[0]?.id || 0)}
-            primaryColor="#FF0096"
-            secondaryColor="#9B00CC"
-            accentColor="#00C8D4"
           />
         )}
 
@@ -5107,11 +5183,8 @@ export function OwnerDashboard() {
         {/* SAAS MODULE: GESTIÓN DE TAREAS */}
         {activeTab === "tareas" && activeEstablishment && (
           <div className="space-y-6 animate-in fade-in duration-200">
-            <TaskModule
+            <AdvancedTaskOperationsModule
               establishmentId={activeEstablishment.id}
-              primaryColor="#00C8D4"
-              secondaryColor="#9B00CC"
-              accentColor="#FF0096"
             />
           </div>
         )}
