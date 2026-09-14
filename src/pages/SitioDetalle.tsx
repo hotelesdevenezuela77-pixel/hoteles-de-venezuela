@@ -388,10 +388,10 @@ export function SitioDetalle() {
           <div className="absolute -top-24 -left-24 w-48 h-48 bg-white/10 rounded-full blur-2xl" />
           <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-black/10 rounded-full blur-2xl" />
 
-          <h3 className="text-xl md:text-2xl font-black mb-3 relative z-10 playfair">
+          <h3 className="text-xl md:text-2xl font-black mb-3 relative z-10 playfair !text-white drop-shadow-md">
             ¿Quieres visitar {site.name}?
           </h3>
-          <p className="text-white/80 text-xs md:text-sm font-medium max-w-lg mx-auto mb-6 relative z-10 leading-relaxed">
+          <p className="!text-white/95 text-xs md:text-sm font-medium max-w-lg mx-auto mb-6 relative z-10 leading-relaxed drop-shadow-xs">
             Te asesoramos gratuitamente sobre traslados fluviales/marítimos, peñeros autorizados y las mejores opciones de hospedaje local en {destinationName}.
           </p>
           
