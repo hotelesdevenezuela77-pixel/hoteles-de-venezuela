@@ -28,6 +28,7 @@ import { FinanceModule } from "../tenants/templates/components/FinanceModule";
 import { AnalyticsModule } from "../tenants/templates/components/AnalyticsModule";
 import { OwnerAgendaModule } from "@/components/owner/OwnerAgendaModule";
 import { OwnerTechnicalSupportModule } from "@/components/owner/OwnerTechnicalSupportModule";
+import { OwnerWhatsAppCRMModule } from "@/components/owner/OwnerWhatsAppCRMModule";
 import { AddEstablishmentWizardModal } from "@/components/owner/AddEstablishmentWizardModal";
 import { ParkComplexDashboard } from "@/components/park/ParkComplexDashboard";
 import { isTouristComplexOrWaterPark } from "@/types/parkComplex";
@@ -3274,6 +3275,7 @@ export function OwnerDashboard() {
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
                 {[
                   { id: "resumen", label: "Dashboard Ejecutivo", icon: BarChart3, enabled: true },
+                  { id: "crm_whatsapp", label: "CRM Leads WhatsApp", icon: MessageSquare, enabled: true, badge: leads.length > 0 ? `${leads.length}` : "WhatsApp" },
                   { id: "agenda", label: "Agenda & Calendario", icon: Calendar, enabled: true, badge: "Drag & Drop" },
                   { id: "soporte", label: "Soporte Técnico", icon: Wrench, enabled: true, badge: "Tickets D&D" },
                   { id: "webapp_cms", label: "Aplicación Web & CMS", icon: Globe, enabled: effectiveModules?.cms !== false, badge: "Web Builder" },
@@ -3645,6 +3647,15 @@ export function OwnerDashboard() {
           <OwnerAgendaModule
             establishmentId={selectedCalendarEst ? Number(selectedCalendarEst) : (establishments[0]?.id || 0)}
             establishmentName={activeEstablishment?.name || "Mi Establecimiento"}
+          />
+        )}
+
+        {/* CRM LEADS WHATSAPP TAB */}
+        {activeTab === "crm_whatsapp" && (
+          <OwnerWhatsAppCRMModule
+            establishmentId={selectedCalendarEst ? Number(selectedCalendarEst) : (establishments[0]?.id || 0)}
+            establishmentName={activeEstablishment?.name || "Tu Establecimiento"}
+            whatsappNumber={activeEstablishment?.whatsapp || activeEstablishment?.phone || ""}
           />
         )}
 
