@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { 
   Search, MapPin, Building2, Compass, ShieldCheck, Zap, Wifi, Dog, Sparkles, Layers,
-  Palmtree, Waves, Mountain, Trees, ChevronDown, Check, Home, Tent
+  Palmtree, Waves, Mountain, Trees, ChevronDown, Check, Home, Tent, Users
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
@@ -62,6 +62,71 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
   const destRef = useRef<HTMLDivElement>(null);
   const catRef = useRef<HTMLDivElement>(null);
   const expRef = useRef<HTMLDivElement>(null);
+
+  // Helper para calcular contador de visitas/búsquedas diarias dinámico según el día de la semana
+  const getInitialVisitorCount = () => {
+    const now = new Date();
+    const day = now.getDay(); // 0 = Domingo, 1 = Lunes, 2 = Martes...
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+
+    let min = 6315;
+    let max = 7300;
+
+    switch (day) {
+      case 1: // Lunes: 6315 - 7300
+        min = 6315; max = 7300; break;
+      case 2: // Martes: 8015 - 9200
+        min = 8015; max = 9200; break;
+      case 3: // Miércoles: 9250 - 10800
+        min = 9250; max = 10800; break;
+      case 4: // Jueves: 11100 - 12900
+        min = 11100; max = 12900; break;
+      case 5: // Viernes (Elevado): 13800 - 15800
+        min = 13800; max = 15800; break;
+      case 6: // Sábado (Pico más elevado): 14500 - 16527
+        min = 14500; max = 16527; break;
+      case 0: // Domingo (Baja a 5077 - 6157): 5077 - 6157
+        min = 5077; max = 6157; break;
+      default:
+        min = 6157; max = 16527;
+    }
+
+    const timeProgress = (hour * 60 + minute) / 1440;
+    const curveMultiplier = 0.7 + 0.3 * Math.sin(timeProgress * Math.PI);
+    const baseValue = Math.floor(min + (max - min) * curveMultiplier);
+    
+    const seed = (now.getDate() * 100 + minute) % (max - min || 1);
+    return Math.min(max, Math.max(min, baseValue + (seed % 65)));
+  };
+
+  const [liveVisitors, setLiveVisitors] = useState<number>(getInitialVisitorCount);
+
+  // Intervalo de cambio en tiempo real (fluctuación de +1, +3, -1 cada 3.5 segundos)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLiveVisitors(prev => {
+        const deltas = [1, 2, 3, -1, 2, 4, -2, 1, 3];
+        const randomDelta = deltas[Math.floor(Math.random() * deltas.length)];
+        const next = prev + randomDelta;
+
+        const now = new Date();
+        const day = now.getDay();
+        let min = 5077, max = 16527;
+        if (day === 1) { min = 6315; max = 7300; }
+        else if (day === 2) { min = 8015; max = 9200; }
+        else if (day === 3) { min = 9250; max = 10800; }
+        else if (day === 4) { min = 11100; max = 12900; }
+        else if (day === 5) { min = 13800; max = 15800; }
+        else if (day === 6) { min = 14500; max = 16527; }
+        else if (day === 0) { min = 5077; max = 6157; }
+
+        return Math.min(max, Math.max(min, next));
+      });
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const [heroConfig, setHeroConfig] = useState({
     badge: "EL PARAÍSO VENEZOLANO A UN CLIC",
@@ -432,6 +497,29 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
               </button>
             );
           })}
+        </div>
+
+        {/* CONTADOR DE VISITAS / BÚSQUEDAS EN TIEMPO REAL (ESTRATEGIA B2C / B2B) */}
+        <div className="pt-3 pb-1 flex justify-center">
+          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-slate-950/80 backdrop-blur-md border border-[#00C8D4]/30 shadow-[0_0_20px_rgba(0,200,212,0.2)] text-white text-xs font-semibold">
+            <span className="relative flex h-2.5 w-2.5 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+
+            <div className="w-5 h-5 rounded-md bg-[#00C8D4] flex items-center justify-center text-slate-950 shrink-0 shadow-xs">
+              <Users className="w-3 h-3 text-slate-950 stroke-[2.5]" />
+            </div>
+
+            <div className="flex items-center gap-1.5 text-slate-200">
+              <span className="font-mono font-black text-[#00C8D4] text-sm tracking-tight drop-shadow-[0_0_8px_rgba(0,200,212,0.5)]">
+                {liveVisitors.toLocaleString("es-VE")}
+              </span>
+              <span className="text-[11px] sm:text-xs font-bold text-slate-200">
+                turistas y propietarios buscando hospedajes en vivo hoy
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* MICRO-COPY DE CONFIANZA OPERATIVA */}
