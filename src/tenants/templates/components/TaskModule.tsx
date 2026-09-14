@@ -2,12 +2,15 @@ import React, { useState, useEffect } from "react";
 import { supabase } from "../../../lib/supabase";
 import { 
   ClipboardList, Plus, Trash2, CheckCircle2, 
-  Clock, AlertTriangle, User, Loader2, ArrowRight
+  Clock, AlertTriangle, User, Loader2, ArrowRight, BedDouble, Sparkles, Wrench
 } from "lucide-react";
+import { getRoomsForEstablishment, updateRoomCleaningStatus, type RoomItem } from "../../../lib/roomStatusSync";
 
 interface Task {
   id: string;
   establishment_id: number;
+  room_code?: string;
+  category?: "Limpieza" | "Mantenimiento" | "General";
   title: string;
   description: string;
   priority: "high" | "medium" | "low";
@@ -25,6 +28,7 @@ interface TaskModuleProps {
 
 export function TaskModule({ establishmentId, primaryColor, secondaryColor, accentColor }: TaskModuleProps) {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [rooms, setRooms] = useState<RoomItem[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Estado para nueva tarea
@@ -33,16 +37,24 @@ export function TaskModule({ establishmentId, primaryColor, secondaryColor, acce
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<"high" | "medium" | "low">("medium");
   const [assignedTo, setAssignedTo] = useState("");
+  const [selectedRoomCode, setSelectedRoomCode] = useState<string>("");
+  const [category, setCategory] = useState<"Limpieza" | "Mantenimiento" | "General">("Limpieza");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const localKey = `hdv_tasks_${establishmentId}`;
 
+  // Cargar habitaciones disponibles
+  const loadRooms = () => {
+    const list = getRoomsForEstablishment(establishmentId);
+    setRooms(list);
+  };
+
   // Cargar tareas (Supabase con Logical Isolation + Fallback LocalStorage)
   const loadTasks = async () => {
+    loadRooms();
     try {
       setLoading(true);
       
-      // 1. Intentar consultar de la base de datos centralizada
       const { data, error } = await supabase
         .from("hotel_tasks")
         .select("*")
@@ -56,19 +68,19 @@ export function TaskModule({ establishmentId, primaryColor, secondaryColor, acce
       setTasks(data);
       localStorage.setItem(localKey, JSON.stringify(data));
     } catch (e) {
-      console.warn("[PMS Tareas] Falló consulta a DB. Cargando desde almacenamiento local seguro.");
-      // Fallback robusto
+      console.warn("[PMS Tareas] Falló consulta a DB. Cargando desde almacenamiento local.");
       const localData = localStorage.getItem(localKey);
       if (localData) {
         setTasks(JSON.parse(localData));
       } else {
-        // Inicializar con tareas de prueba por defecto
         const defaultTasks: Task[] = [
           {
             id: "1",
             establishment_id: establishmentId,
-            title: "Limpieza profunda Suite Principal",
-            description: "Preparar habitación 204 para check-in de las 3:00 PM.",
+            room_code: "HAB-301",
+            category: "Limpieza",
+            title: "Limpieza profunda Suite Presidencial",
+            description: "Preparar habitación 301 para check-in de las 3:00 PM.",
             priority: "high",
             status: "pending",
             assigned_to: "María Delgado (Camarera)",
@@ -77,8 +89,10 @@ export function TaskModule({ establishmentId, primaryColor, secondaryColor, acce
           {
             id: "2",
             establishment_id: establishmentId,
+            room_code: "HAB-202",
+            category: "Mantenimiento",
             title: "Mantenimiento aire acondicionado",
-            description: "Revisar goteo y limpiar filtros de la habitación 102.",
+            description: "Revisar goteo y limpiar filtros de la habitación HAB-202.",
             priority: "medium",
             status: "in_progress",
             assigned_to: "Carlos Pérez (Técnico)",
@@ -87,8 +101,10 @@ export function TaskModule({ establishmentId, primaryColor, secondaryColor, acce
           {
             id: "3",
             establishment_id: establishmentId,
-            title: "Reposición de Minibar",
-            description: "Colocar aguas, cervezas y snacks en todas las suites ejecutivas.",
+            room_code: "VIL-104",
+            category: "General",
+            title: "Reposición de Minibar y Toallas",
+            description: "Colocar aguas, cervezas y toallas nuevas en Villa VIL-104.",
             priority: "low",
             status: "completed",
             assigned_to: "Juan Torres (Botones)",
@@ -105,6 +121,16 @@ export function TaskModule({ establishmentId, primaryColor, secondaryColor, acce
 
   useEffect(() => {
     loadTasks();
+
+    const handleTaskEvent = (e: any) => {
+      if (e.detail?.establishmentId === establishmentId) {
+        loadTasks();
+      }
+    };
+    window.addEventListener("hdv_tasks_changed", handleTaskEvent);
+    return () => {
+      window.removeEventListener("hdv_tasks_changed", handleTaskEvent);
+    };
   }, [establishmentId]);
 
   // Guardar nueva tarea
@@ -116,6 +142,8 @@ export function TaskModule({ establishmentId, primaryColor, secondaryColor, acce
     const newTask: Task = {
       id: crypto.randomUUID(),
       establishment_id: establishmentId,
+      room_code: selectedRoomCode || undefined,
+      category,
       title,
       description,
       priority,
@@ -124,8 +152,12 @@ export function TaskModule({ establishmentId, primaryColor, secondaryColor, acce
       created_at: new Date().toISOString()
     };
 
+    // Sincronizar estado de habitación si se seleccionó una
+    if (selectedRoomCode && category === "Limpieza") {
+      updateRoomCleaningStatus(establishmentId, selectedRoomCode, "en_limpieza");
+    }
+
     try {
-      // 1. Guardar en Supabase
       const { error } = await supabase.from("hotel_tasks").insert([newTask]);
       if (error) throw error;
       
@@ -142,14 +174,33 @@ export function TaskModule({ establishmentId, primaryColor, secondaryColor, acce
       setShowAddForm(false);
       setTitle("");
       setDescription("");
+      setSelectedRoomCode("");
+      setCategory("Limpieza");
       setPriority("medium");
       setAssignedTo("");
     }
   };
 
-  // Cambiar el estado de una tarea
+  // Cambiar el estado de una tarea (Y sincronizar con el estado de la habitación)
   const handleUpdateStatus = async (id: string, newStatus: "pending" | "in_progress" | "completed") => {
-    const updated = tasks.map(t => t.id === id ? { ...t, status: newStatus } : t);
+    const updated = tasks.map(t => {
+      if (t.id === id) {
+        const updatedTask = { ...t, status: newStatus };
+        // Sincronizar estado de la habitación si aplica
+        if (updatedTask.room_code) {
+          if (newStatus === "completed") {
+            updateRoomCleaningStatus(establishmentId, updatedTask.room_code, "limpia");
+          } else if (newStatus === "in_progress") {
+            updateRoomCleaningStatus(establishmentId, updatedTask.room_code, "en_limpieza");
+          } else if (newStatus === "pending") {
+            updateRoomCleaningStatus(establishmentId, updatedTask.room_code, "sucia_post_checkout");
+          }
+        }
+        return updatedTask;
+      }
+      return t;
+    });
+
     setTasks(updated);
     localStorage.setItem(localKey, JSON.stringify(updated));
 
@@ -192,17 +243,6 @@ export function TaskModule({ establishmentId, primaryColor, secondaryColor, acce
     }
   };
 
-  const getStatusIcon = (status: "pending" | "in_progress" | "completed") => {
-    switch (status) {
-      case "pending":
-        return <Clock className="w-4 h-4 text-slate-400 animate-pulse" />;
-      case "in_progress":
-        return <AlertTriangle className="w-4 h-4 text-amber-500" />;
-      case "completed":
-        return <CheckCircle2 className="w-4 h-4 text-emerald-500" />;
-    }
-  };
-
   return (
     <div className="bg-[#121620] border border-white/5 rounded-3xl p-6 shadow-xl space-y-6">
       
@@ -213,8 +253,12 @@ export function TaskModule({ establishmentId, primaryColor, secondaryColor, acce
             <ClipboardList className="w-5 h-5 text-purple-400" />
           </div>
           <div>
-            <h3 className="text-base font-bold font-serif text-white tracking-wide">Gestión Operativa de Tareas</h3>
-            <p className="text-[10px] uppercase font-bold text-gray-500 tracking-widest mt-0.5">PMS - Control Interno del Staff</p>
+            <h3 className="text-base font-bold font-serif text-white tracking-wide flex items-center gap-2">
+              Gestión Operativa de Tareas & Housekeeping
+            </h3>
+            <p className="text-[10px] uppercase font-bold text-gray-500 tracking-widest mt-0.5">
+              PMS Sincronizado en Tiempo Real con Inventario de Habitaciones
+            </p>
           </div>
         </div>
         <button
@@ -222,14 +266,14 @@ export function TaskModule({ establishmentId, primaryColor, secondaryColor, acce
           className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider text-[#0b0c10] transition-transform active:scale-97 cursor-pointer"
           style={{ backgroundColor: accentColor }}
         >
-          <Plus className="w-4 h-4" /> Nueva Tarea
+          <Plus className="w-4 h-4" /> Nueva Tarea / Limpieza
         </button>
       </div>
 
       {/* Formulario de Adición */}
       {showAddForm && (
         <form onSubmit={handleAddTask} className="bg-slate-950/40 border border-white/10 rounded-2xl p-5 space-y-4 animate-slide-up">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-[9px] uppercase font-bold text-gray-500 tracking-wider mb-1.5">Título de Tarea</label>
               <input
@@ -237,10 +281,44 @@ export function TaskModule({ establishmentId, primaryColor, secondaryColor, acce
                 required
                 value={title}
                 onChange={e => setTitle(e.target.value)}
-                placeholder="Ej: Reparar tubería suite 10"
+                placeholder="Ej: Limpieza profunda Suite 301"
                 className="w-full bg-slate-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#00C8D4]"
               />
             </div>
+            
+            {/* Selección de Habitación */}
+            <div>
+              <label className="block text-[9px] uppercase font-bold text-gray-500 tracking-wider mb-1.5">Habitación / Unidad Asociada</label>
+              <select
+                value={selectedRoomCode}
+                onChange={e => setSelectedRoomCode(e.target.value)}
+                className="w-full bg-slate-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#00C8D4]"
+              >
+                <option value="">Sin Habitación (General)</option>
+                {rooms.map(r => (
+                  <option key={r.id} value={r.code} className="bg-slate-900">
+                    {r.code} · {r.name} ({r.cleaningStatus === "limpia" ? "✨ Limpia" : "🧹 En Limpieza"})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Categoría de Tarea */}
+            <div>
+              <label className="block text-[9px] uppercase font-bold text-gray-500 tracking-wider mb-1.5">Categoría</label>
+              <select
+                value={category}
+                onChange={e => setCategory(e.target.value as any)}
+                className="w-full bg-slate-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#00C8D4]"
+              >
+                <option value="Limpieza" className="bg-slate-900">🧹 Limpieza / Housekeeping</option>
+                <option value="Mantenimiento" className="bg-slate-900">🔧 Mantenimiento Técnico</option>
+                <option value="General" className="bg-slate-900">📋 General / Servicios</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-[9px] uppercase font-bold text-gray-500 tracking-wider mb-1.5">Personal Asignado</label>
               <div className="flex items-center gap-2 bg-slate-900 border border-white/10 rounded-xl px-3.5 py-2.5 focus-within:border-[#00C8D4]">
@@ -249,25 +327,25 @@ export function TaskModule({ establishmentId, primaryColor, secondaryColor, acce
                   type="text"
                   value={assignedTo}
                   onChange={e => setAssignedTo(e.target.value)}
-                  placeholder="Ej: Carlos Gómez"
+                  placeholder="Ej: María Delgado (Camarera)"
                   className="bg-transparent border-none outline-none text-xs text-white placeholder-gray-600 w-full"
                 />
               </div>
             </div>
+
+            <div>
+              <label className="block text-[9px] uppercase font-bold text-gray-500 tracking-wider mb-1.5">Descripción y Detalles</label>
+              <input
+                type="text"
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                placeholder="Detalla instrucciones particulares..."
+                className="w-full bg-slate-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#00C8D4]"
+              />
+            </div>
           </div>
 
-          <div>
-            <label className="block text-[9px] uppercase font-bold text-gray-500 tracking-wider mb-1.5">Descripción y Detalles</label>
-            <textarea
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              placeholder="Detalla lo que se necesita hacer..."
-              rows={2}
-              className="w-full bg-slate-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#00C8D4] resize-none"
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between pt-2">
             <div className="flex gap-4">
               {["low", "medium", "high"].map((p) => (
                 <label key={p} className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
@@ -318,6 +396,22 @@ export function TaskModule({ establishmentId, primaryColor, secondaryColor, acce
                   <span className={`px-2 py-0.5 text-[9px] font-black uppercase rounded-md ${getPriorityStyle(t.priority)}`}>
                     {t.priority === "high" ? "Alta" : t.priority === "medium" ? "Media" : "Baja"}
                   </span>
+                  
+                  {/* Badge de Habitación */}
+                  {t.room_code && (
+                    <span className="px-2.5 py-0.5 text-[9px] font-black uppercase rounded-md bg-[#00C8D4]/15 text-[#00C8D4] border border-[#00C8D4]/30 flex items-center gap-1">
+                      <BedDouble className="w-3 h-3" />
+                      {t.room_code}
+                    </span>
+                  )}
+
+                  {/* Badge de Categoría */}
+                  {t.category && (
+                    <span className="px-2 py-0.5 text-[9px] font-bold rounded-md bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                      {t.category}
+                    </span>
+                  )}
+
                   <span className="text-xs font-bold text-white leading-tight">{t.title}</span>
                 </div>
                 <p className="text-[11px] text-slate-400 font-light leading-relaxed">{t.description}</p>
@@ -345,18 +439,18 @@ export function TaskModule({ establishmentId, primaryColor, secondaryColor, acce
                   <button
                     onClick={() => handleUpdateStatus(t.id, "in_progress")}
                     className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase transition-all cursor-pointer ${
-                      t.status === "in_progress" ? "bg-amber-500/20 text-amber-400" : "text-gray-500 hover:text-white"
+                      t.status === "in_progress" ? "bg-amber-500/20 text-amber-400 font-bold" : "text-gray-500 hover:text-white"
                     }`}
                   >
-                    Progreso
+                    En Limpieza
                   </button>
                   <button
                     onClick={() => handleUpdateStatus(t.id, "completed")}
                     className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase transition-all cursor-pointer ${
-                      t.status === "completed" ? "bg-emerald-500/20 text-emerald-400" : "text-gray-500 hover:text-white"
+                      t.status === "completed" ? "bg-emerald-500/20 text-emerald-400 font-black" : "text-gray-500 hover:text-white"
                     }`}
                   >
-                    Listo
+                    ✨ Operativa
                   </button>
                 </div>
 

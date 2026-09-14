@@ -3,8 +3,9 @@ import {
   Building2, Calendar, BedDouble, DollarSign, Coffee, Globe,
   Plus, Search, Filter, CheckCircle2, Clock, Users, Sparkles,
   ArrowUpRight, ChevronRight, Layers, Sliders, RefreshCw,
-  Eye, Edit3, ShieldCheck, Tag, Zap, MessageSquare, Utensils
+  Eye, Edit3, ShieldCheck, Tag, Zap, MessageSquare, Utensils, Wrench
 } from "lucide-react";
+import { getRoomsForEstablishment, requestRoomHousekeeping, updateRoomCleaningStatus, type RoomItem } from "../../lib/roomStatusSync";
 
 const FUCSIA = "#FF0096";
 const CIAN = "#00C8D4";
@@ -35,56 +36,22 @@ export function HotelPMSDashboard({
   const [selectedSeason, setSelectedSeason] = useState<"alta" | "media" | "baja">("alta");
   const [currency, setCurrency] = useState<"USD" | "BS">("USD");
 
-  const [roomsList, setRoomsList] = useState([
-    {
-      id: 1,
-      name: "Suite Presidencial Vista al Mar",
-      code: "HAB-301",
-      type: "Suite Deluxe",
-      capacity: 4,
-      priceUSD: 160,
-      status: "disponible",
-      amenities: ["Jacuzzi Privado", "Cama King", "Balcón", "A/C Inverter", "Wifi Starlink"],
-      cleaningStatus: "limpia"
-    },
-    {
-      id: 2,
-      name: "Habitación Matrimonial Superior",
-      code: "HAB-202",
-      type: "Matrimonial",
-      capacity: 2,
-      priceUSD: 85,
-      status: "ocupada",
-      guest: "Carlos Mendoza",
-      checkOut: "Mañana 12:00 PM",
-      amenities: ["Cama Queen", "A/C", "TV Smart", "Desayuno Incluido"],
-      cleaningStatus: "en_uso"
-    },
-    {
-      id: 3,
-      name: "Villa Familiar 2 Ambientes",
-      code: "VIL-104",
-      type: "Villa",
-      capacity: 6,
-      priceUSD: 210,
-      status: "reservada",
-      guest: "Familia Gómez",
-      checkIn: "Hoy 3:00 PM",
-      amenities: ["Cocina Equipada", "2 Baños", "Terraza", "Piscina Compartida"],
-      cleaningStatus: "limpia"
-    },
-    {
-      id: 4,
-      name: "Domo Glamping Panorámico",
-      code: "GLAMP-01",
-      type: "Glamping Eco",
-      capacity: 2,
-      priceUSD: 120,
-      status: "disponible",
-      amenities: ["Cama King", "Deck Privado", "Fogata", "Telescopio"],
-      cleaningStatus: "limpia"
-    }
-  ]);
+  const estId = establishment.id || 101;
+  const [roomsList, setRoomsList] = useState<RoomItem[]>(() => getRoomsForEstablishment(estId));
+
+  // Sincronización en vivo del estado de habitaciones con el módulo de tareas (Housekeeping)
+  React.useEffect(() => {
+    const syncRooms = () => {
+      setRoomsList(getRoomsForEstablishment(estId));
+    };
+
+    window.addEventListener("hdv_room_status_changed", syncRooms);
+    window.addEventListener("storage", syncRooms);
+    return () => {
+      window.removeEventListener("hdv_room_status_changed", syncRooms);
+      window.removeEventListener("storage", syncRooms);
+    };
+  }, [estId]);
 
   const [reservations, setReservations] = useState([
     {
@@ -376,24 +343,53 @@ export function HotelPMSDashboard({
                   ))}
                 </div>
 
-                <div className="flex justify-between items-center pt-3 border-t border-slate-100 text-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase">Camarera:</span>
-                    <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                      r.cleaningStatus === "limpia" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pt-3 border-t border-slate-100 gap-3 text-xs">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase">Estado:</span>
+                    <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full ${
+                      r.cleaningStatus === "limpia" 
+                        ? "bg-emerald-100 text-emerald-800 border border-emerald-300" 
+                        : r.cleaningStatus === "en_limpieza"
+                        ? "bg-amber-100 text-amber-800 border border-amber-300 animate-pulse"
+                        : r.cleaningStatus === "mantenimiento"
+                        ? "bg-purple-100 text-purple-800 border border-purple-300"
+                        : "bg-rose-100 text-rose-800 border border-rose-300"
                     }`}>
-                      {r.cleaningStatus === "limpia" ? "✨ Lista para Check-in" : "🧹 En Limpieza"}
+                      {r.cleaningStatus === "limpia" ? "✨ Operativa / Lista" : r.cleaningStatus === "en_limpieza" ? "🧹 En Limpieza" : r.cleaningStatus === "mantenimiento" ? "🔧 Mantenimiento" : "🏷️ Sucia post Check-out"}
                     </span>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => alert(`Configuración de ${r.name}`)}
-                    className="text-xs font-bold hover:underline cursor-pointer"
-                    style={{ color: CIAN }}
-                  >
-                    Editar Ficha & Fotos →
-                  </button>
+                  {/* Acciones de Limpieza / Tareas Directas */}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {r.cleaningStatus !== "en_limpieza" && (
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          await requestRoomHousekeeping(estId, r.code, r.name);
+                          alert(`🧹 Tarea de limpieza generada para ${r.code} y asignada al Staff en TaskModule.`);
+                        }}
+                        className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 transition-all flex items-center gap-1 cursor-pointer"
+                        title="Solicitar Limpieza y generar tarea en PMS"
+                      >
+                        <Sparkles className="w-3 h-3 text-amber-600" />
+                        <span>Solicitar Limpieza</span>
+                      </button>
+                    )}
+
+                    {r.cleaningStatus !== "limpia" && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          updateRoomCleaningStatus(estId, r.code, "limpia");
+                        }}
+                        className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-all flex items-center gap-1 cursor-pointer"
+                        title="Marcar como Operativa y Limpia"
+                      >
+                        <Sparkles className="w-3 h-3 text-emerald-600" />
+                        <span>Operativa</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}

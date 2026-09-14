@@ -8,7 +8,7 @@ import { TENANTS_REGISTRY, type TenantConfig } from "../../tenants/tenantContext
 import { 
   Network, Settings, Server, Plus, Edit3, Save, Trash2, 
   Search, ShieldAlert, CheckCircle, HelpCircle, Activity, 
-  Sliders, Grid, Smartphone, RefreshCw, X, Loader2, Copy, Globe, ExternalLink, Check
+  Sliders, Grid, Smartphone, RefreshCw, X, Loader2, Copy, Globe, ExternalLink, Check, Upload, Image as ImageIcon
 } from "lucide-react";
 
 export function AdminSaaS() {
@@ -126,6 +126,27 @@ export function AdminSaaS() {
     setEditingTenant(JSON.parse(JSON.stringify(tenant))); // Copia profunda
     setShowEditModal(true);
     setFeedbackMsg(null);
+  };
+
+  // Carga e inyección de imagen local (DataURL o Archivo)
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, field: "banner_url" | "logo_url") => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = event.target?.result as string;
+      if (result) {
+        setEditingTenant(prev => ({
+          ...prev,
+          branding: {
+            ...prev?.branding!,
+            [field]: result
+          }
+        }));
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   // Crear un nuevo Tenant de prueba/nuevo nodo
@@ -873,18 +894,92 @@ export function AdminSaaS() {
                   </div>
                 </div>
 
+                {/* Imagen del Logo */}
                 <div>
-                  <label className="block text-[9px] uppercase font-bold text-gray-500 tracking-wider mb-1.5">Imagen de Banner (URL R2 / Unsplash)</label>
-                  <input
-                    type="url"
-                    value={editingTenant.branding?.banner_url || ""}
-                    onChange={e => setEditingTenant(prev => ({
-                      ...prev,
-                      branding: { ...prev.branding!, banner_url: e.target.value }
-                    }))}
-                    className="w-full bg-slate-950/40 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#00C8D4]"
-                    placeholder="https://r2.hotelesdevenezuela.com/..."
-                  />
+                  <label className="block text-[9px] uppercase font-bold text-gray-500 tracking-wider mb-1.5 flex items-center justify-between">
+                    <span>Imagen de Logo (URL / Archivo Local)</span>
+                    <span className="text-[#00C8D4] text-[8px]">PNG / SVG / JPG</span>
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={editingTenant.branding?.logo_url || ""}
+                      onChange={e => setEditingTenant(prev => ({
+                        ...prev,
+                        branding: { ...prev.branding!, logo_url: e.target.value }
+                      }))}
+                      className="w-full bg-slate-950/40 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#00C8D4]"
+                      placeholder="https://... o /images/logo.png"
+                    />
+                    <label className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-[#00C8D4]/20 border border-white/10 hover:border-[#00C8D4]/40 text-[#00C8D4] text-xs font-bold rounded-xl cursor-pointer shrink-0 transition-all">
+                      <Upload className="w-4 h-4" />
+                      <span>Subir</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={e => handleFileUpload(e, "logo_url")}
+                      />
+                    </label>
+                  </div>
+                  {editingTenant.branding?.logo_url && (
+                    <div className="mt-2 flex items-center gap-3 p-2 bg-slate-950/60 rounded-xl border border-white/10">
+                      <img
+                        src={editingTenant.branding.logo_url}
+                        alt="Logo Preview"
+                        className="w-10 h-10 object-contain rounded-lg bg-black/40 p-1 border border-white/10"
+                        onError={(e) => { (e.target as HTMLElement).style.display = "none"; }}
+                      />
+                      <span className="text-[10px] text-slate-400 font-mono truncate">Vista previa del Logo del Hotel</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Imagen del Banner */}
+                <div>
+                  <label className="block text-[9px] uppercase font-bold text-gray-500 tracking-wider mb-1.5 flex items-center justify-between">
+                    <span>Imagen de Banner (URL R2 / Unsplash / Archivo Local)</span>
+                    <span className="text-[#FF0096] text-[8px]">Recomendado 1600x600px</span>
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={editingTenant.branding?.banner_url || ""}
+                      onChange={e => setEditingTenant(prev => ({
+                        ...prev,
+                        branding: { ...prev.branding!, banner_url: e.target.value }
+                      }))}
+                      className="w-full bg-slate-950/40 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#00C8D4]"
+                      placeholder="https://r2.hotelesdevenezuela.com/... o /images/banner.jpg"
+                    />
+                    <label className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-[#FF0096]/20 border border-white/10 hover:border-[#FF0096]/40 text-[#FF0096] text-xs font-bold rounded-xl cursor-pointer shrink-0 transition-all">
+                      <Upload className="w-4 h-4" />
+                      <span>Subir Banner</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={e => handleFileUpload(e, "banner_url")}
+                      />
+                    </label>
+                  </div>
+
+                  {/* Vista Previa del Banner */}
+                  {editingTenant.branding?.banner_url && (
+                    <div className="relative mt-2 rounded-2xl overflow-hidden border border-white/10 h-28 w-full bg-slate-950/80 group">
+                      <img
+                        src={editingTenant.branding.banner_url}
+                        alt="Vista previa del banner"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onError={(e) => { (e.target as HTMLElement).style.display = "none"; }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent flex items-end p-3">
+                        <span className="text-[10px] font-black uppercase text-white tracking-widest bg-black/60 px-2.5 py-1 rounded-lg border border-white/10 backdrop-blur-md flex items-center gap-1.5">
+                          <ImageIcon className="w-3.5 h-3.5 text-[#00C8D4]" /> Vista Previa del Banner Principal
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
