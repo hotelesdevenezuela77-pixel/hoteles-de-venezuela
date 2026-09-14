@@ -11,6 +11,7 @@ import {
 
 // Importación de módulos PMS & CMS
 import { TaskModule } from "./components/TaskModule";
+import { AdvancedTaskOperationsModule } from "./components/AdvancedTaskOperationsModule";
 import { FinanceModule } from "./components/FinanceModule";
 import { CMSModule } from "./components/CMSModule";
 import { AnalyticsModule } from "./components/AnalyticsModule";
@@ -348,7 +349,7 @@ export function TemplateB() {
                     />
                   )}
                   {activeTab === "tareas" && config.modules.tareas && (
-                    <TaskModule 
+                    <AdvancedTaskOperationsModule 
                       establishmentId={config.establishment_id}
                       primaryColor={config.branding.primary_color}
                       secondaryColor={config.branding.secondary_color}
