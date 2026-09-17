@@ -1367,6 +1367,20 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                 </div>
 
                 {(() => {
+                  const PILLAR_CONFIG: Record<string, { title: string; color: string }> = {
+                    C00: { title: "C00. Configuración Inicial & Datos", color: "#3B82F6" },
+                    C01: { title: "C01. Distribución, Infraestructura y Equipamiento Físico", color: "#00C8D4" },
+                    C02: { title: "C02. Servicios del Establecimiento y Experiencias", color: "#FF0096" },
+                    C03: { title: "C03. Accesibilidad y Seguridad", color: "#9B00CC" },
+                    C04: { title: "C04. Políticas y Normas de la Propiedad", color: "#64748B" },
+                    C05: { title: "C05. Agrupaciones Habitacionales (Campings/Glampings)", color: "#10B981" },
+                    C06: { title: "C06. Específicos Love Hotels & Moteles", color: "#EC4899" },
+                    C07: { title: "C07. Específicos Casas y Chalets de Montaña (Esquí)", color: "#0284C7" },
+                    C08: { title: "C08. Específicos Barcos Alojamiento Estático", color: "#0EA5E9" },
+                    C09: { title: "C09. Específicos Barcos + Navegación Diaria", color: "#2563EB" },
+                    C10: { title: "C10. Específicos Restaurantes & Gastronomía", color: "#F59E0B" }
+                  };
+
                   const itemsWithInfo = servicesList.map(s => {
                     const info = getAmenityInfo(s);
                     return {
@@ -1380,15 +1394,15 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                     };
                   });
 
-                  const pillarC01 = itemsWithInfo.filter(i => i.pillar === "C01");
-                  const pillarC02 = itemsWithInfo.filter(i => i.pillar === "C02");
-                  const pillarC03 = itemsWithInfo.filter(i => i.pillar === "C03");
-
-                  const pillarsToRender = [
-                    { id: "C01", title: "C01. Infraestructura y Equipamiento Físico", color: "#00C8D4", items: pillarC01 },
-                    { id: "C02", title: "C02. Servicios y Experiencias", color: "#FF0096", items: pillarC02 },
-                    { id: "C03", title: "C03. Gestión, Políticas y Accesibilidad", color: "#9B00CC", items: pillarC03 },
-                  ].filter(p => p.items.length > 0);
+                  const pillarsToRender = Object.keys(PILLAR_CONFIG).map(pKey => {
+                    const items = itemsWithInfo.filter(i => i.pillar === pKey);
+                    return {
+                      id: pKey,
+                      title: PILLAR_CONFIG[pKey].title,
+                      color: PILLAR_CONFIG[pKey].color,
+                      items
+                    };
+                  }).filter(p => p.items.length > 0);
 
                   return (
                     <div className="space-y-6">

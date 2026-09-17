@@ -27,34 +27,34 @@ interface AmenitiesSelectorProps {
 const getCategoryModule = (categoryStr: string | undefined): {
   type: "barco" | "camping" | "love_hotel" | "montana" | "restaurante" | "general";
   label: string;
-  subCategoryFilter: string | null;
+  pillarFilter: AmenityPillar | null;
 } => {
-  if (!categoryStr) return { type: "general", label: "Hospedaje General", subCategoryFilter: null };
+  if (!categoryStr) return { type: "general", label: "Hospedaje General", pillarFilter: null };
   const lower = categoryStr.toLowerCase();
 
   if (lower.includes("barco") || lower.includes("yate") || lower.includes("marina") || lower.includes("catamaran") || lower.includes("houseboat") || lower.includes("velero")) {
-    return { type: "barco", label: "⛵ Barcos, Veleros, Yates & Marinas", subCategoryFilter: "Barcos" };
+    return { type: "barco", label: "⛵ Barcos, Veleros, Yates & Marinas (Pilares C08/C09)", pillarFilter: "C09" };
   }
   if (lower.includes("camping") || lower.includes("glamping") || lower.includes("eco-lodge")) {
-    return { type: "camping", label: "🏕️ Campings, Glamping & Eco-Lodges", subCategoryFilter: "Campings" };
+    return { type: "camping", label: "🏕️ Campings, Glamping & Eco-Lodges (Pilar C05)", pillarFilter: "C05" };
   }
   if (lower.includes("love") || lower.includes("motel")) {
-    return { type: "love_hotel", label: "💖 Love Hotels & Moteles", subCategoryFilter: "Love Hotels" };
+    return { type: "love_hotel", label: "💖 Love Hotels & Moteles (Pilar C06)", pillarFilter: "C06" };
   }
   if (lower.includes("chalet") || lower.includes("esqui") || lower.includes("esquí") || lower.includes("nieve") || lower.includes("montaña") || lower.includes("montana")) {
-    return { type: "montana", label: "🏔️ Chalets de Montaña & Esquí", subCategoryFilter: "Chalets de Montaña" };
+    return { type: "montana", label: "🏔️ Chalets de Montaña & Esquí (Pilar C07)", pillarFilter: "C07" };
   }
   if (lower.includes("restaurante") || lower.includes("gastronomia") || lower.includes("gastronomía") || lower.includes("bar") || lower.includes("cafeteria") || lower.includes("comida")) {
-    return { type: "restaurante", label: "🍽️ Restaurantes & Gastronomía", subCategoryFilter: "Restaurantes" };
+    return { type: "restaurante", label: "🍽️ Restaurantes & Gastronomía (Pilar C10)", pillarFilter: "C10" };
   }
 
-  return { type: "general", label: "🏨 Hospedaje General", subCategoryFilter: null };
+  return { type: "general", label: "🏨 Hospedaje General", pillarFilter: null };
 };
 
 const ICON_MAP: Record<string, any> = {
   Wifi, Wind, Car, Zap, Droplets, ShieldCheck, Clock, Dog, Accessibility, ArrowUpSquare,
   Waves, Bath, Palmtree, Sparkles, Dumbbell, Flame, TreePine, Smile, Trophy, Utensils,
-  Coffee, Wine, ConciergeBell, Plane, Compass, Sun, Briefcase, Shirt,
+  Coffee, Wine, ConciergeBell, Plane, Compass, Sun, Briefcase, Shirt, Anchor,
   Eye, Tv, ChefHat, Lock, AlertTriangle, Building, Home, Bed, UserCheck, GraduationCap,
   Box, Tent, Ship, Heart, Mountain, FileText, Globe, VolumeX, EyeOff, Footprints, IceCream, Ban, Building2, Users
 };
@@ -118,7 +118,7 @@ export function AmenitiesSelector({ selectedServices, onChange, selectedCategory
   };
 
   const selectBasicEssentials = () => {
-    const basics = ["wifi", "aire_acondicionado", "aparcamiento", "recepcion_24h", "ropa_cama", "papel_higienico", "toallas"];
+    const basics = ["wifi_gratis", "aire_acondicionado", "recepcion_24h", "ropa_cama", "papel_higienico", "toallas_bano", "planta_electrica_24_7", "tanque_agua_continuo"];
     const merged = Array.from(new Set([...currentList, ...basics]));
     onChange(merged);
   };
@@ -127,7 +127,7 @@ export function AmenitiesSelector({ selectedServices, onChange, selectedCategory
     onChange([]);
   };
 
-  // Filter master amenities by pillar, scope, search term, and smart category module (C04)
+  // Filter master amenities by pillar, scope, search term, and smart category module (C05-C10)
   const filteredAmenities = useMemo(() => {
     return MASTER_AMENITIES.filter(item => {
       const matchesPillar = activePillar === "all" || item.pillar === activePillar;
@@ -139,12 +139,14 @@ export function AmenitiesSelector({ selectedServices, onChange, selectedCategory
         item.code.toLowerCase().includes(searchLower) ||
         item.subCategory.toLowerCase().includes(searchLower);
 
-      // Smart Category Filtering for C04 Specifics:
-      // If a specific category is selected (e.g. Barco, Camping, Love Hotel, Chalet, Restaurante),
-      // ONLY show the C04 items that match this category's subCategory!
+      // Smart Category Filtering for C05-C10 Specifics:
       let matchesCategoryModule = true;
-      if (item.pillar === "C04" && activeModule.subCategoryFilter) {
-        matchesCategoryModule = item.subCategory === activeModule.subCategoryFilter;
+      if (["C05", "C06", "C07", "C08", "C09", "C10"].includes(item.pillar) && activeModule.pillarFilter) {
+        if (item.pillar === "C08" || item.pillar === "C09") {
+          matchesCategoryModule = activeModule.pillarFilter === "C09";
+        } else {
+          matchesCategoryModule = item.pillar === activeModule.pillarFilter;
+        }
       }
 
       return matchesPillar && matchesScope && matchesSearch && matchesCategoryModule;
@@ -154,20 +156,20 @@ export function AmenitiesSelector({ selectedServices, onChange, selectedCategory
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5">
       {/* Banner de Módulo Inteligente por Categoría */}
-      {activeModule.subCategoryFilter && (
+      {activeModule.pillarFilter && (
         <div className="bg-gradient-to-r from-[#00C8D4]/10 via-[#FF0096]/10 to-[#9B00CC]/10 border border-[#00C8D4]/30 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fade-in">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00C8D4] to-[#9B00CC] text-white flex items-center justify-center font-bold text-base shadow-md shrink-0">
               ⚡
             </div>
             <div className="text-left">
-              <span className="text-[10px] font-black uppercase text-[#00C8D4] tracking-widest block">Módulo Dinámico Adaptativo Documento 77 V.5</span>
+              <span className="text-[10px] font-black uppercase text-[#00C8D4] tracking-widest block">Módulo Dinámico Adaptativo Documento 77 V.11</span>
               <h4 className="text-xs sm:text-sm font-extrabold text-slate-900">{activeModule.label}</h4>
-              <p className="text-[11px] text-slate-500 font-medium">Formulario inteligente configurado automáticamente. Se muestran instalaciones específicas para esta tipología.</p>
+              <p className="text-[11px] text-slate-500 font-medium">Taxonomía oficial adaptada automáticamente a los 11 Pilares de HDV.</p>
             </div>
           </div>
           <span className="px-3 py-1 bg-white text-[#FF0096] text-[10px] font-black uppercase rounded-full border border-[#FF0096]/30 shadow-xs shrink-0 self-start sm:self-center">
-            Filtrado Activo
+            Filtrado Activo V.11
           </span>
         </div>
       )}
@@ -179,7 +181,7 @@ export function AmenitiesSelector({ selectedServices, onChange, selectedCategory
             <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#00C8D4]/10 text-[#00C8D4]">
               <Sparkles className="w-4.5 h-4.5 text-[#00C8D4]" />
             </div>
-            <h2 className="font-bold text-slate-900 text-sm tracking-tight">Estándar Documento 77 V.10 - Taxonomía Oficial HDV</h2>
+            <h2 className="font-bold text-slate-900 text-sm tracking-tight">Estándar Documento 77 V.11 - Taxonomía Oficial HDV</h2>
             <span
               className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase text-white tracking-wider shadow-xs"
               style={{ background: "#FF0096" }}
@@ -188,7 +190,7 @@ export function AmenitiesSelector({ selectedServices, onChange, selectedCategory
             </span>
           </div>
           <p className="text-slate-500 text-xs mt-1">
-            Clasificación estructurada en 3 Niveles (Infraestructura Físicas, Servicios e Intangibles, Gestión y Normas) + Específicos por Tipología.
+            Estructura Oficial V.11 (Categorías 1-9, Subcategorías 21-49, Pivote 50-62 y Pilares C00-C10).
           </p>
         </div>
 
