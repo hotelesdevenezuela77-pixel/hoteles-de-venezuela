@@ -450,8 +450,8 @@ function App() {
   }
 
   return (
-    <MainLayout>
-      <AppErrorBoundary>
+    <AppErrorBoundary>
+      <MainLayout>
         <Suspense fallback={
           <div className="min-h-[60vh] flex flex-col items-center justify-center bg-transparent">
             {/* Subtle loading spinner using official colors */}
@@ -530,8 +530,8 @@ function App() {
             <Route component={NotFound} />
           </Switch>
         </Suspense>
-      </AppErrorBoundary>
-    </MainLayout>
+      </MainLayout>
+    </AppErrorBoundary>
   );
 }
 
