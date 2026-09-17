@@ -15,7 +15,7 @@ import {
   Dumbbell, Flame, TreePine, Smile, Trophy, Utensils, Coffee, Wine,
   ConciergeBell, Plane, Compass, Sun, Briefcase, Shirt, Eye, Tv, ChefHat,
   Lock, AlertTriangle, Building, Home, Bed, UserCheck, GraduationCap, Box, Tent, Ship, Heart, Mountain, FileText, Globe,
-  VolumeX, EyeOff, Footprints, IceCream, Ban, Building2, Users
+  VolumeX, EyeOff, Footprints, IceCream, Ban, Building2, Users, Anchor
 } from "lucide-react";
 
 interface AmenitiesSelectorProps {
