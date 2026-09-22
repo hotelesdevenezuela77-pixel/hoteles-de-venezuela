@@ -100,6 +100,15 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
   const notificationRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const mainContentRef = useRef<HTMLElement>(null);
+
+  // Al navegar dentro del panel administrativo principal, reiniciar scroll del contenido derecho al tope
+  // manteniendo la posición del menú izquierdo intacta e independiente
+  useEffect(() => {
+    if (mainContentRef.current) {
+      mainContentRef.current.scrollTo({ top: 0, behavior: "instant" });
+    }
+  }, [currentPath]);
 
   // Alertas Simuladas en Tiempo Real
   const [notifications, setNotifications] = useState([
@@ -285,7 +294,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
   if (loading || isMasterAdmin === null) {
     return (
-      <div className="min-h-screen bg-[#0e011f] flex flex-col items-center justify-center text-white space-y-4 font-sans">
+      <div className="h-screen h-[100dvh] bg-[#0e011f] flex flex-col items-center justify-center text-white space-y-4 font-sans">
         <div className="w-12 h-12 border-4 border-[#00C8D4] border-t-transparent rounded-full animate-spin" />
         <p className="text-xs font-mono font-bold tracking-widest text-slate-300 uppercase">
           Verificando Credenciales de Seguridad Matrix...
@@ -296,7 +305,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
   if (isMasterAdmin === false) {
     return (
-      <div className="min-h-screen bg-[#0e011f] flex flex-col items-center justify-center p-6 text-center text-white font-sans">
+      <div className="h-screen h-[100dvh] bg-[#0e011f] flex flex-col items-center justify-center p-6 text-center text-white font-sans">
         <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-500 mb-6 shadow-xl">
           <ShieldAlert className="w-8 h-8 text-rose-500" />
         </div>
@@ -323,8 +332,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen text-slate-100 flex font-sans overflow-hidden relative"
-      style={{ background: "linear-gradient(135deg, #0e011f 0%, #17032d 50%, #081124 100%)" }}>
+    <div
+      className="h-screen h-[100dvh] max-h-screen w-full text-slate-100 flex font-sans overflow-hidden relative"
+      style={{ background: "linear-gradient(135deg, #0e011f 0%, #17032d 50%, #081124 100%)" }}
+    >
 
       {/* ── OVERLAY BACKDROP PARA MENÚ MÓVIL ── */}
       {mobileMenuOpen && (
@@ -334,9 +345,9 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         />
       )}
 
-      {/* ── SIDEBAR LATERAL RETRÁCTIL & MOBILE DRAWER ── */}
+      {/* ── SIDEBAR LATERAL RETRÁCTIL & MOBILE DRAWER (ZONA DE SCROLL INDEPENDIENTE IZQUIERDA) ── */}
       <aside
-        className={`transition-all duration-300 ease-in-out shrink-0 flex flex-col border-r border-white/5 shadow-2xl ${
+        className={`transition-all duration-300 ease-in-out shrink-0 flex flex-col h-full max-h-screen border-r border-white/5 shadow-2xl z-30 ${
           mobileMenuOpen
             ? "fixed inset-y-0 left-0 z-50 w-[270px] translate-x-0"
             : "fixed inset-y-0 left-0 z-50 -translate-x-full md:static md:translate-x-0"
@@ -346,8 +357,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           backgroundColor: "#1a0533"
         }}
       >
-        {/* Cabecera del Sidebar */}
-        <div className="p-4 flex items-center justify-between border-b border-white/5">
+        {/* Cabecera del Sidebar (Fija arriba en el menú izquierdo) */}
+        <div className="p-4 flex items-center justify-between border-b border-white/5 shrink-0">
           <div className="flex items-center gap-2.5 overflow-hidden">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg"
               style={{ background: `linear-gradient(135deg, ${FUCSIA}, ${PURPURA})` }}>
@@ -370,14 +381,15 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             <button
               onClick={toggleSidebar}
               className="hidden md:block p-1 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-white cursor-pointer transition-colors"
+              title={sidebarOpen ? "Colapsar menú" : "Expandir menú"}
             >
               {sidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
             </button>
           </div>
         </div>
 
-        {/* Atajo de Buscador Lateral */}
-        <div className="p-3">
+        {/* Atajo de Buscador Lateral (Fijo arriba en el menú izquierdo) */}
+        <div className="p-3 shrink-0">
           <button
             onClick={() => { setSearchOpen(true); setMobileMenuOpen(false); }}
             className="w-full py-2 px-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 text-left text-slate-400 flex items-center justify-between text-xs transition-all cursor-pointer"
@@ -390,8 +402,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           </button>
         </div>
 
-        {/* Elementos de Navegación */}
-        <div className="flex-1 overflow-y-auto px-3 py-2 space-y-4 no-scrollbar">
+        {/* Elementos de Navegación (ÁREA DE SCROLL INDEPENDIENTE DEL MENÚ LATERAL) */}
+        <div className="flex-1 overflow-y-auto px-3 py-2 space-y-4 custom-admin-scrollbar overscroll-contain">
           {menuCategories.map((category, idx) => (
             <div key={idx} className="space-y-1">
               {(sidebarOpen || mobileMenuOpen) && (
@@ -441,8 +453,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           ))}
         </div>
 
-        {/* Footer del Sidebar con el Operador */}
-        <div className="p-4 border-t border-white/5 flex items-center justify-between gap-2 bg-[#14022a]/40">
+        {/* Footer del Sidebar con el Operador (Fijo abajo en el menú izquierdo) */}
+        <div className="p-4 border-t border-white/5 flex items-center justify-between gap-2 bg-[#14022a]/40 shrink-0">
           <div className="flex items-center gap-3 overflow-hidden">
             <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-white text-xs font-black"
               style={{ borderLeft: `3px solid ${CIAN}` }}>
@@ -467,10 +479,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      {/* ── CONTENIDO PRINCIPAL ENVOLVENTE ── */}
-      <div className="flex-1 flex flex-col overflow-hidden relative w-full">
+      {/* ── CONTENIDO PRINCIPAL ENVOLVENTE (ZONA DE SCROLL INDEPENDIENTE DERECHA) ── */}
+      <div className="flex-1 flex flex-col h-full max-h-screen overflow-hidden relative w-full min-w-0">
 
-        {/* Cabecera Superior (Top Header) */}
+        {/* Cabecera Superior (Top Header - Fija arriba en el panel derecho) */}
         <header className="h-16 border-b border-white/5 flex items-center justify-between px-4 sm:px-6 shrink-0 bg-[#0e011f]/90 backdrop-blur-md relative z-20">
           <div className="flex items-center gap-3">
             <button
@@ -529,7 +541,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                       </button>
                     )}
                   </div>
-                  <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                  <div className="space-y-2 max-h-60 overflow-y-auto pr-1 custom-admin-scrollbar">
                     {notifications.map(n => (
                       <div key={n.id} className={`p-2.5 rounded-xl border text-[11px] leading-relaxed transition-all ${n.read ? "bg-black/10 border-white/5 text-slate-400" : "bg-gradient-to-r from-pink-500/5 to-purple-500/5 border-pink-500/20 text-white"
                         }`}>
@@ -566,8 +578,11 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        {/* Zona del Cuerpo / Ruta Activa */}
-        <main className="flex-1 overflow-y-auto relative no-scrollbar">
+        {/* Zona del Cuerpo / Ruta Activa (ÁREA DE SCROLL INDEPENDIENTE DEL CONTENIDO DERECHO) */}
+        <main
+          ref={mainContentRef}
+          className="flex-1 h-full overflow-y-auto overflow-x-hidden relative custom-admin-scrollbar overscroll-contain"
+        >
           {children}
         </main>
       </div>

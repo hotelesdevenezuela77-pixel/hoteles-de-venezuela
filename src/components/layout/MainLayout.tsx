@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Navbar } from "./Navbar";
 import { TickerBar } from "./TickerBar";
 import { RouteAlertsBanner } from "../alerts/RouteAlertsBanner";
@@ -266,6 +266,19 @@ interface MainLayoutProps {
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
+  const [location] = useLocation();
+  const isAdminRoute = location.startsWith("/admin") || location === "/crm" || location === "/centaurus" || location === "/andromeda";
+
+  // Si nos encontramos dentro de la consola administrativa o dashboards de control,
+  // permitimos que AdminLayout tome el 100% del viewport sin barras públicas superpuestas
+  if (isAdminRoute) {
+    return (
+      <div className="h-screen h-[100dvh] w-full overflow-hidden bg-[#0e011f]">
+        {children}
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-800 font-sans">
       <Navbar />
@@ -280,3 +293,4 @@ export function MainLayout({ children }: MainLayoutProps) {
     </div>
   );
 }
+
