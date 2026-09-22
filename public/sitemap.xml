@@ -805,13 +805,7 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://hotelesdevenezuela.com/blog/canaima-salto-angel-campamentos-excursion-churun</loc>
-    <lastmod>2026-09-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://hotelesdevenezuela.com/blog/los-roques-posadas-cayos-vuelos-guia</loc>
+    <loc>https://hotelesdevenezuela.com/blog/trekking-monte-roraima-gran-sabana-guia-excursion</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -823,7 +817,13 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://hotelesdevenezuela.com/blog/trekking-monte-roraima-gran-sabana-guia-excursion</loc>
+    <loc>https://hotelesdevenezuela.com/blog/los-roques-posadas-cayos-vuelos-guia</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/canaima-salto-angel-campamentos-excursion-churun</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -853,7 +853,7 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://hotelesdevenezuela.com/blog/medanos-de-coro-casco-colonial-falcon-posadas</loc>
+    <loc>https://hotelesdevenezuela.com/blog/barquisimeto-sanare-cubiro-turismo-posadas-lara</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -865,19 +865,7 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://hotelesdevenezuela.com/blog/barquisimeto-sanare-cubiro-turismo-posadas-lara</loc>
-    <lastmod>2026-09-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://hotelesdevenezuela.com/blog/parque-nacional-morrocoy-cayos-tucacas-posadas</loc>
-    <lastmod>2026-09-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://hotelesdevenezuela.com/blog/colonia-tovar-posadas-el-picacho-cabanas-turismo</loc>
+    <loc>https://hotelesdevenezuela.com/blog/medanos-de-coro-casco-colonial-falcon-posadas</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -889,13 +877,25 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://hotelesdevenezuela.com/blog/safaris-llanos-venezolanos-hatos-fauna-apure-barinas</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://hotelesdevenezuela.com/blog/la-cienaga-ocumare-de-la-costa-aragua-posadas-lanchas</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://hotelesdevenezuela.com/blog/safaris-llanos-venezolanos-hatos-fauna-apure-barinas</loc>
+    <loc>https://hotelesdevenezuela.com/blog/colonia-tovar-posadas-el-picacho-cabanas-turismo</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/parque-nacional-morrocoy-cayos-tucacas-posadas</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -907,13 +907,13 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://hotelesdevenezuela.com/blog/ruta-del-cacao-barlovento-curiepe-birongo-cueva-alfredo-jahn</loc>
+    <loc>https://hotelesdevenezuela.com/blog/pampatar-ruta-gastronomica-margarita-castillo-borromeo-hoteles</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://hotelesdevenezuela.com/blog/pampatar-ruta-gastronomica-margarita-castillo-borromeo-hoteles</loc>
+    <loc>https://hotelesdevenezuela.com/blog/ruta-del-cacao-barlovento-curiepe-birongo-cueva-alfredo-jahn</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>

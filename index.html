@@ -3,12 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/images/logo-hdv-transparent.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/logo-hdv-transparent.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <title>Hoteles de Venezuela | Reservas sin Intermediarios | Guía Turística</title>
-    <meta name="description" content="Encuentra hoteles, posadas, resorts y alojamientos en toda Venezuela. Explora destinos turísticos,  parques nacionales..." />
+    
+    <!-- Title & Meta Description optimizados para SERP (Longitud < 580px) -->
+    <title>Hoteles de Venezuela | Hoteles, Posadas y Guía Turística</title>
+    <meta name="description" content="Guía turística y directorio oficial de hoteles, posadas boutique, resorts y campamentos en Venezuela. Reserva directo con los anfitriones por WhatsApp sin intermediarios." />
+    <meta name="keywords" content="hoteles venezuela, posadas venezuela, turismo venezuela, reservas sin intermediarios, los roques, canaima, morrocoy, margarita, merida, campamentos de lujo" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="author" content="Hoteles de Venezuela LLC" />
+    <link rel="canonical" href="https://hotelesdevenezuela.com/" />
 
     <!-- Google Fonts Preconnect & Stylesheet -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,24 +29,186 @@
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Hoteles de Venezuela" />
     <meta property="og:url" content="https://hotelesdevenezuela.com/" />
-    <meta property="og:title" content="Hoteles de Venezuela | Reservas sin Intermediarios | Guía Turística" />
-    <meta property="og:description" content="Encuentra hoteles, posadas, resorts y alojamientos en toda Venezuela. Explora destinos turísticos, parques nacionales y reserva directo." />
+    <meta property="og:title" content="Hoteles de Venezuela | Hoteles, Posadas y Guía Turística" />
+    <meta property="og:description" content="Directorio y guía turística oficial de hoteles, posadas boutique, resorts y campamentos en Venezuela. Reservas directas sin intermediarios ni comisiones." />
     <meta property="og:image" content="https://hotelesdevenezuela.com/images/beach_social.png" />
     <meta property="og:image:secure_url" content="https://hotelesdevenezuela.com/images/beach_social.png" />
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Hoteles de Venezuela - Su Guía Turística" />
+    <meta property="og:image:alt" content="Hoteles de Venezuela - Guía Turística Oficial" />
+    <meta property="og:locale" content="es_VE" />
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://hotelesdevenezuela.com/" />
-    <meta property="twitter:title" content="Hoteles de Venezuela | Reservas sin Intermediarios | Guía Turística" />
-    <meta property="twitter:description" content="Encuentra hoteles, posadas, resorts y alojamientos en toda Venezuela. Explora destinos turísticos, parques nacionales y reserva directo." />
-    <meta property="twitter:image" content="https://hotelesdevenezuela.com/images/beach_social.png" />
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://hotelesdevenezuela.com/" />
+    <meta name="twitter:title" content="Hoteles de Venezuela | Hoteles, Posadas y Guía Turística" />
+    <meta name="twitter:description" content="Directorio y guía turística oficial de hoteles, posadas boutique, resorts y campamentos en Venezuela. Reservas directas sin intermediarios." />
+    <meta name="twitter:image" content="https://hotelesdevenezuela.com/images/beach_social.png" />
+
+    <!-- Schema.org JSON-LD Structured Data Estático para Motores de Búsqueda -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://hotelesdevenezuela.com/#organization",
+          "name": "Hoteles de Venezuela LLC",
+          "url": "https://hotelesdevenezuela.com/",
+          "logo": "https://hotelesdevenezuela.com/images/logo-hdv-transparent.png",
+          "description": "Directorio oficial y guía turística de hospedajes verificados en Venezuela. Reservas directas sin intermediarios ni comisiones.",
+          "sameAs": [
+            "https://instagram.com/hotelesdevenezuela",
+            "https://facebook.com/hotelesdevenezuela"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://hotelesdevenezuela.com/#website",
+          "url": "https://hotelesdevenezuela.com/",
+          "name": "Hoteles de Venezuela",
+          "publisher": {
+            "@id": "https://hotelesdevenezuela.com/#organization"
+          },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://hotelesdevenezuela.com/establecimientos?destination={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "TravelAgency",
+          "@id": "https://hotelesdevenezuela.com/#travelagency",
+          "name": "Hoteles de Venezuela",
+          "url": "https://hotelesdevenezuela.com/",
+          "description": "Plataforma de conexión directa entre viajeros y los mejores hoteles, posadas y operadores turísticos de Venezuela.",
+          "areaServed": {
+            "@type": "Country",
+            "name": "Venezuela"
+          }
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
-    <div id="root"></div>
+    <!-- Fallback Semántico Pre-renderizado para Bots, Rastreadores y SEO Crawlers (Seobility, Googlebot, Bingbot) -->
+    <!-- React reemplazará automáticamente este contenido al hidratar en el cliente sin alterar la experiencia de usuario -->
+    <div id="root">
+      <div style="font-family: 'Montserrat', system-ui, -apple-system, sans-serif; max-width: 1200px; margin: 0 auto; padding: 40px 20px; color: #1e293b; background-color: #f8fafc; min-height: 100vh;">
+        
+        <header style="border-bottom: 2px solid #e2e8f0; padding-bottom: 24px; margin-bottom: 36px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <span style="font-size: 11px; font-weight: 900; letter-spacing: 0.2em; text-transform: uppercase; color: #00C8D4; display: block; margin-bottom: 4px;">Directorio Oficial & Guía Turística</span>
+            <span style="font-size: 24px; font-weight: 900; color: #0f172a; font-family: 'Playfair Display', serif;">Hoteles de Venezuela</span>
+          </div>
+          <nav aria-label="Navegación Principal" style="display: flex; gap: 16px; flex-wrap: wrap;">
+            <a href="/establecimientos" style="color: #00C8D4; font-weight: 700; text-decoration: none; font-size: 14px;">Hospedajes</a>
+            <a href="/destinos" style="color: #1e293b; font-weight: 600; text-decoration: none; font-size: 14px;">Destinos</a>
+            <a href="/parques" style="color: #1e293b; font-weight: 600; text-decoration: none; font-size: 14px;">Parques Nacionales</a>
+            <a href="/paquetes" style="color: #1e293b; font-weight: 600; text-decoration: none; font-size: 14px;">Paquetes</a>
+            <a href="/blog" style="color: #1e293b; font-weight: 600; text-decoration: none; font-size: 14px;">Blog de Viajes</a>
+            <a href="/servicios-b2b" style="color: #FF0096; font-weight: 700; text-decoration: none; font-size: 14px;">Servicios B2B</a>
+          </nav>
+        </header>
+
+        <main>
+          <!-- Encabezado Principal H1 -->
+          <section style="text-align: center; margin-bottom: 48px;">
+            <span style="display: inline-block; background-color: rgba(0, 200, 212, 0.12); color: #00C8D4; padding: 6px 16px; border-radius: 9999px; font-size: 12px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 16px;">
+              Reserva sin comisiones ni intermediarios
+            </span>
+            <h1 style="font-size: 38px; font-weight: 900; color: #0f172a; line-height: 1.2; margin-bottom: 20px; font-family: 'Playfair Display', serif;">
+              Hoteles de Venezuela | Hoteles, Posadas y Guía Turística
+            </h1>
+            <p style="font-size: 18px; color: #475569; max-width: 860px; margin: 0 auto 24px; line-height: 1.6;">
+              Bienvenido a la plataforma líder de turismo y hospedaje en Venezuela. Conectamos directamente a viajeros y turistas con los dueños y anfitriones de los mejores hoteles, posadas boutique, resorts de playa, campamentos de selva y cabañas de montaña en todo el territorio nacional, garantizando 0% comisiones y comunicación directa por WhatsApp.
+            </p>
+          </section>
+
+          <!-- Sección de Destinos y Categorías -->
+          <section style="background-color: #ffffff; border-radius: 20px; padding: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 40px; border: 1px solid #e2e8f0;">
+            <h2 style="font-size: 24px; font-weight: 800; color: #0f172a; margin-bottom: 16px; font-family: 'Playfair Display', serif;">
+              Destinos Turísticos y Alojamientos Destacados en Venezuela
+            </h2>
+            <p style="font-size: 15px; color: #334155; line-height: 1.7; margin-bottom: 20px;">
+              Explora una amplia selección de hospedajes verificados en los destinos más emblemáticos del país: desde las aguas cristalinas del <strong>Archipiélago Los Roques</strong>, las playas paradisíacas de <strong>Morrocoy</strong> y la <strong>Isla de Margarita</strong>, hasta la majestuosidad de la Gran Sabana y el Salto Ángel en el <strong>Parque Nacional Canaima</strong>, el encanto andino de <strong>Mérida</strong> y las tradiciones de la <strong>Colonia Tovar</strong>.
+            </p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 24px;">
+              <div style="padding: 16px; background-color: #f8fafc; border-radius: 12px; border-left: 4px solid #00C8D4;">
+                <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">🏖️ Posadas de Playa</h3>
+                <p style="font-size: 13px; color: #64748b; margin: 0;">Los Roques, Morrocoy, Mochima, Margarita, Coche y Choroní.</p>
+              </div>
+              <div style="padding: 16px; background-color: #f8fafc; border-radius: 12px; border-left: 4px solid #FF0096;">
+                <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">⛰️ Cabañas de Montaña</h3>
+                <p style="font-size: 13px; color: #64748b; margin: 0;">Mérida, Sanare, Galipán, Colonia Tovar y Cordillera de la Costa.</p>
+              </div>
+              <div style="padding: 16px; background-color: #f8fafc; border-radius: 12px; border-left: 4px solid #9B00CC;">
+                <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">🌿 Campamentos de Selva</h3>
+                <p style="font-size: 13px; color: #64748b; margin: 0;">Canaima, Salto Ángel, Amazonas, Delta del Orinoco y Tepuyes.</p>
+              </div>
+              <div style="padding: 16px; background-color: #f8fafc; border-radius: 12px; border-left: 4px solid #10b981;">
+                <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">💎 Hoteles Boutique & Resorts</h3>
+                <p style="font-size: 13px; color: #64748b; margin: 0;">Hospedajes con Sello de Calidad HDV y atención de primera clase.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Sección de Beneficios y Sello HDV -->
+          <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 40px;">
+            <div style="background-color: #ffffff; border-radius: 20px; padding: 28px; border: 1px solid #e2e8f0;">
+              <h2 style="font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 12px; font-family: 'Playfair Display', serif;">
+                Reserva Directa por WhatsApp sin Intermediarios
+              </h2>
+              <p style="font-size: 14px; color: #475569; line-height: 1.6; margin-bottom: 16px;">
+                A diferencia de las OTAs internacionales que cobran comisiones de hasta 25%, en <strong>Hoteles de Venezuela</strong> te comunicas directamente con la recepción del establecimiento. Obtén la tarifa más económica, promociones exclusivas, cotizaciones en tiempo real y soporte personalizado para tus vacaciones o viajes de negocios.
+              </p>
+              <a href="/establecimientos" style="display: inline-block; color: #00C8D4; font-weight: 700; font-size: 14px; text-decoration: none;">Ver todos los alojamientos &rarr;</a>
+            </div>
+
+            <div style="background-color: #ffffff; border-radius: 20px; padding: 28px; border: 1px solid #e2e8f0;">
+              <h2 style="font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 12px; font-family: 'Playfair Display', serif;">
+                Sello de Verificación e Inspección HDV
+              </h2>
+              <p style="font-size: 14px; color: #475569; line-height: 1.6; margin-bottom: 16px;">
+                Nuestro equipo audita y valida físicamente las instalaciones hoteleras: suministro eléctrico con planta de respaldo, conectividad a internet de alta velocidad (Starlink), estándares de limpieza, seguridad y servicio de alimentos. Viaja con total tranquilidad y respaldo certificado en cada rincón de Venezuela.
+              </p>
+              <a href="/prestigio-2026" style="display: inline-block; color: #FF0096; font-weight: 700; font-size: 14px; text-decoration: none;">Conocer el Sello Prestigio 2026 &rarr;</a>
+            </div>
+          </section>
+
+          <!-- Enlaces Internos y Navegación Rápida -->
+          <section style="background-color: #0e011f; color: #ffffff; border-radius: 20px; padding: 32px; margin-bottom: 40px;">
+            <h2 style="font-size: 20px; font-weight: 800; color: #ffffff; margin-bottom: 16px; font-family: 'Playfair Display', serif;">
+              Explora Nuestro Ecosistema Turístico
+            </h2>
+            <p style="font-size: 14px; color: #cbd5e1; line-height: 1.6; margin-bottom: 20px;">
+              Accede a nuestras herramientas interactivas, guías editoriales y directorio comercial especializado:
+            </p>
+            <ul style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; list-style: none; padding: 0; margin: 0;">
+              <li><a href="/destinos" style="color: #00C8D4; text-decoration: none; font-size: 14px; font-weight: 600;">📍 Guía de Destinos</a></li>
+              <li><a href="/parques" style="color: #00C8D4; text-decoration: none; font-size: 14px; font-weight: 600;">🏞️ Parques Nacionales</a></li>
+              <li><a href="/mapa" style="color: #00C8D4; text-decoration: none; font-size: 14px; font-weight: 600;">🗺️ Mapa Interactivo</a></li>
+              <li><a href="/paquetes" style="color: #00C8D4; text-decoration: none; font-size: 14px; font-weight: 600;">✈️ Paquetes y Tours</a></li>
+              <li><a href="/blog" style="color: #00C8D4; text-decoration: none; font-size: 14px; font-weight: 600;">📖 Artículos de Viajes</a></li>
+              <li><a href="/comparar" style="color: #00C8D4; text-decoration: none; font-size: 14px; font-weight: 600;">⚖️ Comparar Hoteles</a></li>
+              <li><a href="/servicios-b2b" style="color: #FF0096; text-decoration: none; font-size: 14px; font-weight: 600;">💼 Portal para Hoteleros</a></li>
+              <li><a href="/membresias" style="color: #FF0096; text-decoration: none; font-size: 14px; font-weight: 600;">⭐ Afiliación Hotelera</a></li>
+            </ul>
+          </section>
+        </main>
+
+        <footer style="border-top: 1px solid #cbd5e1; padding-top: 24px; text-align: center; font-size: 12px; color: #64748b;">
+          <p>© 2026 Hoteles de Venezuela LLC. Todos los derechos reservados. Plataforma de reservas directas y promoción turística nacional e internacional.</p>
+        </footer>
+      </div>
+    </div>
+
+    <!-- Script de Inicialización de la Aplicación React SPA -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

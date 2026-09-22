@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /mis-negocios
+Disallow: /panel-propietario
+Disallow: /perfil/kyc
+Disallow: /hdv-acceso-llc2027
+
+Sitemap: https://hotelesdevenezuela.com/sitemap.xml

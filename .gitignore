@@ -20,6 +20,7 @@ legacy_db_export/
 ReplitExport-*/
 *.zip
 *.txt
+!public/robots.txt
 
 # Editor directories and files
 .vscode/*

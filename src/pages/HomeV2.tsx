@@ -142,8 +142,8 @@ export function HomeV2({ isMainHome = false }: { isMainHome?: boolean }) {
   const [activeTab, setActiveTab] = useState<string>("all");
 
   const [seoConfig, setSeoConfig] = useState({
-    title: "Hoteles de Venezuela | Reservas Directas sin Intermediarios | Guía Turística Oficial",
-    description: "Directorio y guía turística oficial de hoteles, posadas boutique, resorts y campamentos en Venezuela. Contacto directo por WhatsApp con los anfitriones y 0% comisiones.",
+    title: "Hoteles de Venezuela | Hoteles, Posadas y Guía Turística",
+    description: "Guía turística y directorio oficial de hoteles, posadas boutique, resorts y campamentos en Venezuela. Reserva directo con los anfitriones por WhatsApp sin intermediarios.",
     keywords: "hoteles venezuela, posadas venezuela, reservas sin intermediarios, turismo venezuela, los roques, canaima, morrocoy, merida, posadas boutique, resorts venezuela, campamentos turismo",
     ogImage: "https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public/establecimientos/destinos/salto-angel-hero-v2.jpg"
   });

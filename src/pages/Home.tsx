@@ -556,7 +556,7 @@ export function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-white">
       <SeoHead
-        title="Hoteles de Venezuela | Reservas sin Intermediarios | Guía Turística"
+        title="Hoteles de Venezuela | Hoteles, Posadas y Guía Turística"
         description="Directorio oficial de hoteles, posadas boutique y campamentos en Venezuela. Reserva directo con el propietario vía WhatsApp con 0% comisiones."
         canonicalUrl="https://hotelesdevenezuela.com/"
       />

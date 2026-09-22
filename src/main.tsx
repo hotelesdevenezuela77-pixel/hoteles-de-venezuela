@@ -5,6 +5,11 @@ import App from './App.tsx'
 import { AuthProvider } from './lib/auth.tsx'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
+// Canonical apex domain redirect enforcement (www -> non-www)
+if (typeof window !== 'undefined' && window.location.hostname === 'www.hotelesdevenezuela.com') {
+  window.location.replace('https://hotelesdevenezuela.com' + window.location.pathname + window.location.search + window.location.hash);
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
