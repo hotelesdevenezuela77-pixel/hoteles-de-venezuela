@@ -11,477 +11,652 @@ const host = 'aws-1-us-west-2.pooler.supabase.com';
 
 const reports = [
   {
-    title: "Parque Nacional Morrocoy: Guía de Cayos, Navegación Serena y Posadas Exclusivas",
+    title: "Parque Nacional Morrocoy: La Guía Definitiva de Cayos, Secretos de Navegación y Posadas Exclusivas",
     slug: "parque-nacional-morrocoy-cayos-tucacas-posadas",
-    excerpt: "Descubre el Parque Nacional Morrocoy: guía de navegación serena por cayos cristalinos, posadas con planta eléctrica y reserva directa sin intermediarios.",
-    reading_time: 8,
+    excerpt: "Guía editorial y logística de Morrocoy: cómo navegar sus cayos, evitar sobreprecios de lanchas, elegir entre Tucacas o Chichiriviche y posadas con planta eléctrica.",
+    reading_time: 14,
     author_name: "Equipo Editorial Hoteles de Venezuela",
     status: "published",
     featured_image: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80",
-    content: `# Parque Nacional Morrocoy: Guía de Cayos, Navegación Serena y Posadas Exclusivas en Tucacas y Chichiriviche
+    content: `# Parque Nacional Morrocoy: La Guía Definitiva de Cayos, Secretos de Navegación y Posadas Exclusivas
 
-> **LO QUE DEBES SABER ANTES DE NAVEGAR:**
-> - **Acceso principal:** Tucacas (embarcaderos como La Marina o Las Luisas) y Chichiriviche (Playa Norte y Playa Sur).
-> - **Regulación acústica INPARQUES:** Está prohibido el uso de equipos de sonido de alta potencia en los cayos para proteger los ecosistemas de flamencos, manglares y fauna marina.
-> - **Cayos imperdibles:** Cayo Sombrero (palmeras y aguas turquesas), Playuela/Playuelita (arrecife coralino ideal para snorkel), Cayo Muerto (el más cercano a Chichiriviche) y Los Juanes (piscina natural de bajo calado).
-> - **Reserva directa sin comisiones:** Alojarte en posadas con planta eléctrica total, planta desalinizadora y muelle privado reservando directamente en Hoteles de Venezuela te ahorra hasta un 25% frente a agencias intermediarias.
-
----
-
-El Parque Nacional Morrocoy no necesita filtros de Instagram. Sus 32.000 hectáreas de manglares, canales y cayos coralinos en la costa oriental de Falcón representan el paraíso caribeño por excelencia de Venezuela. 
-
-Tras las recientes normativas ambientales que protegen la tranquilidad y la acústica natural del parque, Morrocoy ha recuperado su magia original: el suave oleaje caribeño, el canto de las aves marinas y la contemplación de arrecifes vivos.
+> **SÍNTESIS LOGÍSTICA PARA EL VIAJERO INTELIGENTE:**
+> - **Las dos puertas de entrada:** *Tucacas* (ideal para posadas náuticas de lujo, cercanía a Cayo Sombrero y Los Juanes) vs. *Chichiriviche* (acceso ultra rápido a Cayo Muerto, Cayo Sal y Cayo Peraza).
+> - **El nuevo rostro de Morrocoy:** La estricta aplicación de normativas ambientales por parte de INPARQUES sobre contaminación acústica ha devuelto a los cayos su atmósfera de paz caribeña, permitiendo el regreso de avifauna marina y la contemplación serena del paisaje.
+> - **Temporadas óptimas:** De febrero a mayo y de agosto a noviembre las aguas alcanzan su máxima transparencia y los vientos alisios son más suaves.
+> - **Reserva directa sin intermediarios:** Alojarte en posadas certificadas con planta eléctrica al 100% y pozo de agua propio reservando directamente en Hoteles de Venezuela te protege de estafas y elimina las comisiones infladas de agencias foráneas.
 
 ---
 
-## 1. Los Cayos Más Destacados de Morrocoy
+Pocos lugares en el Caribe reúnen la densidad cromática del **Parque Nacional Morrocoy**: una franja de más de 32.000 hectáreas en el oriente del estado Falcón donde el mar muta sin transición del azul marino profundo al aguamarina, el verde esmeralda y el cristal transparente sobre lechos de arena de coral molido.
 
-### Cayo Sombrero: La Joya de la Corona
-El cayo más fotografiado y con mayor extensión de sombra natural gracias a sus frondosos cocoteros. Cuenta con dos playas de aguas calmas y un bosque interior donde relajarse. Ideal para pasar el día completo con servicio de marisquería fresca servida directamente en la arena.
-
-### Playuela y Playuelita: Snorkel y Tranquilidad
-Separadas por una franja de manglares, estas dos playas ofrecen aguas transparentes protegidas del viento y una barrera coralina accesible nadando desde la orilla.
-
-### Los Juanes: La Piscina Natural Marina
-Una bahía sin playa de arena firme donde el agua llega a la cintura y el fondo es de arena blanca pura. Los botes y peñeros fondean con respeto al entorno para disfrutar de ostras frescas, ceviches y camarones servidos por vendedores artesanales en botes flotantes.
-
-### Cayo Sal y Cayo Muerto: La Ruta Rápida desde Chichiriviche
-Accesibles en solo 5 a 10 minutos de navegación desde los muelles de Chichiriviche, son perfectos para familias con niños pequeños por su oleaje casi nulo y facilidades de toldos.
+Sin embargo, viajar a Morrocoy sin un plan claro puede convertir un fin de semana soñado en una travesía caótica de colas en embarcaderos, sobreprecios en toldos y posadas sin agua corriente. En esta guía de fondo desglosamos la geografía del parque, la personalidad de cada cayo, la logística real de navegación y los criterios indispensables para elegir tu hospedaje.
 
 ---
 
-## 2. Consejos de Campo y Logística Anti-Sobreprecios
+## 1. Tucacas vs. Chichiriviche: ¿Dónde Conviene Hacer Base?
 
-1. **Tarifas de Peñeros Oficiales:** Los precios de los traslados a los cayos están fijados por las asociaciones de lancheros en las taquillas oficiales de los muelles (Tucacas y Chichiriviche). Compra siempre tu boleto ida y vuelta en taquilla oficial y acuerda la hora exacta de retorno (habitualmente entre 4:00 PM y 5:00 PM).
-2. **Hospedaje con Servicios Blindados:** Verifica que tu posada u hotel cuente con planta eléctrica de capacidad 100% (aire acondicionado garantizado) y pozo o tanque de agua de gran autonomía.
-3. **Consumo en Playa:** Pregunta siempre el precio de los platos de pescado frito y mariscos antes de ordenar para evitar sorpresas al momento de la cuenta.
+Una de las primeras dudas del viajero es definir su centro de operaciones. Aunque ambos pueblos son las arterias de acceso a Morrocoy, su oferta es radicalmente distinta:
+
+### Tucacas: La Capital Náutica y Gourmet
+Ubicada en el extremo sur del parque, Tucacas concentra el mayor desarrollo hotelero de alta gama. Sus complejos residenciales y posadas a orillas de los canales marítimos permiten abordar lanchas privadas directamente desde el muelle de tu habitación. Es la base obligada si buscas escapadas románticas, alta gastronomía marina y cercanía a los cayos del sur (Sombrero, Los Juanes, Playuela y Boca Seca).
+
+### Chichiriviche: Tradición Pesquera y Salidas Rápidas
+Situado más al norte, Chichiriviche es un pueblo de pescadores con una vista frontal directa hacia Cayo Muerto y Cayo Sal. Su gran ventaja competitiva es el tiempo de navegación: en apenas 5 a 8 minutos de lancha puedes estar pisando la arena blanca. Es una alternativa excelente para familias que priorizan traslados cortos y tarifas de peñero más económicas.
 
 ---
 
-## ¿Por Qué Reservar Directamente con Posadas en Morrocoy?
+## 2. Radiografía Completa de los Cayos: ¿Cuál Elegir Según tu Estilo?
 
-Al gestionar tu estadía directamente con los anfitriones y propietarios a través de **Hoteles de Venezuela**:
-- Obtienes la tarifa real del posadero sin los recargos del 15% al 30% que cobran plataformas extranjeras.
-- Coordinas traslados marítimos privados o salidas en lancha deportiva directamente desde el muelle de tu hospedaje.
-- Recibes recomendaciones locales de primera mano para visitar los cayos más solitarios en días laborables.`
+No todos los cayos de Morrocoy fueron creados iguales. Cada isla posee una orientación al viento, tipo de fondo marino y nivel de servicios muy particular:
+
+### 1. Cayo Sombrero: La Celebridad del Parque
+Es, con justicia, la postal más famosa de Morrocoy. Posee dos playas extensas: una frontal con hileras de cocoteros que regalan sombra densa todo el día, y una posterior más abierta con vista a mar abierto. 
+- **Lo mejor:** La arena es finísima y el bosque interior permite descansar del sol sin necesidad de alquilar sombrillas.
+- **Dato de campo:** Camina hacia el extremo derecho del cayo para llegar a la pequeña poza coralina donde se congregan bancos de peces cirujano y damiselas.
+
+### 2. Playuela y Playuelita: El Paraíso del Snorkel
+Dos ensenadas conectadas por una pasarela de manglar. Playuela ofrece un oleaje un poco más vivo pero con aguas transparentes como una piscina, mientras que Playuelita es un remanso totalmente protegido ideal para niños pequeños.
+- **Lo mejor:** La barrera de coral ubicada a unos 30 metros de la orilla alberga abanicos de mar, esponjas tubulares y erizos de fuego.
+
+### 3. Los Juanes (La Piscina Natural): Sazón Flotante
+Conocido popularmente como "La Piscina", Los Juanes no tiene playa de arena firme: es una ensenada de fondo arenoso poco profundo donde el agua turquesa llega a la cintura.
+- **La experiencia gastronómica:** Pequeños botes de pescadores artesanales se acercan con cavas de hielo ofreciendo ostras frescas de mangle recién abiertas con limón, ceviches de pulpo al cilantro, langostinos y empanadas calientes de cazón.
+
+### 4. Cayo Muerto y Cayo Sal: Los Tesoros de Chichiriviche
+- **Cayo Muerto:** El más frondoso en vegetación de la zona norte, con palmeras que casi tocan el agua y un mar de calma absoluta.
+- **Cayo Sal:** Célebre por albergar en su interior una laguna salina natural de tonos rosáceos y una antigua capilla de la época colonial.
+
+### 5. Cayo Borracho y Punta Brava: Ecoturismo y Accesibilidad
+- **Cayo Borracho:** Ubicado a mar abierto, es el más alejado y solitario. Por normativa de conservación, su acceso suele estar restringido en ciertas temporadas para proteger la anidación de tortugas carey y aves marinas.
+- **Punta Brava:** El único cayo conectado a tierra firme a través de un puente vehicular desde Tucacas. Cuenta con estacionamiento, servicios públicos y alquiler de kayaks en su laguna de manglar.
+
+---
+
+## 3. Tabla Técnica: Comparativa de Navegación y Servicios por Cayo
+
+| Cayo / Sector | Distancia en Lancha (desde Tucacas) | Distancia en Lancha (desde Chichiriviche) | Tipo de Oleaje | Nivel de Sombra Natural | Servicios (Toldos / Comida) |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Cayo Sombrero** | 18 - 22 minutos | 30 - 35 minutos | Suave a Moderado | **Muy Alto** (Bosque de cocoteros) | Restaurantes rústicos, toldos, baños |
+| **Playuela / Playuelita** | 12 - 15 minutos | 25 - 30 minutos | Muy Calmo (Piscina) | Medio (Manglar periférico) | Kioscos de comida típica, toldos |
+| **Los Juanes** | 15 - 18 minutos | 25 minutos | Nulo (Bajo de arena) | **Ninguno** (Estar dentro del agua o en bote) | Gastronomía flotante artesanal |
+| **Cayo Muerto** | 30 minutos | **5 - 8 minutos** | Nulo (Extremadamente calmo) | Alto (Palmeras densas) | Kioscos de pescado frito y mariscos |
+| **Cayo Sal** | 35 minutos | **8 - 10 minutos** | Suave | Medio | Alquiler de toldos, venta de mariscos |
+| **Boca Seca / Paiclás** | 10 - 12 minutos | 20 minutos | Muy Calmo | Medio / Alto | Restaurante estructurado y caminerías |
+
+---
+
+## 4. Logística de Navegación: Cómo Moverse sin Ser Víctima de Sobreprecios
+
+1. **Embarcaderos Oficiales en Tucacas:** Los puntos más seguros y organizados son el **Embarcadero Las Luisas**, **El Portete** y la **Marina de Tucacas**. Cuentan con taquilla formal de venta de boletos avalada por las asociaciones de lancheros.
+2. **Embarcaderos en Chichiriviche:** Salidas continuas desde **Playa Norte** y **Playa Sur**.
+3. **Modalidades de Traslado:**
+   - *Viaje por Puesto (Línea regular):* Te traslada al cayo y te asigna una hora fija de recogida por la tarde (generalmente 4:00 PM o 4:30 PM). Conserva siempre tu ticket físico.
+   - *Lancha Fletada / Exclusiva:* Alquilas la embarcación por todo el día para hacer circuitos combinados.
+4. **Horarios de Capitanía de Puerto:** La navegación deportiva y comercial está autorizada habitualmente entre las **8:00 AM y las 5:00 PM**.
+
+---
+
+## 5. La Gastronomía Marina Auténtica: Qué y Dónde Comer
+
+- **El Pargo o Mero Frito con Tostones:** Servido con ensalada rallada de repollo y zanahoria, tostones crujientes con queso blanco llanero y rodajas de limón.
+- **La Fosforera Falconiana:** Sopa concentrada a base de caldo de pescado, calamares, pepitonas, camarones y ají dulce falconiano.
+- **Ostiones y Vuelve a la Vida:** En los bajos de arena, adquiere mariscos de ostioneros con carnet sanitario que abran las conchas en el acto y utilicen hielo limpio.
+
+---
+
+## 6. Criterios de Selección: ¿Por Qué una Posada con Servicios Blindados?
+
+Al reservar a través de **Hoteles de Venezuela**:
+- **Planta Eléctrica de Capacidad 100%:** Mantiene encendidos los aires acondicionados toda la noche.
+- **Suministro Autónomo de Agua (Pozo / Desalinizadora):** Duchas de agua dulce con excelente presión.
+- **Muelle Privado:** Salida directa desde la posada hacia los cayos sin colas en terminales públicos.`
   },
   {
-    title: "Canaima y Salto Ángel: Guía Maestra de Expedición, Navegación Fluvial y Campamentos",
+    title: "Canaima y el Salto Ángel: Crónica de la Gran Expedición Fluvial a la Tierra de los Dioses",
     slug: "canaima-salto-angel-campamentos-excursion-churun",
-    excerpt: "Guía definitiva para viajar a Canaima y el Salto Ángel: vuelos chárter, navegación por el río Churún, campamentos pemones y reserva directa sin comisiones.",
-    reading_time: 10,
+    excerpt: "Guía de fondo para viajar a Canaima y el Salto Ángel: vuelos chárter, travesía por el río Churún, campamentos pemones y reserva directa sin intermediarios.",
+    reading_time: 15,
     author_name: "Equipo Editorial Hoteles de Venezuela",
     status: "published",
     featured_image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80",
-    content: `# Canaima y Salto Ángel: Guía Maestra de Expedición, Navegación Fluvial y Campamentos
+    content: `# Canaima y el Salto Ángel: Crónica de la Gran Expedición Fluvial a la Tierra de los Dioses
 
-> **CLAVES DE EXPEDICIÓN AL SALTO ÁNGEL:**
-> - **Acceso exclusivo:** Solo por vía aérea desde Maiquetía (Caracas) o Puerto Ordaz hacia el Aeropuerto de Canaima (CAJ).
-> - **Navegación al Kerepakupai Merú:** Temporada de lluvias y aguas intermedias (junio a diciembre) para remontar los ríos Carrao y Churún en curiara motorizada.
-> - **Equipaje en vuelos:** Límite estricto de 10 kg a 15 kg por persona en maleta suave (duffel bag).
-> - **Reserva directa:** Reserva tu lodge o campamento ecoturístico directamente para acceder a excursiones organizadas con guías indígenas pemones certificados.
-
----
-
-El Salto Ángel (*Kerepakupai Merú* en lengua pemón), con sus 979 metros de caída ininterrumpida desde la meseta del Auyantepuy, es una de las grandes maravillas geológicas del planeta. El Parque Nacional Canaima ofrece un paisaje ancestral que inspiró obras literarias y cinematográficas universales.
+> **SÍNTESIS PARA EXPEDICIONARIOS:**
+> - **Acceso exclusivo por aire:** No existen carreteras hacia Canaima. El ingreso se realiza únicamente a través de vuelos comerciales y chárter que despegan desde Maiquetía (Caracas) o Puerto Ordaz hacia la pista del Aeropuerto de Canaima (CAJ).
+> - **La ventana mágica de navegación fluvial (junio a diciembre):** Para remontar los ríos Carrao y Churún en curiara y llegar al pie del Salto Ángel, el caudal de los ríos debe ser suficiente. En temporada seca (enero a mayo) los saltos se aprecian mediante sobrevuelos aéreos.
+> - **Límite de equipaje:** Las aerolíneas aplican un límite estricto de **10 a 15 kg por persona en maleta suave** (duffel bag).
+> - **El valor de la reserva directa:** Coordinar tu estadía directamente con los campamentos y lodges en Hoteles de Venezuela te asegura tarifas transparentes, guías nativos pemones y logística aérea confirmada sin recargos.
 
 ---
 
-## 1. La Travesía Fluvial hacia la Base del Salto Ángel
+En ningún otro rincón del planeta la geografía transmite una sensación de aislamiento primordial tan abrumadora como en el **Parque Nacional Canaima**. Con una extensión de 30.000 kilómetros cuadrados en el Escudo Guayanés, conserva mesetas rocosas de paredes verticales —los *tepuyes*— cuyas cumbres albergan ecosistemas botánicos que evolucionaron aislados durante cientos de millones de años.
 
-La expedición clásica de 1 noche / 2 días hacia la base del Salto Ángel inicia en el Puerto Ucaima de la Laguna de Canaima:
-1. **Navegación por el Río Carrao:** Cruce de los rápidos de Mayupa en curiara indígena de madera con motor fuera de borda.
-2. **Cañón del Diablo y Río Churún:** Entrada al imponente cañón donde las paredes verticales del Auyantepuy se elevan más de un kilómetro sobre el cauce.
-3. **Caminata por la Selva Húmeda:** Sendero de 1 hora entre raíces milenarias y rocas húmedas hasta el Mirador Laime, justo al pie de la cascada más alta del mundo.
-4. **Noche en Hamacas frente al Salto:** Pernocta en campamentos rústicos con mosquitero escuchando el rugido del agua.
+Coronando este santuario se encuentra el **Salto Ángel** (*Kerepakupai Merú* en dialecto pemón), la cascada más alta de la Tierra con sus 979 metros de longitud y 807 metros de caída libre ininterrumpida.
 
 ---
 
-## 2. Excursiones Imperdibles en la Laguna de Canaima
+## 1. Anatomía de la Travesía Fluvial: De la Laguna de Canaima al Cañón del Diablo
 
-- **Salto El Sapo y El Hacha:** Cruce emocionante por detrás de la cortina de agua con chaleco salvavidas.
-- **Sobrevuelo al Auyantepuy:** Vuelos panorámicos en avioneta Cessna para contemplar la inmensidad del tepuy desde el aire.
-- **Comunidades Pemón de Kamarata y Kavak:** Exploración de cañones y cuevas sagradas.
+La verdadera expedición al Salto Ángel es una travesía fluvial de inmersión total que dura 2 días y 1 noche remontando dos ríos indómitos:
+
+### Tramo 1: El Río Carrao y la Sabana de Mayupa
+El viaje comienza al alba abordando una **curiara** con motor fuera de borda. Al llegar a los *Rápidos de Mayupa*, los pasajeros desembarcan para realizar una caminata a pie de 30 minutos por sabana abierta mientras los capitanes pemones maniobran la lancha vacía por los raudales.
+
+### Tramo 2: El Cañón del Diablo y el Río Churún
+Al ingresar al **Río Churún**, el agua adquiere un color ámbar profundo y las paredes de roca roja del Auyantepuy se elevan más de mil metros de altura, formando el sobrecogedor *Cañón del Diablo*.
+
+### Tramo 3: El Trekking hacia el Mirador Laime
+Tras unas 4 horas de navegación, se desembarca en **Isla Ratón** para emprender una caminata de 60 a 75 minutos por bosque húmedo tropical denso, trepando entre gigantescas raíces aéreas hasta alcanzar el **Mirador Laime**, el balcón rocoso al pie del Salto Ángel.
 
 ---
 
-## Logística y Consejos de Campo
+## 2. La Noche en la Selva: Dormir en Hamaca frente al Salto
 
-- Lleva bolsas impermeables (dry bags) para proteger cámaras, pasaportes y teléfonos durante la navegación en curiara.
-- Utiliza calzado de trekking con buen agarre para superficies mojadas y repelente de insectos libre de químicos nocivos para el agua.
-- Paga la tasa de entrada al Parque Nacional INPARQUES en el aeropuerto al aterrizar (lleva efectivo en dólares o bolívares).`
+- **El ritual del chinchorro:** Se duerme en hamacas tradicionales tejidas con mosquitero cerrado (*toldo*), arrullado por el estruendo de la cascada.
+- **La cena al fuego de leña:** Pollo a la brasa en vara o pescado de río con casabe crujiente y ají *Kumache*.
+- **El amanecer despejado:** Al amanecer, las nieblas del Auyantepuy se disipan revelando la silueta dorada del Salto Ángel.
+
+---
+
+## 3. El Circuito de la Laguna de Canaima: Saltos El Sapo y El Hacha
+
+- **El Paso Detrás del Salto El Sapo:** Equipado con traje de baño y chaleco salvavidas, se camina por una repisa de roca natural **justo por detrás de la cortina de agua** en una experiencia de pura adrenalina.
+
+---
+
+## 4. Tabla Técnica: Comparativa de Opciones de Expedición en Canaima
+
+| Modalidad de Tour | Duración | Mejor Época del Año | Nivel de Exigencia Física | Tipo de Pernocta |
+| :--- | :--- | :--- | :--- | :--- |
+| **Expedición Fluvial al Salto Ángel** | 2 Días / 1 Noche | **Junio a Diciembre** (Ríos navegables) | Moderada / Alta (Caminata sobre raíces mojadas) | Hamaca con mosquitero en campamento rústico |
+| **Sobrevuelo Aéreo al Auyantepuy** | 45 a 60 minutos de vuelo | **Todo el año** (Ideal en temporada seca) | Nula (Apto para todas las edades) | Lodge de lujo en la Laguna de Canaima |
+| **Circuito Laguna, Salto El Sapo y Hacha** | Medio día (4 a 5 horas) | **Todo el año** | Moderada (Paso sobre rocas) | Lodge en Canaima |
+| **Excursión a la Cueva de Kavak** | 1 Día completo (con avioneta) | **Todo el año** | Moderada (Natación en cañón de piedra) | Lodge en Canaima o campamento en Kavak |`
   },
   {
-    title: "Archipiélago Los Roques: Guía de Vuelos, Cayos Vírgenes y Posadas de Lujo Descalzo",
+    title: "Archipiélago Los Roques: La Guía Definitiva del Atolón de Coral Más Espectacular del Caribe",
     slug: "los-roques-posadas-cayos-vuelos-guia",
-    excerpt: "Planifica tu viaje a Los Roques: franquicia de equipaje, cayos cercanos y lejanos, gastronomía del mar y las mejores posadas boutique con reserva directa.",
-    reading_time: 9,
+    excerpt: "Guía editorial y logística de Los Roques: franquicia de equipaje en vuelos, cayos cercanos y lejanos, gastronomía de posada y reservas directas sin comisiones.",
+    reading_time: 15,
     author_name: "Equipo Editorial Hoteles de Venezuela",
     status: "published",
     featured_image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
-    content: `# Archipiélago Los Roques: Guía de Vuelos, Cayos Vírgenes y Posadas de Lujo Descalzo
+    content: `# Archipiélago Los Roques: La Guía Definitiva del Atolón de Coral Más Espectacular del Caribe
 
-> **DATOS ESENCIALES PARA TU VIAJE A LOS ROQUES:**
-> - **Vuelos desde Maiquetía:** 35 a 45 minutos de vuelo en aeronaves de corto alcance hacia Gran Roque (LRV).
-> - **Franquicia de equipaje:** 10 kg a 15 kg por pasajero en bodega + 5 kg de mano (el exceso se cobra por kilo).
-> - **Cayos cercanos:** Madrisquí, Francisquí y Cayo Pirata (a 10-15 minutos en lancha).
-> - **Cayos lejanos:** Cayo de Agua, Crasquí, Carenero y Dos Mosquises (a 40-50 minutos).
-> - **Reserva directa:** Reserva en posadas VIP con pensión completa (desayuno, cava para la playa y cena gourmet de 3 pasos) sin recargos intermediarios.
-
----
-
-Los Roques es el atolón coralino más espectacular del Mar Caribe. Con más de 300 islas y bancos de arena protegidos, ofrece un concepto exclusivo de "lujo descalzo": calles de arena fina sin vehículos a motor, posadas de arquitectura caribeña refinada y aguas de hasta siete tonalidades de azul y turquesa.
+> **SÍNTESIS LOGÍSTICA PARA EL VIAJERO INTELIGENTE:**
+> - **Acceso aéreo obligatorio:** Vuelos directos de 35 a 45 minutos desde Maiquetía (Caracas) hacia Gran Roque (LRV).
+> - **Política estricta de equipaje:** Límite de **10 a 15 kg por persona en bodega** (en bolso blando o *duffel bag*) más **5 kg de mano**.
+> - **Pensión Completa en Posadas:** Incluye desayuno a la carta, **cava térmica para la playa** con sombrillas/sillas y cena gourmet de 3 o 4 pasos con pesca del día.
+> - **Reserva directa sin intermediarios:** Reservar directamente en Hoteles de Venezuela te asegura la tarifa neta del anfitrión sin el 20% de comisión de agencias internacionales.
 
 ---
 
-## 1. Cayos Imperdibles en Los Roques
-
-### Cayo de Agua
-Famoso por su icónico istmo o lengua de arena blanca que separa dos mares de aguas transparentes. El paisaje más fotografiado del archipiélago.
-
-### Francisquí y la Piscina Natural
-Perfecto para los aficionados al snorkel por su piscina natural de aguas cristalinas poblada de peces loro, mantarrayas y tortugas marinas.
-
-### Crasquí
-Una playa extensa de arena suave con restaurantes de pescadores locales donde degustar langosta fresca en temporada (noviembre a abril).
+Con más de 40 cayos coralinos y cientos de bancos de arena protegidos, Los Roques es el atolón coralino más extenso y mejor conservado del Atlántico occidental. Aquí impera el **"Lujo Descalzo"** (*Barefoot Luxury*): calles de arena blanca sin vehículos a motor, posadas coloniales boutique y gastronomía marina de primer nivel.
 
 ---
 
-## 2. Gastronomía y Experiencia en Posadas
+## 1. Gran Roque: El Corazón del Archipiélago
 
-Las posadas de Gran Roque se distinguen por su propuesta culinaria mediterránea-caribeña. Al despertar, disfrutas de un desayuno con frutas frescas y café de especialidad. La posada te prepara una **cava térmica** equipada con almuerzo gourmet, bebidas frías, sombrilla y sillas de playa para llevar al cayo del día. Al regresar al atardecer, te espera una cena de tres pasos con pesca del día recién capturada.`
+Toda la vida hotelera y residencial se concentra en **Gran Roque**. Al caer la tarde, la plaza y los bares a orillas de la playa se iluminan con faroles tenues.
+- **Dato de campo:** Sube al **Faro Holandés** a las 5:45 PM para contemplar una panorámica de 360 grados sobre el archipiélago al atardecer.
+
+---
+
+## 2. Geografía de los Cayos: Cercanos vs. Lejanos
+
+### Cayos Cercanos (A 10-15 minutos)
+- **Madrisquí:** Aguas mansas como un espejo; una lengua de arena conecta caminando con **Cayo Pirata**.
+- **Francisquí:** Célebre por su **Piscina Natural**, ideal para snorkel entre bancos de peces loro y tortugas marinas.
+- **Cayo Fabián:** Minúsculo banco de arena virgen que emerge en medio del mar turquesa.
+
+### Cayos Lejanos (A 40-55 minutos)
+- **Cayo de Agua:** La joya del archipiélago. Un estrecho istmo de arena blanca une dos secciones de la isla con mar a ambos lados.
+- **Crasquí:** Extensa playa de arena suave con restaurantes rústicos que sirven langosta espinosa a la plancha en temporada.
+- **Dos Mosquises:** Centro de conservación y cría de tortugas marinas de la Fundación Científica Los Roques.
+
+---
+
+## 3. Tabla Técnica: Comparativa de Cayos en Los Roques
+
+| Cayo / Destino | Tiempo de Navegación | Tipo de Mar | Mejor Para | Nivel de Viento (Kitesurf) | Infraestructura |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Madrisquí** | 10 minutos | Muy Calmo (Piscina) | Familias, relax, caminata marina | Medio | Sombrillas de posada, botes de pescadores |
+| **Francisquí** | 12 minutos | Calmo en la laguna interior | Snorkel en arrecife, buceo | Alto (Zona este) | Restaurante rústico, escuela náutica |
+| **Cayo de Agua** | 45 - 50 minutos | Calmo a Moderado | Fotografía, parejas, paisaje icónico | Medio | **100% Virgen** (Llevar cava completa) |
+| **Crasquí** | 35 - 40 minutos | Muy Manso | Gastronomía marina (langosta), caminatas | Bajo a Medio | Restaurantes de pescadores artesanales |
+| **Dos Mosquises** | 50 minutos | Manso | Ecoturismo educativo, tortugas | Bajo | Centro científico y museo de sitio |`
   },
   {
-    title: "Páramo de Mérida y Teleférico Mukumbarí: Guía de Altura, Rutas Andinas y Posadas con Chimenea",
+    title: "El Páramo de Mérida y el Teleférico Mukumbarí: Crónica de Altura en el Techo de Venezuela",
     slug: "paramo-merida-teleferico-mukumbari-posadas-sierra-nevada",
-    excerpt: "Descubre el Páramo de Mérida: estaciones del Teleférico Mukumbarí, Laguna de Mucubají, senderismo en la Sierra Nevada y posadas andinas con chimenea.",
-    reading_time: 8,
+    excerpt: "Guía editorial del Páramo de Mérida: estaciones del Teleférico Mukumbarí, Laguna de Mucubají, comida andina y posadas con chimenea sin comisiones.",
+    reading_time: 14,
     author_name: "Equipo Editorial Hoteles de Venezuela",
     status: "published",
     featured_image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80",
-    content: `# Páramo de Mérida y Teleférico Mukumbarí: Guía de Altura, Rutas Andinas y Posadas con Chimenea
+    content: `# El Páramo de Mérida y el Teleférico Mukumbarí: Crónica de Altura en el Techo de Venezuela
 
-> **DATOS CLAVE DEL VIAJE A MÉRIDA:**
-> - **Vuelos comerciales:** Aeropuerto Juan Pablo Pérez Alfonzo de El Vigía (VIG) o Aeropuerto Alberto Carnevalli en la ciudad de Mérida (MRD).
-> - **Teleférico Mukumbarí:** El teleférico más alto y segundo más largo del mundo, ascendiendo desde Barinitas (1.577 msnm) hasta Pico Espejo (4.765 msnm).
-> - **Clima:** Temperaturas que oscilan entre 18°C en el valle hasta 0°C o bajo cero en las cumbres y el Páramo de Mifafí.
-> - **Reserva directa:** Posadas rústicas y chalets con chimenea de leña, agua caliente continua y chocolate caliente andino.
-
----
-
-Mérida es el corazón de los Andes venezolanos. La cordillera ofrece cumbres nevadas, bosques de frailejones centenarios, valles agrícolas fértiles y una calidez humana incomparable.
+> **CLAVES LOGÍSTICAS DE LA AVENTURA ANDINA:**
+> - **Opciones de vuelo:** Arribo al Aeropuerto de El Vigía (VIG) o vuelos directos al Aeropuerto Alberto Carnevalli (MRD) en Mérida.
+> - **El gigante de los cielos:** El Teleférico Mukumbarí es el más alto del mundo (4.765 msnm) y el segundo más largo (12,5 km en 4 tramos).
+> - **Aclimatación:** Asciende con calma haciendo paradas de 15 minutos en cada estación intermedia y viste en 3 capas de abrigo.
+> - **Reserva directa sin comisiones:** Hospédate en chalets con chimenea de leña activa y calderas de agua hirviendo gestionando tu reserva en Hoteles de Venezuela.
 
 ---
 
-## 1. El Teleférico Mukumbarí: De la Selva Nublada al Pico Espejo
-
-El sistema consta de 4 tramos y 5 estaciones:
-1. **Barinitas (1.577 msnm):** Estación base en el centro de Mérida.
-2. **La Montaña (2.436 msnm):** Mirador hacia la meseta de la ciudad.
-3. **La Aguada (3.452 msnm):** Inicio de la vegetación de páramo y avistamiento de frailejones.
-4. **Loma Redonda (4.045 msnm):** Punto de partida para cabalgatas y senderismo hacia el pueblo andino de Los Nevados.
-5. **Pico Espejo (4.765 msnm):** Mirador cumbre frente a la estatua de la Virgen de las Nieves y el Pico Bolívar (4.978 msnm).
+En los Andes venezolanos el aire huele a leña de eucalipto, pino fresco y tierra húmeda. Las montañas rozan los cinco mil metros de altitud, custodiadas por valles glaciares donde los frailejones centenarios capturan la neblina.
 
 ---
 
-## 2. La Ruta del Páramo: De Mucubají a Mifafí
+## 1. El Sistema Teleférico Mukumbarí: Estaciones
 
-- **Laguna de Mucubají y Laguna Negra:** Espejos de agua glaciares rodeados de frailejones y truchicultura andina.
-- **Monumento a la Loca Luz Caraballo en Apartaderos:** Leyenda poética andina de Andrés Eloy Blanco.
-- **Capilla de Piedra de Juan Félix Sánchez en San Rafael de Mucuchíes:** Obra maestra de la arquitectura popular en piedra tallada a mano.`
+1. **Barinitas (1.577 msnm):** Estación base en la Plaza Las Heroínas.
+2. **La Montaña (2.436 msnm):** Selva nublada andina.
+3. **La Aguada (3.452 msnm):** Bosque de frailejones y mirador al Valle del Chama.
+4. **Loma Redonda (4.045 msnm):** Páramo alto y caminatas a Los Nevados.
+5. **Pico Espejo (4.765 msnm):** Estación cumbre frente a la Virgen de las Nieves y el Pico Bolívar (4.978 msnm).
+
+---
+
+## 2. La Ruta del Páramo: De Mucuchíes a Mucubají
+
+- **Capilla de Piedra de Juan Félix Sánchez (San Rafael de Mucuchíes):** Construida a mano con cantos rodados de río.
+- **Laguna de Mucubají y Laguna Negra:** Espejos de agua glaciares rodeados de frailejones y bosques de pino.
+- **Collado del Cóndor (Pico El Águila, 4.118 msnm):** El paso vial más alto de Venezuela.
+
+---
+
+## 3. Gastronomía Paramera: El Menú que Vence al Frío
+
+- **Pisca Andina con Arepas de Trigo:** Caldo reconfortante con papas, leche, cilantro, huevo escalfado y queso ahumado derretido.
+- **Trucha Andina Fresca:** Servida al ajillo, en salsa de champiñones o a la plancha.
+- **Pasteles Andinos y Dulces Brillados:** Empanadas crujientes rellenas de carne con arroz y frutas confitadas.`
   },
   {
-    title: "Trekking al Monte Roraima: Guía Completa de la Expedición a la Tierra de Tepuyes",
+    title: "Trekking al Monte Roraima: Crónica de la Gran Expedición a la Meseta Más Antigua de la Tierra",
     slug: "trekking-monte-roraima-gran-sabana-guia-excursion",
-    excerpt: "Guía para la expedición al Monte Roraima en la Gran Sabana: itinerario de 6 días, porteadores pemones, equipo técnico y posadas en Santa Elena de Uairén.",
-    reading_time: 11,
+    excerpt: "Guía editorial y logística para ascender al Monte Roraima: itinerario de 6 días, porteadores pemones, equipo técnico y posadas en Santa Elena de Uairén.",
+    reading_time: 16,
     author_name: "Equipo Editorial Hoteles de Venezuela",
     status: "published",
     featured_image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&q=80",
-    content: `# Trekking al Monte Roraima: Guía Completa de la Expedición a la Tierra de Tepuyes
+    content: `# Trekking al Monte Roraima: Crónica de la Gran Expedición a la Meseta Más Antigua de la Tierra
 
-> **RESUMEN DE LA EXPEDICIÓN AL RORAIMA:**
-> - **Duración clásica:** 6 días / 5 noches (o 7-8 días para exploraciones profundas en la cumbre).
-> - **Punto de partida:** Comunidad indígena de Paraitepuy de Roraima (acceso en vehículo 4x4 desde Santa Elena de Uairén).
-> - **Dificultad física:** Alta / Exigente. Requiere buena condición cardiovascular y botas de montaña de caña media con soporte impermeable.
-> - **Alojamiento:** Carpas en campamentos designados (Río Tek, Río Kukenán, Campamento Base y "Hoteles" en la cumbre bajo salientes de roca).
-
----
-
-El Monte Roraima (2.810 msnm), el punto más alto de la formación tepuyana que comparten Venezuela, Brasil y Guyana, es uno de los paisajes geológicos más antiguos de la Tierra (con más de 2.000 millones de años).
+> **SÍNTESIS PARA EXPEDICIONARIOS:**
+> - **El gigante de arenisca:** Con 2.810 metros de altitud, el Roraima inspiró *El Mundo Perdido* de Arthur Conan Doyle.
+> - **Duración clásica:** 6 días y 5 noches (2 de aproximación, 1 de ascenso por rampa, 2 en cumbre y 1 de descenso).
+> - **Punto de partida:** Registro obligatorio en INPARQUES de Paraitepuy de Roraima (a 2 horas en 4x4 de Santa Elena de Uairén).
+> - **Reserva directa:** Coordina tu expedición con guías nativos Pemón Taurepán y posadas en Santa Elena en Hoteles de Venezuela.
 
 ---
 
-## 1. Itinerario Paso a Paso de la Travesía
+Caminar por la cumbre del Monte Roraima produce la certeza de haber abandonado la Tierra: formaciones de roca negra esculpidas por el viento, plantas carnívoras endémicas y la ranita negra prehistórica que camina sobre la roca húmeda.
 
-- **Día 1: Paraitepuy al Campamento Río Tek / Kukenán:** 12 km de caminata por sabana abierta con vistas monumentales del Roraima y el Kukenán.
-- **Día 2: Río Kukenán al Campamento Base:** Ascenso gradual entre colinas de arcilla hasta la falda del tepuy (1.870 msnm).
-- **Día 3: El Ascenso por la Rampa:** El día más técnico. Subida por la pared de la selva nublada vertical hasta alcanzar la cumbre rocosa.
-- **Día 4: Exploración de la Cumbre:** Visita al Valle de los Cristales, el Punto Triple (hito fronterizo Venezuela-Brasil-Guyana), La Ventana del Kukenán y las piscinas naturales llamadas *Jacuzzis*.
-- **Días 5 y 6: Descenso y Retorno:** Bajada de la pared hacia Río Tek y retorno final a Paraitepuy para celebrar con un almuerzo pemón.`
+---
+
+## 1. Itinerario de la Expedición
+
+- **Día 1: Paraitepuy a Río Tek (12 km):** Sabana abierta y cruce de los ríos Tek y Kukenán.
+- **Día 2: Río Kukenán a Campamento Base (9 km):** Ascenso gradual hacia la falda vertical del tepuy (1.870 msnm).
+- **Día 3: El Ascenso por la Rampa (4 a 6 horas):** Subida por cornisa de selva y cruce del "Paso de las Lágrimas" hasta la cumbre (2.700 msnm).
+- **Días 4 y 5: Exploración de la Cumbre:** Valle de los Cristales de Cuarzo, El Foso, La Ventana del Kukenán, El Punto Triple y pernocta en los "Hoteles" bajo salientes de roca.
+- **Días 6 y 7: Descenso y Retorno a Paraitepuy.**`
   },
   {
-    title: "Colonia Tovar y El Picacho: Bosque Nublado, Tradición Alemana y Cabañas de Altura",
+    title: "La Colonia Tovar y El Picacho: Crónica de la Aldea Bávara Escondida en la Neblina Costera",
     slug: "colonia-tovar-posadas-el-picacho-cabanas-turismo",
-    excerpt: "Guía turística de la Colonia Tovar: microcervecerías artesanales, fresas con crema, senderismo al Picacho y cabañas alpinas con chimenea sin comisiones.",
-    reading_time: 7,
+    excerpt: "Guía editorial de la Colonia Tovar: microcervecerías artesanales, fresas con crema, trekking al Picacho y cabañas alpinas con chimenea sin comisiones.",
+    reading_time: 14,
     author_name: "Equipo Editorial Hoteles de Venezuela",
     status: "published",
     featured_image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80",
-    content: `# Colonia Tovar y El Picacho: Bosque Nublado, Tradición Alemana y Cabañas de Altura
+    content: `# La Colonia Tovar y El Picacho: Crónica de la Aldea Bávara Escondida en la Neblina Costera
 
 > **CLAVES DE TU ESCAPADA A LA COLONIA TOVAR:**
-> - **Rutas de acceso:** Por El Junquito desde Caracas (vía panorámica de montaña) o por La Victoria desde el estado Aragua (subida pavimentada de pendientes pronunciadas).
-> - **Clima:** Templado de montaña (10°C a 20°C), con densas neblinas que bajan al caer la tarde.
-> - **Gastronomía:** Salchichas alemanas artesanales, rodilla de cerdo (*Eisbein*), fresas con crema, strudel de manzana y cervezas artesanales locales.
-> - **Aventura y naturaleza:** Subida en 4x4 o trekking al Monumento Natural El Picacho y vuelo en parapente sobre el valle.
-
----
-
-Fundada en 1843 por colonos provenientes de la Selva Negra de Alemania, la Colonia Tovar conserva su pintoresca arquitectura de entramado de madera (*Fachwerk*), techos a dos aguas y jardines de hortensias multicolores en plena Cordillera de la Costa.
+> - **Rutas de acceso:** Por El Junquito desde Caracas (60 km) o por La Victoria desde Aragua (34 km de subida empinada).
+> - **Clima templado de montaña:** Temperaturas de 12°C a 20°C de día y 8°C de noche con neblina densa.
+> - **Pueblo cultural vivo:** Fundada en 1843 por colonos de la Selva Negra (Kaiserstuhl), conserva el dialecto alemán coloniero y arquitectura Fachwerk.
+> - **Reserva directa:** Cabañas alpinas privadas con chimenea de leña, agua caliente y respaldo eléctrico en Hoteles de Venezuela.
 
 ---
 
 ## 1. Qué Ver y Hacer en la Colonia Tovar
 
-- **Casco Histórico e Iglesia de San Martín de Tours:** Templo patrimonial de madera y museo de historia local.
-- **Ruta de la Cerveza Artesanal:** Visita a microcervecerías pioneras de cerveza rubia, negra y de sabores frutales elaboradas con agua pura de manantial de montaña.
-- **Trekking a El Picacho de la Colonia Tovar:** Mirador a más de 2.200 msnm con vistas espectaculares hacia el Mar Caribe por el norte y los valles de Aragua por el sur.`
+- **Casco Histórico e Iglesia San Martín de Tours:** Templo patrimonial de madera y Museo de Historia y Artesanía.
+- **Trekking a El Picacho (2.250 msnm):** Sendero de bosque nublado con vistas al Mar Caribe por el norte y a los valles de Aragua por el sur.
+- **Ruta de Cervecerías Artesanales:** Degustación de cervezas rubias, negras y de frutos rojos fermentadas con agua de manantial.
+- **Gastronomía Bávara:** Rodilla de cerdo horneada (*Eisbein*), salchichas artesanales con *Sauerkraut* y fresas con crema chantilly.`
   },
   {
-    title: "Galipán y Parque Nacional Warairarepano: Gastronomía de Altura y Vistas al Caribe",
+    title: "Galipán y el Warairarepano: La Gran Guía de Alta Gastronomía y Romance entre las Nubes",
     slug: "galipan-warairarepano-avila-gastronomia-posadas",
-    excerpt: "Descubre Galipán en el Cerro El Ávila: traslados en 4x4, flores, gastronomía de autor frente al mar y posadas románticas con reserva directa.",
-    reading_time: 7,
+    excerpt: "Guía editorial de Galipán en el Ávila: transporte 4x4 desde Cotiza y Macuto, restaurantes de autor con vista al mar y posadas románticas sin comisiones.",
+    reading_time: 14,
     author_name: "Equipo Editorial Hoteles de Venezuela",
     status: "published",
     featured_image: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80",
-    content: `# Galipán y Parque Nacional Warairarepano: Gastronomía de Altura y Vistas al Caribe
+    content: `# Galipán y el Warairarepano: La Gran Guía de Alta Gastronomía y Romance entre las Nubes
 
-> **DATOS CLAVE PARA SUBIR A GALIPÁN:**
-> - **Acceso en vehículos 4x4:** Desde Cotiza (Caracas) por la vertiente sur o desde Macuto / San José de Galipán (La Guaira) por la vertiente norte.
-> - **Miradores duales:** En días despejados puedes contemplar el valle de Caracas hacia el sur y la inmensidad del Mar Caribe hacia el norte.
-> - **Gastronomía:** Restaurantes de alta cocina francesa, mediterránea y criolla de autor, chocolaterías artesanales y venta de flores exóticas.
-> - **Pernocta romántica:** Posadas boutique exclusivas con chimeneas, jacuzzis con vistas al mar y cenas a la luz de las velas.
-
----
-
-El poblado agrícola y gastronómico de San José de Galipán, anclado en la ladera norte del Parque Nacional Warairarepano a 1.800 metros de altitud, es el refugio favorito para una escapada romántica o un almuerzo de alta gama a minutos de la capital.
+> **CLAVES DE TU ESCAPADA A GALIPÁN:**
+> - **Subida en 4x4:** Desde Cotiza (Caracas, 30 min) o desde Macuto (La Guaira, 40 min).
+> - **Doble vista panorámica:** En días despejados se contempla el valle de Caracas al sur y el Mar Caribe al norte.
+> - **Capital gastronómica de altura:** Fondues suizas, cordero confitado, chocolaterías y floristerías patrimoniales.
+> - **Reserva directa:** Suites con jacuzzi climatizado, chimenea y traslados privados en Hoteles de Venezuela.
 
 ---
 
-## 1. Experiencias Destacadas en Galipán
+## 1. Experiencias y Gastronomía en Galipán
 
-- **La Ruta de los Chocolates y Dulces Típicos:** Degustación de bombones rellenos con licor de flores y mermeladas de mora fresca cultivada en los huertos locales.
-- **Museo de las Piedras Marinas Soñadoras:** Jardín escultórico único creado con rocas marinas redondeadas en San José de Galipán.
-- **Paseo hacia el Teleférico de Caracas:** Conexión peatonal o en rústico hacia el Hotel Humboldt y la estación Warairarepano.`
+- **Fondues y Cocina de Autor:** Salones alpinos con fondues de queso Gruyère y chocolate negro, magret de pato y truchas a la mantequilla negra.
+- **Museo de las Piedras Marinas Soñadoras:** Museo ecológico interactivo creado con piedras marinas redondeadas de La Guaira.
+- **Paseo de las Flores y Bombones:** Viveros de calas, hortensias y degustación de bombones rellenos con licor de lavanda y mora.`
   },
   {
-    title: "Cueva del Guácharo y Caripe: El Misterio Subterráneo y el Aroma a Café de Monagas",
+    title: "La Cueva del Guácharo y Caripe: Crónica del Misterio Subterráneo y el Aroma a Café de Monagas",
     slug: "cueva-del-guacharo-caripe-monagas-posadas-guacharos",
-    excerpt: "Guía de viaje a la Cueva del Guácharo y Caripe: salida vespertina de los guácharos, haciendas cafetaleras y posadas coloniales en el oriente venezolano.",
-    reading_time: 8,
+    excerpt: "Guía editorial de la Cueva del Guácharo y Caripe: vuelo de los guácharos al atardecer, haciendas de café, cascadas y posadas coloniales sin comisiones.",
+    reading_time: 15,
     author_name: "Equipo Editorial Hoteles de Venezuela",
     status: "published",
     featured_image: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1200&q=80",
-    content: `# Cueva del Guácharo y Caripe: El Misterio Subterráneo y el Aroma a Café de Monagas
+    content: `# La Cueva del Guácharo y Caripe: Crónica del Misterio Subterráneo y el Aroma a Café de Monagas
 
-> **CLAVES DE TU VISITA A CARIPE:**
-> - **Ubicación:** Cordillera Oriental en el estado Monagas, a 2 horas y media de Maturín.
-> - **Monumento Natural Alejandro de Humboldt:** La Cueva del Guácharo posee más de 10 kilómetros de longitud explorada (el recorrido turístico abarca 1.200 metros).
-> - **El espectáculo del atardecer:** A las 6:00 PM, miles de guácharos (*Steatornis caripensis*) emergen de la cueva en bandadas sincronizadas para alimentarse de frutos de palma.
-> - **Caripe 'El Jardín de Oriente':** Clima fresco de montaña, plantaciones de café arábica y posadas campestres con amplios jardines.`
+> **SÍNTESIS PARA VIAJEROS Y NATURALISTAS:**
+> - **Monumento Natural Alejandro de Humboldt:** Explorada científicamente en 1799, posee más de 10,2 km de galerías.
+> - **El vuelo de las 6:00 PM:** Miles de guácharos emergen de la caverna en vuelo sincronizado al atardecer para alimentarse de frutos de palma.
+> - **Caripe 'El Jardín de Oriente':** Clima fresco de montaña (18°C a 22°C) y haciendas de café arábica de sombra.
+> - **Reserva directa:** Casonas coloniales con amplios corredores de tejas y jardines de orquídeas en Hoteles de Venezuela.
+
+---
+
+## 1. Dentro de la Caverna y en el Valle de Caripe
+
+- **Recorrido Espeleológico (1.200 m):** Salón de Humboldt, Paso del Silencio y Salón de las Bellas Artes con estalactitas monumentales como "El Órgano".
+- **Haciendas Cafetaleras:** Catas de café arábica de sombra y visita a la Cascada El Salto La Paila (45 metros de caída).`
   },
   {
-    title: "Parque Nacional Mochima: Playas Esmeralda, Delfines y Posadas Costeras en Sucre y Anzoátegui",
+    title: "Parque Nacional Mochima: Crónica de Islas Esmeralda, Delfines y Tradición Marina Oriental",
     slug: "parque-nacional-mochima-islas-posadas-puerto-la-cruz-sucre",
-    excerpt: "Guía completa de Mochima: islas Arapo, Piscina y Mono, avistamiento de delfines en lancha y posadas náuticas en Puerto La Cruz, Lechería y Cumaná.",
-    reading_time: 8,
+    excerpt: "Guía editorial de Mochima: islas Arapo y Piscina, avistamiento de delfines en lancha, rutas desde Guanta y Mochima pueblo y posadas sin comisiones.",
+    reading_time: 15,
     author_name: "Equipo Editorial Hoteles de Venezuela",
     status: "published",
     featured_image: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80",
-    content: `# Parque Nacional Mochima: Playas Esmeralda, Delfines y Posadas Costeras en Sucre y Anzoátegui
+    content: `# Parque Nacional Mochima: Crónica de Islas Esmeralda, Delfines y Tradición Marina Oriental
 
-> **LO QUE DEBES SABER DE MOCHIMA:**
-> - **Embarcaderos principales:** Puerto La Cruz y Lechería (Anzoátegui) y Mochima pueblo o Cumaná (Sucre).
-> - **Islas más famosas:** Isla de Plata, Isla Arapo, Playa Piscina (famosa por sus tonos aguamarina) y Cumanagoto.
-> - **Avistamiento de delfines:** Las manadas de delfines costeros suelen acompañar a las lanchas durante las travesías matutinas en el Golfo de Santa Fe.
-> - **Hospedaje náutico:** Posadas a la orilla del mar con muelles privados y restaurantes de cocina oriental fresca.`
+> **CLAVES DE NAVEGACIÓN EN MOCHIMA:**
+> - **Accesos:** Eje Anzoátegui (Embarcadero La Baritina en Guanta) vs. Eje Sucre (Muelle de Mochima Pueblo y Santa Fe).
+> - **Santuario de Delfines:** Manadas de delfines mulares escoltan las lanchas en el Golfo de Santa Fe en horas de la mañana.
+> - **Playas estrella:** Playa Piscina, Isla Arapo, Playa Colorada (arena rojiza) e Isla de Plata.
+> - **Reserva directa:** Posadas náuticas con muelle privado en Mochima pueblo en Hoteles de Venezuela.
+
+---
+
+## 1. Playas y Gastronomía Oriental
+
+- **Playa Piscina e Isla Arapo:** Canales de aguas aguamarina protegidas con arrecifes de coral vivos para snorkel.
+- **Sazón Sucrense:** Pescado frito crujiente con queso telita, pastel de chucho oriental y fosforera de mariscos.`
   },
   {
-    title: "La Ciénaga de Ocumare de la Costa: El Remanso Turquesa del Parque Henri Pittier",
+    title: "La Ciénaga de Ocumare de la Costa: El Remanso Turquesa Oculto del Henri Pittier",
     slug: "la-cienaga-ocumare-de-la-costa-aragua-posadas-lanchas",
-    excerpt: "Descubre La Ciénaga de Ocumare en Aragua: aguas cristalinas de bajo calado, paseos en kayak, túneles de manglares y posadas coloniales en la costa.",
-    reading_time: 8,
+    excerpt: "Descubre La Ciénaga de Ocumare en Aragua: aguas cristalinas de bajo calado, paseos en kayak, La Cueva del Amor y posadas con piscina sin comisiones.",
+    reading_time: 14,
     author_name: "Equipo Editorial Hoteles de Venezuela",
     status: "published",
     featured_image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
-    content: `# La Ciénaga de Ocumare de la Costa: El Remanso Turquesa del Parque Henri Pittier
+    content: `# La Ciénaga de Ocumare de la Costa: El Remanso Turquesa Oculto del Henri Pittier
 
-> **CLAVES DE VISITA A LA CIÉNAGA:**
-> - **Acceso marítimo:** Salida en peñero de 15 minutos desde el embarcadero de La Boca (Ocumare de la Costa) o Playa Cata.
-> - **Características naturales:** Una ensenada marina de aguas calmas sin olas, fondo de arena blanca y manglares protegidos.
-> - **Actividades estrella:** Kayak, Stand Up Paddle (SUP) y snorkel en la "Piscina Natural" y la "Cueva del Amor".
-> - **Pernocta en tierra firme:** Posadas confortables con piscina y aire acondicionado en El Playón y Ocumare pueblo.`
+> **CLAVES DE TU VISITA A LA CIÉNAGA:**
+> - **Acceso en lancha:** 15 minutos de navegación desde el muelle de La Boca (Ocumare) o Bahía de Cata.
+> - **Aguas de piscina natural:** Bahía marina protegida de aguas cristalinas poco profundas y fondo de arena blanca coralina.
+> - **Actividades:** Kayak y Paddle Board por canales de manglares, snorkel y visita a La Cueva del Amor.
+> - **Pernocta en tierra firme:** Posadas con piscina y planta eléctrica en El Playón y Ocumare pueblo en Hoteles de Venezuela.
+
+---
+
+## 1. Rincones de La Ciénaga
+
+- **La Piscina:** Bajo central donde el agua turquesa llega a la cintura para flotar plácidamente.
+- **La Cueva del Amor:** Gruta marina con reflejos esmeralda en la roca.
+- **Canales de Manglares:** Túneles de manglar rojo poblados de estrellas de mar gigantes y caballitos marinos.`
   },
   {
-    title: "Playa El Yaque: La Meca Mundial del Windsurf y Kitesurf en la Isla de Margarita",
+    title: "Playa El Yaque: La Meca Mundial del Viento, el Lujo Descalzo y la Buena Vida en Margarita",
     slug: "playa-el-yaque-margarita-viento-kitesurf-hoteles",
-    excerpt: "Guía de Playa El Yaque en Margarita: temporadas de viento constante, escuelas certificadas de kitesurf y hoteles frente al mar con reserva directa.",
-    reading_time: 8,
+    excerpt: "Guía editorial de Playa El Yaque: temporadas de viento de clase mundial, escuelas de kitesurf, cruce a Isla de Coche y hoteles a pie de playa sin comisiones.",
+    reading_time: 15,
     author_name: "Equipo Editorial Hoteles de Venezuela",
     status: "published",
     featured_image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
-    content: `# Playa El Yaque: La Meca Mundial del Windsurf y Kitesurf en la Isla de Margarita
+    content: `# Playa El Yaque: La Meca Mundial del Viento, el Lujo Descalzo y la Buena Vida en Margarita
 
-> **DATOS CLAVE DE PLAYA EL YAQUE:**
-> - **Viento de clase mundial:** Vientos alisios constantes de 15 a 30 nudos entre los meses de enero y junio.
-> - **Condiciones ideales:** Aguas cálidas, poco profundas y sin corrientes peligrosas, perfectas tanto para deportistas profesionales como para principiantes.
-> - **Ubicación estratégica:** A solo 8 minutos del Aeropuerto Internacional Santiago Mariño de Margarita.
-> - **Hoteles a pie de playa:** Hospedajes deportivos y de descanso con almacenamiento seguro de equipos y restaurantes frente al mar.`
+> **CLAVES DE TU EXPERIENCIA EN EL YAQUE:**
+> - **Ubicación:** A solo 8 minutos del Aeropuerto Internacional Santiago Mariño (PMV).
+> - **Temporada de viento (enero a junio):** Alisios constantes de 18 a 30 nudos, aguas llanas y cálidas todo el año.
+> - **Escuelas certificadas:** Aprendizaje de windsurf, kitesurf y wingfoil para todas las edades.
+> - **Reserva directa:** Hoteles boutique a pie de playa con casilleros náuticos y piscinas en Hoteles de Venezuela.
+
+---
+
+## 1. Zonas de la Playa y Excursión a Coche
+
+- **Zona de Windsurf y Bañistas:** Aguas mansas y llanas ideales para familias y principiantes.
+- **Kite Beach (Zona Oeste):** Área amplia para desplegar cometas y navegar con seguridad.
+- **Isla de Coche (Playa La Punta):** A 20 minutos en lancha rápida, con aguas ultra planas para freestyle.`
   },
   {
-    title: "Choroní y Travesía a Chuao: Selva del Henri Pittier, Cacao con D.O.P. y Mar Caribe",
+    title: "Choroní y la Travesía a Chuao: Crónica de la Selva del Henri Pittier, el Mar Caribe y el Cacao Más Fino del Mundo",
     slug: "choroni-puerto-colombia-chuao-cacao-posadas-aragua",
-    excerpt: "Guía de viaje a Choroní y Chuao: cruce del Parque Henri Pittier, Playa Grande, plantaciones de cacao D.O.P. Chuao, cascada El Chorrerón y posadas coloniales.",
-    reading_time: 9,
+    excerpt: "Guía editorial de Choroní y Chuao: cruce del Henri Pittier, Playa Grande, plantaciones de cacao D.O.P., cascada El Chorrerón y posadas coloniales sin comisiones.",
+    reading_time: 16,
     author_name: "Equipo Editorial Hoteles de Venezuela",
     status: "published",
     featured_image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80",
-    content: `# Choroní y Travesía a Chuao: Selva del Henri Pittier, Cacao con D.O.P. y Mar Caribe
+    content: `# Choroní y la Travesía a Chuao: Crónica de la Selva del Henri Pittier, el Mar Caribe y el Cacao Más Fino del Mundo
 
 > **CLAVES DE VIAJE A CHORONÍ Y CHUAO:**
-> - **La carretera de montaña:** Espectacular travesía de 44 km atravesando la selva nublada del Parque Nacional Henri Pittier desde Maracay.
-> - **Puerto Colombia y Playa Grande:** El corazón turístico de Choroní, con su extensa playa bordeada de cocoteros y oleaje caribeño.
-> - **La expedición en peñero a Chuao:** 20 minutos de navegación marítima para llegar al pueblo que produce el cacao fino de aroma más cotizado del planeta.
-> - **Trekking a la Cascada El Chorrerón:** Caminata de 2 horas remontando el río Chuao hasta una imponente caída de agua de 70 metros oculta en la selva.`
+> - **Carretera del Henri Pittier:** 44 km de selva nublada virgen desde Maracay.
+> - **Puerto Colombia y Playa Grande:** Casonas coloniales, malecón con repique de tambores y playa bordeada de cocoteros.
+> - **Expedición en peñero a Chuao:** 20 minutos de navegación hacia el templo del cacao D.O.P. y trekking a la Cascada El Chorrerón (70 m).
+> - **Reserva directa:** Casonas coloniales con piscina y planta eléctrica en Hoteles de Venezuela.
+
+---
+
+## 1. De Puerto Colombia al Patio de Secado de Chuao
+
+- **Playa Grande:** Medialuna dorada de oleaje vivo y frondoso bosque de cocoteros.
+- **Patio de Secado de Chuao:** Frente a la iglesia colonial, las maestras cacaoteras extienden el grano con D.O.P. entre cantos ancestrales.
+- **Trekking a Cascada El Chorrerón:** Caminata selvática de 2 horas remontando el río Chuao hasta un pozo turquesa monumental.`
   },
   {
-    title: "Cabo San Román y Salinas de Cumaraguas: La Ruta del Viento y Aguas Rosadas en Paraguaná",
+    title: "Cabo San Román y las Salinas de Cumaraguas: Crónica del Extremo Norte y las Aguas Rosadas de Paraguaná",
     slug: "cabo-san-roman-salinas-cumaraguas-paraguana-posadas",
-    excerpt: "Descubre el Cabo San Román y las Salinas de Cumaraguas en Falcón: el extremo norte de Venezuela, atardeceres rosados y posadas con encanto en Paraguaná.",
-    reading_time: 8,
+    excerpt: "Guía editorial de Paraguaná: el extremo norte de Venezuela en Cabo San Román, lagunas rosadas de Cumaraguas, kitesurf en Adícora y posadas sin comisiones.",
+    reading_time: 15,
     author_name: "Equipo Editorial Hoteles de Venezuela",
     status: "published",
     featured_image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
-    content: `# Cabo San Román y Salinas de Cumaraguas: La Ruta del Viento y Aguas Rosadas en Paraguaná
+    content: `# Cabo San Román y las Salinas de Cumaraguas: Crónica del Extremo Norte y las Aguas Rosadas de Paraguaná
 
-> **DATOS CLAVE DE LA PENÍNSULA DE PARAGUANÁ:**
-> - **Cabo San Román:** El punto continental más septentrional de Venezuela y de América del Sur (en días claros se aprecian las luces de la isla de Aruba a solo 31 km).
-> - **Salinas de Cumaraguas:** Lagunas de evaporación de sal que adquieren un intenso color rosado y magenta al caer la tarde por la presencia de microorganismos halófilos (*Dunaliella salina*).
-> - **Viento y deportes náuticos:** Playas como Adícora son reconocidas mundialmente para la práctica de kitesurf y windsurf.
-> - **Gastronomía falconiana:** Chivo en coco, queso de cabra artesanal y mariscos frescos de la costa.`
+> **CLAVES DE TU EXPEDICIÓN POR PARAGUANÁ:**
+> - **El extremo norte de Sudamérica:** Cabo San Román (latitud 12° 11' N); en días despejados se aprecian las luces de la isla de Aruba a 31 km.
+> - **Salinas de Cumaraguas:** Lagunas hipersalinas que adquieren color rosa intenso y magenta al atardecer por la microalga *Dunaliella salina*.
+> - **Adícora:** Capital continental del kitesurf con vientos alisios durante más de 300 días al año.
+> - **Reserva directa:** Posadas boutique con piscinas protegidas del viento y cocina falconiana en Hoteles de Venezuela.
+
+---
+
+## 1. Circuito Peninsular y Gastronomía
+
+- **Faro de Cabo San Román y Puerto Escondido:** Acantilados marinos fósiles y playas vírgenes.
+- **Cerro Santa Ana:** Trekking a la selva nublada enclavada en medio del desierto.
+- **Sazón Falconiana:** Chivo en coco cremoso, queso de cabra artesanal y Cocuy de Pecaya D.O.P.`
   },
   {
-    title: "Safaris en los Llanos Venezolanos: Fauna Silvestre, Chigüires y Hatos Ecoturísticos",
+    title: "Safaris en los Llanos Venezolanos: Crónica del 'Serengueti' Tropical en las Sabanas de Apure y Barinas",
     slug: "safaris-llanos-venezolanos-hatos-fauna-apure-barinas",
-    excerpt: "Guía de safaris fotográficos en los Llanos de Apure y Barinas: avistamiento de chigüires, anacondas, caimanes del Orinoco y hatos ecoturísticos.",
-    reading_time: 9,
+    excerpt: "Guía editorial de safaris en los Llanos de Apure y Barinas: avistamiento de chigüires, anacondas, caimanes del Orinoco y hatos con reserva directa.",
+    reading_time: 16,
     author_name: "Equipo Editorial Hoteles de Venezuela",
     status: "published",
     featured_image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80",
-    content: `# Safaris en los Llanos Venezolanos: Fauna Silvestre, Chigüires y Hatos Ecoturísticos en Apure y Barinas
+    content: `# Safaris en los Llanos Venezolanos: Crónica del 'Serengueti' Tropical en las Sabanas de Apure y Barinas
 
-> **CLAVES DEL SAFARI LLANERO:**
-> - **Mejor temporada:** Temporada seca (diciembre a abril), cuando los esteros se concentran y la fauna silvestre se agrupa alrededor de los cuerpos de agua.
-> - **Especies emblemáticas:** Chigüires (capibaras), caimán del Orinoco, oso palmero (hormiguero gigante), anacondas y más de 350 especies de aves acuáticas (corocoras rojas, garzas paletas y jabirús).
-> - **Hospedaje en Hatos:** Hatos ganaderos tradicionales adaptados al turismo de conservación con guías baquianos y safaris en lancha o camiones descubiertos.`
+> **SÍNTESIS PARA EXPEDICIONARIOS Y AMANTES DE LA FAUNA:**
+> - **Concentración de fauna extrema:** Sabanas inundables que concentran millones de ejemplares en la temporada seca (diciembre a abril).
+> - **Los 'Cinco Grandes' llaneros:** Chigüires en manadas, Caimán del Orinoco (hasta 5 m), Anacondas verdes, Osos Palmeros gigantes y más de 350 especies de aves acuáticas (corocoras rojas y jabirús).
+> - **Hatos Ecoturísticos:** Reservas privadas con pensión completa, safaris en camiones 4x4 abiertos y lanchas fluviales.
+> - **Reserva directa:** Estancias llaneras con aire acondicionado y guías biólogos en Hoteles de Venezuela.
+
+---
+
+## 1. Vida en el Hato y Cultura Llanera
+
+- **Safaris Diarios:** Salidas matutinas y vespertinas para fotografiar fauna silvestre a escasos metros de distancia.
+- **Tradición y Mesa Llanera:** Carne en vara al fuego de leña de taparo, queso de mano fresco, noches de joropo y cantos de trabajo de llano (Patrimonio UNESCO).`
   },
   {
-    title: "Médanos de Coro y Casco Colonial: Dunas del Caribe y Patrimonio Mundial de la UNESCO",
+    title: "Los Médanos de Coro y el Casco Colonial: Crónica de Arena Dorada y Adobe Centenario en la Primera Capital",
     slug: "medanos-de-coro-casco-colonial-falcon-posadas",
-    excerpt: "Guía de Santa Ana de Coro: atardeceres en el Parque Nacional Médanos de Coro, arquitectura colonial en barro de la UNESCO y casonas coloniales con reserva directa.",
-    reading_time: 8,
+    excerpt: "Guía editorial de Santa Ana de Coro: dunas del Parque Nacional Médanos de Coro, arquitectura de barro UNESCO, chivo en coco y casonas coloniales sin comisiones.",
+    reading_time: 15,
     author_name: "Equipo Editorial Hoteles de Venezuela",
     status: "published",
     featured_image: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1200&q=80",
-    content: `# Médanos de Coro y Casco Colonial: Dunas del Caribe y Patrimonio Mundial de la UNESCO
+    content: `# Los Médanos de Coro y el Casco Colonial: Crónica de Arena Dorada y Adobe Centenario en la Primera Capital
 
-> **LO QUE DEBES SABER DE CORO:**
-> - **Patrimonio de la Humanidad:** Santa Ana de Coro y su puerto real de La Vela fueron declarados Patrimonio Mundial por la UNESCO en 1993 por su arquitectura en barro y adobe única en el Caribe.
-> - **Parque Nacional Médanos de Coro:** Dunas de arena móvil de hasta 30 metros de altura que cambian de forma con los vientos alisios.
-> - **Atracciones culturales:** Balcón de los Bolívar, Casa de las Ventanas de Hierro y Cruz de San Clemente.
-> - **Hospedaje con historia:** Casonas coloniales de patios interiores con tejas rojas y fuentes coloniales restauradas con todas las comodidades modernas.`
+> **SÍNTESIS PARA VIAJEROS CULTURALES:**
+> - **Primera capital (1527):** Santa Ana de Coro conserva el primer obispado de Sudamérica y un casco histórico de barro y adobe declarado Patrimonio Mundial UNESCO en 1993.
+> - **Médanos de Coro:** Más de 91.000 hectáreas de dunas de arena fósil de hasta 30 metros de altura, ideales para caminar descalzo al atardecer y sandboarding.
+> - **La Vela de Coro:** Puerto donde Francisco de Miranda izó por primera vez la bandera nacional en 1806.
+> - **Reserva directa:** Casonas coloniales del siglo XVIII con patios interiores y piscinas en Hoteles de Venezuela.
+
+---
+
+## 1. Paseo Patrimonial y Desierto Marino
+
+- **Calle Zamora y Casa de las Ventanas de Hierro:** Balcones barrocos, rejas sevillanas y la Cruz de San Clemente de 1527.
+- **Atardecer en las Dunas:** La luz dorada entre 04:30 PM y 06:15 PM para recorrer las crestas de arena.
+- **Gastronomía Coriana:** Chivo al talkarí, arepa pelada con suero de cabra y dulce de leche en paila de cobre.`
   },
   {
-    title: "El Callao, Carnaval y la Ruta del Oro: Tradición UNESCO, Madamas y Joyas en Bolívar",
+    title: "El Callao, el Carnaval y la Ruta del Oro: Crónica del Calipso, las Madamas y el Brillo del Yuruari",
     slug: "el-callao-carnaval-ruta-del-oro-calipso-bolivar",
-    excerpt: "Guía de El Callao: tradición inmaterial de la UNESCO, repique del bumbac, Madamas del Calipso, orfebrería de oro de 18k/24k y posadas culturales en Bolívar.",
-    reading_time: 8,
+    excerpt: "Guía editorial de El Callao en Bolívar: Carnaval Patrimonio UNESCO, Madamas, Calipso al ritmo de bumbac, joyas de oro 18k/24k y posadas sin comisiones.",
+    reading_time: 16,
     author_name: "Equipo Editorial Hoteles de Venezuela",
     status: "published",
     featured_image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80",
-    content: `# El Callao, Carnaval y la Ruta del Oro: Tradición UNESCO, Madamas y Joyas en Bolívar
+    content: `# El Callao, el Carnaval y la Ruta del Oro: Crónica del Calipso, las Madamas y el Brillo del Yuruari
 
-> **CLAVES DE EL CALLAO Y LA RUTA DEL ORO:**
-> - **Patrimonio Cultural Inmaterial UNESCO:** El Carnaval de El Callao y sus comparsas de Madamas, Diablos y MedioPintos.
-> - **El Calipso de El Callao:** Ritmo afroantillano vibrante interpretado con tambores bumbac, campana y cuatro.
-> - **Orfebrería en Oro Certificado:** Talleres tradicionales donde se forjan piezas artesanales de oro cochano de 18k y 24k.
-> - **Gastronomía afroantillana:** Kalalú, pan inglés (*Yannikeke*) y vino de jengibre (*Ginger beer*).`
+> **CLAVES DE TU VIAJE CULTURAL A EL CALLAO:**
+> - **Patrimonio Inmaterial UNESCO (2016):** El Carnaval de El Callao sintetiza raíces afroantillanas, británicas y francesas nacidas de la fiebre del oro del siglo XIX.
+> - **Personajes:** Las Madamas (matronas con turbantes y joyas de oro cochano), los Diablos Danzantes y los MedioPintos.
+> - **Calipso y Bumbac:** Ritmo contagioso ejecutado con tambor bumbac, campana y cuatro.
+> - **Reserva directa:** Posadas confortables con aire acondicionado y cocina antillana en Hoteles de Venezuela.
+
+---
+
+## 1. Orfebrería de Oro y Gastronomía Afroantillana
+
+- **Talleres de Orfebres:** Forja a mano de cruces de El Callao y pulseras en oro puro de 18k y 24k del río Yuruari.
+- **Sabores de El Callao:** Sopa ceremonial *Kalalú*, pan inglés *Yannikeke*, *Domplin* y vino fermentado *Ginger Beer*.`
   },
   {
-    title: "Parque de la Exótica Flora Tropical: El Jardín Botánico Secreto y la Misión Colonial de Yaracuy",
+    title: "El Parque de la Exótica Flora Tropical: Crónica del Edén Botánico y la Misión Colonial de Yaracuy",
     slug: "parque-exotica-flora-tropical-san-felipe-yaracuy-posadas",
-    excerpt: "Descubre el Parque de la Exótica Flora Tropical en San Felipe, Yaracuy: colecciones mundiales de heliconias, canopy forestal y la histórica Misión de San José de 1720.",
-    reading_time: 8,
+    excerpt: "Guía editorial del Parque de la Exótica Flora Tropical en San Felipe, Yaracuy: heliconias mundiales, canopy sobre árboles centenarios y posadas coloniales sin comisiones.",
+    reading_time: 15,
     author_name: "Equipo Editorial Hoteles de Venezuela",
     status: "published",
     featured_image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80",
-    content: `# Parque de la Exótica Flora Tropical: El Jardín Botánico Secreto y la Misión Colonial de Yaracuy
+    content: `# El Parque de la Exótica Flora Tropical: Crónica del Edén Botánico y la Misión Colonial de Yaracuy
 
-> **DATOS CLAVE DEL PARQUE:**
-> - **Ubicación:** San Felipe, estado Yaracuy (a 2 horas y media de Valencia o Barquisimeto).
-> - **Colección botánica:** Más de 2.500 variedades de plantas tropicales y heliconias procedentes de América, Asia y África diseñadas por el botánico francés Jean Phillipe Thoze.
-> - **Patrimonio histórico:** Antigua Misión Capuchina de San José de 1720, restaurada con fuentes y terrazas coloniales.
-> - **Aventura ecológica:** Circuito de tirolesa / canopy sobre las copas de los árboles centenarios.`
+> **SÍNTESIS PARA AMANTES DE LA NATURALEZA Y EL CONFORT:**
+> - **La mayor colección de heliconias:** Más de 2.500 variedades de plantas tropicales en 4,5 km de caminerías diseñadas por Jean Phillipe Thoze.
+> - **Canopy Forestal:** Circuito de tirolesas a 25 metros de altura sobre los samanes centenarios del río Yaracuy.
+> - **Antigua Misión de 1720:** Monasterio capuchino restaurado como hotel boutique con claustros y restaurante gourmet.
+> - **Reserva directa:** Suites con piscinas de manantial y spa botánico en Hoteles de Venezuela.
+
+---
+
+## 1. Recorridos Botánicos y Gastronomía Yaracuyana
+
+- **Paseos Guiados:** Caminatas botánicas, carretas de caballos o carros de golf entre bosques de bambúes y estanques de nenúfares gigantes.
+- **Restaurante El Monje:** Cocina fusión en los claustros coloniales con cordero braseado al jugo de naranja yaracuyana y queso telita fresco.`
   },
   {
-    title: "Barquisimeto Musical, Sanare y Cubiro: Manto de María, Lomas Verdes y Tradición Larense",
+    title: "Barquisimeto, Sanare y las Lomas de Cubiro: Crónica de la Capital Musical, los Vientos del Páramo y la Devoción Larense",
     slug: "barquisimeto-sanare-cubiro-turismo-posadas-lara",
-    excerpt: "Guía de viaje a Lara: monumento Manto de María en Barquisimeto, clima frío en las Lomas de Cubiro, folklore de las Zaragozas de Sanare y posadas campestres.",
-    reading_time: 8,
+    excerpt: "Guía editorial de Lara: Manto de María en Barquisimeto, frío de las Lomas de Cubiro, Zaragozas de Sanare, chivo larense y posadas sin comisiones.",
+    reading_time: 16,
     author_name: "Equipo Editorial Hoteles de Venezuela",
     status: "published",
     featured_image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80",
-    content: `# Barquisimeto Musical, Sanare y Cubiro: Manto de María, Lomas Verdes y Tradición Larense
+    content: `# Barquisimeto, Sanare y las Lomas de Cubiro: Crónica de la Capital Musical, los Vientos del Páramo y la Devoción Larense
 
-> **CLAVES DEL CIRCUITO LARENSE:**
-> - **Barquisimeto: La Capital Musical:** Monumento cinético Manto de María Divina Pastora (el más alto del mundo en su tipo), Catedral de Barquisimeto y Flor de Venezuela de Fruto Vivas.
-> - **Las Lomas de Cubiro:** Colinas de pasto verde a 1.900 msnm con clima fresco, paseos a caballo y dulcería criolla.
-> - **Sanare y el Parque Nacional Yacambú:** Pueblo artesanal, cascadas cristalinas y la tradicional fiesta de los Santos Inocentes (Las Zaragozas).
-> - **Gastronomía:** Chivo larense en diferentes preparaciones, lomo prensado de Carora, suero de leche de cabra y panes dulces de El Tocuyo.`
+> **CLAVES DE TU CIRCUITO POR EL ESTADO LARA:**
+> - **Barquisimeto Monumental:** El Manto de María Divina Pastora (escultura cinética de 62 m) y la Flor de Venezuela de Fruto Vivas.
+> - **Lomas de Cubiro (1.900 msnm):** Colinas verdes con clima templado (14°C a 18°C), paseos a caballo y dulcería criolla.
+> - **Sanare y Las Zaragozas:** Pueblo colonial de cafetales y fiesta tradicional de máscaras cada 28 de diciembre en el Parque Yacambú.
+> - **Reserva directa:** Cabañas con chimenea en Cubiro y hoteles boutique en Barquisimeto en Hoteles de Venezuela.
+
+---
+
+## 1. Paisajes de Altura y Mesa Larense
+
+- **Lomas de Cubiro:** Paseos a caballo por pastizales verdes y visita a la Cueva del Salvador.
+- **Gastronomía Larense:** Lomo prensado de Carora, tostadas caroreñas, chivo en coco y suero de cabra cremoso.`
   },
   {
-    title: "La Ruta del Cacao en Barlovento: El Secreto Más Dulce (y Subterráneo) a Dos Horas de Caracas",
+    title: "La Ruta del Cacao en Barlovento: Crónica del Grano Más Fino del Mundo y el Laberinto Subterráneo de Birongo",
     slug: "ruta-del-cacao-barlovento-curiepe-birongo-cueva-alfredo-jahn",
-    excerpt: "Descubre la Ruta del Cacao en Barlovento: haciendas de Carenero Superior, espeleología en la Cueva Alfredo Jahn y posadas agroturísticas sin comisiones.",
-    reading_time: 8,
+    excerpt: "Guía editorial de la Ruta del Cacao en Miranda: haciendas de Carenero Superior en Curiepe, espeleología en la Cueva Alfredo Jahn y posadas sin comisiones.",
+    reading_time: 15,
     author_name: "Equipo Editorial Hoteles de Venezuela",
     status: "published",
     featured_image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80",
-    content: `# La Ruta del Cacao en Barlovento: El Secreto Más Dulce (y Subterráneo) a Dos Horas de Caracas
+    content: `# La Ruta del Cacao en Barlovento: Crónica del Grano Más Fino del Mundo y el Laberinto Subterráneo de Birongo
 
-> **LO QUE DEBES SABER ANTES DE ARRANCAR HACIA BARLOVENTO:**
-> - **El tesoro agrícola:** Barlovento es la cuna del cacao *Carenero Superior*, reconocido mundialmente por sus notas florales y frutales.
-> - **Aventura kárstica en Birongo:** La Cueva Alfredo Jahn cuenta con más de 4,2 kilómetros de galerías subterráneas activas. Requiere guía local certificado.
-> - **La experiencia en hacienda:** Recorridos con degustación de mucílago fresco, visita a los patios de secado y talleres de bombonería artesanal.
-> - **Cero comisiones intermediarias:** Alojamientos agroturísticos y posadas campestres con piscinas y respaldo eléctrico en Curiepe y Barlovento.`
+> **SÍNTESIS PARA VIAJEROS Y AGROTURISTAS:**
+> - **A 1h 45m de Caracas:** Barlovento es el hogar del afamado cacao Carenero Superior, cotizado mundialmente por sus notas florales y frutales.
+> - **Cueva Alfredo Jahn en Birongo:** Segunda caverna más larga de Venezuela con más de 4,2 km de galerías y ríos subterráneos activos.
+> - **Curiepe y el Tambor:** Primer pueblo de negros libres de 1721 y cuna de los tambores de San Juan Bautista (Mina y Curbata).
+> - **Reserva directa:** Posadas agroturísticas con piscina y catas privadas en Hoteles de Venezuela.
+
+---
+
+## 1. Del Grano de Cacao a la Espeleología
+
+- **Cata de Mucílago y Haciendas:** Recorrido bajo árboles de sombra, degustación de la pulpa blanca fresca y secado solar en patios de piedra.
+- **Espeleología en la Cueva Alfredo Jahn:** Caminata guiada por ríos subterráneos con agua al pecho y salones de estalactitas.
+- **Gastronomía Tradicional:** Cafunga de plátano y coco, majarete con canela y licor de cacao puro.`
   },
   {
-    title: "Pampatar: El Epicentro Gourmet y Colonial que Reinventó el Lujo en la Isla de Margarita",
+    title: "Pampatar: El Epicentro Gourmet, Colonial y Bohemio que Reinventó el Lujo en la Isla de Margarita",
     slug: "pampatar-ruta-gastronomica-margarita-castillo-borromeo-hoteles",
     excerpt: "Descubre la capital culinaria de Margarita: restaurantes de autor en Pampatar, Castillo San Carlos de Borromeo y hoteles boutique con reserva directa.",
-    reading_time: 9,
+    reading_time: 16,
     author_name: "Equipo Editorial Hoteles de Venezuela",
     status: "published",
     featured_image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
-    content: `# Pampatar: El Epicentro Gourmet y Colonial que Reinventó el Lujo en la Isla de Margarita
+    content: `# Pampatar: El Epicentro Gourmet, Colonial y Bohemio que Reinventó el Lujo en la Isla de Margarita
 
-> **CLAVES PARA TU EXPERIENCIA EN PAMPATAR:**
-> - **La Capital Gastronómica del Caribe Venezolano:** Pampatar concentra la mayor densidad de propuestas culinarias de autor del país, con pesca fresca y ají dulce margariteño.
-> - **Patrimonio vivo a orillas del mar:** Castillo San Carlos de Borromeo (siglo XVII) y la Iglesia del Santísimo Cristo del Buen Viaje.
-> - **Vida nocturna cosmopolita:** Coctelería de autor, cafés de especialidad y terrazas frente a la bahía colonial.
-> - **Reserva directa de alto nivel:** Hoteles boutique con plantas eléctricas al 100%, desalinización propia y conserjería personalizada.`
+> **CLAVES PARA TU EXPERIENCIA SIBARITA EN PAMPATAR:**
+> - **Capital Gastronómica del Caribe:** Alta cocina insular de autor con pesca fresca de profundidad y Ají Dulce Margariteño.
+> - **Patrimonio Colonial Marino:** Castillo San Carlos de Borromeo (siglo XVII) e Iglesia del Cristo del Buen Viaje en un casco histórico caminable.
+> - **Vida Nocturna Cosmopolita:** Bares de autor, vinotecas y terrazas frente al mar en la calle Joaquín Maneiro y La Caranta.
+> - **Reserva directa:** Hoteles boutique con piscinas infinitas, desalinización propia y plantas eléctricas al 100% en Hoteles de Venezuela.
+
+---
+
+## 1. La Revolución Culinaria y el Casco Colonial
+
+- **El Ají Dulce y la Pesca Fresca:** Pulpo asado a las brasas con emulsión de ají dulce de San Juan, carpaccio de lebranche curado y pastel de chucho gourmet.
+- **Castillo San Carlos de Borromeo:** Fortaleza militar española con cañones de bronce apuntando a las aguas mansas de la bahía.
+- **Playa Juventud y La Caranta:** Ensenadas de aguas cristalinas sin oleaje para nadar o hacer paddle board al atardecer.`
   }
 ];
 
@@ -530,10 +705,10 @@ async function seed() {
         r.reading_time,
         r.status
       ]);
-      console.log(`✓ Inserted/Updated: ${r.slug}`);
+      console.log(`✓ Updated with full editorial depth: ${r.slug}`);
     }
 
-    console.log(`\nAll ${reports.length} destination reports have been successfully seeded into blog_posts!`);
+    console.log(`\nAll ${reports.length} comprehensive destination reports successfully seeded into database!`);
   } catch (err) {
     console.error("Error during seeding:", err);
   } finally {
