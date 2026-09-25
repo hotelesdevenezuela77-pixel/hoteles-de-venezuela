@@ -101,7 +101,7 @@ function Footer() {
             </div>
           </div>
 
-          {/* Explorar */}
+          {/* Column 2: Explorar & Categorías */}
           <div>
             <div className="flex items-center gap-2 mb-5">
               <div className="w-6 h-0.5" style={{ background: "linear-gradient(90deg, #FF0096, #9B00CC)" }} />
@@ -109,14 +109,15 @@ function Footer() {
             </div>
             <ul className="space-y-2.5">
               {[
-                { href: "/establecimientos?category=hoteles", label: "Hoteles" },
-                { href: "/establecimientos?category=restaurantes", label: "Restaurantes" },
-                { href: "/establecimientos?category=posadas", label: "Posadas" },
+                { href: "/establecimientos?category=hoteles", label: "Hoteles de Venezuela" },
+                { href: "/establecimientos?category=posadas", label: "Posadas Boutique" },
+                { href: "/establecimientos?category=restaurantes", label: "Restaurantes & Sabor" },
+                { href: "/sitios-turisticos", label: "Sitios Turísticos Iconos" },
                 { href: "/parques", label: "Parques Nacionales" },
-                { href: "/destinos", label: "Todos los destinos" },
+                { href: "/destinos", label: "Todos los Destinos" },
               ].map((l) => (
                 <li key={l.href}>
-                  <Link href={l.href} className="text-gray-300 text-sm hover:text-pink-400 transition-colors flex items-center gap-1.5">
+                  <Link href={l.href} className="text-gray-300 text-xs hover:text-pink-400 transition-colors flex items-center gap-1.5 font-medium">
                     <span className="text-pink-500 font-bold">•</span> {l.label}
                   </Link>
                 </li>
@@ -124,26 +125,47 @@ function Footer() {
             </ul>
           </div>
 
-          {/* Para Negocios */}
+          {/* Column 3: Guías & Reportajes SEO */}
           <div>
             <div className="flex items-center gap-2 mb-5">
-              <div className="w-6 h-0.5" style={{ background: "linear-gradient(90deg, #9B00CC, #00C8D4)" }} />
-              <h4 className="font-bold text-white text-sm tracking-wide">Para Negocios</h4>
+              <div className="w-6 h-0.5" style={{ background: "linear-gradient(90deg, #00C8D4, #FF0096)" }} />
+              <h4 className="font-bold text-white text-sm tracking-wide">Guías & Reportajes</h4>
             </div>
             <ul className="space-y-2.5">
               {[
-                { href: "/50-fundadores", label: "50 Fundadores" },
-                { href: "/alianzas-para-agencias", label: "Alianzas para Agencias" },
-                { href: "/membresias", label: "Membresías" },
-                { href: "/prestigio-2026", label: "Prestigio" },
-                { href: "/reportar-pago", label: "Reportar Pago Local" },
-                { href: "/mis-negocios", label: "Registrar mi negocio" },
-                { href: "/servicios-b2b", label: "Servicios B2B" },
-                { href: "/blog", label: "Blog" },
+                { href: "/blog/morrocoy-guia-definitiva-cayos", label: "Guía Morrocoy & Cayos" },
+                { href: "/blog/canaima-salto-angel-guia", label: "Guía Canaima & Salto Ángel" },
+                { href: "/blog/los-roques-mejor-epoca-del-ano", label: "Guía Los Roques" },
+                { href: "/blog", label: "Tips de Viaje & 20 Reportajes" },
+                { href: "/top-10-hoteles", label: "Top 10 Hoteles Selección" },
+                { href: "/prestigio-2026", label: "Colección Prestigio 2026" },
               ].map((l, i) => (
                 <li key={i}>
-                  <Link href={l.href} className="text-gray-300 text-sm hover:text-cyan-400 transition-colors flex items-center gap-1.5">
-                    <span className="text-cyan-500 font-bold">•</span> {l.label}
+                  <Link href={l.href} className="text-gray-300 text-xs hover:text-cyan-400 transition-colors flex items-center gap-1.5 font-medium">
+                    <span className="text-cyan-400 font-bold">•</span> {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Column 4: Para Propietarios & B2B */}
+          <div>
+            <div className="flex items-center gap-2 mb-5">
+              <div className="w-6 h-0.5" style={{ background: "linear-gradient(90deg, #9B00CC, #00C8D4)" }} />
+              <h4 className="font-bold text-white text-sm tracking-wide">Para Propietarios</h4>
+            </div>
+            <ul className="space-y-2.5">
+              {[
+                { href: "/mis-negocios", label: "Registrar mi Negocio (0% Comisiones)" },
+                { href: "/50-fundadores", label: "Programa 50 Fundadores" },
+                { href: "/alianzas-para-agencias", label: "Alianzas para Agencias" },
+                { href: "/membresias", label: "Membresías & Planes" },
+                { href: "/reportar-pago", label: "Reportar Pago Local" },
+              ].map((l, i) => (
+                <li key={i}>
+                  <Link href={l.href} className="text-gray-300 text-xs hover:text-purple-400 transition-colors flex items-center gap-1.5 font-medium">
+                    <span className="text-purple-400 font-bold">•</span> {l.label}
                   </Link>
                 </li>
               ))}

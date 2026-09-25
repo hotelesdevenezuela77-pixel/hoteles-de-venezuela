@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { MapPin, Star, Wifi, Car, Waves, Utensils, TreePine, Dumbbell, Sparkles, Phone, BarChart3, Award, Calendar, Megaphone } from "lucide-react";
+import { MapPin, Star, Wifi, Car, Waves, Utensils, TreePine, Dumbbell, Sparkles, Phone, BarChart3, Award, Calendar, Megaphone, Zap, Droplets, ShieldCheck, Heart } from "lucide-react";
 import { TrackedWhatsAppButton } from "./TrackedWhatsAppButton";
 import { parseServicesList, getAmenityLabel } from "@/lib/amenitiesList";
 import { optimizeImageUrl } from "@/lib/utils";
@@ -163,9 +163,48 @@ export function EstablishmentCard({
                 <span className={`truncate ${isPriority ? "text-gray-300" : "text-gray-400"}`}>{establishment.destination_name || establishment.address || "Venezuela"}</span>
               </div>
 
+              {/* Insignias Operativas de Venezuela (Planta Eléctrica, Agua 24/7, Starlink, Pet Friendly) */}
+              <div className="flex flex-wrap gap-1.5 mt-2.5">
+                <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider flex items-center gap-1 border ${
+                  isPriority 
+                    ? "bg-amber-500/20 border-amber-500/35 text-amber-300" 
+                    : "bg-amber-50 border border-amber-200 text-amber-800"
+                }`} title="Generador de energía continua respaldado 24/7">
+                  <Zap className="w-3 h-3 text-amber-500 fill-amber-400 shrink-0" />
+                  Planta Eléctrica
+                </span>
+
+                <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider flex items-center gap-1 border ${
+                  isPriority 
+                    ? "bg-cyan-500/20 border-cyan-500/35 text-cyan-300" 
+                    : "bg-cyan-50 border border-cyan-200 text-cyan-800"
+                }`} title="Suministro de agua garantizado por tanque y sistema propio">
+                  <Droplets className="w-3 h-3 text-cyan-500 fill-cyan-400 shrink-0" />
+                  Agua 24/7
+                </span>
+
+                <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider flex items-center gap-1 border ${
+                  isPriority 
+                    ? "bg-emerald-500/20 border-emerald-500/35 text-emerald-300" 
+                    : "bg-emerald-50 border border-emerald-200 text-emerald-800"
+                }`} title="Internet de alta velocidad vía satélite Starlink">
+                  <Wifi className="w-3 h-3 text-emerald-500 shrink-0" />
+                  Starlink
+                </span>
+
+                <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider flex items-center gap-1 border ${
+                  isPriority 
+                    ? "bg-pink-500/20 border-pink-500/35 text-pink-300" 
+                    : "bg-pink-50 border border-pink-200 text-pink-800"
+                }`} title="Admite mascotas">
+                  <Heart className="w-3 h-3 text-pink-500 fill-pink-400 shrink-0" />
+                  Pet Friendly
+                </span>
+              </div>
+
               {/* Status Badges Row (Sello HDV, Reservas, Ads) */}
               {(establishment.has_hdv_seal || establishment.has_reservations_enabled || establishment.is_ads_enabled) && (
-                <div className="flex flex-wrap gap-1.5 mt-2.5">
+                <div className="flex flex-wrap gap-1.5 mt-2">
                   {establishment.has_hdv_seal && (
                     <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider border flex items-center gap-1 shrink-0 ${
                       isPriority 
@@ -244,23 +283,35 @@ export function EstablishmentCard({
 
         {/* Action Buttons */}
         <div className="px-5 pb-5">
-          <div className={`flex gap-2.5 pt-4 border-t mt-4 ${isPriority ? "border-white/10" : "border-gray-50"}`}>
-            {(establishment.whatsapp || establishment.phone) ? (
-              <div className="flex-1">
-                <TrackedWhatsAppButton
-                  whatsappNumber={establishment.whatsapp || establishment.phone}
-                  establishmentId={establishment.id}
-                  establishmentName={establishment.name}
-                  isPriority={isPriority}
-                />
-              </div>
-            ) : null}
+          <div className={`flex flex-col gap-2 pt-4 border-t mt-4 ${isPriority ? "border-white/10" : "border-gray-50"}`}>
+            <div className="flex gap-2.5">
+              {(establishment.whatsapp || establishment.phone) ? (
+                <div className="flex-1">
+                  <TrackedWhatsAppButton
+                    whatsappNumber={establishment.whatsapp || establishment.phone}
+                    establishmentId={establishment.id}
+                    establishmentName={establishment.name}
+                    isPriority={isPriority}
+                  />
+                </div>
+              ) : null}
 
-            <Link href={`/establecimiento/${establishment.slug}`} className="flex-1">
-              <button className="w-full btn-cyan-gradient text-white text-xs font-extrabold py-2.5 px-4 rounded-xl flex items-center justify-center shadow-md shadow-brand-turquesa/10 hover:scale-102 transition-all cursor-pointer">
-                Ver Ficha
-              </button>
-            </Link>
+              <Link href={`/establecimiento/${establishment.slug}`} className="flex-1">
+                <button className="w-full btn-cyan-gradient text-white text-xs font-extrabold py-2.5 px-4 rounded-xl flex items-center justify-center shadow-md shadow-brand-turquesa/10 hover:scale-102 transition-all cursor-pointer">
+                  Ver Ficha
+                </button>
+              </Link>
+            </div>
+
+            {/* CRO Guarantee Micro-Badge */}
+            <div className={`flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl border text-[10px] font-black ${
+              isPriority 
+                ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-300" 
+                : "bg-emerald-50 border-emerald-200 text-emerald-700"
+            }`}>
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+              <span>0% Comisión · Trato Directo con Propietario</span>
+            </div>
           </div>
         </div>
       </div>

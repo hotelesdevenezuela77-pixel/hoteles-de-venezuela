@@ -596,13 +596,20 @@ export function Home() {
         {/* Lado Izquierdo: Movimiento de abajo hacia arriba */}
         <div className="absolute left-1 sm:left-3 md:left-5 top-0 bottom-0 z-10 pointer-events-none select-none flex items-center justify-center overflow-hidden hidden min-[480px]:flex border-r border-[#00C8D4]/20 pr-1 sm:pr-2">
           <div className="animate-marquee-vertical-up flex flex-col items-center">
-            {[1, 2, 3, 4, 5, 6].map(i => (
+            {[
+              "RESERVAS DIRECTAS CON EL PROPIETARIO 0% COMISIONES",
+              "HOSPEDAJES AUDITADOS FÍSICAMENTE EN PERSONA",
+              "PLANTA ELÉCTRICA · AGUA CONTINUA 24/7 · STARLINK",
+              "HOTELES DE VENEZUELA · SELLO DE CALIDAD AUDITADO",
+              "RESERVAS DIRECTAS CON EL PROPIETARIO 0% COMISIONES",
+              "HOSPEDAJES AUDITADOS FÍSICAMENTE EN PERSONA"
+            ].map((txt, i) => (
               <div 
                 key={`v-left-${i}`}
-                className="py-5 font-mono font-black text-[9px] sm:text-[11px] tracking-[0.25em] uppercase text-transparent bg-clip-text bg-gradient-to-b from-[#00C8D4] via-white to-[#FF0096] writing-mode-vertical rotate-180 flex items-center gap-3 drop-shadow-[0_0_8px_rgba(0,200,212,0.35)] opacity-85"
+                className="py-5 font-mono font-black text-[9px] sm:text-[10px] tracking-[0.22em] uppercase text-transparent bg-clip-text bg-gradient-to-b from-[#00C8D4] via-white to-[#FF0096] writing-mode-vertical rotate-180 flex items-center gap-3 drop-shadow-[0_0_8px_rgba(0,200,212,0.35)] opacity-85"
               >
                 <span className="text-[#00C8D4] text-[10px]">✦</span>
-                <span>Plataforma Hoteles de Venezuela en actualización 2026</span>
+                <span>{txt}</span>
               </div>
             ))}
           </div>
@@ -611,13 +618,20 @@ export function Home() {
         {/* Lado Derecho: Movimiento de arriba hacia abajo */}
         <div className="absolute right-1 sm:right-3 md:right-5 top-0 bottom-0 z-10 pointer-events-none select-none flex items-center justify-center overflow-hidden hidden min-[480px]:flex border-l border-[#FF0096]/20 pl-1 sm:pl-2">
           <div className="animate-marquee-vertical-down flex flex-col items-center">
-            {[1, 2, 3, 4, 5, 6].map(i => (
+            {[
+              "PLANTA ELÉCTRICA · AGUA CONTINUA 24/7 · STARLINK",
+              "CONTACTO DIRECTO VÍA WHATSAPP CON EL HOTEL",
+              "COLECCIÓN PRESTIGIO 2026 · HOTELES ÉLITE",
+              "GUÍA TURÍSTICA Y HOSPEDAJES EN TODA VENEZUELA",
+              "PLANTA ELÉCTRICA · AGUA CONTINUA 24/7 · STARLINK",
+              "CONTACTO DIRECTO VÍA WHATSAPP CON EL HOTEL"
+            ].map((txt, i) => (
               <div 
                 key={`v-right-${i}`}
-                className="py-5 font-mono font-black text-[9px] sm:text-[11px] tracking-[0.25em] uppercase text-transparent bg-clip-text bg-gradient-to-b from-[#FF0096] via-white to-[#00C8D4] writing-mode-vertical flex items-center gap-3 drop-shadow-[0_0_8px_rgba(255,0,150,0.35)] opacity-85"
+                className="py-5 font-mono font-black text-[9px] sm:text-[10px] tracking-[0.22em] uppercase text-transparent bg-clip-text bg-gradient-to-b from-[#FF0096] via-white to-[#00C8D4] writing-mode-vertical flex items-center gap-3 drop-shadow-[0_0_8px_rgba(255,0,150,0.35)] opacity-85"
               >
                 <span className="text-[#FF0096] text-[10px]">✦</span>
-                <span>Plataforma Hoteles de Venezuela en actualización 2026</span>
+                <span>{txt}</span>
               </div>
             ))}
           </div>
