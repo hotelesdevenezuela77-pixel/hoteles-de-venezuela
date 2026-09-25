@@ -3,38 +3,54 @@
  */
 export const OFFICIAL_WHATSAPP_NUMBER = "584145069774";
 export const OFFICIAL_WHATSAPP_DISPLAY = "+58 414-5069774";
-export const OFFICIAL_WHATSAPP_URL = `https://wa.me/${OFFICIAL_WHATSAPP_NUMBER}`;
+export const OFFICIAL_WHATSAPP_URL = `https://wa.me/${OFFICIAL_WHATSAPP_NUMBER}?text=Hola%2C%20quisiera%20informaci%C3%B3n%20sobre%20Hoteles%20de%20Venezuela`;
 export const OFFICIAL_CALL_URL = `tel:+584145069774`;
 
 export const SECONDARY_WHATSAPP_NUMBER = "584242608686";
 export const SECONDARY_WHATSAPP_DISPLAY = "+58 424-260-8686";
-export const SECONDARY_WHATSAPP_URL = `https://wa.me/${SECONDARY_WHATSAPP_NUMBER}`;
+export const SECONDARY_WHATSAPP_URL = `https://wa.me/${SECONDARY_WHATSAPP_NUMBER}?text=Hola%2C%20quisiera%20informaci%C3%B3n%20sobre%20Hoteles%20de%20Venezuela`;
 export const SECONDARY_CALL_URL = `tel:+584242608686`;
 
 export const TERTIARY_WHATSAPP_NUMBER = "584244798412";
 export const TERTIARY_WHATSAPP_DISPLAY = "+58 424-479-8412";
-export const TERTIARY_WHATSAPP_URL = `https://wa.me/${TERTIARY_WHATSAPP_NUMBER}`;
+export const TERTIARY_WHATSAPP_URL = `https://wa.me/${TERTIARY_WHATSAPP_NUMBER}?text=Hola%2C%20quisiera%20informaci%C3%B3n%20sobre%20Hoteles%20de%20Venezuela`;
 export const TERTIARY_CALL_URL = `tel:+584244798412`;
 
-export const OFFICIAL_PHONE_NUMBERS = [
+export interface FooterContactButton {
+  display: string;
+  href: string;
+  type: "whatsapp" | "call";
+  label: string;
+  badge: string;
+  isExternal: boolean;
+}
+
+export const FOOTER_PHONE_BUTTONS: FooterContactButton[] = [
   {
     display: OFFICIAL_WHATSAPP_DISPLAY,
-    tel: OFFICIAL_CALL_URL,
-    whatsapp: OFFICIAL_WHATSAPP_URL,
-    label: "Línea Principal",
-  },
-  {
-    display: SECONDARY_WHATSAPP_DISPLAY,
-    tel: SECONDARY_CALL_URL,
-    whatsapp: SECONDARY_WHATSAPP_URL,
-    label: "Atención & Reservas",
+    href: OFFICIAL_WHATSAPP_URL,
+    type: "whatsapp",
+    label: "Canal Oficial WhatsApp",
+    badge: "WhatsApp",
+    isExternal: true,
   },
   {
     display: TERTIARY_WHATSAPP_DISPLAY,
-    tel: TERTIARY_CALL_URL,
-    whatsapp: TERTIARY_WHATSAPP_URL,
-    label: "Soporte Directo",
+    href: TERTIARY_WHATSAPP_URL,
+    type: "whatsapp",
+    label: "Atención & WhatsApp Directo",
+    badge: "WhatsApp",
+    isExternal: true,
+  },
+  {
+    display: SECONDARY_WHATSAPP_DISPLAY,
+    href: SECONDARY_CALL_URL,
+    type: "call",
+    label: "Llamada Telefónica Directa",
+    badge: "Llamar",
+    isExternal: false,
   },
 ];
+
 
 
