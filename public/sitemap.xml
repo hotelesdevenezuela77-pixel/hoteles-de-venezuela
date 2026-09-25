@@ -2,67 +2,67 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://hotelesdevenezuela.com/</loc>
-    <lastmod>2026-09-22</lastmod>
+    <lastmod>2026-09-25</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/establecimientos</loc>
-    <lastmod>2026-09-22</lastmod>
+    <lastmod>2026-09-25</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/destinos</loc>
-    <lastmod>2026-09-22</lastmod>
+    <lastmod>2026-09-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/mapa</loc>
-    <lastmod>2026-09-22</lastmod>
+    <lastmod>2026-09-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/parques</loc>
-    <lastmod>2026-09-22</lastmod>
+    <lastmod>2026-09-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/servicios-b2b</loc>
-    <lastmod>2026-09-22</lastmod>
+    <lastmod>2026-09-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/comparar</loc>
-    <lastmod>2026-09-22</lastmod>
+    <lastmod>2026-09-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/paquetes</loc>
-    <lastmod>2026-09-22</lastmod>
+    <lastmod>2026-09-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/links</loc>
-    <lastmod>2026-09-22</lastmod>
+    <lastmod>2026-09-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/membresias</loc>
-    <lastmod>2026-09-22</lastmod>
+    <lastmod>2026-09-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/prestigio-2026</loc>
-    <lastmod>2026-09-22</lastmod>
+    <lastmod>2026-09-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -799,6 +799,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://hotelesdevenezuela.com/blog/checklist-tecnico-equipaje-tropico-venezolano-playa-selva-montana</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://hotelesdevenezuela.com/blog/galipan-warairarepano-avila-gastronomia-posadas</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
@@ -817,6 +823,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://hotelesdevenezuela.com/blog/conectividad-operadoras-internet-movil-turistas-venezuela-esim</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://hotelesdevenezuela.com/blog/los-roques-posadas-cayos-vuelos-guia</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
@@ -829,14 +841,32 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://hotelesdevenezuela.com/blog/normativas-inparques-venezuela-permisos-tasas-drones-restricciones</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://hotelesdevenezuela.com/blog/playa-el-yaque-margarita-viento-kitesurf-hoteles</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://hotelesdevenezuela.com/blog/posada-boutique-vs-hotel-vs-apartamento-venezuela-alojamiento-grupo</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://hotelesdevenezuela.com/blog/parque-nacional-mochima-islas-posadas-puerto-la-cruz-sucre</loc>
     <lastmod>2026-09-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/ecoturismo-consciente-venezuela-basura-cero-apoyo-comunidades-locales</loc>
+    <lastmod>2026-09-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -849,6 +879,30 @@
   <url>
     <loc>https://hotelesdevenezuela.com/blog/cabo-san-roman-salinas-cumaraguas-paraguana-posadas</loc>
     <lastmod>2026-09-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/salud-seguros-viaje-emergencias-zonas-remotas-venezuela</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/viajar-con-mascotas-venezuela-posadas-pet-friendly-aerolineas-playas</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/turismo-aventura-venezuela-kitesurf-parapente-buceo-operadores-locales</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/comisiones-ocultas-vs-reserva-directa-posadas-venezuela</loc>
+    <lastmod>2026-09-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -915,6 +969,72 @@
   <url>
     <loc>https://hotelesdevenezuela.com/blog/ruta-del-cacao-barlovento-curiepe-birongo-cueva-alfredo-jahn</loc>
     <lastmod>2026-09-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/como-pagar-manejar-dinero-venezuela-turismo-guia-pagos</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/temporada-alta-vs-baja-venezuela-calendario-ahorro-posadas</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/presupuesto-mochilero-vs-viaje-premium-venezuela-costos-reales</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/viajar-por-carretera-venezuela-peajes-alcabalas-documentos-rutas</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/gasolina-combustible-rutas-turisticas-venezuela-subsidiada-internacional-apps</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/alquiler-vehiculos-vs-rusticos-traslados-privados-venezuela</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/vuelos-nacionales-venezuela-aerolineas-equipaje-penalizaciones</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/mapa-empanada-venezolana-carretera-playa-guia-sabores</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/como-pedir-pescado-fresco-mariscos-costa-venezuela-sin-sobreprecio</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/ruta-cafe-criollo-especialidad-venezuela-conuco-taza-autor</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/gastronomia-carretera-venezuela-cachaperas-cochineras-paradas</loc>
+    <lastmod>2026-09-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
