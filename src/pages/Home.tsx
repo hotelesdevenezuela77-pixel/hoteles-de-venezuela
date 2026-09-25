@@ -1007,6 +1007,18 @@ export function Home() {
             height="520"
           />
           
+          {/* CASCADA ANIMADA & BRUMA DE NIEBLA EN CAPAS CSS (Efecto Salto Ángel) */}
+          <div className="absolute inset-0 z-5 pointer-events-none overflow-hidden">
+            {/* Capas de chorro de agua que cae continuamente en el centro */}
+            <div className="absolute left-1/2 top-0 -translate-x-1/2 w-48 sm:w-64 h-[125%] bg-gradient-to-b from-white/20 via-cyan-100/30 to-transparent blur-md animate-waterfall-flow-1 opacity-70" />
+            <div className="absolute left-1/2 top-0 -translate-x-1/2 w-32 sm:w-44 h-[135%] bg-gradient-to-b from-white/30 via-white/40 to-transparent blur-sm animate-waterfall-flow-2 opacity-60" />
+            <div className="absolute left-1/2 top-0 -translate-x-1/2 w-20 sm:w-28 h-full animate-water-shimmer opacity-80 mix-blend-overlay" />
+
+            {/* Capas de niebla/bruma de vapor desvaneciéndose en la base */}
+            <div className="absolute bottom-0 left-1/4 w-[600px] h-[250px] bg-gradient-to-t from-cyan-100/25 via-white/15 to-transparent rounded-full blur-2xl animate-mist-drift-1" />
+            <div className="absolute bottom-10 right-1/4 w-[550px] h-[220px] bg-gradient-to-t from-white/20 via-cyan-50/15 to-transparent rounded-full blur-3xl animate-mist-drift-2" />
+          </div>
+          
           {/* Dark overlay for text readability */}
           <div className="absolute inset-0 bg-black/45 z-10" />
 
