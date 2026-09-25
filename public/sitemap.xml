@@ -1219,12 +1219,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://hotelesdevenezuela.com/blog/guia-altos-mirandinos-san-antonio-los-teques-clima-fresco-posadas-miranda</loc>
-    <lastmod>2026-09-25</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://hotelesdevenezuela.com/blog/guia-sierra-de-la-culata-paramo-valle-hermoso-posadas-merida</loc>
     <lastmod>2026-09-25</lastmod>
     <changefreq>weekly</changefreq>
@@ -1232,6 +1226,12 @@
   </url>
   <url>
     <loc>https://hotelesdevenezuela.com/blog/guia-aguas-termales-trincheras-san-juan-de-los-morros-posadas-bienestar</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hotelesdevenezuela.com/blog/guia-altos-mirandinos-san-antonio-los-teques-clima-fresco-posadas-miranda</loc>
     <lastmod>2026-09-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
