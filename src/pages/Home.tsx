@@ -296,7 +296,7 @@ export function Home() {
           `).eq("status", "approved"),
           supabase.from("destinations").select("id, name, slug, state, image_url, description, is_featured, status"),
           supabase.from("site_sections").select("*").order("id"),
-          supabase.from("blog_posts").select("id, title, slug, excerpt, featured_image, published_at, reading_time").order("published_at", { ascending: false }).limit(3),
+          supabase.from("blog_posts").select("id, title, slug, excerpt, featured_image, published_at, reading_time").order("published_at", { ascending: false }).limit(9),
           supabase.from("tourist_sites").select("id, name, slug, short_description, image_url, category, highlights").order("sort_order").limit(3),
           supabase.from("categories").select("id, name, slug").order("name")
         ]);
@@ -1243,7 +1243,7 @@ export function Home() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {blogs.map((blog) => (
+            {blogs.slice(0, 9).map((blog) => (
               <article key={blog.id} className="group flex flex-col justify-between bg-white border border-gray-100 rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300 h-full text-left">
                 <div>
                   <div className="h-44 overflow-hidden relative">

@@ -163,7 +163,7 @@ export function HomeV2({ isMainHome = false }: { isMainHome?: boolean }) {
           `).eq("status", "approved"),
           supabase.from("destinations").select("id, name, slug, state, image_url, description, is_featured, status"),
           supabase.from("site_sections").select("*").order("id"),
-          supabase.from("blog_posts").select("id, title, slug, excerpt, featured_image, published_at, reading_time").order("id", { ascending: false }).limit(20),
+          supabase.from("blog_posts").select("id, title, slug, excerpt, featured_image, published_at, reading_time").order("id", { ascending: false }).limit(9),
           supabase.from("tourist_sites").select("id, name, slug, short_description, image_url, category, highlights").order("sort_order").limit(6),
           supabase.from("seo_settings").select("*").in("page_key", ["home-v2", "home"])
         ]);
@@ -809,7 +809,7 @@ export function HomeV2({ isMainHome = false }: { isMainHome?: boolean }) {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {blogs.map((blog) => (
+          {blogs.slice(0, 9).map((blog) => (
             <article key={blog.id} className="group flex flex-col justify-between bg-white border border-slate-200/80 rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300 h-full text-left">
               <div>
                 <div className="h-48 overflow-hidden relative">
