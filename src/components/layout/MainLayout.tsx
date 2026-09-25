@@ -6,9 +6,9 @@ import { RouteAlertsBanner } from "../alerts/RouteAlertsBanner";
 import { BackgroundMusicPlayer } from "./BackgroundMusicPlayer";
 import { ChatWidget } from "./ChatWidget";
 import {
-  MapPin, Phone, MessageSquare, Send, X, Headphones
+  MapPin, Phone, PhoneCall, MessageSquare, Send, X, Headphones, Mail
 } from "lucide-react";
-import { OFFICIAL_WHATSAPP_DISPLAY, OFFICIAL_WHATSAPP_URL, SECONDARY_WHATSAPP_DISPLAY, SECONDARY_WHATSAPP_URL } from "@/config/whatsapp";
+import { OFFICIAL_PHONE_NUMBERS, OFFICIAL_WHATSAPP_DISPLAY, OFFICIAL_WHATSAPP_URL, SECONDARY_WHATSAPP_DISPLAY, SECONDARY_WHATSAPP_URL } from "@/config/whatsapp";
 
 const DESTINATIONS = [
   { name: "Morrocoy",        slug: "morrocoy" },
@@ -44,7 +44,7 @@ function Footer() {
         style={{ background: "linear-gradient(135deg, #1a0533 0%, #2d0d5c 100%)" }} 
         className="px-6 py-14"
       >
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-6">
 
           {/* Marca */}
           <div>
@@ -184,34 +184,64 @@ function Footer() {
             </ul>
           </div>
 
-          {/* Contacto */}
-          <div>
-            <div className="flex items-center gap-2 mb-5">
+          {/* Column 5: Contacto Directo & Líneas Telefónicas */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-3">
               <div className="w-6 h-0.5" style={{ background: "linear-gradient(90deg, #00C8D4, #FF0096)" }} />
-              <h4 className="font-bold text-white text-sm tracking-wide">Contacto</h4>
+              <h4 className="font-bold text-white text-sm tracking-wide">Contacto Directo</h4>
             </div>
-            <ul className="space-y-3">
-              <li className="flex items-start gap-2.5">
-                <span className="text-pink-400 font-bold mt-0.5">✉</span>
-                <span className="text-gray-300 text-sm font-light">partner@hotelesdevenezuela.com</span>
+
+            {/* Botones de Llamada Telefónica Directa */}
+            <div className="space-y-2">
+              <span className="text-[10px] uppercase font-black text-[#00C8D4] tracking-wider block">
+                Líneas Telefónicas Directas:
+              </span>
+              
+              {OFFICIAL_PHONE_NUMBERS.map((phone, idx) => (
+                <a
+                  key={idx}
+                  href={phone.tel}
+                  className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-white/[0.08] hover:bg-[#00C8D4]/20 border border-white/10 hover:border-[#00C8D4]/60 text-white transition-all group shadow-sm hover:scale-[1.02] active:scale-98 cursor-pointer"
+                  title={`Toca para llamar a ${phone.display}`}
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-6 h-6 rounded-lg bg-[#00C8D4]/20 group-hover:bg-[#00C8D4] text-[#00C8D4] group-hover:text-slate-950 flex items-center justify-center shrink-0 transition-colors shadow-xs">
+                      <PhoneCall className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex flex-col text-left min-w-0">
+                      <span className="text-xs font-bold text-white group-hover:text-cyan-200 tracking-tight truncate">
+                        {phone.display}
+                      </span>
+                      <span className="text-[9px] text-slate-400 group-hover:text-slate-300 font-medium truncate">
+                        {phone.label}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <span className="text-[9px] font-black uppercase tracking-wider text-[#00C8D4] group-hover:text-white bg-[#00C8D4]/10 group-hover:bg-[#00C8D4]/30 px-2 py-0.5 rounded-md shrink-0 transition-colors">
+                    Llamar
+                  </span>
+                </a>
+              ))}
+            </div>
+
+            {/* Correos y Dirección */}
+            <ul className="space-y-2 pt-2 border-t border-white/10 text-xs text-gray-300">
+              <li className="flex items-center gap-2">
+                <Mail className="w-3.5 h-3.5 text-[#FF0096] shrink-0" />
+                <a href="mailto:partner@hotelesdevenezuela.com" className="hover:text-pink-300 transition-colors truncate">
+                  partner@hotelesdevenezuela.com
+                </a>
               </li>
-              <li className="flex items-start gap-2.5">
-                <span className="text-cyan-400 font-bold mt-0.5">✉</span>
-                <span className="text-gray-300 text-sm font-light">Hotelesdevenezuela77@gmail.com</span>
+              <li className="flex items-center gap-2">
+                <Mail className="w-3.5 h-3.5 text-[#00C8D4] shrink-0" />
+                <a href="mailto:Hotelesdevenezuela77@gmail.com" className="hover:text-cyan-300 transition-colors truncate">
+                  Hotelesdevenezuela77@gmail.com
+                </a>
               </li>
-              <li className="flex items-center gap-2.5">
-                <Phone className="w-4 h-4 text-green-400 shrink-0" />
-                <div className="flex flex-col text-sm font-light text-gray-300">
-                  <a href={OFFICIAL_WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hover:text-[#00C8D4] transition-colors">{OFFICIAL_WHATSAPP_DISPLAY}</a>
-                  <a href={SECONDARY_WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hover:text-[#00C8D4] transition-colors">{SECONDARY_WHATSAPP_DISPLAY}</a>
-                </div>
-              </li>
-              <li className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" />
-                <span className="text-gray-300 text-sm font-light leading-snug flex items-center gap-1.5">
-                  <span>408 W POPLAR ST OLATHE, KS 66061</span>
-                  <span className="text-xs" title="Dirección de la LLC en USA">🇺🇸</span>
-                </span>
+              <li className="flex items-start gap-2 pt-1 text-[11px] text-slate-400">
+                <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                <span>408 W POPLAR ST OLATHE, KS 66061 🇺🇸</span>
               </li>
             </ul>
           </div>
