@@ -566,12 +566,25 @@ export function Home() {
         className="relative pt-24 pb-28 md:pt-32 md:pb-36 px-4 hero-banner-bg flex flex-col items-center justify-center text-center overflow-hidden"
         style={heroStyle}
       >
-        {/* Render hero image using normal img tag if imageUrl is set */}
-        {!loading && isValidLandscapeImage(heroSection.imageUrl) && (
+        {/* OPCCIÓN 3: VIDEO CINEMÁTICO DEL SALTO ÁNGEL CON CAÍDA DE AGUA REAL Y BRUMA */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster={optimizeImageUrl(heroSection.imageUrl || "https://images.unsplash.com/photo-1548013146-72479768bada", 1200)}
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none scale-[1.08] z-0 opacity-90"
+        >
+          <source src="https://assets.mixkit.co/videos/preview/mixkit-waterfall-in-forest-2213-large.mp4" type="video/mp4" />
+          <source src="https://assets.mixkit.co/videos/preview/mixkit-waterfall-in-a-forest-close-up-4248-large.mp4" type="video/mp4" />
+        </video>
+
+        {/* Capa de imagen estática de respaldo en caso de carga lenta */}
+        {(!loading && isValidLandscapeImage(heroSection.imageUrl)) && (
           <img
             src={optimizeImageUrl(heroSection.imageUrl, 1200)}
             alt={heroSection.title}
-            className="absolute inset-0 w-full h-full object-cover pointer-events-none scale-[1.08] z-0"
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none scale-[1.08] z-0 hidden"
             fetchPriority="high"
             loading="eager"
             width="1200"
@@ -579,33 +592,14 @@ export function Home() {
           />
         )}
         
-        {/* Dark overlay for readability (z-1) */}
-        {!loading && isValidLandscapeImage(heroSection.imageUrl) && (
-          <div className="absolute inset-0 bg-black/45 z-[1]" />
-        )}
+        {/* Capa de gradiente oscuro para asegurar 100% legibilidad de textos */}
+        <div className="absolute inset-0 bg-black/40 z-[1]" />
 
-        {/* CASCADA ANIMADA & BRUMA DE NIEBLA EN CAPAS CSS (Efecto Salto Ángel Hero z-2) */}
-        {!loading && isValidLandscapeImage(heroSection.imageUrl) && (
-          <div className="absolute inset-0 z-[2] pointer-events-none overflow-hidden">
-            {/* Capa de chorro de agua con resplandor turquesa/blanco descendiendo */}
-            <div 
-              className="absolute left-1/2 top-0 -translate-x-1/2 w-48 sm:w-72 h-[140%] bg-gradient-to-b from-[#00C8D4]/60 via-white/90 to-transparent blur-xs animate-waterfall-flow-1 opacity-95"
-              style={{ filter: "drop-shadow(0 0 18px rgba(0, 200, 212, 0.85))" }}
-            />
-            <div 
-              className="absolute left-1/2 top-0 -translate-x-1/2 w-32 sm:w-48 h-[150%] bg-gradient-to-b from-white via-cyan-100/85 to-transparent blur-2xs animate-waterfall-flow-2 opacity-90"
-              style={{ filter: "drop-shadow(0 0 25px rgba(255, 255, 255, 0.95))" }}
-            />
-            <div 
-              className="absolute left-1/2 top-0 -translate-x-1/2 w-24 sm:w-36 h-full animate-water-shimmer opacity-95"
-              style={{ filter: "drop-shadow(0 0 10px rgba(0, 200, 212, 0.6))" }}
-            />
-
-            {/* Bruma de niebla expansiva flotando en la base del Salto Ángel */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[900px] h-[320px] bg-gradient-to-t from-[#00C8D4]/40 via-white/45 to-transparent rounded-full blur-3xl animate-mist-drift-1" />
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[800px] h-[280px] bg-gradient-to-t from-white/50 via-cyan-100/30 to-transparent rounded-full blur-2xl animate-mist-drift-2" />
-          </div>
-        )}
+        {/* Bruma de niebla flotante ambiental */}
+        <div className="absolute inset-0 z-[2] pointer-events-none overflow-hidden">
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[900px] h-[280px] bg-gradient-to-t from-cyan-100/25 via-white/20 to-transparent rounded-full blur-3xl animate-mist-drift-1" />
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[800px] h-[240px] bg-gradient-to-t from-white/30 via-cyan-50/15 to-transparent rounded-full blur-2xl animate-mist-drift-2" />
+        </div>
 
         {/* Glow Spots (sólo visibles cuando se usa el degradado morado de fondo) */}
         {(!heroSection.imageUrl || loading) && (
