@@ -579,23 +579,23 @@ export function Home() {
           />
         )}
         
-        {/* CASCADA ANIMADA & BRUMA DE NIEBLA EN CAPAS CSS (Efecto Salto Ángel Hero) */}
+        {/* Dark overlay for readability (z-1) */}
         {!loading && isValidLandscapeImage(heroSection.imageUrl) && (
-          <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
-            {/* Capas de chorro de agua que cae continuamente en el centro de la cascada */}
-            <div className="absolute left-1/2 top-0 -translate-x-1/2 w-48 sm:w-64 h-[125%] bg-gradient-to-b from-white/25 via-cyan-100/35 to-transparent blur-md animate-waterfall-flow-1 opacity-75" />
-            <div className="absolute left-1/2 top-0 -translate-x-1/2 w-32 sm:w-44 h-[135%] bg-gradient-to-b from-white/35 via-white/45 to-transparent blur-sm animate-waterfall-flow-2 opacity-65" />
-            <div className="absolute left-1/2 top-0 -translate-x-1/2 w-24 sm:w-32 h-full animate-water-shimmer opacity-85 mix-blend-overlay" />
-
-            {/* Capas de niebla/bruma de vapor desvaneciéndose en la base */}
-            <div className="absolute bottom-0 left-1/4 w-[600px] h-[250px] bg-gradient-to-t from-cyan-100/30 via-white/20 to-transparent rounded-full blur-2xl animate-mist-drift-1" />
-            <div className="absolute bottom-10 right-1/4 w-[550px] h-[220px] bg-gradient-to-t from-white/25 via-cyan-50/20 to-transparent rounded-full blur-3xl animate-mist-drift-2" />
-          </div>
+          <div className="absolute inset-0 bg-black/45 z-[1]" />
         )}
 
-        {/* Dark overlay for readability, only when image is present */}
+        {/* CASCADA ANIMADA & BRUMA DE NIEBLA EN CAPAS CSS (Efecto Salto Ángel Hero z-2) */}
         {!loading && isValidLandscapeImage(heroSection.imageUrl) && (
-          <div className="absolute inset-0 bg-black/45 z-0" />
+          <div className="absolute inset-0 z-[2] pointer-events-none overflow-hidden">
+            {/* Capas de chorro de agua que cae continuamente en el centro de la cascada */}
+            <div className="absolute left-1/2 top-0 -translate-x-1/2 w-56 sm:w-80 h-[130%] bg-gradient-to-b from-white/40 via-cyan-100/50 to-transparent blur-md animate-waterfall-flow-1 mix-blend-screen opacity-90" />
+            <div className="absolute left-1/2 top-0 -translate-x-1/2 w-36 sm:w-52 h-[140%] bg-gradient-to-b from-white/60 via-white/75 to-transparent blur-xs animate-waterfall-flow-2 mix-blend-screen opacity-85" />
+            <div className="absolute left-1/2 top-0 -translate-x-1/2 w-28 sm:w-36 h-full animate-water-shimmer opacity-90 mix-blend-overlay" />
+
+            {/* Capas de niebla/bruma de vapor desvaneciéndose en la base */}
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-gradient-to-t from-cyan-100/40 via-white/30 to-transparent rounded-full blur-3xl animate-mist-drift-1" />
+            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 w-[700px] h-[260px] bg-gradient-to-t from-white/35 via-cyan-50/25 to-transparent rounded-full blur-2xl animate-mist-drift-2" />
+          </div>
         )}
 
         {/* Glow Spots (sólo visibles cuando se usa el degradado morado de fondo) */}
