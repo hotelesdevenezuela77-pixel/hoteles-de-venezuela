@@ -140,6 +140,7 @@ export function HomeV2({ isMainHome = false }: { isMainHome?: boolean }) {
   const [sections, setSections] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<string>("all");
+  const [editorialTab, setEditorialTab] = useState<"destinos" | "tips">("destinos");
 
   const [seoConfig, setSeoConfig] = useState({
     title: "Hoteles de Venezuela | Hoteles, Posadas y Guía Turística",
@@ -162,8 +163,8 @@ export function HomeV2({ isMainHome = false }: { isMainHome?: boolean }) {
           `).eq("status", "approved"),
           supabase.from("destinations").select("id, name, slug, state, image_url, description, is_featured, status"),
           supabase.from("site_sections").select("*").order("id"),
-          supabase.from("blog_posts").select("id, title, slug, excerpt, featured_image, published_at, reading_time").order("published_at", { ascending: false }).limit(3),
-          supabase.from("tourist_sites").select("id, name, slug, short_description, image_url, category, highlights").order("sort_order").limit(3),
+          supabase.from("blog_posts").select("id, title, slug, excerpt, featured_image, published_at, reading_time").order("id", { ascending: false }).limit(20),
+          supabase.from("tourist_sites").select("id, name, slug, short_description, image_url, category, highlights").order("sort_order").limit(6),
           supabase.from("seo_settings").select("*").in("page_key", ["home-v2", "home"])
         ]);
 
