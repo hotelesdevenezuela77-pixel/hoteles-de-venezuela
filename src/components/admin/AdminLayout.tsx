@@ -49,8 +49,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     if (
       email === "hotelesdevenezuela77@gmail.com" ||
       email === "webmasterpro177@gmail.com" ||
-      email === "admin@hotelesdevenezuela.com" ||
-      email.includes("ramiropf")
+      email === "admin@hotelesdevenezuela.com"
     ) {
       return true;
     }
