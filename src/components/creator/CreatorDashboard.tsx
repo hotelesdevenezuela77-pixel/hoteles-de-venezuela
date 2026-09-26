@@ -34,13 +34,12 @@ import { CreatorImportRouteModal } from "./CreatorImportRouteModal";
 import { CreatorProfileEditModal } from "./CreatorProfileEditModal";
 import { ConstellationBackground } from "../ConstellationBackground";
 
-// Módulos Ejecutivos
-import { OwnerAgendaModule } from "../owner/OwnerAgendaModule";
-import { OwnerWhatsAppCRMModule } from "../owner/OwnerWhatsAppCRMModule";
-import { OwnerTechnicalSupportModule } from "../owner/OwnerTechnicalSupportModule";
-import { CMSModule } from "../../tenants/templates/components/CMSModule";
-import { AdvancedTaskOperationsModule } from "../../tenants/templates/components/AdvancedTaskOperationsModule";
-import type { TenantConfig } from "../../tenants/tenantContext";
+// Módulos Especializados para Creadora de Contenido & Influencer de Viajes
+import { CreatorAgendaModule } from "./CreatorAgendaModule";
+import { CreatorWhatsAppCRMModule } from "./CreatorWhatsAppCRMModule";
+import { CreatorSupportModule } from "./CreatorSupportModule";
+import { CreatorCmsModule } from "./CreatorCmsModule";
+import { CreatorTasksModule } from "./CreatorTasksModule";
 
 interface CreatorDashboardProps {
   establishment?: {
@@ -126,62 +125,6 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
     } catch (e) {}
     return 10;
   });
-
-  // Configuración WebApp / CMS Builder
-  const [tenantConfig, setTenantConfig] = useState<TenantConfig>(() => {
-    try {
-      const raw = localStorage.getItem("hdv_tenants_configurations");
-      if (raw) {
-        const list: TenantConfig[] = JSON.parse(raw);
-        const match = list.find(t => t.establishment_id === estId || t.slug === (establishment?.slug || "influencer-aura-croce"));
-        if (match) return match;
-      }
-    } catch (e) {}
-
-    return {
-      establishment_id: estId,
-      slug: establishment?.slug || "influencer-aura-croce",
-      name: profileInfo?.name || creatorName,
-      template: "A",
-      domain: `${(profileInfo?.name || creatorName).toLowerCase().replace(/\s+/g, '')}.hotelesdevenezuela.com`,
-      branding: {
-        primary_color: "#FF0096",
-        secondary_color: "#9B00CC",
-        accent_color: "#00C8D4",
-        font_title: "Playfair Display",
-        font_body: "Montserrat",
-        logo_url: profileInfo?.avatar_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
-        banner_url: profileInfo?.banner_url || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1600&auto=format&fit=crop"
-      },
-      modules: {
-        reservas: true,
-        pos: false,
-        galeria: true,
-        contacto: true,
-        cms: true
-      },
-      contact: {
-        phone: profileInfo?.phone || establishment?.phone || "+58 414 123 4567",
-        whatsapp: profileInfo?.phone || establishment?.whatsapp || "+58 414 123 4567",
-        email: "contacto@auracroce.com",
-        instagram: profileInfo?.instagram || "@auracroce"
-      }
-    };
-  });
-
-  const handleTenantConfigChange = (updated: TenantConfig) => {
-    setTenantConfig(updated);
-    try {
-      const raw = localStorage.getItem("hdv_tenants_configurations");
-      let list: TenantConfig[] = raw ? JSON.parse(raw) : [];
-      const idx = list.findIndex(t => t.establishment_id === updated.establishment_id || t.slug === updated.slug);
-      if (idx >= 0) list[idx] = updated;
-      else list.push(updated);
-      localStorage.setItem("hdv_tenants_configurations", JSON.stringify(list));
-      window.dispatchEvent(new Event("hdv_tenant_config_changed"));
-      window.dispatchEvent(new Event("storage"));
-    } catch (e) {}
-  };
 
   const CREATOR_TABS: {
     id: CreatorTabType;
@@ -495,9 +438,9 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
         {/* 2. Tab Agenda & Calendario Drag & Drop */}
         {activeTab === "agenda_dnd" && (
           <div className="space-y-6">
-            <OwnerAgendaModule
+            <CreatorAgendaModule
               establishmentId={estId}
-              establishmentName={creatorName}
+              creatorName={creatorName}
             />
           </div>
         )}
@@ -505,9 +448,9 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
         {/* 3. Tab CRM Leads WhatsApp */}
         {activeTab === "crm_whatsapp" && (
           <div className="space-y-6">
-            <OwnerWhatsAppCRMModule
+            <CreatorWhatsAppCRMModule
               establishmentId={estId}
-              establishmentName={creatorName}
+              creatorName={creatorName}
               whatsappNumber={profileInfo?.phone || establishment?.phone || "+584141234567"}
             />
           </div>
@@ -516,9 +459,9 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
         {/* 4. Tab Soporte Técnico Tickets D&D */}
         {activeTab === "soporte_dnd" && (
           <div className="space-y-6">
-            <OwnerTechnicalSupportModule
+            <CreatorSupportModule
               establishmentId={estId}
-              establishmentName={creatorName}
+              creatorName={creatorName}
             />
           </div>
         )}
@@ -526,12 +469,11 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
         {/* 5. Tab Aplicación Web & CMS Web Builder */}
         {activeTab === "webapp_cms" && (
           <div className="space-y-6">
-            <CMSModule
-              config={tenantConfig}
-              onConfigChange={handleTenantConfigChange}
-              primaryColor="#FF0096"
-              secondaryColor="#9B00CC"
-              accentColor="#00C8D4"
+            <CreatorCmsModule
+              establishmentId={estId}
+              creatorName={creatorName}
+              profileInfo={profileInfo}
+              onUpdateProfile={updateProfileInfo}
             />
           </div>
         )}
@@ -539,11 +481,9 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
         {/* 6. Tab Gestión de Tareas */}
         {activeTab === "tareas_saas" && (
           <div className="space-y-6">
-            <AdvancedTaskOperationsModule
+            <CreatorTasksModule
               establishmentId={estId}
-              primaryColor="#00C8D4"
-              secondaryColor="#9B00CC"
-              accentColor="#FF0096"
+              creatorName={creatorName}
             />
           </div>
         )}
