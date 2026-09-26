@@ -253,10 +253,10 @@ _Hoteles de Venezuela LLC • Plataforma de Expediciones Turísticas_`;
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 shrink-0">
+          <div className="w-full lg:w-auto flex items-center justify-start lg:justify-end">
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="px-5 py-3 rounded-2xl text-xs font-black text-white shadow-xl hover:scale-103 active:scale-97 transition-all flex items-center gap-2 cursor-pointer border border-white/20"
+              className="w-full sm:w-auto px-5 py-3 rounded-2xl text-xs font-black text-white shadow-xl hover:scale-103 active:scale-97 transition-all flex items-center justify-center gap-2 cursor-pointer border border-white/20"
               style={{ background: `linear-gradient(135deg, ${FUCSIA} 0%, ${PURPURA} 100%)` }}
             >
               <Plus className="w-4 h-4" />
@@ -637,13 +637,13 @@ _Hoteles de Venezuela LLC • Plataforma de Expediciones Turísticas_`;
                   </div>
 
                   {/* Botones de Acción */}
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                     
                     {/* Botón WhatsApp */}
                     <button
                       type="button"
                       onClick={() => handleCopyWhatsAppSummary(trip)}
-                      className="px-3 py-1.5 rounded-xl text-xs font-bold bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 flex items-center gap-1.5 cursor-pointer transition-all"
+                      className="flex-1 sm:flex-initial px-3 py-1.5 rounded-xl text-xs font-bold bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 flex items-center justify-center gap-1.5 cursor-pointer transition-all"
                       title="Copiar resumen estructurado para WhatsApp"
                     >
                       {copiedId === trip.id ? (
@@ -663,7 +663,7 @@ _Hoteles de Venezuela LLC • Plataforma de Expediciones Turísticas_`;
                     <button
                       type="button"
                       onClick={() => setViewingReceiptTrip(trip)}
-                      className="px-3 py-1.5 rounded-xl text-xs font-bold bg-[#00C8D4]/15 hover:bg-[#00C8D4]/25 text-[#00C8D4] border border-[#00C8D4]/30 flex items-center gap-1.5 cursor-pointer transition-all"
+                      className="flex-1 sm:flex-initial px-3 py-1.5 rounded-xl text-xs font-bold bg-[#00C8D4]/15 hover:bg-[#00C8D4]/25 text-[#00C8D4] border border-[#00C8D4]/30 flex items-center justify-center gap-1.5 cursor-pointer transition-all"
                     >
                       <Receipt className="w-3.5 h-3.5" />
                       <span>Ver Recibo</span>
@@ -677,7 +677,7 @@ _Hoteles de Venezuela LLC • Plataforma de Expediciones Turísticas_`;
                           setLiquidatingTrip(trip);
                           setSettlementRef(trip.payment_reference || "");
                         }}
-                        className="px-3.5 py-1.5 rounded-xl text-xs font-black text-white shadow-md flex items-center gap-1.5 cursor-pointer hover:scale-103 transition-all"
+                        className="flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl text-xs font-black text-white shadow-md flex items-center justify-center gap-1.5 cursor-pointer hover:scale-103 transition-all"
                         style={{ background: `linear-gradient(135deg, ${FUCSIA} 0%, ${PURPURA} 100%)` }}
                       >
                         <CheckCircle className="w-3.5 h-3.5" />

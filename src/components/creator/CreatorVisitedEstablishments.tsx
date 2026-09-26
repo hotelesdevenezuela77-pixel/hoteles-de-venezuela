@@ -264,14 +264,16 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
             </p>
           </div>
 
-          <button
-            onClick={handleOpenCreate}
-            className="px-5 py-3 rounded-2xl text-xs font-black text-white shadow-xl hover:scale-103 active:scale-97 transition-all flex items-center gap-2 cursor-pointer border border-white/20 shrink-0"
-            style={{ background: `linear-gradient(135deg, ${FUCSIA} 0%, ${PURPURA} 100%)` }}
-          >
-            <Plus className="w-4 h-4" />
-            <span>Registrar Nuevo Establecimiento Visitado</span>
-          </button>
+          <div className="w-full lg:w-auto flex items-center justify-start lg:justify-end">
+            <button
+              onClick={handleOpenCreate}
+              className="w-full sm:w-auto px-5 py-3 rounded-2xl text-xs font-black text-white shadow-xl hover:scale-103 active:scale-97 transition-all flex items-center justify-center gap-2 cursor-pointer border border-white/20"
+              style={{ background: `linear-gradient(135deg, ${FUCSIA} 0%, ${PURPURA} 100%)` }}
+            >
+              <Plus className="w-4 h-4" />
+              <span>Registrar Nuevo Establecimiento Visitado</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -407,47 +409,49 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
                 </div>
 
                 {/* Acciones de la Tarjeta */}
-                <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+                <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
                   <button
                     onClick={() => handleCopyWhatsAppAudit(est)}
-                    className="flex-1 py-2 px-3 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="flex-1 py-2 px-3 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer min-w-[120px]"
                     title="Copiar auditoría para WhatsApp"
                   >
                     {copiedId === est.id ? <Check className="w-3.5 h-3.5" /> : <Send className="w-3.5 h-3.5" />}
                     <span>{copiedId === est.id ? "¡Copiado!" : "WhatsApp"}</span>
                   </button>
 
-                  {est.hdv_slug && (
-                    <a
-                      href={`/establecimiento/${est.hdv_slug}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 text-xs transition flex items-center justify-center"
-                      title="Ver Ficha Pública en HDV"
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {est.hdv_slug && (
+                      <a
+                        href={`/establecimiento/${est.hdv_slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 text-xs transition flex items-center justify-center cursor-pointer"
+                        title="Ver Ficha Pública en HDV"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </a>
+                    )}
+
+                    <button
+                      onClick={() => handleOpenEdit(est)}
+                      className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 text-xs transition cursor-pointer"
+                      title="Editar auditoría"
                     >
-                      <Eye className="w-4 h-4" />
-                    </a>
-                  )}
+                      <Edit2 className="w-4 h-4" />
+                    </button>
 
-                  <button
-                    onClick={() => handleOpenEdit(est)}
-                    className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 text-xs transition"
-                    title="Editar auditoría"
-                  >
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      if (confirm(`¿Eliminar ${est.name} del inventario visitado?`)) {
-                        onDeleteEstablishment(est.id);
-                      }
-                    }}
-                    className="p-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-300 text-xs transition"
-                    title="Eliminar registro"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                    <button
+                      onClick={() => {
+                        if (confirm(`¿Eliminar ${est.name} del inventario visitado?`)) {
+                          onDeleteEstablishment(est.id);
+                        }
+                      }}
+                      className="p-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-300 text-xs transition cursor-pointer"
+                      title="Eliminar registro"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             );

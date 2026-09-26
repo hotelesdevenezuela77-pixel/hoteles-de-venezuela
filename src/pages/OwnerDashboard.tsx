@@ -2933,10 +2933,10 @@ export function OwnerDashboard() {
             </div>
 
             {/* Status CONECTADO y Selector de Dashboard Matriz / Vistas */}
-            <div className="flex items-center gap-2.5 flex-wrap">
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 w-full sm:w-auto flex-nowrap sm:flex-wrap">
               <button
                 onClick={() => setViewModeOverride('matriz')}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-black shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-black shadow-lg hover:scale-[1.02] transition-all border cursor-pointer shrink-0 ${
                   viewModeOverride === 'matriz'
                     ? "bg-[#00C8D4] text-slate-950 border-white ring-2 ring-[#00C8D4]/50 shadow-[#00C8D4]/30"
                     : "bg-white/10 hover:bg-white/20 text-white border-white/20"
@@ -2954,14 +2954,14 @@ export function OwnerDashboard() {
                     if (firstHotel) setSelectedCalendarEst(firstHotel.id);
                     setViewModeOverride('hotel');
                   }}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer shrink-0 ${
                     viewModeOverride === 'hotel'
                       ? "bg-[#FF0096] text-white border-white ring-2 ring-[#FF0096]/50 shadow-[#FF0096]/30 font-black"
                       : "bg-white/10 hover:bg-white/20 text-white border-white/20"
                   }`}
                 >
                   <Building2 className="w-4 h-4" />
-                  <span className="hidden sm:inline">Vista Hotel / Posadas</span>
+                  <span>Vista Hotel</span>
                 </button>
               )}
 
@@ -2972,14 +2972,14 @@ export function OwnerDashboard() {
                     if (firstPark) setSelectedCalendarEst(firstPark.id);
                     setViewModeOverride('park');
                   }}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer shrink-0 ${
                     viewModeOverride === 'park'
                       ? "bg-[#00C8D4] text-slate-950 border-white ring-2 ring-[#00C8D4]/50 shadow-[#00C8D4]/30 font-black"
                       : "bg-white/10 hover:bg-white/20 text-white border-white/20"
                   }`}
                 >
                   <Waves className="w-4 h-4" />
-                  <span className="hidden sm:inline">Vista Parque Acuático</span>
+                  <span>Vista Parque</span>
                 </button>
               )}
 
@@ -2990,14 +2990,14 @@ export function OwnerDashboard() {
                     if (firstAgency) setSelectedCalendarEst(firstAgency.id);
                     setViewModeOverride('agency');
                   }}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer shrink-0 ${
                     viewModeOverride === 'agency'
                       ? "bg-[#9B00CC] text-white border-white ring-2 ring-[#9B00CC]/50 shadow-[#9B00CC]/30 font-black"
                       : "bg-white/10 hover:bg-white/20 text-white border-white/20"
                   }`}
                 >
                   <Compass className="w-4 h-4" />
-                  <span className="hidden sm:inline">Vista Agencia / DMC</span>
+                  <span>Vista Agencia</span>
                 </button>
               )}
 
@@ -3008,14 +3008,14 @@ export function OwnerDashboard() {
                     if (firstCreator) setSelectedCalendarEst(firstCreator.id);
                     setViewModeOverride('creator');
                   }}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer shrink-0 ${
                     viewModeOverride === 'creator'
                       ? "bg-[#FF0096] text-white border-white ring-2 ring-[#FF0096]/50 shadow-[#FF0096]/30 font-black"
                       : "bg-white/10 hover:bg-white/20 text-white border-white/20"
                   }`}
                 >
                   <Camera className="w-4 h-4" />
-                  <span className="hidden sm:inline">Vista Creador / Desk Hub</span>
+                  <span>Vista Influencer</span>
                 </button>
               )}
 
@@ -3026,14 +3026,14 @@ export function OwnerDashboard() {
                     if (firstRest) setSelectedCalendarEst(firstRest.id);
                     setViewModeOverride('restaurant');
                   }}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer shrink-0 ${
                     viewModeOverride === 'restaurant'
                       ? "bg-[#FF0096] text-white border-white ring-2 ring-[#FF0096]/50 shadow-[#FF0096]/30 font-black"
                       : "bg-white/10 hover:bg-white/20 text-white border-white/20"
                   }`}
                 >
                   <Utensils className="w-4 h-4" />
-                  <span className="hidden sm:inline">Vista Restaurante</span>
+                  <span>Vista Restaurante</span>
                 </button>
               )}
 
@@ -3044,14 +3044,14 @@ export function OwnerDashboard() {
                     if (firstMarina) setSelectedCalendarEst(firstMarina.id);
                     setViewModeOverride('marina');
                   }}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer shrink-0 ${
                     viewModeOverride === 'marina'
                       ? "bg-[#00C8D4] text-slate-950 border-white ring-2 ring-[#00C8D4]/50 shadow-[#00C8D4]/30 font-black"
                       : "bg-white/10 hover:bg-white/20 text-white border-white/20"
                   }`}
                 >
                   <Anchor className="w-4 h-4" />
-                  <span className="hidden sm:inline">Vista Marina</span>
+                  <span>Vista Marina</span>
                 </button>
               )}
 
@@ -3062,14 +3062,14 @@ export function OwnerDashboard() {
                     if (firstCar) setSelectedCalendarEst(firstCar.id);
                     setViewModeOverride('car_rental');
                   }}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer shrink-0 ${
                     viewModeOverride === 'car_rental'
                       ? "bg-[#00C8D4] text-slate-950 border-white ring-2 ring-[#00C8D4]/50 shadow-[#00C8D4]/30 font-black"
                       : "bg-white/10 hover:bg-white/20 text-white border-white/20"
                   }`}
                 >
                   <Car className="w-4 h-4" />
-                  <span className="hidden sm:inline">Vista Rent-a-Car</span>
+                  <span>Rent-a-Car</span>
                 </button>
               )}
 
@@ -3080,23 +3080,23 @@ export function OwnerDashboard() {
                     if (firstYacht) setSelectedCalendarEst(firstYacht.id);
                     setViewModeOverride('yacht_charter');
                   }}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer ${
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-extrabold shadow-lg hover:scale-[1.02] transition-all border cursor-pointer shrink-0 ${
                     viewModeOverride === 'yacht_charter'
                       ? "bg-[#00C8D4] text-slate-950 border-white ring-2 ring-[#00C8D4]/50 shadow-[#00C8D4]/30 font-black"
                       : "bg-white/10 hover:bg-white/20 text-white border-white/20"
                   }`}
                 >
                   <Ship className="w-4 h-4" />
-                  <span className="hidden sm:inline">Vista Alquiler de Yates</span>
+                  <span>Yates</span>
                 </button>
               )}
 
-              <div className="flex items-center gap-3 bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl px-4 py-2 text-xs text-white shrink-0 shadow-lg">
-                <div className="text-right">
+              <div className="flex items-center gap-2.5 bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl px-3 py-1.5 text-xs text-white shrink-0 shadow-lg ml-auto sm:ml-0">
+                <div className="text-right hidden sm:block">
                   <p className="text-[9px] uppercase font-black text-[#00C8D4] tracking-wider">CONECTADO</p>
-                  <p className="font-bold text-white text-xs truncate max-w-[180px]">{user?.email || "hotelesdevenezuela"}</p>
+                  <p className="font-bold text-white text-xs truncate max-w-[140px]">{user?.email || "hotelesdevenezuela"}</p>
                 </div>
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#FF0096] to-[#9B00CC] flex items-center justify-center text-white font-black text-sm uppercase shadow-sm">
+                <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-[#FF0096] to-[#9B00CC] flex items-center justify-center text-white font-black text-xs uppercase shadow-sm">
                   {(user?.email || "H").charAt(0)}
                 </div>
               </div>

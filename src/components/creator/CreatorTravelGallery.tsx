@@ -143,7 +143,7 @@ export const CreatorTravelGallery: React.FC<CreatorTravelGalleryProps> = ({
 
         <button
           onClick={() => setIsNewAlbumModalOpen(true)}
-          className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#FF0096] to-[#00C8D4] hover:opacity-90 text-white font-black text-xs shadow-lg shadow-[#FF0096]/20 transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0 hover:scale-[1.02]"
+          className="w-full sm:w-auto px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#FF0096] to-[#00C8D4] hover:opacity-90 text-white font-black text-xs shadow-lg shadow-[#FF0096]/20 transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0 hover:scale-[1.02]"
         >
           <Plus className="w-4 h-4" />
           <span>Nueva Expedición</span>
@@ -194,10 +194,10 @@ export const CreatorTravelGallery: React.FC<CreatorTravelGalleryProps> = ({
               </div>
             </div>
 
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
               <button
                 onClick={() => handleShareAlbumWhatsapp(currentAlbum)}
-                className="px-3.5 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 font-extrabold text-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                className="flex-1 sm:flex-initial px-3.5 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 font-extrabold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <Share2 className="w-3.5 h-3.5" />
                 <span>Compartir Bitácora</span>
@@ -205,7 +205,7 @@ export const CreatorTravelGallery: React.FC<CreatorTravelGalleryProps> = ({
 
               <button
                 onClick={() => setIsAddPhotoModalOpen(true)}
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] hover:opacity-90 text-white font-extrabold text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+                className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] hover:opacity-90 text-white font-extrabold text-xs shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <Camera className="w-3.5 h-3.5" />
                 <span>+ Cargar Foto</span>
@@ -218,7 +218,7 @@ export const CreatorTravelGallery: React.FC<CreatorTravelGalleryProps> = ({
                       onDeleteAlbum(currentAlbum.id);
                     }
                   }}
-                  className="p-2 rounded-xl bg-red-950/40 hover:bg-red-900/60 border border-red-500/30 text-red-300 transition-all cursor-pointer"
+                  className="p-2 rounded-xl bg-red-950/40 hover:bg-red-900/60 border border-red-500/30 text-red-300 transition-all cursor-pointer flex items-center justify-center"
                   title="Eliminar Expedición"
                 >
                   <Trash2 className="w-4 h-4" />

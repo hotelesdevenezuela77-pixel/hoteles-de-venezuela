@@ -273,22 +273,22 @@ export const CreatorRouteExplorer: React.FC<CreatorRouteExplorerProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
             <button
               onClick={() => setIsRecording(!isRecording)}
-              className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-2 shadow-lg cursor-pointer ${
+              className={`flex-1 sm:flex-initial px-4 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer ${
                 isRecording
                   ? "bg-red-600 hover:bg-red-700 text-white animate-pulse"
                   : "bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] hover:brightness-110 text-white"
               }`}
             >
               {isRecording ? <Square className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-              <span>{isRecording ? "Detener Grabación GPS" : "Iniciar Trazado GPS en Vivo"}</span>
+              <span>{isRecording ? "Detener Grabación" : "Iniciar Trazado GPS"}</span>
             </button>
 
             <button
               onClick={() => setShowPointModal(true)}
-              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] text-white text-xs font-bold shadow-md hover:brightness-110 transition flex items-center gap-1.5"
+              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] text-white text-xs font-bold shadow-md hover:brightness-110 transition flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Capturar Spot</span>

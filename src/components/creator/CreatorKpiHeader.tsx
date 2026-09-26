@@ -8,7 +8,7 @@ interface CreatorKpiHeaderProps {
 
 export const CreatorKpiHeader: React.FC<CreatorKpiHeaderProps> = ({ kpis }) => {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6">
       
       {/* 1. Remuneraciones de Viaje ($20 Honorarios + Viáticos) */}
       <div className="relative overflow-hidden rounded-2xl bg-[#1a0533]/80 border border-[#FF0096]/30 p-5 shadow-xl backdrop-blur-md transition-all hover:border-[#FF0096]/60">

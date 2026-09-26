@@ -182,10 +182,10 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
             </div>
 
             {/* Quick Actions & Navigation Controls */}
-            <div className="flex items-center gap-2.5 flex-wrap shrink-0">
+            <div className="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/10 flex-wrap">
               <button
                 onClick={() => setIsProfileModalOpen(true)}
-                className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm hover:scale-[1.02]"
+                className="flex-1 sm:flex-initial px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:scale-[1.02]"
               >
                 <Edit3 className="w-3.5 h-3.5 text-[#00C8D4]" />
                 <span>Editar Perfil</span>
@@ -193,7 +193,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
 
               <button
                 onClick={refresh}
-                className="p-2 rounded-xl bg-slate-900 border border-white/10 hover:bg-slate-800 text-slate-300 transition-all cursor-pointer"
+                className="p-2 rounded-xl bg-slate-900 border border-white/10 hover:bg-slate-800 text-slate-300 transition-all cursor-pointer flex items-center justify-center"
                 title="Sincronizar Datos"
               >
                 <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin text-[#FF0096]" : ""}`} />
@@ -202,7 +202,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
               {onSwitchToTraditionalDashboard && (
                 <button
                   onClick={onSwitchToTraditionalDashboard}
-                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:opacity-90 text-white font-extrabold text-xs shadow-lg transition-all flex items-center space-x-1.5 cursor-pointer border border-white/20 hover:scale-[1.02]"
+                  className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:opacity-90 text-white font-extrabold text-xs shadow-lg transition-all flex items-center justify-center space-x-1.5 cursor-pointer border border-white/20 hover:scale-[1.02]"
                 >
                   <Building2 className="w-4 h-4 text-white" />
                   <span>⬅ Dashboard Matriz</span>

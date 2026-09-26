@@ -297,17 +297,17 @@ export const CreatorProfileEditModal: React.FC<CreatorProfileEditModalProps> = (
           </div>
 
           {/* Submit Action */}
-          <div className="pt-4 border-t border-white/10 flex items-center justify-end gap-3">
+          <div className="pt-4 border-t border-white/10 flex items-center justify-end gap-3 flex-wrap sm:flex-nowrap">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-bold cursor-pointer transition-all"
+              className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-bold cursor-pointer transition-all text-center"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#FF0096] to-[#00C8D4] hover:opacity-90 text-white text-xs font-black shadow-lg shadow-[#FF0096]/20 cursor-pointer flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all"
+              className="flex-1 sm:flex-initial px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#FF0096] to-[#00C8D4] hover:opacity-90 text-white text-xs font-black shadow-lg shadow-[#FF0096]/20 cursor-pointer flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
               {savedSuccess ? (
                 <>

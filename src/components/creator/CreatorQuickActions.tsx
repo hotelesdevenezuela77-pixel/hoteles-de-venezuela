@@ -15,27 +15,27 @@ export const CreatorQuickActions: React.FC<CreatorQuickActionsProps> = ({
   onNavigateCalendar
 }) => {
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-full max-w-4xl px-4">
-      <div className="rounded-2xl bg-[#0e011f]/95 border border-[#00C8D4]/30 shadow-2xl shadow-[#00C8D4]/20 p-2.5 backdrop-blur-xl grid grid-cols-2 sm:grid-cols-4 gap-2">
+    <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 w-full max-w-4xl px-3 sm:px-4">
+      <div className="rounded-2xl bg-[#0e011f]/95 border border-[#00C8D4]/30 shadow-2xl shadow-[#00C8D4]/20 p-2 sm:p-2.5 backdrop-blur-xl grid grid-cols-2 sm:grid-cols-4 gap-2">
         
         {/* 1. Importar Ruta / Coordenadas */}
         <button
           onClick={onOpenImportModal}
-          className="flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] text-white font-extrabold text-xs shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all"
+          className="flex items-center justify-center space-x-1.5 sm:space-x-2 py-2.5 sm:py-3 px-2.5 sm:px-4 rounded-xl bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] text-white font-extrabold text-[11px] sm:text-xs shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
         >
-          <div className="w-6 h-6 rounded-lg bg-white/20 flex items-center justify-center">
-            <Upload className="w-4 h-4 text-white" />
+          <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+            <Upload className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
           </div>
-          <span className="truncate">Importar Ruta GPS</span>
+          <span className="truncate">Importar Ruta</span>
         </button>
 
         {/* 2. Nuevo Contrato / Canje */}
         <button
           onClick={onNavigateDeals}
-          className="flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-gradient-to-r from-[#9B00CC] to-[#FF0096] text-white font-extrabold text-xs shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all"
+          className="flex items-center justify-center space-x-1.5 sm:space-x-2 py-2.5 sm:py-3 px-2.5 sm:px-4 rounded-xl bg-gradient-to-r from-[#9B00CC] to-[#FF0096] text-white font-extrabold text-[11px] sm:text-xs shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
         >
-          <div className="w-6 h-6 rounded-lg bg-white/20 flex items-center justify-center">
-            <Award className="w-4 h-4 text-white" />
+          <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+            <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
           </div>
           <span className="truncate">Nuevo Contrato</span>
         </button>
@@ -43,21 +43,21 @@ export const CreatorQuickActions: React.FC<CreatorQuickActionsProps> = ({
         {/* 3. Cargar Gasto de Ruta */}
         <button
           onClick={onNavigateExpenses}
-          className="flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-slate-900 border border-red-500/40 text-red-300 font-extrabold text-xs shadow-lg hover:bg-red-950/60 hover:scale-[1.02] active:scale-[0.98] transition-all"
+          className="flex items-center justify-center space-x-1.5 sm:space-x-2 py-2.5 sm:py-3 px-2.5 sm:px-4 rounded-xl bg-slate-900 border border-red-500/40 text-red-300 font-extrabold text-[11px] sm:text-xs shadow-lg hover:bg-red-950/60 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
         >
-          <div className="w-6 h-6 rounded-lg bg-red-500/20 flex items-center justify-center">
-            <Wallet className="w-4 h-4 text-red-400" />
+          <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-red-500/20 flex items-center justify-center shrink-0">
+            <Wallet className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-400" />
           </div>
-          <span className="truncate">Cargar Gasto Ruta</span>
+          <span className="truncate">Gasto Ruta</span>
         </button>
 
         {/* 4. Nueva Tarea / Entregable */}
         <button
           onClick={onNavigateCalendar}
-          className="flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-slate-900 border border-sky-500/40 text-sky-300 font-extrabold text-xs shadow-lg hover:bg-sky-950/60 hover:scale-[1.02] active:scale-[0.98] transition-all"
+          className="flex items-center justify-center space-x-1.5 sm:space-x-2 py-2.5 sm:py-3 px-2.5 sm:px-4 rounded-xl bg-slate-900 border border-sky-500/40 text-sky-300 font-extrabold text-[11px] sm:text-xs shadow-lg hover:bg-sky-950/60 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
         >
-          <div className="w-6 h-6 rounded-lg bg-sky-500/20 flex items-center justify-center">
-            <Calendar className="w-4 h-4 text-sky-400" />
+          <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-sky-500/20 flex items-center justify-center shrink-0">
+            <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-400" />
           </div>
           <span className="truncate">Nueva Tarea</span>
         </button>

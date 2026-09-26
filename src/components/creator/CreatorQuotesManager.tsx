@@ -170,7 +170,7 @@ export const CreatorQuotesManager: React.FC<CreatorQuotesManagerProps> = ({
 
           <button
             onClick={handleOpenCreate}
-            className="px-5 py-3 rounded-2xl text-xs font-black text-white shadow-xl hover:scale-103 active:scale-97 transition-all flex items-center gap-2 cursor-pointer border border-white/20 shrink-0"
+            className="w-full sm:w-auto px-5 py-3 rounded-2xl text-xs font-black text-white shadow-xl hover:scale-103 active:scale-97 transition-all flex items-center justify-center gap-2 cursor-pointer border border-white/20 shrink-0"
             style={{ background: `linear-gradient(135deg, ${FUCSIA} 0%, ${PURPURA} 100%)` }}
           >
             <Plus className="w-4 h-4" />
