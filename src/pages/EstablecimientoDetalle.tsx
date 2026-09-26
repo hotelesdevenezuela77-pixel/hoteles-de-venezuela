@@ -443,6 +443,13 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
           const matchedDemo = demoProfiles.find(d => 
             d.slug === slug || 
             String(d.id) === slug || 
+            slug === `influencer-${d.id}` ||
+            slug === "influencer-99901" ||
+            slug === "influencer-1" ||
+            slug === "influencer-aura-croce" ||
+            slugLower.startsWith("influencer") ||
+            slugLower.includes("influencer") ||
+            slugLower.includes(String(d.id)) ||
             (slugLower.includes("aura") && d.id === 99901) ||
             (slugLower.includes("croce") && d.id === 99901) ||
             (slugLower.includes("mundo") && d.id === 99902) ||
@@ -450,7 +457,29 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
           );
 
           if (matchedDemo) {
-            dbData = matchedDemo;
+            let customProfile: any = null;
+            if (matchedDemo.id === 99901) {
+              try {
+                const raw1 = localStorage.getItem("hdv_creator_profile_1");
+                const raw99901 = localStorage.getItem("hdv_creator_profile_99901");
+                const saved = raw1 || raw99901;
+                if (saved) customProfile = JSON.parse(saved);
+              } catch (e) {}
+            }
+
+            dbData = {
+              ...matchedDemo,
+              name: customProfile?.name || matchedDemo.name,
+              description: customProfile?.bio || matchedDemo.description,
+              primary_image: customProfile?.avatar_url || matchedDemo.primary_image,
+              phone: customProfile?.phone || matchedDemo.phone,
+              whatsapp: customProfile?.phone || matchedDemo.whatsapp,
+              establishment_images: [
+                { image_url: customProfile?.banner_url || matchedDemo.establishment_images[0]?.image_url || matchedDemo.primary_image, is_primary: true },
+                { image_url: customProfile?.avatar_url || matchedDemo.establishment_images[1]?.image_url, is_primary: false },
+                { image_url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80", is_primary: false }
+              ]
+            };
           }
         }
 
