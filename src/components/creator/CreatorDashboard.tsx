@@ -23,6 +23,7 @@ const YoutubeIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) => (
 
 import { useCreatorInfluencerRealtime } from "../../hooks/useCreatorInfluencerRealtime";
 import { CreatorKpiHeader } from "./CreatorKpiHeader";
+import { CreatorExecutiveStatsDashboard } from "./CreatorExecutiveStatsDashboard";
 import { CreatorTripRemunerationModule } from "./CreatorTripRemunerationModule";
 import { CreatorVisitedEstablishments } from "./CreatorVisitedEstablishments";
 import { CreatorRouteExplorer } from "./CreatorRouteExplorer";
@@ -54,6 +55,7 @@ interface CreatorDashboardProps {
 }
 
 export type CreatorTabType = 
+  | "dashboard_ejecutivo"
   | "remuneraciones" 
   | "agenda_dnd"
   | "crm_whatsapp"
@@ -109,7 +111,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
     refresh
   } = useCreatorInfluencerRealtime(estId);
 
-  const [activeTab, setActiveTab] = useState<CreatorTabType>("remuneraciones");
+  const [activeTab, setActiveTab] = useState<CreatorTabType>("dashboard_ejecutivo");
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
@@ -189,6 +191,14 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
     badgeColor?: string;
     accentGlow: string;
   }[] = [
+    {
+      id: "dashboard_ejecutivo",
+      label: "Dashboard Ejecutivo",
+      icon: BarChart3,
+      badge: "Estadísticas",
+      badgeColor: "bg-[#00C8D4]/20 text-[#00C8D4] border-[#00C8D4]/40",
+      accentGlow: "from-[#00C8D4] to-[#9B00CC]"
+    },
     {
       id: "remuneraciones",
       label: "Honorarios & Viáticos",
@@ -396,7 +406,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
               </h3>
             </div>
             <span className="text-[11px] text-slate-400 font-medium">
-              11 Áreas Operativas Disponibles
+              12 Áreas Operativas Disponibles
             </span>
           </div>
 
@@ -449,6 +459,24 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
         </div>
 
         {/* ── 3. CONTENIDO DE CADA PESTAÑA ── */}
+
+        {/* 0. Tab Dashboard Ejecutivo con Estadísticas */}
+        {activeTab === "dashboard_ejecutivo" && (
+          <CreatorExecutiveStatsDashboard
+            creatorName={creatorName}
+            profileInfo={profileInfo}
+            membership={membership}
+            expeditions={expeditions}
+            visitedEstablishments={visitedEstablishments}
+            quotes={quotes}
+            deals={deals}
+            expenses={routeExpenses}
+            galleryAlbums={galleryAlbums}
+            kpis={kpis}
+            leadsCount={leadsCount}
+            onNavigateTab={(tabId) => setActiveTab(tabId as CreatorTabType)}
+          />
+        )}
 
         {/* 1. Tab Remuneraciones */}
         {activeTab === "remuneraciones" && (
