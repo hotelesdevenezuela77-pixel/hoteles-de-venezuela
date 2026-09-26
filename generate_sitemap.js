@@ -47,16 +47,28 @@ async function run() {
     const today = new Date().toISOString().split('T')[0];
     const staticPages = [
       { path: '/', priority: '1.0', freq: 'daily' },
+      { path: '/home-v2', priority: '0.9', freq: 'daily' },
       { path: '/establecimientos', priority: '0.8', freq: 'daily' },
       { path: '/destinos', priority: '0.8', freq: 'weekly' },
       { path: '/mapa', priority: '0.7', freq: 'weekly' },
       { path: '/parques', priority: '0.7', freq: 'weekly' },
       { path: '/servicios-b2b', priority: '0.6', freq: 'weekly' },
+      { path: '/marketplace', priority: '0.7', freq: 'weekly' },
       { path: '/comparar', priority: '0.5', freq: 'monthly' },
       { path: '/paquetes', priority: '0.7', freq: 'weekly' },
+      { path: '/experiencias', priority: '0.7', freq: 'weekly' },
+      { path: '/tips', priority: '0.7', freq: 'weekly' },
+      { path: '/asistente-ia', priority: '0.8', freq: 'daily' },
       { path: '/links', priority: '0.5', freq: 'monthly' },
       { path: '/membresias', priority: '0.6', freq: 'monthly' },
       { path: '/prestigio-2026', priority: '0.8', freq: 'weekly' },
+      // Perfiles Oficiales de Creadores, Influencers & Hubs
+      { path: '/establecimiento/aura-croce-viajera-creadora', priority: '0.9', freq: 'daily' },
+      { path: '/establecimiento/influencer-99901', priority: '0.8', freq: 'daily' },
+      { path: '/establecimiento/influencer-1', priority: '0.8', freq: 'daily' },
+      { path: '/establecimiento/influencer-aura-croce', priority: '0.8', freq: 'daily' },
+      { path: '/establecimiento/el-mundo-de-los-ninos-barquisimeto', priority: '0.8', freq: 'weekly' },
+      { path: '/establecimiento/agencia-global-travel-tours-dmc', priority: '0.8', freq: 'weekly' },
     ];
 
     staticPages.forEach(p => {
