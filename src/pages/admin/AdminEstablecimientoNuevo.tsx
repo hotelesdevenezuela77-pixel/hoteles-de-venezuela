@@ -94,12 +94,12 @@ export function AdminEstablecimientoNuevo() {
     }
   }, [location]);
 
-  // Redirección si no es admin ni propietario autorizado
+  // Redirección si no hay sesión activa
   useEffect(() => {
-    if (!authLoading && (!user || (profile?.role !== "admin" && user?.email?.toLowerCase() !== "hotelesdevenezuela77@gmail.com"))) {
-      setLocation("/hdv-acceso-llc2027");
+    if (!authLoading && !user) {
+      setLocation("/login?redirectTo=" + encodeURIComponent(window.location.pathname + window.location.search));
     }
-  }, [user, profile, authLoading]);
+  }, [user, authLoading, setLocation]);
 
   // Consultar categorías y destinos
   const { data: categories = [], isLoading: catLoading } = useQuery<Category[]>({
@@ -682,6 +682,7 @@ export function AdminEstablecimientoNuevo() {
           .from("establishments")
           .insert({
             ...payload,
+            owner_user_id: user?.id || null,
             has_reservations_enabled: false,
             created_at: new Date().toISOString()
           })
@@ -691,6 +692,21 @@ export function AdminEstablecimientoNuevo() {
         if (error) throw error;
         if (!data?.id) throw new Error("No se obtuvo el ID del nuevo establecimiento.");
         establishmentId = data.id;
+
+        // Registrar propiedad en el almacenamiento local del propietario para carga instantánea
+        if (user?.id) {
+          try {
+            localStorage.setItem(`hdv_claimed_tenant_${payload.slug}`, user.id);
+            localStorage.setItem(`hdv_claimed_tenant_${establishmentId}`, user.id);
+            const savedList = JSON.parse(localStorage.getItem("hdv_custom_establishments") || "[]");
+            if (!savedList.some((e: any) => e.id === establishmentId || e.slug === payload.slug)) {
+              savedList.push({ id: establishmentId, ...payload });
+              localStorage.setItem("hdv_custom_establishments", JSON.stringify(savedList));
+            }
+          } catch (e) {
+            console.warn("Error guardando claim local:", e);
+          }
+        }
       }
 
       // Guardar puntos de interés y habitaciones en almacenamiento extendido
@@ -729,9 +745,15 @@ export function AdminEstablecimientoNuevo() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-establishments"] });
+      queryClient.invalidateQueries({ queryKey: ["owner-establishments"] });
       triggerToast("🎉 ¡Establecimiento registrado con éxito bajo Documento 77 V.10!");
       setTimeout(() => {
-        setLocation("/admin/establecimientos");
+        const isAdmin = profile?.role === "admin" || user?.email?.toLowerCase() === "hotelesdevenezuela77@gmail.com";
+        if (isAdmin) {
+          setLocation("/admin/establecimientos");
+        } else {
+          setLocation("/owner-dashboard");
+        }
       }, 1000);
     },
     onError: (err: any) => {
@@ -1067,9 +1089,9 @@ export function AdminEstablecimientoNuevo() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-[#0e011f] via-[#1a0533] to-[#0e011f] border border-[#00C8D4]/30 p-6 rounded-3xl shadow-2xl">
           <div className="flex items-center gap-3.5">
             <Link
-              href="/admin/establecimientos"
+              href={(profile?.role === "admin" || user?.email?.toLowerCase() === "hotelesdevenezuela77@gmail.com") ? "/admin/establecimientos" : "/owner-dashboard"}
               className="w-10 h-10 rounded-2xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all cursor-pointer shrink-0"
-              title="Volver a la lista"
+              title="Volver al panel"
             >
               <ArrowLeft className="w-5 h-5" />
             </Link>

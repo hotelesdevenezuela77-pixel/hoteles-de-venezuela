@@ -64,16 +64,23 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     return false;
   }, [user, profile, loading]);
 
-  // Redirección automática si el usuario no tiene rango de Administrador Master
+  // Rutas de administración accesibles para propietarios autenticados (Registro y Edición de Propiedades)
+  const isOwnerAccessibleAdminRoute = currentPath.startsWith("/admin/establecimientos/nuevo") || 
+                                      (currentPath.startsWith("/admin/establecimientos/") && currentPath.includes("/editar"));
+
+  // Redirección automática si el usuario no tiene rango de Administrador Master y no está en una ruta permitida para propietarios
   useEffect(() => {
     if (isMasterAdmin === false) {
+      if (user && isOwnerAccessibleAdminRoute) {
+        return;
+      }
       if (profile?.role === "owner" || profile?.role === "business_owner") {
         setLocation("/mis-negocios");
       } else {
         setLocation("/admin/login");
       }
     }
-  }, [isMasterAdmin, profile, setLocation]);
+  }, [isMasterAdmin, profile, setLocation, user, isOwnerAccessibleAdminRoute]);
 
   useEffect(() => {
     const updateFullPath = () => {
@@ -309,6 +316,39 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         <p className="text-xs font-mono font-bold tracking-widest text-slate-300 uppercase">
           Verificando Credenciales de Seguridad Matrix...
         </p>
+      </div>
+    );
+  }
+
+  // Si el usuario no es Super-Admin pero es un Propietario / Usuario autenticado en la ruta de registro/edición de propiedad
+  if (isMasterAdmin === false && user && isOwnerAccessibleAdminRoute) {
+    return (
+      <div className="min-h-screen bg-[#0e011f] text-white font-sans selection:bg-[#FF0096] selection:text-white">
+        {/* Cabecera corporativa para Propietarios */}
+        <header className="h-16 bg-[#1a0533]/80 backdrop-blur-md border-b border-[#00C8D4]/30 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-40">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/owner-dashboard"
+              className="flex items-center gap-2 text-xs font-bold text-white hover:text-[#00C8D4] transition-colors cursor-pointer"
+            >
+              <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-[#00C8D4] border border-[#00C8D4]/30">
+                <ChevronLeft className="w-4 h-4" />
+              </div>
+              <span className="hidden sm:inline">Volver a Mi Panel de Propietario</span>
+            </Link>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-[11px] font-semibold text-slate-300 hidden sm:inline">
+              {user.email}
+            </span>
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest text-[#00C8D4] bg-[#00C8D4]/15 border border-[#00C8D4]/30">
+              Panel Propietario
+            </span>
+          </div>
+        </header>
+        <main className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+          {children}
+        </main>
       </div>
     );
   }
