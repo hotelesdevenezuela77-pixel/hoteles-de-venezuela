@@ -3,7 +3,7 @@ import {
   Compass, ShieldCheck, Award, Calendar, Wallet, MapPin,
   RefreshCw, Building2, Activity, Layers, Star, Video, DollarSign, Receipt,
   FileText, Navigation, Tag, Sparkles, Image as ImageIcon, User, Edit3, Camera,
-  Phone, Globe
+  Phone, Globe, MessageSquare, Wrench, Clipboard, CheckSquare, BarChart3, TrendingUp
 } from "lucide-react";
 
 const InstagramIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) => (
@@ -20,6 +20,7 @@ const YoutubeIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) => (
     <path d="m10 15 5-3-5-3z" />
   </svg>
 );
+
 import { useCreatorInfluencerRealtime } from "../../hooks/useCreatorInfluencerRealtime";
 import { CreatorKpiHeader } from "./CreatorKpiHeader";
 import { CreatorTripRemunerationModule } from "./CreatorTripRemunerationModule";
@@ -28,10 +29,17 @@ import { CreatorRouteExplorer } from "./CreatorRouteExplorer";
 import { CreatorQuotesManager } from "./CreatorQuotesManager";
 import { CreatorFinanceMembership } from "./CreatorFinanceMembership";
 import { CreatorTravelGallery } from "./CreatorTravelGallery";
-import { DashboardAgendaCalendar } from "../agenda/DashboardAgendaCalendar";
 import { CreatorImportRouteModal } from "./CreatorImportRouteModal";
 import { CreatorProfileEditModal } from "./CreatorProfileEditModal";
 import { ConstellationBackground } from "../ConstellationBackground";
+
+// Módulos Ejecutivos Solicitados
+import { OwnerAgendaModule } from "../owner/OwnerAgendaModule";
+import { OwnerWhatsAppCRMModule } from "../owner/OwnerWhatsAppCRMModule";
+import { OwnerTechnicalSupportModule } from "../owner/OwnerTechnicalSupportModule";
+import { CMSModule } from "../../tenants/templates/components/CMSModule";
+import { AdvancedTaskOperationsModule } from "../../tenants/templates/components/AdvancedTaskOperationsModule";
+import type { TenantConfig } from "../../tenants/tenantContext";
 
 interface CreatorDashboardProps {
   establishment?: {
@@ -39,18 +47,24 @@ interface CreatorDashboardProps {
     name: string;
     slug?: string;
     category_name?: string;
+    phone?: string;
+    whatsapp?: string;
   } | null;
   onSwitchToTraditionalDashboard?: () => void;
 }
 
 export type CreatorTabType = 
   | "remuneraciones" 
+  | "agenda_dnd"
+  | "crm_whatsapp"
+  | "soporte_dnd"
+  | "webapp_cms"
+  | "tareas_saas"
   | "establecimientos_visitados" 
   | "explorador_rutas" 
   | "cotizaciones" 
-  | "finanzas_membresia" 
   | "galeria"
-  | "editorial";
+  | "finanzas_membresia";
 
 export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
   establishment,
@@ -69,10 +83,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
     galleryAlbums,
     waypoints,
     deals,
-    deliverables,
     routeExpenses,
-    tasks,
-    audits,
     kpis,
     loading,
     addExpedition,
@@ -94,20 +105,81 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
     addPhotoToAlbum,
     deletePhotoFromAlbum,
     addWaypoint,
-    updateWaypoint,
-    deleteWaypoint,
     importWaypoints,
-    createDeal,
-    addRouteExpense,
-    addEditorialTask,
-    updateTaskStatus,
-    addAudit,
     refresh
   } = useCreatorInfluencerRealtime(estId);
 
   const [activeTab, setActiveTab] = useState<CreatorTabType>("remuneraciones");
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+  // Contador de leads de WhatsApp (CRM)
+  const [leadsCount, setLeadsCount] = useState<number>(() => {
+    try {
+      const raw = localStorage.getItem(`hdv_owner_wa_leads_${estId}`);
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr) && arr.length > 0) return arr.length;
+      }
+    } catch (e) {}
+    return 10;
+  });
+
+  // Configuración WebApp / CMS Builder
+  const [tenantConfig, setTenantConfig] = useState<TenantConfig>(() => {
+    try {
+      const raw = localStorage.getItem("hdv_tenants_configurations");
+      if (raw) {
+        const list: TenantConfig[] = JSON.parse(raw);
+        const match = list.find(t => t.establishment_id === estId || t.slug === (establishment?.slug || "influencer-aura-croce"));
+        if (match) return match;
+      }
+    } catch (e) {}
+
+    return {
+      establishment_id: estId,
+      slug: establishment?.slug || "influencer-aura-croce",
+      name: profileInfo?.name || creatorName,
+      template: "A",
+      domain: `${(profileInfo?.name || creatorName).toLowerCase().replace(/\s+/g, '')}.hotelesdevenezuela.com`,
+      branding: {
+        primary_color: "#FF0096",
+        secondary_color: "#9B00CC",
+        accent_color: "#00C8D4",
+        font_title: "Playfair Display",
+        font_body: "Montserrat",
+        logo_url: profileInfo?.avatar_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+        banner_url: profileInfo?.banner_url || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1600&auto=format&fit=crop"
+      },
+      modules: {
+        reservas: true,
+        pos: false,
+        galeria: true,
+        contacto: true,
+        cms: true
+      },
+      contact: {
+        phone: profileInfo?.phone || establishment?.phone || "+58 414 123 4567",
+        whatsapp: profileInfo?.phone || establishment?.whatsapp || "+58 414 123 4567",
+        email: "contacto@auracroce.com",
+        instagram: profileInfo?.instagram || "@auracroce"
+      }
+    };
+  });
+
+  const handleTenantConfigChange = (updated: TenantConfig) => {
+    setTenantConfig(updated);
+    try {
+      const raw = localStorage.getItem("hdv_tenants_configurations");
+      let list: TenantConfig[] = raw ? JSON.parse(raw) : [];
+      const idx = list.findIndex(t => t.establishment_id === updated.establishment_id || t.slug === updated.slug);
+      if (idx >= 0) list[idx] = updated;
+      else list.push(updated);
+      localStorage.setItem("hdv_tenants_configurations", JSON.stringify(list));
+      window.dispatchEvent(new Event("hdv_tenant_config_changed"));
+      window.dispatchEvent(new Event("storage"));
+    } catch (e) {}
+  };
 
   return (
     <div className="relative min-h-screen bg-[#0e011f] text-slate-100 font-sans pb-16">
@@ -142,7 +214,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
               <div className="space-y-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="px-2.5 py-0.5 rounded-full bg-[#FF0096]/20 border border-[#FF0096]/40 text-[#FF0096] text-[9px] font-black uppercase tracking-wider">
-                    SUITE DE CREADORA & EXPEDICIONES
+                    SUITE EJECUTIVA DE CREADORA & EXPEDICIONES
                   </span>
                   <span className="inline-flex items-center text-[9px] text-emerald-400 font-bold bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-500/30">
                     <Activity className="w-2.5 h-2.5 mr-1 animate-pulse" /> Sincronización en Vivo
@@ -216,7 +288,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
         {/* ── 1. MÉTRICAS SUPERIORES (KPIs) ── */}
         <CreatorKpiHeader kpis={kpis} />
 
-        {/* ── 2. BARRA DE PESTAÑAS 100% RESPONSIVE (SIN DESBORDAMIENTOS) ── */}
+        {/* ── 2. BARRA DE PESTAÑAS 100% RESPONSIVE (MÓDULOS EJECUTIVOS Y DE CREADORA) ── */}
         <div className="relative border-b border-white/10 pb-3 -mx-3 px-3 sm:mx-0 sm:px-0">
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none flex-nowrap">
             
@@ -233,7 +305,87 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
               <span>Honorarios ($20/Viaje)</span>
             </button>
 
-            {/* 2. Establecimientos Visitados */}
+            {/* 2. Agenda & Calendario Drag & Drop */}
+            <button
+              onClick={() => setActiveTab("agenda_dnd")}
+              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
+                activeTab === "agenda_dnd"
+                  ? "bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] text-white border-white/40 shadow-lg shadow-[#00C8D4]/20 font-black ring-2 ring-white/30"
+                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
+              }`}
+            >
+              <Calendar className="w-4 h-4 text-cyan-300" />
+              <span>Agenda & Calendario</span>
+              <span className="ml-1 px-1.5 py-0.2 rounded-full text-[9px] font-black uppercase bg-[#00C8D4]/20 text-[#00C8D4] border border-[#00C8D4]/40">
+                Drag & Drop
+              </span>
+            </button>
+
+            {/* 3. CRM Leads WhatsApp */}
+            <button
+              onClick={() => setActiveTab("crm_whatsapp")}
+              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
+                activeTab === "crm_whatsapp"
+                  ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-white/40 shadow-lg shadow-emerald-500/20 font-black ring-2 ring-white/30"
+                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
+              }`}
+            >
+              <MessageSquare className="w-4 h-4 text-emerald-400" />
+              <span>CRM Leads WhatsApp</span>
+              <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-500 text-slate-950 font-mono font-bold">
+                {leadsCount}
+              </span>
+            </button>
+
+            {/* 4. Soporte Técnico Tickets D&D */}
+            <button
+              onClick={() => setActiveTab("soporte_dnd")}
+              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
+                activeTab === "soporte_dnd"
+                  ? "bg-gradient-to-r from-[#9B00CC] to-[#FF0096] text-white border-white/40 shadow-lg shadow-[#9B00CC]/20 font-black ring-2 ring-white/30"
+                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
+              }`}
+            >
+              <Wrench className="w-4 h-4 text-pink-400" />
+              <span>Soporte Técnico</span>
+              <span className="ml-1 px-1.5 py-0.2 rounded-full text-[9px] font-black uppercase bg-[#FF0096]/20 text-[#FF0096] border border-[#FF0096]/40">
+                Tickets D&D
+              </span>
+            </button>
+
+            {/* 5. Aplicación Web & CMS */}
+            <button
+              onClick={() => setActiveTab("webapp_cms")}
+              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
+                activeTab === "webapp_cms"
+                  ? "bg-gradient-to-r from-[#00C8D4] via-[#FF0096] to-[#9B00CC] text-white border-white/40 shadow-lg shadow-[#00C8D4]/20 font-black ring-2 ring-white/30"
+                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
+              }`}
+            >
+              <Globe className="w-4 h-4 text-cyan-300" />
+              <span>Aplicación Web & CMS</span>
+              <span className="ml-1 px-1.5 py-0.2 rounded-full text-[9px] font-black uppercase bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
+                Web Builder
+              </span>
+            </button>
+
+            {/* 6. Gestión de Tareas */}
+            <button
+              onClick={() => setActiveTab("tareas_saas")}
+              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
+                activeTab === "tareas_saas"
+                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white border-white/40 shadow-lg shadow-purple-600/20 font-black ring-2 ring-white/30"
+                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
+              }`}
+            >
+              <Clipboard className="w-4 h-4 text-indigo-300" />
+              <span>Gestión de Tareas</span>
+              <span className="ml-1 px-1.5 py-0.2 rounded-full text-[9px] font-black uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
+                SaaS
+              </span>
+            </button>
+
+            {/* 7. Establecimientos Visitados */}
             <button
               onClick={() => setActiveTab("establecimientos_visitados")}
               className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
@@ -249,7 +401,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
               </span>
             </button>
 
-            {/* 3. Explorador de Rutas & GPS */}
+            {/* 8. Explorador de Rutas & GPS */}
             <button
               onClick={() => setActiveTab("explorador_rutas")}
               className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
@@ -259,10 +411,10 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
               }`}
             >
               <Compass className="w-4 h-4 text-cyan-300" />
-              <span>Explorador Satelital GPS</span>
+              <span>Explorador GPS</span>
             </button>
 
-            {/* 4. Cotizaciones & Tarifario */}
+            {/* 9. Cotizaciones & Tarifario */}
             <button
               onClick={() => setActiveTab("cotizaciones")}
               className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
@@ -278,7 +430,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
               </span>
             </button>
 
-            {/* 5. Galería & Bitácora de Viajes */}
+            {/* 10. Galería & Bitácora de Viajes */}
             <button
               onClick={() => setActiveTab("galeria")}
               className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
@@ -288,13 +440,13 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
               }`}
             >
               <ImageIcon className="w-4 h-4 text-emerald-300" />
-              <span>Galería & Bitácora de Viajes</span>
+              <span>Galería & Bitácora</span>
               <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-black/40 text-white font-mono">
                 {galleryAlbums.length}
               </span>
             </button>
 
-            {/* 6. Finanzas & Membresía VIP */}
+            {/* 11. Finanzas & Membresía VIP */}
             <button
               onClick={() => setActiveTab("finanzas_membresia")}
               className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
@@ -304,26 +456,13 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
               }`}
             >
               <Wallet className="w-4 h-4 text-emerald-300" />
-              <span>Finanzas & Membresía VIP</span>
-            </button>
-
-            {/* 7. Agenda Editorial */}
-            <button
-              onClick={() => setActiveTab("editorial")}
-              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
-                activeTab === "editorial"
-                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white border-white/40 shadow-lg shadow-purple-600/20 font-black ring-2 ring-white/30"
-                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
-              }`}
-            >
-              <Calendar className="w-4 h-4 text-indigo-300" />
-              <span>Agenda Editorial</span>
+              <span>Finanzas & Pase VIP</span>
             </button>
 
           </div>
         </div>
 
-        {/* ── 3. CONTENIDO DE CADA PESTAÑA ESPECIALIZADA ── */}
+        {/* ── 3. CONTENIDO DE CADA PESTAÑA ── */}
 
         {/* 1. Tab Remuneraciones */}
         {activeTab === "remuneraciones" && (
@@ -339,7 +478,63 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
           />
         )}
 
-        {/* 2. Tab Establecimientos Visitados */}
+        {/* 2. Tab Agenda & Calendario Drag & Drop */}
+        {activeTab === "agenda_dnd" && (
+          <div className="space-y-6">
+            <OwnerAgendaModule
+              establishmentId={estId}
+              establishmentName={creatorName}
+            />
+          </div>
+        )}
+
+        {/* 3. Tab CRM Leads WhatsApp */}
+        {activeTab === "crm_whatsapp" && (
+          <div className="space-y-6">
+            <OwnerWhatsAppCRMModule
+              establishmentId={estId}
+              establishmentName={creatorName}
+              whatsappNumber={profileInfo?.phone || establishment?.phone || "+584141234567"}
+            />
+          </div>
+        )}
+
+        {/* 4. Tab Soporte Técnico Tickets D&D */}
+        {activeTab === "soporte_dnd" && (
+          <div className="space-y-6">
+            <OwnerTechnicalSupportModule
+              establishmentId={estId}
+              establishmentName={creatorName}
+            />
+          </div>
+        )}
+
+        {/* 5. Tab Aplicación Web & CMS Web Builder */}
+        {activeTab === "webapp_cms" && (
+          <div className="space-y-6">
+            <CMSModule
+              config={tenantConfig}
+              onConfigChange={handleTenantConfigChange}
+              primaryColor="#FF0096"
+              secondaryColor="#9B00CC"
+              accentColor="#00C8D4"
+            />
+          </div>
+        )}
+
+        {/* 6. Tab Gestión de Tareas */}
+        {activeTab === "tareas_saas" && (
+          <div className="space-y-6">
+            <AdvancedTaskOperationsModule
+              establishmentId={estId}
+              primaryColor="#00C8D4"
+              secondaryColor="#9B00CC"
+              accentColor="#FF0096"
+            />
+          </div>
+        )}
+
+        {/* 7. Tab Establecimientos Visitados */}
         {activeTab === "establecimientos_visitados" && (
           <CreatorVisitedEstablishments
             visitedEstablishments={visitedEstablishments}
@@ -350,7 +545,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
           />
         )}
 
-        {/* 3. Tab Explorador de Rutas & GPS */}
+        {/* 8. Tab Explorador de Rutas & GPS */}
         {activeTab === "explorador_rutas" && (
           <CreatorRouteExplorer
             establishmentId={estId}
@@ -361,7 +556,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
           />
         )}
 
-        {/* 4. Tab Cotizaciones & Tarifario */}
+        {/* 9. Tab Cotizaciones & Tarifario */}
         {activeTab === "cotizaciones" && (
           <CreatorQuotesManager
             quotes={quotes}
@@ -373,7 +568,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
           />
         )}
 
-        {/* 5. Tab Galería & Bitácora de Viajes */}
+        {/* 10. Tab Galería & Bitácora de Viajes */}
         {activeTab === "galeria" && (
           <CreatorTravelGallery
             albums={galleryAlbums}
@@ -386,7 +581,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
           />
         )}
 
-        {/* 6. Tab Finanzas & Membresía VIP */}
+        {/* 11. Tab Finanzas & Membresía VIP */}
         {activeTab === "finanzas_membresia" && (
           <CreatorFinanceMembership
             kpis={kpis}
@@ -396,15 +591,6 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
             expenses={routeExpenses}
             creatorName={creatorName}
             onUpdateMembership={updateMembership}
-          />
-        )}
-
-        {/* 7. Tab Agenda Editorial */}
-        {activeTab === "editorial" && (
-          <DashboardAgendaCalendar
-            establishmentId={estId}
-            portalTitle={`Agenda Editorial & Entregables de ${creatorName}`}
-            themeColor="#FF0096"
           />
         )}
 
