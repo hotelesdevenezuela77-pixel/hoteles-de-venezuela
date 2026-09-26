@@ -18,6 +18,9 @@ import type {
   CreatorQuote,
   CreatorQuoteItem,
   CreatorMembershipProfile,
+  CreatorProfileInfo,
+  CreatorGalleryAlbum,
+  CreatorGalleryItem,
   QuoteStatus
 } from "../types/creatorInfluencer";
 
@@ -593,11 +596,106 @@ const INITIAL_MEMBERSHIP: CreatorMembershipProfile = {
   ]
 };
 
+const INITIAL_PROFILE_INFO: CreatorProfileInfo = {
+  name: "Aura Croce",
+  headline: "Viajera 4x4, expedicionaria audiovisual & auditora de turismo HDV",
+  avatar_url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+  banner_url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+  bio: "Documentando los rincones más mágicos e inexplorados de Venezuela: desde expediciones 4x4 en los Andes y el Gran Roque hasta selvas y tepuyes de Canaima.",
+  instagram: "@auracroce",
+  tiktok: "@auracroce_viajes",
+  youtube: "Aura Croce Expediciones",
+  phone: "+58 414-1234567",
+  gear_equipment: "DJI Mavic 3 Pro • Sony Alpha 7 IV • Lente G-Master 24-70mm • Micrófonos Rode Wireless PRO • Starlink Mini",
+  location: "Caracas / Expediciones Nacionales, Venezuela"
+};
+
+const INITIAL_GALLERY_ALBUMS: CreatorGalleryAlbum[] = [
+  {
+    id: "album-1",
+    establishment_id: 1,
+    title: "Expedición Morrocoy & Cayo Sombrero",
+    destination: "Parque Nacional Morrocoy, Falcón",
+    trip_date: "2026-09-12",
+    cover_url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+    notes_for_future_trips: "Mejor luz de vuelo drone entre 7:30 AM y 10:00 AM antes de que sople la brisa marina. Contactar al Capitán Manuel en el muelle de Tucacas.",
+    best_lighting_hours: "07:30 AM - 10:00 AM (Golden Hour)",
+    local_contacts: "Capitán Manuel (Lancha Rápida): +58 412-5550192 | Posada Perla Negra: +58 424-9988771",
+    tags: ["drone", "paisaje", "hospedaje"],
+    photos: [
+      {
+        id: "p-1",
+        photo_url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+        title: "Aguas Cristalinas de Cayo Sombrero",
+        caption: "Toma cenital con DJI Mavic 3 a 120m de altura.",
+        tag: "drone"
+      },
+      {
+        id: "p-2",
+        photo_url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
+        title: "Atardecer en Posada Perla Negra",
+        caption: "Fachada iluminada al anochecer.",
+        tag: "hospedaje"
+      }
+    ]
+  },
+  {
+    id: "album-2",
+    establishment_id: 1,
+    title: "Travesía Sierra Nevada & Mucubají 4x4",
+    destination: "Mérida, Andes Venezolanos",
+    trip_date: "2026-08-15",
+    cover_url: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",
+    notes_for_future_trips: "Llevar baterías extra temperadas en bolsillos internos por el frío a 3.600 msnm. Parar en el Mirador de la Loca Luz Caraballo para tomas de neblina matutina.",
+    best_lighting_hours: "06:00 AM - 08:30 AM (Niebla y amanecer)",
+    local_contacts: "Guía de Páramo Carlos: +58 426-3334411 | Posada Los Frailes: +58 414-7788992",
+    tags: ["4x4", "paisaje", "drone"],
+    photos: [
+      {
+        id: "p-3",
+        photo_url: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",
+        title: "Laguna de Mucubají con Neblina",
+        caption: "Espejo de agua a 3.600 metros de altitud.",
+        tag: "paisaje"
+      }
+    ]
+  }
+];
+
 export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
   const localExpKey = `hdv_creator_expeditions_${establishmentId}`;
   const localVisitedKey = `hdv_creator_visited_est_${establishmentId}`;
   const localQuotesKey = `hdv_creator_quotes_${establishmentId}`;
   const localMembershipKey = `hdv_creator_membership_${establishmentId}`;
+  const localProfileKey = `hdv_creator_profile_${establishmentId}`;
+  const localGalleryKey = `hdv_creator_gallery_${establishmentId}`;
+  const localWaypointsKey = `hdv_creator_waypoints_${establishmentId}`;
+
+  const [profileInfo, setProfileInfo] = useState<CreatorProfileInfo>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem(localProfileKey);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && parsed.name) return parsed;
+        }
+      } catch (e) {}
+    }
+    return INITIAL_PROFILE_INFO;
+  });
+
+  const [galleryAlbums, setGalleryAlbums] = useState<CreatorGalleryAlbum[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem(localGalleryKey);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+    }
+    return INITIAL_GALLERY_ALBUMS;
+  });
 
   const [expeditions, setExpeditions] = useState<CreatorExpedition[]>(() => {
     if (typeof window !== "undefined") {
@@ -1285,12 +1383,142 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
     setAudits(prev => [newAudit, ...prev]);
   };
 
+  // Gestión de Perfil de Creadora
+  const updateProfileInfo = (updates: Partial<CreatorProfileInfo>) => {
+    const updated = { ...profileInfo, ...updates };
+    setProfileInfo(updated);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem(localProfileKey, JSON.stringify(updated));
+        window.dispatchEvent(new CustomEvent("hdv_creator_profile_changed", { detail: updated }));
+      } catch (e) {}
+    }
+  };
+
+  // Gestión de Galería & Bitácora de Expediciones
+  const saveGalleryLocally = (newAlbums: CreatorGalleryAlbum[]) => {
+    setGalleryAlbums(newAlbums);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem(localGalleryKey, JSON.stringify(newAlbums));
+        window.dispatchEvent(new CustomEvent("hdv_creator_gallery_changed", { detail: newAlbums }));
+      } catch (e) {}
+    }
+  };
+
+  const addGalleryAlbum = (albumData: Partial<CreatorGalleryAlbum>): CreatorGalleryAlbum => {
+    const newAlbum: CreatorGalleryAlbum = {
+      id: `alb-${Date.now()}`,
+      establishment_id: establishmentId,
+      title: albumData.title || "Nueva Expedición",
+      destination: albumData.destination || "Venezuela",
+      trip_date: albumData.trip_date || new Date().toISOString().split("T")[0],
+      cover_url: albumData.cover_url || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+      notes_for_future_trips: albumData.notes_for_future_trips || "",
+      best_lighting_hours: albumData.best_lighting_hours || "07:00 AM - 09:30 AM",
+      local_contacts: albumData.local_contacts || "",
+      tags: albumData.tags || ["paisaje", "drone"],
+      photos: albumData.photos || [],
+      created_at: new Date().toISOString()
+    };
+    const updated = [newAlbum, ...galleryAlbums];
+    saveGalleryLocally(updated);
+    return newAlbum;
+  };
+
+  const updateGalleryAlbum = (albumId: string, updates: Partial<CreatorGalleryAlbum>) => {
+    const updated = galleryAlbums.map(a => a.id === albumId ? { ...a, ...updates } : a);
+    saveGalleryLocally(updated);
+  };
+
+  const deleteGalleryAlbum = (albumId: string) => {
+    const updated = galleryAlbums.filter(a => a.id !== albumId);
+    saveGalleryLocally(updated);
+  };
+
+  const addPhotoToAlbum = (albumId: string, photo: Partial<CreatorGalleryItem>) => {
+    const newItem: CreatorGalleryItem = {
+      id: `p-${Date.now()}`,
+      photo_url: photo.photo_url || "",
+      title: photo.title || "Foto de Expedición",
+      caption: photo.caption || "",
+      tag: photo.tag || "general",
+      taken_at: photo.taken_at || new Date().toISOString(),
+      latitude: photo.latitude,
+      longitude: photo.longitude
+    };
+    const updated = galleryAlbums.map(a => {
+      if (a.id === albumId) {
+        return {
+          ...a,
+          photos: [...a.photos, newItem],
+          cover_url: a.cover_url || newItem.photo_url
+        };
+      }
+      return a;
+    });
+    saveGalleryLocally(updated);
+  };
+
+  const deletePhotoFromAlbum = (albumId: string, photoId: string) => {
+    const updated = galleryAlbums.map(a => {
+      if (a.id === albumId) {
+        return {
+          ...a,
+          photos: a.photos.filter(p => p.id !== photoId)
+        };
+      }
+      return a;
+    });
+    saveGalleryLocally(updated);
+  };
+
+  // Gestión de Waypoints en vivo
+  const saveWaypointsLocally = (newWps: CreatorWaypoint[]) => {
+    setWaypoints(newWps);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem(localWaypointsKey, JSON.stringify(newWps));
+      } catch (e) {}
+    }
+  };
+
+  const addWaypoint = (wpData: Partial<CreatorWaypoint>): CreatorWaypoint => {
+    const newWp: CreatorWaypoint = {
+      id: `wp-${Date.now()}`,
+      expedition_id: wpData.expedition_id || expeditions[0]?.id || "exp-201",
+      latitude: wpData.latitude || 10.4806,
+      longitude: wpData.longitude || -66.9036,
+      altitude_meters: wpData.altitude_meters || 900,
+      point_type: wpData.point_type || "spot_fotografico",
+      title: wpData.title || "Nuevo Punto GPS",
+      description: wpData.description || "",
+      photo_url: wpData.photo_url || "",
+      created_at: new Date().toISOString()
+    };
+    const updated = [newWp, ...waypoints];
+    saveWaypointsLocally(updated);
+    return newWp;
+  };
+
+  const updateWaypoint = (wpId: string, updates: Partial<CreatorWaypoint>) => {
+    const updated = waypoints.map(w => w.id === wpId ? { ...w, ...updates } : w);
+    saveWaypointsLocally(updated);
+  };
+
+  const deleteWaypoint = (wpId: string) => {
+    const updated = waypoints.filter(w => w.id !== wpId);
+    saveWaypointsLocally(updated);
+  };
+
   return {
     expeditions,
     travelAuthorizations,
     visitedEstablishments,
     quotes,
     membership,
+    profileInfo,
+    galleryAlbums,
     waypoints,
     deals,
     deliverables,
@@ -1315,6 +1543,15 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
     deleteQuote,
     convertQuoteToDeal,
     updateMembership,
+    updateProfileInfo,
+    addGalleryAlbum,
+    updateGalleryAlbum,
+    deleteGalleryAlbum,
+    addPhotoToAlbum,
+    deletePhotoFromAlbum,
+    addWaypoint,
+    updateWaypoint,
+    deleteWaypoint,
     importWaypoints,
     createDeal,
     addRouteExpense,

@@ -233,7 +233,50 @@ export interface CreatorVisitedEstablishment {
   deal_value_usd?: number;
   
   photos?: string[];
+  cover_image?: string;
+  latitude?: number;
+  longitude?: number;
   notes?: string;
+  created_at?: string;
+}
+
+export interface CreatorProfileInfo {
+  name: string;
+  headline: string;
+  avatar_url: string;
+  banner_url?: string;
+  bio: string;
+  instagram?: string;
+  tiktok?: string;
+  youtube?: string;
+  phone?: string;
+  gear_equipment?: string;
+  location?: string;
+}
+
+export interface CreatorGalleryItem {
+  id: string;
+  photo_url: string;
+  title: string;
+  caption?: string;
+  tag?: 'drone' | 'gastronomia' | 'hospedaje' | '4x4' | 'paisaje' | 'detras_camara' | 'general';
+  taken_at?: string;
+  latitude?: number;
+  longitude?: number;
+}
+
+export interface CreatorGalleryAlbum {
+  id: string;
+  establishment_id: number;
+  title: string;
+  destination: string;
+  trip_date: string;
+  cover_url: string;
+  notes_for_future_trips?: string;
+  best_lighting_hours?: string;
+  local_contacts?: string;
+  tags?: string[];
+  photos: CreatorGalleryItem[];
   created_at?: string;
 }
 

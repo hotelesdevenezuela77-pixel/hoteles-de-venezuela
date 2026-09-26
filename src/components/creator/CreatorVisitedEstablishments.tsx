@@ -63,13 +63,55 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
     water_pressure: "excelente" as "excelente" | "aceptable" | "deficiente",
     deal_type: "canje" as DealType,
     deal_value_usd: 250,
+    cover_image: "",
+    latitude: undefined as number | undefined,
+    longitude: undefined as number | undefined,
     social_link: "",
     hdv_slug: "",
     notes: ""
   });
 
+  const [isCapturingGps, setIsCapturingGps] = useState(false);
+  const [gpsStatusMsg, setGpsStatusMsg] = useState<string | null>(null);
+
+  const handleGetGpsLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocalización no soportada en este navegador.");
+      return;
+    }
+    setIsCapturingGps(true);
+    setGpsStatusMsg("Obteniendo satélites GPS...");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = parseFloat(pos.coords.latitude.toFixed(5));
+        const lng = parseFloat(pos.coords.longitude.toFixed(5));
+        setForm(prev => ({ ...prev, latitude: lat, longitude: lng }));
+        setIsCapturingGps(false);
+        setGpsStatusMsg(`GPS fijado: ${lat}, ${lng} (±${Math.round(pos.coords.accuracy)}m)`);
+      },
+      (err) => {
+        setIsCapturingGps(false);
+        setGpsStatusMsg("Error al obtener señal GPS: " + err.message);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        setForm(prev => ({ ...prev, cover_image: result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleOpenCreate = () => {
     setEditingEst(null);
+    setGpsStatusMsg(null);
     setForm({
       name: "",
       destination: "",
@@ -85,6 +127,9 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
       water_pressure: "excelente",
       deal_type: "canje",
       deal_value_usd: 250,
+      cover_image: "",
+      latitude: undefined,
+      longitude: undefined,
       social_link: "",
       hdv_slug: "",
       notes: ""
@@ -94,6 +139,7 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
 
   const handleOpenEdit = (est: CreatorVisitedEstablishment) => {
     setEditingEst(est);
+    setGpsStatusMsg(est.latitude && est.longitude ? `Coordenadas: ${est.latitude}, ${est.longitude}` : null);
     setForm({
       name: est.name,
       destination: est.destination,
@@ -109,6 +155,9 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
       water_pressure: est.water_pressure,
       deal_type: est.deal_type || "canje",
       deal_value_usd: est.deal_value_usd || 200,
+      cover_image: est.cover_image || (est.photos && est.photos[0]) || "",
+      latitude: est.latitude,
+      longitude: est.longitude,
       social_link: est.social_link || "",
       hdv_slug: est.hdv_slug || "",
       notes: est.notes || ""
@@ -123,46 +172,34 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
     const catObj = CATEGORIES.find(c => c.id === form.category);
     const catLabel = catObj ? catObj.label : "Establecimiento";
 
+    const payload = {
+      name: form.name.trim(),
+      destination: form.destination.trim(),
+      category: form.category,
+      category_label: catLabel,
+      visit_date: form.visit_date,
+      status: form.status,
+      rating: Number(form.rating),
+      is_recommended: form.is_recommended,
+      wifi_speed_mbps: Number(form.wifi_speed_mbps),
+      power_generator: form.power_generator,
+      water_supply: form.water_supply,
+      water_pressure: form.water_pressure,
+      deal_type: form.deal_type,
+      deal_value_usd: Number(form.deal_value_usd),
+      cover_image: form.cover_image,
+      latitude: form.latitude,
+      longitude: form.longitude,
+      photos: form.cover_image ? [form.cover_image] : undefined,
+      social_link: form.social_link.trim(),
+      hdv_slug: form.hdv_slug.trim(),
+      notes: form.notes.trim()
+    };
+
     if (editingEst) {
-      onUpdateEstablishment(editingEst.id, {
-        name: form.name.trim(),
-        destination: form.destination.trim(),
-        category: form.category,
-        category_label: catLabel,
-        visit_date: form.visit_date,
-        status: form.status,
-        rating: Number(form.rating),
-        is_recommended: form.is_recommended,
-        wifi_speed_mbps: Number(form.wifi_speed_mbps),
-        power_generator: form.power_generator,
-        water_supply: form.water_supply,
-        water_pressure: form.water_pressure,
-        deal_type: form.deal_type,
-        deal_value_usd: Number(form.deal_value_usd),
-        social_link: form.social_link.trim(),
-        hdv_slug: form.hdv_slug.trim(),
-        notes: form.notes.trim()
-      });
+      onUpdateEstablishment(editingEst.id, payload);
     } else {
-      onAddEstablishment({
-        name: form.name.trim(),
-        destination: form.destination.trim(),
-        category: form.category,
-        category_label: catLabel,
-        visit_date: form.visit_date,
-        status: form.status,
-        rating: Number(form.rating),
-        is_recommended: form.is_recommended,
-        wifi_speed_mbps: Number(form.wifi_speed_mbps),
-        power_generator: form.power_generator,
-        water_supply: form.water_supply,
-        water_pressure: form.water_pressure,
-        deal_type: form.deal_type,
-        deal_value_usd: Number(form.deal_value_usd),
-        social_link: form.social_link.trim(),
-        hdv_slug: form.hdv_slug.trim(),
-        notes: form.notes.trim()
-      });
+      onAddEstablishment(payload);
     }
 
     setShowModal(false);
@@ -471,6 +508,53 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
                     placeholder="Ej: Tucacas, Falcón / Mochima, Sucre"
                     className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-xs text-white focus:outline-none focus:border-[#00C8D4]"
                   />
+                </div>
+              </div>
+
+              {/* GPS Geolocation & Photo Capture Buttons */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-2xl bg-[#0e011f] border border-[#00C8D4]/30">
+                {/* GPS Capture */}
+                <div className="space-y-1.5">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-[#00C8D4] block">
+                    📍 Coordenadas Satelitales GPS
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleGetGpsLocation}
+                    disabled={isCapturingGps}
+                    className="w-full px-3 py-2 rounded-xl bg-cyan-950/80 hover:bg-cyan-900/90 border border-[#00C8D4]/40 text-[#00C8D4] text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    <Compass className={`w-4 h-4 ${isCapturingGps ? "animate-spin" : ""}`} />
+                    <span>{isCapturingGps ? "Fijando Satélites..." : "Capturar Mi GPS Ahora"}</span>
+                  </button>
+                  {gpsStatusMsg && (
+                    <p className="text-[10px] text-cyan-300 font-mono truncate">{gpsStatusMsg}</p>
+                  )}
+                </div>
+
+                {/* Camera / Photo Upload */}
+                <div className="space-y-1.5">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-[#FF0096] block">
+                    📷 Foto en Sitio / Portada
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <label className="flex-1 px-3 py-2 rounded-xl bg-[#FF0096]/20 hover:bg-[#FF0096]/30 border border-[#FF0096]/40 text-[#FF0096] text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer">
+                      <Camera className="w-4 h-4" />
+                      <span>{form.cover_image ? "Cambiar Foto" : "Tomar Foto / Subir"}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        onChange={handlePhotoUpload}
+                        className="hidden"
+                      />
+                    </label>
+                    {form.cover_image && (
+                      <div className="w-9 h-9 rounded-lg overflow-hidden border border-[#FF0096] shrink-0 bg-black">
+                        <img src={form.cover_image} alt="Thumb" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 

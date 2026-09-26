@@ -60,8 +60,21 @@ export const CreatorRouteExplorer: React.FC<CreatorRouteExplorerProps> = ({
     title: "",
     point_type: "spot_fotografico" as PointType,
     description: "",
-    altitude_meters: 1150
+    altitude_meters: 1150,
+    photo_url: ""
   });
+  const [activeLightboxWpPhoto, setActiveLightboxWpPhoto] = useState<string | null>(null);
+
+  const handleWaypointPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setPointForm(prev => ({ ...prev, photo_url: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Temporizador de grabación
   useEffect(() => {
@@ -214,6 +227,7 @@ export const CreatorRouteExplorer: React.FC<CreatorRouteExplorerProps> = ({
         point_type: pointForm.point_type,
         description: pointForm.description.trim(),
         altitude_meters: Number(pointForm.altitude_meters) || currentAltitude,
+        photo_url: pointForm.photo_url || undefined,
         latitude: 10.4806 + (Math.random() - 0.5) * 0.1,
         longitude: -66.9036 + (Math.random() - 0.5) * 0.1
       });
@@ -224,7 +238,8 @@ export const CreatorRouteExplorer: React.FC<CreatorRouteExplorerProps> = ({
       title: "",
       point_type: "spot_fotografico",
       description: "",
-      altitude_meters: currentAltitude
+      altitude_meters: currentAltitude,
+      photo_url: ""
     });
   };
 
@@ -432,6 +447,49 @@ export const CreatorRouteExplorer: React.FC<CreatorRouteExplorerProps> = ({
                 </div>
               </div>
 
+              {/* Photo Upload / Camera Capture for Waypoint */}
+              <div className="p-3.5 rounded-2xl bg-black/40 border border-[#00C8D4]/30 space-y-2">
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#00C8D4] block">
+                  📷 Foto del Spot / Referencia Visual
+                </span>
+                
+                {pointForm.photo_url ? (
+                  <div className="relative aspect-video rounded-xl overflow-hidden border border-[#00C8D4] bg-black">
+                    <img src={pointForm.photo_url} alt="Waypoint preview" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => setPointForm(prev => ({ ...prev, photo_url: "" }))}
+                      className="absolute top-2 right-2 p-1 rounded-full bg-black/70 text-white hover:bg-red-600"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <label className="flex-1 px-3 py-2 rounded-xl bg-[#00C8D4]/20 hover:bg-[#00C8D4]/30 border border-[#00C8D4]/40 text-[#00C8D4] text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer">
+                      <Camera className="w-3.5 h-3.5" />
+                      <span>Cámara en Sitio</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        onChange={handleWaypointPhotoUpload}
+                        className="hidden"
+                      />
+                    </label>
+                    <label className="flex-1 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-white text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer">
+                      <span>Subir Imagen</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleWaypointPhotoUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                )}
+              </div>
+
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
                   Descripción & Tips de Acceso
@@ -455,12 +513,32 @@ export const CreatorRouteExplorer: React.FC<CreatorRouteExplorerProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] text-white text-xs font-bold shadow-md hover:brightness-110"
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] text-white text-xs font-bold shadow-md hover:brightness-110 cursor-pointer"
                 >
                   Guardar Waypoint
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Lightbox for Waypoint Photo */}
+      {activeLightboxWpPhoto && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl"
+          onClick={() => setActiveLightboxWpPhoto(null)}
+        >
+          <div className="relative max-w-4xl w-full max-h-[90vh] flex flex-col items-center justify-center space-y-3" onClick={e => e.stopPropagation()}>
+            <button
+              onClick={() => setActiveLightboxWpPhoto(null)}
+              className="absolute -top-10 right-0 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <div className="rounded-3xl overflow-hidden border border-white/20 shadow-2xl max-h-[75vh] w-full flex items-center justify-center bg-black">
+              <img src={activeLightboxWpPhoto} alt="Waypoint Photo" className="max-h-[75vh] w-auto object-contain rounded-2xl" />
+            </div>
           </div>
         </div>
       )}

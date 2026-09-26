@@ -2,8 +2,24 @@ import React, { useState } from "react";
 import {
   Compass, ShieldCheck, Award, Calendar, Wallet, MapPin,
   RefreshCw, Building2, Activity, Layers, Star, Video, DollarSign, Receipt,
-  FileText, Navigation, Tag, Sparkles
+  FileText, Navigation, Tag, Sparkles, Image as ImageIcon, User, Edit3, Camera,
+  Phone, Globe
 } from "lucide-react";
+
+const InstagramIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+  </svg>
+);
+
+const YoutubeIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17" />
+    <path d="m10 15 5-3-5-3z" />
+  </svg>
+);
 import { useCreatorInfluencerRealtime } from "../../hooks/useCreatorInfluencerRealtime";
 import { CreatorKpiHeader } from "./CreatorKpiHeader";
 import { CreatorTripRemunerationModule } from "./CreatorTripRemunerationModule";
@@ -11,9 +27,10 @@ import { CreatorVisitedEstablishments } from "./CreatorVisitedEstablishments";
 import { CreatorRouteExplorer } from "./CreatorRouteExplorer";
 import { CreatorQuotesManager } from "./CreatorQuotesManager";
 import { CreatorFinanceMembership } from "./CreatorFinanceMembership";
+import { CreatorTravelGallery } from "./CreatorTravelGallery";
 import { DashboardAgendaCalendar } from "../agenda/DashboardAgendaCalendar";
 import { CreatorImportRouteModal } from "./CreatorImportRouteModal";
-import { CreatorQuickActions } from "./CreatorQuickActions";
+import { CreatorProfileEditModal } from "./CreatorProfileEditModal";
 import { ConstellationBackground } from "../ConstellationBackground";
 
 interface CreatorDashboardProps {
@@ -32,6 +49,7 @@ export type CreatorTabType =
   | "explorador_rutas" 
   | "cotizaciones" 
   | "finanzas_membresia" 
+  | "galeria"
   | "editorial";
 
 export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
@@ -47,6 +65,8 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
     visitedEstablishments,
     quotes,
     membership,
+    profileInfo,
+    galleryAlbums,
     waypoints,
     deals,
     deliverables,
@@ -67,6 +87,15 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
     deleteQuote,
     convertQuoteToDeal,
     updateMembership,
+    updateProfileInfo,
+    addGalleryAlbum,
+    updateGalleryAlbum,
+    deleteGalleryAlbum,
+    addPhotoToAlbum,
+    deletePhotoFromAlbum,
+    addWaypoint,
+    updateWaypoint,
+    deleteWaypoint,
     importWaypoints,
     createDeal,
     addRouteExpense,
@@ -78,54 +107,93 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
 
   const [activeTab, setActiveTab] = useState<CreatorTabType>("remuneraciones");
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   return (
-    <div className="relative min-h-screen bg-[#0e011f] text-slate-100 font-sans pb-28">
+    <div className="relative min-h-screen bg-[#0e011f] text-slate-100 font-sans pb-16">
       {/* Background Constellation Effect */}
       <ConstellationBackground />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+      <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 space-y-6">
         
-        {/* Header Banner */}
-        <div className="rounded-3xl bg-gradient-to-r from-[#1a0533] via-[#0e011f] to-[#1a0533] border border-white/10 p-6 shadow-2xl backdrop-blur-md mb-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        {/* ── HEADER BANNER CON PERFIL DE CREADORA ── */}
+        <div className="rounded-3xl bg-gradient-to-r from-[#1a0533] via-[#0e011f] to-[#1a0533] border border-white/10 p-4 sm:p-6 shadow-2xl backdrop-blur-md">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
             
-            <div className="flex items-center space-x-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#FF0096] via-[#00C8D4] to-[#9B00CC] p-0.5 shadow-xl shadow-[#FF0096]/20 shrink-0">
-                <div className="w-full h-full bg-[#0e011f] rounded-[14px] flex items-center justify-center">
-                  <Compass className="w-8 h-8 text-[#FF0096]" />
+            {/* Creator Photo + Identity */}
+            <div className="flex items-start sm:items-center gap-4">
+              <div className="relative group shrink-0">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 border-[#FF0096] shadow-xl shadow-[#FF0096]/20 bg-slate-900">
+                  <img
+                    src={profileInfo?.avatar_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80"}
+                    alt={profileInfo?.name || creatorName}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  />
                 </div>
+                <button
+                  onClick={() => setIsProfileModalOpen(true)}
+                  className="absolute -bottom-1.5 -right-1.5 p-1.5 rounded-xl bg-gradient-to-tr from-[#FF0096] to-[#00C8D4] text-white shadow-md hover:scale-110 transition-all cursor-pointer"
+                  title="Cambiar Foto / Editar Perfil"
+                >
+                  <Camera className="w-3.5 h-3.5" />
+                </button>
               </div>
 
-              <div>
-                <div className="flex items-center space-x-2">
-                  <span className="px-3 py-0.5 rounded-full bg-[#FF0096]/20 border border-[#FF0096]/40 text-[#FF0096] text-[10px] font-extrabold uppercase tracking-wider">
-                    SUITE PROFESIONAL DE CREADOR & EXPEDICIONES
+              <div className="space-y-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#FF0096]/20 border border-[#FF0096]/40 text-[#FF0096] text-[9px] font-black uppercase tracking-wider">
+                    SUITE DE CREADORA & EXPEDICIONES
                   </span>
-                  <span className="hidden sm:inline-flex items-center text-[10px] text-emerald-400 font-semibold bg-emerald-950/40 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
-                    <Activity className="w-3 h-3 mr-1 animate-pulse" /> Realtime Sync Active
+                  <span className="inline-flex items-center text-[9px] text-emerald-400 font-bold bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                    <Activity className="w-2.5 h-2.5 mr-1 animate-pulse" /> Sincronización en Vivo
                   </span>
                 </div>
 
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-1 font-serif">
-                  {creatorName}
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight font-serif truncate">
+                  {profileInfo?.name || creatorName}
                 </h1>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Honorarios ($20/Viaje) • Inventario de Establecimientos Auditados • Explorador Satelital GPS • Cotizaciones & Membresía
+                
+                <p className="text-xs text-slate-300 font-medium line-clamp-1">
+                  {profileInfo?.headline || "Viajera 4x4, expedicionaria audiovisual & auditora de turismo HDV"}
                 </p>
+
+                {/* Social Badges */}
+                <div className="flex items-center gap-2 pt-1 flex-wrap text-[11px]">
+                  {profileInfo?.instagram && (
+                    <span className="px-2 py-0.5 rounded-lg bg-pink-950/60 border border-pink-500/30 text-pink-300 font-bold flex items-center gap-1">
+                      <InstagramIcon className="w-3 h-3 text-[#FF0096]" />
+                      {profileInfo.instagram}
+                    </span>
+                  )}
+                  {profileInfo?.tiktok && (
+                    <span className="px-2 py-0.5 rounded-lg bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 font-bold flex items-center gap-1">
+                      <Video className="w-3 h-3 text-cyan-400" />
+                      {profileInfo.tiktok}
+                    </span>
+                  )}
+                  {profileInfo?.location && (
+                    <span className="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-400 flex items-center gap-1">
+                      <MapPin className="w-3 h-3 text-[#00C8D4]" />
+                      {profileInfo.location}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* Controls */}
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="px-3.5 py-2 rounded-2xl bg-slate-900/90 border border-white/10 text-xs flex items-center space-x-2 text-slate-300">
-                <ShieldCheck className="w-4 h-4 text-[#00C8D4]" />
-                <span>Pase de Prensa HDV Activo</span>
-              </div>
+            {/* Quick Actions & Navigation Controls */}
+            <div className="flex items-center gap-2.5 flex-wrap shrink-0">
+              <button
+                onClick={() => setIsProfileModalOpen(true)}
+                className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm hover:scale-[1.02]"
+              >
+                <Edit3 className="w-3.5 h-3.5 text-[#00C8D4]" />
+                <span>Editar Perfil</span>
+              </button>
 
               <button
                 onClick={refresh}
-                className="p-2.5 rounded-2xl bg-slate-900 border border-white/10 hover:bg-slate-800 text-slate-300 transition-all cursor-pointer"
+                className="p-2 rounded-xl bg-slate-900 border border-white/10 hover:bg-slate-800 text-slate-300 transition-all cursor-pointer"
                 title="Sincronizar Datos"
               >
                 <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin text-[#FF0096]" : ""}`} />
@@ -134,10 +202,10 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
               {onSwitchToTraditionalDashboard && (
                 <button
                   onClick={onSwitchToTraditionalDashboard}
-                  className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:opacity-90 text-white font-extrabold text-xs shadow-lg transition-all flex items-center space-x-2 cursor-pointer border border-white/20 hover:scale-[1.02]"
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:opacity-90 text-white font-extrabold text-xs shadow-lg transition-all flex items-center space-x-1.5 cursor-pointer border border-white/20 hover:scale-[1.02]"
                 >
                   <Building2 className="w-4 h-4 text-white" />
-                  <span>⬅ Volver al Dashboard Matriz</span>
+                  <span>⬅ Dashboard Matriz</span>
                 </button>
               )}
             </div>
@@ -145,99 +213,117 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
           </div>
         </div>
 
-        {/* 1. Métricas Superiores (KPIs de Remuneración, Expedición y Contratos) */}
+        {/* ── 1. MÉTRICAS SUPERIORES (KPIs) ── */}
         <CreatorKpiHeader kpis={kpis} />
 
-        {/* ── BARRA DE PESTAÑAS PRINCIPALES (REDISEÑO ARQUITECTÓNICO SENIOR) ── */}
-        <div className="flex space-x-2.5 border-b border-white/10 pb-4 mb-8 overflow-x-auto no-scrollbar">
-          
-          {/* 1. Honorarios & Viáticos */}
-          <button
-            onClick={() => setActiveTab("remuneraciones")}
-            className={`px-5 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center space-x-2 shrink-0 cursor-pointer border ${
-              activeTab === "remuneraciones"
-                ? "bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] text-white border-white/40 shadow-lg shadow-[#FF0096]/20 font-black ring-2 ring-white/30"
-                : "bg-slate-900/60 border-white/10 text-slate-400 hover:text-white"
-            }`}
-          >
-            <DollarSign className="w-4 h-4 text-amber-300" />
-            <span>Honorarios & Viáticos ($20/Viaje)</span>
-          </button>
+        {/* ── 2. BARRA DE PESTAÑAS 100% RESPONSIVE (SIN DESBORDAMIENTOS) ── */}
+        <div className="relative border-b border-white/10 pb-3 -mx-3 px-3 sm:mx-0 sm:px-0">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none flex-nowrap">
+            
+            {/* 1. Honorarios & Viáticos */}
+            <button
+              onClick={() => setActiveTab("remuneraciones")}
+              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
+                activeTab === "remuneraciones"
+                  ? "bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] text-white border-white/40 shadow-lg shadow-[#FF0096]/20 font-black ring-2 ring-white/30"
+                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
+              }`}
+            >
+              <DollarSign className="w-4 h-4 text-amber-300" />
+              <span>Honorarios ($20/Viaje)</span>
+            </button>
 
-          {/* 2. Establecimientos Visitados (Reemplazo de habitaciones) */}
-          <button
-            onClick={() => setActiveTab("establecimientos_visitados")}
-            className={`px-5 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center space-x-2 shrink-0 cursor-pointer border ${
-              activeTab === "establecimientos_visitados"
-                ? "bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] text-white border-white/40 shadow-lg shadow-[#00C8D4]/20 font-black ring-2 ring-white/30"
-                : "bg-slate-900/60 border-white/10 text-slate-400 hover:text-white"
-            }`}
-          >
-            <Building2 className="w-4 h-4 text-[#00C8D4]" />
-            <span>Establecimientos Visitados & Auditados</span>
-            <span className="ml-1 px-2 py-0.5 rounded-full text-[10px] bg-black/40 text-white font-mono">
-              {visitedEstablishments.length}
-            </span>
-          </button>
+            {/* 2. Establecimientos Visitados */}
+            <button
+              onClick={() => setActiveTab("establecimientos_visitados")}
+              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
+                activeTab === "establecimientos_visitados"
+                  ? "bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] text-white border-white/40 shadow-lg shadow-[#00C8D4]/20 font-black ring-2 ring-white/30"
+                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
+              }`}
+            >
+              <Building2 className="w-4 h-4 text-[#00C8D4]" />
+              <span>Establecimientos Visitados</span>
+              <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-black/40 text-white font-mono">
+                {visitedEstablishments.length}
+              </span>
+            </button>
 
-          {/* 3. Explorador de Rutas & GPS */}
-          <button
-            onClick={() => setActiveTab("explorador_rutas")}
-            className={`px-5 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center space-x-2 shrink-0 cursor-pointer border ${
-              activeTab === "explorador_rutas"
-                ? "bg-gradient-to-r from-[#00C8D4] to-[#FF0096] text-white border-white/40 shadow-lg shadow-[#00C8D4]/20 font-black ring-2 ring-white/30"
-                : "bg-slate-900/60 border-white/10 text-slate-400 hover:text-white"
-            }`}
-          >
-            <Compass className="w-4 h-4 text-cyan-300" />
-            <span>Explorador Satelital & GPS</span>
-          </button>
+            {/* 3. Explorador de Rutas & GPS */}
+            <button
+              onClick={() => setActiveTab("explorador_rutas")}
+              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
+                activeTab === "explorador_rutas"
+                  ? "bg-gradient-to-r from-[#00C8D4] to-[#FF0096] text-white border-white/40 shadow-lg shadow-[#00C8D4]/20 font-black ring-2 ring-white/30"
+                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
+              }`}
+            >
+              <Compass className="w-4 h-4 text-cyan-300" />
+              <span>Explorador Satelital GPS</span>
+            </button>
 
-          {/* 4. Cotizaciones & Tarifario */}
-          <button
-            onClick={() => setActiveTab("cotizaciones")}
-            className={`px-5 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center space-x-2 shrink-0 cursor-pointer border ${
-              activeTab === "cotizaciones"
-                ? "bg-gradient-to-r from-[#9B00CC] to-[#FF0096] text-white border-white/40 shadow-lg shadow-[#9B00CC]/20 font-black ring-2 ring-white/30"
-                : "bg-slate-900/60 border-white/10 text-slate-400 hover:text-white"
-            }`}
-          >
-            <FileText className="w-4 h-4 text-pink-300" />
-            <span>Cotizaciones & Tarifario</span>
-            <span className="ml-1 px-2 py-0.5 rounded-full text-[10px] bg-black/40 text-white font-mono">
-              {quotes.length}
-            </span>
-          </button>
+            {/* 4. Cotizaciones & Tarifario */}
+            <button
+              onClick={() => setActiveTab("cotizaciones")}
+              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
+                activeTab === "cotizaciones"
+                  ? "bg-gradient-to-r from-[#9B00CC] to-[#FF0096] text-white border-white/40 shadow-lg shadow-[#9B00CC]/20 font-black ring-2 ring-white/30"
+                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
+              }`}
+            >
+              <FileText className="w-4 h-4 text-pink-300" />
+              <span>Cotizaciones & Tarifario</span>
+              <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-black/40 text-white font-mono">
+                {quotes.length}
+              </span>
+            </button>
 
-          {/* 5. Finanzas & Membresía VIP */}
-          <button
-            onClick={() => setActiveTab("finanzas_membresia")}
-            className={`px-5 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center space-x-2 shrink-0 cursor-pointer border ${
-              activeTab === "finanzas_membresia"
-                ? "bg-gradient-to-r from-[#FF0096] to-[#9B00CC] text-white border-white/40 shadow-lg shadow-[#FF0096]/20 font-black ring-2 ring-white/30"
-                : "bg-slate-900/60 border-white/10 text-slate-400 hover:text-white"
-            }`}
-          >
-            <Wallet className="w-4 h-4 text-emerald-300" />
-            <span>Finanzas & Membresía VIP</span>
-          </button>
+            {/* 5. Galería & Bitácora de Viajes */}
+            <button
+              onClick={() => setActiveTab("galeria")}
+              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
+                activeTab === "galeria"
+                  ? "bg-gradient-to-r from-[#00C8D4] via-[#FF0096] to-[#9B00CC] text-white border-white/40 shadow-lg shadow-[#00C8D4]/20 font-black ring-2 ring-white/30"
+                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
+              }`}
+            >
+              <ImageIcon className="w-4 h-4 text-emerald-300" />
+              <span>Galería & Bitácora de Viajes</span>
+              <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-black/40 text-white font-mono">
+                {galleryAlbums.length}
+              </span>
+            </button>
 
-          {/* 6. Agenda Editorial */}
-          <button
-            onClick={() => setActiveTab("editorial")}
-            className={`px-5 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center space-x-2 shrink-0 cursor-pointer border ${
-              activeTab === "editorial"
-                ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white border-white/40 shadow-lg shadow-purple-600/20 font-black ring-2 ring-white/30"
-                : "bg-slate-900/60 border-white/10 text-slate-400 hover:text-white"
-            }`}
-          >
-            <Calendar className="w-4 h-4 text-indigo-300" />
-            <span>Agenda Editorial</span>
-          </button>
+            {/* 6. Finanzas & Membresía VIP */}
+            <button
+              onClick={() => setActiveTab("finanzas_membresia")}
+              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
+                activeTab === "finanzas_membresia"
+                  ? "bg-gradient-to-r from-[#FF0096] to-[#9B00CC] text-white border-white/40 shadow-lg shadow-[#FF0096]/20 font-black ring-2 ring-white/30"
+                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
+              }`}
+            >
+              <Wallet className="w-4 h-4 text-emerald-300" />
+              <span>Finanzas & Membresía VIP</span>
+            </button>
 
+            {/* 7. Agenda Editorial */}
+            <button
+              onClick={() => setActiveTab("editorial")}
+              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
+                activeTab === "editorial"
+                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white border-white/40 shadow-lg shadow-purple-600/20 font-black ring-2 ring-white/30"
+                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
+              }`}
+            >
+              <Calendar className="w-4 h-4 text-indigo-300" />
+              <span>Agenda Editorial</span>
+            </button>
+
+          </div>
         </div>
 
-        {/* ── CONTENIDO DE CADA PESTAÑA ESPECIALIZADA ── */}
+        {/* ── 3. CONTENIDO DE CADA PESTAÑA ESPECIALIZADA ── */}
 
         {/* 1. Tab Remuneraciones */}
         {activeTab === "remuneraciones" && (
@@ -253,7 +339,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
           />
         )}
 
-        {/* 2. Tab Establecimientos Visitados (Reemplazo de habitaciones) */}
+        {/* 2. Tab Establecimientos Visitados */}
         {activeTab === "establecimientos_visitados" && (
           <CreatorVisitedEstablishments
             visitedEstablishments={visitedEstablishments}
@@ -267,10 +353,11 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
         {/* 3. Tab Explorador de Rutas & GPS */}
         {activeTab === "explorador_rutas" && (
           <CreatorRouteExplorer
+            establishmentId={estId}
             creatorName={creatorName}
             expeditions={expeditions}
             waypoints={waypoints}
-            onAddWaypoint={importWaypoints ? (wp) => importWaypoints([wp]) : undefined}
+            onAddWaypoint={addWaypoint}
           />
         )}
 
@@ -278,19 +365,33 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
         {activeTab === "cotizaciones" && (
           <CreatorQuotesManager
             quotes={quotes}
+            creatorName={creatorName}
             onAddQuote={addQuote}
             onUpdateQuote={updateQuote}
             onDeleteQuote={deleteQuote}
             onConvertToDeal={convertQuoteToDeal}
-            creatorName={creatorName}
           />
         )}
 
-        {/* 5. Tab Finanzas & Membresía */}
+        {/* 5. Tab Galería & Bitácora de Viajes */}
+        {activeTab === "galeria" && (
+          <CreatorTravelGallery
+            albums={galleryAlbums}
+            creatorName={creatorName}
+            onAddAlbum={addGalleryAlbum}
+            onUpdateAlbum={updateGalleryAlbum}
+            onDeleteAlbum={deleteGalleryAlbum}
+            onAddPhoto={addPhotoToAlbum}
+            onDeletePhoto={deletePhotoFromAlbum}
+          />
+        )}
+
+        {/* 6. Tab Finanzas & Membresía VIP */}
         {activeTab === "finanzas_membresia" && (
           <CreatorFinanceMembership
             kpis={kpis}
             membership={membership}
+            expeditions={expeditions}
             deals={deals}
             expenses={routeExpenses}
             creatorName={creatorName}
@@ -298,7 +399,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
           />
         )}
 
-        {/* 6. Tab Agenda Editorial */}
+        {/* 7. Tab Agenda Editorial */}
         {activeTab === "editorial" && (
           <DashboardAgendaCalendar
             establishmentId={estId}
@@ -316,13 +417,14 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
         onImportWaypoints={importWaypoints}
       />
 
-      {/* Quick Actions Footer */}
-      <CreatorQuickActions
-        onOpenImportModal={() => setIsImportModalOpen(true)}
-        onNavigateDeals={() => setActiveTab("cotizaciones")}
-        onNavigateExpenses={() => setActiveTab("finanzas_membresia")}
-        onNavigateCalendar={() => setActiveTab("editorial")}
+      {/* Modal Editar Perfil & Fotos */}
+      <CreatorProfileEditModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        profile={profileInfo}
+        onSave={updateProfileInfo}
       />
+
     </div>
   );
 };
