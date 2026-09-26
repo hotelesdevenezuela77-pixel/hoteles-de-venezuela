@@ -21,10 +21,11 @@ interface CreatorFinanceMembershipProps {
   onUpdateMembership?: (updates: Partial<CreatorMembershipProfile>) => void;
 }
 
+import { useBcvExchangeRate } from "@/hooks/useBcvExchangeRate";
+
 const CIAN = "#00C8D4";
 const FUCSIA = "#FF0096";
 const PURPURA = "#9B00CC";
-const DEFAULT_RATE = 36.5;
 
 export const CreatorFinanceMembership: React.FC<CreatorFinanceMembershipProps> = ({
   kpis,
@@ -34,6 +35,7 @@ export const CreatorFinanceMembership: React.FC<CreatorFinanceMembershipProps> =
   creatorName = "Aura Croce",
   onUpdateMembership
 }) => {
+  const { bcvRate, formatBs } = useBcvExchangeRate();
   const [copiedToken, setCopiedToken] = useState(false);
 
   // Cálculos consolidados
@@ -101,7 +103,7 @@ export const CreatorFinanceMembership: React.FC<CreatorFinanceMembershipProps> =
           </div>
           <div className="text-[10px] text-slate-400 mt-1 flex justify-between">
             <span>Honorarios + Viáticos + Pautas</span>
-            <span className="text-emerald-400 font-mono">Bs. {(totalGrossIncome * DEFAULT_RATE).toLocaleString("es-VE", { minimumFractionDigits: 2 })}</span>
+            <span className="text-emerald-400 font-mono">Bs. {formatBs(totalGrossIncome)}</span>
           </div>
         </div>
 
@@ -152,7 +154,7 @@ export const CreatorFinanceMembership: React.FC<CreatorFinanceMembershipProps> =
           </div>
           <div className="text-[10px] text-emerald-400 mt-1 flex justify-between">
             <span>Ganancia neta acumulada</span>
-            <span>~Bs. {(netEarnings * DEFAULT_RATE).toLocaleString("es-VE", { minimumFractionDigits: 2 })}</span>
+            <span>~Bs. {formatBs(netEarnings)}</span>
           </div>
         </div>
 

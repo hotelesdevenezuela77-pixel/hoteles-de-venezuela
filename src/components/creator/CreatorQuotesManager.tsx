@@ -15,10 +15,11 @@ interface CreatorQuotesManagerProps {
   creatorName?: string;
 }
 
+import { useBcvExchangeRate } from "@/hooks/useBcvExchangeRate";
+
 const CIAN = "#00C8D4";
 const FUCSIA = "#FF0096";
 const PURPURA = "#9B00CC";
-const DEFAULT_RATE = 36.5;
 
 // Servicios predefinidos del tarifario base del influencer
 const BASE_SERVICES = [
@@ -38,6 +39,7 @@ export const CreatorQuotesManager: React.FC<CreatorQuotesManagerProps> = ({
   onConvertToDeal,
   creatorName = "Aura Croce"
 }) => {
+  const { bcvRate, formatBs } = useBcvExchangeRate();
   const [filterStatus, setFilterStatus] = useState<QuoteStatus | "all">("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -115,14 +117,15 @@ export const CreatorQuotesManager: React.FC<CreatorQuotesManagerProps> = ({
 
   const handleCopyWhatsAppQuote = (q: CreatorQuote) => {
     const itemsList = q.items.map(it => `• *${it.service_name}* (x${it.quantity}): $${it.total_usd.toFixed(2)} USD`).join("\n");
-    const bsTotal = (q.total_usd * DEFAULT_RATE).toLocaleString("es-VE", { minimumFractionDigits: 2 });
+    const bsTotal = formatBs(q.total_usd);
 
     const text = `📋 *PROPUESTA COMERCIAL & COTIZACIÓN OFICIAL HDV* 🇻🇪\n` +
       `📄 *Cotización N°:* ${q.quote_number}\n` +
       `👤 *Creador(a):* ${creatorName} (Creadora Oficial Hoteles de Venezuela)\n` +
       `🏨 *Cliente / Establecimiento:* ${q.client_name}\n` +
       `📍 *Destino:* ${q.destination_target || 'Venezuela'}\n` +
-      `🗓️ *Validez:* Hasta ${q.valid_until_date}\n\n` +
+      `🗓️ *Validez:* Hasta ${q.valid_until_date}\n` +
+      `💵 *Tasa Oficial BCV:* Bs. ${bcvRate.toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / USD\n\n` +
       `💼 *SERVICIOS INCLUIDOS EN LA COBERTURA:*\n` +
       `${itemsList}\n\n` +
       (q.discount_usd > 0 ? `🎟️ *Descuento Especial Convenio:* -$${q.discount_usd.toFixed(2)} USD\n` : '') +
@@ -428,7 +431,7 @@ export const CreatorQuotesManager: React.FC<CreatorQuotesManagerProps> = ({
                     Total Cotización
                   </label>
                   <div className="px-3.5 py-2 rounded-xl bg-black/60 border border-[#00C8D4]/40 text-sm font-black text-[#00C8D4]">
-                    ${formTotal.toFixed(2)} USD (~Bs. {(formTotal * DEFAULT_RATE).toLocaleString("es-VE", { minimumFractionDigits: 2 })})
+                    ${formTotal.toFixed(2)} USD (~Bs. {formatBs(formTotal)})
                   </div>
                 </div>
               </div>

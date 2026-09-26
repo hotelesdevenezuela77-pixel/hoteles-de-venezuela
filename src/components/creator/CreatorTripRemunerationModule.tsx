@@ -15,6 +15,8 @@ import type {
   InfluencerTravelAuthorization
 } from "../../types/creatorInfluencer";
 
+import { useBcvExchangeRate } from "../../hooks/useBcvExchangeRate";
+
 interface CreatorTripRemunerationModuleProps {
   expeditions: CreatorExpedition[];
   travelAuthorizations?: InfluencerTravelAuthorization[];
@@ -29,7 +31,6 @@ interface CreatorTripRemunerationModuleProps {
 const CIAN = "#00C8D4";
 const FUCSIA = "#FF0096";
 const PURPURA = "#9B00CC";
-const DEFAULT_EXCHANGE_RATE = 36.5;
 
 const PAYMENT_METHODS: { id: ExpeditionPaymentMethod; label: string; icon: string }[] = [
   { id: "pago_movil", label: "Pago Móvil Interbancario", icon: "📱" },
@@ -49,6 +50,7 @@ export const CreatorTripRemunerationModule: React.FC<CreatorTripRemunerationModu
   onUpdatePayment,
   onDeleteExpedition
 }) => {
+  const { bcvRate, formatBs, convertToBs } = useBcvExchangeRate();
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
@@ -156,18 +158,20 @@ export const CreatorTripRemunerationModule: React.FC<CreatorTripRemunerationModu
   const handleCopyWhatsAppSummary = (trip: CreatorExpedition) => {
     const fee = (trip.base_fee_usd || 20.00).toFixed(2);
     const viat = (trip.viaticos_usd || 0).toFixed(2);
-    const total = (trip.total_remuneration_usd || (trip.base_fee_usd || 20) + (trip.viaticos_usd || 0)).toFixed(2);
-    const bsTotal = ((trip.total_remuneration_usd || 0) * DEFAULT_EXCHANGE_RATE).toLocaleString("es-VE", { minimumFractionDigits: 2 });
+    const totalNum = trip.total_remuneration_usd || (trip.base_fee_usd || 20) + (trip.viaticos_usd || 0);
+    const total = totalNum.toFixed(2);
+    const bsTotal = formatBs(totalNum);
     const b = trip.viaticos_breakdown || {};
 
     const msg = `🧾 *LIQUIDACIÓN DE VIAJE / INFLUENCER HDV*
 🌟 *Creador:* ${creatorName}
 📍 *Ruta / Destino:* ${trip.title} (${trip.destination})
 🗓️ *Fechas:* ${trip.start_date} al ${trip.end_date}
+💵 *Tasa BCV Oficial:* Bs. ${bcvRate.toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / USD
 
 💵 *DESGLOSE FINANCIERO:*
-• *Honorarios Profesionales Fijos:* $${fee} USD (Garantizado por Viaje)
-• *Viáticos de Ruta:* $${viat} USD
+• *Honorarios Profesionales Fijos:* $${fee} USD (~Bs. ${formatBs(Number(fee))})
+• *Viáticos de Ruta:* $${viat} USD (~Bs. ${formatBs(Number(viat))})
   - Combustible: $${(b.combustible || 0).toFixed(2)}
   - Comidas / Hidratación: $${(b.comidas || 0).toFixed(2)}
   - Lancheros / Guías: $${(b.guias_lancheros || 0).toFixed(2)}
@@ -230,16 +234,22 @@ _Hoteles de Venezuela LLC • Plataforma de Expediciones Turísticas_`;
 
         <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider"
-                 style={{ backgroundColor: `${CIAN}15`, color: CIAN, border: `1px solid ${CIAN}30` }}>
-              <Wallet className="w-3.5 h-3.5" />
-              <span>Finanzas de Creador & Coberturas Turísticas</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider"
+                   style={{ backgroundColor: `${CIAN}15`, color: CIAN, border: `1px solid ${CIAN}30` }}>
+                <Wallet className="w-3.5 h-3.5" />
+                <span>Finanzas de Creador & Coberturas Turísticas</span>
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[10px] font-mono font-bold bg-white/10 text-emerald-300 border border-emerald-500/30">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Tasa Oficial BCV: Bs. {bcvRate.toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / USD</span>
+              </div>
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold font-serif text-white tracking-wide">
               Remuneraciones de Viaje & Viáticos
             </h2>
             <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
-              Módulo oficial para la asignación y liquidación de <strong className="text-white">Honorarios Base de $20.00 USD por cada viaje</strong> más el reembolso y anticipo de <strong className="text-white">Viáticos de Carretera (Combustible, Lancheros, Comidas y Peajes)</strong>.
+              Módulo oficial para la asignación y liquidación de <strong className="text-white">Honorarios Base de $20.00 USD por cada viaje (~Bs. {formatBs(20)})</strong> más el reembolso y anticipo de <strong className="text-white">Viáticos de Carretera (Combustible, Lancheros, Comidas y Peajes)</strong> liquidados en Bolívares a la tasa oficial del día.
             </p>
           </div>
 
@@ -601,8 +611,8 @@ _Hoteles de Venezuela LLC • Plataforma de Expediciones Turísticas_`;
                       ${totalRemun.toFixed(2)} <span className="text-xs font-bold text-[#FF0096]">USD</span>
                     </div>
                     <div className="text-[10px] font-mono text-slate-400 flex items-center justify-between">
-                      <span>Ref. BCV:</span>
-                      <span className="text-slate-200 font-bold">Bs. {(totalRemun * DEFAULT_EXCHANGE_RATE).toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      <span>Ref. BCV ({bcvRate.toLocaleString("es-VE", { minimumFractionDigits: 2 })}):</span>
+                      <span className="text-slate-200 font-bold">Bs. {formatBs(totalRemun)}</span>
                     </div>
                   </div>
 
@@ -896,8 +906,13 @@ _Hoteles de Venezuela LLC • Plataforma de Expediciones Turísticas_`;
                   <span className="text-[10px] uppercase font-bold text-pink-300">TOTAL REMUNERACIÓN DEL VIAJE</span>
                   <div className="text-xs text-slate-300">$20.00 (Honorarios) + ${formViaticosTotal.toFixed(2)} (Viáticos)</div>
                 </div>
-                <div className="text-2xl font-black text-white font-mono">
-                  ${formTotalRemuneration.toFixed(2)} <span className="text-xs text-[#FF0096]">USD</span>
+                <div className="text-right">
+                  <div className="text-2xl font-black text-white font-mono">
+                    ${formTotalRemuneration.toFixed(2)} <span className="text-xs text-[#FF0096]">USD</span>
+                  </div>
+                  <div className="text-[10px] font-mono text-slate-300">
+                    ~Bs. {formatBs(formTotalRemuneration)} BCV
+                  </div>
                 </div>
               </div>
 
@@ -945,8 +960,13 @@ _Hoteles de Venezuela LLC • Plataforma de Expediciones Turísticas_`;
             <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1">
               <span className="text-[10px] text-slate-400 font-bold uppercase">{liquidatingTrip.destination}</span>
               <p className="font-bold text-white text-sm">{liquidatingTrip.title}</p>
-              <div className="text-lg font-black text-[#00C8D4] font-mono pt-1">
-                Total a Pagar: ${liquidatingTrip.total_remuneration_usd?.toFixed(2) || (liquidatingTrip.base_fee_usd + liquidatingTrip.viaticos_usd).toFixed(2)} USD
+              <div className="flex items-baseline justify-between pt-1">
+                <div className="text-lg font-black text-[#00C8D4] font-mono">
+                  Total: ${(liquidatingTrip.total_remuneration_usd || (liquidatingTrip.base_fee_usd + liquidatingTrip.viaticos_usd)).toFixed(2)} USD
+                </div>
+                <div className="text-xs font-mono text-slate-300 font-bold">
+                  ~Bs. {formatBs(liquidatingTrip.total_remuneration_usd || (liquidatingTrip.base_fee_usd + liquidatingTrip.viaticos_usd))}
+                </div>
               </div>
             </div>
 
@@ -1105,9 +1125,13 @@ _Hoteles de Venezuela LLC • Plataforma de Expediciones Turísticas_`;
               </tbody>
               <tfoot>
                 <tr className="border-t-2 border-slate-900 font-bold text-sm">
-                  <td className="py-3 text-slate-900">TOTAL LIQUIDADO</td>
+                  <td className="py-3 text-slate-900">
+                    <div>TOTAL LIQUIDADO</div>
+                    <div className="text-[10px] text-slate-500 font-normal font-mono">Tasa Oficial BCV: Bs. {bcvRate.toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / USD</div>
+                  </td>
                   <td className="py-3 text-right font-mono text-[#FF0096]">
-                    ${(viewingReceiptTrip.total_remuneration_usd || (viewingReceiptTrip.base_fee_usd || 20) + (viewingReceiptTrip.viaticos_usd || 0)).toFixed(2)} USD
+                    <div>${(viewingReceiptTrip.total_remuneration_usd || (viewingReceiptTrip.base_fee_usd || 20) + (viewingReceiptTrip.viaticos_usd || 0)).toFixed(2)} USD</div>
+                    <div className="text-xs text-slate-700 font-bold">~Bs. {formatBs(viewingReceiptTrip.total_remuneration_usd || (viewingReceiptTrip.base_fee_usd || 20) + (viewingReceiptTrip.viaticos_usd || 0))}</div>
                   </td>
                 </tr>
               </tfoot>

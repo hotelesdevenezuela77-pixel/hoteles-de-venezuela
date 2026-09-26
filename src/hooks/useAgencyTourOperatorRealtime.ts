@@ -11,7 +11,9 @@ import type {
   QuoteStatus
 } from "../types/agencyTourOperator";
 
-const DEFAULT_EXCHANGE_RATE = 36.5;
+import { getBcvExchangeRate } from "./useBcvExchangeRate";
+
+const DEFAULT_EXCHANGE_RATE = getBcvExchangeRate();
 
 // Datos de demostración en vivo de Expediciones & Paquetes Turísticos
 const INITIAL_PACKAGES: AgencyPackage[] = [

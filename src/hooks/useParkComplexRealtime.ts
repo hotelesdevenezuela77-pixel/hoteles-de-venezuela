@@ -11,7 +11,9 @@ import type {
   QRValidationResult
 } from "../types/parkComplex";
 
-const DEFAULT_EXCHANGE_RATE = 36.5; // Tasa USD a VED / BS
+import { getBcvExchangeRate } from "./useBcvExchangeRate";
+
+const DEFAULT_EXCHANGE_RATE = getBcvExchangeRate(); // Tasa USD a VED / BS
 
 // Datos iniciales de demostración en vivo (Ej: El Mundo de los Niños)
 const INITIAL_POOLS: ParkPool[] = [

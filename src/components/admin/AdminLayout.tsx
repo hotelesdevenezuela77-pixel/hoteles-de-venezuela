@@ -7,8 +7,10 @@ import {
   Sparkles, Bot, Network, Shield, Car, Compass, AlertTriangle, Ticket, LayoutDashboard,
   Search, Bell, ChevronLeft, ChevronRight, X, ShieldAlert, Menu,
   ArrowUpDown, Receipt, MessageSquare, Star, Mail, Link2, LogOut, ChevronDown,
-  Calendar, TrendingUp, Activity, Edit3, Briefcase, HelpCircle, BookOpen, Cpu, LifeBuoy, Scale, Layers
+  Calendar, TrendingUp, Activity, Edit3, Briefcase, HelpCircle, BookOpen, Cpu, LifeBuoy, Scale, Layers,
+  ArrowRight
 } from "lucide-react";
+import { useBcvExchangeRate } from "@/hooks/useBcvExchangeRate";
 
 // Colores Oficiales (Sistemas de Contraste)
 const FUCSIA = "#FF0096"; // Botones premium y llamados de atención
@@ -97,6 +99,12 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
+
+  // Control de Tasa de Cambio BCV en Tiempo Real
+  const { bcvRate, bcvSource, updateRate } = useBcvExchangeRate();
+  const [isBcvModalOpen, setIsBcvModalOpen] = useState(false);
+  const [tempBcvRate, setTempBcvRate] = useState(String(bcvRate));
+  const [tempBcvSource, setTempBcvSource] = useState(bcvSource);
 
   const notificationRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -504,6 +512,22 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-4">
+            {/* Widget Tasa BCV Rápida en Header */}
+            <button
+              onClick={() => {
+                setTempBcvRate(String(bcvRate));
+                setTempBcvSource(bcvSource || "BCV Oficial");
+                setIsBcvModalOpen(true);
+              }}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-[#00C8D4]/30 text-xs font-mono text-white transition-all cursor-pointer shadow-xs group"
+              title="Editar Tasa Oficial BCV del Día"
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+              <span className="text-[10px] font-sans font-black text-slate-400 uppercase group-hover:text-[#00C8D4] transition-colors hidden sm:inline">BCV:</span>
+              <span className="font-bold text-[#00C8D4] tracking-tight">Bs. {bcvRate.toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              <Edit3 className="w-3 h-3 text-slate-400 group-hover:text-white transition-colors ml-0.5 shrink-0" />
+            </button>
+
             {/* Buscador de Cabecera */}
             <button
               onClick={() => setSearchOpen(true)}
@@ -661,6 +685,111 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               <span>Cierra con <kbd className="px-1 py-0.5 rounded bg-white/5 font-mono">ESC</kbd></span>
             </div>
 
+          </div>
+        </div>
+      )}
+      {isBcvModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="relative w-full max-w-sm bg-[#1a0533] border border-[#00C8D4]/40 rounded-3xl p-6 text-white shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-[#00C8D4]/20 border border-[#00C8D4]/30 flex items-center justify-center text-[#00C8D4]">
+                  <TrendingUp className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold font-serif text-white">Tasa Oficial Dólar BCV</h3>
+                  <p className="text-[10px] text-slate-400">Actualización en tiempo real para toda la plataforma</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsBcvModalOpen(false)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1">
+                  Tasa en Bolívares (VES / USD)
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-mono font-bold text-xs">Bs.</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={tempBcvRate}
+                    onChange={(e) => setTempBcvRate(e.target.value)}
+                    className="w-full pl-10 pr-3 py-2.5 bg-black/40 border border-white/20 rounded-xl text-white font-mono font-bold text-sm focus:outline-none focus:border-[#00C8D4]"
+                    placeholder="Ej: 855.66"
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1">
+                  Fuente de Referencia
+                </label>
+                <input
+                  type="text"
+                  value={tempBcvSource}
+                  onChange={(e) => setTempBcvSource(e.target.value)}
+                  className="w-full px-3 py-2 bg-black/40 border border-white/20 rounded-xl text-white text-xs focus:outline-none focus:border-[#00C8D4]"
+                  placeholder="BCV Oficial"
+                />
+              </div>
+
+              <div className="p-3 bg-white/5 rounded-xl border border-white/10 text-[11px] text-slate-300 space-y-1.5">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Ej. $20 USD (Honorarios Viaje):</span>
+                  <span className="font-mono font-bold text-[#00C8D4]">
+                    Bs. {((parseFloat(tempBcvRate) || 0) * 20).toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Ej. $165 USD (Cotización / Expedición):</span>
+                  <span className="font-mono font-bold text-pink-400">
+                    Bs. {((parseFloat(tempBcvRate) || 0) * 165).toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t border-white/10">
+              <Link
+                href="/admin/tasas"
+                onClick={() => setIsBcvModalOpen(false)}
+                className="text-[11px] text-[#00C8D4] hover:underline flex items-center gap-1 font-bold cursor-pointer"
+              >
+                <span>Panel de Tasas</span>
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsBcvModalOpen(false)}
+                  className="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white bg-white/5 cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const num = parseFloat(tempBcvRate);
+                    if (!isNaN(num) && num > 0) {
+                      await updateRate(num, tempBcvSource || "BCV Oficial");
+                      setIsBcvModalOpen(false);
+                    }
+                  }}
+                  className="px-4 py-1.5 rounded-xl text-xs font-black text-white shadow-lg cursor-pointer hover:scale-103 active:scale-97 transition-all"
+                  style={{ background: `linear-gradient(135deg, ${FUCSIA} 0%, ${PURPURA} 100%)` }}
+                >
+                  Guardar Tasa
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

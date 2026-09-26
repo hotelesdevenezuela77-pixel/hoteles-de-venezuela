@@ -23,8 +23,9 @@ import type {
   CreatorGalleryItem,
   QuoteStatus
 } from "../types/creatorInfluencer";
+import { getBcvExchangeRate } from "./useBcvExchangeRate";
 
-const DEFAULT_EXCHANGE_RATE = 36.5;
+const DEFAULT_EXCHANGE_RATE = getBcvExchangeRate();
 
 // Datos iniciales de demostración con honorarios base de $20 USD y desglose de viáticos
 const INITIAL_EXPEDITIONS: CreatorExpedition[] = [
@@ -697,6 +698,18 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
     return INITIAL_GALLERY_ALBUMS;
   });
 
+  const [bcvRate, setBcvRate] = useState<number>(getBcvExchangeRate);
+
+  useEffect(() => {
+    const handleRateChange = (e: any) => {
+      if (e.detail && typeof e.detail.rate === "number") {
+        setBcvRate(e.detail.rate);
+      }
+    };
+    window.addEventListener("hdv_bcv_rate_changed", handleRateChange);
+    return () => window.removeEventListener("hdv_bcv_rate_changed", handleRateChange);
+  }, []);
+
   const [expeditions, setExpeditions] = useState<CreatorExpedition[]>(() => {
     if (typeof window !== "undefined") {
       try {
@@ -940,13 +953,13 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
   // Cómputo consolidado de KPIs incluyendo Honorarios ($20/viaje) y Viáticos
   const kpis: CreatorKpiSummary = (() => {
     const expeditionIncomeUsd = deals.reduce((acc, d) => acc + (d.monetary_usd || 0), 0);
-    const expeditionIncomeBs = expeditionIncomeUsd * DEFAULT_EXCHANGE_RATE;
+    const expeditionIncomeBs = expeditionIncomeUsd * bcvRate;
 
     const expeditionExpensesUsd = routeExpenses.reduce((acc, e) => acc + (e.amount_usd || 0), 0);
-    const expeditionExpensesBs = expeditionExpensesUsd * DEFAULT_EXCHANGE_RATE;
+    const expeditionExpensesBs = expeditionExpensesUsd * bcvRate;
 
     const netExpeditionMarginUsd = expeditionIncomeUsd - expeditionExpensesUsd;
-    const netExpeditionMarginBs = netExpeditionMarginUsd * DEFAULT_EXCHANGE_RATE;
+    const netExpeditionMarginBs = netExpeditionMarginUsd * bcvRate;
 
     const totalKmTraveled = expeditions.reduce((acc, exp) => acc + (exp.km_distance || 0), 0);
     const totalWaypointsCount = waypoints.length;
@@ -963,11 +976,11 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
     // Métricas de Remuneración de Viajes ($20 Honorarios + Viáticos)
     const totalTripsCount = expeditions.length;
     const totalBaseFeesUsd = expeditions.reduce((acc, exp) => acc + (exp.base_fee_usd || 20.00), 0);
-    const totalBaseFeesBs = totalBaseFeesUsd * DEFAULT_EXCHANGE_RATE;
+    const totalBaseFeesBs = totalBaseFeesUsd * bcvRate;
     const totalViaticosUsd = expeditions.reduce((acc, exp) => acc + (exp.viaticos_usd || 0), 0);
-    const totalViaticosBs = totalViaticosUsd * DEFAULT_EXCHANGE_RATE;
+    const totalViaticosBs = totalViaticosUsd * bcvRate;
     const totalRemunerationUsd = expeditions.reduce((acc, exp) => acc + (exp.total_remuneration_usd || ((exp.base_fee_usd || 20.00) + (exp.viaticos_usd || 0))), 0);
-    const totalRemunerationBs = totalRemunerationUsd * DEFAULT_EXCHANGE_RATE;
+    const totalRemunerationBs = totalRemunerationUsd * bcvRate;
 
     const liquidatedRemunerationUsd = expeditions
       .filter(exp => exp.payment_status === "liquidado")
@@ -1216,7 +1229,7 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
       subtotal_usd: subtotal,
       discount_usd: discount,
       total_usd: total,
-      total_bs: total * DEFAULT_EXCHANGE_RATE,
+      total_bs: total * bcvRate,
       status: quoteData.status || "borrador",
       notes: quoteData.notes || "",
       converted_to_deal: false,
@@ -1237,7 +1250,7 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
           const total = Math.max(0, subtotal - discount);
           merged.subtotal_usd = subtotal;
           merged.total_usd = total;
-          merged.total_bs = total * DEFAULT_EXCHANGE_RATE;
+          merged.total_bs = total * bcvRate;
         }
         return merged;
       }
@@ -1339,7 +1352,7 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
       description: expData.description || "Gasto de carretera",
       category: expData.category || "otros",
       amount_usd: expData.amount_usd || 0,
-      amount_bs: (expData.amount_usd || 0) * DEFAULT_EXCHANGE_RATE,
+      amount_bs: (expData.amount_usd || 0) * bcvRate,
       logged_by: expData.logged_by || "Creador",
       created_at: new Date().toISOString()
     };
@@ -1558,6 +1571,7 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
     addEditorialTask,
     updateTaskStatus,
     addAudit,
+    bcvRate,
     refresh: loadData
   };
 }

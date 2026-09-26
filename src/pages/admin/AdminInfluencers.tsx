@@ -18,12 +18,14 @@ import {
   TrendingUp, Award, Layers
 } from "lucide-react";
 
+import { useBcvExchangeRate } from "@/hooks/useBcvExchangeRate";
+
 const FUCSIA = "#FF0096";
 const CIAN = "#00C8D4";
 const PURPURA = "#9B00CC";
-const DEFAULT_RATE = 36.5;
 
 export default function AdminInfluencers() {
+  const { bcvRate, formatBs } = useBcvExchangeRate();
   const { user, profile, loading: authLoading } = useAuth();
   const [, setLocation] = useLocation();
 
@@ -238,13 +240,15 @@ export default function AdminInfluencers() {
       ? `📅 *SEMANA HABILITADA:* ${auth.assigned_week || "Semana"} (${auth.start_date} a ${auth.end_date})`
       : `📆 *MES ASIGNADO:* ${auth.assigned_month || "Mes"} (Cupo de ${auth.authorized_trips_count} viajes)`;
 
+    const totalBudg = (auth.total_honorarios_usd || 20) + (auth.approved_viaticos_budget_usd || 0);
     const text = `🌴 *HOTELES DE VENEZUELA - AUTORIZACIÓN OFICIAL DE VIAJE* 🇻🇪\n` +
       `👤 *Creador(a):* ${auth.influencer_name} (${auth.influencer_handle || "@auracroce"})\n` +
       `📍 *Destino / Ruta:* ${auth.destination_target}\n` +
       `${periodLabel}\n\n` +
-      `💰 *HONORARIOS DE VIAJE:* $${(auth.fee_per_trip_usd || 20).toFixed(2)} USD por viaje ($${(auth.total_honorarios_usd || 20).toFixed(2)} USD total)\n` +
-      `⛽ *VIÁTICOS ASIGNADOS:* $${(auth.approved_viaticos_budget_usd || 0).toFixed(2)} USD\n` +
-      `💵 *PRESUPUESTO TOTAL HABILITADO:* $${((auth.total_honorarios_usd || 20) + (auth.approved_viaticos_budget_usd || 0)).toFixed(2)} USD (~Bs. ${(((auth.total_honorarios_usd || 20) + (auth.approved_viaticos_budget_usd || 0)) * DEFAULT_RATE).toLocaleString("es-VE", { minimumFractionDigits: 2 })} BCV)\n\n` +
+      `💵 *TASA OFICIAL BCV:* Bs. ${bcvRate.toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / USD\n` +
+      `💰 *HONORARIOS DE VIAJE:* $${(auth.fee_per_trip_usd || 20).toFixed(2)} USD (~Bs. ${formatBs(auth.fee_per_trip_usd || 20)})\n` +
+      `⛽ *VIÁTICOS ASIGNADOS:* $${(auth.approved_viaticos_budget_usd || 0).toFixed(2)} USD (~Bs. ${formatBs(auth.approved_viaticos_budget_usd || 0)})\n` +
+      `💵 *PRESUPUESTO TOTAL HABILITADO:* $${totalBudg.toFixed(2)} USD (~Bs. ${formatBs(totalBudg)} BCV)\n\n` +
       `✅ *Estado:* HABILITADO Y ACTIVO EN TU PANEL DE CREADOR\n` +
       `ℹ️ *Instrucciones:* Puedes registrar waypoints, auditorías de posadas y gastos de ruta directamente en tu panel: https://hotelesdevenezuela.com/mis-negocios\n\n` +
       `_Coordinación de Expediciones - Hoteles de Venezuela_`;
@@ -391,7 +395,7 @@ export default function AdminInfluencers() {
             </div>
             <div className="mt-3">
               <div className="text-2xl font-bold text-white">${totalGlobalBudgetUsd.toFixed(2)} <span className="text-xs text-slate-300 font-normal">USD</span></div>
-              <div className="text-xs text-slate-300 mt-0.5">~Bs. {(totalGlobalBudgetUsd * DEFAULT_RATE).toLocaleString("es-VE", { minimumFractionDigits: 2 })} BCV</div>
+              <div className="text-xs text-slate-300 mt-0.5">~Bs. {formatBs(totalGlobalBudgetUsd)} BCV</div>
             </div>
           </div>
 
@@ -648,7 +652,7 @@ export default function AdminInfluencers() {
                       <div className="text-right">
                         <div className="text-[10px] uppercase font-bold text-slate-700">Equiv. BCV</div>
                         <div className="text-xs font-semibold text-emerald-700">
-                          Bs. {(totalAuthBudget * DEFAULT_RATE).toLocaleString("es-VE", { minimumFractionDigits: 2 })}
+                          Bs. {formatBs(totalAuthBudget)}
                         </div>
                       </div>
                     </div>
@@ -1059,9 +1063,9 @@ export default function AdminInfluencers() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs text-slate-400">Tasa Oficial BCV</span>
+                    <span className="text-xs text-slate-400">Tasa Oficial BCV ({bcvRate.toLocaleString("es-VE", { minimumFractionDigits: 2 })} Bs/$)</span>
                     <div className="text-sm font-semibold text-emerald-400">
-                      Bs. {(currentTotalBudget * DEFAULT_RATE).toLocaleString("es-VE", { minimumFractionDigits: 2 })}
+                      Bs. {formatBs(currentTotalBudget)}
                     </div>
                   </div>
                 </div>
