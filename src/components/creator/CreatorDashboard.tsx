@@ -3,7 +3,8 @@ import {
   Compass, ShieldCheck, Award, Calendar, Wallet, MapPin,
   RefreshCw, Building2, Activity, Layers, Star, Video, DollarSign, Receipt,
   FileText, Navigation, Tag, Sparkles, Image as ImageIcon, User, Edit3, Camera,
-  Phone, Globe, MessageSquare, Wrench, Clipboard, CheckSquare, BarChart3, TrendingUp
+  Phone, Globe, MessageSquare, Wrench, Clipboard, CheckSquare, BarChart3, TrendingUp,
+  Sun, Moon
 } from "lucide-react";
 
 const InstagramIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) => (
@@ -113,6 +114,26 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
   const [activeTab, setActiveTab] = useState<CreatorTabType>("dashboard_ejecutivo");
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+  // Selector de Tema (Modo Oscuro Cósmico HDV vs Modo Claro Blanco Safari)
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    try {
+      return (localStorage.getItem(`hdv_creator_theme_${estId}`) as "dark" | "light") || "dark";
+    } catch (e) {
+      return "dark";
+    }
+  });
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    try {
+      localStorage.setItem(`hdv_creator_theme_${estId}`, nextTheme);
+      window.dispatchEvent(new CustomEvent("hdv_creator_theme_changed", { detail: nextTheme }));
+    } catch (e) {}
+  };
+
+  const isLight = theme === "light";
 
   // Contador de leads de WhatsApp (CRM)
   const [leadsCount, setLeadsCount] = useState<number>(() => {
@@ -233,14 +254,27 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
   ];
 
   return (
-    <div className="relative min-h-screen bg-[#0e011f] text-slate-100 font-sans pb-16">
-      {/* Background Constellation Effect */}
-      <ConstellationBackground />
+    <div className={`relative min-h-screen font-sans pb-16 transition-colors duration-300 ${
+      isLight ? "bg-[#f8fafc] text-slate-800" : "bg-[#0e011f] text-slate-100"
+    }`}>
+      {/* Background Effect */}
+      {!isLight ? (
+        <ConstellationBackground />
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-slate-100 pointer-events-none">
+          <div className="absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl opacity-15 bg-[#00C8D4]" />
+          <div className="absolute top-1/3 left-0 w-96 h-96 rounded-full blur-3xl opacity-15 bg-[#FF0096]" />
+        </div>
+      )}
 
       <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 space-y-6">
         
         {/* ── HEADER BANNER CON PERFIL DE CREADORA ── */}
-        <div className="rounded-3xl bg-gradient-to-r from-[#1a0533] via-[#0e011f] to-[#1a0533] border border-white/10 p-4 sm:p-6 shadow-2xl backdrop-blur-md">
+        <div className={`rounded-3xl p-4 sm:p-6 shadow-xl backdrop-blur-md transition-all ${
+          isLight 
+            ? "bg-white border border-slate-200 shadow-md text-slate-800" 
+            : "bg-gradient-to-r from-[#1a0533] via-[#0e011f] to-[#1a0533] border border-white/10 text-white shadow-2xl"
+        }`}>
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
             
             {/* Creator Photo + Identity */}
@@ -267,35 +301,53 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
                   <span className="px-2.5 py-0.5 rounded-full bg-[#FF0096]/20 border border-[#FF0096]/40 text-[#FF0096] text-[9px] font-black uppercase tracking-wider">
                     SUITE EJECUTIVA DE CREADORA & EXPEDICIONES
                   </span>
-                  <span className="inline-flex items-center text-[9px] text-emerald-400 font-bold bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                  <span className={`inline-flex items-center text-[9px] font-bold px-2 py-0.5 rounded-full border ${
+                    isLight 
+                      ? "text-emerald-700 bg-emerald-50 border-emerald-300" 
+                      : "text-emerald-400 bg-emerald-950/60 border-emerald-500/30"
+                  }`}>
                     <Activity className="w-2.5 h-2.5 mr-1 animate-pulse" /> Sincronización en Vivo
                   </span>
                 </div>
 
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight font-serif truncate">
+                <h1 className={`text-xl sm:text-2xl lg:text-3xl font-black tracking-tight font-serif truncate ${
+                  isLight ? "text-slate-900" : "text-white"
+                }`}>
                   {profileInfo?.name || creatorName}
                 </h1>
                 
-                <p className="text-xs text-slate-300 font-medium line-clamp-1">
+                <p className={`text-xs font-medium line-clamp-1 ${isLight ? "text-slate-600" : "text-slate-300"}`}>
                   {profileInfo?.headline || "Viajera 4x4, expedicionaria audiovisual & auditora de turismo HDV"}
                 </p>
 
                 {/* Social Badges */}
                 <div className="flex items-center gap-2 pt-1 flex-wrap text-[11px]">
                   {profileInfo?.instagram && (
-                    <span className="px-2 py-0.5 rounded-lg bg-pink-950/60 border border-pink-500/30 text-pink-300 font-bold flex items-center gap-1">
+                    <span className={`px-2 py-0.5 rounded-lg font-bold flex items-center gap-1 border ${
+                      isLight 
+                        ? "bg-pink-50 border-pink-200 text-pink-700" 
+                        : "bg-pink-950/60 border-pink-500/30 text-pink-300"
+                    }`}>
                       <InstagramIcon className="w-3 h-3 text-[#FF0096]" />
                       {profileInfo.instagram}
                     </span>
                   )}
                   {profileInfo?.tiktok && (
-                    <span className="px-2 py-0.5 rounded-lg bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 font-bold flex items-center gap-1">
-                      <Video className="w-3 h-3 text-cyan-400" />
+                    <span className={`px-2 py-0.5 rounded-lg font-bold flex items-center gap-1 border ${
+                      isLight 
+                        ? "bg-cyan-50 border-cyan-200 text-cyan-800" 
+                        : "bg-cyan-950/60 border-cyan-500/30 text-cyan-300"
+                    }`}>
+                      <Video className="w-3 h-3 text-cyan-500" />
                       {profileInfo.tiktok}
                     </span>
                   )}
                   {profileInfo?.location && (
-                    <span className="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-400 flex items-center gap-1">
+                    <span className={`px-2 py-0.5 rounded-lg flex items-center gap-1 border ${
+                      isLight 
+                        ? "bg-slate-100 text-slate-700 border-slate-200" 
+                        : "bg-slate-800 text-slate-400 border-transparent"
+                    }`}>
                       <MapPin className="w-3 h-3 text-[#00C8D4]" />
                       {profileInfo.location}
                     </span>
@@ -305,10 +357,38 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
             </div>
 
             {/* Quick Actions & Navigation Controls */}
-            <div className="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/10 flex-wrap">
+            <div className="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200/40 flex-wrap">
+              
+              {/* Botón de Selector de Tema Claro / Oscuro */}
+              <button
+                onClick={toggleTheme}
+                className={`flex-1 sm:flex-initial px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:scale-[1.02] border ${
+                  isLight
+                    ? "bg-slate-900 hover:bg-slate-800 text-white border-slate-700"
+                    : "bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border-amber-500/40"
+                }`}
+                title={isLight ? "Cambiar a Modo Oscuro Cósmico HDV" : "Cambiar a Modo Claro Blanco Safari"}
+              >
+                {isLight ? (
+                  <>
+                    <Moon className="w-3.5 h-3.5 text-[#00C8D4]" />
+                    <span>Modo Oscuro</span>
+                  </>
+                ) : (
+                  <>
+                    <Sun className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Modo Blanco</span>
+                  </>
+                )}
+              </button>
+
               <button
                 onClick={() => setIsProfileModalOpen(true)}
-                className="flex-1 sm:flex-initial px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:scale-[1.02]"
+                className={`flex-1 sm:flex-initial px-3.5 py-2 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:scale-[1.02] ${
+                  isLight 
+                    ? "bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300" 
+                    : "bg-white/10 hover:bg-white/20 border-white/20 text-white"
+                }`}
               >
                 <Edit3 className="w-3.5 h-3.5 text-[#00C8D4]" />
                 <span>Editar Perfil</span>
@@ -316,7 +396,11 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
 
               <button
                 onClick={refresh}
-                className="p-2 rounded-xl bg-slate-900 border border-white/10 hover:bg-slate-800 text-slate-300 transition-all cursor-pointer flex items-center justify-center"
+                className={`p-2 rounded-xl border transition-all cursor-pointer flex items-center justify-center ${
+                  isLight 
+                    ? "bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300" 
+                    : "bg-slate-900 hover:bg-slate-800 text-slate-300 border-white/10"
+                }`}
                 title="Sincronizar Datos"
               >
                 <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin text-[#FF0096]" : ""}`} />
@@ -337,18 +421,26 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
         </div>
 
         {/* ── 1. MÉTRICAS SUPERIORES (KPIs) ── */}
-        <CreatorKpiHeader kpis={kpis} />
+        <CreatorKpiHeader kpis={kpis} theme={theme} />
 
         {/* ── 2. MENÚ DE ÁREAS Y MÓDULOS MULTI-LÍNEA 100% RESPONSIVE (SIN CORTES NI BOTONES MOCHOS) ── */}
-        <div className="space-y-3 p-4 sm:p-5 rounded-3xl bg-[#1a0533]/80 border border-white/10 shadow-2xl backdrop-blur-md">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+        <div className={`space-y-3 p-4 sm:p-5 rounded-3xl transition-all ${
+          isLight 
+            ? "bg-white border border-slate-200 shadow-md text-slate-800" 
+            : "bg-[#1a0533]/80 border border-white/10 shadow-2xl backdrop-blur-md text-white"
+        }`}>
+          <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b pb-3 ${
+            isLight ? "border-slate-200" : "border-white/10"
+          }`}>
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-[#00C8D4]" />
-              <h3 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-white">
+              <h3 className={`text-xs sm:text-sm font-extrabold uppercase tracking-wider ${
+                isLight ? "text-slate-900" : "text-white"
+              }`}>
                 Módulos de Gestión Ejecutiva & Expediciones de Creador
               </h3>
             </div>
-            <span className="text-[11px] text-slate-400 font-medium">
+            <span className={`text-[11px] font-medium ${isLight ? "text-slate-500" : "text-slate-400"}`}>
               12 Áreas Operativas Disponibles
             </span>
           </div>
@@ -364,14 +456,20 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
                   onClick={() => setActiveTab(tab.id)}
                   className={`p-3 rounded-2xl border transition-all text-left flex flex-col justify-between gap-2 cursor-pointer group ${
                     active
-                      ? `bg-gradient-to-br ${tab.accentGlow} text-white border-white/40 shadow-xl shadow-[#FF0096]/20 ring-2 ring-white/30 scale-[1.02]`
+                      ? `bg-gradient-to-br ${tab.accentGlow} text-white border-transparent shadow-xl shadow-[#FF0096]/20 ring-2 ring-[#FF0096]/40 scale-[1.02]`
+                      : isLight
+                      ? "bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200 hover:border-slate-300 shadow-xs"
                       : "bg-[#0e011f]/90 hover:bg-white/10 text-slate-300 border-white/10 hover:border-white/20"
                   }`}
                 >
                   <div className="flex items-center justify-between gap-1.5 w-full">
                     <div
                       className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 ${
-                        active ? "bg-black/40 text-white" : "bg-black/50 text-[#00C8D4] border border-white/10"
+                        active 
+                          ? "bg-black/40 text-white" 
+                          : isLight
+                          ? "bg-white text-[#FF0096] border border-slate-200 shadow-xs"
+                          : "bg-black/50 text-[#00C8D4] border border-white/10"
                       }`}
                     >
                       <Icon className="w-3.5 h-3.5" />
@@ -391,7 +489,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
                   </div>
 
                   <span className={`text-xs font-black tracking-tight leading-snug break-words ${
-                    active ? "text-white" : "text-slate-200"
+                    active ? "text-white" : isLight ? "text-slate-800" : "text-slate-200"
                   }`}>
                     {tab.label}
                   </span>
