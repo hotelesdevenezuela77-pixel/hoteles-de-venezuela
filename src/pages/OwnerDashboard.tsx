@@ -1412,6 +1412,18 @@ export function OwnerDashboard() {
         const chosenId = matchingTarget || mappedEsts[0].id;
         setSelectedCalendarEst(chosenId);
         fetchRooms(chosenId);
+
+        // Auto-activar vista especializada si estamos asistiendo a un negocio o si solo tiene 1 unidad especializada
+        const targetEst = mappedEsts.find(e => Number(e.id) === Number(chosenId)) || mappedEsts[0];
+        const detectedMode = getEstablishmentDashboardMode(targetEst);
+        const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+        const explicitView = urlParams?.get('view');
+
+        if (!explicitView && (mappedEsts.length === 1 || isImpersonatingAny)) {
+          if (detectedMode && detectedMode !== 'hotel') {
+            setViewModeOverride(detectedMode);
+          }
+        }
       }
 
       if (mappedEsts.length === 0) {
@@ -3245,6 +3257,23 @@ export function OwnerDashboard() {
                   <MapPin className="w-3.5 h-3.5" />
                   <span>Alrededores</span>
                 </button>
+
+                {(() => {
+                  const selectedEstObj = establishments.find(e => Number(e.id) === Number(selectedCalendarEst));
+                  if (selectedEstObj && isCreatorOrInfluencer(selectedEstObj)) {
+                    return (
+                      <button
+                        onClick={() => setViewModeOverride('creator')}
+                        className="px-3 py-1 bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:opacity-95 text-white rounded-lg text-[10px] font-black uppercase tracking-wider cursor-pointer shadow-sm transition-all flex items-center gap-1.5 animate-pulse"
+                        title="Abrir el panel especializado para Creadores de Contenido"
+                      >
+                        <Camera className="w-3.5 h-3.5" />
+                        <span>Abrir Desk Hub Creador</span>
+                      </button>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
             )}
           </div>
