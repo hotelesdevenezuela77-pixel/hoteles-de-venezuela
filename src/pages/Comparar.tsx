@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { supabase } from "../lib/supabase";
 import { ESTABLISHMENTS_MOCK } from "../lib/establishmentsMock";
-import { 
-  ArrowLeft, Star, MapPin, Sparkles, Check, X, 
-  Trash2, Phone, Globe, ShieldCheck, DollarSign 
+import {
+  ArrowLeft, Star, MapPin, Sparkles, Check, X,
+  Trash2, Phone, Globe, ShieldCheck, DollarSign
 } from "lucide-react";
 
 interface ComparedEstablishment {
@@ -62,8 +62,8 @@ export function Comparar() {
 
       if (data && data.length > 0) {
         const mapped: ComparedEstablishment[] = data.map((item: any) => {
-          const primaryImg = item.establishment_images?.find((img: any) => img.is_primary)?.image_url 
-            || item.establishment_images?.[0]?.image_url 
+          const primaryImg = item.establishment_images?.find((img: any) => img.is_primary)?.image_url
+            || item.establishment_images?.[0]?.image_url
             || "";
 
           let servicesArray: string[] = [];
@@ -162,7 +162,7 @@ export function Comparar() {
 
       {/* Main Container */}
       <div className="max-w-7xl mx-auto px-6 mt-10">
-        
+
         {comparedHotels.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-3xl border border-gray-100 p-8 shadow-sm">
             <Trash2 className="w-16 h-16 text-gray-200 mx-auto mb-4" />
@@ -178,7 +178,7 @@ export function Comparar() {
           </div>
         ) : (
           <div className="space-y-6">
-            
+
             {/* Header / Back Button */}
             <div className="flex justify-between items-center">
               <Link href="/establecimientos">
@@ -198,11 +198,11 @@ export function Comparar() {
                     <tr className="bg-gray-50/50 border-b border-gray-100">
                       {/* Column 0: Label */}
                       <th className="p-6 w-1/4 min-w-[200px] text-xs font-black text-gray-400 uppercase tracking-wider">Características</th>
-                      
+
                       {/* Columns 1-3: Hotels */}
                       {comparedHotels.map(hotel => (
                         <th key={hotel.id} className="p-6 w-1/4 border-l border-gray-100 relative group">
-                          
+
                           {/* Close button */}
                           <button
                             onClick={() => handleRemove(hotel.id)}
@@ -240,7 +240,7 @@ export function Comparar() {
                           </div>
                         </th>
                       ))}
-                      
+
                       {/* Empty slots placeholders if compared length < 3 */}
                       {Array.from({ length: 3 - comparedHotels.length }).map((_, idx) => (
                         <th key={`empty-${idx}`} className="p-6 w-1/4 border-l border-gray-100 text-center bg-gray-50/20 text-gray-300">
@@ -254,7 +254,7 @@ export function Comparar() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 text-xs">
-                    
+
                     {/* Destination Row */}
                     <tr className="hover:bg-gray-50/30">
                       <td className="p-5 font-bold text-gray-400 uppercase tracking-wider text-[10px]">Ubicación / Destino</td>

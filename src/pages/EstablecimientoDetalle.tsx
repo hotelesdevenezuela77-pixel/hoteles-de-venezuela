@@ -297,6 +297,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
 
         // 1. Try Supabase DB lookup by exact slug or alias
         let dbData: any = null;
+        // 1. Direct DB lookup
         try {
           const { data, error: dbErr } = await supabase
             .from("establishments")
@@ -333,30 +334,124 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
 
               if (altData) dbData = altData;
             }
-
-            // Fuzzy fallback: search by slug ilike
-            if (!dbData && slug.length > 3) {
-              const prefix = slug.split("-")[0];
-              const { data: searchData } = await supabase
-                .from("establishments")
-                .select(`
-                  *,
-                  categories (name, slug),
-                  destinations (name, slug),
-                  establishment_images (image_url, is_primary)
-                `)
-                .ilike("slug", `%${prefix}%`)
-                .limit(5);
-
-              if (searchData && searchData.length > 0) {
-                dbData = searchData.find((e: any) => 
-                  e.slug.includes("entre") || e.name?.toLowerCase().includes("entre")
-                ) || searchData[0];
-              }
-            }
           }
         } catch (e) {
           console.warn("Error querying Supabase for detail:", e);
+        }
+
+        // 1b. Built-in Special Profiles (Aura Croce, El Mundo De Los Niños, Agencia Global Travel DMC)
+        if (!dbData) {
+          const demoProfiles = [
+            {
+              id: 99901,
+              name: "Aura Croce - Viajera & Creadora de Contenido",
+              slug: "aura-croce-viajera-creadora",
+              description: "Desk Hub oficial, bitácora multimedia, auditorías técnicas de posadas y expediciones turísticas de Aura Croce. Cobertura audiovisual 4K, rutas GPS satelitales y alianzas comerciales con hoteles y posadas de Venezuela.",
+              address: "Caracas / Expediciones Nacionales (Los Roques, Canaima, Morrocoy, Roraima)",
+              city: "Caracas",
+              state: "Distrito Capital",
+              phone: "+58 414 123 4567",
+              whatsapp: "+58 414 123 4567",
+              email: "aura.croce@hdv.com",
+              website: "https://instagram.com/auracroce",
+              category_name: "Creadores de Contenido / Influencers",
+              category_slug: "influencers",
+              categories: { name: "Creadores de Contenido / Influencers", slug: "influencers" },
+              destination_name: "Los Roques & Morrocoy",
+              destination_slug: "los-roques",
+              destinations: { name: "Los Roques & Morrocoy", slug: "los-roques" },
+              primary_image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1600&q=80",
+              rating_avg: 5.0,
+              review_count: 48,
+              price_level: "$$$",
+              is_featured: true,
+              services: JSON.stringify(["Rutas Satelitales GPS", "Auditorías de Posadas", "Canjes B2B", "Producción 4K", "Honorarios $20/Viaje + Viáticos"]),
+              membership_tier: "diamante",
+              has_hdv_seal: true,
+              has_reservations_enabled: true,
+              establishment_images: [
+                { image_url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1600&q=80", is_primary: true },
+                { image_url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80", is_primary: false },
+                { image_url: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1600&q=80", is_primary: false }
+              ]
+            },
+            {
+              id: 99902,
+              name: "El Mundo De Los Niños Barquisimeto",
+              slug: "el-mundo-de-los-ninos-barquisimeto",
+              description: "Parque acuático y centro de recreación familiar en Barquisimeto con piscinas temáticas, toboganes y áreas VIP.",
+              address: "Av. Ribereña, Barquisimeto, Lara",
+              city: "Barquisimeto",
+              state: "Lara",
+              phone: "+58 251 000 0000",
+              whatsapp: "+58 414 000 0000",
+              email: "contacto@elmundodelosninos.com",
+              website: "https://elmundodelosninos.com",
+              category_name: "Complejos Turísticos y Parques Acuáticos",
+              category_slug: "parques-acuaticos",
+              categories: { name: "Complejos Turísticos y Parques Acuáticos", slug: "parques-acuaticos" },
+              destination_name: "Barquisimeto",
+              destination_slug: "barquisimeto",
+              destinations: { name: "Barquisimeto", slug: "barquisimeto" },
+              primary_image: "https://images.unsplash.com/photo-1582650625119-3a31f8418b7d?auto=format&fit=crop&w=1600&q=80",
+              rating_avg: 4.9,
+              review_count: 124,
+              price_level: "$$",
+              is_featured: true,
+              services: JSON.stringify(["Piscinas", "Toboganes", "FastPass", "Puntos POS", "Zonas VIP"]),
+              membership_tier: "diamante",
+              has_hdv_seal: true,
+              has_reservations_enabled: true,
+              establishment_images: [
+                { image_url: "https://images.unsplash.com/photo-1582650625119-3a31f8418b7d?auto=format&fit=crop&w=1600&q=80", is_primary: true }
+              ]
+            },
+            {
+              id: 99903,
+              name: "Agencia Global Travel & Tours DMC",
+              slug: "agencia-global-travel-tours-dmc",
+              description: "Agencia de viajes integradora y receptivo DMC especializado en paquetes multidestino, traslados privados y cotizaciones B2B.",
+              address: "Av. Francisco de Miranda, Caracas",
+              city: "Caracas",
+              state: "Distrito Capital",
+              phone: "+58 212 000 0000",
+              whatsapp: "+58 412 000 0000",
+              email: "operaciones@globaltraveldmc.com",
+              website: "https://globaltraveldmc.com",
+              category_name: "Agencias de Viajes y Tour Operadores",
+              category_slug: "agencias-de-viajes",
+              categories: { name: "Agencias de Viajes y Tour Operadores", slug: "agencias-de-viajes" },
+              destination_name: "Caracas / Multidestino",
+              destination_slug: "caracas",
+              destinations: { name: "Caracas / Multidestino", slug: "caracas" },
+              primary_image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1600&q=80",
+              rating_avg: 4.8,
+              review_count: 89,
+              price_level: "$$$",
+              is_featured: true,
+              services: JSON.stringify(["Cotizador B2B", "Lotes de Cupos", "Gestión de Guías", "Vouchers PDF"]),
+              membership_tier: "diamante",
+              has_hdv_seal: true,
+              has_reservations_enabled: true,
+              establishment_images: [
+                { image_url: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1600&q=80", is_primary: true }
+              ]
+            }
+          ];
+
+          const slugLower = slug.toLowerCase();
+          const matchedDemo = demoProfiles.find(d => 
+            d.slug === slug || 
+            String(d.id) === slug || 
+            (slugLower.includes("aura") && d.id === 99901) ||
+            (slugLower.includes("croce") && d.id === 99901) ||
+            (slugLower.includes("mundo") && d.id === 99902) ||
+            (slugLower.includes("global") && d.id === 99903)
+          );
+
+          if (matchedDemo) {
+            dbData = matchedDemo;
+          }
         }
 
         // 2. Fallback to localStorage mock establishments if not found in DB
@@ -632,6 +727,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
   };
 
   const isGastronomyCategory = (establishment.category_slug || establishment.category_name || "").toLowerCase().match(/(restaurante|bar|gastronomia|comida|market|cafeteria|lounge)/);
+  const isCreatorCategory = (establishment.category_slug || establishment.category_name || establishment.slug || "").toLowerCase().match(/(creador|influencer|viajera|creadora|aura-croce)/);
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-800 pb-24 font-sans">
@@ -662,7 +758,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
         </div>
       )}
 
-      {/* ── 1. CABECERA DEGRADADA HERO DE ALTO IMPACTO (Estilo Alianzas para Agencias) ── */}
+      {/* ── 1. CABECERA DEGRADADA HERO DE ALTO IMPACTO ── */}
       <section className="w-full relative overflow-hidden bg-[#0e011f] pt-12 pb-16 lg:pt-16 lg:pb-24 text-left shadow-xl">
         {/* Banner de fondo con parallax suave y superposición de degradados */}
         <div 
@@ -681,7 +777,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-3">
               <span className="text-[#00C8D4] text-[10px] md:text-xs font-black tracking-[0.25em] uppercase px-3.5 py-1.5 rounded-full bg-[#00C8D4]/10 border border-[#00C8D4]/30 shadow-xs">
-                {isGastronomyCategory ? "GASTRONOMÍA & ESPACIOS EXCLUSIVOS" : "HOSPEDAJE DE EXCELENCIA & DISTINCIÓN"}
+                {isGastronomyCategory ? "GASTRONOMÍA & ESPACIOS EXCLUSIVOS" : isCreatorCategory ? "CREADOR DE CONTENIDO & EXPEDICIONES VIP" : "HOSPEDAJE DE EXCELENCIA & DISTINCIÓN"}
               </span>
 
               <span className="bg-[#FF0096]/20 border border-[#FF0096]/40 text-[#FF0096] text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-full">
@@ -714,15 +810,15 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
               {establishment.name}
             </h1>
 
-            {/* Pulsing Maintenance Badge para Establecimiento / Clientes SaaS */}
+            {/* Pulsing Badge */}
             <div className="inline-flex items-center gap-2.5 p-[2px] rounded-2xl bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] shadow-2xl animate-pulse hover:scale-105 transition-all cursor-pointer my-1">
               <div className="px-5 py-2 rounded-[14px] bg-slate-900/90 backdrop-blur flex items-center gap-2.5">
                 <span className="relative flex h-3 w-3 shrink-0">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-400"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00C8D4] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-[#00C8D4]"></span>
                 </span>
-                <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-amber-300 drop-shadow">
-                  🛠️ EN MANTENIMIENTO PROGRAMADO • PLATAFORMA WEB EN CONSTRUCCIÓN
+                <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-[#00C8D4] drop-shadow">
+                  {isCreatorCategory ? "🌟 DESK HUB DE CREADOR DE CONTENIDO & EXPEDICIONES" : "🛠️ PLATAFORMA OFICIAL • HOTELES DE VENEZUELA"}
                 </span>
               </div>
             </div>
@@ -736,8 +832,8 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
           <div className="flex flex-wrap items-center gap-6 text-xs font-bold text-slate-300 pt-2 border-t border-slate-800/80 max-w-3xl">
             <div className="flex items-center gap-2">
               <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-              <span className="text-white font-extrabold text-sm">{establishment.rating_avg > 0 ? establishment.rating_avg.toFixed(1) : "4.9"}</span>
-              <span className="text-slate-400">({establishment.review_count || 14} valoraciones)</span>
+              <span className="text-white font-extrabold text-sm">{establishment.rating_avg > 0 ? establishment.rating_avg.toFixed(1) : "5.0"}</span>
+              <span className="text-slate-400">({establishment.review_count || 48} auditorías & reseñas)</span>
             </div>
             <span>•</span>
             <div className="flex items-center gap-2 text-[#00C8D4]">
@@ -755,20 +851,34 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
           {/* Ticker / Strip de Estadísticas Rápida de Prestigio */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 max-w-4xl">
             <div className="bg-[#1a0533]/80 backdrop-blur border border-[#9B00CC]/30 p-3.5 rounded-2xl">
-              <span className="text-xl md:text-2xl font-black text-[#00C8D4] block font-serif">{isGastronomyCategory ? "4+ Áreas" : `${rooms.length || 10}+ Hab.`}</span>
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">{isGastronomyCategory ? "Espacios Gastronómicos" : "Unidades de Hospedaje"}</span>
+              <span className="text-xl md:text-2xl font-black text-[#00C8D4] block font-serif">
+                {isGastronomyCategory ? "4+ Áreas" : isCreatorCategory ? "50+ Rutas" : `${rooms.length || 10}+ Hab.`}
+              </span>
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
+                {isGastronomyCategory ? "Espacios Gastronómicos" : isCreatorCategory ? "Expediciones GPS & 4K" : "Unidades de Hospedaje"}
+              </span>
             </div>
             <div className="bg-[#1a0533]/80 backdrop-blur border border-[#9B00CC]/30 p-3.5 rounded-2xl">
-              <span className="text-xl md:text-2xl font-black text-[#FF0096] block font-serif">4.9★</span>
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Satisfacción Garantizada</span>
+              <span className="text-xl md:text-2xl font-black text-[#FF0096] block font-serif">
+                {isCreatorCategory ? "$20 Base" : "4.9★"}
+              </span>
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
+                {isCreatorCategory ? "Honorarios / Viaje" : "Satisfacción Garantizada"}
+              </span>
             </div>
             <div className="bg-[#1a0533]/80 backdrop-blur border border-[#9B00CC]/30 p-3.5 rounded-2xl">
               <span className="text-xl md:text-2xl font-black text-amber-400 block font-serif">100%</span>
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Verificado HDV</span>
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
+                {isCreatorCategory ? "Verificado HDV" : "Verificado HDV"}
+              </span>
             </div>
             <div className="bg-[#1a0533]/80 backdrop-blur border border-[#9B00CC]/30 p-3.5 rounded-2xl">
-              <span className="text-xl md:text-2xl font-black text-emerald-400 block font-serif">Starlink</span>
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Wi-Fi de Alta Velocidad</span>
+              <span className="text-xl md:text-2xl font-black text-emerald-400 block font-serif">
+                {isCreatorCategory ? "+ Viáticos" : "Starlink"}
+              </span>
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
+                {isCreatorCategory ? "Cobertura de Ruta" : "Wi-Fi de Alta Velocidad"}
+              </span>
             </div>
           </div>
 
@@ -783,6 +893,15 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                 <Utensils className="w-4 h-4 text-white" />
                 <span>Reservar Mesa en Línea</span>
               </button>
+            ) : isCreatorCategory ? (
+              <TrackedWhatsAppButton
+                whatsappNumber={establishment.whatsapp || establishment.phone}
+                establishmentId={establishment.id}
+                establishmentName={establishment.name}
+                customMessage={`Hola Aura Croce! Me gustaría coordinar una expedición, auditoría técnica de posada o alianza de contenido con ${establishment.name}.`}
+              >
+                Contactar por WhatsApp
+              </TrackedWhatsAppButton>
             ) : (
               <TrackedWhatsAppButton
                 whatsappNumber={establishment.whatsapp || establishment.phone}
@@ -802,7 +921,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
               className="px-6 py-3.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl backdrop-blur transition-all text-xs cursor-pointer border border-white/20 flex items-center gap-2"
             >
               <Compass className="w-4 h-4 text-[#00C8D4]" />
-              <span>{isGastronomyCategory ? "Ver Áreas & Menú" : "Ver Habitaciones"}</span>
+              <span>{isGastronomyCategory ? "Ver Áreas & Menú" : isCreatorCategory ? "Ver Rutas & Servicios" : "Ver Habitaciones"}</span>
             </button>
           </div>
 
@@ -871,15 +990,15 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
         )}
       </div>
 
-      {/* ── 2. SECCIÓN: MÁS QUE UN HOSPEDAJE / EXP. GASTRONÓMICA (Propuesta de Valor) ── */}
+      {/* ── 2. SECCIÓN: PROPUESTA DE VALOR / PILARES ── */}
       <section className="max-w-7xl mx-auto px-6 mb-12">
         <div className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-10 shadow-sm space-y-8">
           <div>
             <span className="text-[10px] tracking-[0.25em] font-extrabold text-[#00C8D4] uppercase block mb-1">
-              CONCEBIDO PARA EL CONCERTADO RESTAURACIÓN Y DESCANSO
+              {isCreatorCategory ? "COBERTURA MULTIMEDIA & EXPEDICIONES DE ALTO IMPACTO" : "CONCEBIDO PARA EL CONCERTADO RESTAURACIÓN Y DESCANSO"}
             </span>
             <h2 className="text-2xl md:text-3xl font-black font-serif text-slate-900">
-              {isGastronomyCategory ? "Más que una Gastronomía, una Experiencia Memorable" : "Más que un Hospedaje, Su Casa en la Playa"}
+              {isCreatorCategory ? "Desk Hub de Expediciones, Auditorías Técnicas y Alianzas B2B" : isGastronomyCategory ? "Más que una Gastronomía, una Experiencia Memorable" : "Más que un Hospedaje, Su Casa en la Playa"}
             </h2>
             <p className="text-xs md:text-sm text-slate-500 mt-2 max-w-3xl leading-relaxed">
               {establishment.description || "Un refugio pensado para quienes valoran la privacidad, el confort impecable y el trato personalizado. Cada espacio ha sido acondicionado para garantizar recuerdos inolvidables."}
@@ -893,8 +1012,12 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                 <MapPin className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">Ubicación Privilegiada</h4>
-                <p className="text-[11px] text-slate-500 mt-1 leading-normal">Acceso inmediato a los puntos turísticos y costeros más deseados.</p>
+                <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+                  {isCreatorCategory ? "Rutas Satelitales & GPS" : "Ubicación Privilegiada"}
+                </h4>
+                <p className="text-[11px] text-slate-500 mt-1 leading-normal">
+                  {isCreatorCategory ? "Coordenadas georreferenciadas y tracks satelitales en tiempo real." : "Acceso inmediato a los puntos turísticos y costeros más deseados."}
+                </p>
               </div>
             </div>
 
@@ -903,28 +1026,40 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                 <ShieldCheck className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">Seguridad & Privacidad</h4>
-                <p className="text-[11px] text-slate-500 mt-1 leading-normal">Estacionamiento privado y vigilancia las 24 horas del día.</p>
+                <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+                  {isCreatorCategory ? "Auditorías de Posadas" : "Seguridad & Privacidad"}
+                </h4>
+                <p className="text-[11px] text-slate-500 mt-1 leading-normal">
+                  {isCreatorCategory ? "Inspección técnica de Wi-Fi, plantas eléctricas, agua y estándares HDV." : "Estacionamiento privado y vigilancia las 24 horas del día."}
+                </p>
               </div>
             </div>
 
             <div className="p-4 bg-slate-50 border border-slate-200/60 rounded-2xl flex items-start gap-3.5">
               <div className="w-10 h-10 rounded-xl bg-[#FF0096] flex items-center justify-center text-white shrink-0 shadow-xs">
-                {isGastronomyCategory ? <Wine className="w-5 h-5 text-white" /> : <Coffee className="w-5 h-5 text-white" />}
+                {isCreatorCategory ? <Video className="w-5 h-5 text-white" /> : isGastronomyCategory ? <Wine className="w-5 h-5 text-white" /> : <Coffee className="w-5 h-5 text-white" />}
               </div>
               <div>
-                <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">{isGastronomyCategory ? "Gastronomía Exclusiva" : "Áreas Recreativas"}</h4>
-                <p className="text-[11px] text-slate-500 mt-1 leading-normal">{isGastronomyCategory ? "Chef ejecutivo y maridajes seleccionados de alta gama." : "Piscina, solárium y zonas de esparcimiento familiar."}</p>
+                <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+                  {isCreatorCategory ? "Producción 4K & Reels" : isGastronomyCategory ? "Gastronomía Exclusiva" : "Áreas Recreativas"}
+                </h4>
+                <p className="text-[11px] text-slate-500 mt-1 leading-normal">
+                  {isCreatorCategory ? "Fotografía aérea con Drone, micro-documentales y piezas virales." : isGastronomyCategory ? "Chef ejecutivo y maridajes seleccionados de alta gama." : "Piscina, solárium y zonas de esparcimiento familiar."}
+                </p>
               </div>
             </div>
 
             <div className="p-4 bg-slate-50 border border-slate-200/60 rounded-2xl flex items-start gap-3.5">
               <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white shrink-0 shadow-xs">
-                <Zap className="w-5 h-5 text-white" />
+                {isCreatorCategory ? <Wallet className="w-5 h-5 text-white" /> : <Zap className="w-5 h-5 text-white" />}
               </div>
               <div>
-                <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">Wi-Fi & Respaldo</h4>
-                <p className="text-[11px] text-slate-500 mt-1 leading-normal">Conexión Starlink de alta velocidad y planta eléctrica auxiliar.</p>
+                <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+                  {isCreatorCategory ? "Honorarios & Viáticos" : "Wi-Fi & Respaldo"}
+                </h4>
+                <p className="text-[11px] text-slate-500 mt-1 leading-normal">
+                  {isCreatorCategory ? "Tarifa base de $20 USD por viaje asignado más reembolso de viáticos de ruta." : "Conexión Starlink de alta velocidad y planta eléctrica auxiliar."}
+                </p>
               </div>
             </div>
           </div>
@@ -937,29 +1072,103 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
           
           <div className="lg:col-span-8 space-y-10">
 
-            {/* ── 3. SECCIÓN: CATÁLOGO DE HABITACIONES O FICHAS DE ÁREAS GASTRONÓMICAS ── */}
+            {/* ── 3. SECCIÓN: CATÁLOGO DE RUTAS / ÁREAS / HABITACIONES ── */}
             <div id="seccion-catalogo" className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm space-y-6 text-left">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                 <div>
                   <h2 className="text-xl font-serif font-black text-slate-900 tracking-tight flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-xl bg-[#FF0096] flex items-center justify-center text-white shrink-0 shadow-xs">
-                      {isGastronomyCategory ? <ChefHat className="w-4 h-4 text-white" /> : <Bed className="w-4 h-4 text-white" />}
+                      {isCreatorCategory ? <Compass className="w-4 h-4 text-white" /> : isGastronomyCategory ? <ChefHat className="w-4 h-4 text-white" /> : <Bed className="w-4 h-4 text-white" />}
                     </div>
-                    {isGastronomyCategory ? "Fichas de Áreas & Espacios Gastronómicos" : "Encuentre su Refugio Perfecto — Habitaciones"}
+                    {isCreatorCategory ? "Rutas Georreferenciadas & Servicios de Expedición" : isGastronomyCategory ? "Fichas de Áreas & Espacios Gastronómicos" : "Encuentre su Refugio Perfecto — Habitaciones"}
                   </h2>
                   <p className="text-xs text-slate-400 font-semibold mt-1">
-                    {isGastronomyCategory 
+                    {isCreatorCategory
+                      ? "Conoce los paquetes de expedición, auditorías técnicas para posadas y honorarios base de cobertura."
+                      : isGastronomyCategory 
                       ? "Conozca los distintos ambientes, aforos y cartas especiales para su reserva de mesa o evento." 
                       : "Explore la distribución, equipamiento y tarifas de nuestras unidades de hospedaje."}
                   </p>
                 </div>
                 <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 bg-[#00C8D4]/10 text-[#00C8D4] rounded-full border border-[#00C8D4]/20 shrink-0 self-start sm:self-center">
-                  {isGastronomyCategory ? "4 Espacios Disponibles" : `${rooms.length} Opciones Disponibles`}
+                  {isCreatorCategory ? "Servicios & Rutas Activas" : isGastronomyCategory ? "4 Espacios Disponibles" : `${rooms.length} Opciones Disponibles`}
                 </span>
               </div>
 
-              {/* RENDERIZADO DUAL: SI ES GASTRONOMÍA MUESTRA FICHAS DE ÁREAS GASTRONÓMICAS */}
-              {isGastronomyCategory ? (
+              {/* RENDERIZADO PARA CREADORES DE CONTENIDO / INFLUENCERS */}
+              {isCreatorCategory ? (
+                <div className="space-y-6">
+                  {[
+                    {
+                      id: "exp-gran-sabana",
+                      title: "Expedición Gran Sabana 4x4 & Roraima Off-Road",
+                      description: "Cobertura completa de ruta 4x4, cruces de ríos, geodatos de miradores y auditoría de posadas en Santa Elena de Uairén.",
+                      category: "Expedición 4x4 & Drone",
+                      remuneration: "Honorarios $20.00 USD + Viáticos Combustible & Guías",
+                      image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80",
+                      features: ["1,420 Km Mapeados", "Auditoría Wi-Fi Satelital", "Tomas Aéreas 4K", "Reseña HDV Verificada"]
+                    },
+                    {
+                      id: "exp-morrocoy",
+                      title: "Ruta Playera Morrocoy & Cayo Sombrero 360°",
+                      description: "Inspección de posadas boutique en Tucacas y Chichiriviche, traslados en lancha y cobertura de playas y cayos vírgenes.",
+                      category: "Ruta Náutica & Posadas",
+                      remuneration: "Honorarios $20.00 USD + Viáticos Lancheros & Logística",
+                      image: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1000&q=80",
+                      features: ["680 Km Mapeados", "Inspección de Plantas Eléctricas", "Reels Instagram", "Guía Gastronómica"]
+                    },
+                    {
+                      id: "serv-auditoria-posada",
+                      title: "Auditoría Técnica Integral para Hoteles & Posadas",
+                      description: "Servicio profesional B2B: test de velocidad de Wi-Fi, evaluación de presión de agua, tiempo de respuesta de plantas eléctricas y entrega de sello de calidad HDV.",
+                      category: "Auditoría Técnica B2B",
+                      remuneration: "Acuerdo Corporativo HDV + Mención en Redes",
+                      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1000&q=80",
+                      features: ["Test Wi-Fi Mbps", "Inspección Eléctrica", "Ficha Fidedigna HDV", "Reel en Colaboración"]
+                    }
+                  ].map((item) => (
+                    <div key={item.id} className="bg-slate-50/80 border border-slate-200/80 rounded-3xl p-5 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 hover:border-slate-300 transition-all">
+                      <div className="lg:col-span-5 relative aspect-[4/3] rounded-2xl overflow-hidden bg-slate-200 group">
+                        <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        <span className="absolute top-3 left-3 px-2.5 py-1 bg-[#0e011f]/90 text-white text-[9px] font-black uppercase rounded-lg backdrop-blur">
+                          {item.category}
+                        </span>
+                      </div>
+
+                      <div className="lg:col-span-7 flex flex-col justify-between space-y-4">
+                        <div>
+                          <div className="flex flex-wrap justify-between items-start gap-2 mb-2">
+                            <h3 className="text-lg font-serif font-black text-slate-900 leading-tight">{item.title}</h3>
+                            <span className="text-xs font-bold text-[#FF0096] bg-[#FF0096]/10 px-2.5 py-1 rounded-lg font-mono">{item.remuneration}</span>
+                          </div>
+
+                          <p className="text-xs text-slate-500 leading-relaxed mb-4">{item.description}</p>
+
+                          <div className="flex flex-wrap gap-2 mb-3">
+                            {item.features.map((feat) => (
+                              <span key={feat} className="inline-flex items-center gap-1 px-2.5 py-1 bg-white text-slate-700 border border-slate-200 rounded-lg text-[10px] font-bold">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#00C8D4]" />
+                                {feat}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+                          <TrackedWhatsAppButton
+                            whatsappNumber={establishment.whatsapp || establishment.phone}
+                            establishmentId={establishment.id}
+                            establishmentName={establishment.name}
+                            customMessage={`Hola Aura Croce! Quisiera consultar sobre el servicio/expedición: "${item.title}".`}
+                          >
+                            Solicitar Cobertura / Alianza
+                          </TrackedWhatsAppButton>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : isGastronomyCategory ? (
                 <div className="space-y-6">
                   {[
                     {

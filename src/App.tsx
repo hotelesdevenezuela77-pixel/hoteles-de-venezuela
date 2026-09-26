@@ -280,6 +280,7 @@ const AdminIaViajes = lazyNamed(() => import("./pages/admin/AdminIaViajes"), "Ad
 const AdminExpedicionRutas = lazyNamed(() => import("./pages/admin/AdminExpedicionRutas"), "AdminExpedicionRutas");
 const AdminAsistencia = lazyWithRetry(() => import("./pages/admin/AdminAsistencia"));
 const AdminContabilidad = lazyWithRetry(() => import("./pages/admin/AdminContabilidad"));
+const AdminInfluencers = lazyWithRetry(() => import("./pages/admin/AdminInfluencers"));
 
 // Importación del Agente IA sin llaves apuntando a la carpeta admin
 const AdminConversacionalIA = lazyWithRetry(() => import("./pages/admin/AdminConversacionalIA"));
@@ -338,6 +339,8 @@ function AdminShell() {
         <Route path="/admin/ia-viajes" component={AdminIaViajes} />
         <Route path="/admin/agenda" component={AdminAgenda} />
         <Route path="/admin/expedicion-rutas" component={AdminExpedicionRutas} />
+        <Route path="/admin/influencers" component={AdminInfluencers} />
+        <Route path="/admin/creadores" component={AdminInfluencers} />
         <Route path="/admin/asistencia" component={AdminAsistencia} />
         <Route path="/admin/contabilidad" component={AdminContabilidad} />
         <Route path="/admin/dashboards-alfa" component={AdminDashboardsAlfa} />

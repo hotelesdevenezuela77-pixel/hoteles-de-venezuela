@@ -185,12 +185,14 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         { label: "Auditoría Legal (Resoluciones PDF)", href: "/admin?tab=auditoria_legal", icon: Scale },
         { label: "Agenda y Calendario", href: "/admin/agenda", icon: Calendar },
         { label: "Expedición de Rutas", href: "/admin/expedicion-rutas", icon: MapPin },
+        { label: "Gestión de Influencers ($20/Viaje)", href: "/admin/influencers", icon: Sparkles },
       ]
     },
     {
       name: "Marketing y Ventas",
       items: [
         { label: "Gestión Comercial", href: "/admin/comercial", icon: Briefcase },
+        { label: "Influencers & Creadores", href: "/admin/influencers", icon: Sparkles },
         { label: "Turistas y Usuarios", href: "/admin/usuarios?filter=tourist", icon: Users },
         { label: "Paquetes Turísticos", href: "/admin/paquetes", icon: Package },
         { label: "WhatsApp CRM", href: "/crm", icon: MessageSquare },

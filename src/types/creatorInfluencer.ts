@@ -13,6 +13,18 @@ export type PlatformType = 'instagram_reel' | 'tiktok' | 'instagram_stories' | '
 export type TaskStatus = 'todo' | 'editing' | 'review' | 'published';
 export type RouteExpenseCategory = 'combustible' | 'peajes' | 'lancheros' | 'comidas' | 'reparaciones' | 'propinas' | 'otros';
 
+export type ExpeditionPaymentStatus = 'pendiente' | 'aprobado' | 'liquidado';
+export type ExpeditionPaymentMethod = 'pago_movil' | 'zelle' | 'efectivo' | 'transferencia' | 'binance_usdt';
+
+export interface ViaticosBreakdown {
+  combustible?: number;
+  comidas?: number;
+  hospedaje?: number;
+  peajes?: number;
+  guias_lancheros?: number;
+  otros?: number;
+}
+
 export interface CreatorExpedition {
   id: string;
   establishment_id: number;
@@ -24,6 +36,17 @@ export interface CreatorExpedition {
   total_budget_usd?: number;
   status: 'active' | 'completed' | 'archived';
   created_at?: string;
+
+  // Remuneración de Viajes (Honorarios $20 USD + Viáticos)
+  base_fee_usd: number; // Por defecto $20.00 USD
+  viaticos_usd: number; // Suma total de viáticos
+  viaticos_breakdown?: ViaticosBreakdown;
+  total_remuneration_usd: number; // base_fee_usd + viaticos_usd
+  payment_status: ExpeditionPaymentStatus;
+  payment_method?: ExpeditionPaymentMethod;
+  payment_reference?: string;
+  payment_date?: string;
+  notes?: string;
 }
 
 export interface CreatorWaypoint {
@@ -115,6 +138,145 @@ export interface CreatorKpiSummary {
 
   pendingDeliverablesCount: number;
   urgentDeliverablesCount: number;
+
+  // Remuneraciones por Viaje ($20 Honorarios + Viáticos)
+  totalTripsCount: number;
+  totalBaseFeesUsd: number; // N viajes × $20
+  totalBaseFeesBs: number;
+  totalViaticosUsd: number;
+  totalViaticosBs: number;
+  totalRemunerationUsd: number; // Honorarios + Viáticos
+  totalRemunerationBs: number;
+  liquidatedRemunerationUsd: number;
+  pendingRemunerationUsd: number;
+}
+
+export type PeriodType = 'dias' | 'semanas' | 'mes';
+export type AuthorizationStatus = 'habilitado' | 'programado' | 'en_curso' | 'completado' | 'pausado';
+
+export interface InfluencerTravelAuthorization {
+  id: string;
+  influencer_id: number;
+  influencer_name: string;
+  influencer_handle?: string;
+  influencer_avatar?: string;
+  period_type: PeriodType;
+  title: string;
+  assigned_month?: string; // Ej: "Octubre 2026"
+  assigned_week?: string; // Ej: "Semana 42 (19-25 Oct)"
+  start_date: string;
+  end_date: string;
+  allowed_days_count: number;
+  destination_target: string;
+  authorized_trips_count: number;
+  fee_per_trip_usd: number; // $20.00 USD
+  total_honorarios_usd: number; // authorized_trips_count * fee_per_trip_usd
+  approved_viaticos_budget_usd: number;
+  viaticos_budget_breakdown?: ViaticosBreakdown;
+  status: AuthorizationStatus;
+  enabled_by_admin: boolean;
+  admin_notes?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface InfluencerProfileSummary {
+  id: number;
+  name: string;
+  handle: string;
+  email: string;
+  category: string;
+  destination: string;
+  avatar_url: string;
+  bio: string;
+  status: 'active' | 'inactive';
+  honorarios_rate_usd: number; // $20.00
+  total_expeditions_completed: number;
+  total_authorizations_active: number;
+  total_paid_usd: number;
+  total_pending_usd: number;
+}
+
+export type EstablishmentCategoryType = 
+  | 'hoteles_posadas'
+  | 'restaurantes_gastronomia'
+  | 'marinas_yates'
+  | 'rent_a_car'
+  | 'parques_complejos'
+  | 'agencias_viajes'
+  | 'sitios_turisticos'
+  | 'otros';
+
+export interface CreatorVisitedEstablishment {
+  id: string;
+  establishment_id: number;
+  name: string;
+  destination: string;
+  category: EstablishmentCategoryType;
+  category_label: string;
+  visit_date: string;
+  status: 'auditado' | 'en_ruta' | 'pautado' | 'por_visitar';
+  rating: number; // 1 to 10
+  is_recommended: boolean;
+  
+  // Auditoría técnica para nómadas y viajeros
+  wifi_speed_mbps: number;
+  power_generator: 'si_automatica' | 'si_manual' | 'no_tiene';
+  water_supply: 'si_pozo_propio' | 'tanque_reserva' | 'no_tiene';
+  water_pressure: 'excelente' | 'aceptable' | 'deficiente';
+  
+  // Cobertura mediática
+  coverage_types?: ('instagram_reel' | 'tiktok' | 'youtube' | 'hdv_review' | 'fotos_4k')[];
+  social_link?: string;
+  hdv_slug?: string;
+  deal_type?: DealType;
+  deal_value_usd?: number;
+  
+  photos?: string[];
+  notes?: string;
+  created_at?: string;
+}
+
+export type QuoteStatus = 'borrador' | 'enviada' | 'aprobada' | 'cobrada' | 'rechazada';
+
+export interface CreatorQuoteItem {
+  id: string;
+  service_name: string;
+  description?: string;
+  quantity: number;
+  unit_price_usd: number;
+  total_usd: number;
+}
+
+export interface CreatorQuote {
+  id: string;
+  establishment_id: number;
+  quote_number: string; // ej: "COT-2026-001"
+  client_name: string;
+  client_contact?: string;
+  destination_target?: string;
+  created_date: string;
+  valid_until_date: string;
+  items: CreatorQuoteItem[];
+  subtotal_usd: number;
+  discount_usd: number;
+  total_usd: number;
+  total_bs: number;
+  status: QuoteStatus;
+  notes?: string;
+  converted_to_deal?: boolean;
+  created_at?: string;
+}
+
+export interface CreatorMembershipProfile {
+  tier_name: string;
+  tier_badge: string;
+  status: 'active' | 'pending_renewal' | 'expired';
+  member_since: string;
+  valid_thru: string;
+  qr_code_token: string;
+  benefits: string[];
+  press_card_number: string;
 }
 
 export function isCreatorOrInfluencer(est?: {
@@ -155,3 +317,5 @@ export function isCreatorOrInfluencer(est?: {
 
   return isKnownCreator;
 }
+
+
