@@ -33,7 +33,7 @@ import { CreatorImportRouteModal } from "./CreatorImportRouteModal";
 import { CreatorProfileEditModal } from "./CreatorProfileEditModal";
 import { ConstellationBackground } from "../ConstellationBackground";
 
-// Módulos Ejecutivos Solicitados
+// Módulos Ejecutivos
 import { OwnerAgendaModule } from "../owner/OwnerAgendaModule";
 import { OwnerWhatsAppCRMModule } from "../owner/OwnerWhatsAppCRMModule";
 import { OwnerTechnicalSupportModule } from "../owner/OwnerTechnicalSupportModule";
@@ -181,6 +181,104 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
     } catch (e) {}
   };
 
+  const CREATOR_TABS: {
+    id: CreatorTabType;
+    label: string;
+    icon: any;
+    badge?: string;
+    badgeColor?: string;
+    accentGlow: string;
+  }[] = [
+    {
+      id: "remuneraciones",
+      label: "Honorarios & Viáticos",
+      icon: DollarSign,
+      badge: "$20 Base",
+      badgeColor: "bg-[#FF0096]/20 text-[#FF0096] border-[#FF0096]/40",
+      accentGlow: "from-[#FF0096] via-[#9B00CC] to-[#00C8D4]"
+    },
+    {
+      id: "agenda_dnd",
+      label: "Agenda & Calendario",
+      icon: Calendar,
+      badge: "Drag & Drop",
+      badgeColor: "bg-[#00C8D4]/20 text-[#00C8D4] border-[#00C8D4]/40",
+      accentGlow: "from-[#00C8D4] to-[#9B00CC]"
+    },
+    {
+      id: "crm_whatsapp",
+      label: "CRM Leads WhatsApp",
+      icon: MessageSquare,
+      badge: `${leadsCount} Leads`,
+      badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
+      accentGlow: "from-emerald-500 to-teal-600"
+    },
+    {
+      id: "soporte_dnd",
+      label: "Soporte Técnico",
+      icon: Wrench,
+      badge: "Tickets D&D",
+      badgeColor: "bg-[#FF0096]/20 text-[#FF0096] border-[#FF0096]/40",
+      accentGlow: "from-[#9B00CC] to-[#FF0096]"
+    },
+    {
+      id: "webapp_cms",
+      label: "Aplicación Web & CMS",
+      icon: Globe,
+      badge: "Web Builder",
+      badgeColor: "bg-cyan-500/20 text-cyan-300 border-cyan-500/40",
+      accentGlow: "from-[#00C8D4] via-[#FF0096] to-[#9B00CC]"
+    },
+    {
+      id: "tareas_saas",
+      label: "Gestión de Tareas",
+      icon: Clipboard,
+      badge: "SaaS",
+      badgeColor: "bg-indigo-500/20 text-indigo-300 border-indigo-500/40",
+      accentGlow: "from-purple-600 to-indigo-600"
+    },
+    {
+      id: "establecimientos_visitados",
+      label: "Establecimientos Auditados",
+      icon: Building2,
+      badge: `${visitedEstablishments.length} Lugares`,
+      badgeColor: "bg-[#00C8D4]/20 text-[#00C8D4] border-[#00C8D4]/40",
+      accentGlow: "from-[#00C8D4] to-[#9B00CC]"
+    },
+    {
+      id: "explorador_rutas",
+      label: "Explorador GPS Satelital",
+      icon: Compass,
+      badge: "4K Track",
+      badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
+      accentGlow: "from-[#00C8D4] to-[#FF0096]"
+    },
+    {
+      id: "cotizaciones",
+      label: "Cotizaciones & Tarifario",
+      icon: FileText,
+      badge: `${quotes.length} Pautas`,
+      badgeColor: "bg-[#FF0096]/20 text-[#FF0096] border-[#FF0096]/40",
+      accentGlow: "from-[#9B00CC] to-[#FF0096]"
+    },
+    {
+      id: "galeria",
+      label: "Galería & Bitácora 4K",
+      icon: ImageIcon,
+      badge: `${galleryAlbums.length} Viajes`,
+      badgeColor: "bg-purple-500/20 text-purple-300 border-purple-500/40",
+      accentGlow: "from-[#00C8D4] via-[#FF0096] to-[#9B00CC]"
+    },
+    {
+      id: "finanzas_membresia",
+      label: "Finanzas & Pase VIP",
+      icon: Wallet,
+      badge: "Prensa HDV",
+      badgeColor: "bg-amber-500/20 text-amber-300 border-amber-500/40",
+      accentGlow: "from-[#FF0096] to-[#9B00CC]"
+    }
+  ];
+
   return (
     <div className="relative min-h-screen bg-[#0e011f] text-slate-100 font-sans pb-16">
       {/* Background Constellation Effect */}
@@ -288,177 +386,65 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
         {/* ── 1. MÉTRICAS SUPERIORES (KPIs) ── */}
         <CreatorKpiHeader kpis={kpis} />
 
-        {/* ── 2. BARRA DE PESTAÑAS 100% RESPONSIVE (MÓDULOS EJECUTIVOS Y DE CREADORA) ── */}
-        <div className="relative border-b border-white/10 pb-3 -mx-3 px-3 sm:mx-0 sm:px-0">
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none flex-nowrap">
-            
-            {/* 1. Honorarios & Viáticos */}
-            <button
-              onClick={() => setActiveTab("remuneraciones")}
-              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
-                activeTab === "remuneraciones"
-                  ? "bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] text-white border-white/40 shadow-lg shadow-[#FF0096]/20 font-black ring-2 ring-white/30"
-                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
-              }`}
-            >
-              <DollarSign className="w-4 h-4 text-amber-300" />
-              <span>Honorarios ($20/Viaje)</span>
-            </button>
+        {/* ── 2. MENÚ DE ÁREAS Y MÓDULOS MULTI-LÍNEA 100% RESPONSIVE (SIN CORTES NI BOTONES MOCHOS) ── */}
+        <div className="space-y-3 p-4 sm:p-5 rounded-3xl bg-[#1a0533]/80 border border-white/10 shadow-2xl backdrop-blur-md">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#00C8D4]" />
+              <h3 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-white">
+                Módulos de Gestión Ejecutiva & Expediciones de Creador
+              </h3>
+            </div>
+            <span className="text-[11px] text-slate-400 font-medium">
+              11 Áreas Operativas Disponibles
+            </span>
+          </div>
 
-            {/* 2. Agenda & Calendario Drag & Drop */}
-            <button
-              onClick={() => setActiveTab("agenda_dnd")}
-              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
-                activeTab === "agenda_dnd"
-                  ? "bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] text-white border-white/40 shadow-lg shadow-[#00C8D4]/20 font-black ring-2 ring-white/30"
-                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
-              }`}
-            >
-              <Calendar className="w-4 h-4 text-cyan-300" />
-              <span>Agenda & Calendario</span>
-              <span className="ml-1 px-1.5 py-0.2 rounded-full text-[9px] font-black uppercase bg-[#00C8D4]/20 text-[#00C8D4] border border-[#00C8D4]/40">
-                Drag & Drop
-              </span>
-            </button>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
+            {CREATOR_TABS.map((tab) => {
+              const active = activeTab === tab.id;
+              const Icon = tab.icon;
 
-            {/* 3. CRM Leads WhatsApp */}
-            <button
-              onClick={() => setActiveTab("crm_whatsapp")}
-              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
-                activeTab === "crm_whatsapp"
-                  ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-white/40 shadow-lg shadow-emerald-500/20 font-black ring-2 ring-white/30"
-                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
-              }`}
-            >
-              <MessageSquare className="w-4 h-4 text-emerald-400" />
-              <span>CRM Leads WhatsApp</span>
-              <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-500 text-slate-950 font-mono font-bold">
-                {leadsCount}
-              </span>
-            </button>
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`p-3 rounded-2xl border transition-all text-left flex flex-col justify-between gap-2 cursor-pointer group ${
+                    active
+                      ? `bg-gradient-to-br ${tab.accentGlow} text-white border-white/40 shadow-xl shadow-[#FF0096]/20 ring-2 ring-white/30 scale-[1.02]`
+                      : "bg-[#0e011f]/90 hover:bg-white/10 text-slate-300 border-white/10 hover:border-white/20"
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-1.5 w-full">
+                    <div
+                      className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 ${
+                        active ? "bg-black/40 text-white" : "bg-black/50 text-[#00C8D4] border border-white/10"
+                      }`}
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                    </div>
 
-            {/* 4. Soporte Técnico Tickets D&D */}
-            <button
-              onClick={() => setActiveTab("soporte_dnd")}
-              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
-                activeTab === "soporte_dnd"
-                  ? "bg-gradient-to-r from-[#9B00CC] to-[#FF0096] text-white border-white/40 shadow-lg shadow-[#9B00CC]/20 font-black ring-2 ring-white/30"
-                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
-              }`}
-            >
-              <Wrench className="w-4 h-4 text-pink-400" />
-              <span>Soporte Técnico</span>
-              <span className="ml-1 px-1.5 py-0.2 rounded-full text-[9px] font-black uppercase bg-[#FF0096]/20 text-[#FF0096] border border-[#FF0096]/40">
-                Tickets D&D
-              </span>
-            </button>
+                    {tab.badge && (
+                      <span
+                        className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider shrink-0 border ${
+                          active
+                            ? "bg-black/40 text-white border-white/30"
+                            : tab.badgeColor
+                        }`}
+                      >
+                        {tab.badge}
+                      </span>
+                    )}
+                  </div>
 
-            {/* 5. Aplicación Web & CMS */}
-            <button
-              onClick={() => setActiveTab("webapp_cms")}
-              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
-                activeTab === "webapp_cms"
-                  ? "bg-gradient-to-r from-[#00C8D4] via-[#FF0096] to-[#9B00CC] text-white border-white/40 shadow-lg shadow-[#00C8D4]/20 font-black ring-2 ring-white/30"
-                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
-              }`}
-            >
-              <Globe className="w-4 h-4 text-cyan-300" />
-              <span>Aplicación Web & CMS</span>
-              <span className="ml-1 px-1.5 py-0.2 rounded-full text-[9px] font-black uppercase bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
-                Web Builder
-              </span>
-            </button>
-
-            {/* 6. Gestión de Tareas */}
-            <button
-              onClick={() => setActiveTab("tareas_saas")}
-              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
-                activeTab === "tareas_saas"
-                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white border-white/40 shadow-lg shadow-purple-600/20 font-black ring-2 ring-white/30"
-                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
-              }`}
-            >
-              <Clipboard className="w-4 h-4 text-indigo-300" />
-              <span>Gestión de Tareas</span>
-              <span className="ml-1 px-1.5 py-0.2 rounded-full text-[9px] font-black uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
-                SaaS
-              </span>
-            </button>
-
-            {/* 7. Establecimientos Visitados */}
-            <button
-              onClick={() => setActiveTab("establecimientos_visitados")}
-              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
-                activeTab === "establecimientos_visitados"
-                  ? "bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] text-white border-white/40 shadow-lg shadow-[#00C8D4]/20 font-black ring-2 ring-white/30"
-                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
-              }`}
-            >
-              <Building2 className="w-4 h-4 text-[#00C8D4]" />
-              <span>Establecimientos Visitados</span>
-              <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-black/40 text-white font-mono">
-                {visitedEstablishments.length}
-              </span>
-            </button>
-
-            {/* 8. Explorador de Rutas & GPS */}
-            <button
-              onClick={() => setActiveTab("explorador_rutas")}
-              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
-                activeTab === "explorador_rutas"
-                  ? "bg-gradient-to-r from-[#00C8D4] to-[#FF0096] text-white border-white/40 shadow-lg shadow-[#00C8D4]/20 font-black ring-2 ring-white/30"
-                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
-              }`}
-            >
-              <Compass className="w-4 h-4 text-cyan-300" />
-              <span>Explorador GPS</span>
-            </button>
-
-            {/* 9. Cotizaciones & Tarifario */}
-            <button
-              onClick={() => setActiveTab("cotizaciones")}
-              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
-                activeTab === "cotizaciones"
-                  ? "bg-gradient-to-r from-[#9B00CC] to-[#FF0096] text-white border-white/40 shadow-lg shadow-[#9B00CC]/20 font-black ring-2 ring-white/30"
-                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
-              }`}
-            >
-              <FileText className="w-4 h-4 text-pink-300" />
-              <span>Cotizaciones & Tarifario</span>
-              <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-black/40 text-white font-mono">
-                {quotes.length}
-              </span>
-            </button>
-
-            {/* 10. Galería & Bitácora de Viajes */}
-            <button
-              onClick={() => setActiveTab("galeria")}
-              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
-                activeTab === "galeria"
-                  ? "bg-gradient-to-r from-[#00C8D4] via-[#FF0096] to-[#9B00CC] text-white border-white/40 shadow-lg shadow-[#00C8D4]/20 font-black ring-2 ring-white/30"
-                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
-              }`}
-            >
-              <ImageIcon className="w-4 h-4 text-emerald-300" />
-              <span>Galería & Bitácora</span>
-              <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-black/40 text-white font-mono">
-                {galleryAlbums.length}
-              </span>
-            </button>
-
-            {/* 11. Finanzas & Membresía VIP */}
-            <button
-              onClick={() => setActiveTab("finanzas_membresia")}
-              className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
-                activeTab === "finanzas_membresia"
-                  ? "bg-gradient-to-r from-[#FF0096] to-[#9B00CC] text-white border-white/40 shadow-lg shadow-[#FF0096]/20 font-black ring-2 ring-white/30"
-                  : "bg-slate-900/80 hover:bg-slate-800 border-white/10 text-slate-400 hover:text-white"
-              }`}
-            >
-              <Wallet className="w-4 h-4 text-emerald-300" />
-              <span>Finanzas & Pase VIP</span>
-            </button>
-
+                  <span className={`text-xs font-black tracking-tight leading-snug break-words ${
+                    active ? "text-white" : "text-slate-200"
+                  }`}>
+                    {tab.label}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
