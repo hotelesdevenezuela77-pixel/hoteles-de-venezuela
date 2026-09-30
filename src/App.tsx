@@ -202,6 +202,7 @@ const MainHomeWrapper = lazyNamed(() => import("./components/home/MainHomeWrappe
 const HomeV2 = lazyNamed(() => import("./pages/HomeV2"), "HomeV2");
 const Login = lazyNamed(() => import("./pages/Login"), "Login");
 const Registro = lazyNamed(() => import("./pages/Registro"), "Registro");
+const PreRegistro = lazyNamed(() => import("./pages/PreRegistro"), "PreRegistro");
 const Perfil = lazyNamed(() => import("./pages/Perfil"), "Perfil");
 const AdminLogin = lazyNamed(() => import("./pages/AdminLogin"), "AdminLogin");
 const Destinos = lazyNamed(() => import("./pages/Destinos"), "Destinos");
@@ -474,6 +475,8 @@ function App() {
             <Route path="/home-v1" component={Home} />
             <Route path="/login" component={Login} />
             <Route path="/registro" component={Registro} />
+            <Route path="/pre-registro" component={PreRegistro} />
+            <Route path="/registro-rapido" component={PreRegistro} />
             <Route path="/perfil" component={Perfil} />
             <Route path="/panel-turista" component={Perfil} />
             <Route path="/perfil/kyc" component={PerfilKYC} />

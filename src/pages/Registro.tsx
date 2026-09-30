@@ -118,6 +118,16 @@ export function Registro() {
             )}
             <span>{loading ? "Conectando con Google..." : "Registrarse con Google"}</span>
           </button>
+          {/* Acceso Rápido al Pre-Registro de Ficha Pública */}
+          <div className="pt-4 border-t border-gray-100">
+            <Link
+              href="/pre-registro"
+              className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-[#00C8D4]/15 to-[#FF0096]/15 border border-[#00C8D4]/30 hover:border-[#00C8D4] text-slate-800 hover:text-slate-950 font-black text-xs transition-all shadow-xs"
+            >
+              <span className="w-2 h-2 rounded-full bg-[#FF0096] animate-pulse"></span>
+              <span>⚡ Pre-Registro Rápido (Ficha Pública)</span>
+            </Link>
+          </div>
         </div>
 
         <p className="text-gray-500 text-xs mt-8">
