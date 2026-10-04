@@ -22,7 +22,15 @@ import {
   AlertCircle,
   ExternalLink,
   MessageCircle,
-  ArrowLeft
+  ArrowLeft,
+  Camera,
+  Upload,
+  Navigation,
+  Loader2,
+  Trash2,
+  Globe,
+  Radio,
+  Share2
 } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import type { PreRegistrationPayload, PreRegistrationBadgeFlags } from "../types/preRegistration";
@@ -45,9 +53,26 @@ export function PreRegistro() {
   );
   const [basePriceFrom, setBasePriceFrom] = useState<number>(140);
   const [whatsappNumber, setWhatsappNumber] = useState<string>("+58 412 1234567");
+
+  // GPS & Ubicación en tiempo real desde celular/dispositivo
+  const [latitude, setLatitude] = useState<string>("");
+  const [longitude, setLongitude] = useState<string>("");
+  const [isCapturingGps, setIsCapturingGps] = useState<boolean>(false);
+  const [gpsSuccessMsg, setGpsSuccessMsg] = useState<string | null>(null);
+  const [gpsErrorMsg, setGpsErrorMsg] = useState<string | null>(null);
+
+  // Fotos & Archivos del Establecimiento
   const [primaryImage, setPrimaryImage] = useState<string>(
     "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop"
   );
+  const [galleryImages, setGalleryImages] = useState<string[]>([
+    "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop"
+  ]);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState<boolean>(false);
+  const [photoUrlInput, setPhotoUrlInput] = useState<string>("");
+
+  // Estado de Publicación Directa (Agente en Ruta)
+  const [publishDirectly, setPublishDirectly] = useState<boolean>(true);
 
   // Badges Destacados
   const [badges, setBadges] = useState<PreRegistrationBadgeFlags>({
@@ -83,6 +108,116 @@ export function PreRegistro() {
     "Piscina infinita",
     "Chef privado"
   ];
+
+  // Captura de GPS inteligente desde el navegador / dispositivo móvil
+  const handleCaptureGps = () => {
+    if (!navigator.geolocation) {
+      setGpsErrorMsg("Tu navegador o dispositivo no soporta geolocalización por GPS.");
+      return;
+    }
+    setIsCapturingGps(true);
+    setGpsErrorMsg(null);
+    setGpsSuccessMsg(null);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude.toFixed(6);
+        const lng = position.coords.longitude.toFixed(6);
+        setLatitude(lat);
+        setLongitude(lng);
+        setIsCapturingGps(false);
+        setGpsSuccessMsg(`📍 Coordenadas detectadas: ${lat}, ${lng}`);
+      },
+      (error) => {
+        setIsCapturingGps(false);
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            setGpsErrorMsg("Permiso de ubicación denegado. Activa la ubicación en los ajustes de tu celular.");
+            break;
+          case error.POSITION_UNAVAILABLE:
+            setGpsErrorMsg("Ubicación GPS no disponible en este momento.");
+            break;
+          case error.TIMEOUT:
+            setGpsErrorMsg("Tiempo de espera agotado para conectar con el GPS del dispositivo.");
+            break;
+          default:
+            setGpsErrorMsg("Error al obtener señal del GPS.");
+        }
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    );
+  };
+
+  // Carga de Archivos de Fotos (Soporta cámara del celular y selección múltiple)
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploadingPhoto(true);
+    const newImages: string[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const fileExt = file.name.split(".").pop() || "jpg";
+      const fileName = `prereg_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+
+      try {
+        const { data, error } = await supabase.storage
+          .from("establecimientos")
+          .upload(fileName, file, { contentType: file.type || "image/jpeg", upsert: true });
+
+        if (!error && data) {
+          const { data: publicUrlData } = supabase.storage
+            .from("establecimientos")
+            .getPublicUrl(fileName);
+          if (publicUrlData?.publicUrl) {
+            newImages.push(publicUrlData.publicUrl);
+            continue;
+          }
+        }
+      } catch (err) {
+        console.warn("Error en Supabase storage, usando lector Base64 local:", err);
+      }
+
+      // Fallback a Base64 Data URL local
+      await new Promise<void>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (typeof reader.result === "string") {
+            newImages.push(reader.result);
+          }
+          resolve();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    setGalleryImages((prev) => {
+      const updated = [...prev, ...newImages];
+      if (!primaryImage || primaryImage.includes("unsplash.com")) {
+        setPrimaryImage(updated[0]);
+      }
+      return updated;
+    });
+    setIsUploadingPhoto(false);
+  };
+
+  // Agregar foto vía URL manual
+  const handleAddPhotoUrl = () => {
+    if (photoUrlInput.trim()) {
+      setGalleryImages((prev) => [...prev, photoUrlInput.trim()]);
+      if (!primaryImage) setPrimaryImage(photoUrlInput.trim());
+      setPhotoUrlInput("");
+    }
+  };
+
+  const removePhoto = (index: number) => {
+    const updated = galleryImages.filter((_, idx) => idx !== index);
+    setGalleryImages(updated);
+    if (primaryImage === galleryImages[index]) {
+      setPrimaryImage(updated[0] || "");
+    }
+  };
 
   const toggleBadge = (key: keyof PreRegistrationBadgeFlags) => {
     setBadges(prev => ({ ...prev, [key]: !prev[key] }));
@@ -121,6 +256,9 @@ export function PreRegistro() {
       setIsSaving(true);
       const slug = `${generateSlug(title)}-${generateSlug(destinationName)}`;
 
+      const onboardingStatus = publishDirectly ? "COMPLETED" : "PRE_REGISTERED";
+      const status = publishDirectly ? "ACTIVE" : "ACTIVE";
+
       const payload: PreRegistrationPayload = {
         service_category_id: serviceCategoryId,
         subcategory_id: subcategoryId,
@@ -136,14 +274,20 @@ export function PreRegistro() {
         short_description: shortDescription,
         base_price_from: basePriceFrom,
         whatsapp_number: whatsappNumber,
-        primary_image: primaryImage
+        primary_image: primaryImage,
+        gallery_images: galleryImages
       };
 
       // Construcción JSONB para features
       const initialFeatures = {
         pre_registration: {
           captured_at: new Date().toISOString(),
-          source: "FICHA_PUBLICA_FAST_ONBOARDING"
+          source: "FICHA_PUBLICA_FAST_ONBOARDING",
+          published_directly: publishDirectly
+        },
+        gps: {
+          latitude: latitude || null,
+          longitude: longitude || null
         },
         badges: {
           "C03.4.1": badges.has_power_plant,
@@ -161,7 +305,8 @@ export function PreRegistro() {
         },
         contact: {
           "C00.3.2.6": whatsappNumber
-        }
+        },
+        gallery: galleryImages
       };
 
       // Intentar guardar en Supabase si está disponible, o almacenar localmente de respaldo
@@ -174,6 +319,8 @@ export function PreRegistro() {
           destination_name: destinationName,
           state,
           city,
+          latitude: latitude ? parseFloat(latitude) : null,
+          longitude: longitude ? parseFloat(longitude) : null,
           short_description: shortDescription,
           base_price_from: basePriceFrom,
           rating_avg: ratingAvg,
@@ -185,8 +332,8 @@ export function PreRegistro() {
           is_pet_friendly: badges.is_pet_friendly,
           has_hdv_seal: badges.has_hdv_seal,
           key_service_pills: pills,
-          onboarding_status: "PRE_REGISTERED",
-          status: "ACTIVE",
+          onboarding_status: onboardingStatus,
+          status: status,
           features: initialFeatures
         }, { onConflict: "slug" });
 
@@ -354,43 +501,110 @@ export function PreRegistro() {
                 />
               </div>
 
-              {/* 3. Ubicación / Destino */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div>
-                  <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1.5">
-                    3. Destino Turístico
-                  </label>
-                  <input
-                    type="text"
-                    value={destinationName}
-                    onChange={(e) => setDestinationName(e.target.value)}
-                    placeholder="Ej. Morrocoy"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
-                  />
+              {/* 3. Ubicación / Destino & Captura de GPS inteligente */}
+              <div className="space-y-3">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1.5">
+                      3. Destino Turístico
+                    </label>
+                    <input
+                      type="text"
+                      value={destinationName}
+                      onChange={(e) => setDestinationName(e.target.value)}
+                      placeholder="Ej. Morrocoy"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1.5">
+                      Estado
+                    </label>
+                    <input
+                      type="text"
+                      value={state}
+                      onChange={(e) => setState(e.target.value)}
+                      placeholder="Ej. Falcón"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1.5">
+                      Ciudad / Sector
+                    </label>
+                    <input
+                      type="text"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      placeholder="Ej. Tucacas"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1.5">
-                    Estado
-                  </label>
-                  <input
-                    type="text"
-                    value={state}
-                    onChange={(e) => setState(e.target.value)}
-                    placeholder="Ej. Falcón"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1.5">
-                    Ciudad / Sector
-                  </label>
-                  <input
-                    type="text"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    placeholder="Ej. Tucacas"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
-                  />
+
+                {/* Sub-bloque GPS para Agentes de Campo / Exploradores de Ruta */}
+                <div className="bg-gradient-to-r from-cyan-50/80 to-blue-50/80 p-4 rounded-2xl border border-[#00C8D4]/30 space-y-3">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <span className="text-xs font-black text-slate-900 flex items-center gap-1.5 uppercase tracking-wider">
+                      <MapPin className="w-4 h-4 text-[#00C8D4]" />
+                      <span>Coordenadas GPS (Agente de Campo / Celular)</span>
+                    </span>
+
+                    <button
+                      type="button"
+                      onClick={handleCaptureGps}
+                      disabled={isCapturingGps}
+                      className="px-3.5 py-2 rounded-xl text-xs font-black text-white bg-gradient-to-r from-[#00C8D4] to-[#0098A6] hover:opacity-95 shadow-md flex items-center gap-1.5 cursor-pointer transition-all disabled:opacity-50"
+                    >
+                      {isCapturingGps ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span>Obteniendo GPS...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Navigation className="w-3.5 h-3.5" />
+                          <span>📍 Capturar GPS Ahora (En el Sitio)</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] uppercase font-bold text-slate-600 mb-1">Latitud GPS</label>
+                      <input
+                        type="text"
+                        placeholder="Ej. 10.480594"
+                        value={latitude}
+                        onChange={(e) => setLatitude(e.target.value)}
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-mono font-bold focus:outline-none focus:border-[#00C8D4]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] uppercase font-bold text-slate-600 mb-1">Longitud GPS</label>
+                      <input
+                        type="text"
+                        placeholder="Ej. -66.903606"
+                        value={longitude}
+                        onChange={(e) => setLongitude(e.target.value)}
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-mono font-bold focus:outline-none focus:border-[#00C8D4]"
+                      />
+                    </div>
+                  </div>
+
+                  {gpsSuccessMsg && (
+                    <p className="text-xs text-emerald-700 font-bold flex items-center gap-1 bg-emerald-100/80 p-2 rounded-lg">
+                      <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                      {gpsSuccessMsg}
+                    </p>
+                  )}
+                  {gpsErrorMsg && (
+                    <p className="text-xs text-rose-600 font-bold flex items-center gap-1 bg-rose-100/80 p-2 rounded-lg">
+                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                      {gpsErrorMsg}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -542,11 +756,11 @@ export function PreRegistro() {
                 />
               </div>
 
-              {/* 9. Botones de Acción Directos & Foto */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* 9. Contacto WhatsApp & Fotos con Captura de Celular / Cámara */}
+              <div className="space-y-4">
                 <div>
                   <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1.5">
-                    9. WhatsApp de Reservas / Contacto
+                    9. WhatsApp de Reservas / Contacto *
                   </label>
                   <div className="relative">
                     <Phone className="w-4 h-4 absolute left-3 top-3 text-emerald-500" />
@@ -560,38 +774,165 @@ export function PreRegistro() {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1.5">
-                    URL de Foto de Portada
-                  </label>
-                  <input
-                    type="text"
-                    value={primaryImage}
-                    onChange={(e) => setPrimaryImage(e.target.value)}
-                    placeholder="https://images.unsplash.com/..."
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
-                  />
+                {/* Subida Directa de Fotos con Cámara del Celular / Galería del Dispositivo */}
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                      <Camera className="w-4 h-4 text-[#FF0096]" />
+                      <span>Fotos del Establecimiento (Cámara o Galería Móvil)</span>
+                    </span>
+
+                    <label className="px-4 py-2 rounded-xl text-xs font-black text-white bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:opacity-95 shadow-md flex items-center gap-1.5 cursor-pointer transition-all">
+                      {isUploadingPhoto ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span>Cargando Fotos...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>📸 Tomar o Subir Fotos</span>
+                        </>
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        multiple
+                        onChange={handleFileUpload}
+                        disabled={isUploadingPhoto}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+
+                  {/* Input Alternativo por URL */}
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="url"
+                      placeholder="O pega una URL de foto (https://...)"
+                      value={photoUrlInput}
+                      onChange={(e) => setPhotoUrlInput(e.target.value)}
+                      className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddPhotoUrl}
+                      className="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold shrink-0 cursor-pointer"
+                    >
+                      + URL
+                    </button>
+                  </div>
+
+                  {/* Miniaturas de Fotos Capturadas */}
+                  {galleryImages.length > 0 && (
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2">
+                      {galleryImages.map((url, idx) => (
+                        <div
+                          key={idx}
+                          className={`relative rounded-xl overflow-hidden border aspect-video group shadow-xs ${
+                            primaryImage === url ? "ring-2 ring-[#00C8D4] border-[#00C8D4]" : "border-slate-200"
+                          }`}
+                        >
+                          <img src={url} alt={`Foto ${idx + 1}`} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 p-1">
+                            <button
+                              type="button"
+                              onClick={() => setPrimaryImage(url)}
+                              className="px-2 py-1 rounded bg-[#00C8D4] text-slate-950 text-[9px] font-black uppercase"
+                            >
+                              {primaryImage === url ? "Portada" : "Usar Portada"}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => removePhoto(idx)}
+                              className="p-1 rounded bg-rose-600 text-white"
+                              title="Eliminar"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          </div>
+                          {primaryImage === url && (
+                            <span className="absolute top-1.5 left-1.5 bg-[#00C8D4] text-slate-950 text-[8px] font-black uppercase px-2 py-0.5 rounded-md shadow">
+                              Portada
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* Botón Principal de Guardado */}
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                <p className="text-[11px] text-slate-400 max-w-xs">
-                  Genera la propiedad en PostgreSQL con JSONB indexado en GIN y estado <code>PRE_REGISTERED</code>.
+              {/* Selector de Modalidad de Publicación Inmediata (Agentes de Campo) */}
+              <div className="bg-slate-900 text-white p-4.5 rounded-2xl space-y-3 shadow-lg">
+                <span className="text-xs font-black uppercase tracking-wider text-[#00C8D4] flex items-center gap-1.5">
+                  <Radio className="w-4 h-4 text-[#FF0096] animate-pulse" />
+                  <span>Estado al Guardar (Agente en Frente del Hotel)</span>
+                </span>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setPublishDirectly(true)}
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                      publishDirectly
+                        ? "bg-emerald-500/20 border-emerald-400 text-white ring-1 ring-emerald-400"
+                        : "bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-750"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 font-bold text-xs text-emerald-300 mb-0.5">
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>🚀 Publicar Ahora Mismo</span>
+                    </div>
+                    <p className="text-[10px] text-slate-300">
+                      Publica de inmediato la ficha con el GPS y fotos capturadas en la plataforma pública.
+                    </p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setPublishDirectly(false)}
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                      !publishDirectly
+                        ? "bg-[#00C8D4]/20 border-[#00C8D4] text-white ring-1 ring-[#00C8D4]"
+                        : "bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-750"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 font-bold text-xs text-[#00C8D4] mb-0.5">
+                      <FileText className="w-4 h-4" />
+                      <span>📝 Guardar como Pre-Registro</span>
+                    </div>
+                    <p className="text-[10px] text-slate-300">
+                      Guarda la ficha como borrador en estado <code>PRE_REGISTERED</code> para revisiones posteriores.
+                    </p>
+                  </button>
+                </div>
+              </div>
+
+              {/* Botón Principal de Guardado / Publicación Directa */}
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between flex-wrap gap-3">
+                <p className="text-[11px] text-slate-500 max-w-xs">
+                  {publishDirectly
+                    ? "Publicará inmediatamente la propiedad activa en la plataforma."
+                    : "Generará la propiedad en estado PRE_REGISTERED para ser completada luego."}
                 </p>
 
                 <button
                   type="button"
                   onClick={handleSavePreRegistration}
                   disabled={isSaving}
-                  className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:opacity-95 text-white font-black text-xs shadow-lg shadow-pink-900/30 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] hover:opacity-95 text-white font-black text-xs shadow-xl shadow-pink-900/20 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 hover:scale-102 active:scale-98"
                 >
                   {isSaving ? (
-                    <span>Guardando en BD...</span>
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Guardando Ficha...</span>
+                    </>
                   ) : (
                     <>
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>Completar Pre-Registro</span>
+                      <CheckCircle2 className="w-4.5 h-4.5" />
+                      <span>{publishDirectly ? "🚀 Publicar Ahora en HDV" : "Completar Pre-Registro"}</span>
                     </>
                   )}
                 </button>

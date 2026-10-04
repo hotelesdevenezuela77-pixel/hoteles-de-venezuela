@@ -551,6 +551,49 @@ export function AdminEstablecimientoNuevo() {
     setPhotoUrl("");
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const fileExt = file.name.split(".").pop() || "jpg";
+      const fileName = `property_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+
+      try {
+        const { data, error } = await supabase.storage
+          .from("establecimientos")
+          .upload(fileName, file, { contentType: file.type || "image/jpeg", upsert: true });
+
+        if (!error && data) {
+          const { data: publicUrlData } = supabase.storage
+            .from("establecimientos")
+            .getPublicUrl(fileName);
+          if (publicUrlData?.publicUrl) {
+            setPhotos(prev => [...prev, { url: publicUrlData.publicUrl, isPrimary: prev.length === 0 }]);
+            continue;
+          }
+        }
+      } catch (err) {
+        console.warn("Error en Supabase storage, usando lector Base64 local:", err);
+      }
+
+      // Fallback local Base64 Data URL
+      await new Promise<void>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (typeof reader.result === "string") {
+            const url = reader.result;
+            setPhotos(prev => [...prev, { url, isPrimary: prev.length === 0 }]);
+          }
+          resolve();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    triggerToast("📸 Fotos agregadas desde el dispositivo.");
+  };
+
   const removePhoto = (index: number) => {
     setPhotos((prev) => {
       const next = prev.filter((_, idx) => idx !== index);
@@ -2825,9 +2868,24 @@ export function AdminEstablecimientoNuevo() {
 
               {/* Galería de Fotos */}
               <div className="space-y-4 pt-4 border-t border-slate-200">
-                <span className="text-xs font-black uppercase text-[#FF0096] tracking-wider block">
-                  Galería de Fotos del Establecimiento
-                </span>
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <span className="text-xs font-black uppercase text-[#FF0096] tracking-wider block">
+                    Galería de Fotos del Establecimiento
+                  </span>
+
+                  <label className="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:opacity-95 cursor-pointer shadow-sm flex items-center gap-1.5">
+                    <Camera className="w-3.5 h-3.5" />
+                    <span>📸 Tomar o Subir Fotos</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      multiple
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
 
                 <div className="flex items-center gap-2">
                   <input
@@ -2840,9 +2898,9 @@ export function AdminEstablecimientoNuevo() {
                   <button
                     type="button"
                     onClick={addPhoto}
-                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-[#FF0096] hover:bg-[#e00084] cursor-pointer shadow-sm"
+                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-slate-800 hover:bg-slate-900 cursor-pointer shadow-sm"
                   >
-                    + Agregar Foto
+                    + Agregar URL
                   </button>
                 </div>
 
