@@ -54,7 +54,7 @@ export function PropertyRegistrationSelectorModal({
             <div className="flex items-center gap-2 mb-1.5">
               <span className="px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest text-[#00C8D4] bg-[#00C8D4]/15 border border-[#00C8D4]/30 flex items-center gap-1.5">
                 <Sparkles className="w-3 h-3 text-[#00C8D4]" />
-                Documento 77 V.10 Oficial
+                Documento 77 V.13 Oficial
               </span>
               <span className="text-[11px] font-semibold text-white/60">Asistente por Secciones</span>
             </div>

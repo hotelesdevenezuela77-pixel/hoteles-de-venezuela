@@ -823,7 +823,7 @@ export function AdminEstablecimientoNuevo() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0e011f] text-white font-sans py-8 px-4 sm:px-6 relative">
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans py-8 px-4 sm:px-6 relative">
       
       {/* Modal Selector de Tipo de Propiedad (Los 6 Botones) */}
       <PropertyRegistrationSelectorModal
@@ -839,42 +839,42 @@ export function AdminEstablecimientoNuevo() {
 
       {/* Modal Guía GPS */}
       {showGpsHelpModal && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-slate-900 border border-[#00C8D4]/40 rounded-3xl p-6 sm:p-8 max-w-lg w-full text-left shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 max-w-lg w-full text-left shadow-2xl space-y-4 text-slate-900">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <div className="flex items-center gap-2 text-[#00C8D4]">
                 <MapPin className="w-5 h-5" />
-                <h3 className="font-bold text-base text-white">¿Cómo obtener las coordenadas GPS?</h3>
+                <h3 className="font-bold text-base text-slate-900">¿Cómo obtener las coordenadas GPS?</h3>
               </div>
               <button
                 onClick={() => setShowGpsHelpModal(false)}
-                className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-gray-400 hover:text-white"
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800"
               >
                 ✕
               </button>
             </div>
-            <div className="space-y-3 text-xs text-slate-300 leading-relaxed">
+            <div className="space-y-3 text-xs text-slate-600 leading-relaxed">
               <div className="flex items-start gap-2.5">
-                <span className="w-5 h-5 rounded-full bg-[#00C8D4] text-[#0e011f] font-black text-xs flex items-center justify-center shrink-0">1</span>
+                <span className="w-5 h-5 rounded-full bg-[#00C8D4] text-white font-black text-xs flex items-center justify-center shrink-0">1</span>
                 <span>Abre <strong>Google Maps</strong> en tu navegador o teléfono y busca la ubicación exacta de tu propiedad.</span>
               </div>
               <div className="flex items-start gap-2.5">
-                <span className="w-5 h-5 rounded-full bg-[#00C8D4] text-[#0e011f] font-black text-xs flex items-center justify-center shrink-0">2</span>
+                <span className="w-5 h-5 rounded-full bg-[#00C8D4] text-white font-black text-xs flex items-center justify-center shrink-0">2</span>
                 <span>Haz <strong>click derecho</strong> (o mantén pulsado en el móvil) sobre el punto exacto del mapa.</span>
               </div>
               <div className="flex items-start gap-2.5">
-                <span className="w-5 h-5 rounded-full bg-[#00C8D4] text-[#0e011f] font-black text-xs flex items-center justify-center shrink-0">3</span>
+                <span className="w-5 h-5 rounded-full bg-[#00C8D4] text-white font-black text-xs flex items-center justify-center shrink-0">3</span>
                 <span>Verás dos números (ej: <strong>10.480594, -66.903606</strong>). El primer número es la <strong>Latitud</strong> y el segundo la <strong>Longitud</strong>.</span>
               </div>
               <div className="flex items-start gap-2.5">
-                <span className="w-5 h-5 rounded-full bg-[#00C8D4] text-[#0e011f] font-black text-xs flex items-center justify-center shrink-0">4</span>
+                <span className="w-5 h-5 rounded-full bg-[#00C8D4] text-white font-black text-xs flex items-center justify-center shrink-0">4</span>
                 <span>Copia y pega cada número en sus respectivos campos. También puedes pulsar el botón <em>"Detectar Ubicación Actual"</em> si estás físicamente en el establecimiento.</span>
               </div>
             </div>
             <div className="pt-2 text-right">
               <button
                 onClick={() => setShowGpsHelpModal(false)}
-                className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-[#00C8D4] text-[#0e011f] hover:bg-[#00b0bb]"
+                className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-[#00C8D4] hover:bg-[#00b0bb] shadow-md cursor-pointer"
               >
                 Entendido
               </button>
@@ -885,23 +885,23 @@ export function AdminEstablecimientoNuevo() {
 
       {/* Modal Habitación Individual (Botón 2) */}
       {showRoomModal && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-slate-900 border border-[#FF0096]/40 rounded-3xl p-6 sm:p-8 max-w-2xl w-full text-left shadow-2xl space-y-5 my-8 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 max-w-2xl w-full text-left shadow-2xl space-y-5 my-8 max-h-[90vh] overflow-y-auto text-slate-900">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-[#FF0096]/20 text-[#FF0096] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-[#FF0096]/15 text-[#FF0096] flex items-center justify-center font-bold">
                   <Bed className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-base text-white">
+                  <h3 className="font-bold text-base text-slate-900">
                     {editingRoomId ? "Editar Habitación" : "+ Agregar Habitación Individual"}
                   </h3>
-                  <p className="text-[11px] text-slate-400">Configuración personalizada de tamaño, camas y amenidades</p>
+                  <p className="text-[11px] text-slate-500">Configuración personalizada de tamaño, camas y amenidades</p>
                 </div>
               </div>
               <button
                 onClick={() => setShowRoomModal(false)}
-                className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-gray-400 hover:text-white"
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800"
               >
                 ✕
               </button>
@@ -910,7 +910,7 @@ export function AdminEstablecimientoNuevo() {
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[11px] uppercase font-black text-slate-300 tracking-wider mb-1">
+                  <label className="block text-[11px] uppercase font-bold text-slate-700 tracking-wider mb-1">
                     Denominación (Número o Nombre) *
                   </label>
                   <input
@@ -919,11 +919,11 @@ export function AdminEstablecimientoNuevo() {
                     placeholder="Ej: Habitación 1 / Suite Deluxe"
                     value={tempRoomName}
                     onChange={(e) => setTempRoomName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-[#FF0096]/30 focus:border-[#FF0096]"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-[#FF0096]/20 focus:border-[#FF0096]"
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] uppercase font-black text-slate-300 tracking-wider mb-1">
+                  <label className="block text-[11px] uppercase font-bold text-slate-700 tracking-wider mb-1">
                     Tamaño de la Habitación (m²)
                   </label>
                   <input
@@ -931,72 +931,72 @@ export function AdminEstablecimientoNuevo() {
                     placeholder="25"
                     value={tempRoomM2}
                     onChange={(e) => setTempRoomM2(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-[#FF0096]/30 focus:border-[#FF0096]"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-[#FF0096]/20 focus:border-[#FF0096]"
                   />
                 </div>
               </div>
 
               {/* Camas */}
-              <div className="bg-slate-800/60 p-4 rounded-2xl border border-slate-700 space-y-3">
+              <div className="bg-slate-50/80 p-4 rounded-2xl border border-slate-200/90 space-y-3">
                 <span className="text-[11px] font-black uppercase text-[#00C8D4] tracking-wider block">
                   C01.3. Tamaño y Distribución de las Camas
                 </span>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   <div>
-                    <span className="text-[10px] text-slate-300 block mb-1">Individuales (100 cm)</span>
+                    <span className="text-[10px] text-slate-600 font-bold block mb-1">Individuales (100 cm)</span>
                     <input
                       type="number"
                       min="0"
                       value={tempSingleBeds}
                       onChange={(e) => setTempSingleBeds(e.target.value)}
-                      className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+                      className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold"
                     />
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-300 block mb-1">King Size (200 cm)</span>
+                    <span className="text-[10px] text-slate-600 font-bold block mb-1">King Size (200 cm)</span>
                     <input
                       type="number"
                       min="0"
                       value={tempKingBeds}
                       onChange={(e) => setTempKingBeds(e.target.value)}
-                      className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+                      className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold"
                     />
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-300 block mb-1">Queen Size (180 cm)</span>
+                    <span className="text-[10px] text-slate-600 font-bold block mb-1">Queen Size (180 cm)</span>
                     <input
                       type="number"
                       min="0"
                       value={tempQueenBeds}
                       onChange={(e) => setTempQueenBeds(e.target.value)}
-                      className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+                      className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold"
                     />
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-300 block mb-1">Doble Full (150 cm)</span>
+                    <span className="text-[10px] text-slate-600 font-bold block mb-1">Doble Full (150 cm)</span>
                     <input
                       type="number"
                       min="0"
                       value={tempFullBeds}
                       onChange={(e) => setTempFullBeds(e.target.value)}
-                      className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+                      className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold"
                     />
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-300 block mb-1">Literas</span>
+                    <span className="text-[10px] text-slate-600 font-bold block mb-1">Literas</span>
                     <input
                       type="number"
                       min="0"
                       value={tempBunkBeds}
                       onChange={(e) => setTempBunkBeds(e.target.value)}
-                      className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+                      className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Tipo de Baño */}
-              <div className="bg-slate-800/60 p-4 rounded-2xl border border-slate-700 space-y-3">
+              <div className="bg-slate-50/80 p-4 rounded-2xl border border-slate-200/90 space-y-3">
                 <span className="text-[11px] font-black uppercase text-[#FF0096] tracking-wider block">
                   Tipo de Baño de esta Habitación
                 </span>
@@ -1005,8 +1005,8 @@ export function AdminEstablecimientoNuevo() {
                     onClick={() => setTempBathType("privado")}
                     className={`p-3 rounded-xl border flex items-center gap-2.5 cursor-pointer ${
                       tempBathType === "privado"
-                        ? "bg-[#FF0096]/15 border-[#FF0096] text-white"
-                        : "bg-slate-900 border-slate-700 text-slate-400"
+                        ? "bg-[#FF0096]/10 border-[#FF0096] text-slate-900 font-bold"
+                        : "bg-white border-slate-200 text-slate-600"
                     }`}
                   >
                     <input
@@ -1022,8 +1022,8 @@ export function AdminEstablecimientoNuevo() {
                     onClick={() => setTempBathType("compartido")}
                     className={`p-3 rounded-xl border flex items-center gap-2.5 cursor-pointer ${
                       tempBathType === "compartido"
-                        ? "bg-[#00C8D4]/15 border-[#00C8D4] text-white"
-                        : "bg-slate-900 border-slate-700 text-slate-400"
+                        ? "bg-[#00C8D4]/10 border-[#00C8D4] text-slate-900 font-bold"
+                        : "bg-white border-slate-200 text-slate-600"
                     }`}
                   >
                     <input
@@ -1039,7 +1039,7 @@ export function AdminEstablecimientoNuevo() {
 
                 {tempBathType === "compartido" && (
                   <div className="pt-2 animate-in fade-in">
-                    <label className="block text-[10px] uppercase font-bold text-slate-300 mb-1">
+                    <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">
                       Indicar qué habitaciones comparten este baño (Ej: Hab 1 y Hab 2):
                     </label>
                     <input
@@ -1047,25 +1047,25 @@ export function AdminEstablecimientoNuevo() {
                       placeholder="Concretar nombres o números de las habitaciones que comparten"
                       value={tempSharedWith}
                       onChange={(e) => setTempSharedWith(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold"
                     />
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
               <button
                 type="button"
                 onClick={() => setShowRoomModal(false)}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700"
+                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200"
               >
                 Cancelar
               </button>
               <button
                 type="button"
                 onClick={saveRoomConfig}
-                className="px-6 py-2 rounded-xl text-xs font-bold text-white shadow-lg cursor-pointer"
+                className="px-6 py-2 rounded-xl text-xs font-bold text-white shadow-md cursor-pointer"
                 style={{ background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)" }}
               >
                 Guardar Habitación
@@ -1147,7 +1147,7 @@ export function AdminEstablecimientoNuevo() {
         </div>
 
         {/* Barra de Progreso del Asistente (Stepper Wizard por Secciones) */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl">
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-md shadow-slate-100">
           <div className="flex items-center justify-between gap-2 overflow-x-auto pb-2 scrollbar-thin">
             {sectionsConfig.map((sec) => {
               const isActive = currentSection === sec.id;
@@ -1157,21 +1157,21 @@ export function AdminEstablecimientoNuevo() {
                   key={sec.id}
                   type="button"
                   onClick={() => setCurrentSection(sec.id)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black whitespace-nowrap transition-all cursor-pointer shrink-0 ${
                     isActive
-                      ? "bg-[#00C8D4] text-[#0e011f] shadow-lg scale-102"
+                      ? "bg-[#00C8D4] text-white shadow-md scale-102"
                       : isPast
-                      ? "bg-slate-800 text-slate-300 hover:bg-slate-750"
-                      : "bg-slate-850 text-slate-500 hover:text-slate-400"
+                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900"
                   }`}
                 >
                   <span
                     className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${
                       isActive
-                        ? "bg-[#0e011f] text-[#00C8D4]"
+                        ? "bg-white text-[#00C8D4]"
                         : isPast
-                        ? "bg-[#00C8D4]/20 text-[#00C8D4]"
-                        : "bg-slate-700 text-slate-400"
+                        ? "bg-emerald-600 text-white"
+                        : "bg-slate-200 text-slate-500"
                     }`}
                   >
                     {isPast ? "✓" : sec.id}
@@ -1184,22 +1184,22 @@ export function AdminEstablecimientoNuevo() {
         </div>
 
         {/* FORMULARIO PRINCIPAL */}
-        <form onSubmit={handleSubmit} className="space-y-6 text-left">
+        <form onSubmit={handleSubmit} className="space-y-6 text-left text-slate-800">
           
           {/* ================================================================= */}
           {/* SECCIÓN 1: DATOS GENERALES / UBICACIÓN / LICENCIAS / TAMAÑO */}
           {/* ================================================================= */}
           {currentSection === 1 && (
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl animate-in fade-in">
-              <div className="flex items-center gap-3 pb-4 border-b border-slate-800">
+            <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 space-y-6 shadow-lg shadow-slate-100/80 animate-in fade-in">
+              <div className="flex items-center gap-3 pb-4 border-b border-slate-200">
                 <div className="w-10 h-10 rounded-2xl bg-[#00C8D4]/15 text-[#00C8D4] flex items-center justify-center font-black">
                   1
                 </div>
                 <div>
-                  <h2 className="text-lg font-black text-white font-serif">
+                  <h2 className="text-lg font-black text-slate-900 font-serif">
                     Sección 1: Datos Generales / Ubicación / Licencias & Categorización / Tamaño
                   </h2>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500 font-medium">
                     Información comercial, localización geográfica precisa y certificaciones oficiales.
                   </p>
                 </div>
@@ -1213,7 +1213,7 @@ export function AdminEstablecimientoNuevo() {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div className="lg:col-span-2">
-                    <label className="block text-[11px] uppercase font-bold text-slate-300 tracking-wider mb-1">
+                    <label className="block text-[11px] uppercase font-bold text-slate-700 tracking-wider mb-1">
                       Nombre Comercial de la Propiedad *
                     </label>
                     <input
@@ -1225,19 +1225,19 @@ export function AdminEstablecimientoNuevo() {
                         setName(e.target.value);
                         if (!editId) setSlug(autoSlug(e.target.value));
                       }}
-                      className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-[#00C8D4]/30 focus:border-[#00C8D4]"
+                      className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-[#00C8D4]/20 focus:border-[#00C8D4] shadow-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] uppercase font-bold text-slate-300 tracking-wider mb-1">
+                    <label className="block text-[11px] uppercase font-bold text-slate-700 tracking-wider mb-1">
                       C00.1. Tipo de Establecimiento *
                     </label>
                     <select
                       required
                       value={propertyType}
                       onChange={(e) => setPropertyType(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-[#00C8D4]/30 focus:border-[#00C8D4] cursor-pointer"
+                      className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-[#00C8D4]/20 focus:border-[#00C8D4] cursor-pointer shadow-xs"
                     >
                       {activeButtonGroup === "boton1" && BUTTON_1_PROPERTY_TYPES.map(t => (
                         <option key={t.id} value={t.id}>{t.code} - {t.label}</option>
@@ -1252,23 +1252,23 @@ export function AdminEstablecimientoNuevo() {
                   </div>
 
                   <div>
-                    <label className="block text-[11px] uppercase font-bold text-slate-300 tracking-wider mb-1">
+                    <label className="block text-[11px] uppercase font-bold text-slate-700 tracking-wider mb-1">
                       Sitio Web / Enlace a Red Social
                     </label>
                     <div className="relative">
-                      <Globe className="absolute left-3 top-3 w-4 h-4 text-slate-500" />
+                      <Globe className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
                       <input
                         type="text"
                         placeholder="https://posada.com o instagram"
                         value={website}
                         onChange={(e) => setWebsite(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-[#00C8D4]/30 focus:border-[#00C8D4]"
+                        className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-[#00C8D4]/20 focus:border-[#00C8D4] shadow-xs"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-[11px] uppercase font-bold text-slate-300 tracking-wider mb-1">
+                    <label className="block text-[11px] uppercase font-bold text-slate-700 tracking-wider mb-1">
                       Año de Construcción
                     </label>
                     <input
@@ -1276,12 +1276,12 @@ export function AdminEstablecimientoNuevo() {
                       placeholder="Ej: 2010"
                       value={yearBuilt}
                       onChange={(e) => setYearBuilt(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] uppercase font-bold text-slate-300 tracking-wider mb-1">
+                    <label className="block text-[11px] uppercase font-bold text-slate-700 tracking-wider mb-1">
                       Año de Última Reforma
                     </label>
                     <input
@@ -1289,16 +1289,16 @@ export function AdminEstablecimientoNuevo() {
                       placeholder="Ej: 2023"
                       value={yearRenovated}
                       onChange={(e) => setYearRenovated(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
 
                   <div className="sm:col-span-2 lg:col-span-3">
                     <div className="flex items-center justify-between mb-1">
-                      <label className="block text-[11px] uppercase font-bold text-slate-300 tracking-wider">
+                      <label className="block text-[11px] uppercase font-bold text-slate-700 tracking-wider">
                         Descripción o Reseña Comercial (Máximo 500 caracteres)
                       </label>
-                      <span className={`text-[10px] font-bold ${description.length > 500 ? "text-rose-400" : "text-slate-400"}`}>
+                      <span className={`text-[10px] font-bold ${description.length > 500 ? "text-rose-500" : "text-slate-400"}`}>
                         {description.length}/500
                       </span>
                     </div>
@@ -1308,27 +1308,27 @@ export function AdminEstablecimientoNuevo() {
                       placeholder="Describe los aspectos clave, ambientación y servicios principales de tu negocio..."
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-[#00C8D4]/30 focus:border-[#00C8D4] resize-none"
+                      className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-[#00C8D4]/20 focus:border-[#00C8D4] resize-none shadow-xs"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Sub-bloque: Ubicación Desglosada con 85+ Tipos de Vía */}
-              <div className="space-y-4 pt-4 border-t border-slate-800">
+              <div className="space-y-4 pt-4 border-t border-slate-200">
                 <span className="text-xs font-black uppercase text-[#FF0096] tracking-wider block">
                   Ubicación & Dirección de la Propiedad (Doc 77 V.13 Oficial)
                 </span>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                   <div className="col-span-2 sm:col-span-1">
-                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">
+                    <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">
                       Tipo de Vía (Doc 77 V.13 Oficial) *
                     </label>
                     <select
                       value={roadType}
                       onChange={(e) => setRoadType(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white cursor-pointer"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold cursor-pointer shadow-xs"
                     >
                       {ROAD_TYPES_V10.map(rt => (
                         <option key={rt} value={rt}>{rt}</option>
@@ -1337,7 +1337,7 @@ export function AdminEstablecimientoNuevo() {
                   </div>
 
                   <div className="col-span-2 sm:col-span-2">
-                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">
+                    <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">
                       Nombre de la Vía *
                     </label>
                     <input
@@ -1345,82 +1345,82 @@ export function AdminEstablecimientoNuevo() {
                       placeholder="Ej: Francisco de Miranda"
                       value={roadName}
                       onChange={(e) => setRoadName(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Número</label>
+                    <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">Número</label>
                     <input
                       type="text"
                       placeholder="S/N o 123"
                       value={roadNumber}
                       onChange={(e) => setRoadNumber(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Portal</label>
+                    <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">Portal</label>
                     <input
                       type="text"
                       placeholder="Portal A"
                       value={portal}
                       onChange={(e) => setPortal(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Bloque</label>
+                    <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">Bloque</label>
                     <input
                       type="text"
                       placeholder="Bloque 3"
                       value={block}
                       onChange={(e) => setBlock(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Escalera</label>
+                    <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">Escalera</label>
                     <input
                       type="text"
                       placeholder="Esc. 2"
                       value={staircase}
                       onChange={(e) => setStaircase(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Piso</label>
+                    <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">Piso</label>
                     <input
                       type="text"
                       placeholder="PB / Piso 4"
                       value={floor}
                       onChange={(e) => setFloor(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Puerta</label>
+                    <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">Puerta</label>
                     <input
                       type="text"
                       placeholder="Pta. B"
                       value={door}
                       onChange={(e) => setDoor(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Provincia (Estado)</label>
+                    <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">Provincia (Estado)</label>
                     <select
                       value={state}
                       onChange={(e) => setState(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white cursor-pointer"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold cursor-pointer shadow-xs"
                     >
                       {VE_STATES.map(s => (
                         <option key={s} value={s}>{s}</option>
@@ -1429,30 +1429,30 @@ export function AdminEstablecimientoNuevo() {
                   </div>
 
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Localidad (Ciudad)</label>
+                    <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">Localidad (Ciudad)</label>
                     <input
                       type="text"
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Código Postal</label>
+                    <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">Código Postal</label>
                     <input
                       type="text"
                       placeholder="1060"
                       value={postalCode}
                       onChange={(e) => setPostalCode(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
                 </div>
 
                 {/* C00.4. REGIÓN */}
                 <div className="pt-2">
-                  <label className="block text-[11px] uppercase font-black text-slate-300 tracking-wider mb-2">
+                  <label className="block text-[11px] uppercase font-bold text-slate-700 tracking-wider mb-2">
                     C00.4. Región Geográfica Oficial
                   </label>
                   <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-2">
@@ -1463,21 +1463,21 @@ export function AdminEstablecimientoNuevo() {
                         onClick={() => setRegion(r.code)}
                         className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
                           region === r.code
-                            ? "bg-[#00C8D4]/20 border-[#00C8D4] text-white shadow-xs font-bold"
-                            : "bg-slate-800/60 border-slate-700 text-slate-400 hover:text-white"
+                            ? "bg-[#00C8D4]/10 border-[#00C8D4] text-[#00C8D4] shadow-xs font-bold"
+                            : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                         }`}
                       >
-                        <span className="text-[10px] font-mono text-slate-500 block">{r.code}</span>
-                        <span className="text-xs">{r.label}</span>
+                        <span className="text-[10px] font-mono text-slate-400 block">{r.code}</span>
+                        <span className="text-xs font-bold">{r.label}</span>
                       </button>
                     ))}
                   </div>
                 </div>
 
                 {/* Coordenadas GPS & Explicación */}
-                <div className="bg-slate-800/60 p-4 rounded-2xl border border-slate-700 space-y-3">
+                <div className="bg-slate-50/80 p-4 rounded-2xl border border-slate-200 space-y-3">
                   <div className="flex items-center justify-between flex-wrap gap-2">
-                    <span className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                       <MapPin className="w-4 h-4 text-[#00C8D4]" />
                       Coordenadas GPS (Latitud & Longitud para Google Maps)
                     </span>
@@ -1493,23 +1493,23 @@ export function AdminEstablecimientoNuevo() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Latitud</label>
+                      <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">Latitud</label>
                       <input
                         type="text"
                         placeholder="Ej: 10.480594"
                         value={latitude}
                         onChange={(e) => setLatitude(e.target.value)}
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white font-mono"
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-mono font-semibold shadow-xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Longitud</label>
+                      <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">Longitud</label>
                       <input
                         type="text"
                         placeholder="Ej: -66.903606"
                         value={longitude}
                         onChange={(e) => setLongitude(e.target.value)}
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white font-mono"
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-mono font-semibold shadow-xs"
                       />
                     </div>
                   </div>
@@ -1519,16 +1519,16 @@ export function AdminEstablecimientoNuevo() {
                       type="button"
                       onClick={detectLocation}
                       disabled={gpsLoading}
-                      className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-[#00C8D4]/15 hover:bg-[#00C8D4]/25 text-[#00C8D4] border border-[#00C8D4]/30 transition-all flex items-center gap-1.5 cursor-pointer"
+                      className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-[#00C8D4]/10 hover:bg-[#00C8D4]/20 text-[#00C8D4] border border-[#00C8D4]/30 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
                     >
                       {gpsLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Navigation className="w-3.5 h-3.5" />}
                       <span>Detectar Ubicación Actual</span>
                     </button>
-                    {gpsError && <span className="text-xs text-rose-400">{gpsError}</span>}
+                    {gpsError && <span className="text-xs text-rose-500 font-bold">{gpsError}</span>}
                   </div>
 
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">
+                    <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">
                       Indicaciones de Acceso
                     </label>
                     <input
@@ -1536,14 +1536,14 @@ export function AdminEstablecimientoNuevo() {
                       placeholder="Ej: Acceso por carretera N-340 km 12, desvío derecha hacia la colina"
                       value={accessDirections}
                       onChange={(e) => setAccessDirections(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Sub-bloque: Licencias, 11 Certificaciones & Estrellas */}
-              <div className="space-y-4 pt-4 border-t border-slate-800">
+              <div className="space-y-4 pt-4 border-t border-slate-200">
                 <span className="text-xs font-black uppercase text-[#00C8D4] tracking-wider block">
                   Licencias, Categorización y Certificaciones Oficiales
                 </span>
@@ -1642,20 +1642,21 @@ export function AdminEstablecimientoNuevo() {
           )}
 
           {/* ================================================================= */}
+          {/* ================================================================= */}
           {/* SECCIÓN 2: DATOS FISCALES Y DE FACTURACIÓN */}
           {/* ================================================================= */}
           {currentSection === 2 && (
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl animate-in fade-in">
-              <div className="flex items-center justify-between pb-4 border-b border-slate-800 flex-wrap gap-2">
+            <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 space-y-6 shadow-lg shadow-slate-100/80 animate-in fade-in">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-200 flex-wrap gap-2">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-2xl bg-[#FF0096]/15 text-[#FF0096] flex items-center justify-center font-black">
                     2
                   </div>
                   <div>
-                    <h2 className="text-lg font-black text-white font-serif">
+                    <h2 className="text-lg font-black text-slate-900 font-serif">
                       Sección 2: Datos Fiscales y de Facturación
                     </h2>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-slate-500 font-medium">
                       Datos legales para emisión de comprobantes, facturas de comisiones y contratos.
                     </p>
                   </div>
@@ -1664,7 +1665,7 @@ export function AdminEstablecimientoNuevo() {
                 <button
                   type="button"
                   onClick={copyPropertyAddressToFiscal}
-                  className="px-3.5 py-2 rounded-xl text-xs font-bold text-[#00C8D4] bg-[#00C8D4]/10 hover:bg-[#00C8D4]/20 border border-[#00C8D4]/30 flex items-center gap-1.5 transition-all cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl text-xs font-bold text-[#00C8D4] bg-[#00C8D4]/10 hover:bg-[#00C8D4]/20 border border-[#00C8D4]/30 flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
                 >
                   <span>📋 Copiar Dirección de la Propiedad</span>
                 </button>
@@ -1672,7 +1673,7 @@ export function AdminEstablecimientoNuevo() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-[11px] uppercase font-bold text-slate-300 tracking-wider mb-1">
+                  <label className="block text-[11px] uppercase font-bold text-slate-700 tracking-wider mb-1">
                     Razón Social
                   </label>
                   <input
@@ -1680,12 +1681,12 @@ export function AdminEstablecimientoNuevo() {
                     placeholder="Ej: Hostelería y Turismo S.L. / C.A."
                     value={fiscalBusinessName}
                     onChange={(e) => setFiscalBusinessName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] uppercase font-bold text-slate-300 tracking-wider mb-1">
+                  <label className="block text-[11px] uppercase font-bold text-slate-700 tracking-wider mb-1">
                     Nombre del Titular
                   </label>
                   <input
@@ -1693,12 +1694,12 @@ export function AdminEstablecimientoNuevo() {
                     placeholder="Ej: Juan Pérez García"
                     value={fiscalHolderName}
                     onChange={(e) => setFiscalHolderName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] uppercase font-bold text-slate-300 tracking-wider mb-1">
+                  <label className="block text-[11px] uppercase font-bold text-slate-700 tracking-wider mb-1">
                     NIF / CIF / RIF
                   </label>
                   <input
@@ -1706,7 +1707,7 @@ export function AdminEstablecimientoNuevo() {
                     placeholder="Ej: J-12345678-9"
                     value={fiscalTaxId}
                     onChange={(e) => setFiscalTaxId(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                   />
                 </div>
 
@@ -1714,11 +1715,11 @@ export function AdminEstablecimientoNuevo() {
                   <span className="text-xs font-bold text-[#00C8D4] block mb-2">Dirección Fiscal Completa</span>
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                     <div>
-                      <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Tipo de Vía</label>
+                      <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">Tipo de Vía</label>
                       <select
                         value={fiscalRoadType}
                         onChange={(e) => setFiscalRoadType(e.target.value)}
-                        className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white cursor-pointer"
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold cursor-pointer shadow-xs"
                       >
                         {ROAD_TYPES_V10.map(rt => (
                           <option key={rt} value={rt}>{rt}</option>
@@ -1726,56 +1727,56 @@ export function AdminEstablecimientoNuevo() {
                       </select>
                     </div>
                     <div className="col-span-2">
-                      <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nombre de la Vía</label>
+                      <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">Nombre de la Vía</label>
                       <input
                         type="text"
                         value={fiscalRoadName}
                         onChange={(e) => setFiscalRoadName(e.target.value)}
-                        className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Número</label>
+                      <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">Número</label>
                       <input
                         type="text"
                         value={fiscalRoadNumber}
                         onChange={(e) => setFiscalRoadNumber(e.target.value)}
-                        className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Provincia</label>
+                      <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">Provincia</label>
                       <select
                         value={fiscalState}
                         onChange={(e) => setFiscalState(e.target.value)}
-                        className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                       >
                         {VE_STATES.map(s => <option key={s} value={s}>{s}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Localidad</label>
+                      <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">Localidad</label>
                       <input
                         type="text"
                         value={fiscalCity}
                         onChange={(e) => setFiscalCity(e.target.value)}
-                        className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Código Postal</label>
+                      <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">Código Postal</label>
                       <input
                         type="text"
                         value={fiscalPostalCode}
                         onChange={(e) => setFiscalPostalCode(e.target.value)}
-                        className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                       />
                     </div>
                   </div>
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block text-[11px] uppercase font-bold text-slate-300 tracking-wider mb-1">
+                  <label className="block text-[11px] uppercase font-bold text-slate-700 tracking-wider mb-1">
                     Email para Facturación
                   </label>
                   <input
@@ -1783,19 +1784,19 @@ export function AdminEstablecimientoNuevo() {
                     placeholder="administracion@hotel.com"
                     value={billingEmail}
                     onChange={(e) => setBillingEmail(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                   />
                 </div>
 
                 {activeButtonGroup !== "boton2" && (
                   <div>
-                    <label className="block text-[11px] uppercase font-bold text-slate-300 tracking-wider mb-1">
+                    <label className="block text-[11px] uppercase font-bold text-slate-700 tracking-wider mb-1">
                       Régimen de IVA Aplicable
                     </label>
                     <select
                       value={vatRegime}
                       onChange={(e) => setVatRegime(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white cursor-pointer"
+                      className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold cursor-pointer shadow-xs"
                     >
                       {VAT_REGIMES.map(v => <option key={v} value={v}>{v}</option>)}
                     </select>
@@ -1809,16 +1810,16 @@ export function AdminEstablecimientoNuevo() {
           {/* SECCIÓN 3: CONTACTO OPERATIVO */}
           {/* ================================================================= */}
           {currentSection === 3 && (
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl animate-in fade-in">
-              <div className="flex items-center gap-3 pb-4 border-b border-slate-800">
+            <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 space-y-6 shadow-lg shadow-slate-100/80 animate-in fade-in">
+              <div className="flex items-center gap-3 pb-4 border-b border-slate-200">
                 <div className="w-10 h-10 rounded-2xl bg-[#00C8D4]/15 text-[#00C8D4] flex items-center justify-center font-black">
                   3
                 </div>
                 <div>
-                  <h2 className="text-lg font-black text-white font-serif">
+                  <h2 className="text-lg font-black text-slate-900 font-serif">
                     Sección 3: Contacto Operativo
                   </h2>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500 font-medium">
                     Canales de comunicación directa interna con HDV y canales oficiales para los clientes.
                   </p>
                 </div>
@@ -1832,83 +1833,83 @@ export function AdminEstablecimientoNuevo() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-[11px] uppercase font-bold text-slate-300 mb-1">Nombre y Apellidos *</label>
+                    <label className="block text-[11px] uppercase font-bold text-slate-700 mb-1">Nombre y Apellidos *</label>
                     <input
                       type="text"
                       placeholder="Ej: Carlos Rodríguez"
                       value={hdvContactName}
                       onChange={(e) => setHdvContactName(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] uppercase font-bold text-slate-300 mb-1">Cargo</label>
+                    <label className="block text-[11px] uppercase font-bold text-slate-700 mb-1">Cargo</label>
                     <input
                       type="text"
                       placeholder="Ej: Gerente Operativo"
                       value={hdvContactRole}
                       onChange={(e) => setHdvContactRole(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] uppercase font-bold text-slate-300 mb-1">Teléfono</label>
+                    <label className="block text-[11px] uppercase font-bold text-slate-700 mb-1">Teléfono</label>
                     <input
                       type="tel"
                       placeholder="+58 212 1234567"
                       value={hdvPhone}
                       onChange={(e) => setHdvPhone(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] uppercase font-bold text-slate-300 mb-1">Horario de Atención</label>
+                    <label className="block text-[11px] uppercase font-bold text-slate-700 mb-1">Horario de Atención</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="time"
                         value={hdvHoursFrom}
                         onChange={(e) => setHdvHoursFrom(e.target.value)}
-                        className="w-full px-2.5 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                        className="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                       />
-                      <span className="text-xs text-slate-400">a</span>
+                      <span className="text-xs text-slate-500">a</span>
                       <input
                         type="time"
                         value={hdvHoursTo}
                         onChange={(e) => setHdvHoursTo(e.target.value)}
-                        className="w-full px-2.5 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                        className="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-[11px] uppercase font-bold text-slate-300 mb-1">Email</label>
+                    <label className="block text-[11px] uppercase font-bold text-slate-700 mb-1">Email</label>
                     <input
                       type="email"
                       placeholder="contacto@hotel.com"
                       value={hdvEmail}
                       onChange={(e) => setHdvEmail(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] uppercase font-bold text-slate-300 mb-1">WhatsApp Directo</label>
+                    <label className="block text-[11px] uppercase font-bold text-slate-700 mb-1">WhatsApp Directo</label>
                     <input
                       type="tel"
                       placeholder="+58 414 1234567"
                       value={hdvWhatsapp}
                       onChange={(e) => setHdvWhatsapp(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
                 </div>
               </div>
 
               {/* 2. Contacto con Clientes */}
-              <div className="space-y-4 pt-4 border-t border-slate-800">
+              <div className="space-y-4 pt-4 border-t border-slate-200">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <span className="text-xs font-black uppercase text-[#FF0096] tracking-wider block">
                     2. Contacto con Clientes (Público & Reservas)
@@ -1916,7 +1917,7 @@ export function AdminEstablecimientoNuevo() {
                   <button
                     type="button"
                     onClick={copyHdvContactToClients}
-                    className="px-3 py-1.5 rounded-lg text-xs font-bold text-[#FF0096] bg-[#FF0096]/10 hover:bg-[#FF0096]/20 border border-[#FF0096]/30 transition-all cursor-pointer"
+                    className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#FF0096] bg-[#FF0096]/10 hover:bg-[#FF0096]/20 border border-[#FF0096]/30 transition-all cursor-pointer shadow-xs"
                   >
                     <span>📋 Copiar Datos de Contacto HDV</span>
                   </button>
@@ -1924,42 +1925,42 @@ export function AdminEstablecimientoNuevo() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-[11px] uppercase font-bold text-slate-300 mb-1">Nombre y Apellidos</label>
+                    <label className="block text-[11px] uppercase font-bold text-slate-700 mb-1">Nombre y Apellidos</label>
                     <input
                       type="text"
                       placeholder="Ej: Atención al Huésped"
                       value={clientContactName}
                       onChange={(e) => setClientContactName(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] uppercase font-bold text-slate-300 mb-1">Cargo</label>
+                    <label className="block text-[11px] uppercase font-bold text-slate-700 mb-1">Cargo</label>
                     <input
                       type="text"
                       placeholder="Ej: Recepción 24h"
                       value={clientContactRole}
                       onChange={(e) => setClientContactRole(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] uppercase font-bold text-slate-300 mb-1">Teléfono Emergencias / Recepción</label>
+                    <label className="block text-[11px] uppercase font-bold text-slate-700 mb-1">Teléfono Emergencias / Recepción</label>
                     <input
                       type="tel"
                       placeholder="+58 212 9876543"
                       value={clientEmergencyPhone}
                       onChange={(e) => setClientEmergencyPhone(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] uppercase font-bold text-slate-300 mb-1">Horario de Atención</label>
+                    <label className="block text-[11px] uppercase font-bold text-slate-700 mb-1">Horario de Atención</label>
                     <div className="space-y-2">
-                      <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+                      <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-700">
                         <input
                           type="checkbox"
                           checked={clientIs24Hours}
@@ -1974,14 +1975,14 @@ export function AdminEstablecimientoNuevo() {
                             type="time"
                             value={clientHoursFrom}
                             onChange={(e) => setClientHoursFrom(e.target.value)}
-                            className="w-full px-2 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white"
+                            className="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold shadow-xs"
                           />
-                          <span className="text-xs text-slate-400">a</span>
+                          <span className="text-xs text-slate-500">a</span>
                           <input
                             type="time"
                             value={clientHoursTo}
                             onChange={(e) => setClientHoursTo(e.target.value)}
-                            className="w-full px-2 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white"
+                            className="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold shadow-xs"
                           />
                         </div>
                       )}
@@ -1989,24 +1990,24 @@ export function AdminEstablecimientoNuevo() {
                   </div>
 
                   <div>
-                    <label className="block text-[11px] uppercase font-bold text-slate-300 mb-1">Email para Reservas</label>
+                    <label className="block text-[11px] uppercase font-bold text-slate-700 mb-1">Email para Reservas</label>
                     <input
                       type="email"
                       placeholder="reservas@hotel.com"
                       value={clientReservationsEmail}
                       onChange={(e) => setClientReservationsEmail(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] uppercase font-bold text-slate-300 mb-1">WhatsApp Directo</label>
+                    <label className="block text-[11px] uppercase font-bold text-slate-700 mb-1">WhatsApp Directo</label>
                     <input
                       type="tel"
                       placeholder="+58 412 9876543"
                       value={clientWhatsapp}
                       onChange={(e) => setClientWhatsapp(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
                 </div>
@@ -2018,16 +2019,16 @@ export function AdminEstablecimientoNuevo() {
           {/* SECCIÓN 4: C01.7 ZONAS COMUNES E INSTALACIONES */}
           {/* ================================================================= */}
           {currentSection === 4 && (
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl animate-in fade-in">
-              <div className="flex items-center gap-3 pb-4 border-b border-slate-800">
+            <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 space-y-6 shadow-lg shadow-slate-100/80 animate-in fade-in">
+              <div className="flex items-center gap-3 pb-4 border-b border-slate-200">
                 <div className="w-10 h-10 rounded-2xl bg-[#00C8D4]/15 text-[#00C8D4] flex items-center justify-center font-black">
                   4
                 </div>
                 <div>
-                  <h2 className="text-lg font-black text-white font-serif">
+                  <h2 className="text-lg font-black text-slate-900 font-serif">
                     Sección 4: C01.7. Zonas Comunes e Instalaciones del Establecimiento
                   </h2>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500 font-medium">
                     Instalaciones recreativas, relax, espacios compartidos, abastecimiento y baños comunes.
                   </p>
                 </div>
@@ -2042,7 +2043,7 @@ export function AdminEstablecimientoNuevo() {
               </div>
 
               {/* C01.7.2 Ocio y Espacios Sociales */}
-              <div className="space-y-3 pt-4 border-t border-slate-800">
+              <div className="space-y-3 pt-4 border-t border-slate-200">
                 <span className="text-xs font-black uppercase text-[#FF0096] tracking-wider block">
                   C01.7.2. Ocio y Espacios Sociales (Compartido)
                 </span>
@@ -2050,7 +2051,7 @@ export function AdminEstablecimientoNuevo() {
               </div>
 
               {/* C01.7.3 Infraestructuras de Negocios y Eventos */}
-              <div className="space-y-3 pt-4 border-t border-slate-800">
+              <div className="space-y-3 pt-4 border-t border-slate-200">
                 <span className="text-xs font-black uppercase text-[#9B00CC] tracking-wider block">
                   C01.7.3. Infraestructuras de Negocios y Eventos
                 </span>
@@ -2058,16 +2059,16 @@ export function AdminEstablecimientoNuevo() {
               </div>
 
               {/* C01.8 Abastecimiento y Energía */}
-              <div className="space-y-3 pt-4 border-t border-slate-800">
-                <span className="text-xs font-black uppercase text-amber-400 tracking-wider block">
+              <div className="space-y-3 pt-4 border-t border-slate-200">
+                <span className="text-xs font-black uppercase text-amber-500 tracking-wider block">
                   C01.8. Abastecimiento y Energía (Garantía de Suministro)
                 </span>
                 {renderAmenityCheckGrid(MASTER_AMENITIES.filter(a => a.code.startsWith("C01.8")))}
               </div>
 
               {/* Amenidades de Baño Compartido y Adaptado PMR */}
-              <div className="space-y-3 pt-4 border-t border-slate-800">
-                <span className="text-xs font-black uppercase text-emerald-400 tracking-wider block">
+              <div className="space-y-3 pt-4 border-t border-slate-200">
+                <span className="text-xs font-black uppercase text-emerald-600 tracking-wider block">
                   C01.6.2. Amenidades de Baño Compartido & C01.6.3. Baño Adaptado PMR
                 </span>
                 {renderAmenityCheckGrid(MASTER_AMENITIES.filter(a => a.code.startsWith("C01.6.2") || a.code.startsWith("C01.6.3")))}
@@ -2079,16 +2080,16 @@ export function AdminEstablecimientoNuevo() {
           {/* SECCIÓN 5: C02 SERVICIOS Y EXPERIENCIAS */}
           {/* ================================================================= */}
           {currentSection === 5 && (
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl animate-in fade-in">
-              <div className="flex items-center gap-3 pb-4 border-b border-slate-800">
+            <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 space-y-6 shadow-lg shadow-slate-100/80 animate-in fade-in">
+              <div className="flex items-center gap-3 pb-4 border-b border-slate-200">
                 <div className="w-10 h-10 rounded-2xl bg-[#FF0096]/15 text-[#FF0096] flex items-center justify-center font-black">
                   5
                 </div>
                 <div>
-                  <h2 className="text-lg font-black text-white font-serif">
+                  <h2 className="text-lg font-black text-slate-900 font-serif">
                     Sección 5: C02. Servicios y Experiencias
                   </h2>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500 font-medium">
                     Atención al cliente, idiomas, gastronomía, limpieza, conectividad y experiencias organizadas.
                   </p>
                 </div>
@@ -2103,7 +2104,7 @@ export function AdminEstablecimientoNuevo() {
               </div>
 
               {/* C02.2 Gastronomía y Alimentos */}
-              <div className="space-y-3 pt-4 border-t border-slate-800">
+              <div className="space-y-3 pt-4 border-t border-slate-200">
                 <span className="text-xs font-black uppercase text-[#FF0096] tracking-wider block">
                   C02.2. Gastronomía y Alimentos (Hostelería Interna)
                 </span>
@@ -2111,7 +2112,7 @@ export function AdminEstablecimientoNuevo() {
               </div>
 
               {/* C02.3 Mantenimiento y Limpieza */}
-              <div className="space-y-3 pt-4 border-t border-slate-800">
+              <div className="space-y-3 pt-4 border-t border-slate-200">
                 <span className="text-xs font-black uppercase text-[#9B00CC] tracking-wider block">
                   C02.3. Mantenimiento de Habitaciones y Limpieza de Ropa
                 </span>
@@ -2119,16 +2120,16 @@ export function AdminEstablecimientoNuevo() {
               </div>
 
               {/* C02.4 Conectividad y Movilidad */}
-              <div className="space-y-3 pt-4 border-t border-slate-800">
-                <span className="text-xs font-black uppercase text-cyan-400 tracking-wider block">
+              <div className="space-y-3 pt-4 border-t border-slate-200">
+                <span className="text-xs font-black uppercase text-cyan-600 tracking-wider block">
                   C02.4. Conectividad a Internet & Movilidad / Parking
                 </span>
                 {renderAmenityCheckGrid(MASTER_AMENITIES.filter(a => a.code.startsWith("C02.4")))}
 
                 {/* Precios de parking opcionales */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 bg-slate-800/40 p-4 rounded-2xl border border-slate-700">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 bg-slate-50/80 p-4 rounded-2xl border border-slate-200">
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">
+                    <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">
                       Precio Parking Cubierto (si es de pago)
                     </label>
                     <input
@@ -2136,11 +2137,11 @@ export function AdminEstablecimientoNuevo() {
                       placeholder="Ej: $10/día o Bs. 400"
                       value={parkingCoveredPrice}
                       onChange={(e) => setParkingCoveredPrice(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">
+                    <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">
                       Precio Parking Descubierto (si es de pago)
                     </label>
                     <input
@@ -2148,15 +2149,15 @@ export function AdminEstablecimientoNuevo() {
                       placeholder="Ej: $5/día o Bs. 200"
                       value={parkingUncoveredPrice}
                       onChange={(e) => setParkingUncoveredPrice(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
                 </div>
               </div>
 
               {/* C02.5 Actividades y Experiencias en Alrededores */}
-              <div className="space-y-3 pt-4 border-t border-slate-800">
-                <span className="text-xs font-black uppercase text-emerald-400 tracking-wider block">
+              <div className="space-y-3 pt-4 border-t border-slate-200">
+                <span className="text-xs font-black uppercase text-emerald-600 tracking-wider block">
                   C02.5. Actividades y Experiencias Organizadas en Alrededores
                 </span>
                 {renderAmenityCheckGrid(MASTER_AMENITIES.filter(a => a.code.startsWith("C02.5")))}
@@ -2168,16 +2169,16 @@ export function AdminEstablecimientoNuevo() {
           {/* SECCIÓN 6: C03 GESTIÓN, POLÍTICAS Y LOGÍSTICA */}
           {/* ================================================================= */}
           {currentSection === 6 && (
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl animate-in fade-in">
-              <div className="flex items-center gap-3 pb-4 border-b border-slate-800">
+            <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 space-y-6 shadow-lg shadow-slate-100/80 animate-in fade-in">
+              <div className="flex items-center gap-3 pb-4 border-b border-slate-200">
                 <div className="w-10 h-10 rounded-2xl bg-[#9B00CC]/15 text-[#9B00CC] flex items-center justify-center font-black">
                   6
                 </div>
                 <div>
-                  <h2 className="text-lg font-black text-white font-serif">
+                  <h2 className="text-lg font-black text-slate-900 font-serif">
                     Sección 6: C03. Gestión, Políticas y Logística
                   </h2>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500 font-medium">
                     Normas de la propiedad, accesibilidad, seguridad, pagos online y condiciones de reserva.
                   </p>
                 </div>
@@ -2192,73 +2193,73 @@ export function AdminEstablecimientoNuevo() {
               </div>
 
               {/* C03.2 Seguridad y Protección */}
-              <div className="space-y-3 pt-4 border-t border-slate-800">
-                <span className="text-xs font-black uppercase text-rose-400 tracking-wider block">
+              <div className="space-y-3 pt-4 border-t border-slate-200">
+                <span className="text-xs font-black uppercase text-rose-500 tracking-wider block">
                   C03.2. Seguridad y Protección
                 </span>
                 {renderAmenityCheckGrid(MASTER_AMENITIES.filter(a => a.code.startsWith("C03.2")))}
               </div>
 
               {/* C03.3 Políticas y Normas */}
-              <div className="space-y-4 pt-4 border-t border-slate-800">
+              <div className="space-y-4 pt-4 border-t border-slate-200">
                 <span className="text-xs font-black uppercase text-[#FF0096] tracking-wider block">
                   C03.3. Políticas y Normas de la Propiedad
                 </span>
 
                 {/* Horarios Check-in/out */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-800/40 p-4 rounded-2xl border border-slate-700">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50/80 p-4 rounded-2xl border border-slate-200">
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Horario Check-in</label>
+                    <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">Horario Check-in</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="time"
                         value={checkInFrom}
                         onChange={(e) => setCheckInFrom(e.target.value)}
-                        className="w-full px-2 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+                        className="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold shadow-xs"
                       />
-                      <span className="text-xs text-slate-400">a</span>
+                      <span className="text-xs text-slate-500">a</span>
                       <input
                         type="time"
                         value={checkInTo}
                         onChange={(e) => setCheckInTo(e.target.value)}
-                        className="w-full px-2 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+                        className="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold shadow-xs"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Horario Check-out</label>
+                    <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">Horario Check-out</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="time"
                         value={checkOutFrom}
                         onChange={(e) => setCheckOutFrom(e.target.value)}
-                        className="w-full px-2 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+                        className="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold shadow-xs"
                       />
-                      <span className="text-xs text-slate-400">a</span>
+                      <span className="text-xs text-slate-500">a</span>
                       <input
                         type="time"
                         value={checkOutTo}
                         onChange={(e) => setCheckOutTo(e.target.value)}
-                        className="w-full px-2 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+                        className="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold shadow-xs"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Late Check-out Hasta</label>
+                    <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">Late Check-out Hasta</label>
                     <input
                       type="time"
                       value={lateCheckOutTo}
                       onChange={(e) => setLateCheckOutTo(e.target.value)}
-                      className="w-full px-2 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+                      className="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
                 </div>
 
                 {/* Mascotas */}
-                <div className="bg-slate-800/40 p-4 rounded-2xl border border-slate-700 space-y-3">
-                  <span className="text-[11px] font-bold text-slate-300 block">C03.3.2. Política de Mascotas</span>
+                <div className="bg-slate-50/80 p-4 rounded-2xl border border-slate-200 space-y-3">
+                  <span className="text-[11px] font-bold text-slate-800 block">C03.3.2. Política de Mascotas</span>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {[
                       { id: "gratis", label: "Mascotas Gratis" },
@@ -2272,8 +2273,8 @@ export function AdminEstablecimientoNuevo() {
                         onClick={() => setPetPolicy(p.id)}
                         className={`p-2.5 rounded-xl border text-xs font-bold text-center cursor-pointer transition-all ${
                           petPolicy === p.id
-                            ? "bg-[#00C8D4]/20 border-[#00C8D4] text-white"
-                            : "bg-slate-900 border-slate-700 text-slate-400 hover:text-white"
+                            ? "bg-[#00C8D4]/10 border-[#00C8D4] text-[#00C8D4] font-bold shadow-xs"
+                            : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                         }`}
                       >
                         {p.label}
@@ -2283,13 +2284,13 @@ export function AdminEstablecimientoNuevo() {
 
                   {petPolicy === "suplemento" && (
                     <div className="pt-1 animate-in fade-in">
-                      <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Precio Suplemento Mascota</label>
+                      <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">Precio Suplemento Mascota</label>
                       <input
                         type="text"
                         placeholder="Ej: $15 por estancia o $5/noche"
                         value={petFeePrice}
                         onChange={(e) => setPetFeePrice(e.target.value)}
-                        className="w-full sm:w-60 px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+                        className="w-full sm:w-60 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold shadow-xs"
                       />
                     </div>
                   )}
@@ -2306,24 +2307,24 @@ export function AdminEstablecimientoNuevo() {
                 ))}
 
                 {/* Horario de silencio */}
-                <div className="bg-slate-800/40 p-4 rounded-2xl border border-slate-700 flex items-center justify-between flex-wrap gap-3">
-                  <span className="text-xs text-slate-300 font-bold">
+                <div className="bg-slate-50/80 p-4 rounded-2xl border border-slate-200 flex items-center justify-between flex-wrap gap-3">
+                  <span className="text-xs text-slate-800 font-bold">
                     C03.3.4.4. Minimizar ruido nocturno:
                   </span>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-400">De</span>
+                    <span className="text-xs text-slate-500">De</span>
                     <input
                       type="time"
                       value={quietHoursFrom}
                       onChange={(e) => setQuietHoursFrom(e.target.value)}
-                      className="px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+                      className="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold shadow-xs"
                     />
-                    <span className="text-xs text-slate-400">a</span>
+                    <span className="text-xs text-slate-500">a</span>
                     <input
                       type="time"
                       value={quietHoursTo}
                       onChange={(e) => setQuietHoursTo(e.target.value)}
-                      className="px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+                      className="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold shadow-xs"
                     />
                   </div>
                 </div>
@@ -2335,28 +2336,28 @@ export function AdminEstablecimientoNuevo() {
           {/* SECCIÓN 7 (ESPECIAL BOTÓN 2): CONFIGURACIÓN DE HABITACIONES */}
           {/* ================================================================= */}
           {activeButtonGroup === "boton2" && currentSection === 7 && (
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl animate-in fade-in">
-              <div className="flex items-center gap-3 pb-4 border-b border-slate-800">
+            <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 space-y-6 shadow-lg shadow-slate-100/80 animate-in fade-in">
+              <div className="flex items-center gap-3 pb-4 border-b border-slate-200">
                 <div className="w-10 h-10 rounded-2xl bg-[#FF0096]/15 text-[#FF0096] flex items-center justify-center font-black">
                   7
                 </div>
                 <div>
-                  <h2 className="text-lg font-black text-white font-serif">
+                  <h2 className="text-lg font-black text-slate-900 font-serif">
                     Sección 7: Configuración de las Habitaciones y Baños Privados
                   </h2>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500 font-medium">
                     Estructura informativa para mostrar al turista la distribución de la casa, apartamento o villa.
                   </p>
                 </div>
               </div>
 
               {/* Banner Informativo Obligatorio Doc 77 V.13 Oficial */}
-              <div className="bg-gradient-to-r from-[#0e011f] to-[#1a0533] border border-[#00C8D4]/40 p-4 rounded-2xl text-white text-xs leading-relaxed space-y-1">
+              <div className="bg-slate-50 border border-slate-200 p-4 rounded-2xl text-slate-800 text-xs leading-relaxed space-y-1">
                 <div className="flex items-center gap-2 font-bold text-[#00C8D4]">
                   <Info className="w-4 h-4" />
                   <span>Aviso Importante sobre Alquiler Completo</span>
                 </div>
-                <p className="text-slate-300 text-[11px]">
+                <p className="text-slate-600 text-[11px]">
                   La información solicitada en esta sección es meramente informativa para que el turista conozca la distribución y amenidades de cada estancia. En este tipo de propiedades se reserva el establecimiento completo, no por unidad operativa separada.
                 </p>
               </div>
@@ -2368,8 +2369,8 @@ export function AdminEstablecimientoNuevo() {
                   onClick={() => setRoomConfigMode("same")}
                   className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
                     roomConfigMode === "same"
-                      ? "bg-[#00C8D4]/15 border-[#00C8D4] text-white shadow-md ring-1 ring-[#00C8D4]"
-                      : "bg-slate-800/60 border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-white"
+                      ? "bg-[#00C8D4]/10 border-[#00C8D4] text-slate-900 shadow-xs ring-1 ring-[#00C8D4]"
+                      : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
                   }`}
                 >
                   <div className="flex items-center gap-2 mb-1.5">
@@ -2380,9 +2381,9 @@ export function AdminEstablecimientoNuevo() {
                       onChange={() => setRoomConfigMode("same")}
                       className="text-[#00C8D4]"
                     />
-                    <span className="font-bold text-xs text-white">Prefiero configurar todas las habitaciones con las mismas amenidades</span>
+                    <span className="font-bold text-xs text-slate-900">Prefiero configurar todas las habitaciones con las mismas amenidades</span>
                   </div>
-                  <p className="text-[11px] text-slate-400 pl-6">
+                  <p className="text-[11px] text-slate-500 pl-6">
                     Aplica una configuración homogénea de camas, tamaño y comodidades a todas las habitaciones.
                   </p>
                 </button>
@@ -2392,8 +2393,8 @@ export function AdminEstablecimientoNuevo() {
                   onClick={() => setRoomConfigMode("individual")}
                   className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
                     roomConfigMode === "individual"
-                      ? "bg-[#FF0096]/15 border-[#FF0096] text-white shadow-md ring-1 ring-[#FF0096]"
-                      : "bg-slate-800/60 border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-white"
+                      ? "bg-[#FF0096]/10 border-[#FF0096] text-slate-900 shadow-xs ring-1 ring-[#FF0096]"
+                      : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
                   }`}
                 >
                   <div className="flex items-center gap-2 mb-1.5">
@@ -2404,9 +2405,9 @@ export function AdminEstablecimientoNuevo() {
                       onChange={() => setRoomConfigMode("individual")}
                       className="text-[#FF0096]"
                     />
-                    <span className="font-bold text-xs text-white">Prefiero configurar individualmente cada habitación</span>
+                    <span className="font-bold text-xs text-slate-900">Prefiero configurar individualmente cada habitación</span>
                   </div>
-                  <p className="text-[11px] text-slate-400 pl-6">
+                  <p className="text-[11px] text-slate-500 pl-6">
                     Permite detallar habitación por habitación (Hab 1, Hab 2, etc.) con sus camas y baños compartidos/privados.
                   </p>
                 </button>
@@ -2414,105 +2415,105 @@ export function AdminEstablecimientoNuevo() {
 
               {/* MODO A: MISMAS AMENIDADES */}
               {roomConfigMode === "same" && (
-                <div className="space-y-5 bg-slate-800/40 p-5 rounded-2xl border border-slate-700 animate-in fade-in">
+                <div className="space-y-5 bg-slate-50/80 p-5 rounded-2xl border border-slate-200 animate-in fade-in">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-[11px] uppercase font-bold text-slate-300 mb-1">C01.2.1. Número de Habitaciones</label>
+                      <label className="block text-[11px] uppercase font-bold text-slate-700 mb-1">C01.2.1. Número de Habitaciones</label>
                       <input
                         type="number"
                         min="1"
                         value={unitCount}
                         onChange={(e) => setUnitCount(e.target.value)}
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white"
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] uppercase font-bold text-slate-300 mb-1">C01.6.1.1. Baños Privados</label>
+                      <label className="block text-[11px] uppercase font-bold text-slate-700 mb-1">C01.6.1.1. Baños Privados</label>
                       <input
                         type="number"
                         min="0"
                         value={globalPrivateBathCount}
                         onChange={(e) => setGlobalPrivateBathCount(e.target.value)}
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white"
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] uppercase font-bold text-slate-300 mb-1">C01.6.1.2. Baños Compartidos</label>
+                      <label className="block text-[11px] uppercase font-bold text-slate-700 mb-1">C01.6.1.2. Baños Compartidos</label>
                       <input
                         type="number"
                         min="0"
                         value={globalSharedBathCount}
                         onChange={(e) => setGlobalSharedBathCount(e.target.value)}
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white"
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                       />
                     </div>
                   </div>
 
                   {/* Camas Globales */}
-                  <div className="space-y-2 pt-2 border-t border-slate-700">
+                  <div className="space-y-2 pt-2 border-t border-slate-200">
                     <span className="text-xs font-bold text-[#00C8D4] block">
                       C01.3. Tamaño y Distribución de las Camas en las Habitaciones
                     </span>
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                       <div>
-                        <span className="text-[10px] text-slate-400 block mb-1">Tamaño m²</span>
+                        <span className="text-[10px] text-slate-600 font-bold block mb-1">Tamaño m²</span>
                         <input
                           type="number"
                           value={globalRoomSizeM2}
                           onChange={(e) => setGlobalRoomSizeM2(e.target.value)}
-                          className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold shadow-xs"
                         />
                       </div>
                       <div>
-                        <span className="text-[10px] text-slate-400 block mb-1">Indiv. 100 cm</span>
+                        <span className="text-[10px] text-slate-600 font-bold block mb-1">Indiv. 100 cm</span>
                         <input
                           type="number"
                           value={globalBedsSingle100}
                           onChange={(e) => setGlobalBedsSingle100(e.target.value)}
-                          className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold shadow-xs"
                         />
                       </div>
                       <div>
-                        <span className="text-[10px] text-slate-400 block mb-1">King 200 cm</span>
+                        <span className="text-[10px] text-slate-600 font-bold block mb-1">King 200 cm</span>
                         <input
                           type="number"
                           value={globalBedsDoubleKing200}
                           onChange={(e) => setGlobalBedsDoubleKing200(e.target.value)}
-                          className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold shadow-xs"
                         />
                       </div>
                       <div>
-                        <span className="text-[10px] text-slate-400 block mb-1">Queen 180 cm</span>
+                        <span className="text-[10px] text-slate-600 font-bold block mb-1">Queen 180 cm</span>
                         <input
                           type="number"
                           value={globalBedsDoubleQueen180}
                           onChange={(e) => setGlobalBedsDoubleQueen180(e.target.value)}
-                          className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold shadow-xs"
                         />
                       </div>
                       <div>
-                        <span className="text-[10px] text-slate-400 block mb-1">Full 150 cm</span>
+                        <span className="text-[10px] text-slate-600 font-bold block mb-1">Full 150 cm</span>
                         <input
                           type="number"
                           value={globalBedsDoubleFull150}
                           onChange={(e) => setGlobalBedsDoubleFull150(e.target.value)}
-                          className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold shadow-xs"
                         />
                       </div>
                       <div>
-                        <span className="text-[10px] text-slate-400 block mb-1">Literas</span>
+                        <span className="text-[10px] text-slate-600 font-bold block mb-1">Literas</span>
                         <input
                           type="number"
                           value={globalBunkBeds}
                           onChange={(e) => setGlobalBunkBeds(e.target.value)}
-                          className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold shadow-xs"
                         />
                       </div>
                     </div>
                   </div>
 
                   {/* C01.4 Equipamiento de la Habitación */}
-                  <div className="space-y-3 pt-3 border-t border-slate-700">
+                  <div className="space-y-3 pt-3 border-t border-slate-200">
                     <span className="text-xs font-bold text-[#FF0096] block">
                       C01.4. Equipamiento de la Unidad Privada
                     </span>
@@ -2525,7 +2526,7 @@ export function AdminEstablecimientoNuevo() {
               {roomConfigMode === "individual" && (
                 <div className="space-y-4 animate-in fade-in">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-300">
+                    <span className="text-xs font-bold text-slate-700">
                       Habitaciones Configurada(s): {customRooms.length}
                     </span>
                     <button
@@ -2543,20 +2544,20 @@ export function AdminEstablecimientoNuevo() {
                     {customRooms.map((r, idx) => (
                       <div
                         key={r.id}
-                        className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700 space-y-2.5 text-left relative"
+                        className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2.5 text-left relative"
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex items-center gap-2">
                             <span className="w-6 h-6 rounded-lg bg-[#FF0096]/20 text-[#FF0096] text-xs font-black flex items-center justify-center">
                               {idx + 1}
                             </span>
-                            <h4 className="text-sm font-bold text-white">{r.name}</h4>
+                            <h4 className="text-sm font-bold text-slate-900">{r.name}</h4>
                           </div>
                           <div className="flex items-center gap-1.5">
                             <button
                               type="button"
                               onClick={() => openEditRoomModal(r)}
-                              className="p-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300"
+                              className="p-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 cursor-pointer"
                               title="Editar"
                             >
                               <Edit3 className="w-3.5 h-3.5" />
@@ -2564,7 +2565,7 @@ export function AdminEstablecimientoNuevo() {
                             <button
                               type="button"
                               onClick={() => removeCustomRoom(r.id)}
-                              className="p-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-400"
+                              className="p-1.5 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-600 cursor-pointer"
                               title="Eliminar"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -2572,19 +2573,19 @@ export function AdminEstablecimientoNuevo() {
                           </div>
                         </div>
 
-                        <div className="text-[11px] text-slate-300 space-y-1">
+                        <div className="text-[11px] text-slate-700 space-y-1">
                           <div><strong>Superficie:</strong> {r.sizeM2 || "25"} m²</div>
                           <div>
                             <strong>Baño:</strong>{" "}
                             {r.bathType === "privado" ? (
                               <span className="text-[#00C8D4] font-semibold">Privado en suite</span>
                             ) : (
-                              <span className="text-amber-400 font-semibold">
+                              <span className="text-amber-600 font-semibold">
                                 Compartido {r.sharedWithRooms ? `(con ${r.sharedWithRooms})` : ""}
                               </span>
                             )}
                           </div>
-                          <div className="text-slate-400 text-[10px] pt-1">
+                          <div className="text-slate-500 text-[10px] pt-1">
                             {r.amenities.length} comodidades seleccionadas
                           </div>
                         </div>
@@ -2600,16 +2601,16 @@ export function AdminEstablecimientoNuevo() {
           {/* SECCIÓN 8 (ESPECIAL BOTÓN 2): CHALETS DE MONTAÑA / ESQUÍ */}
           {/* ================================================================= */}
           {activeButtonGroup === "boton2" && currentSection === 8 && (
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl animate-in fade-in">
-              <div className="flex items-center gap-3 pb-4 border-b border-slate-800">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center font-black">
+            <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 space-y-6 shadow-lg shadow-slate-100/80 animate-in fade-in">
+              <div className="flex items-center gap-3 pb-4 border-b border-slate-200">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-600 flex items-center justify-center font-black">
                   8
                 </div>
                 <div>
-                  <h2 className="text-lg font-black text-white font-serif">
+                  <h2 className="text-lg font-black text-slate-900 font-serif">
                     Sección 8: C04.4. Instalaciones Específicas para Chalets de Montaña / Esquí
                   </h2>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500 font-medium">
                     Equipamiento térmico, fondue/raclette, guardaesquís, hot tubs nórdicos y servicios de nieve.
                   </p>
                 </div>
@@ -2626,7 +2627,7 @@ export function AdminEstablecimientoNuevo() {
               </div>
 
               {/* Exteriores & Esquí */}
-              <div className="space-y-3 pt-4 border-t border-slate-800">
+              <div className="space-y-3 pt-4 border-t border-slate-200">
                 <span className="text-xs font-black uppercase text-[#FF0096] tracking-wider block">
                   C04.4.1.5. Exteriores & C04.4.1.6. Instalaciones de Esquí (Ski Room, Mudroom, Ski-in/Ski-out)
                 </span>
@@ -2636,8 +2637,8 @@ export function AdminEstablecimientoNuevo() {
               </div>
 
               {/* Servicios y Actividades de Montaña */}
-              <div className="space-y-3 pt-4 border-t border-slate-800">
-                <span className="text-xs font-black uppercase text-amber-400 tracking-wider block">
+              <div className="space-y-3 pt-4 border-t border-slate-200">
+                <span className="text-xs font-black uppercase text-amber-600 tracking-wider block">
                   C04.4.1.7. Servicios, Forfaits, Chef Privado & Actividades de Nieve
                 </span>
                 {renderAmenityCheckGrid(MASTER_AMENITIES.filter(a =>
@@ -2651,16 +2652,16 @@ export function AdminEstablecimientoNuevo() {
           {/* SECCIÓN 7 (ESPECIAL BOTÓN 4): AMENIDADES ESPECÍFICAS LOVE HOTELS */}
           {/* ================================================================= */}
           {activeButtonGroup === "boton4" && currentSection === 7 && (
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl animate-in fade-in">
-              <div className="flex items-center gap-3 pb-4 border-b border-slate-800">
+            <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 space-y-6 shadow-lg shadow-slate-100/80 animate-in fade-in">
+              <div className="flex items-center gap-3 pb-4 border-b border-slate-200">
                 <div className="w-10 h-10 rounded-2xl bg-[#FF0096]/15 text-[#FF0096] flex items-center justify-center font-black">
                   7
                 </div>
                 <div>
-                  <h2 className="text-lg font-black text-white font-serif">
+                  <h2 className="text-lg font-black text-slate-900 font-serif">
                     Sección 7: C04.3. Amenidades Específicas para LOVE HOTELS & MOTELES
                   </h2>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500 font-medium">
                     Mobiliario erótico, jacuzzis XL, ambientación LED, garajes con check-in en auto y privacidad total.
                   </p>
                 </div>
@@ -2675,7 +2676,7 @@ export function AdminEstablecimientoNuevo() {
               </div>
 
               {/* C04.3.2 Baño y Agua */}
-              <div className="space-y-3 pt-4 border-t border-slate-800">
+              <div className="space-y-3 pt-4 border-t border-slate-200">
                 <span className="text-xs font-black uppercase text-[#00C8D4] tracking-wider block">
                   C04.3.2. Baño Privado y Zona de Agua (Jacuzzis XL, Ducha de Cristal Vista)
                 </span>
@@ -2683,16 +2684,16 @@ export function AdminEstablecimientoNuevo() {
               </div>
 
               {/* C04.3.3 Climatización & LED */}
-              <div className="space-y-3 pt-4 border-t border-slate-800">
-                <span className="text-xs font-black uppercase text-purple-400 tracking-wider block">
+              <div className="space-y-3 pt-4 border-t border-slate-200">
+                <span className="text-xs font-black uppercase text-purple-600 tracking-wider block">
                   C04.3.3. Climatización Rápida & Ambientación LED por Colores
                 </span>
                 {renderAmenityCheckGrid(MASTER_AMENITIES.filter(a => a.code.startsWith("C04.3.3") || a.code.startsWith("C04.3.4")))}
               </div>
 
               {/* C04.3.6 Acceso y Privacidad */}
-              <div className="space-y-3 pt-4 border-t border-slate-800">
-                <span className="text-xs font-black uppercase text-amber-400 tracking-wider block">
+              <div className="space-y-3 pt-4 border-t border-slate-200">
+                <span className="text-xs font-black uppercase text-amber-600 tracking-wider block">
                   C04.3.6. Acceso, Garaje Privado con Puerta Automática, Torno Anónimo & Cobro 100% Discreto
                 </span>
                 {renderAmenityCheckGrid(MASTER_AMENITIES.filter(a =>
@@ -2708,16 +2709,16 @@ export function AdminEstablecimientoNuevo() {
           {((activeButtonGroup === "boton1" && currentSection === 7) ||
             (activeButtonGroup === "boton2" && currentSection === 9) ||
             (activeButtonGroup === "boton4" && currentSection === 8)) && (
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl animate-in fade-in">
-              <div className="flex items-center gap-3 pb-4 border-b border-slate-800">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center font-black">
+            <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 space-y-6 shadow-lg shadow-slate-100/80 animate-in fade-in">
+              <div className="flex items-center gap-3 pb-4 border-b border-slate-200">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-600 flex items-center justify-center font-black">
                   {currentSection}
                 </div>
                 <div>
-                  <h2 className="text-lg font-black text-white font-serif">
+                  <h2 className="text-lg font-black text-slate-900 font-serif">
                     Sección {currentSection}: C00.5. Lugares de Interés Dinámicos & Galería Fotográfica
                   </h2>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500 font-medium">
                     Puntos de interés cercanos informados por el propietario y fotos destacadas para la ficha.
                   </p>
                 </div>
@@ -2729,16 +2730,16 @@ export function AdminEstablecimientoNuevo() {
                   C00.5. Lugares de Interés en los Alrededores
                 </span>
 
-                <div className="bg-slate-800/60 p-4 rounded-2xl border border-slate-700 space-y-3">
+                <div className="bg-slate-50/80 p-4 rounded-2xl border border-slate-200 space-y-3">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">
+                      <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">
                         C00.5.1. Tipo de Lugar *
                       </label>
                       <select
                         value={newPoiCat}
                         onChange={(e) => setNewPoiCat(e.target.value)}
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white cursor-pointer"
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold cursor-pointer shadow-xs"
                       >
                         {POI_TYPES_V10.map(pt => (
                           <option key={pt.code} value={pt.code}>{pt.label}</option>
@@ -2747,7 +2748,7 @@ export function AdminEstablecimientoNuevo() {
                     </div>
 
                     <div>
-                      <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">
+                      <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">
                         C00.5.2. Nombre del Lugar *
                       </label>
                       <input
@@ -2755,12 +2756,12 @@ export function AdminEstablecimientoNuevo() {
                         placeholder="Ej: Playa El Yaque / Parque Nacional"
                         value={newPoiName}
                         onChange={(e) => setNewPoiName(e.target.value)}
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white"
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">
+                      <label className="block text-[10px] uppercase font-bold text-slate-700 mb-1">
                         C00.5.3. Distancia (m, km) / Tiempo
                       </label>
                       <div className="flex items-center gap-2">
@@ -2769,12 +2770,12 @@ export function AdminEstablecimientoNuevo() {
                           placeholder="Ej: 300 m o 5 min a pie"
                           value={newPoiDistance}
                           onChange={(e) => setNewPoiDistance(e.target.value)}
-                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white"
+                          className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                         />
                         <button
                           type="button"
                           onClick={addPoi}
-                          className="px-4 py-2 rounded-xl text-xs font-bold text-white shrink-0 cursor-pointer"
+                          className="px-4 py-2 rounded-xl text-xs font-bold text-white shrink-0 cursor-pointer shadow-sm"
                           style={{ background: "linear-gradient(135deg, #00C8D4 0%, #0098A6 100%)" }}
                         >
                           + Añadir
@@ -2786,7 +2787,7 @@ export function AdminEstablecimientoNuevo() {
                   {/* Lista de Puntos de Interés Añadidos */}
                   {pointsOfInterest.length > 0 && (
                     <div className="pt-2 space-y-2">
-                      <span className="text-[10px] font-bold uppercase text-slate-400 block">
+                      <span className="text-[10px] font-bold uppercase text-slate-600 block">
                         Lugares Registrados ({pointsOfInterest.length}):
                       </span>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -2795,13 +2796,13 @@ export function AdminEstablecimientoNuevo() {
                           return (
                             <div
                               key={poi.id}
-                              className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900 border border-slate-750 text-xs text-slate-200"
+                              className="flex items-center justify-between p-2.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-800 shadow-xs"
                             >
                               <div className="flex items-center gap-2 min-w-0">
                                 <MapPin className="w-3.5 h-3.5 text-[#00C8D4] shrink-0" />
                                 <div className="truncate">
-                                  <span className="font-bold text-white">{poi.name}</span>
-                                  <span className="text-[10px] text-slate-400 block truncate">
+                                  <span className="font-bold text-slate-900">{poi.name}</span>
+                                  <span className="text-[10px] text-slate-500 block truncate">
                                     {poiTypeObj?.label || poi.category} • {poi.distance}
                                   </span>
                                 </div>
@@ -2809,7 +2810,7 @@ export function AdminEstablecimientoNuevo() {
                               <button
                                 type="button"
                                 onClick={() => removePoi(poi.id)}
-                                className="p-1 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 cursor-pointer"
+                                className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
@@ -2823,7 +2824,7 @@ export function AdminEstablecimientoNuevo() {
               </div>
 
               {/* Galería de Fotos */}
-              <div className="space-y-4 pt-4 border-t border-slate-800">
+              <div className="space-y-4 pt-4 border-t border-slate-200">
                 <span className="text-xs font-black uppercase text-[#FF0096] tracking-wider block">
                   Galería de Fotos del Establecimiento
                 </span>
@@ -2834,12 +2835,12 @@ export function AdminEstablecimientoNuevo() {
                     placeholder="Pega la URL de una foto (https://...)"
                     value={photoUrl}
                     onChange={(e) => setPhotoUrl(e.target.value)}
-                    className="flex-1 px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
+                    className="flex-1 px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold shadow-xs"
                   />
                   <button
                     type="button"
                     onClick={addPhoto}
-                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-[#FF0096] hover:bg-[#e00084] cursor-pointer"
+                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-[#FF0096] hover:bg-[#e00084] cursor-pointer shadow-sm"
                   >
                     + Agregar Foto
                   </button>
@@ -2851,15 +2852,15 @@ export function AdminEstablecimientoNuevo() {
                       <div
                         key={idx}
                         className={`relative rounded-2xl overflow-hidden border aspect-video group ${
-                          p.isPrimary ? "border-[#00C8D4] ring-2 ring-[#00C8D4]" : "border-slate-700"
+                          p.isPrimary ? "border-[#00C8D4] ring-2 ring-[#00C8D4]" : "border-slate-200"
                         }`}
                       >
                         <img src={p.url} alt="Hotel" className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 p-2">
+                        <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 p-2">
                           <button
                             type="button"
                             onClick={() => setPrimaryPhoto(idx)}
-                            className="px-2 py-1 rounded bg-[#00C8D4] text-[#0e011f] text-[10px] font-bold"
+                            className="px-2 py-1 rounded bg-[#00C8D4] text-slate-900 text-[10px] font-bold"
                           >
                             {p.isPrimary ? "Principal" : "Hacer Principal"}
                           </button>
@@ -2872,7 +2873,7 @@ export function AdminEstablecimientoNuevo() {
                           </button>
                         </div>
                         {p.isPrimary && (
-                          <span className="absolute top-2 left-2 bg-[#00C8D4] text-[#0e011f] text-[9px] font-black uppercase px-2 py-0.5 rounded-full shadow">
+                          <span className="absolute top-2 left-2 bg-[#00C8D4] text-slate-900 text-[9px] font-black uppercase px-2 py-0.5 rounded-full shadow">
                             Portada
                           </span>
                         )}
@@ -2885,12 +2886,12 @@ export function AdminEstablecimientoNuevo() {
           )}
 
           {/* BARRA DE NAVEGACIÓN Y ACCIÓN INFERIOR */}
-          <div className="flex items-center justify-between gap-4 bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl flex-wrap">
+          <div className="flex items-center justify-between gap-4 bg-white border border-slate-200 p-5 rounded-3xl shadow-lg flex-wrap">
             <button
               type="button"
               disabled={currentSection === 1}
               onClick={() => setCurrentSection(prev => Math.max(1, prev - 1))}
-              className="px-5 py-2.5 rounded-xl text-xs font-bold text-slate-300 bg-slate-800 hover:bg-slate-750 disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
+              className="px-5 py-2.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer transition-all"
             >
               <ChevronLeft className="w-4 h-4" />
               <span>Sección Anterior</span>
