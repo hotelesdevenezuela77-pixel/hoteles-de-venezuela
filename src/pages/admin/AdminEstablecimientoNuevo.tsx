@@ -1099,7 +1099,7 @@ export function AdminEstablecimientoNuevo() {
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-[10px] font-black uppercase tracking-widest text-[#00C8D4] bg-[#00C8D4]/15 border border-[#00C8D4]/30 px-2.5 py-0.5 rounded-full flex items-center gap-1">
                   <Sparkles className="w-3 h-3" />
-                  Doc 77 V.10 Oficial
+                  Doc 77 V.13 Oficial
                 </span>
                 <span className="text-xs font-black uppercase px-2.5 py-0.5 rounded-full text-white"
                   style={{
@@ -1317,13 +1317,13 @@ export function AdminEstablecimientoNuevo() {
               {/* Sub-bloque: Ubicación Desglosada con 85+ Tipos de Vía */}
               <div className="space-y-4 pt-4 border-t border-slate-800">
                 <span className="text-xs font-black uppercase text-[#FF0096] tracking-wider block">
-                  Ubicación & Dirección de la Propiedad (Doc 77 V.10)
+                  Ubicación & Dirección de la Propiedad (Doc 77 V.13 Oficial)
                 </span>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                   <div className="col-span-2 sm:col-span-1">
                     <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">
-                      Tipo de Vía (Doc 77 V10) *
+                      Tipo de Vía (Doc 77 V.13 Oficial) *
                     </label>
                     <select
                       value={roadType}
@@ -2350,7 +2350,7 @@ export function AdminEstablecimientoNuevo() {
                 </div>
               </div>
 
-              {/* Banner Informativo Obligatorio Doc 77 V.10 */}
+              {/* Banner Informativo Obligatorio Doc 77 V.13 Oficial */}
               <div className="bg-gradient-to-r from-[#0e011f] to-[#1a0533] border border-[#00C8D4]/40 p-4 rounded-2xl text-white text-xs leading-relaxed space-y-1">
                 <div className="flex items-center gap-2 font-bold text-[#00C8D4]">
                   <Info className="w-4 h-4" />
@@ -2915,7 +2915,7 @@ export function AdminEstablecimientoNuevo() {
                   style={{ background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)" }}
                 >
                   {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-                  <span>{editId ? "Guardar Cambios Doc 77 V.10" : "Finalizar y Registrar Establecimiento"}</span>
+                  <span>{editId ? "Guardar Cambios Doc 77 V.13 Oficial" : "Finalizar y Registrar Establecimiento"}</span>
                 </button>
               )}
             </div>

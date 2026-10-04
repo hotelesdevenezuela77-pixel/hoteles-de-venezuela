@@ -185,6 +185,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         { label: "Resumen", href: "/admin", icon: LayoutDashboard },
         { label: "Dashboards Alfa HDV", href: "/admin/dashboards-alfa", icon: Layers },
         { label: "Establecimientos", href: "/admin/establecimientos", icon: Building2 },
+        { label: "Pre-Registro V13 (Ficha Pública)", href: "/pre-registro", icon: Sparkles },
         { label: "Asistencia Propietario", href: "/admin/asistencia", icon: HelpCircle },
         { label: "Aprobaciones", href: "/admin/aprobaciones", icon: ShieldCheck },
         { label: "Reservas de Hoteles", href: "/admin/reservas", icon: Calendar },
