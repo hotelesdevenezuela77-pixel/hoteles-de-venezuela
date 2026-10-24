@@ -323,9 +323,9 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   // Si el usuario no es Super-Admin pero es un Propietario / Usuario autenticado en la ruta de registro/edición de propiedad
   if (isMasterAdmin === false && user && isOwnerAccessibleAdminRoute) {
     return (
-      <div className="min-h-screen bg-[#0e011f] text-white font-sans selection:bg-[#FF0096] selection:text-white">
+      <div className="h-screen h-[100dvh] max-h-screen w-full bg-[#0e011f] text-white font-sans selection:bg-[#FF0096] selection:text-white flex flex-col overflow-hidden">
         {/* Cabecera corporativa para Propietarios */}
-        <header className="h-16 bg-[#1a0533]/80 backdrop-blur-md border-b border-[#00C8D4]/30 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-40">
+        <header className="h-16 bg-[#1a0533]/90 backdrop-blur-md border-b border-[#00C8D4]/30 px-4 sm:px-6 flex items-center justify-between shrink-0 z-40 shadow-md">
           <div className="flex items-center gap-3">
             <Link
               href="/owner-dashboard"
@@ -346,7 +346,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             </span>
           </div>
         </header>
-        <main className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+        <main className="flex-1 h-full overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full custom-admin-scrollbar overscroll-contain">
           {children}
         </main>
       </div>

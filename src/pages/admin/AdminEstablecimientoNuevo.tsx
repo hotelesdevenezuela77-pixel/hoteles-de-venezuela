@@ -866,7 +866,7 @@ export function AdminEstablecimientoNuevo() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans py-8 px-4 sm:px-6 relative">
+    <div className="w-full text-slate-800 font-sans pb-16 relative">
       
       {/* Modal Selector de Tipo de Propiedad (Los 6 Botones) */}
       <PropertyRegistrationSelectorModal

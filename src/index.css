@@ -266,22 +266,25 @@
 
 /* Custom sleek scrollbar for Admin Layout (Left Menu & Right Content independent scroll) */
 .custom-admin-scrollbar::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 9px;
+  height: 9px;
 }
 .custom-admin-scrollbar::-webkit-scrollbar-track {
-  background: rgba(14, 1, 31, 0.4);
-}
-.custom-admin-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(14, 1, 31, 0.7);
   border-radius: 9999px;
 }
+.custom-admin-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 200, 212, 0.5);
+  border-radius: 9999px;
+  border: 2px solid rgba(14, 1, 31, 0.7);
+}
 .custom-admin-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 200, 212, 0.6);
+  background: #00C8D4;
+  box-shadow: 0 0 10px rgba(0, 200, 212, 0.8);
 }
 .custom-admin-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.2) rgba(14, 1, 31, 0.4);
+  scrollbar-color: rgba(0, 200, 212, 0.6) rgba(14, 1, 31, 0.7);
 }
 
 /* Animated Priority WhatsApp Button Blinking Effect */
