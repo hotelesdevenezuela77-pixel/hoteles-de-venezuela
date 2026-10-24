@@ -454,10 +454,22 @@ export const APARTO_SERVICES = [
   }
 ];
 
-export const APARTO_REVIEWS = [
+export interface ApartoReviewItem {
+  name: string;
+  role: string;
+  location: string;
+  avatar: string;
+  rating: number;
+  date: string;
+  verified: boolean;
+  content: string;
+}
+
+export const APARTO_REVIEWS: ApartoReviewItem[] = [
   {
     name: "Alejandro Mendoza",
     role: "Local Guide • 42 opiniones en Google",
+    location: "Caracas, Venezuela",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop",
     rating: 5,
     date: "Hace 2 semanas",
@@ -467,6 +479,7 @@ export const APARTO_REVIEWS = [
   {
     name: "Valentina Rivas de Colmenares",
     role: "Huésped Verificada • Google Business",
+    location: "Valencia, Venezuela",
     avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop",
     rating: 5,
     date: "Hace 1 mes",
@@ -476,11 +489,32 @@ export const APARTO_REVIEWS = [
   {
     name: "Ing. Carlos Eduardo Gómez",
     role: "Local Guide • 34 opiniones",
+    location: "Barquisimeto, Venezuela",
     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop",
     rating: 5,
     date: "Hace 1 mes",
     verified: true,
-    content: "El mejor punto para descansar en Morrocoy si buscas tranquilidad y seguridad. Estacionamiento cerrado cerrado dentro de la posada, suministro de agua que garantiza presión continua y atención directa por WhatsApp sin comisiones abusivas de agencias."
+    content: "El mejor punto para descansar en Morrocoy si buscas tranquilidad y seguridad. Estacionamiento cerrado dentro de la posada, suministro de agua que garantiza presión continua y atención directa por WhatsApp sin comisiones abusivas de agencias."
+  },
+  {
+    name: "Dra. Mariana Salazar",
+    role: "Huésped Verificada • Estadía Familiar",
+    location: "Maracay, Venezuela",
+    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop",
+    rating: 5,
+    date: "Hace 3 semanas",
+    verified: true,
+    content: "Alquilamos un apartamento completo para 5 personas y superó nuestras expectativas. La cocina tiene nevera grande y todo para preparar desayunos y cenas frescas. La seguridad privada y el ambiente familiar nos dieron total paz mental."
+  },
+  {
+    name: "Roberto & Patricia Betancourt",
+    role: "Pareja VIP • Google Reviews",
+    location: "Caracas, Venezuela",
+    avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150&auto=format&fit=crop",
+    rating: 5,
+    date: "Hace 2 meses",
+    verified: true,
+    content: "Celebramos nuestro aniversario en Aparto Posada del Mar. La iluminación nocturna de la piscina es un espectáculo, camas comodísimas con aire split silencioso y la atención cálida hace que te sientas como en casa propia en la playa."
   }
 ];
 

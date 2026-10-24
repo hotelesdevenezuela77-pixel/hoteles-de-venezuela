@@ -6,30 +6,30 @@ export function FaqAccordion() {
   const [openIndex, setOpenIndex] = useState<number | null>(0); // First item open by default
 
   const toggleIndex = (idx: number) => {
-    setOpenIndex(prev => (prev === idx ? null : idx));
+    setOpenIndex((prev) => (prev === idx ? null : idx));
   };
 
   return (
-    <section id="faq" className="py-20 md:py-28 bg-slate-50/70 border-y border-slate-200/80 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto space-y-12">
+    <section id="faq" className="py-20 md:py-28 bg-white border-y border-slate-200/80 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto space-y-14">
         
-        {/* Encabezado */}
+        {/* Encabezado Editorial Boutique */}
         <div className="text-center space-y-4 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FF0096]/10 border border-[#FF0096]/30 text-[#FF0096] text-[11px] font-extrabold tracking-[0.25em] uppercase font-['Plus_Jakarta_Sans',sans-serif]">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00C8D4]/10 border border-[#00C8D4]/30 text-[#009da7] text-[11px] font-extrabold tracking-[0.25em] uppercase font-['Plus_Jakarta_Sans',sans-serif]">
             <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
-            RESOLVEMOS TUS DUDAS
+            CLARIDAD & ATENCIÓN DIRECTA
           </div>
 
-          <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight font-['Plus_Jakarta_Sans',sans-serif]">
+          <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight font-serif">
             Preguntas Frecuentes
           </h2>
 
-          <p className="text-slate-600 text-sm sm:text-base font-normal font-['Inter',sans-serif]">
-            Todo lo que necesitas conocer antes de confirmar tu reserva en Aparto Posada del Mar.
+          <p className="text-slate-600 text-sm sm:text-base font-normal font-['Inter',sans-serif] leading-relaxed">
+            Todo lo que necesita conocer para planificar su estancia perfecta en Aparto Posada del Mar.
           </p>
         </div>
 
-        {/* Lista de Acordeón */}
+        {/* Lista de Acordeón Limpia y Organizada con Estilo Hotel Boutique */}
         <div className="space-y-4">
           {APARTO_FAQS.map((faq, idx) => {
             const isOpen = openIndex === idx;
@@ -37,38 +37,48 @@ export function FaqAccordion() {
             return (
               <div
                 key={idx}
-                className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 overflow-hidden shadow-xs transition-all duration-300"
+                className={`rounded-2xl sm:rounded-3xl border transition-all duration-300 overflow-hidden ${
+                  isOpen
+                    ? "bg-slate-50/80 border-[#00C8D4]/50 shadow-md ring-1 ring-[#00C8D4]/20"
+                    : "bg-white border-slate-200/80 hover:border-slate-300 hover:bg-slate-50/40 shadow-xs"
+                }`}
               >
                 <button
                   type="button"
                   onClick={() => toggleIndex(idx)}
-                  className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 cursor-pointer hover:bg-slate-50/80 transition-colors"
+                  className="w-full p-5 sm:p-7 text-left flex items-center justify-between gap-4 cursor-pointer transition-colors"
                   aria-expanded={isOpen}
                 >
-                  <div className="flex items-center gap-3.5">
+                  <div className="flex items-center gap-4">
+                    {/* Icono de Trazo Fino Minimalista */}
                     <div
-                      className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
-                        isOpen ? "bg-[#00C8D4] text-white" : "bg-slate-100 text-slate-500"
+                      className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+                        isOpen
+                          ? "bg-[#00C8D4] text-white shadow-sm"
+                          : "bg-slate-100 text-slate-600"
                       }`}
                     >
-                      <HelpCircle className="w-4 h-4 stroke-[2.2]" />
+                      <HelpCircle className="w-4.5 h-4.5 stroke-[1.5]" />
                     </div>
-                    <span className="text-base sm:text-lg font-bold text-slate-900 font-['Plus_Jakarta_Sans',sans-serif] tracking-tight">
+
+                    <span className="text-base sm:text-lg font-bold text-slate-900 font-serif tracking-tight">
                       {faq.question}
                     </span>
                   </div>
 
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-transform duration-300 ${
-                      isOpen ? "rotate-180 bg-[#FF0096]/10 text-[#FF0096]" : "bg-slate-100 text-slate-400"
+                      isOpen
+                        ? "rotate-180 bg-[#00C8D4]/15 text-[#008d96]"
+                        : "bg-slate-100 text-slate-400"
                     }`}
                   >
-                    <ChevronDown className="w-4 h-4 stroke-[2.5]" />
+                    <ChevronDown className="w-4 h-4 stroke-[2]" />
                   </div>
                 </button>
 
                 {isOpen && (
-                  <div className="px-5 sm:px-6 pb-6 pt-1 text-slate-600 text-xs sm:text-sm leading-relaxed font-['Inter',sans-serif] border-t border-slate-100/80 animate-fade-in">
+                  <div className="px-5 sm:px-7 pb-7 pt-1 text-slate-600 text-xs sm:text-sm leading-relaxed font-['Inter',sans-serif] border-t border-slate-200/60 animate-fade-in pl-18">
                     <p className="pt-2">{faq.answer}</p>
                   </div>
                 )}

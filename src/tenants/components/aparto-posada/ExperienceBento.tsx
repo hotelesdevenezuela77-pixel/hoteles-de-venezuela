@@ -1,6 +1,7 @@
 import React from "react";
-import { Compass, Waves, Zap, Sparkles, ArrowUpRight, Camera, Maximize2, Eye } from "lucide-react";
+import { Compass, Waves, Zap, Sparkles, ArrowUpRight, Camera, Maximize2, Eye, ShieldCheck, HeartHandshake } from "lucide-react";
 import { APARTO_DIFFERENTIALS, APARTO_BENTO_TILES } from "../../lib/apartoPosadaData";
+import { LuxuryHeroCarousel } from "./LuxuryHeroCarousel";
 
 interface ExperienceBentoProps {
   onOpenImage?: (imgUrl: string, caption: string) => void;
@@ -8,10 +9,10 @@ interface ExperienceBentoProps {
 
 export function ExperienceBento({ onOpenImage }: ExperienceBentoProps) {
   return (
-    <section id="experiencia" className="py-20 md:py-28 bg-slate-50/70 border-b border-slate-200/80 px-4 sm:px-6 lg:px-8">
+    <section id="experiencia" className="py-16 md:py-24 bg-white border-b border-slate-200/80 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-16">
         
-        {/* Encabezado de Storytelling de Alto Impacto con Logo Oficial */}
+        {/* Encabezado de Storytelling de Alto Impacto con Logo Oficial (INTOCABLE) */}
         <div className="text-center space-y-5 max-w-3xl mx-auto flex flex-col items-center">
           <div className="relative group">
             <div className="absolute -inset-3 bg-gradient-to-r from-[#00C8D4]/25 via-[#FF0096]/20 to-[#9B00CC]/25 rounded-full blur-xl opacity-75 group-hover:opacity-100 transition duration-500 pointer-events-none"></div>
@@ -42,29 +43,30 @@ export function ExperienceBento({ onOpenImage }: ExperienceBentoProps) {
           </p>
         </div>
 
-        {/* 3 Valores Diferenciales */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* ── NUEVO COMPONENTE: CARRUSEL DE IMÁGENES ANIMADO (ALTA GAMA) ── */}
+        <LuxuryHeroCarousel onOpenImage={onOpenImage} />
+
+        {/* 3 Pilares de Hospitalidad Boutique con Iconos Minimalistas de Trazo Fino */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
           {APARTO_DIFFERENTIALS.map((item, idx) => {
             const IconComp = item.icon;
             return (
               <div
                 key={idx}
-                className="bg-white rounded-3xl p-7 border border-slate-200/90 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1"
+                className="bg-slate-50/70 rounded-3xl p-8 border border-slate-200/80 shadow-xs hover:shadow-xl hover:bg-white hover:border-[#00C8D4]/40 transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1"
               >
-                <div className="space-y-4">
+                <div className="space-y-5">
                   <div className="flex items-center justify-between">
-                    <div
-                      className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-md group-hover:scale-110 transition-transform"
-                      style={{ backgroundColor: item.solidBg }}
-                    >
-                      <IconComp className="w-6 h-6 text-white stroke-[2.2]" />
+                    {/* Icono minimalista de trazo fino */}
+                    <div className="w-13 h-13 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex items-center justify-center text-slate-800 group-hover:text-[#00C8D4] group-hover:border-[#00C8D4]/30 transition-all">
+                      <IconComp className="w-6 h-6 stroke-[1.5]" />
                     </div>
                     <span className="text-xs font-black tracking-widest text-slate-300 font-mono">
                       {item.number}
                     </span>
                   </div>
 
-                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight font-['Plus_Jakarta_Sans',sans-serif] group-hover:text-[#00C8D4] transition-colors">
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight font-serif group-hover:text-[#00C8D4] transition-colors">
                     {item.title}
                   </h3>
 
@@ -73,9 +75,9 @@ export function ExperienceBento({ onOpenImage }: ExperienceBentoProps) {
                   </p>
                 </div>
 
-                <div className="pt-4 mt-4 border-t border-slate-100 flex items-center gap-1.5 text-xs font-bold text-slate-400 group-hover:text-slate-900 transition-colors">
-                  <span className="font-['Plus_Jakarta_Sans',sans-serif] tracking-wider uppercase text-[10px]">Garantía Certificada</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 text-[#00C8D4]" />
+                <div className="pt-5 mt-6 border-t border-slate-200/60 flex items-center justify-between text-xs font-bold text-slate-400 group-hover:text-slate-900 transition-colors">
+                  <span className="font-['Plus_Jakarta_Sans',sans-serif] tracking-wider uppercase text-[10px]">Estándar de Calidad</span>
+                  <ArrowUpRight className="w-4 h-4 text-[#00C8D4]" />
                 </div>
               </div>
             );
