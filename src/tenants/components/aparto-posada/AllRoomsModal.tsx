@@ -47,13 +47,13 @@ export function AllRoomsModal({
         onClick={e => e.stopPropagation()}
       >
         {/* Header Modal */}
-        <div className="p-5 sm:p-6 bg-slate-900 text-white flex items-center justify-between shrink-0">
+        <div className="p-5 sm:p-6 bg-gradient-to-r from-[#0e011f] to-[#1a0533] text-white flex items-center justify-between shrink-0 border-b border-white/10">
           <div>
             <div className="flex items-center gap-2 text-[#00C8D4] text-xs font-bold uppercase tracking-wider">
-              <Layers className="w-4 h-4" />
+              <Layers className="w-4 h-4 text-[#00C8D4]" />
               <span>Inventario Completo de Alojamiento</span>
             </div>
-            <h3 className="text-xl sm:text-2xl font-black font-['Plus_Jakarta_Sans',sans-serif]">
+            <h3 className="text-xl sm:text-2xl font-black font-['Plus_Jakarta_Sans',sans-serif] text-white">
               Catálogo de Unidades • {hotelName}
             </h3>
           </div>
@@ -114,28 +114,29 @@ export function AllRoomsModal({
               return (
                 <div
                   key={room.id}
-                  className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
+                  className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl transition-all flex flex-col justify-between group hover:-translate-y-1"
                 >
                   <div>
-                    <div className="relative h-44 bg-slate-900">
+                    <div className="relative h-48 bg-slate-100 overflow-hidden">
                       <img
                         src={room.primary_image || room.cover_image}
                         alt={room.nombre || room.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover filter brightness-[1.02] contrast-[1.02] group-hover:scale-105 transition-transform duration-500"
                       />
-                      <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#00C8D4]">
+                      <span className="absolute top-2.5 left-2.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider text-slate-900 bg-white/95 backdrop-blur-md shadow-md border border-white/80">
                         {room.capacityText}
                       </span>
-                      <span className="absolute bottom-2 right-2 px-2.5 py-1 rounded-xl text-xs font-black text-white bg-slate-950/85">
-                        ${price} USD
-                      </span>
+                      <div className="absolute bottom-2.5 right-2.5 px-3 py-1 rounded-xl text-xs font-black text-slate-900 bg-white/95 backdrop-blur-md shadow-md border border-white/80 flex items-baseline gap-1">
+                        <span>${price}</span>
+                        <span className="text-[10px] font-bold text-[#FF0096]">USD</span>
+                      </div>
                     </div>
 
                     <div className="p-4 space-y-2">
-                      <h4 className="font-extrabold text-sm text-slate-900 font-['Plus_Jakarta_Sans',sans-serif]">
+                      <h4 className="font-black text-base text-slate-900 font-['Plus_Jakarta_Sans',sans-serif] group-hover:text-[#00C8D4] transition-colors">
                         {room.nombre || room.name}
                       </h4>
-                      <p className="text-xs text-slate-500 line-clamp-2">
+                      <p className="text-xs text-slate-600 line-clamp-2">
                         {room.description}
                       </p>
                     </div>
@@ -146,15 +147,16 @@ export function AllRoomsModal({
                       href={waUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#20ba59] hover:to-[#0f7a6e] text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:shadow-md transition-all"
                     >
-                      <MessageCircle className="w-3.5 h-3.5" />
+                      <MessageCircle className="w-3.5 h-3.5 fill-white" />
                       <span>Cotizar</span>
                     </a>
                     <button
                       type="button"
                       onClick={() => { onClose(); onOpenDetail(room); }}
-                      className="py-2 px-3 rounded-xl border border-slate-200 hover:border-slate-800 text-slate-700 text-xs font-bold cursor-pointer"
+                      className="py-2.5 px-3 rounded-xl bg-white hover:bg-[#00C8D4] text-[#00C8D4] hover:text-white border border-[#00C8D4]/40 font-bold text-xs cursor-pointer transition-all flex items-center justify-center"
+                      title="Ver detalles"
                     >
                       <Eye className="w-3.5 h-3.5" />
                     </button>
