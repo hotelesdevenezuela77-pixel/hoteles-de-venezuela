@@ -14,6 +14,14 @@ import { OLEAJE_CATEGORIES, OLEAJE_MENU_ITEMS, OLEAJE_ZONES, type OleajeDish, ty
 import { PERLA_NEGRA_ROOMS, PERLA_NEGRA_ROOM_TYPES } from "./lib/perlaNegraData";
 import { MY_CAMPERS_ROOMS } from "./lib/myCampersData";
 import { POSModule } from "./templates/components/POSModule";
+import { TrustBar } from "./components/aparto-posada/TrustBar";
+import { ExperienceBento } from "./components/aparto-posada/ExperienceBento";
+import { RoomsExplorer } from "./components/aparto-posada/RoomsExplorer";
+import { AllRoomsModal } from "./components/aparto-posada/AllRoomsModal";
+import { ServicesGrid } from "./components/aparto-posada/ServicesGrid";
+import { SocialProof } from "./components/aparto-posada/SocialProof";
+import { FaqAccordion } from "./components/aparto-posada/FaqAccordion";
+import { LocationSection } from "./components/aparto-posada/LocationSection";
 
 interface SaaSTenantLandingPageProps {
   config: TenantConfig;
@@ -93,6 +101,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
   const isApartoPosada = (config.slug && config.slug.toLowerCase().includes("aparto-posada")) || config.establishment_id === 2 || (config.name && config.name.toLowerCase().includes("aparto posada")) || (config.domain && config.domain.toLowerCase().includes("apartoposadadelmar"));
   const [activeMenuCategory, setActiveMenuCategory] = useState<string>("all");
   const [orderCart, setOrderCart] = useState<{ dish: OleajeDish; count: number }[]>([]);
+  const [isAllRoomsModalOpen, setIsAllRoomsModalOpen] = useState<boolean>(false);
 
   // ── ESTADOS DEL FILTRO DE TRES NIVELES (ESTILO HOTELES DE VENEZUELA) ──
   const [filterRoomType, setFilterRoomType] = useState<string>("all");
@@ -798,7 +807,9 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               {isMyCampers ? "DONDE EL SILENCIO SE VUELVE MÚSICA • CUBIRO, LARA" : isPerlaNegra ? "BIENVENIDOS A MORROCOY • POSADA PERLA NEGRA" : "EL PARAÍSO TE ESPERA • HOSPEDAJE DE EXCELENCIA"}
             </div>
 
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-black font-serif text-white tracking-tight leading-tight drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)]">
+            <h1 className={`text-4xl sm:text-6xl md:text-7xl font-black text-white tracking-tight leading-tight drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)] ${
+              isApartoPosada ? "font-['Plus_Jakarta_Sans',sans-serif]" : "font-serif"
+            }`}>
               {config.name}
             </h1>
 
@@ -1077,36 +1088,40 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               })}
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto pt-2">
-              <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
-                <span className="text-lg font-black text-white block font-serif drop-shadow-sm">
-                  {isMyCampers ? "6 Unidades VIP" : isPerlaNegra ? "21 Unidades" : "⭐ 4.9 / 5"}
-                </span>
-                <span className="text-[10px] text-white font-bold uppercase tracking-wider">
-                  {isMyCampers ? "Campers & Suites" : isPerlaNegra ? "4 Tipos de Habitación" : "Valoración Huéspedes"}
-                </span>
+            {isApartoPosada ? (
+              <TrustBar />
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto pt-2">
+                <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
+                  <span className="text-lg font-black text-white block font-serif drop-shadow-sm">
+                    {isMyCampers ? "6 Unidades VIP" : isPerlaNegra ? "21 Unidades" : "⭐ 4.9 / 5"}
+                  </span>
+                  <span className="text-[10px] text-white font-bold uppercase tracking-wider">
+                    {isMyCampers ? "Campers & Suites" : isPerlaNegra ? "4 Tipos de Habitación" : "Valoración Huéspedes"}
+                  </span>
+                </div>
+                <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
+                  <span className="text-lg font-black text-white block font-serif drop-shadow-sm">100%</span>
+                  <span className="text-[10px] text-white font-bold uppercase tracking-wider">Planta Eléctrica 24/7</span>
+                </div>
+                <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
+                  <span className="text-lg font-black text-white block font-serif drop-shadow-sm">
+                    {isMyCampers ? "1,500m Altitud" : "Piscina"}
+                  </span>
+                  <span className="text-[10px] text-white font-bold uppercase tracking-wider">
+                    {isMyCampers ? "Clima Fresco de Montaña" : "Iluminación Nocturna"}
+                  </span>
+                </div>
+                <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
+                  <span className="text-lg font-black text-white block font-serif drop-shadow-sm">
+                    {isMyCampers ? "WiFi Starlink" : "Cayos Morrocoy"}
+                  </span>
+                  <span className="text-[10px] text-white font-bold uppercase tracking-wider">
+                    {isMyCampers ? "High Speed Montaña" : "Paseos en Peñero/Yate"}
+                  </span>
+                </div>
               </div>
-              <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
-                <span className="text-lg font-black text-white block font-serif drop-shadow-sm">100%</span>
-                <span className="text-[10px] text-white font-bold uppercase tracking-wider">Planta Eléctrica 24/7</span>
-              </div>
-              <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
-                <span className="text-lg font-black text-white block font-serif drop-shadow-sm">
-                  {isMyCampers ? "1,500m Altitud" : "Piscina"}
-                </span>
-                <span className="text-[10px] text-white font-bold uppercase tracking-wider">
-                  {isMyCampers ? "Clima Fresco de Montaña" : "Iluminación Nocturna"}
-                </span>
-              </div>
-              <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
-                <span className="text-lg font-black text-white block font-serif drop-shadow-sm">
-                  {isMyCampers ? "WiFi Starlink" : "Cayos Morrocoy"}
-                </span>
-                <span className="text-[10px] text-white font-bold uppercase tracking-wider">
-                  {isMyCampers ? "High Speed Montaña" : "Paseos en Peñero/Yate"}
-                </span>
-              </div>
-            </div>
+            )}
 
             <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
               
@@ -1135,39 +1150,73 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
 
       </section>
 
-      <div className="bg-white border-b border-slate-200/80 py-4 px-4 sm:px-6 lg:px-8 shadow-xs">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 text-center sm:text-left">
-          <div className="flex items-center justify-center sm:justify-start gap-3 p-2">
-            <span className="text-xl">🛡️</span>
-            <div>
-              <span className="text-xs font-bold text-slate-900 block">
-                {isRestaurant ? "Insumos Marinos Frescos del Día" : "Mejor Tarifa Oficial Garantizada"}
-              </span>
-              <span className="text-[11px] text-slate-500 font-medium">Sin comisiones de intermediarios</span>
+      {!isApartoPosada && (
+        <div className="bg-white border-b border-slate-200/80 py-4 px-4 sm:px-6 lg:px-8 shadow-xs">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 text-center sm:text-left">
+            <div className="flex items-center justify-center sm:justify-start gap-3 p-2">
+              <span className="text-xl">🛡️</span>
+              <div>
+                <span className="text-xs font-bold text-slate-900 block">
+                  {isRestaurant ? "Insumos Marinos Frescos del Día" : "Mejor Tarifa Oficial Garantizada"}
+                </span>
+                <span className="text-[11px] text-slate-500 font-medium">Sin comisiones de intermediarios</span>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center justify-center sm:justify-start gap-3 p-2 border-t sm:border-t-0 sm:border-l border-slate-100">
-            <span className="text-xl">⚡</span>
-            <div>
-              <span className="text-xs font-bold text-slate-900 block">
-                {isRestaurant ? "Reserva de Mesas en Vivo" : "Confirmación Inmediata"}
-              </span>
-              <span className="text-[11px] text-slate-500 font-medium">Vía WhatsApp Oficial directo</span>
+            <div className="flex items-center justify-center sm:justify-start gap-3 p-2 border-t sm:border-t-0 sm:border-l border-slate-100">
+              <span className="text-xl">⚡</span>
+              <div>
+                <span className="text-xs font-bold text-slate-900 block">
+                  {isRestaurant ? "Reserva de Mesas en Vivo" : "Confirmación Inmediata"}
+                </span>
+                <span className="text-[11px] text-slate-500 font-medium">Vía WhatsApp Oficial directo</span>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center justify-center sm:justify-start gap-3 p-2 border-t sm:border-t-0 sm:border-l border-slate-100">
-            <span className="text-xl">🌟</span>
-            <div>
-              <span className="text-xs font-bold text-slate-900 block">
-                {isRestaurant ? "Experiencia Gourmet Frente al Mar" : "Atención Personalizada"}
-              </span>
-              <span className="text-[11px] text-slate-500 font-medium">Atendidos por el equipo del establecimiento</span>
+            <div className="flex items-center justify-center sm:justify-start gap-3 p-2 border-t sm:border-t-0 sm:border-l border-slate-100">
+              <span className="text-xl">🌟</span>
+              <div>
+                <span className="text-xs font-bold text-slate-900 block">
+                  {isRestaurant ? "Experiencia Gourmet Frente al Mar" : "Atención Personalizada"}
+                </span>
+                <span className="text-[11px] text-slate-500 font-medium">Atendidos por el equipo del establecimiento</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {isRestaurant ? (
+      {isApartoPosada ? (
+        <>
+          {/* ── SECCIÓN 1: STORYTELLING & EXPERIENCIA (POR ENCIMA DEL CATÁLOGO) ── */}
+          <ExperienceBento
+            onOpenImage={(url, cap) => setActiveLightboxImg({ url, category: cap })}
+          />
+
+          {/* ── SECCIÓN 2: HABITACIONES Y SUITES (GRID MÁXIMO 6 TARJETAS + TABS FILTER) ── */}
+          <RoomsExplorer
+            whatsappPhone={whatsapp}
+            hotelName={config.name}
+            onOpenDetail={(r) => setSelectedRoom(r)}
+            onOpenAllRooms={() => setIsAllRoomsModalOpen(true)}
+            onToggleCart={toggleCartRoom}
+            cartRooms={cartRooms}
+          />
+
+          {/* ── SECCIÓN 3: SERVICIOS E INSTALACIONES (LUCIDE ICONS EN CAJAS DE COLOR SÓLIDO) ── */}
+          <ServicesGrid />
+
+          {/* ── SECCIÓN 4: PRUEBA SOCIAL / RESEÑAS REALES (GOOGLE REVIEWS 5 ESTRELLAS) ── */}
+          <SocialProof />
+
+          {/* ── SECCIÓN 5: PREGUNTAS FRECUENTES (FAQ ACORDEÓN REACT) ── */}
+          <FaqAccordion />
+
+          {/* ── SECCIÓN 6: UBICACIÓN, MAPA Y CTA FINAL EN GRADIENTE MAGENTA/PÚRPURA ── */}
+          <LocationSection
+            whatsappPhone={whatsapp}
+            hotelName={config.name}
+          />
+        </>
+      ) : isRestaurant ? (
         <>
           {/* ── SECCIÓN 1: CARTA GASTRONÓMICA DE ALTA GAMA ── */}
           <section id="menu" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
@@ -1342,7 +1391,8 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           </section>
         </>
       ) : (
-        <section id="habitaciones" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <>
+          <section id="habitaciones" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           
           <div className="text-center space-y-4 max-w-3xl mx-auto mb-16">
             <span className="text-[11px] tracking-[0.25em] font-extrabold text-[#00C8D4] uppercase block">
@@ -1447,7 +1497,6 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           )}
 
         </section>
-      )}
 
       {/* ── INTERSECCIÓN 1: SERVICIOS Y EXPERIENCIA EXCLUSIVA ── */}
       <section id="servicios" className="py-20 bg-slate-50 border-y border-slate-200/80 px-4 sm:px-6 lg:px-8">
@@ -1967,6 +2016,8 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
 
         </div>
       </section>
+        </>
+      )}
 
       <footer className="bg-[#080112] border-t border-white/10 py-12 px-4 sm:px-6 lg:px-8 text-xs text-slate-400">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
@@ -2128,6 +2179,14 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           </div>
         </div>
       )}
+
+      <AllRoomsModal
+        isOpen={isAllRoomsModalOpen}
+        onClose={() => setIsAllRoomsModalOpen(false)}
+        hotelName={config.name}
+        whatsappPhone={whatsapp}
+        onOpenDetail={(r) => setSelectedRoom(r)}
+      />
 
       <RoomDetailModal
         room={selectedRoom}
