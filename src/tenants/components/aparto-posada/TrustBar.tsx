@@ -38,17 +38,17 @@ export function TrustBar() {
           </div>
         </div>
 
-        {/* Item 3: Planta Eléctrica & Pozo Propio */}
+        {/* Item 3: Planta Eléctrica & Agua Continua */}
         <div className="w-full md:w-1/3 flex items-center justify-center md:justify-start gap-3 py-1 md:py-0 md:pl-4">
           <div className="w-8 h-8 rounded-full bg-[#9B00CC] flex items-center justify-center text-white shrink-0 shadow-sm">
             <Zap className="w-4.5 h-4.5 text-white fill-white" />
           </div>
           <div className="text-left">
             <span className="text-xs sm:text-sm font-extrabold text-slate-900 font-['Plus_Jakarta_Sans',sans-serif] tracking-tight block">
-              Planta Eléctrica 100% y Pozo Propio
+              Planta Eléctrica 100% & Agua Continua
             </span>
             <span className="text-[11px] text-slate-500 font-medium block font-['Inter',sans-serif]">
-              Aires y agua continua 24/7
+              Aires split y suministro 24/7 garantizado
             </span>
           </div>
         </div>

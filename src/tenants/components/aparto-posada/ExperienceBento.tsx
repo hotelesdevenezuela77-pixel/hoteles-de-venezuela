@@ -164,7 +164,7 @@ export function ExperienceBento({ onOpenImage }: ExperienceBentoProps) {
               </div>
             </div>
 
-            {/* Tile 2: Pozo Propio & Agua Continua (1x1) */}
+            {/* Tile 2: Caney Colonial & Jardines Decorativos (1x1) */}
             <div
               onClick={() => onOpenImage && onOpenImage(APARTO_BENTO_TILES[1].image, APARTO_BENTO_TILES[1].title)}
               className="col-span-1 md:col-span-1 row-span-1 rounded-3xl overflow-hidden relative group cursor-pointer shadow-md hover:shadow-xl hover:shadow-[#FF0096]/20 transition-all duration-500 border border-slate-200/90 hover:border-[#FF0096]/60 bg-slate-100"

@@ -25,8 +25,8 @@ export const APARTO_TRUST_ITEMS = [
   },
   {
     icon: Zap,
-    title: "Planta Eléctrica 100% y Pozo Propio",
-    subtitle: "Aires y agua cristalina continua 24/7",
+    title: "Planta Eléctrica 100% & Agua Continua",
+    subtitle: "Aires split y suministro 24/7 garantizado",
     solidBg: "#9B00CC"
   }
 ];
@@ -49,7 +49,7 @@ export const APARTO_DIFFERENTIALS = [
   {
     number: "03",
     title: "Servicios Continuos 100% Garantizados",
-    description: "Planta eléctrica automática de capacidad total para energizar todos los aires acondicionados split y pozo de agua potable propio de flujo ininterrumpido.",
+    description: "Planta eléctrica automática de capacidad total para energizar todos los aires acondicionados split y suministro continuo de agua potable.",
     solidBg: "#9B00CC",
     icon: Zap
   }
@@ -65,11 +65,11 @@ export const APARTO_BENTO_TILES = [
     className: "col-span-1 md:col-span-2 row-span-2 min-h-[380px] md:min-h-[460px]"
   },
   {
-    id: "pozo-propio-agua",
-    title: "Pozo Propio & Agua Continua",
-    subtitle: "Suministro ininterrumpido 24/7 en jardines coloniales",
+    id: "caney-colonial-jardines",
+    title: "Caney Colonial & Jardines",
+    subtitle: "Área social decorativa y descanso al aire libre",
     image: "/images/aparto-posada/pozo-agua-artesanal.jpg",
-    tag: "Servicio Garantizado",
+    tag: "Zona de Descanso",
     className: "col-span-1 md:col-span-1 row-span-1 min-h-[220px]"
   },
   {
@@ -448,8 +448,8 @@ export const APARTO_SERVICES = [
   },
   {
     icon: Zap,
-    title: "Planta Eléctrica & Pozo Continuo",
-    description: "Respaldo energético 100% automático para todos los aires acondicionados y pozo de agua propio sin fallas.",
+    title: "Planta Eléctrica & Agua Continua",
+    description: "Respaldo energético 100% automático para todos los aires acondicionados y suministro continuo de agua sin fallas.",
     solidBg: "#f59e0b"
   }
 ];
@@ -480,14 +480,14 @@ export const APARTO_REVIEWS = [
     rating: 5,
     date: "Hace 1 mes",
     verified: true,
-    content: "El mejor punto para descansar en Morrocoy si buscas tranquilidad y seguridad. Estacionamiento cerrado cerrado dentro de la posada, pozo de agua que garantiza presión continua y atención directa por WhatsApp sin comisiones abusivas de agencias."
+    content: "El mejor punto para descansar en Morrocoy si buscas tranquilidad y seguridad. Estacionamiento cerrado cerrado dentro de la posada, suministro de agua que garantiza presión continua y atención directa por WhatsApp sin comisiones abusivas de agencias."
   }
 ];
 
 export const APARTO_FAQS = [
   {
     question: "¿Cuentan con planta eléctrica y suministro de agua continuo?",
-    answer: "Sí, absolutamente. Contamos con una planta eléctrica industrial de respaldo 100% que alimenta todas las áreas, incluyendo los aires acondicionados de todas las habitaciones las 24 horas del día. Además, disponemos de pozo de agua propio de flujo continuo, garantizando agua dulce limpia y sin racionamientos durante toda su estancia."
+    answer: "Sí, absolutamente. Contamos con una planta eléctrica industrial de respaldo 100% que alimenta todas las áreas, incluyendo los aires acondicionados de todas las habitaciones las 24 horas del día. Además, disponemos de sistema de reserva de agua de gran capacidad con suministro continuo, garantizando agua dulce limpia y sin racionamientos durante toda su estancia."
   },
   {
     question: "¿Tienen planes de traslados en lancha a los cayos de Morrocoy?",
