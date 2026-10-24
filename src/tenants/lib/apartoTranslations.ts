@@ -174,7 +174,7 @@ export const APARTO_TRANSLATIONS: Record<Language, TranslationDictionary> = {
     hero: {
       upcomingLaunch: "PRÓXIMO LANZAMIENTO! • APLICACIÓN MULTI PLATAFORMA WEB EN ACTUALIZACIÓN",
       title: "APARTO POSADA DEL MAR",
-      subtitle: "Su Casa en las Playas de Morrocoy • Tucacas",
+      subtitle: "¡Su casa en la Playa! • Tucacas",
       tagline: "Disfrute de confort familiar, piscina cristalina, planta eléctrica total y acceso directo a los cayos más paradisíacos de Venezuela.",
       roomType: "Tipo de Habitación",
       allTypes: "Todos los tipos",
@@ -205,7 +205,7 @@ export const APARTO_TRANSLATIONS: Record<Language, TranslationDictionary> = {
     },
     presentation: {
       badge: "EXPERIENCIA & HOSPITALIDAD EXCLUSIVA EN MORROCOY",
-      title: "Su Casa en las Playas de Morrocoy",
+      title: "¡Su casa en la Playa!",
       description: "Disfrute de la independencia de un apartamento totalmente equipado con la calidez, piscina cristalina y seguridad de una posada vacacional de primera línea."
     },
     differentials: {
@@ -319,7 +319,7 @@ export const APARTO_TRANSLATIONS: Record<Language, TranslationDictionary> = {
       ctaBtn: "Consultar Disponibilidad por WhatsApp"
     },
     footer: {
-      slogan: "¡Su Casa en las Playas de Morrocoy!",
+      slogan: "¡Su casa en la Playa!",
       desc: "La libertad de un apartamento equipado con la piscina, seguridad y confort de una posada de primera clase.",
       contactHeader: "Contacto Oficial",
       companyName: "Inversiones Febo C.A.",
@@ -368,7 +368,7 @@ export const APARTO_TRANSLATIONS: Record<Language, TranslationDictionary> = {
     hero: {
       upcomingLaunch: "UPCOMING LAUNCH! • MULTI-PLATFORM WEB APP IN UPDATE",
       title: "APARTO POSADA DEL MAR",
-      subtitle: "Your Beachfront Haven in Morrocoy • Tucacas",
+      subtitle: "Your Home on the Beach! • Tucacas",
       tagline: "Experience family comfort, crystal-clear swimming pool, 100% backup power generator, and direct boat access to Venezuela's most breathtaking coral cays.",
       roomType: "Room Type",
       allTypes: "All Room Types",
@@ -399,7 +399,7 @@ export const APARTO_TRANSLATIONS: Record<Language, TranslationDictionary> = {
     },
     presentation: {
       badge: "EXCLUSIVE HOSPITALITY & EXPERIENCE IN MORROCOY",
-      title: "Your Home on the Beaches of Morrocoy",
+      title: "Your Home on the Beach!",
       description: "Enjoy the independence of a fully equipped apartment combined with the warmth, crystal-clear swimming pool, and security of a premier boutique vacation inn."
     },
     differentials: {
@@ -513,7 +513,7 @@ export const APARTO_TRANSLATIONS: Record<Language, TranslationDictionary> = {
       ctaBtn: "Check Availability via WhatsApp"
     },
     footer: {
-      slogan: "Your Beachfront Haven in Morrocoy!",
+      slogan: "Your Home on the Beach!",
       desc: "The freedom of an equipped apartment combined with the pool, security, and comfort of a premier inn.",
       contactHeader: "Official Contact",
       companyName: "Inversiones Febo C.A.",
