@@ -4,6 +4,21 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/images/logo-hdv-transparent.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/images/logo-hdv-transparent.png" />
+    <script>
+      (function() {
+        try {
+          var h = window.location.hostname.toLowerCase();
+          var q = window.location.search.toLowerCase();
+          if (h.includes("apartoposadadelmar") || q.includes("tenant=aparto-posada")) {
+            var icon = document.querySelector("link[rel*='icon']");
+            if (icon) { icon.href = "/images/aparto-posada/favicon.png"; }
+            var apple = document.querySelector("link[rel='apple-touch-icon']");
+            if (apple) { apple.href = "/images/aparto-posada/favicon-192.png"; }
+            document.title = "Aparto Posada del Mar | Reservas Oficiales";
+          }
+        } catch(e) {}
+      })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />

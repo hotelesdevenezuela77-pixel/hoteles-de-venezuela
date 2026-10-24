@@ -185,7 +185,10 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
               const facilityPhotosObj = typeof est.facility_photos === "object" && est.facility_photos !== null ? est.facility_photos : {};
               const savedBranding = facilityPhotosObj.branding || facilityPhotosObj;
 
-              const logoUrlResolved = savedBranding.logo_url || facilityPhotosObj.logo_url || matchingStatic?.branding?.logo_url || "https://r2.hotelesdevenezuela.com/default/logo.png";
+              const isAPM = est.slug === "aparto-posada-del-mar" || est.id === 2 || (est.name && est.name.toLowerCase().includes("aparto posada"));
+              const logoUrlResolved = isAPM 
+                ? "/images/aparto-posada/logo.png" 
+                : (savedBranding.logo_url || facilityPhotosObj.logo_url || matchingStatic?.branding?.logo_url || "https://r2.hotelesdevenezuela.com/default/logo.png");
               const bannerUrlResolved = savedBranding.banner_url || facilityPhotosObj.banner_url || bannerImgFromImages || matchingStatic?.branding?.banner_url || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1600&auto=format&fit=crop";
 
               const mergedTenant: TenantConfig = {

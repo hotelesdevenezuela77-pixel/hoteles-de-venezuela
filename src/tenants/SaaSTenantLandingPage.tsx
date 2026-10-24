@@ -131,6 +131,34 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Sincronizar favicon y título oficial de Aparto Posada del Mar / Inquilino
+  useEffect(() => {
+    const faviconUrl = isApartoPosada 
+      ? "/images/aparto-posada/favicon.png" 
+      : (config.branding?.logo_url || "/images/logo-hdv-transparent.png");
+
+    let link: HTMLLinkElement | null = document.querySelector("link[rel*='icon']");
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "icon";
+      document.head.appendChild(link);
+    }
+    link.type = "image/png";
+    link.href = faviconUrl;
+
+    let appleLink: HTMLLinkElement | null = document.querySelector("link[rel='apple-touch-icon']");
+    if (!appleLink) {
+      appleLink = document.createElement("link");
+      appleLink.rel = "apple-touch-icon";
+      document.head.appendChild(appleLink);
+    }
+    appleLink.href = isApartoPosada ? "/images/aparto-posada/favicon-192.png" : faviconUrl;
+
+    if (isApartoPosada) {
+      document.title = "Aparto Posada del Mar | Reservas Oficiales";
+    }
+  }, [isApartoPosada, config.branding?.logo_url]);
+
   const addDishToCart = (dish: OleajeDish) => {
     setOrderCart(prev => {
       const idx = prev.findIndex(item => item.dish.id === dish.id);
@@ -635,11 +663,11 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
           
           <a href="#inicio" className="flex items-center gap-3 group">
-            {config.branding?.logo_url && !logoError ? (
+            {((isApartoPosada ? "/images/aparto-posada/logo.png" : config.branding?.logo_url)) && !logoError ? (
               <img
-                src={config.branding.logo_url}
+                src={isApartoPosada ? "/images/aparto-posada/logo.png" : config.branding?.logo_url}
                 alt={config.name}
-                className="h-10 sm:h-11 w-auto object-contain max-w-[160px]"
+                className="h-11 sm:h-12 w-auto object-contain max-w-[160px]"
                 onError={() => setLogoError(true)}
               />
             ) : (
