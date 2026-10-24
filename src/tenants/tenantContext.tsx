@@ -23,6 +23,7 @@ export interface TenantConfig {
     font_body: string;
     logo_url: string;
     banner_url: string;
+    video_url?: string;
   };
   modules: {
     reservas: boolean;

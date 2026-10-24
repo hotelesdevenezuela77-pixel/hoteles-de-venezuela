@@ -576,6 +576,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
   }, [config, establishmentDetail]);
 
   const bannerImage = config.branding?.banner_url || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1600&auto=format&fit=crop";
+  const videoUrl = isApartoPosada ? (config.branding?.video_url || "/videos/aparto-posada-pool-hero.mp4") : config.branding?.video_url;
   const phone = establishmentDetail?.phone || config.contact?.phone || "+584144815321";
   const whatsapp = establishmentDetail?.whatsapp || establishmentDetail?.phone || config.contact?.whatsapp || "584144815321";
   const cleanWhatsapp = whatsapp.replace(/[^0-9]/g, "") || "584144815321";
@@ -682,14 +683,34 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
 
       <section id="inicio" className="relative w-full min-h-[85vh] flex items-center justify-center overflow-hidden bg-slate-950">
         
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          <img
-            src={bannerImage}
-            alt={config.name}
-            className={`w-full h-full object-cover scale-[1.08] transition-transform duration-1000 ${
-              isApartoPosada ? "filter brightness-105 contrast-[1.02]" : "filter brightness-95"
-            }`}
-          />
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          {videoUrl ? (
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              poster={bannerImage}
+              className={`w-full h-full object-cover scale-[1.08] ${
+                isApartoPosada ? "filter brightness-105 contrast-[1.02]" : "filter brightness-95"
+              }`}
+            >
+              <source src={videoUrl} type="video/mp4" />
+              <img
+                src={bannerImage}
+                alt={config.name}
+                className="w-full h-full object-cover scale-[1.08]"
+              />
+            </video>
+          ) : (
+            <img
+              src={bannerImage}
+              alt={config.name}
+              className={`w-full h-full object-cover scale-[1.08] transition-transform duration-1000 ${
+                isApartoPosada ? "filter brightness-105 contrast-[1.02]" : "filter brightness-95"
+              }`}
+            />
+          )}
           {!isApartoPosada && (
             <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent"></div>
           )}

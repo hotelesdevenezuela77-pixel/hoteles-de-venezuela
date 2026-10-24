@@ -38,13 +38,25 @@ export function Hero({ onReserveClick, content }: HeroProps) {
       {/* Gradient bar at top */}
       <div className="absolute top-0 left-0 right-0 h-1.5 gradient-tropical-bar z-50" />
       
-      {/* Background Image full brightness sin filtro oscuro */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat filter brightness-105"
-        style={{
-          backgroundImage: `url(${content.imageUrl})`
-        }}
-      />
+      {/* Background Video / Image full brightness sin filtro oscuro */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster={content.imageUrl}
+          className="w-full h-full object-cover scale-[1.08] filter brightness-105"
+        >
+          <source src="/videos/aparto-posada-pool-hero.mp4" type="video/mp4" />
+          <div 
+            className="w-full h-full bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${content.imageUrl})`
+            }}
+          />
+        </video>
+      </div>
 
       {/* Gradient fade to next section (white) */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent via-white/50 to-white" />
