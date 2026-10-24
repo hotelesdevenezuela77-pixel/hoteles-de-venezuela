@@ -192,7 +192,7 @@ export const APARTO_TRANSLATIONS: Record<Language, TranslationDictionary> = {
         cayos: "Paseos Cayos Morrocoy",
         cocina: "Apartamentos con Cocina",
         matrimoniales: "Habitaciones Matrimoniales",
-        wifi: "WiFi Starlink"
+        wifi: "Internet"
       }
     },
     trustBar: {
@@ -386,7 +386,7 @@ export const APARTO_TRANSLATIONS: Record<Language, TranslationDictionary> = {
         cayos: "Morrocoy Cay Boat Tours",
         cocina: "Apartments with Kitchen",
         matrimoniales: "King Bedroom Suites",
-        wifi: "Starlink WiFi"
+        wifi: "Internet"
       }
     },
     trustBar: {

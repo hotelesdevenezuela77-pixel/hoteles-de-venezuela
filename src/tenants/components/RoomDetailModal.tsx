@@ -52,7 +52,7 @@ export function RoomDetailModal({ room, hotelName, whatsappPhone, onClose }: Roo
   const waUrl = `https://wa.me/${cleanPhone || "584141234567"}?text=${waMsg}`;
 
   const AMENITY_MAP: Record<string, string> = {
-    "wifi": "WiFi Starlink High-Speed",
+    "wifi": "Internet",
     "aire": "Aire Acondicionado Split 18.000 BTU",
     "balcon": "Balcón Privado Vista al Mar",
     "vista_mar": "Vista Panorámica al Mar",

@@ -72,7 +72,7 @@ const APM_FACILITIES = [
   { val: "planta", label: "Planta Eléctrica 100%", sub: "Respaldo continuo 24/7", icon: Zap, solidBg: "#f59e0b" },
   { val: "cayos", label: "Paseos a Cayos Morrocoy", sub: "En Peñero o Yate", icon: Compass, solidBg: "#00C8D4" },
   { val: "cocina", label: "Con Cocina Completa", sub: "Nevera y utensilios", icon: Utensils, solidBg: "#FF0096" },
-  { val: "wifi", label: "WiFi Starlink & Parking", sub: "Internet satelital y seguridad", icon: Wifi, solidBg: "#10b981" }
+  { val: "wifi", label: "Internet & Parking", sub: "Internet y seguridad", icon: Wifi, solidBg: "#10b981" }
 ];
 
 const APM_QUICK_FILTERS = [
@@ -81,7 +81,7 @@ const APM_QUICK_FILTERS = [
   { label: "Paseos Cayos Morrocoy", icon: Compass, solidBg: "#00C8D4", facilityVal: "cayos" },
   { label: "Apartamentos con Cocina", icon: Hotel, solidBg: "#FF0096", roomVal: "apartamento" },
   { label: "Habitaciones Matrimoniales", icon: Bed, solidBg: "#FF0096", roomVal: "matrimonial" },
-  { label: "WiFi Starlink", icon: Wifi, solidBg: "#9B00CC", facilityVal: "wifi" }
+  { label: "Internet", icon: Wifi, solidBg: "#9B00CC", facilityVal: "wifi" }
 ];
 
 export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
@@ -1720,8 +1720,8 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             {[
               {
                 icon: <Wifi className="w-6 h-6 text-white" />,
-                title: "Conexión Starlink High Speed",
-                desc: "WiFi de alta velocidad libre en todas las habitaciones y áreas comunes.",
+                title: "Conexión a Internet",
+                desc: "Internet libre en todas las habitaciones y áreas comunes.",
                 bg: "bg-[#00C8D4]"
               },
               {

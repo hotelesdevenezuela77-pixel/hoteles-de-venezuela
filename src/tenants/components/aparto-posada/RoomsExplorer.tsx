@@ -184,9 +184,9 @@ export function RoomsExplorer({
                         <Wind className="w-3.5 h-3.5 text-slate-600 stroke-[1.5]" />
                         <span>A/C 24/7</span>
                       </span>
-                      <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-700 bg-slate-100/80 border border-slate-200/90 px-3 py-1.5 rounded-xl">
+                      <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-700 bg-slate-100/80 border border-slate-200/90 px-3 py-1.5 rounded-xl font-roboto">
                         <Wifi className="w-3.5 h-3.5 text-slate-600 stroke-[1.5]" />
-                        <span>Starlink</span>
+                        <span>Internet</span>
                       </span>
                       {room.badgeCategory === "apartamentos" && (
                         <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl">

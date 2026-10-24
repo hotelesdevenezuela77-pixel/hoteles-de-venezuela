@@ -109,7 +109,7 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail, onToggl
   const capacity = room.capacidad_max || room.max_guests || room.capacity || 2;
 
   const AMENITY_MAP: Record<string, string> = {
-    "wifi": "WiFi Starlink",
+    "wifi": "Internet",
     "aire": "Aire Acondicionado Split",
     "balcon": "Balcón Privado",
     "vista_mar": "Vista Panorámica al Mar",
@@ -132,7 +132,7 @@ export function RoomCard({ room, hotelName, whatsappPhone, onOpenDetail, onToggl
   } else {
     amenitiesList = [
       "Aire Acondicionado Split",
-      "WiFi Starlink",
+      "Internet",
       "Baño Privado",
       "TV Smart",
       "Servicio a la Habitación"

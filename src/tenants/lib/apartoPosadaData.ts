@@ -121,8 +121,8 @@ export const APARTO_FEATURED_ROOMS: ApartoRoomItem[] = [
       "/images/aparto-posada/piscina-cristalina-palmeras.jpg",
       "/images/aparto-posada/vista-balcon-mar.jpg"
     ],
-    amenities: ["Cama King", "Techo con Vigas", "A/C 24/7", "WiFi Starlink", "Baño Privado", "Lámparas de Lectura"],
-    comodidades: ["Cama King", "Techo con Vigas", "A/C 24/7", "WiFi Starlink", "Baño Privado", "Lámparas de Lectura"],
+    amenities: ["Cama King", "Techo con Vigas", "A/C 24/7", "Internet", "Baño Privado", "Lámparas de Lectura"],
+    comodidades: ["Cama King", "Techo con Vigas", "A/C 24/7", "Internet", "Baño Privado", "Lámparas de Lectura"],
     description: "Habitación prémium para parejas con techo de vigas de madera rústica, cama matrimonial king, aire acondicionado split continuo y baño privado impecable."
   },
   {
@@ -147,8 +147,8 @@ export const APARTO_FEATURED_ROOMS: ApartoRoomItem[] = [
       "/images/aparto-posada/hab-matrimonial-beige.jpg",
       "/images/aparto-posada/piscina-dia-caney.jpg"
     ],
-    amenities: ["Cama King", "Pared Texturizada", "A/C 24/7", "WiFi Starlink", "Baño Privado", "Nevera Ejecutiva"],
-    comodidades: ["Cama King", "Pared Texturizada", "A/C 24/7", "WiFi Starlink", "Baño Privado", "Nevera Ejecutiva"],
+    amenities: ["Cama King", "Pared Texturizada", "A/C 24/7", "Internet", "Baño Privado", "Nevera Ejecutiva"],
+    comodidades: ["Cama King", "Pared Texturizada", "A/C 24/7", "Internet", "Baño Privado", "Nevera Ejecutiva"],
     description: "Ambiente íntimo con paredes de textura colonial, cama matrimonial king con lencería fresca, cortinas azules y aire acondicionado ininterrumpido."
   },
   {
@@ -173,8 +173,8 @@ export const APARTO_FEATURED_ROOMS: ApartoRoomItem[] = [
       "/images/aparto-posada/hab-sofa-marinera.jpg",
       "/images/aparto-posada/piscina-cristalina-palmeras.jpg"
     ],
-    amenities: ["1 Cama Doble + 1 Individual", "Toallas Blancas", "A/C 24/7", "WiFi Starlink", "Baño Privado", "Mesa Auxiliar"],
-    comodidades: ["1 Cama Doble + 1 Individual", "Toallas Blancas", "A/C 24/7", "WiFi Starlink", "Baño Privado", "Mesa Auxiliar"],
+    amenities: ["1 Cama Doble + 1 Individual", "Toallas Blancas", "A/C 24/7", "Internet", "Baño Privado", "Mesa Auxiliar"],
+    comodidades: ["1 Cama Doble + 1 Individual", "Toallas Blancas", "A/C 24/7", "Internet", "Baño Privado", "Mesa Auxiliar"],
     description: "Espaciosa unidad familiar con una cama matrimonial más cama individual marinera, lencería limpia con toallas dobladas y ventana con vista a la vegetación."
   },
   {
@@ -199,8 +199,8 @@ export const APARTO_FEATURED_ROOMS: ApartoRoomItem[] = [
       "/images/aparto-posada/hab-suite-escritorio.jpg",
       "/images/aparto-posada/vista-balcon-mar.jpg"
     ],
-    amenities: ["Smart TV", "Microondas", "Nevera Ejecutiva", "A/C 24/7", "WiFi Starlink", "Espejo Decorativo", "Baño Privado"],
-    comodidades: ["Smart TV", "Microondas", "Nevera Ejecutiva", "A/C 24/7", "WiFi Starlink", "Espejo Decorativo", "Baño Privado"],
+    amenities: ["Smart TV", "Microondas", "Nevera Ejecutiva", "A/C 24/7", "Internet", "Espejo Decorativo", "Baño Privado"],
+    comodidades: ["Smart TV", "Microondas", "Nevera Ejecutiva", "A/C 24/7", "Internet", "Espejo Decorativo", "Baño Privado"],
     description: "Habitación de alto confort con TV de pantalla plana en pared, microondas, nevera ejecutiva, clóset abierto con perchas y mesa de trabajo."
   },
   {
@@ -226,8 +226,8 @@ export const APARTO_FEATURED_ROOMS: ApartoRoomItem[] = [
       "/images/aparto-posada/sala-comedor-apartamento.jpg",
       "/images/aparto-posada/apartamento-camas-sala.jpg"
     ],
-    amenities: ["Cocina Equipada", "Estufa a Gas", "Nevera Grande", "Terraza con Vista al Mar", "Sala-Comedor", "A/C 24/7", "WiFi Starlink"],
-    comodidades: ["Cocina Equipada", "Estufa a Gas", "Nevera Grande", "Terraza con Vista al Mar", "Sala-Comedor", "A/C 24/7", "WiFi Starlink"],
+    amenities: ["Cocina Equipada", "Estufa a Gas", "Nevera Grande", "Terraza con Vista al Mar", "Sala-Comedor", "A/C 24/7", "Internet"],
+    comodidades: ["Cocina Equipada", "Estufa a Gas", "Nevera Grande", "Terraza con Vista al Mar", "Sala-Comedor", "A/C 24/7", "Internet"],
     description: "La auténtica experiencia 'Su Casa en la Playa'. Cuenta con cocina equipada completa con estufa y nevera, sala de estar independiente, terraza privada con vista al mar y baldosas de terracota."
   },
   {
@@ -253,8 +253,8 @@ export const APARTO_FEATURED_ROOMS: ApartoRoomItem[] = [
       "/images/aparto-posada/comedor-taburetes-rusticos.jpg",
       "/images/aparto-posada/pasillo-apartamento-cocina.jpg"
     ],
-    amenities: ["Parrillera Privada de Ladrillo", "Cocina Panorámica", "Comedor con Taburetes", "Terraza Privada", "A/C Continuo", "WiFi Starlink"],
-    comodidades: ["Parrillera Privada de Ladrillo", "Cocina Panorámica", "Comedor con Taburetes", "Terraza Privada", "A/C Continuo", "WiFi Starlink"],
+    amenities: ["Parrillera Privada de Ladrillo", "Cocina Panorámica", "Comedor con Taburetes", "Terraza Privada", "A/C Continuo", "Internet"],
+    comodidades: ["Parrillera Privada de Ladrillo", "Cocina Panorámica", "Comedor con Taburetes", "Terraza Privada", "A/C Continuo", "Internet"],
     description: "Máxima amplitud y privacidad. Cuenta con su propia parrillera de ladrillos en terraza privada, cocina completa con ventana panorámica, comedor rústico y capacidad holgada para toda la familia."
   }
 ];
@@ -282,8 +282,8 @@ export const APARTO_ALL_ROOMS: ApartoRoomItem[] = [
       "/images/aparto-posada/hab-matrimonial-beige.jpg",
       "/images/aparto-posada/piscina-cristalina-palmeras.jpg"
     ],
-    amenities: ["Cama King", "A/C 24/7", "WiFi Starlink", "Baño Privado"],
-    comodidades: ["Cama King", "A/C 24/7", "WiFi Starlink", "Baño Privado"],
+    amenities: ["Cama King", "A/C 24/7", "Internet", "Baño Privado"],
+    comodidades: ["Cama King", "A/C 24/7", "Internet", "Baño Privado"],
     description: "Habitación matrimonial tranquila en Edificio Principal con lencería beige y baño privado."
   },
   {
@@ -307,8 +307,8 @@ export const APARTO_ALL_ROOMS: ApartoRoomItem[] = [
       "/images/aparto-posada/hab-sofa-marinera.jpg",
       "/images/aparto-posada/hab-familiar-dos-camas.jpg"
     ],
-    amenities: ["1 Doble + 1 Marinera", "A/C 24/7", "WiFi Starlink", "Baño Privado"],
-    comodidades: ["1 Doble + 1 Marinera", "A/C 24/7", "WiFi Starlink", "Baño Privado"],
+    amenities: ["1 Doble + 1 Marinera", "A/C 24/7", "Internet", "Baño Privado"],
+    comodidades: ["1 Doble + 1 Marinera", "A/C 24/7", "Internet", "Baño Privado"],
     description: "Triple confortable en Edificio Principal con sofá cama marinera para niños y aire continuo."
   },
   {
@@ -332,8 +332,8 @@ export const APARTO_ALL_ROOMS: ApartoRoomItem[] = [
       "/images/aparto-posada/hab-suite-escritorio.jpg",
       "/images/aparto-posada/suite-completa-tv-microondas.jpg"
     ],
-    amenities: ["2 Camas Dobles", "Escritorio & Espejo", "A/C 24/7", "WiFi Starlink", "Baño Privado"],
-    comodidades: ["2 Camas Dobles", "Escritorio & Espejo", "A/C 24/7", "WiFi Starlink", "Baño Privado"],
+    amenities: ["2 Camas Dobles", "Escritorio & Espejo", "A/C 24/7", "Internet", "Baño Privado"],
+    comodidades: ["2 Camas Dobles", "Escritorio & Espejo", "A/C 24/7", "Internet", "Baño Privado"],
     description: "Cuádruple confortable para grupos familiares con mesa tocador, espejo y ventilación fresca."
   },
   {
@@ -358,8 +358,8 @@ export const APARTO_ALL_ROOMS: ApartoRoomItem[] = [
       "/images/aparto-posada/terraza-privada-mar.jpg",
       "/images/aparto-posada/sala-comedor-apartamento.jpg"
     ],
-    amenities: ["Cocina Completa", "Nevera Grande", "Sala de Estar", "A/C 24/7", "WiFi Starlink"],
-    comodidades: ["Cocina Completa", "Nevera Grande", "Sala de Estar", "A/C 24/7", "WiFi Starlink"],
+    amenities: ["Cocina Completa", "Nevera Grande", "Sala de Estar", "A/C 24/7", "Internet"],
+    comodidades: ["Cocina Completa", "Nevera Grande", "Sala de Estar", "A/C 24/7", "Internet"],
     description: "Apartamento amplio con vista al área de piscina, cocina con nevera de gran capacidad y terraza."
   },
   {
@@ -384,8 +384,8 @@ export const APARTO_ALL_ROOMS: ApartoRoomItem[] = [
       "/images/aparto-posada/comedor-taburetes-rusticos.jpg",
       "/images/aparto-posada/cocina-apartamento-panoramica.jpg"
     ],
-    amenities: ["Cocina", "Sala con Camas Adicionales", "Comedor Rústico", "A/C 24/7", "WiFi Starlink"],
-    comodidades: ["Cocina", "Sala con Camas Adicionales", "Comedor Rústico", "A/C 24/7", "WiFi Starlink"],
+    amenities: ["Cocina", "Sala con Camas Adicionales", "Comedor Rústico", "A/C 24/7", "Internet"],
+    comodidades: ["Cocina", "Sala con Camas Adicionales", "Comedor Rústico", "A/C 24/7", "Internet"],
     description: "Excelente para estancias largas en Tucacas con cocina totalmente funcional y capacidad para familias numerosas."
   },
   {
@@ -409,8 +409,8 @@ export const APARTO_ALL_ROOMS: ApartoRoomItem[] = [
       "/images/aparto-posada/sala-comedor-apartamento.jpg",
       "/images/aparto-posada/comedor-taburetes-rusticos.jpg"
     ],
-    amenities: ["Sala Independiente", "Comedor", "Cocina", "A/C 24/7", "WiFi Starlink"],
-    comodidades: ["Sala Independiente", "Comedor", "Cocina", "A/C 24/7", "WiFi Starlink"],
+    amenities: ["Sala Independiente", "Comedor", "Cocina", "A/C 24/7", "Internet"],
+    comodidades: ["Sala Independiente", "Comedor", "Cocina", "A/C 24/7", "Internet"],
     description: "Pisos de terracota tradicionales, sala de estar independiente y cercanía inmediata a la piscina."
   }
 ];
@@ -484,7 +484,7 @@ export const APARTO_REVIEWS: ApartoReviewItem[] = [
     rating: 5,
     date: "Hace 1 mes",
     verified: true,
-    content: "Nos quedamos en la suite matrimonial frente a la piscina. Todo súper limpio, lencería impecable y el WiFi Starlink vuela. Además, la posada nos ayudó a coordinar la lancha directa a Cayo Sombrero sin enredos ni sobreprecios. 100% recomendados."
+    content: "Nos quedamos en la suite matrimonial frente a la piscina. Todo súper limpio, lencería impecable y el Internet funciona de maravilla. Además, la posada nos ayudó a coordinar la lancha directa a Cayo Sombrero sin enredos ni sobreprecios. 100% recomendados."
   },
   {
     name: "Ing. Carlos Eduardo Gómez",

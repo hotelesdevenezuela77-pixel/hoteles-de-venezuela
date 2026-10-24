@@ -235,9 +235,6 @@ export function LuxuryHeroCarousel({ onOpenImage, language = "es" }: LuxuryHeroC
                   }}
                   loading={idx === 0 ? "eager" : "lazy"}
                 />
-
-                {/* Sutil gradiente para asegurar legibilidad impecable sin apagar la imagen */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0e011f]/90 via-[#0e011f]/30 to-transparent pointer-events-none" />
               </div>
             );
           })}
@@ -309,41 +306,41 @@ export function LuxuryHeroCarousel({ onOpenImage, language = "es" }: LuxuryHeroC
           <ChevronRight className="w-6 h-6 stroke-[2]" />
         </button>
 
-        {/* Ficha Inferior Flotante con Descripción e Indicadores */}
-        <div className="absolute bottom-0 inset-x-0 z-20 p-5 sm:p-8 bg-gradient-to-t from-[#0e011f] via-[#0e011f]/85 to-transparent">
-          <div className="max-w-3xl space-y-2 text-left">
+        {/* Ficha Inferior Flotante con Descripción e Indicadores (Glassmorphism sin tapar la foto) */}
+        <div className="absolute bottom-0 inset-x-0 z-20 p-4 sm:p-6 pointer-events-none">
+          <div className="max-w-2xl bg-black/40 backdrop-blur-md p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-white/25 shadow-2xl pointer-events-auto space-y-1.5 text-left">
             <div className="inline-flex items-center gap-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-[#00C8D4] font-caviar">
               <Sparkles className="w-3 h-3 text-[#FF0096]" />
               <span>{slideCategory}</span>
             </div>
 
-            <h3 className="text-xl sm:text-3xl md:text-4xl font-semibold text-white tracking-tight font-montserrat drop-shadow-md leading-tight">
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold text-white tracking-tight font-montserrat drop-shadow-md leading-tight">
               {slideTitle}
             </h3>
 
-            <p className="text-slate-200 text-xs sm:text-sm font-normal max-w-2xl leading-relaxed font-roboto drop-shadow-sm line-clamp-2 sm:line-clamp-none">
+            <p className="text-slate-100 text-xs sm:text-sm font-normal max-w-xl leading-relaxed font-roboto drop-shadow-sm line-clamp-2 sm:line-clamp-none">
               {slideSubtitle}
             </p>
-          </div>
 
-          {/* Puntos Indicadores Inferiores Minimalistas */}
-          <div className="flex items-center gap-2 pt-4">
-            {APARTO_CAROUSEL_SLIDES.map((_, idx) => {
-              const isSelected = idx === currentIndex;
-              return (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => setCurrentIndex(idx)}
-                  className={`h-2 rounded-full transition-all duration-500 cursor-pointer ${
-                    isSelected
-                      ? "w-8 bg-gradient-to-r from-[#00C8D4] to-[#FF0096] shadow-md shadow-[#00C8D4]/50"
-                      : "w-2 bg-white/40 hover:bg-white/70"
-                  }`}
-                  aria-label={`Go to slide ${idx + 1}`}
-                />
-              );
-            })}
+            {/* Puntos Indicadores Inferiores Minimalistas */}
+            <div className="flex items-center gap-2 pt-2">
+              {APARTO_CAROUSEL_SLIDES.map((_, idx) => {
+                const isSelected = idx === currentIndex;
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setCurrentIndex(idx)}
+                    className={`h-2 rounded-full transition-all duration-500 cursor-pointer ${
+                      isSelected
+                        ? "w-8 bg-gradient-to-r from-[#00C8D4] to-[#FF0096] shadow-md shadow-[#00C8D4]/50"
+                        : "w-2 bg-white/40 hover:bg-white/70"
+                    }`}
+                    aria-label={`Go to slide ${idx + 1}`}
+                  />
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
@@ -360,7 +357,7 @@ export function LuxuryHeroCarousel({ onOpenImage, language = "es" }: LuxuryHeroC
               className={`group flex-1 min-w-[120px] rounded-2xl overflow-hidden border-2 transition-all duration-300 cursor-pointer text-left relative ${
                 isSelected
                   ? "border-[#00C8D4] shadow-lg shadow-[#00C8D4]/20 scale-[1.02] ring-2 ring-[#00C8D4]/30"
-                  : "border-slate-200/80 hover:border-slate-400 opacity-70 hover:opacity-100"
+                  : "border-slate-200/80 hover:border-slate-400 opacity-80 hover:opacity-100"
               }`}
             >
               <div className="relative h-16 w-full overflow-hidden bg-slate-900">
@@ -369,7 +366,7 @@ export function LuxuryHeroCarousel({ onOpenImage, language = "es" }: LuxuryHeroC
                   alt={slide.title[language]}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                <div className="absolute inset-0 bg-black/30 group-hover:bg-transparent transition-colors" />
+                <div className="absolute inset-0 bg-transparent group-hover:bg-white/10 transition-colors" />
                 <span className="absolute bottom-1 left-2 text-[9px] font-medium text-white drop-shadow truncate max-w-[90%] font-caviar">
                   {slide.tag[language]}
                 </span>
