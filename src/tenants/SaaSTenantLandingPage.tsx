@@ -4,7 +4,7 @@ import {
   Utensils, Car, Sparkles, CheckCircle2, MessageCircle, ExternalLink, Calendar,
   Bed, Users, Award, ChevronDown, Layers, ArrowRight, Heart, Navigation, X, ShoppingBag,
   ChefHat, Flame, Fish, Waves, Beef, Wine, Cake, Soup, Plus, Minus, Search,
-  Copy, Check, Radio, Globe, Zap, Hotel, Palmtree
+  Copy, Check, Radio, Globe, Zap, Hotel, Palmtree, PhoneCall
 } from "lucide-react";
 import { type TenantConfig } from "./tenantContext";
 import { RoomCard, type Room } from "./components/RoomCard";
@@ -631,7 +631,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
   return (
     <div className="min-h-screen bg-white text-slate-900 selection:bg-[#FF0096] selection:text-white font-sans">
       
-      <header className="sticky top-0 z-50 bg-[#0e011f]/95 backdrop-blur-md border-b border-[#9B00CC]/30 text-white shadow-xl">
+      <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
           
           <a href="#inicio" className="flex items-center gap-3 group">
@@ -639,7 +639,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               <img
                 src={config.branding.logo_url}
                 alt={config.name}
-                className="h-10 w-auto object-contain max-w-[160px]"
+                className="h-10 sm:h-11 w-auto object-contain max-w-[160px]"
                 onError={() => setLogoError(true)}
               />
             ) : (
@@ -648,32 +648,32 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               </div>
             )}
             <div>
-              <span className="text-lg font-black font-serif text-white tracking-wide group-hover:text-[#00C8D4] transition-colors block leading-tight">
+              <span className="text-lg font-black font-serif text-[#1e293b] tracking-wide group-hover:text-[#FF0096] transition-colors block leading-tight">
                 {config.name}
               </span>
-              <span className="text-[10px] text-[#00C8D4] font-bold tracking-widest uppercase block">
+              <span className="text-[10px] text-[#0099AA] font-black tracking-widest uppercase block">
                 Sello Oficial de Excelencia
               </span>
             </div>
           </a>
 
           {isRestaurant ? (
-            <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-300">
-              <a href="#inicio" className="hover:text-[#00C8D4] transition-colors">Inicio</a>
-              <a href="#menu" className="hover:text-[#00C8D4] transition-colors">Carta Gastronómica</a>
-              <a href="#zonas" className="hover:text-[#00C8D4] transition-colors">Zonas & Mesas</a>
-              <a href="#pos-demo" className="hover:text-[#00C8D4] transition-colors">Punto de Venta POS</a>
-              <a href="#galeria" className="hover:text-[#00C8D4] transition-colors">Galería & Experiencias</a>
-              <a href="#contacto" className="hover:text-[#00C8D4] transition-colors">Ubicación</a>
+            <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-700">
+              <a href="#inicio" className="hover:text-[#FF0096] transition-colors">Inicio</a>
+              <a href="#menu" className="hover:text-[#FF0096] transition-colors">Carta Gastronómica</a>
+              <a href="#zonas" className="hover:text-[#FF0096] transition-colors">Zonas & Mesas</a>
+              <a href="#pos-demo" className="hover:text-[#FF0096] transition-colors">Punto de Venta POS</a>
+              <a href="#galeria" className="hover:text-[#FF0096] transition-colors">Galería & Experiencias</a>
+              <a href="#contacto" className="hover:text-[#FF0096] transition-colors">Ubicación</a>
             </nav>
           ) : (
-            <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-300">
-              <a href="#inicio" className="hover:text-[#00C8D4] transition-colors">Inicio</a>
-              <a href="#habitaciones" className="hover:text-[#00C8D4] transition-colors">Habitaciones & Tarifas</a>
-              <a href="#galeria" className="hover:text-[#00C8D4] transition-colors">Galería Instalaciones</a>
-              <a href="#servicios" className="hover:text-[#00C8D4] transition-colors">Servicios</a>
-              <a href="#sobre-nosotros" className="hover:text-[#00C8D4] transition-colors">Sobre Nosotros</a>
-              <a href="#contacto" className="hover:text-[#00C8D4] transition-colors">Ubicación</a>
+            <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-700">
+              <a href="#inicio" className="hover:text-[#FF0096] transition-colors">Inicio</a>
+              <a href="#habitaciones" className="hover:text-[#FF0096] transition-colors">Habitaciones & Tarifas</a>
+              <a href="#galeria" className="hover:text-[#FF0096] transition-colors">Galería Instalaciones</a>
+              <a href="#servicios" className="hover:text-[#FF0096] transition-colors">Servicios</a>
+              <a href="#sobre-nosotros" className="hover:text-[#FF0096] transition-colors">Sobre Nosotros</a>
+              <a href="#contacto" className="hover:text-[#FF0096] transition-colors">Ubicación</a>
             </nav>
           )}
 
@@ -681,12 +681,72 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             href={generalWaUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-black text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-md active:scale-95 shrink-0 cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-black text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-md hover:shadow-lg active:scale-95 shrink-0 cursor-pointer"
           >
             <MessageCircle className="w-4 h-4 fill-current" />
             <span className="hidden sm:inline">WhatsApp Directo</span>
           </a>
 
+        </div>
+
+        {/* Submenú Franja (Estilo Oficial Hoteles de Venezuela con degradado Magenta a Púrpura) */}
+        <div 
+          className="relative h-8 sm:h-9 flex items-center select-none overflow-hidden text-white"
+          style={{
+            background: "linear-gradient(90deg, #FF0096 0%, #9B00CC 100%)"
+          }}
+        >
+          {/* Tag Izquierdo Estilo HDV */}
+          <div
+            className="hidden lg:flex items-center h-full px-4 gap-1.5 font-bold text-white text-[11px] whitespace-nowrap select-none shrink-0"
+            style={{
+              background: "linear-gradient(90deg, rgba(255,0,150,0.85) 85%, transparent)"
+            }}
+          >
+            <Hotel className="w-3.5 h-3.5 text-white" />
+            <span>Hospedaje de Selección</span>
+          </div>
+
+          {/* Centro: Contáctanos al +58 (414) 4815321 con Icono Blanco Moderno */}
+          <div className="flex-1 flex items-center justify-center px-4">
+            <a
+              href={`https://wa.me/${cleanWhatsapp || "584144815321"}?text=${encodeURIComponent(
+                `Hola ${config.name}, deseo consultar tarifas y disponibilidad para reservar.`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 group cursor-pointer hover:text-yellow-200 transition-colors py-0.5"
+              title="Contáctanos vía WhatsApp o Llamada"
+            >
+              <div className="w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 group-hover:bg-white transition-all">
+                <PhoneCall className="w-3 h-3 text-white group-hover:text-[#FF0096] transition-colors" />
+              </div>
+              <span className="text-[11px] sm:text-xs font-bold tracking-wide">
+                Contáctanos al{" "}
+                <span className="font-black underline underline-offset-2 decoration-white/70 group-hover:decoration-yellow-200">
+                  +58 (414) 4815321
+                </span>
+              </span>
+            </a>
+          </div>
+
+          {/* Tag Derecho Estilo HDV */}
+          <div
+            className="hidden lg:flex items-center h-full px-4 gap-2 font-bold text-white text-[11px] whitespace-nowrap select-none shrink-0"
+            style={{
+              background: "linear-gradient(270deg, rgba(155,0,204,0.85) 85%, transparent)"
+            }}
+          >
+            <span className="flex h-2 w-2 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+            </span>
+            <span>Atención Inmediata</span>
+            <span className="text-white/40">•</span>
+            <span className="text-[10px] text-yellow-300 font-extrabold flex items-center gap-0.5">
+              ★ <span className="text-white">5.0</span>
+            </span>
+          </div>
         </div>
       </header>
 
