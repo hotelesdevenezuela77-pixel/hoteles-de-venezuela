@@ -178,7 +178,21 @@ export function LocationSection({ whatsappPhone, hotelName }: LocationSectionPro
           <div className="absolute top-0 right-0 -mt-10 -mr-10 w-48 h-48 rounded-full bg-white/10 blur-2xl pointer-events-none"></div>
           <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-48 h-48 rounded-full bg-black/15 blur-2xl pointer-events-none"></div>
 
-          <div className="relative z-10 space-y-6 max-w-3xl mx-auto">
+          <div className="relative z-10 space-y-6 max-w-3xl mx-auto flex flex-col items-center">
+            <div className="bg-white/95 backdrop-blur-md p-3.5 rounded-3xl border border-white/40 shadow-2xl hover:scale-105 transition-transform duration-300">
+              <img
+                src="/images/aparto-posada/logo.png"
+                alt={hotelName}
+                className="w-24 sm:w-28 h-auto object-contain drop-shadow-sm"
+                onError={(e) => {
+                  const target = e.currentTarget as HTMLImageElement;
+                  if (!target.src.includes("logo-oficial.png")) {
+                    target.src = "/images/aparto-posada/logo-oficial.png";
+                  }
+                }}
+              />
+            </div>
+
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-white text-[11px] font-extrabold tracking-[0.25em] uppercase font-['Plus_Jakarta_Sans',sans-serif]">
               <Sparkles className="w-3.5 h-3.5 text-white" />
               RESERVA DIRECTA GARANTIZADA 0% COMISIONES

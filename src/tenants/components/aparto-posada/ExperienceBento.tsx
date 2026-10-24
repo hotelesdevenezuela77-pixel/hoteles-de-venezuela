@@ -11,8 +11,23 @@ export function ExperienceBento({ onOpenImage }: ExperienceBentoProps) {
     <section id="experiencia" className="py-20 md:py-28 bg-slate-50/70 border-b border-slate-200/80 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-16">
         
-        {/* Encabezado de Storytelling de Alto Impacto */}
-        <div className="text-center space-y-4 max-w-3xl mx-auto">
+        {/* Encabezado de Storytelling de Alto Impacto con Logo Oficial */}
+        <div className="text-center space-y-5 max-w-3xl mx-auto flex flex-col items-center">
+          <div className="relative group">
+            <div className="absolute -inset-3 bg-gradient-to-r from-[#00C8D4]/25 via-[#FF0096]/20 to-[#9B00CC]/25 rounded-full blur-xl opacity-75 group-hover:opacity-100 transition duration-500 pointer-events-none"></div>
+            <img
+              src="/images/aparto-posada/logo.png"
+              alt="Aparto Posada del Mar - Logo Oficial"
+              className="relative w-36 sm:w-44 md:w-52 h-auto object-contain drop-shadow-lg hover:scale-105 transition-transform duration-300"
+              onError={(e) => {
+                const target = e.currentTarget as HTMLImageElement;
+                if (!target.src.includes("logo-oficial.png")) {
+                  target.src = "/images/aparto-posada/logo-oficial.png";
+                }
+              }}
+            />
+          </div>
+
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00C8D4]/10 border border-[#00C8D4]/30 text-[#009da7] text-[11px] font-extrabold tracking-[0.25em] uppercase font-['Plus_Jakarta_Sans',sans-serif]">
             <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
             EXPERIENCIA & HOSPITALIDAD EXCLUSIVA EN MORROCOY

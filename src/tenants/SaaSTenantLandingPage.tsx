@@ -662,10 +662,22 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
       <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
           
-          <a href="#inicio" className="flex items-center gap-3 group">
-            {((isApartoPosada ? "/images/aparto-posada/logo.png" : config.branding?.logo_url)) && !logoError ? (
+          <a href="#inicio" className="flex items-center gap-3.5 group">
+            {isApartoPosada ? (
               <img
-                src={isApartoPosada ? "/images/aparto-posada/logo.png" : config.branding?.logo_url}
+                src="/images/aparto-posada/logo.png"
+                alt={config.name}
+                className="h-12 sm:h-14 md:h-15 w-auto object-contain shrink-0 group-hover:scale-105 transition-transform duration-200"
+                onError={(e) => {
+                  const target = e.currentTarget as HTMLImageElement;
+                  if (!target.src.includes("logo-oficial.png")) {
+                    target.src = "/images/aparto-posada/logo-oficial.png";
+                  }
+                }}
+              />
+            ) : config.branding?.logo_url && !logoError ? (
+              <img
+                src={config.branding?.logo_url}
                 alt={config.name}
                 className="h-11 sm:h-12 w-auto object-contain max-w-[160px]"
                 onError={() => setLogoError(true)}
@@ -676,7 +688,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               </div>
             )}
             <div>
-              <span className="text-lg font-black font-serif text-[#1e293b] tracking-wide group-hover:text-[#FF0096] transition-colors block leading-tight">
+              <span className="text-lg sm:text-xl font-black font-serif text-[#1e293b] tracking-wide group-hover:text-[#FF0096] transition-colors block leading-tight">
                 {config.name}
               </span>
               <span className="text-[10px] text-[#0099AA] font-black tracking-widest uppercase block">
@@ -2110,9 +2122,24 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
       <footer className="bg-[#080112] border-t border-white/10 py-12 px-4 sm:px-6 lg:px-8 text-xs text-slate-400">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
           
-          <div>
-            <span className="text-sm font-bold text-white font-serif block">{config.name}</span>
-            <span className="text-[11px] text-slate-400">Sitio Web Oficial • Operado bajo tecnología SaaS Hoteles de Venezuela</span>
+          <div className="flex items-center gap-4">
+            {isApartoPosada && (
+              <img
+                src="/images/aparto-posada/logo.png"
+                alt="Aparto Posada del Mar"
+                className="w-14 h-14 object-contain bg-white/10 p-1.5 rounded-2xl border border-white/15 shrink-0"
+                onError={(e) => {
+                  const target = e.currentTarget as HTMLImageElement;
+                  if (!target.src.includes("logo-oficial.png")) {
+                    target.src = "/images/aparto-posada/logo-oficial.png";
+                  }
+                }}
+              />
+            )}
+            <div>
+              <span className="text-sm font-bold text-white font-serif block">{config.name}</span>
+              <span className="text-[11px] text-slate-400">Sitio Web Oficial • Operado bajo tecnología SaaS Hoteles de Venezuela</span>
+            </div>
           </div>
 
           <div className="flex items-center gap-4 text-xs font-semibold text-slate-300">
