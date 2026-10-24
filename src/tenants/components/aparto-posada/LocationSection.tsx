@@ -11,7 +11,7 @@ interface LocationSectionProps {
 }
 
 export function LocationSection({ whatsappPhone, hotelName }: LocationSectionProps) {
-  const [mapMode, setMapMode] = useState<"satelite" | "estandar">("satelite");
+  const [mapMode, setMapMode] = useState<"satelite" | "estandar">("estandar");
   const [copied, setCopied] = useState<boolean>(false);
 
   const cleanWa = whatsappPhone.replace(/\D/g, "");
@@ -114,40 +114,43 @@ export function LocationSection({ whatsappPhone, hotelName }: LocationSectionPro
             </div>
           </div>
 
-          {/* Columna Derecha: Mapa Interactivo con Switch Satélite/Estándar */}
-          <div className="lg:col-span-7 bg-[#0e011f] rounded-3xl overflow-hidden border border-slate-200 shadow-xl flex flex-col min-h-[420px]">
-            {/* Header del Mapa */}
-            <div className="p-4 bg-gradient-to-r from-[#0e011f] via-[#1a0533] to-[#0e011f] text-white flex items-center justify-between shrink-0 border-b border-white/10">
+          {/* Columna Derecha: Mapa Interactivo con Cabecera en Magenta Degradado (Sin Negro ni Gris) */}
+          <div className="lg:col-span-7 bg-white rounded-3xl overflow-hidden border-2 border-[#FF0096]/30 shadow-2xl flex flex-col min-h-[420px]">
+            {/* Header del Mapa en Magenta Degradado Corporativo */}
+            <div 
+              className="p-4 text-white flex items-center justify-between shrink-0 shadow-md"
+              style={{ background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)" }}
+            >
               <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-[#00C8D4]" />
-                <span className="text-xs font-extrabold uppercase tracking-wider font-['Plus_Jakarta_Sans',sans-serif]">
-                  Vista Satelital & Terrestre Morrocoy
+                <MapPin className="w-4 h-4 text-white" />
+                <span className="text-xs font-black uppercase tracking-wider font-['Plus_Jakarta_Sans',sans-serif] text-white">
+                  Vista Terrestre & Mapa Interactivo Morrocoy
                 </span>
               </div>
-              <div className="flex items-center gap-1 bg-white/10 p-1 rounded-xl">
-                <button
-                  type="button"
-                  onClick={() => setMapMode("satelite")}
-                  className={`px-3 py-1 rounded-lg text-[10px] font-extrabold uppercase transition-all cursor-pointer ${
-                    mapMode === "satelite" ? "bg-[#00C8D4] text-white shadow-xs" : "text-slate-300 hover:text-white"
-                  }`}
-                >
-                  Satélite
-                </button>
+              <div className="flex items-center gap-1 bg-white/20 backdrop-blur-md p-1 rounded-xl border border-white/30">
                 <button
                   type="button"
                   onClick={() => setMapMode("estandar")}
-                  className={`px-3 py-1 rounded-lg text-[10px] font-extrabold uppercase transition-all cursor-pointer ${
-                    mapMode === "estandar" ? "bg-[#00C8D4] text-white shadow-xs" : "text-slate-300 hover:text-white"
+                  className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase transition-all cursor-pointer ${
+                    mapMode === "estandar" ? "bg-white text-[#FF0096] shadow-sm scale-105" : "text-white/80 hover:text-white"
                   }`}
                 >
                   Mapa
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMapMode("satelite")}
+                  className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase transition-all cursor-pointer ${
+                    mapMode === "satelite" ? "bg-white text-[#FF0096] shadow-sm scale-105" : "text-white/80 hover:text-white"
+                  }`}
+                >
+                  Satélite
                 </button>
               </div>
             </div>
 
             {/* Contenedor Iframe */}
-            <div className="flex-1 w-full min-h-[340px] relative bg-slate-900">
+            <div className="flex-1 w-full min-h-[340px] relative bg-slate-100">
               <iframe
                 title="Mapa de Ubicación de Aparto Posada del Mar"
                 width="100%"
@@ -157,8 +160,11 @@ export function LocationSection({ whatsappPhone, hotelName }: LocationSectionPro
                 src={`https://maps.google.com/maps?q=${coords.lat},${coords.lng}&t=${mapMode === "satelite" ? "k" : "m"}&z=15&ie=UTF8&iwloc=&output=embed`}
                 className="w-full h-full min-h-[340px]"
               />
-              <div className="absolute top-4 left-4 bg-[#0e011f]/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border border-white/20 text-[10px] text-white font-black flex items-center gap-2 shadow-2xl pointer-events-none">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#00C8D4] animate-pulse" />
+              <div 
+                className="absolute top-4 left-4 backdrop-blur-md px-4 py-1.5 rounded-2xl border border-white/40 text-[10px] text-white font-black flex items-center gap-2 shadow-2xl pointer-events-none"
+                style={{ background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)" }}
+              >
+                <span className="w-2.5 h-2.5 rounded-full bg-white animate-pulse" />
                 <span>ACCESO VERIFICADO • TUCACAS / MORROCOY</span>
               </div>
             </div>

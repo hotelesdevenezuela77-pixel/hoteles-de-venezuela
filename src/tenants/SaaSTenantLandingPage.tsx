@@ -2119,36 +2119,51 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         </>
       )}
 
-      <footer className="bg-[#080112] border-t border-white/10 py-12 px-4 sm:px-6 lg:px-8 text-xs text-slate-400">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
+      <footer 
+        className={
+          isApartoPosada 
+            ? "text-white py-14 px-4 sm:px-6 lg:px-8 text-xs border-t border-white/20 relative overflow-hidden shadow-2xl" 
+            : "bg-[#080112] border-t border-white/10 py-12 px-4 sm:px-6 lg:px-8 text-xs text-slate-400"
+        }
+        style={
+          isApartoPosada 
+            ? { background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)" } 
+            : undefined
+        }
+      >
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left relative z-10">
           
           <div className="flex items-center gap-4">
             {isApartoPosada && (
-              <img
-                src="/images/aparto-posada/logo.png"
-                alt="Aparto Posada del Mar"
-                className="w-14 h-14 object-contain bg-white/10 p-1.5 rounded-2xl border border-white/15 shrink-0"
-                onError={(e) => {
-                  const target = e.currentTarget as HTMLImageElement;
-                  if (!target.src.includes("logo-oficial.png")) {
-                    target.src = "/images/aparto-posada/logo-oficial.png";
-                  }
-                }}
-              />
+              <div className="bg-white p-2 rounded-2xl border border-white/40 shadow-lg shrink-0">
+                <img
+                  src="/images/aparto-posada/logo.png"
+                  alt="Aparto Posada del Mar"
+                  className="w-14 h-14 object-contain"
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    if (!target.src.includes("logo-oficial.png")) {
+                      target.src = "/images/aparto-posada/logo-oficial.png";
+                    }
+                  }}
+                />
+              </div>
             )}
             <div>
-              <span className="text-sm font-bold text-white font-serif block">{config.name}</span>
-              <span className="text-[11px] text-slate-400">Sitio Web Oficial • Operado bajo tecnología SaaS Hoteles de Venezuela</span>
+              <span className="text-base font-black text-white font-serif block tracking-wide">{config.name}</span>
+              <span className={`text-[11px] ${isApartoPosada ? "text-white/90 font-medium" : "text-slate-400"}`}>
+                Sitio Web Oficial • Operado bajo tecnología SaaS Hoteles de Venezuela
+              </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-4 text-xs font-semibold text-slate-300">
+          <div className={`flex items-center gap-4 text-xs font-bold ${isApartoPosada ? "text-white" : "text-slate-300"}`}>
             <span>Teléfono: {phone}</span>
-            <span>•</span>
+            <span className={isApartoPosada ? "text-white/60" : "text-slate-600"}>•</span>
             <span>Dominio: {config.domain}</span>
           </div>
 
-          <div className="text-[10px] text-slate-400">
+          <div className={`text-[11px] ${isApartoPosada ? "text-white/80 font-medium" : "text-slate-400"}`}>
             © 2026 {config.name}. Todos los derechos reservados.
           </div>
 
