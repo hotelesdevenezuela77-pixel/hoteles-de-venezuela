@@ -86,9 +86,12 @@ export function Hero({ onReserveClick, content }: HeroProps) {
         </div>
 
         {/* Subheadline */}
-        <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto font-light leading-relaxed drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
+        <p 
+          className="text-base sm:text-lg md:text-xl text-white/95 mb-8 max-w-2xl mx-auto font-normal leading-relaxed drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)] font-sans"
+          style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 400 }}
+        >
           {content.subtitle}
-          <span className="block mt-2 text-cyan-200">{content.highlightText}</span>
+          <span className="block mt-2 text-cyan-200 font-medium">{content.highlightText}</span>
         </p>
 
         {/* Trust indicators */}

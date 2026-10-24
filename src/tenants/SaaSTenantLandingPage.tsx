@@ -4,7 +4,7 @@ import {
   Utensils, Car, Sparkles, CheckCircle2, MessageCircle, ExternalLink, Calendar,
   Bed, Users, Award, ChevronDown, Layers, ArrowRight, Heart, Navigation, X, ShoppingBag,
   ChefHat, Flame, Fish, Waves, Beef, Wine, Cake, Soup, Plus, Minus, Search,
-  Copy, Check, Radio, Globe
+  Copy, Check, Radio, Globe, Zap, Hotel, Palmtree
 } from "lucide-react";
 import { type TenantConfig } from "./tenantContext";
 import { RoomCard, type Room } from "./components/RoomCard";
@@ -38,6 +38,42 @@ const DESTINATION_MAP_INFO: Record<string, { lat: number; lng: number; state: st
   "tovar": { lat: 10.4069, lng: -67.2889, state: "Aragua", name: "Colonia Tovar" },
 };
 
+// ── CATÁLOGO DEL FILTRO DE TRES NIVELES (BASE DE DATOS APARTO POSADA DEL MAR) ──
+const APM_ROOM_TYPES = [
+  { val: "all", label: "Todas las Habitaciones", sub: "Catálogo completo", icon: Hotel, solidBg: "#00C8D4" },
+  { val: "matrimonial", label: "Habitación Matrimonial", sub: "Parejas • Cama King", icon: Bed, solidBg: "#00C8D4" },
+  { val: "triple", label: "Habitación Triple", sub: "3 Huéspedes • Familiar", icon: Bed, solidBg: "#00C8D4" },
+  { val: "cuadruple", label: "Habitación Cuádruple", sub: "4 Huéspedes • 2 Ambientes", icon: Bed, solidBg: "#00C8D4" },
+  { val: "apartamento", label: "Apartamento con Cocina", sub: "5 a 8 Huéspedes • Familiar", icon: Hotel, solidBg: "#00C8D4" },
+  { val: "piscina", label: "Suite Vista Piscina", sub: "Acceso y vista al agua", icon: Waves, solidBg: "#00C8D4" }
+];
+
+const APM_CAPACITIES = [
+  { val: "all", label: "Cualquier Capacidad", sub: "1 a 8+ Huéspedes", icon: Users, solidBg: "#FF0096" },
+  { val: "2", label: "1 a 2 Huéspedes", sub: "Parejas o Individual", icon: Users, solidBg: "#FF0096" },
+  { val: "3", label: "3 Huéspedes", sub: "Familia pequeña", icon: Users, solidBg: "#FF0096" },
+  { val: "4", label: "4 Huéspedes", sub: "Familia estándar", icon: Users, solidBg: "#FF0096" },
+  { val: "5+", label: "5 a 8+ Huéspedes", sub: "Grupo o Familia grande", icon: Users, solidBg: "#FF0096" }
+];
+
+const APM_FACILITIES = [
+  { val: "all", label: "Todas las Instalaciones", sub: "Piscina, Planta, Paseos", icon: Sparkles, solidBg: "#9B00CC" },
+  { val: "piscina", label: "Piscina Iluminada 24/7", sub: "Iluminación nocturna", icon: Waves, solidBg: "#9B00CC" },
+  { val: "planta", label: "Planta Eléctrica 100%", sub: "Respaldo continuo 24/7", icon: Zap, solidBg: "#f59e0b" },
+  { val: "cayos", label: "Paseos a Cayos Morrocoy", sub: "En Peñero o Yate", icon: Compass, solidBg: "#00C8D4" },
+  { val: "cocina", label: "Con Cocina Completa", sub: "Nevera y utensilios", icon: Utensils, solidBg: "#FF0096" },
+  { val: "wifi", label: "WiFi Starlink & Parking", sub: "Internet satelital y seguridad", icon: Wifi, solidBg: "#10b981" }
+];
+
+const APM_QUICK_FILTERS = [
+  { label: "Piscina Iluminada", icon: Waves, solidBg: "#00C8D4", facilityVal: "piscina" },
+  { label: "Planta Eléctrica 24/7", icon: Zap, solidBg: "#f59e0b", facilityVal: "planta" },
+  { label: "Paseos Cayos Morrocoy", icon: Compass, solidBg: "#00C8D4", facilityVal: "cayos" },
+  { label: "Apartamentos con Cocina", icon: Hotel, solidBg: "#FF0096", roomVal: "apartamento" },
+  { label: "Habitaciones Matrimoniales", icon: Bed, solidBg: "#FF0096", roomVal: "matrimonial" },
+  { label: "WiFi Starlink", icon: Wifi, solidBg: "#9B00CC", facilityVal: "wifi" }
+];
+
 export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
   const [establishmentDetail, setEstablishmentDetail] = useState<any>(null);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
@@ -57,6 +93,34 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
   const isApartoPosada = (config.slug && config.slug.toLowerCase().includes("aparto-posada")) || config.establishment_id === 2 || (config.name && config.name.toLowerCase().includes("aparto posada")) || (config.domain && config.domain.toLowerCase().includes("apartoposadadelmar"));
   const [activeMenuCategory, setActiveMenuCategory] = useState<string>("all");
   const [orderCart, setOrderCart] = useState<{ dish: OleajeDish; count: number }[]>([]);
+
+  // ── ESTADOS DEL FILTRO DE TRES NIVELES (ESTILO HOTELES DE VENEZUELA) ──
+  const [filterRoomType, setFilterRoomType] = useState<string>("all");
+  const [filterCapacity, setFilterCapacity] = useState<string>("all");
+  const [filterFacility, setFilterFacility] = useState<string>("all");
+  const [openRoomDropdown, setOpenRoomDropdown] = useState<boolean>(false);
+  const [openCapDropdown, setOpenCapDropdown] = useState<boolean>(false);
+  const [openFacDropdown, setOpenFacDropdown] = useState<boolean>(false);
+
+  const roomFilterRef = React.useRef<HTMLDivElement>(null);
+  const capFilterRef = React.useRef<HTMLDivElement>(null);
+  const facFilterRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (roomFilterRef.current && !roomFilterRef.current.contains(e.target as Node)) {
+        setOpenRoomDropdown(false);
+      }
+      if (capFilterRef.current && !capFilterRef.current.contains(e.target as Node)) {
+        setOpenCapDropdown(false);
+      }
+      if (facFilterRef.current && !facFilterRef.current.contains(e.target as Node)) {
+        setOpenFacDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const addDishToCart = (dish: OleajeDish) => {
     setOrderCart(prev => {
@@ -736,7 +800,10 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                 </div>
               </div>
 
-              <p className="text-base sm:text-xl text-white font-medium max-w-3xl mx-auto leading-relaxed drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] font-serif">
+              <p 
+                className="text-sm sm:text-base md:text-lg text-white/95 font-normal max-w-2xl mx-auto leading-relaxed drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)] tracking-normal font-sans"
+                style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 400 }}
+              >
                 {isMyCampers
                   ? "Vive la experiencia de hospedarte en un Camper exclusivo rodeado del clima fresco y paisajes icónicos de Cubiro, Estado Lara. Confort de alta gama, fogatas nocturnas, vistas impresionantes y tranquilidad absoluta."
                   : isPerlaNegra 
@@ -744,6 +811,249 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                     : "Más que un Hospedaje, su refugio perfecto. Disfrute de una experiencia inolvidable con atención personalizada y garantía directa de tarifa."
                 }
               </p>
+            </div>
+
+            {/* BARRA DE BÚSQUEDA DE TRES NIVELES FLOTANTE (ESTILO HOTELES DE VENEZUELA) */}
+            <div className="max-w-5xl mx-auto bg-white/95 backdrop-blur-xl p-2.5 sm:p-3.5 rounded-2xl md:rounded-full border border-white/60 shadow-2xl shadow-cyan-950/30 text-slate-800 relative z-40">
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  setOpenRoomDropdown(false);
+                  setOpenCapDropdown(false);
+                  setOpenFacDropdown(false);
+                  const el = document.getElementById("habitaciones");
+                  if (el) el.scrollIntoView({ behavior: "smooth" });
+                }} 
+                className="flex flex-col md:flex-row items-center gap-2 md:gap-0 divide-y md:divide-y-0 md:divide-x divide-slate-200"
+              >
+                
+                {/* SEGMENTO 1: TIPO DE HABITACIÓN (Base de datos Aparto Posada del Mar) */}
+                <div ref={roomFilterRef} className="w-full md:w-[36%] px-3.5 py-2 text-left relative">
+                  <button
+                    type="button"
+                    onClick={() => { setOpenRoomDropdown(!openRoomDropdown); setOpenCapDropdown(false); setOpenFacDropdown(false); }}
+                    className="w-full flex items-center gap-3 group text-left cursor-pointer"
+                  >
+                    <div className="w-9 h-9 rounded-2xl bg-[#00C8D4]/15 border border-[#00C8D4]/30 flex items-center justify-center text-[#00C8D4] shrink-0 group-hover:scale-105 transition-transform">
+                      {React.createElement(
+                        (APM_ROOM_TYPES.find(r => r.val === filterRoomType) || APM_ROOM_TYPES[0]).icon,
+                        { className: "w-4.5 h-4.5 text-[#00C8D4] stroke-[2.2]" }
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-[10px] uppercase font-black tracking-wider text-slate-400 cursor-pointer">
+                        TIPO DE HABITACIÓN
+                      </label>
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="text-xs font-extrabold text-slate-900 truncate">
+                          {(APM_ROOM_TYPES.find(r => r.val === filterRoomType) || APM_ROOM_TYPES[0]).label}
+                        </span>
+                        <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${openRoomDropdown ? "rotate-180" : ""}`} />
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Dropdown Segmento 1 */}
+                  {openRoomDropdown && (
+                    <div className="absolute top-full left-0 mt-2.5 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl shadow-slate-950/40 border border-slate-200/90 py-2 z-[100] max-h-96 overflow-y-auto">
+                      <div className="px-4 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100">
+                        Seleccionar Habitación
+                      </div>
+                      {APM_ROOM_TYPES.map((item) => {
+                        const IconC = item.icon;
+                        const isSelected = filterRoomType === item.val;
+                        return (
+                          <button
+                            key={item.val}
+                            type="button"
+                            onClick={() => { setFilterRoomType(item.val); setOpenRoomDropdown(false); }}
+                            className={`w-full px-4 py-3 flex items-center justify-between text-xs font-bold transition-all text-left ${
+                              isSelected ? "bg-[#00C8D4]/10 text-[#00C8D4] font-extrabold" : "text-slate-900 hover:bg-slate-100/80"
+                            }`}
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="w-7 h-7 rounded-full flex items-center justify-center text-white shrink-0 shadow-xs" style={{ backgroundColor: item.solidBg }}>
+                                <IconC className="w-4 h-4 text-white stroke-[2.5]" />
+                              </div>
+                              <div className="min-w-0">
+                                <span className="truncate block font-bold">{item.label}</span>
+                                <span className="text-[10px] text-slate-500 font-normal block">{item.sub}</span>
+                              </div>
+                            </div>
+                            {isSelected && <Check className="w-4 h-4 text-[#00C8D4] shrink-0" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* SEGMENTO 2: HUÉSPEDES / CAPACIDAD */}
+                <div ref={capFilterRef} className="w-full md:w-[32%] px-3.5 py-2 text-left relative">
+                  <button
+                    type="button"
+                    onClick={() => { setOpenCapDropdown(!openCapDropdown); setOpenRoomDropdown(false); setOpenFacDropdown(false); }}
+                    className="w-full flex items-center gap-3 group text-left cursor-pointer"
+                  >
+                    <div className="w-9 h-9 rounded-2xl bg-[#FF0096]/15 border border-[#FF0096]/30 flex items-center justify-center text-[#FF0096] shrink-0 group-hover:scale-105 transition-transform">
+                      {React.createElement(
+                        (APM_CAPACITIES.find(c => c.val === filterCapacity) || APM_CAPACITIES[0]).icon,
+                        { className: "w-4.5 h-4.5 text-[#FF0096] stroke-[2.2]" }
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-[10px] uppercase font-black tracking-wider text-slate-400 cursor-pointer">
+                        HUÉSPEDES / CAPACIDAD
+                      </label>
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="text-xs font-extrabold text-slate-900 truncate">
+                          {(APM_CAPACITIES.find(c => c.val === filterCapacity) || APM_CAPACITIES[0]).label}
+                        </span>
+                        <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${openCapDropdown ? "rotate-180" : ""}`} />
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Dropdown Segmento 2 */}
+                  {openCapDropdown && (
+                    <div className="absolute top-full left-0 md:left-1/2 md:-translate-x-1/2 mt-2.5 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl shadow-slate-950/40 border border-slate-200/90 py-2 z-[100] max-h-96 overflow-y-auto">
+                      <div className="px-4 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100">
+                        Capacidad de Huéspedes
+                      </div>
+                      {APM_CAPACITIES.map((item) => {
+                        const IconC = item.icon;
+                        const isSelected = filterCapacity === item.val;
+                        return (
+                          <button
+                            key={item.val}
+                            type="button"
+                            onClick={() => { setFilterCapacity(item.val); setOpenCapDropdown(false); }}
+                            className={`w-full px-4 py-3 flex items-center justify-between text-xs font-bold transition-all text-left ${
+                              isSelected ? "bg-[#FF0096]/10 text-[#FF0096] font-extrabold" : "text-slate-900 hover:bg-slate-100/80"
+                            }`}
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="w-7 h-7 rounded-full flex items-center justify-center text-white shrink-0 shadow-xs" style={{ backgroundColor: item.solidBg }}>
+                                <IconC className="w-4 h-4 text-white stroke-[2.5]" />
+                              </div>
+                              <div className="min-w-0">
+                                <span className="truncate block font-bold">{item.label}</span>
+                                <span className="text-[10px] text-slate-500 font-normal block">{item.sub}</span>
+                              </div>
+                            </div>
+                            {isSelected && <Check className="w-4 h-4 text-[#FF0096] shrink-0" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* SEGMENTO 3: INSTALACIONES & SERVICIOS */}
+                <div ref={facFilterRef} className="w-full md:w-[32%] px-3.5 py-2 text-left relative">
+                  <button
+                    type="button"
+                    onClick={() => { setOpenFacDropdown(!openFacDropdown); setOpenRoomDropdown(false); setOpenCapDropdown(false); }}
+                    className="w-full flex items-center gap-3 group text-left cursor-pointer"
+                  >
+                    <div className="w-9 h-9 rounded-2xl bg-[#9B00CC]/15 border border-[#9B00CC]/30 flex items-center justify-center text-[#9B00CC] shrink-0 group-hover:scale-105 transition-transform">
+                      {React.createElement(
+                        (APM_FACILITIES.find(f => f.val === filterFacility) || APM_FACILITIES[0]).icon,
+                        { className: "w-4.5 h-4.5 text-[#9B00CC] stroke-[2.2]" }
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-[10px] uppercase font-black tracking-wider text-slate-400 cursor-pointer">
+                        INSTALACIONES & SERVICIOS
+                      </label>
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="text-xs font-extrabold text-slate-900 truncate">
+                          {(APM_FACILITIES.find(f => f.val === filterFacility) || APM_FACILITIES[0]).label}
+                        </span>
+                        <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${openFacDropdown ? "rotate-180" : ""}`} />
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Dropdown Segmento 3 */}
+                  {openFacDropdown && (
+                    <div className="absolute top-full left-0 md:left-auto md:right-0 mt-2.5 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl shadow-slate-950/40 border border-slate-200/90 py-2 z-[100] max-h-96 overflow-y-auto">
+                      <div className="px-4 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100">
+                        Instalaciones & Servicios
+                      </div>
+                      {APM_FACILITIES.map((item) => {
+                        const IconC = item.icon;
+                        const isSelected = filterFacility === item.val;
+                        return (
+                          <button
+                            key={item.val}
+                            type="button"
+                            onClick={() => { setFilterFacility(item.val); setOpenFacDropdown(false); }}
+                            className={`w-full px-4 py-3 flex items-center justify-between text-xs font-bold transition-all text-left ${
+                              isSelected ? "bg-[#9B00CC]/10 text-[#9B00CC] font-extrabold" : "text-slate-900 hover:bg-slate-100/80"
+                            }`}
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="w-7 h-7 rounded-full flex items-center justify-center text-white shrink-0 shadow-xs" style={{ backgroundColor: item.solidBg }}>
+                                <IconC className="w-4 h-4 text-white stroke-[2.5]" />
+                              </div>
+                              <div className="min-w-0">
+                                <span className="truncate block font-bold">{item.label}</span>
+                                <span className="text-[10px] text-slate-500 font-normal block">{item.sub}</span>
+                              </div>
+                            </div>
+                            {isSelected && <Check className="w-4 h-4 text-[#9B00CC] shrink-0" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* BOTÓN DE ACCIÓN */}
+                <div className="w-full md:w-auto p-1 text-right shrink-0">
+                  <button
+                    type="submit"
+                    className="w-full md:w-auto px-7 py-3.5 rounded-xl md:rounded-full bg-gradient-to-r from-[#00C8D4] to-[#00b2be] hover:from-[#00b2be] hover:to-[#00C8D4] text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#00C8D4]/30 hover:scale-[1.03] transition-all cursor-pointer"
+                  >
+                    <Search className="w-4 h-4 text-white stroke-[2.5]" />
+                    <span>Buscar</span>
+                  </button>
+                </div>
+
+              </form>
+            </div>
+
+            {/* FILA INFERIOR: PILLS / FILTROS RÁPIDOS DE INSTALACIONES */}
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+              <span className="text-[10px] uppercase font-black tracking-wider text-slate-200 mr-1 hidden sm:inline drop-shadow">
+                Filtros Populares:
+              </span>
+
+              {APM_QUICK_FILTERS.map((pill, idx) => {
+                const IconComp = pill.icon;
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      if (pill.roomVal) setFilterRoomType(pill.roomVal);
+                      if (pill.facilityVal) setFilterFacility(pill.facilityVal);
+                      const el = document.getElementById("habitaciones");
+                      if (el) el.scrollIntoView({ behavior: "smooth" });
+                    }}
+                    className="px-3.5 py-1.5 rounded-full bg-slate-900/60 hover:bg-slate-900/80 border border-white/20 text-white text-[11px] font-bold flex items-center gap-1.5 backdrop-blur-md transition-all hover:scale-105 cursor-pointer shadow-xs"
+                  >
+                    <div
+                      className="w-4 h-4 rounded-full flex items-center justify-center text-white shrink-0"
+                      style={{ backgroundColor: pill.solidBg }}
+                    >
+                      <IconComp className="w-2.5 h-2.5 text-white stroke-[2.5]" />
+                    </div>
+                    <span>{pill.label}</span>
+                  </button>
+                );
+              })}
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto pt-2">
@@ -1025,6 +1335,49 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             </p>
           </div>
 
+          {/* Indicador de Filtro Activo con Opción de Limpiar y Consultar */}
+          {(filterRoomType !== "all" || filterCapacity !== "all" || filterFacility !== "all") && (
+            <div className="mb-10 p-4 rounded-2xl bg-white/95 border border-[#00C8D4]/40 shadow-xl flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-[#00C8D4]/15 flex items-center justify-center text-[#00C8D4] shrink-0">
+                  <Sparkles className="w-4 h-4 text-[#00C8D4]" />
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-slate-900 block">
+                    Filtro aplicado: <span className="text-[#00C8D4] font-extrabold">{(APM_ROOM_TYPES.find(r => r.val === filterRoomType) || APM_ROOM_TYPES[0]).label}</span> • <span className="text-[#FF0096] font-extrabold">{(APM_CAPACITIES.find(c => c.val === filterCapacity) || APM_CAPACITIES[0]).label}</span> • <span className="text-[#9B00CC] font-extrabold">{(APM_FACILITIES.find(f => f.val === filterFacility) || APM_FACILITIES[0]).label}</span>
+                  </span>
+                  <span className="text-[11px] text-slate-500 font-medium">
+                    Mostrando habitaciones que coinciden con su búsqueda
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => { setFilterRoomType("all"); setFilterCapacity("all"); setFilterFacility("all"); }}
+                  className="px-4 py-2 rounded-full text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-all cursor-pointer"
+                >
+                  Restablecer
+                </button>
+                <a
+                  href={`https://wa.me/${cleanWhatsapp}?text=${encodeURIComponent(
+                    `¡Hola! Estoy visitando la web de ${config.name} y deseo consultar disponibilidad para:\n` +
+                    `🏨 Habitación: ${(APM_ROOM_TYPES.find(r => r.val === filterRoomType) || APM_ROOM_TYPES[0]).label}\n` +
+                    `👥 Capacidad: ${(APM_CAPACITIES.find(c => c.val === filterCapacity) || APM_CAPACITIES[0]).label}\n` +
+                    `✨ Servicio: ${(APM_FACILITIES.find(f => f.val === filterFacility) || APM_FACILITIES[0]).label}\n\n` +
+                    `¿Tienen disponibilidad en estas fechas?`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 rounded-full text-xs font-extrabold text-white bg-[#25D366] hover:bg-[#20bd5a] flex items-center gap-1.5 shadow-md transition-all cursor-pointer"
+                >
+                  <MessageCircle className="w-3.5 h-3.5 fill-current" />
+                  <span>Consultar esta búsqueda</span>
+                </a>
+              </div>
+            </div>
+          )}
+
           {loadingRooms ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[1, 2, 3].map((i) => (
@@ -1033,17 +1386,42 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {rooms.slice(0, 6).map((room) => (
-                <RoomCard
-                  key={room.id}
-                  room={room}
-                  hotelName={config.name}
-                  whatsappPhone={whatsapp}
-                  onOpenDetail={(r) => setSelectedRoom(r)}
-                  onToggleCart={toggleCartRoom}
-                  isInCart={cartRooms.some(cr => String(cr.id) === String(room.id))}
-                />
-              ))}
+              {rooms
+                .filter(room => {
+                  if (filterRoomType !== "all") {
+                    const text = `${room.name || ""} ${room.nombre || ""} ${room.category || ""} ${room.description || ""}`.toLowerCase();
+                    if (filterRoomType === "matrimonial" && !text.includes("matrimonial") && !text.includes("pareja") && !text.includes("king")) return false;
+                    if (filterRoomType === "triple" && !text.includes("triple") && room.capacity !== 3) return false;
+                    if (filterRoomType === "cuadruple" && !text.includes("cuádruple") && !text.includes("cuadruple") && room.capacity !== 4) return false;
+                    if (filterRoomType === "apartamento" && !text.includes("apartamento") && !text.includes("suite") && !text.includes("cocina")) return false;
+                    if (filterRoomType === "piscina" && !text.includes("piscina") && !text.includes("mar")) return false;
+                  }
+                  if (filterCapacity !== "all") {
+                    if (filterCapacity === "2" && room.capacity > 2 && room.capacity !== 2) return false;
+                    if (filterCapacity === "3" && room.capacity !== 3) return false;
+                    if (filterCapacity === "4" && room.capacity !== 4) return false;
+                    if (filterCapacity === "5+" && room.capacity < 5) return false;
+                  }
+                  if (filterFacility !== "all") {
+                    const amenities = (room.amenities || room.comodidades || []).map(a => String(a).toLowerCase());
+                    const desc = (room.description || "").toLowerCase();
+                    if (filterFacility === "cocina" && !amenities.some(a => a.includes("cocina")) && !desc.includes("cocina")) return false;
+                    if (filterFacility === "piscina" && !amenities.some(a => a.includes("piscina") || a.includes("mar")) && !desc.includes("piscina") && !desc.includes("mar")) return false;
+                  }
+                  return true;
+                })
+                .slice(0, 9)
+                .map((room) => (
+                  <RoomCard
+                    key={room.id}
+                    room={room}
+                    hotelName={config.name}
+                    whatsappPhone={whatsapp}
+                    onOpenDetail={(r) => setSelectedRoom(r)}
+                    onToggleCart={toggleCartRoom}
+                    isInCart={cartRooms.some(cr => String(cr.id) === String(room.id))}
+                  />
+                ))}
             </div>
           )}
 
