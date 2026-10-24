@@ -48,17 +48,17 @@ export function SocialProof({ language = "es" }: SocialProofProps) {
   const nextReview = APARTO_REVIEWS[(currentIndex + 1) % totalReviews];
 
   return (
-    <section id="opiniones" className="py-20 md:py-28 bg-slate-50/50 border-b border-slate-200/80 px-4 sm:px-6 lg:px-8">
+    <section id="opiniones" className="py-20 md:py-28 bg-slate-50/50 border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 font-roboto">
       <div className="max-w-7xl mx-auto space-y-16">
         
         {/* Encabezado Editorial Boutique */}
         <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00C8D4]/10 border border-[#00C8D4]/30 text-[#009da7] text-[11px] font-extrabold tracking-[0.25em] uppercase font-['Plus_Jakarta_Sans',sans-serif]">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00C8D4]/10 border border-[#00C8D4]/30 text-[#009da7] text-[11px] font-bold tracking-[0.25em] uppercase font-caviar">
             <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
             {t.badge}
           </div>
 
-          <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight font-serif">
+          <h2 className="text-3xl sm:text-5xl font-semibold text-slate-900 tracking-tight font-montserrat">
             {t.title}
           </h2>
 
@@ -68,7 +68,7 @@ export function SocialProof({ language = "es" }: SocialProofProps) {
                 <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
               ))}
             </div>
-            <span className="text-sm font-black text-slate-900 font-['Plus_Jakarta_Sans',sans-serif]">
+            <span className="text-sm font-semibold text-slate-900 font-roboto">
               {t.ratingText}
             </span>
           </div>
@@ -98,13 +98,13 @@ export function SocialProof({ language = "es" }: SocialProofProps) {
                   />
                   <div className="space-y-0.5">
                     <div className="flex items-center gap-1.5">
-                      <h4 className="font-extrabold text-base text-slate-900 font-serif">
+                      <h4 className="font-semibold text-base text-slate-900 font-montserrat">
                         {visibleReview.name}
                       </h4>
                       <CheckCircle2 className="w-4 h-4 text-[#00C8D4] fill-[#00C8D4]/15" />
                     </div>
                     
-                    <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
+                    <div className="flex items-center gap-2 text-xs text-slate-500 font-normal">
                       <span className="inline-flex items-center gap-1 text-[#FF0096] font-semibold text-[11px]">
                         <MapPin className="w-3 h-3" />
                         {visibleReview.location}
@@ -123,15 +123,15 @@ export function SocialProof({ language = "es" }: SocialProofProps) {
                 </div>
 
                 {/* Texto del Testimonio */}
-                <p className="text-slate-600 text-sm sm:text-base font-normal leading-relaxed font-['Inter',sans-serif] italic">
+                <p className="text-slate-600 text-sm sm:text-base font-normal leading-relaxed font-roboto italic">
                   "{visibleReview.content}"
                 </p>
               </div>
 
               {/* Pie de Tarjeta */}
-              <div className="pt-5 mt-6 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400 font-['Plus_Jakarta_Sans',sans-serif]">
-                <span className="text-[11px] font-medium">{visibleReview.role}</span>
-                <span className="text-[#00C8D4] font-bold text-[11px] bg-[#00C8D4]/10 px-2.5 py-0.5 rounded-full">
+              <div className="pt-5 mt-6 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400 font-roboto">
+                <span className="text-[11px] font-normal">{visibleReview.role}</span>
+                <span className="text-[#00C8D4] font-semibold text-[11px] bg-[#00C8D4]/10 px-2.5 py-0.5 rounded-full font-roboto">
                   Google Maps Oficial
                 </span>
               </div>
@@ -150,13 +150,13 @@ export function SocialProof({ language = "es" }: SocialProofProps) {
                   />
                   <div className="space-y-0.5">
                     <div className="flex items-center gap-1.5">
-                      <h4 className="font-extrabold text-base text-slate-900 font-serif">
+                      <h4 className="font-semibold text-base text-slate-900 font-montserrat">
                         {nextReview.name}
                       </h4>
                       <CheckCircle2 className="w-4 h-4 text-[#00C8D4] fill-[#00C8D4]/15" />
                     </div>
                     
-                    <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
+                    <div className="flex items-center gap-2 text-xs text-slate-500 font-normal">
                       <span className="inline-flex items-center gap-1 text-[#FF0096] font-semibold text-[11px]">
                         <MapPin className="w-3 h-3" />
                         {nextReview.location}
@@ -173,14 +173,14 @@ export function SocialProof({ language = "es" }: SocialProofProps) {
                   ))}
                 </div>
 
-                <p className="text-slate-600 text-sm sm:text-base font-normal leading-relaxed font-['Inter',sans-serif] italic">
+                <p className="text-slate-600 text-sm sm:text-base font-normal leading-relaxed font-roboto italic">
                   "{nextReview.content}"
                 </p>
               </div>
 
-              <div className="pt-5 mt-6 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400 font-['Plus_Jakarta_Sans',sans-serif]">
-                <span className="text-[11px] font-medium">{nextReview.role}</span>
-                <span className="text-[#00C8D4] font-bold text-[11px] bg-[#00C8D4]/10 px-2.5 py-0.5 rounded-full">
+              <div className="pt-5 mt-6 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400 font-roboto">
+                <span className="text-[11px] font-normal">{nextReview.role}</span>
+                <span className="text-[#00C8D4] font-semibold text-[11px] bg-[#00C8D4]/10 px-2.5 py-0.5 rounded-full font-roboto">
                   Google Maps Oficial
                 </span>
               </div>

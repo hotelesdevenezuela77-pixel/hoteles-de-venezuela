@@ -15,21 +15,21 @@ export function FaqAccordion({ language = "es" }: FaqAccordionProps) {
   };
 
   return (
-    <section id="faq" className="py-20 md:py-28 bg-white border-y border-slate-200/80 px-4 sm:px-6 lg:px-8">
+    <section id="faq" className="py-20 md:py-28 bg-white border-y border-slate-200/80 px-4 sm:px-6 lg:px-8 font-roboto">
       <div className="max-w-4xl mx-auto space-y-14">
         
         {/* Encabezado Editorial Boutique */}
         <div className="text-center space-y-4 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00C8D4]/10 border border-[#00C8D4]/30 text-[#009da7] text-[11px] font-extrabold tracking-[0.25em] uppercase font-['Plus_Jakarta_Sans',sans-serif]">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00C8D4]/10 border border-[#00C8D4]/30 text-[#009da7] text-[11px] font-bold tracking-[0.25em] uppercase font-caviar">
             <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
             {t.badge}
           </div>
 
-          <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight font-serif">
+          <h2 className="text-3xl sm:text-5xl font-semibold text-slate-900 tracking-tight font-montserrat">
             {t.title}
           </h2>
 
-          <p className="text-slate-600 text-sm sm:text-base font-normal font-['Inter',sans-serif] leading-relaxed">
+          <p className="text-slate-600 text-sm sm:text-base font-normal font-roboto leading-relaxed">
             {t.subtitle}
           </p>
         </div>
@@ -66,7 +66,7 @@ export function FaqAccordion({ language = "es" }: FaqAccordionProps) {
                       <HelpCircle className="w-4.5 h-4.5 stroke-[1.5]" />
                     </div>
 
-                    <span className="text-base sm:text-lg font-bold text-slate-900 font-serif tracking-tight">
+                    <span className="text-base sm:text-lg font-medium text-slate-900 font-montserrat tracking-tight">
                       {faq.question}
                     </span>
                   </div>
@@ -83,7 +83,7 @@ export function FaqAccordion({ language = "es" }: FaqAccordionProps) {
                 </button>
 
                 {isOpen && (
-                  <div className="px-5 sm:px-7 pb-7 pt-1 text-slate-600 text-xs sm:text-sm leading-relaxed font-['Inter',sans-serif] border-t border-slate-200/60 animate-fade-in pl-18">
+                  <div className="px-5 sm:px-7 pb-7 pt-1 text-slate-600 text-xs sm:text-sm leading-relaxed font-roboto border-t border-slate-200/60 animate-fade-in pl-18">
                     <p className="pt-2">{faq.answer}</p>
                   </div>
                 )}

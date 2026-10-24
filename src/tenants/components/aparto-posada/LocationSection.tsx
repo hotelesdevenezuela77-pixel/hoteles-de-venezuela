@@ -51,21 +51,21 @@ export function LocationSection({ whatsappPhone, hotelName, language = "es" }: L
   ];
 
   return (
-    <section id="ubicacion" className="py-20 md:py-28 bg-white px-4 sm:px-6 lg:px-8 space-y-20">
+    <section id="ubicacion" className="py-20 md:py-28 bg-white px-4 sm:px-6 lg:px-8 space-y-20 font-roboto">
       <div className="max-w-7xl mx-auto space-y-16">
         
         {/* Encabezado Editorial Boutique */}
         <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00C8D4]/10 border border-[#00C8D4]/30 text-[#009da7] text-[11px] font-extrabold tracking-[0.25em] uppercase font-['Plus_Jakarta_Sans',sans-serif]">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00C8D4]/10 border border-[#00C8D4]/30 text-[#009da7] text-[11px] font-bold tracking-[0.25em] uppercase font-caviar">
             <Compass className="w-3.5 h-3.5 text-[#00C8D4]" />
             {t.badge}
           </div>
 
-          <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight font-serif">
+          <h2 className="text-3xl sm:text-5xl font-semibold text-slate-900 tracking-tight font-montserrat">
             {t.title}
           </h2>
 
-          <p className="text-slate-600 text-sm sm:text-base font-normal font-['Inter',sans-serif] max-w-2xl mx-auto leading-relaxed">
+          <p className="text-slate-600 text-sm sm:text-base font-normal font-roboto max-w-2xl mx-auto leading-relaxed">
             {t.address}
           </p>
         </div>
@@ -76,7 +76,7 @@ export function LocationSection({ whatsappPhone, hotelName, language = "es" }: L
           {/* Columna Izquierda: Instrucciones de Ruta Paso a Paso */}
           <div className="lg:col-span-5 bg-slate-50/90 rounded-3xl p-6 sm:p-8 border border-slate-200/90 flex flex-col justify-between space-y-6">
             <div className="space-y-6">
-              <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-slate-400 font-['Plus_Jakarta_Sans',sans-serif]">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 font-caviar">
                 <Navigation className="w-4 h-4 text-[#00C8D4]" />
                 <span>{t.routeTitle}</span>
               </div>
@@ -84,14 +84,14 @@ export function LocationSection({ whatsappPhone, hotelName, language = "es" }: L
               <div className="space-y-5">
                 {instructions.map((step, idx) => (
                   <div key={idx} className="flex gap-4">
-                    <div className="w-8 h-8 rounded-full bg-[#00C8D4]/15 border border-[#00C8D4]/40 text-[#00C8D4] font-black text-xs flex items-center justify-center shrink-0 font-mono">
+                    <div className="w-8 h-8 rounded-full bg-[#00C8D4]/15 border border-[#00C8D4]/40 text-[#00C8D4] font-bold text-xs flex items-center justify-center shrink-0 font-mono">
                       {step.step}
                     </div>
                     <div className="space-y-1">
-                      <h4 className="text-sm font-bold text-slate-900 font-serif">
+                      <h4 className="text-sm font-semibold text-slate-900 font-montserrat">
                         {step.title}
                       </h4>
-                      <p className="text-xs text-slate-600 leading-relaxed font-['Inter',sans-serif]">
+                      <p className="text-xs text-slate-600 leading-relaxed font-roboto">
                         {step.desc}
                       </p>
                     </div>
@@ -146,15 +146,15 @@ export function LocationSection({ whatsappPhone, hotelName, language = "es" }: L
             >
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-white" />
-                <span className="text-xs font-black uppercase tracking-wider font-['Plus_Jakarta_Sans',sans-serif] text-white">
+                <span className="text-xs font-semibold uppercase tracking-wider font-montserrat text-white">
                   {language === "es" ? "Mapa Interactivo Morrocoy" : "Interactive Morrocoy Map"}
                 </span>
               </div>
-              <div className="flex items-center gap-1 bg-white/20 backdrop-blur-md p-1 rounded-xl border border-white/30">
+              <div className="flex items-center gap-1 bg-white/20 backdrop-blur-md p-1 rounded-xl border border-white/30 font-roboto">
                 <button
                   type="button"
                   onClick={() => setMapMode("estandar")}
-                  className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase transition-all cursor-pointer ${
+                  className={`px-3 py-1 rounded-lg text-[10px] font-semibold uppercase transition-all cursor-pointer ${
                     mapMode === "estandar" ? "bg-white text-[#FF0096] shadow-sm scale-105" : "text-white/80 hover:text-white"
                   }`}
                 >
@@ -163,7 +163,7 @@ export function LocationSection({ whatsappPhone, hotelName, language = "es" }: L
                 <button
                   type="button"
                   onClick={() => setMapMode("satelite")}
-                  className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase transition-all cursor-pointer ${
+                  className={`px-3 py-1 rounded-lg text-[10px] font-semibold uppercase transition-all cursor-pointer ${
                     mapMode === "satelite" ? "bg-white text-[#FF0096] shadow-sm scale-105" : "text-white/80 hover:text-white"
                   }`}
                 >
@@ -184,7 +184,7 @@ export function LocationSection({ whatsappPhone, hotelName, language = "es" }: L
                 className="w-full h-full min-h-[340px]"
               />
               <div 
-                className="absolute top-4 left-4 backdrop-blur-md px-4 py-1.5 rounded-2xl border border-white/40 text-[10px] text-white font-black flex items-center gap-2 shadow-2xl pointer-events-none"
+                className="absolute top-4 left-4 backdrop-blur-md px-4 py-1.5 rounded-2xl border border-white/40 text-[10px] text-white font-bold flex items-center gap-2 shadow-2xl pointer-events-none font-caviar"
                 style={{ background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)" }}
               >
                 <span className="w-2.5 h-2.5 rounded-full bg-white animate-pulse" />
@@ -222,16 +222,16 @@ export function LocationSection({ whatsappPhone, hotelName, language = "es" }: L
               />
             </div>
 
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-white text-[11px] font-extrabold tracking-[0.25em] uppercase font-['Plus_Jakarta_Sans',sans-serif]">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-white text-[11px] font-bold tracking-[0.25em] uppercase font-caviar">
               <Sparkles className="w-3.5 h-3.5 text-white" />
               {language === "es" ? "RESERVA DIRECTA GARANTIZADA 0% COMISIONES" : "GUARANTEED DIRECT BOOKING 0% COMMISSIONS"}
             </div>
 
-            <h3 className="text-3xl sm:text-5xl md:text-6xl font-black font-serif tracking-tight leading-[1.1] text-white drop-shadow-md">
+            <h3 className="text-3xl sm:text-5xl md:text-6xl font-semibold font-montserrat tracking-tight leading-[1.1] text-white drop-shadow-md">
               {t.ctaTitle}
             </h3>
 
-            <p className="text-sm sm:text-base md:text-lg text-white/95 font-normal leading-relaxed font-['Inter',sans-serif] max-w-2xl mx-auto drop-shadow-xs">
+            <p className="text-sm sm:text-base md:text-lg text-white/95 font-normal leading-relaxed font-roboto max-w-2xl mx-auto drop-shadow-xs">
               {t.ctaSub}
             </p>
 
@@ -240,14 +240,14 @@ export function LocationSection({ whatsappPhone, hotelName, language = "es" }: L
                 href={ctaWaUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-9 py-4 rounded-full font-extrabold text-sm sm:text-base text-[#FF0096] bg-white hover:bg-slate-100 transition-all shadow-2xl hover:scale-105 active:scale-95 flex items-center gap-3 cursor-pointer font-['Plus_Jakarta_Sans',sans-serif]"
+                className="px-9 py-4 rounded-full font-semibold text-sm sm:text-base text-[#FF0096] bg-white hover:bg-slate-100 transition-all shadow-2xl hover:scale-105 active:scale-95 flex items-center gap-3 cursor-pointer font-roboto"
               >
                 <MessageCircle className="w-5 h-5 fill-[#25D366] text-[#25D366]" />
                 <span>{t.ctaBtn}</span>
               </a>
             </div>
 
-            <div className="pt-2 flex items-center justify-center gap-6 text-xs text-white/90 font-medium">
+            <div className="pt-2 flex items-center justify-center gap-6 text-xs text-white/90 font-normal font-roboto">
               <span className="flex items-center gap-1.5">
                 <Check className="w-4 h-4 text-emerald-300 stroke-[3]" />
                 {language === "es" ? "Respuesta Inmediata" : "Instant Reply"}

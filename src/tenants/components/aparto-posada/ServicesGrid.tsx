@@ -11,21 +11,21 @@ export function ServicesGrid({ language = "es" }: ServicesGridProps) {
   const t = APARTO_TRANSLATIONS[language].services;
 
   return (
-    <section id="servicios" className="py-20 md:py-28 bg-white border-y border-slate-200/80 px-4 sm:px-6 lg:px-8">
+    <section id="servicios" className="py-20 md:py-28 bg-white border-y border-slate-200/80 px-4 sm:px-6 lg:px-8 font-roboto">
       <div className="max-w-7xl mx-auto space-y-16">
         
         {/* Encabezado Editorial Boutique */}
         <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00C8D4]/10 border border-[#00C8D4]/30 text-[#009da7] text-[11px] font-extrabold tracking-[0.25em] uppercase font-['Plus_Jakarta_Sans',sans-serif]">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00C8D4]/10 border border-[#00C8D4]/30 text-[#009da7] text-[11px] font-bold tracking-[0.25em] uppercase font-caviar">
             <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
             {t.badge}
           </div>
 
-          <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight font-serif">
+          <h2 className="text-3xl sm:text-5xl font-semibold text-slate-900 tracking-tight font-montserrat">
             {t.title}
           </h2>
 
-          <p className="text-slate-600 text-sm sm:text-base font-normal font-['Inter',sans-serif] max-w-2xl mx-auto leading-relaxed">
+          <p className="text-slate-600 text-sm sm:text-base font-normal font-roboto max-w-2xl mx-auto leading-relaxed">
             {t.subtitle}
           </p>
         </div>
@@ -48,17 +48,17 @@ export function ServicesGrid({ language = "es" }: ServicesGridProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <h3 className="text-xl font-bold text-slate-900 tracking-tight font-serif group-hover:text-[#00C8D4] transition-colors">
+                    <h3 className="text-xl font-semibold text-slate-900 tracking-tight font-montserrat group-hover:text-[#00C8D4] transition-colors">
                       {item.title}
                     </h3>
 
-                    <p className="text-slate-600 text-xs sm:text-sm font-normal leading-relaxed font-['Inter',sans-serif]">
+                    <p className="text-slate-600 text-xs sm:text-sm font-normal leading-relaxed font-roboto">
                       {item.description}
                     </p>
                   </div>
                 </div>
 
-                <div className="pt-5 mt-6 border-t border-slate-200/60 flex items-center gap-2 text-[11px] font-bold text-emerald-700 font-['Plus_Jakarta_Sans',sans-serif]">
+                <div className="pt-5 mt-6 border-t border-slate-200/60 flex items-center gap-2 text-[11px] font-semibold text-emerald-700 font-roboto">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                   <span>{t.included}</span>
                 </div>

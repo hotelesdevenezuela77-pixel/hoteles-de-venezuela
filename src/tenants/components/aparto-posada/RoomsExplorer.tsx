@@ -60,21 +60,21 @@ export function RoomsExplorer({
   };
 
   return (
-    <section id="habitaciones" className="py-20 md:py-28 bg-slate-50/60 px-4 sm:px-6 lg:px-8 border-b border-slate-200/80">
+    <section id="habitaciones" className="py-20 md:py-28 bg-slate-50/60 px-4 sm:px-6 lg:px-8 border-b border-slate-200/80 font-roboto">
       <div className="max-w-7xl mx-auto space-y-14">
         
         {/* Encabezado Editorial Boutique */}
         <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FF0096]/10 border border-[#FF0096]/30 text-[#FF0096] text-[11px] font-extrabold tracking-[0.25em] uppercase font-['Plus_Jakarta_Sans',sans-serif]">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FF0096]/10 border border-[#FF0096]/30 text-[#FF0096] text-[11px] font-bold tracking-[0.25em] uppercase font-caviar">
             <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
             {t.badge}
           </div>
 
-          <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight font-serif">
+          <h2 className="text-3xl sm:text-5xl font-semibold text-slate-900 tracking-tight font-montserrat">
             {t.title}
           </h2>
 
-          <p className="text-slate-600 text-sm sm:text-base font-normal font-['Inter',sans-serif] max-w-2xl mx-auto leading-relaxed">
+          <p className="text-slate-600 text-sm sm:text-base font-normal font-roboto max-w-2xl mx-auto leading-relaxed">
             {t.subtitle}
           </p>
         </div>
@@ -93,7 +93,7 @@ export function RoomsExplorer({
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-300 cursor-pointer font-['Plus_Jakarta_Sans',sans-serif] ${
+                className={`px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-300 cursor-pointer font-roboto ${
                   isActive
                     ? "bg-[#00C8D4] text-white shadow-lg shadow-[#00C8D4]/30 scale-105"
                     : "bg-white hover:bg-[#00C8D4]/10 text-slate-700 hover:text-[#00C8D4] border border-slate-200/90 shadow-xs"
@@ -133,13 +133,13 @@ export function RoomsExplorer({
                     {/* Badges Superiores */}
                     <div className="absolute top-4 left-4 flex flex-col gap-1.5 items-start z-10">
                       {/* Capacidad en Cristal Esmerilado Blanco Puro */}
-                      <span className="px-3.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider text-slate-900 bg-white/95 backdrop-blur-md shadow-md border border-white/90 font-['Plus_Jakarta_Sans',sans-serif] flex items-center gap-1.5">
+                      <span className="px-3.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider text-slate-900 bg-white/95 backdrop-blur-md shadow-md border border-white/90 font-caviar flex items-center gap-1.5">
                         <Users className="w-3.5 h-3.5 text-[#00C8D4] stroke-[2.2]" />
                         <span>{room.capacityText}</span>
                       </span>
 
                       {/* Categoría en Color Oficial */}
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider font-['Plus_Jakarta_Sans',sans-serif] flex items-center gap-1 ${getCategoryBadgeStyle(room.badgeCategory)}`}>
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider font-caviar flex items-center gap-1 ${getCategoryBadgeStyle(room.badgeCategory)}`}>
                         <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                         {room.badgeLabel}
                       </span>
@@ -149,28 +149,28 @@ export function RoomsExplorer({
                     <div className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/90 shadow-xl text-right group-hover:scale-105 transition-all duration-300 z-10">
                       <div className="flex items-center justify-end gap-1.5 mb-0.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#00C8D4]" />
-                        <span className="text-[10px] uppercase font-black tracking-wider text-[#00C8D4] font-['Plus_Jakarta_Sans',sans-serif]">
+                        <span className="text-[10px] uppercase font-bold tracking-wider text-[#00C8D4] font-caviar">
                           {t.directRate}
                         </span>
                       </div>
                       <div className="flex items-baseline justify-end gap-1">
-                        <span className="text-xs font-semibold text-slate-500 font-['Inter',sans-serif]">{t.from}</span>
-                        <span className="text-2xl font-black text-slate-900 tracking-tight font-serif">
+                        <span className="text-xs font-normal text-slate-500 font-roboto">{t.from}</span>
+                        <span className="text-2xl font-semibold text-slate-900 tracking-tight font-montserrat">
                           ${price}.00
                         </span>
                         <span className="text-xs font-bold text-[#FF0096]">USD</span>
-                        <span className="text-[11px] text-slate-500 font-semibold font-['Inter',sans-serif]">{t.perNight}</span>
+                        <span className="text-[11px] text-slate-500 font-normal font-roboto">{t.perNight}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Cuerpo de la tarjeta con Tipografía Elegante */}
                   <div className="p-7 space-y-4">
-                    <h3 className="text-xl sm:text-2xl font-bold text-slate-900 font-serif tracking-tight group-hover:text-[#00C8D4] transition-colors leading-snug">
+                    <h3 className="text-xl sm:text-2xl font-semibold text-slate-900 font-montserrat tracking-tight group-hover:text-[#00C8D4] transition-colors leading-snug">
                       {room.nombre || room.name}
                     </h3>
 
-                    <p className="text-slate-600 text-xs sm:text-sm font-normal leading-relaxed line-clamp-2 font-['Inter',sans-serif]">
+                    <p className="text-slate-600 text-xs sm:text-sm font-normal leading-relaxed line-clamp-2 font-roboto">
                       {room.description}
                     </p>
 
@@ -206,7 +206,7 @@ export function RoomsExplorer({
                       href={getWaUrl(room)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#20ba59] hover:to-[#0f7a6e] text-white font-black text-xs uppercase tracking-wider transition-all duration-300 shadow-md hover:shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-2 cursor-pointer font-['Plus_Jakarta_Sans',sans-serif] active:scale-95 group/wa"
+                      className="flex-1 py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#20ba59] hover:to-[#0f7a6e] text-white font-semibold text-xs uppercase tracking-wider transition-all duration-300 shadow-md hover:shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-2 cursor-pointer font-roboto active:scale-95 group/wa"
                     >
                       <MessageCircle className="w-4 h-4 fill-white shrink-0 group-hover/wa:scale-110 transition-transform" />
                       <span>{t.quoteWa}</span>
@@ -216,7 +216,7 @@ export function RoomsExplorer({
                     <button
                       type="button"
                       onClick={() => onOpenDetail(room)}
-                      className="py-3.5 px-4 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 hover:text-[#00C8D4] border border-slate-200 hover:border-[#00C8D4] font-bold text-xs transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer shrink-0 font-['Plus_Jakarta_Sans',sans-serif] shadow-xs group/det"
+                      className="py-3.5 px-4 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 hover:text-[#00C8D4] border border-slate-200 hover:border-[#00C8D4] font-semibold text-xs transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer shrink-0 font-roboto shadow-xs group/det"
                       title={t.details}
                     >
                       <Eye className="w-4 h-4 text-slate-500 group-hover/det:text-[#00C8D4] transition-colors" />
@@ -225,12 +225,12 @@ export function RoomsExplorer({
                   </div>
 
                   {/* Garantía directa al pie de la tarjeta */}
-                  <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 pt-2 border-t border-slate-100">
-                    <span className="inline-flex items-center gap-1 text-emerald-600 font-bold">
+                  <div className="flex items-center justify-between text-[11px] font-normal text-slate-500 pt-2 border-t border-slate-100 font-roboto">
+                    <span className="inline-flex items-center gap-1 text-emerald-600 font-semibold">
                       <Check className="w-3.5 h-3.5 stroke-[2.5]" />
                       <span>{t.directBooking}</span>
                     </span>
-                    <span className="text-[#00C8D4] font-bold uppercase tracking-wider text-[10px]">
+                    <span className="text-[#00C8D4] font-bold uppercase tracking-wider text-[10px] font-caviar">
                       {t.noCommission}
                     </span>
                   </div>
@@ -239,9 +239,9 @@ export function RoomsExplorer({
                     <button
                       type="button"
                       onClick={() => onToggleCart(room)}
-                      className={`w-full py-2 px-3 rounded-xl text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                      className={`w-full py-2 px-3 rounded-xl text-[11px] font-normal transition-all flex items-center justify-center gap-1.5 cursor-pointer font-roboto ${
                         isInCart
-                          ? "bg-pink-50 text-[#FF0096] border border-[#FF0096]/30"
+                          ? "bg-pink-50 text-[#FF0096] border border-[#FF0096]/30 font-semibold"
                           : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
                       }`}
                     >
@@ -261,7 +261,7 @@ export function RoomsExplorer({
           <button
             type="button"
             onClick={onOpenAllRooms}
-            className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-bold text-sm text-slate-900 bg-white hover:bg-slate-50 border border-slate-300 hover:border-[#00C8D4] transition-all shadow-sm hover:shadow-lg active:scale-95 cursor-pointer font-['Plus_Jakarta_Sans',sans-serif]"
+            className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-semibold text-sm text-slate-900 bg-white hover:bg-slate-50 border border-slate-300 hover:border-[#00C8D4] transition-all shadow-sm hover:shadow-lg active:scale-95 cursor-pointer font-roboto"
           >
             <Layers className="w-4.5 h-4.5 text-[#00C8D4]" />
             <span>{t.viewAll}</span>

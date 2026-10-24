@@ -10,7 +10,7 @@ export function TrustBar({ language = "es" }: TrustBarProps) {
   const t = APARTO_TRANSLATIONS[language].trustBar;
 
   return (
-    <div className="w-full max-w-5xl mx-auto mt-4 px-2">
+    <div className="w-full max-w-5xl mx-auto mt-4 px-2 font-roboto">
       <div className="bg-white/95 backdrop-blur-md rounded-2xl md:rounded-full border border-slate-200/90 shadow-xl shadow-cyan-950/10 px-4 sm:px-8 py-3.5 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-0 divide-y md:divide-y-0 md:divide-x divide-slate-100">
         
         {/* Item 1: Google Reviews */}
@@ -20,11 +20,11 @@ export function TrustBar({ language = "es" }: TrustBarProps) {
           </div>
           <div className="text-left">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs sm:text-sm font-extrabold text-slate-900 font-['Plus_Jakarta_Sans',sans-serif] tracking-tight">
+              <span className="text-xs sm:text-sm font-semibold text-slate-900 font-montserrat tracking-tight">
                 {t.googleTitle}
               </span>
             </div>
-            <span className="text-[11px] text-slate-500 font-medium block font-['Inter',sans-serif]">
+            <span className="text-[11px] text-slate-500 font-normal block font-roboto">
               {t.googleSub}
             </span>
           </div>
@@ -36,10 +36,10 @@ export function TrustBar({ language = "es" }: TrustBarProps) {
             <ShieldCheck className="w-4.5 h-4.5 text-white stroke-[2.5]" />
           </div>
           <div className="text-left">
-            <span className="text-xs sm:text-sm font-extrabold text-slate-900 font-['Plus_Jakarta_Sans',sans-serif] tracking-tight block">
+            <span className="text-xs sm:text-sm font-semibold text-slate-900 font-montserrat tracking-tight block">
               {t.commTitle}
             </span>
-            <span className="text-[11px] text-slate-500 font-medium block font-['Inter',sans-serif]">
+            <span className="text-[11px] text-slate-500 font-normal block font-roboto">
               {t.commSub}
             </span>
           </div>
@@ -51,10 +51,10 @@ export function TrustBar({ language = "es" }: TrustBarProps) {
             <Zap className="w-4.5 h-4.5 text-white fill-white" />
           </div>
           <div className="text-left">
-            <span className="text-xs sm:text-sm font-extrabold text-slate-900 font-['Plus_Jakarta_Sans',sans-serif] tracking-tight block">
+            <span className="text-xs sm:text-sm font-semibold text-slate-900 font-montserrat tracking-tight block">
               {t.powerTitle}
             </span>
-            <span className="text-[11px] text-slate-500 font-medium block font-['Inter',sans-serif]">
+            <span className="text-[11px] text-slate-500 font-normal block font-roboto">
               {t.powerSub}
             </span>
           </div>

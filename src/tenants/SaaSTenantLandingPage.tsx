@@ -710,10 +710,14 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               </div>
             )}
             <div>
-              <span className="text-lg sm:text-xl font-black font-serif text-[#1e293b] tracking-wide group-hover:text-[#FF0096] transition-colors block leading-tight">
+              <span className={`text-lg sm:text-xl tracking-wide group-hover:text-[#FF0096] transition-colors block leading-tight ${
+                isApartoPosada ? "font-semibold font-montserrat text-[#1e293b]" : "font-black font-serif text-[#1e293b]"
+              }`}>
                 {config.name}
               </span>
-              <span className="text-[10px] text-[#0099AA] font-black tracking-widest uppercase block">
+              <span className={`text-[10px] text-[#0099AA] uppercase block ${
+                isApartoPosada ? "font-bold font-caviar tracking-widest" : "font-black tracking-widest"
+              }`}>
                 Sello Oficial de Excelencia
               </span>
             </div>
@@ -729,7 +733,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               <a href="#contacto" className="hover:text-[#FF0096] transition-colors">Ubicación</a>
             </nav>
           ) : isApartoPosada ? (
-            <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-700">
+            <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-slate-700 font-roboto">
               <a href="#inicio" className="hover:text-[#FF0096] transition-colors">{tAparto.nav.home}</a>
               <a href="#habitaciones" className="hover:text-[#FF0096] transition-colors">{tAparto.nav.rooms}</a>
               <a href="#galeria" className="hover:text-[#FF0096] transition-colors">{tAparto.nav.gallery}</a>
@@ -783,7 +787,9 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               href={generalWaUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-black text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-md hover:shadow-lg active:scale-95 shrink-0 cursor-pointer"
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-xs text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-md hover:shadow-lg active:scale-95 shrink-0 cursor-pointer ${
+                isApartoPosada ? "font-roboto font-semibold" : "font-black"
+              }`}
             >
               <MessageCircle className="w-4 h-4 fill-current" />
               <span className="hidden sm:inline">
@@ -969,7 +975,9 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         ) : (
           <div className="relative z-10 max-w-5xl mx-auto px-6 py-20 text-center space-y-8 animate-fade-in">
             
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 backdrop-blur border border-[#00C8D4]/40 text-[#00C8D4] text-[11px] font-extrabold tracking-[0.25em] uppercase shadow-2xl">
+            <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 backdrop-blur border border-[#00C8D4]/40 text-[#00C8D4] text-[11px] uppercase shadow-2xl ${
+              isApartoPosada ? "font-caviar font-bold tracking-[0.25em]" : "font-extrabold tracking-[0.25em]"
+            }`}>
               <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
               {isApartoPosada 
                 ? tAparto.hero.tagline 
@@ -980,8 +988,8 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                     : "EL PARAÍSO TE ESPERA • HOSPEDAJE DE EXCELENCIA"}
             </div>
 
-            <h1 className={`text-4xl sm:text-6xl md:text-7xl font-black text-white tracking-tight leading-tight drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)] ${
-              isApartoPosada ? "font-['Plus_Jakarta_Sans',sans-serif]" : "font-serif"
+            <h1 className={`text-4xl sm:text-6xl md:text-7xl text-white tracking-tight leading-tight drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)] ${
+              isApartoPosada ? "font-montserrat font-semibold" : "font-serif font-black"
             }`}>
               {config.name}
             </h1>
@@ -993,7 +1001,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                     <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isApartoPosada ? "bg-[#00C8D4]" : isMyCampers || isPerlaNegra ? "bg-emerald-400" : "bg-[#00C8D4]"} opacity-75`}></span>
                     <span className={`relative inline-flex rounded-full h-3 w-3 ${isApartoPosada ? "bg-[#00C8D4]" : isMyCampers || isPerlaNegra ? "bg-emerald-400" : "bg-[#00C8D4]"}`}></span>
                   </span>
-                  <span className={`text-xs sm:text-sm font-black uppercase tracking-[0.2em] ${isApartoPosada ? "text-[#00C8D4]" : isMyCampers || isPerlaNegra ? "text-emerald-300" : "text-[#00C8D4]"} drop-shadow`}>
+                  <span className={`text-xs sm:text-sm uppercase tracking-[0.2em] ${isApartoPosada ? "text-[#00C8D4] font-caviar font-bold" : isMyCampers || isPerlaNegra ? "text-emerald-300 font-black" : "text-[#00C8D4] font-black"} drop-shadow`}>
                     {isApartoPosada
                       ? tAparto.hero.upcomingLaunch
                       : isMyCampers
@@ -1006,8 +1014,9 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               </div>
 
               <p 
-                className="text-sm sm:text-base md:text-lg text-white/95 font-normal max-w-2xl mx-auto leading-relaxed drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)] tracking-normal font-sans"
-                style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 400 }}
+                className={`text-sm sm:text-base md:text-lg text-white/95 font-normal max-w-2xl mx-auto leading-relaxed drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)] tracking-normal ${
+                  isApartoPosada ? "font-roboto" : "font-sans"
+                }`}
               >
                 {isApartoPosada
                   ? tAparto.hero.subtitle
@@ -1312,7 +1321,9 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               
               <a
                 href="#habitaciones"
-                className="px-8 py-4 rounded-2xl font-extrabold text-sm text-white bg-[#00C8D4] hover:bg-[#00b0bc] transition-all shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer"
+                className={`px-8 py-4 rounded-2xl text-sm text-white bg-[#00C8D4] hover:bg-[#00b0bc] transition-all shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer ${
+                  isApartoPosada ? "font-roboto font-semibold" : "font-extrabold"
+                }`}
               >
                 <span>{isApartoPosada ? (apartoLang === "es" ? "Ver Habitaciones & Tarifas" : "Explore Rooms & Rates") : "Ver Habitaciones & Tarifas"}</span>
                 <ArrowRight className="w-4 h-4" />
@@ -1322,7 +1333,9 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                 href={generalWaUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-8 py-4 rounded-2xl font-extrabold text-sm text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer"
+                className={`px-8 py-4 rounded-2xl text-sm text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer ${
+                  isApartoPosada ? "font-roboto font-semibold" : "font-extrabold"
+                }`}
               >
                 <MessageCircle className="w-4 h-4 fill-current" />
                 <span>{isApartoPosada ? (apartoLang === "es" ? "Reservar Directo por WhatsApp" : "Book Directly on WhatsApp") : "Reservar Directo por WhatsApp"}</span>

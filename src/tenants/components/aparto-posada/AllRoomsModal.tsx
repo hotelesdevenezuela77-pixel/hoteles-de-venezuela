@@ -42,21 +42,21 @@ export function AllRoomsModal({
 
   return (
     <div 
-      className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-6 bg-slate-950/80 backdrop-blur-md animate-fade-in overflow-y-auto"
+      className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-6 bg-slate-950/80 backdrop-blur-md animate-fade-in overflow-y-auto font-roboto"
       onClick={onClose}
     >
       <div 
-        className="relative max-w-6xl w-full bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-auto max-h-[92vh] flex flex-col"
+        className="relative max-w-6xl w-full bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-auto max-h-[92vh] flex flex-col font-roboto"
         onClick={e => e.stopPropagation()}
       >
         {/* Header Modal */}
         <div className="p-5 sm:p-6 bg-gradient-to-r from-[#0e011f] to-[#1a0533] text-white flex items-center justify-between shrink-0 border-b border-white/10">
           <div>
-            <div className="flex items-center gap-2 text-[#00C8D4] text-xs font-bold uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-[#00C8D4] text-xs font-bold uppercase tracking-wider font-caviar">
               <Layers className="w-4 h-4 text-[#00C8D4]" />
               <span>{language === "es" ? "Inventario Completo de Alojamiento" : "Complete Lodging Inventory"}</span>
             </div>
-            <h3 className="text-xl sm:text-2xl font-black font-['Plus_Jakarta_Sans',sans-serif] text-white">
+            <h3 className="text-xl sm:text-2xl font-semibold font-montserrat text-white">
               {language === "es" ? "Catálogo de Unidades" : "Units Catalog"} • {hotelName}
             </h3>
           </div>
@@ -70,7 +70,7 @@ export function AllRoomsModal({
         </div>
 
         {/* Barra de Filtros y Búsqueda */}
-        <div className="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+        <div className="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0 font-roboto">
           <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
             {[
               { id: "all", label: language === "es" ? "Todas" : "All" },
@@ -82,9 +82,9 @@ export function AllRoomsModal({
                 key={tab.id}
                 type="button"
                 onClick={() => setFilterType(tab.id)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                   filterType === tab.id
-                    ? "bg-[#00C8D4] text-white font-extrabold shadow-sm"
+                    ? "bg-[#00C8D4] text-white font-bold shadow-sm"
                     : "bg-white text-slate-700 hover:bg-slate-200 border border-slate-200"
                 }`}
               >
@@ -100,13 +100,13 @@ export function AllRoomsModal({
               placeholder={language === "es" ? "Buscar unidad..." : "Search unit..."}
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-1.5 bg-white border border-slate-200 rounded-full text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#00C8D4]"
+              className="w-full pl-9 pr-4 py-1.5 bg-white border border-slate-200 rounded-full text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#00C8D4] font-roboto"
             />
           </div>
         </div>
 
         {/* Lista de Unidades */}
-        <div className="p-4 sm:p-6 overflow-y-auto space-y-4">
+        <div className="p-4 sm:p-6 overflow-y-auto space-y-4 font-roboto">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map(room => {
               const price = room.price_per_night || room.price_usd || 85;
@@ -128,20 +128,20 @@ export function AllRoomsModal({
                         alt={room.nombre || room.name}
                         className="w-full h-full object-cover filter brightness-[1.02] contrast-[1.02] group-hover:scale-105 transition-transform duration-500"
                       />
-                      <span className="absolute top-2.5 left-2.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider text-slate-900 bg-white/95 backdrop-blur-md shadow-md border border-white/80">
+                      <span className="absolute top-2.5 left-2.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-slate-900 bg-white/95 backdrop-blur-md shadow-md border border-white/80 font-caviar">
                         {room.capacityText}
                       </span>
-                      <div className="absolute bottom-2.5 right-2.5 px-3 py-1 rounded-xl text-xs font-black text-slate-900 bg-white/95 backdrop-blur-md shadow-md border border-white/80 flex items-baseline gap-1">
+                      <div className="absolute bottom-2.5 right-2.5 px-3 py-1 rounded-xl text-xs font-semibold text-slate-900 bg-white/95 backdrop-blur-md shadow-md border border-white/80 flex items-baseline gap-1 font-montserrat">
                         <span>${price}</span>
                         <span className="text-[10px] font-bold text-[#FF0096]">USD</span>
                       </div>
                     </div>
 
                     <div className="p-4 space-y-2">
-                      <h4 className="font-black text-base text-slate-900 font-['Plus_Jakarta_Sans',sans-serif] group-hover:text-[#00C8D4] transition-colors">
+                      <h4 className="font-semibold text-base text-slate-900 font-montserrat group-hover:text-[#00C8D4] transition-colors">
                         {room.nombre || room.name}
                       </h4>
-                      <p className="text-xs text-slate-600 line-clamp-2">
+                      <p className="text-xs text-slate-600 line-clamp-2 font-roboto">
                         {room.description}
                       </p>
                     </div>
@@ -152,7 +152,7 @@ export function AllRoomsModal({
                       href={waUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#20ba59] hover:to-[#0f7a6e] text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:shadow-md transition-all"
+                      className="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#20ba59] hover:to-[#0f7a6e] text-white text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:shadow-md transition-all font-roboto"
                     >
                       <MessageCircle className="w-3.5 h-3.5 fill-white" />
                       <span>{language === "es" ? "Cotizar" : "Quote"}</span>
@@ -160,7 +160,7 @@ export function AllRoomsModal({
                     <button
                       type="button"
                       onClick={() => { onClose(); onOpenDetail(room); }}
-                      className="py-2.5 px-3 rounded-xl bg-white hover:bg-[#00C8D4] text-[#00C8D4] hover:text-white border border-[#00C8D4]/40 font-bold text-xs cursor-pointer transition-all flex items-center justify-center"
+                      className="py-2.5 px-3 rounded-xl bg-white hover:bg-[#00C8D4] text-[#00C8D4] hover:text-white border border-[#00C8D4]/40 font-semibold text-xs cursor-pointer transition-all flex items-center justify-center font-roboto"
                       title={language === "es" ? "Ver detalles" : "View details"}
                     >
                       <Eye className="w-3.5 h-3.5" />
@@ -173,7 +173,7 @@ export function AllRoomsModal({
         </div>
 
         {/* Footer Modal */}
-        <div className="p-4 bg-slate-50 border-t border-slate-200 text-center text-xs text-slate-500 shrink-0">
+        <div className="p-4 bg-slate-50 border-t border-slate-200 text-center text-xs text-slate-500 shrink-0 font-roboto">
           {language === "es"
             ? `Mostrando ${filtered.length} unidades disponibles en ${hotelName}. Trato directo sin comisiones.`
             : `Showing ${filtered.length} units available at ${hotelName}. Direct booking without intermediaries.`}

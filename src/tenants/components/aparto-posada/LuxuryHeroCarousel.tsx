@@ -204,7 +204,7 @@ export function LuxuryHeroCarousel({ onOpenImage, language = "es" }: LuxuryHeroC
   const slideCategory = currentSlide.category[language] || currentSlide.category.es;
 
   return (
-    <div className="w-full max-w-6xl mx-auto mt-10 px-2 sm:px-4">
+    <div className="w-full max-w-6xl mx-auto mt-10 px-2 sm:px-4 font-roboto">
       {/* Marco Principal del Carrusel */}
       <div
         className="relative rounded-3xl sm:rounded-[2.5rem] overflow-hidden bg-slate-900 border border-slate-200/90 shadow-2xl group select-none transition-all duration-300"
@@ -247,7 +247,7 @@ export function LuxuryHeroCarousel({ onOpenImage, language = "es" }: LuxuryHeroC
         <div className="absolute top-4 sm:top-6 left-4 sm:left-6 right-4 sm:right-6 z-20 flex items-center justify-between pointer-events-auto">
           {/* Badge de Categoría */}
           <div className="flex items-center gap-2">
-            <span className="px-3.5 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest text-slate-900 bg-white/95 backdrop-blur-md shadow-lg border border-white/80 font-['Plus_Jakarta_Sans',sans-serif] flex items-center gap-1.5">
+            <span className="px-3.5 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest text-slate-900 bg-white/95 backdrop-blur-md shadow-lg border border-white/80 font-caviar flex items-center gap-1.5">
               <Camera className="w-3.5 h-3.5 text-[#00C8D4] stroke-[2.5]" />
               <span>{slideTag}</span>
             </span>
@@ -263,7 +263,7 @@ export function LuxuryHeroCarousel({ onOpenImage, language = "es" }: LuxuryHeroC
             <button
               type="button"
               onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-              className="p-2 sm:p-2.5 rounded-full bg-white/90 hover:bg-white text-slate-800 hover:text-[#FF0096] transition-all shadow-md backdrop-blur-md cursor-pointer hover:scale-105 active:scale-95 border border-white/60"
+              className="p-2 sm:p-2.5 rounded-full bg-white/90 hover:bg-white text-slate-800 hover:text-[#FF0096] transition-all shadow-md backdrop-blur-md cursor-pointer hover:scale-105 active:scale-95 border border-white/60 font-roboto"
               title={isAutoPlaying ? "Pause auto-slide" : "Play auto-slide"}
               aria-label="Pause or play carousel"
             >
@@ -278,11 +278,11 @@ export function LuxuryHeroCarousel({ onOpenImage, language = "es" }: LuxuryHeroC
               <button
                 type="button"
                 onClick={() => onOpenImage(currentSlide.image, slideTitle)}
-                className="p-2 sm:p-2.5 rounded-full bg-white/90 hover:bg-white text-slate-800 hover:text-[#00C8D4] transition-all shadow-md backdrop-blur-md cursor-pointer hover:scale-105 active:scale-95 border border-white/60 flex items-center gap-1.5 text-xs font-bold"
+                className="p-2 sm:p-2.5 rounded-full bg-white/90 hover:bg-white text-slate-800 hover:text-[#00C8D4] transition-all shadow-md backdrop-blur-md cursor-pointer hover:scale-105 active:scale-95 border border-white/60 flex items-center gap-1.5 text-xs font-semibold font-roboto"
                 title="View Full HD"
               >
                 <Maximize2 className="w-3.5 h-3.5 stroke-[2.2]" />
-                <span className="hidden md:inline text-[11px] font-['Plus_Jakarta_Sans',sans-serif]">
+                <span className="hidden md:inline text-[11px]">
                   {language === "es" ? "Ver en HD" : "View in HD"}
                 </span>
               </button>
@@ -312,16 +312,16 @@ export function LuxuryHeroCarousel({ onOpenImage, language = "es" }: LuxuryHeroC
         {/* Ficha Inferior Flotante con Descripción e Indicadores */}
         <div className="absolute bottom-0 inset-x-0 z-20 p-5 sm:p-8 bg-gradient-to-t from-[#0e011f] via-[#0e011f]/85 to-transparent">
           <div className="max-w-3xl space-y-2 text-left">
-            <div className="inline-flex items-center gap-2 text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-[#00C8D4] font-['Plus_Jakarta_Sans',sans-serif]">
+            <div className="inline-flex items-center gap-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-[#00C8D4] font-caviar">
               <Sparkles className="w-3 h-3 text-[#FF0096]" />
               <span>{slideCategory}</span>
             </div>
 
-            <h3 className="text-xl sm:text-3xl md:text-4xl font-black text-white tracking-tight font-serif drop-shadow-md leading-tight">
+            <h3 className="text-xl sm:text-3xl md:text-4xl font-semibold text-white tracking-tight font-montserrat drop-shadow-md leading-tight">
               {slideTitle}
             </h3>
 
-            <p className="text-slate-200 text-xs sm:text-sm font-normal max-w-2xl leading-relaxed font-['Inter',sans-serif] drop-shadow-sm line-clamp-2 sm:line-clamp-none">
+            <p className="text-slate-200 text-xs sm:text-sm font-normal max-w-2xl leading-relaxed font-roboto drop-shadow-sm line-clamp-2 sm:line-clamp-none">
               {slideSubtitle}
             </p>
           </div>
@@ -349,7 +349,7 @@ export function LuxuryHeroCarousel({ onOpenImage, language = "es" }: LuxuryHeroC
       </div>
 
       {/* Tira de Miniaturas Inferiores con Selector Rápido */}
-      <div className="mt-4 hidden md:flex items-center justify-between gap-2.5 overflow-x-auto pb-2 scrollbar-none">
+      <div className="mt-4 hidden md:flex items-center justify-between gap-2.5 overflow-x-auto pb-2 scrollbar-none font-roboto">
         {APARTO_CAROUSEL_SLIDES.map((slide, idx) => {
           const isSelected = idx === currentIndex;
           return (
@@ -370,7 +370,7 @@ export function LuxuryHeroCarousel({ onOpenImage, language = "es" }: LuxuryHeroC
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-black/30 group-hover:bg-transparent transition-colors" />
-                <span className="absolute bottom-1 left-2 text-[9px] font-bold text-white drop-shadow truncate max-w-[90%] font-['Plus_Jakarta_Sans',sans-serif]">
+                <span className="absolute bottom-1 left-2 text-[9px] font-medium text-white drop-shadow truncate max-w-[90%] font-caviar">
                   {slide.tag[language]}
                 </span>
               </div>
