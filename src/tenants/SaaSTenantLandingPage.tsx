@@ -54,6 +54,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
   const isRestaurant = config.business_type === "restaurant" || (config.slug && config.slug.toLowerCase().includes("oleaje"));
   const isPerlaNegra = (config.slug && config.slug.toLowerCase().includes("perla-negra")) || config.establishment_id === 102 || (config.name && config.name.toLowerCase().includes("perla negra"));
   const isMyCampers = (config.slug && config.slug.toLowerCase().includes("my-campers")) || config.establishment_id === 103 || (config.name && config.name.toLowerCase().includes("my campers"));
+  const isApartoPosada = (config.slug && config.slug.toLowerCase().includes("aparto-posada")) || config.establishment_id === 2 || (config.name && config.name.toLowerCase().includes("aparto posada")) || (config.domain && config.domain.toLowerCase().includes("apartoposadadelmar"));
   const [activeMenuCategory, setActiveMenuCategory] = useState<string>("all");
   const [orderCart, setOrderCart] = useState<{ dish: OleajeDish; count: number }[]>([]);
 
@@ -621,10 +622,14 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           <img
             src={bannerImage}
             alt={config.name}
-            className="w-full h-full object-cover scale-[1.08] filter brightness-95"
+            className={`w-full h-full object-cover scale-[1.08] transition-transform duration-1000 ${
+              isApartoPosada ? "filter brightness-105 contrast-[1.02]" : "filter brightness-95"
+            }`}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent"></div>
-          <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-white via-white/70 to-transparent"></div>
+          {!isApartoPosada && (
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent"></div>
+          )}
+          <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none"></div>
         </div>
 
         {isRestaurant ? (
@@ -708,24 +713,30 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               {isMyCampers ? "DONDE EL SILENCIO SE VUELVE MÚSICA • CUBIRO, LARA" : isPerlaNegra ? "BIENVENIDOS A MORROCOY • POSADA PERLA NEGRA" : "EL PARAÍSO TE ESPERA • HOSPEDAJE DE EXCELENCIA"}
             </div>
 
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-black font-serif text-white tracking-tight leading-tight drop-shadow-2xl">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-black font-serif text-white tracking-tight leading-tight drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)]">
               {config.name}
             </h1>
 
             <div className="flex flex-col items-center justify-center gap-3">
-              <div className="inline-flex items-center gap-2.5 p-[2px] rounded-2xl bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] shadow-2xl hover:scale-105 transition-all">
-                <div className="px-5 py-2 rounded-[14px] bg-slate-900/90 backdrop-blur flex items-center gap-2.5">
+              <div className="inline-flex items-center gap-2.5 p-[2px] rounded-full bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] shadow-2xl animate-pulse hover:scale-105 transition-all cursor-pointer">
+                <div className="px-5 py-2 rounded-full bg-slate-950/90 backdrop-blur-md flex items-center gap-2.5">
                   <span className="relative flex h-3 w-3 shrink-0">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-400"></span>
+                    <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isApartoPosada ? "bg-[#00C8D4]" : isMyCampers || isPerlaNegra ? "bg-emerald-400" : "bg-[#00C8D4]"} opacity-75`}></span>
+                    <span className={`relative inline-flex rounded-full h-3 w-3 ${isApartoPosada ? "bg-[#00C8D4]" : isMyCampers || isPerlaNegra ? "bg-emerald-400" : "bg-[#00C8D4]"}`}></span>
                   </span>
-                  <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-emerald-300 drop-shadow">
-                    {isMyCampers ? "✨ SELLO OFICIAL DE EXCELENCIA • CUBIRO, LARA" : isPerlaNegra ? "✨ SELLO OFICIAL DE EXCELENCIA • CHICHIRIVICHE" : "✨ HOSPEDAJE DE EXCELENCIA • RESERVA DIRECTA"}
+                  <span className={`text-xs sm:text-sm font-black uppercase tracking-[0.2em] ${isApartoPosada ? "text-[#00C8D4]" : isMyCampers || isPerlaNegra ? "text-emerald-300" : "text-[#00C8D4]"} drop-shadow`}>
+                    {isApartoPosada
+                      ? "🚀 PRÓXIMO LANZAMIENTO! • APLICACIÓN MULTI PLATAFORMA WEB EN ACTUALIZACIÓN"
+                      : isMyCampers
+                        ? "✨ SELLO OFICIAL DE EXCELENCIA • CUBIRO, LARA"
+                        : isPerlaNegra
+                          ? "✨ SELLO OFICIAL DE EXCELENCIA • CHICHIRIVICHE"
+                          : "🚀 PRÓXIMO LANZAMIENTO! • APLICACIÓN MULTI PLATAFORMA WEB EN ACTUALIZACIÓN"}
                   </span>
                 </div>
               </div>
 
-              <p className="text-base sm:text-xl text-white font-medium max-w-3xl mx-auto leading-relaxed drop-shadow-lg font-serif">
+              <p className="text-base sm:text-xl text-white font-medium max-w-3xl mx-auto leading-relaxed drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] font-serif">
                 {isMyCampers
                   ? "Vive la experiencia de hospedarte en un Camper exclusivo rodeado del clima fresco y paisajes icónicos de Cubiro, Estado Lara. Confort de alta gama, fogatas nocturnas, vistas impresionantes y tranquilidad absoluta."
                   : isPerlaNegra 

@@ -38,15 +38,13 @@ export function Hero({ onReserveClick, content }: HeroProps) {
       {/* Gradient bar at top */}
       <div className="absolute top-0 left-0 right-0 h-1.5 gradient-tropical-bar z-50" />
       
-      {/* Background Image with Overlay */}
+      {/* Background Image full brightness sin filtro oscuro */}
       <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat filter brightness-105"
         style={{
           backgroundImage: `url(${content.imageUrl})`
         }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40" />
-      </div>
+      />
 
       {/* Gradient fade to next section (white) */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent via-white/50 to-white" />
@@ -68,12 +66,27 @@ export function Hero({ onReserveClick, content }: HeroProps) {
       {/* Content */}
       <div className="relative z-10 text-center px-4 max-w-5xl mx-auto pt-20">
         {/* Main Headline */}
-        <h1 className="text-5xl md:text-7xl font-light text-white mb-4 tracking-tight">
+        <h1 className="text-5xl md:text-7xl font-light text-white mb-4 tracking-tight drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)]">
           {renderTitle()}
         </h1>
 
+        {/* Botón Titilante estilo Hoteles de Venezuela: Próximo Lanzamiento */}
+        <div className="pt-2 pb-4 flex justify-center">
+          <div className="inline-flex items-center gap-2.5 p-[2px] rounded-full bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] shadow-2xl animate-pulse hover:scale-105 transition-all cursor-pointer">
+            <div className="px-5 py-2 rounded-full bg-slate-950/90 backdrop-blur-md flex items-center gap-2.5">
+              <span className="relative flex h-3 w-3 shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00C8D4] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-[#00C8D4]"></span>
+              </span>
+              <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-[#00C8D4] drop-shadow">
+                🚀 PRÓXIMO LANZAMIENTO! • APLICACIÓN MULTI PLATAFORMA WEB EN ACTUALIZACIÓN
+              </span>
+            </div>
+          </div>
+        </div>
+
         {/* Subheadline */}
-        <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto font-light leading-relaxed">
+        <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto font-light leading-relaxed drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
           {content.subtitle}
           <span className="block mt-2 text-cyan-200">{content.highlightText}</span>
         </p>
