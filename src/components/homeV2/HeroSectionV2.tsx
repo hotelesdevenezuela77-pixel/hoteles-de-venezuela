@@ -204,14 +204,23 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
   return (
     <section className="relative w-full bg-slate-950 text-white min-h-[560px] lg:min-h-[620px] flex items-center justify-center pt-20 pb-12 overflow-hidden">
       
-      {/* Background Image full-bleed con lazy loading y scale */}
+      {/* Background Video full-bleed con lazy fallback y scale */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <img
-          src={heroConfig.bgImage}
-          alt="Salto Ángel - Parque Nacional Canaima"
-          loading="lazy"
-          className="w-full h-full object-cover scale-[1.08] filter brightness-105 transition-transform duration-1000"
-        />
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster={heroConfig.bgImage || "/salto-angel-hero.jpg"}
+          className="w-full h-full object-cover scale-[1.08] filter brightness-105 contrast-[1.02]"
+        >
+          <source src="/videos/angel-falls-hero.mp4" type="video/mp4" />
+          <img
+            src={heroConfig.bgImage || "/salto-angel-hero.jpg"}
+            alt="Salto Ángel - Parque Nacional Canaima"
+            className="w-full h-full object-cover scale-[1.08] filter brightness-105"
+          />
+        </video>
         {/* Capa de degradado ligera y cristalina para máxima visibilidad de la imagen del Salto Ángel */}
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/20 to-slate-950/80 z-10" />
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent z-15" />

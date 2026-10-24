@@ -566,17 +566,16 @@ export function Home() {
         className="relative pt-24 pb-28 md:pt-32 md:pb-36 px-4 hero-banner-bg flex flex-col items-center justify-center text-center overflow-hidden"
         style={heroStyle}
       >
-        {/* OPCCIÓN 3: VIDEO CINEMÁTICO DEL SALTO ÁNGEL CON CAÍDA DE AGUA REAL Y BRUMA */}
+        {/* VIDEO CINEMÁTICO DEL SALTO ÁNGEL CON CAÍDA DE AGUA REAL */}
         <video
           autoPlay
           loop
           muted
           playsInline
           poster={optimizeImageUrl(heroSection.imageUrl || "https://images.unsplash.com/photo-1548013146-72479768bada", 1200)}
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none scale-[1.08] z-0 opacity-90"
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none scale-[1.08] z-0 opacity-90 filter brightness-105 contrast-[1.02]"
         >
-          <source src="https://assets.mixkit.co/videos/preview/mixkit-waterfall-in-forest-2213-large.mp4" type="video/mp4" />
-          <source src="https://assets.mixkit.co/videos/preview/mixkit-waterfall-in-a-forest-close-up-4248-large.mp4" type="video/mp4" />
+          <source src="/videos/angel-falls-hero.mp4" type="video/mp4" />
         </video>
 
         {/* Capa de imagen estática de respaldo en caso de carga lenta */}
