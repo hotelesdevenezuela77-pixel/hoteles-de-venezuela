@@ -109,11 +109,11 @@ export function AllRoomsModal({
         <div className="p-4 sm:p-6 overflow-y-auto space-y-4 font-roboto">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map(room => {
-              const price = room.price_per_night || room.price_usd || 85;
-              const waUrl = `https://wa.me/${cleanWa}?text=${encodeURIComponent(
+              const targetPhone = cleanWa || "584144815321";
+              const waUrl = `https://wa.me/${targetPhone}?text=${encodeURIComponent(
                 language === "es"
-                  ? `Hola ${hotelName}, deseo consultar disponibilidad para la unidad "${room.nombre || room.name}" ($${price}/noche).`
-                  : `Hello ${hotelName}, I would like to inquire about availability for "${room.nombre || room.name}" ($${price}/night).`
+                  ? `Hola ${hotelName}, deseo cotizar ahora mismo la unidad "${room.nombre || room.name}". ¿Tienen disponibilidad y tarifas para mis fechas?`
+                  : `Hello ${hotelName}, I would like to get a quote right now for "${room.nombre || room.name}". Do you have availability for my dates?`
               )}`;
 
               return (
@@ -131,9 +131,9 @@ export function AllRoomsModal({
                       <span className="absolute top-2.5 left-2.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-slate-900 bg-white/95 backdrop-blur-md shadow-md border border-white/80 font-caviar">
                         {room.capacityText}
                       </span>
-                      <div className="absolute bottom-2.5 right-2.5 px-3 py-1 rounded-xl text-xs font-semibold text-slate-900 bg-white/95 backdrop-blur-md shadow-md border border-white/80 flex items-baseline gap-1 font-montserrat">
-                        <span>${price}</span>
-                        <span className="text-[10px] font-bold text-[#FF0096]">USD</span>
+                      <div className="absolute bottom-2.5 right-2.5 px-3 py-1 rounded-full text-[10px] font-bold text-slate-800 bg-white/95 backdrop-blur-md shadow-md border border-white/80 flex items-center gap-1.5 font-caviar">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span>{language === "es" ? "Disponible" : "Available"}</span>
                       </div>
                     </div>
 
@@ -152,10 +152,14 @@ export function AllRoomsModal({
                       href={waUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#20ba59] hover:to-[#0f7a6e] text-white text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:shadow-md transition-all font-roboto"
+                      className="relative flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#20ba59] hover:to-[#0f7a6e] text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer shadow-md hover:shadow-lg transition-all font-roboto animate-pulse"
                     >
-                      <MessageCircle className="w-3.5 h-3.5 fill-white" />
-                      <span>{language === "es" ? "Cotizar" : "Quote"}</span>
+                      <span className="relative flex h-2 w-2 shrink-0">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                      </span>
+                      <MessageCircle className="w-3.5 h-3.5 fill-white shrink-0" />
+                      <span>{language === "es" ? "Cotiza ahora mismo" : "Get a Quote Now"}</span>
                     </a>
                     <button
                       type="button"

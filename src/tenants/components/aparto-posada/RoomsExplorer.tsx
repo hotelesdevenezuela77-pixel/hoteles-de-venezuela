@@ -36,14 +36,14 @@ export function RoomsExplorer({
     return room.badgeCategory === activeTab;
   }).slice(0, 6);
 
-  const cleanWa = whatsappPhone.replace(/\D/g, "");
+  const cleanWa = whatsappPhone ? whatsappPhone.replace(/\D/g, "") : "584144815321";
+  const targetPhone = cleanWa || "584144815321";
 
   const getWaUrl = (room: ApartoRoomItem) => {
-    const price = room.price_per_night || room.price_usd || 85;
     const text = language === "es"
-      ? `Hola ${hotelName}, deseo consultar disponibilidad para la "${room.nombre || room.name}" (${room.capacityText}) con tarifa de referencia $${price}/noche. ¿Tienen fechas disponibles?`
-      : `Hello ${hotelName}, I would like to check availability for "${room.nombre || room.name}" (${room.capacityText}) with reference rate $${price}/night. Do you have open dates?`;
-    return `https://wa.me/${cleanWa}?text=${encodeURIComponent(text)}`;
+      ? `Hola ${hotelName}, deseo cotizar ahora mismo la unidad "${room.nombre || room.name}" (${room.capacityText}). ¿Tienen disponibilidad y tarifas para mis fechas?`
+      : `Hello ${hotelName}, I would like to get a quote right now for "${room.nombre || room.name}" (${room.capacityText}). Do you have availability for my dates?`;
+    return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
   };
 
   const getCategoryBadgeStyle = (category?: string) => {
@@ -145,22 +145,12 @@ export function RoomsExplorer({
                       </span>
                     </div>
 
-                    {/* Indicador de Precio Claro en Cristal Blanco Brillante */}
-                    <div className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/90 shadow-xl text-right group-hover:scale-105 transition-all duration-300 z-10">
-                      <div className="flex items-center justify-end gap-1.5 mb-0.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#00C8D4]" />
-                        <span className="text-[10px] uppercase font-bold tracking-wider text-[#00C8D4] font-caviar">
-                          {t.directRate}
-                        </span>
-                      </div>
-                      <div className="flex items-baseline justify-end gap-1">
-                        <span className="text-xs font-normal text-slate-500 font-roboto">{t.from}</span>
-                        <span className="text-2xl font-semibold text-slate-900 tracking-tight font-montserrat">
-                          ${price}.00
-                        </span>
-                        <span className="text-xs font-bold text-[#FF0096]">USD</span>
-                        <span className="text-[11px] text-slate-500 font-normal font-roboto">{t.perNight}</span>
-                      </div>
+                    {/* Badge de Disponibilidad Inmediata Sin Precios */}
+                    <div className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/90 shadow-md text-right z-10 flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-[10px] uppercase font-bold tracking-wider text-slate-800 font-caviar">
+                        {language === "es" ? "Disponibilidad Inmediata" : "Instant Availability"}
+                      </span>
                     </div>
                   </div>
 
@@ -201,15 +191,19 @@ export function RoomsExplorer({
                 {/* Acciones de Tarjeta: WhatsApp Directo + Botón Detalles */}
                 <div className="p-7 pt-0 space-y-3">
                   <div className="flex items-center gap-2">
-                    {/* Botón WhatsApp Oficial Verde Esmeralda */}
+                    {/* Botón WhatsApp Oficial Parpadeante */}
                     <a
                       href={getWaUrl(room)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#20ba59] hover:to-[#0f7a6e] text-white font-semibold text-xs uppercase tracking-wider transition-all duration-300 shadow-md hover:shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-2 cursor-pointer font-roboto active:scale-95 group/wa"
+                      className="relative flex-1 py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#20ba59] hover:to-[#0f7a6e] text-white font-bold text-xs uppercase tracking-wider transition-all duration-300 shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 flex items-center justify-center gap-2 cursor-pointer font-roboto active:scale-95 group/wa animate-pulse"
                     >
+                      <span className="relative flex h-2.5 w-2.5 shrink-0">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+                      </span>
                       <MessageCircle className="w-4 h-4 fill-white shrink-0 group-hover/wa:scale-110 transition-transform" />
-                      <span>{t.quoteWa}</span>
+                      <span className="tracking-wide">{t.quoteWa}</span>
                     </a>
 
                     {/* Botón Detalles Prémium */}

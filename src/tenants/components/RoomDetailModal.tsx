@@ -9,9 +9,10 @@ interface RoomDetailModalProps {
   hotelName: string;
   whatsappPhone: string;
   onClose: () => void;
+  hidePrices?: boolean;
 }
 
-export function RoomDetailModal({ room, hotelName, whatsappPhone, onClose }: RoomDetailModalProps) {
+export function RoomDetailModal({ room, hotelName, whatsappPhone, onClose, hidePrices }: RoomDetailModalProps) {
   if (!room) return null;
 
   const displayPrice = room.price_per_night || room.price || room.base_price || 60;
@@ -40,16 +41,23 @@ export function RoomDetailModal({ room, hotelName, whatsappPhone, onClose }: Roo
 
   const totalPrice = displayPrice * nights;
 
-  const cleanPhone = whatsappPhone.replace(/[^0-9]/g, "");
+  const cleanPhone = whatsappPhone ? whatsappPhone.replace(/[^0-9]/g, "") : "584144815321";
+  const targetPhone = cleanPhone || "584144815321";
   const waMsg = encodeURIComponent(
-    `Hola, deseo reservar la unidad: ${room.name} en ${hotelName}.\n` +
-    `📅 Check-in: ${checkIn || "Por definir"}\n` +
-    `📅 Check-out: ${checkOut || "Por definir"}\n` +
-    `👥 Huéspedes: ${guestsCount}\n` +
-    `💵 Estimado: $${totalPrice} USD (${nights} noche${nights > 1 ? "s" : ""})\n\n` +
-    `¿Tienen disponibilidad disponible para estas fechas?`
+    hidePrices
+      ? `Hola ${hotelName}, deseo cotizar ahora mismo la unidad: ${room.name}.\n` +
+        `📅 Check-in: ${checkIn || "Por definir"}\n` +
+        `📅 Check-out: ${checkOut || "Por definir"}\n` +
+        `👥 Huéspedes: ${guestsCount}\n\n` +
+        `¿Tienen disponibilidad y tarifas para estas fechas?`
+      : `Hola, deseo reservar la unidad: ${room.name} en ${hotelName}.\n` +
+        `📅 Check-in: ${checkIn || "Por definir"}\n` +
+        `📅 Check-out: ${checkOut || "Por definir"}\n` +
+        `👥 Huéspedes: ${guestsCount}\n` +
+        `💵 Estimado: $${totalPrice} USD (${nights} noche${nights > 1 ? "s" : ""})\n\n` +
+        `¿Tienen disponibilidad disponible para estas fechas?`
   );
-  const waUrl = `https://wa.me/${cleanPhone || "584141234567"}?text=${waMsg}`;
+  const waUrl = `https://wa.me/${targetPhone}?text=${waMsg}`;
 
   const AMENITY_MAP: Record<string, string> = {
     "wifi": "Internet",
@@ -228,33 +236,51 @@ export function RoomDetailModal({ room, hotelName, whatsappPhone, onClose }: Roo
                 </div>
               </div>
 
-              {/* Resumen de Tarifas */}
-              <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-2 shadow-xs">
-                <div className="flex justify-between text-xs text-slate-600 font-medium">
-                  <span>Precio por noche</span>
-                  <span className="font-bold text-slate-900">${displayPrice} USD</span>
+              {/* Resumen de Tarifas / Cotización */}
+              {hidePrices ? (
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50/50 border border-emerald-200/80 space-y-1.5 shadow-xs text-center font-roboto">
+                  <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 uppercase tracking-wider font-caviar">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>Cotización Inmediata Directa</span>
+                  </div>
+                  <p className="text-[11px] text-emerald-700 font-medium">
+                    Atención directa con los anfitriones sin intermediarios ni comisiones de agencia.
+                  </p>
                 </div>
-                <div className="flex justify-between text-xs text-slate-600 font-medium">
-                  <span>Estadía estimada</span>
-                  <span className="font-bold text-slate-900">{nights} noche{nights > 1 ? "s" : ""}</span>
+              ) : (
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-2 shadow-xs">
+                  <div className="flex justify-between text-xs text-slate-600 font-medium">
+                    <span>Precio por noche</span>
+                    <span className="font-bold text-slate-900">${displayPrice} USD</span>
+                  </div>
+                  <div className="flex justify-between text-xs text-slate-600 font-medium">
+                    <span>Estadía estimada</span>
+                    <span className="font-bold text-slate-900">{nights} noche{nights > 1 ? "s" : ""}</span>
+                  </div>
+                  <div className="pt-2 border-t border-slate-100 flex justify-between items-center text-sm font-extrabold text-slate-900">
+                    <span>Total Estimado</span>
+                    <span className="text-[#00C8D4] text-xl font-black">${totalPrice} USD</span>
+                  </div>
                 </div>
-                <div className="pt-2 border-t border-slate-100 flex justify-between items-center text-sm font-extrabold text-slate-900">
-                  <span>Total Estimado</span>
-                  <span className="text-[#00C8D4] text-xl font-black">${totalPrice} USD</span>
-                </div>
-              </div>
+              )}
             </div>
 
-            {/* BOTÓN WHATSAPP PRE-FILLED EN VERDE SÓLIDO */}
+            {/* BOTÓN WHATSAPP PRE-FILLED */}
             <div>
               <a
                 href={waUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl font-extrabold text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-xl active:scale-95 text-center text-xs sm:text-sm cursor-pointer"
+                className={`w-full flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl font-extrabold text-white bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#20ba59] hover:to-[#0f7a6e] transition-all shadow-xl active:scale-95 text-center text-xs sm:text-sm cursor-pointer ${hidePrices ? "animate-pulse shadow-emerald-500/30" : ""}`}
               >
+                {hidePrices && (
+                  <span className="relative flex h-2.5 w-2.5 shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+                  </span>
+                )}
                 <MessageCircle className="w-5 h-5 fill-current shrink-0" />
-                <span>Reservar esta Habitación por WhatsApp</span>
+                <span>{hidePrices ? "Cotiza ahora mismo por WhatsApp" : "Reservar esta Habitación por WhatsApp"}</span>
               </a>
               <span className="text-[10px] text-slate-500 text-center block mt-2 font-medium">
                 Respuesta inmediata por el equipo de recepción en menos de 5 min.

@@ -2349,7 +2349,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 max-h-24 overflow-y-auto">
               {cartRooms.map(r => (
                 <span key={r.id} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-extrabold bg-white/10 border border-white/20 text-white shadow-sm">
-                  {r.nombre || r.name || r.title} (${r.price_per_night || r.price || 70})
+                  {r.nombre || r.name || r.title} {!isApartoPosada && `($${r.price_per_night || r.price || 70})`}
                   <button onClick={() => toggleCartRoom(r)} className="hover:text-[#FF0096] font-black text-sm ml-1 cursor-pointer">✕</button>
                 </span>
               ))}
@@ -2358,16 +2358,20 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             {/* Botón Acción Checkout WhatsApp */}
             <a
               href={`https://wa.me/${cleanWhatsapp}?text=${encodeURIComponent(
-                `Hola ${config.name}, deseo consultar disponibilidad para la siguiente combinación de ${cartRooms.length} habitaciones:\n\n` +
-                cartRooms.map((r, idx) => `${idx + 1}. ${r.nombre || r.name} (Capacidad: ${r.capacity || 2} pers) - $${r.price_per_night || r.price || 70}/noche`).join('\n') +
-                `\n\nTotal estimado: $${cartRooms.reduce((sum, r) => sum + (r.price_per_night || r.tarifa_base || r.price || 70), 0)}/noche.\n\nPor favor asesórenme sobre las fechas disponibles.`
+                isApartoPosada
+                  ? `Hola ${config.name}, deseo cotizar ahora mismo la siguiente combinación de ${cartRooms.length} habitaciones:\n\n` +
+                    cartRooms.map((r, idx) => `${idx + 1}. ${r.nombre || r.name} (Capacidad: ${r.capacity || 2} pers)`).join('\n') +
+                    `\n\nPor favor asesórenme sobre las fechas disponibles y cotización directa.`
+                  : `Hola ${config.name}, deseo consultar disponibilidad para la siguiente combinación de ${cartRooms.length} habitaciones:\n\n` +
+                    cartRooms.map((r, idx) => `${idx + 1}. ${r.nombre || r.name} (Capacidad: ${r.capacity || 2} pers) - $${r.price_per_night || r.price || 70}/noche`).join('\n') +
+                    `\n\nTotal estimado: $${cartRooms.reduce((sum, r) => sum + (r.price_per_night || r.tarifa_base || r.price || 70), 0)}/noche.\n\nPor favor asesórenme sobre las fechas disponibles.`
               )}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-6 py-3.5 rounded-2xl font-black text-xs text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-xl flex items-center gap-2 shrink-0 cursor-pointer uppercase tracking-wider hover:scale-105 active:scale-95 text-center"
+              className={`px-6 py-3.5 rounded-2xl font-black text-xs text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-xl flex items-center gap-2 shrink-0 cursor-pointer uppercase tracking-wider hover:scale-105 active:scale-95 text-center ${isApartoPosada ? "animate-pulse" : ""}`}
             >
               <MessageCircle className="w-5 h-5 fill-current" />
-              <span>Reservar {cartRooms.length} Habitaciones por WhatsApp</span>
+              <span>{isApartoPosada ? `Cotiza ${cartRooms.length} Habitaciones por WhatsApp` : `Reservar ${cartRooms.length} Habitaciones por WhatsApp`}</span>
             </a>
 
           </div>
@@ -2410,6 +2414,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         hotelName={config.name}
         whatsappPhone={whatsapp}
         onClose={() => setSelectedRoom(null)}
+        hidePrices={isApartoPosada}
       />
 
     </div>
