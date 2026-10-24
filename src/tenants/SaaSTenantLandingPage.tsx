@@ -614,9 +614,9 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
 
   const bannerImage = config.branding?.banner_url || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1600&auto=format&fit=crop";
   const videoUrl = isApartoPosada ? (config.branding?.video_url || "/videos/aparto-posada-pool-hero.mp4") : config.branding?.video_url;
-  const phone = establishmentDetail?.phone || config.contact?.phone || "+584144815321";
-  const whatsapp = establishmentDetail?.whatsapp || establishmentDetail?.phone || config.contact?.whatsapp || "584144815321";
-  const cleanWhatsapp = whatsapp.replace(/[^0-9]/g, "") || "584144815321";
+  const phone = isApartoPosada ? "+58 (414) 4815321" : (establishmentDetail?.phone || config.contact?.phone || "+584144815321");
+  const whatsapp = isApartoPosada ? "+58 (414) 4815321" : (establishmentDetail?.whatsapp || establishmentDetail?.phone || config.contact?.whatsapp || "584144815321");
+  const cleanWhatsapp = isApartoPosada ? "584144815321" : (whatsapp.replace(/[^0-9]/g, "") || "584144815321");
 
   const address = establishmentDetail?.address || (isMyCampers ? "Lomas de Cubiro, Municipio Jiménez, Estado Lara" : isPerlaNegra ? "Calle Principal Sector Playa Sur, Chichiriviche, Estado Falcón" : "Carretera Principal, Sector Tucacas / Morrocoy");
   const description = establishmentDetail?.description || (isMyCampers ? "En My Campers Venezuela ofrecemos hospedajes únicos en campers acondicionados, cabañas alpinas y suites VIP rodeadas del clima fresco y paisajes panorámicos de Cubiro, Estado Lara." : `En ${config.name} nos esmeramos por ofrecer una atención cálida, personalizada y de primer nivel. Nuestras instalaciones combinan la tranquilidad natural con el confort moderno para que su única preocupación sea descansar.`);
@@ -2157,8 +2157,13 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             </div>
           </div>
 
-          <div className={`flex items-center gap-4 text-xs font-bold ${isApartoPosada ? "text-white" : "text-slate-300"}`}>
-            <span>Teléfono: {phone}</span>
+          <div className={`flex flex-wrap items-center justify-center sm:justify-start gap-4 text-xs font-bold ${isApartoPosada ? "text-white" : "text-slate-300"}`}>
+            <a 
+              href={isApartoPosada ? "tel:+584144815321" : `tel:${phone}`}
+              className="hover:underline transition-all"
+            >
+              Teléfono: {phone}
+            </a>
             <span className={isApartoPosada ? "text-white/60" : "text-slate-600"}>•</span>
             <span>Dominio: {config.domain}</span>
           </div>

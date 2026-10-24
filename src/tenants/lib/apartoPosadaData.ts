@@ -499,7 +499,7 @@ export const APARTO_FAQS = [
   },
   {
     question: "¿Aceptan mascotas en las instalaciones?",
-    answer: "Aceptamos mascotas de razas pequeñas y educadas bajo solicitud previa y condiciones especiales de convivencia, principalmente en nuestras unidades tipo apartamento y planta baja. Por favor infórmenos al momento de cotizar para asignarle la unidad ideal para usted y su mascota."
+    answer: "Con el propósito de garantizar el máximo descanso, confort y los estrictos estándares de higiene y control de alérgenos de todos nuestros huéspedes, lamentablemente no nos es posible admitir mascotas en nuestras instalaciones. Agradecemos profundamente su valiosa comprensión y nos encantará recibirle para brindarle unas vacaciones inolvidables."
   },
   {
     question: "¿Cuáles son los métodos de pago aceptados?",
