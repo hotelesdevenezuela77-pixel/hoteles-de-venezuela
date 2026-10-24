@@ -1,7 +1,14 @@
 import React from "react";
 import { Star, ShieldCheck, Zap } from "lucide-react";
+import { type Language, APARTO_TRANSLATIONS } from "../../lib/apartoTranslations";
 
-export function TrustBar() {
+interface TrustBarProps {
+  language?: Language;
+}
+
+export function TrustBar({ language = "es" }: TrustBarProps) {
+  const t = APARTO_TRANSLATIONS[language].trustBar;
+
   return (
     <div className="w-full max-w-5xl mx-auto mt-4 px-2">
       <div className="bg-white/95 backdrop-blur-md rounded-2xl md:rounded-full border border-slate-200/90 shadow-xl shadow-cyan-950/10 px-4 sm:px-8 py-3.5 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-0 divide-y md:divide-y-0 md:divide-x divide-slate-100">
@@ -14,11 +21,11 @@ export function TrustBar() {
           <div className="text-left">
             <div className="flex items-center gap-1.5">
               <span className="text-xs sm:text-sm font-extrabold text-slate-900 font-['Plus_Jakarta_Sans',sans-serif] tracking-tight">
-                ★ 4.8 en Google Reviews
+                {t.googleTitle}
               </span>
             </div>
             <span className="text-[11px] text-slate-500 font-medium block font-['Inter',sans-serif]">
-              +120 valoraciones de huéspedes
+              {t.googleSub}
             </span>
           </div>
         </div>
@@ -30,10 +37,10 @@ export function TrustBar() {
           </div>
           <div className="text-left">
             <span className="text-xs sm:text-sm font-extrabold text-slate-900 font-['Plus_Jakarta_Sans',sans-serif] tracking-tight block">
-              Contacto Directo 0% Comisiones
+              {t.commTitle}
             </span>
             <span className="text-[11px] text-slate-500 font-medium block font-['Inter',sans-serif]">
-              Trato directo con los anfitriones
+              {t.commSub}
             </span>
           </div>
         </div>
@@ -45,10 +52,10 @@ export function TrustBar() {
           </div>
           <div className="text-left">
             <span className="text-xs sm:text-sm font-extrabold text-slate-900 font-['Plus_Jakarta_Sans',sans-serif] tracking-tight block">
-              Planta Eléctrica 100% & Agua Continua
+              {t.powerTitle}
             </span>
             <span className="text-[11px] text-slate-500 font-medium block font-['Inter',sans-serif]">
-              Aires split y suministro 24/7 garantizado
+              {t.powerSub}
             </span>
           </div>
         </div>

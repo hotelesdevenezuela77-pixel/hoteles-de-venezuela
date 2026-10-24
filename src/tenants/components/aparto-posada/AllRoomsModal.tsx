@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { X, Users, Bed, MessageCircle, Eye, Search, Layers, Check } from "lucide-react";
 import { APARTO_ALL_ROOMS, type ApartoRoomItem } from "../../lib/apartoPosadaData";
 import { type Room } from "../RoomCard";
+import { type Language } from "../../lib/apartoTranslations";
 
 interface AllRoomsModalProps {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface AllRoomsModalProps {
   hotelName: string;
   whatsappPhone: string;
   onOpenDetail: (room: Room) => void;
+  language?: Language;
 }
 
 export function AllRoomsModal({
@@ -16,7 +18,8 @@ export function AllRoomsModal({
   onClose,
   hotelName,
   whatsappPhone,
-  onOpenDetail
+  onOpenDetail,
+  language = "es"
 }: AllRoomsModalProps) {
   const [filterType, setFilterType] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -51,10 +54,10 @@ export function AllRoomsModal({
           <div>
             <div className="flex items-center gap-2 text-[#00C8D4] text-xs font-bold uppercase tracking-wider">
               <Layers className="w-4 h-4 text-[#00C8D4]" />
-              <span>Inventario Completo de Alojamiento</span>
+              <span>{language === "es" ? "Inventario Completo de Alojamiento" : "Complete Lodging Inventory"}</span>
             </div>
             <h3 className="text-xl sm:text-2xl font-black font-['Plus_Jakarta_Sans',sans-serif] text-white">
-              Catálogo de Unidades • {hotelName}
+              {language === "es" ? "Catálogo de Unidades" : "Units Catalog"} • {hotelName}
             </h3>
           </div>
           <button
@@ -70,10 +73,10 @@ export function AllRoomsModal({
         <div className="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
           <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
             {[
-              { id: "all", label: "Todas" },
-              { id: "parejas", label: "Parejas" },
-              { id: "familiares", label: "Familiares" },
-              { id: "apartamentos", label: "Apartamentos" }
+              { id: "all", label: language === "es" ? "Todas" : "All" },
+              { id: "parejas", label: language === "es" ? "Parejas" : "Couples" },
+              { id: "familiares", label: language === "es" ? "Familiares" : "Family" },
+              { id: "apartamentos", label: language === "es" ? "Apartamentos" : "Apartments" }
             ].map(tab => (
               <button
                 key={tab.id}
@@ -94,7 +97,7 @@ export function AllRoomsModal({
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Buscar unidad..."
+              placeholder={language === "es" ? "Buscar unidad..." : "Search unit..."}
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-4 py-1.5 bg-white border border-slate-200 rounded-full text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#00C8D4]"
@@ -108,7 +111,9 @@ export function AllRoomsModal({
             {filtered.map(room => {
               const price = room.price_per_night || room.price_usd || 85;
               const waUrl = `https://wa.me/${cleanWa}?text=${encodeURIComponent(
-                `Hola ${hotelName}, deseo consultar disponibilidad para la unidad "${room.nombre || room.name}" ($${price}/noche).`
+                language === "es"
+                  ? `Hola ${hotelName}, deseo consultar disponibilidad para la unidad "${room.nombre || room.name}" ($${price}/noche).`
+                  : `Hello ${hotelName}, I would like to inquire about availability for "${room.nombre || room.name}" ($${price}/night).`
               )}`;
 
               return (
@@ -150,13 +155,13 @@ export function AllRoomsModal({
                       className="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#20ba59] hover:to-[#0f7a6e] text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:shadow-md transition-all"
                     >
                       <MessageCircle className="w-3.5 h-3.5 fill-white" />
-                      <span>Cotizar</span>
+                      <span>{language === "es" ? "Cotizar" : "Quote"}</span>
                     </a>
                     <button
                       type="button"
                       onClick={() => { onClose(); onOpenDetail(room); }}
                       className="py-2.5 px-3 rounded-xl bg-white hover:bg-[#00C8D4] text-[#00C8D4] hover:text-white border border-[#00C8D4]/40 font-bold text-xs cursor-pointer transition-all flex items-center justify-center"
-                      title="Ver detalles"
+                      title={language === "es" ? "Ver detalles" : "View details"}
                     >
                       <Eye className="w-3.5 h-3.5" />
                     </button>
@@ -169,7 +174,9 @@ export function AllRoomsModal({
 
         {/* Footer Modal */}
         <div className="p-4 bg-slate-50 border-t border-slate-200 text-center text-xs text-slate-500 shrink-0">
-          Mostrando {filtered.length} unidades disponibles en {hotelName}. Trato directo sin comisiones.
+          {language === "es"
+            ? `Mostrando ${filtered.length} unidades disponibles en ${hotelName}. Trato directo sin comisiones.`
+            : `Showing ${filtered.length} units available at ${hotelName}. Direct booking without intermediaries.`}
         </div>
       </div>
     </div>

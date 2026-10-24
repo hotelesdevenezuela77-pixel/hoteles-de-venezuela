@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import { APARTO_FEATURED_ROOMS, type ApartoRoomItem } from "../../lib/apartoPosadaData";
 import { type Room } from "../RoomCard";
+import { type Language, APARTO_TRANSLATIONS } from "../../lib/apartoTranslations";
 
 interface RoomsExplorerProps {
   whatsappPhone: string;
@@ -13,6 +14,7 @@ interface RoomsExplorerProps {
   onOpenAllRooms: () => void;
   onToggleCart?: (room: Room) => void;
   cartRooms?: Room[];
+  language?: Language;
 }
 
 type TabType = "todas" | "parejas" | "familiares" | "apartamentos";
@@ -23,9 +25,11 @@ export function RoomsExplorer({
   onOpenDetail,
   onOpenAllRooms,
   onToggleCart,
-  cartRooms = []
+  cartRooms = [],
+  language = "es"
 }: RoomsExplorerProps) {
   const [activeTab, setActiveTab] = useState<TabType>("todas");
+  const t = APARTO_TRANSLATIONS[language].rooms;
 
   const filteredRooms = APARTO_FEATURED_ROOMS.filter(room => {
     if (activeTab === "todas") return true;
@@ -35,7 +39,10 @@ export function RoomsExplorer({
   const cleanWa = whatsappPhone.replace(/\D/g, "");
 
   const getWaUrl = (room: ApartoRoomItem) => {
-    const text = `Hola ${hotelName}, deseo consultar disponibilidad para la "${room.nombre || room.name}" (${room.capacityText}) con tarifa de referencia $${room.price_per_night || room.price_usd}/noche. ¿Tienen fechas disponibles?`;
+    const price = room.price_per_night || room.price_usd || 85;
+    const text = language === "es"
+      ? `Hola ${hotelName}, deseo consultar disponibilidad para la "${room.nombre || room.name}" (${room.capacityText}) con tarifa de referencia $${price}/noche. ¿Tienen fechas disponibles?`
+      : `Hello ${hotelName}, I would like to check availability for "${room.nombre || room.name}" (${room.capacityText}) with reference rate $${price}/night. Do you have open dates?`;
     return `https://wa.me/${cleanWa}?text=${encodeURIComponent(text)}`;
   };
 
@@ -60,25 +67,25 @@ export function RoomsExplorer({
         <div className="text-center space-y-4 max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FF0096]/10 border border-[#FF0096]/30 text-[#FF0096] text-[11px] font-extrabold tracking-[0.25em] uppercase font-['Plus_Jakarta_Sans',sans-serif]">
             <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
-            ESTANCIA PERFECTA & TARIFAS DIRECTAS
+            {t.badge}
           </div>
 
           <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight font-serif">
-            Habitaciones, Suites & Apartamentos
+            {t.title}
           </h2>
 
           <p className="text-slate-600 text-sm sm:text-base font-normal font-['Inter',sans-serif] max-w-2xl mx-auto leading-relaxed">
-            Selección exclusiva de nuestras unidades más solicitadas en Tucacas. Reserve directamente sin comisiones de intermediarios con confirmación inmediata por WhatsApp.
+            {t.subtitle}
           </p>
         </div>
 
         {/* Componente de Pestañas (Tabs Filter) - Fondo Blanco Radiante */}
         <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
           {[
-            { id: "todas" as TabType, label: "Todas las Opciones" },
-            { id: "parejas" as TabType, label: "Parejas / Suites" },
-            { id: "familiares" as TabType, label: "Familiares" },
-            { id: "apartamentos" as TabType, label: "Apartamentos con Cocina" }
+            { id: "todas" as TabType, label: t.tabs.todas },
+            { id: "parejas" as TabType, label: t.tabs.parejas },
+            { id: "familiares" as TabType, label: t.tabs.familiares },
+            { id: "apartamentos" as TabType, label: t.tabs.apartamentos }
           ].map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -143,15 +150,16 @@ export function RoomsExplorer({
                       <div className="flex items-center justify-end gap-1.5 mb-0.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#00C8D4]" />
                         <span className="text-[10px] uppercase font-black tracking-wider text-[#00C8D4] font-['Plus_Jakarta_Sans',sans-serif]">
-                          Tarifa Directa
+                          {t.directRate}
                         </span>
                       </div>
                       <div className="flex items-baseline justify-end gap-1">
-                        <span className="text-xs font-semibold text-slate-500 font-['Inter',sans-serif]">Desde</span>
+                        <span className="text-xs font-semibold text-slate-500 font-['Inter',sans-serif]">{t.from}</span>
                         <span className="text-2xl font-black text-slate-900 tracking-tight font-serif">
                           ${price}.00
                         </span>
                         <span className="text-xs font-bold text-[#FF0096]">USD</span>
+                        <span className="text-[11px] text-slate-500 font-semibold font-['Inter',sans-serif]">{t.perNight}</span>
                       </div>
                     </div>
                   </div>
@@ -183,7 +191,7 @@ export function RoomsExplorer({
                       {room.badgeCategory === "apartamentos" && (
                         <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl">
                           <Utensils className="w-3.5 h-3.5 text-emerald-600 stroke-[1.5]" />
-                          <span>Cocina</span>
+                          <span>{language === "es" ? "Cocina" : "Kitchen"}</span>
                         </span>
                       )}
                     </div>
@@ -201,7 +209,7 @@ export function RoomsExplorer({
                       className="flex-1 py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#20ba59] hover:to-[#0f7a6e] text-white font-black text-xs uppercase tracking-wider transition-all duration-300 shadow-md hover:shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-2 cursor-pointer font-['Plus_Jakarta_Sans',sans-serif] active:scale-95 group/wa"
                     >
                       <MessageCircle className="w-4 h-4 fill-white shrink-0 group-hover/wa:scale-110 transition-transform" />
-                      <span>Cotizar WhatsApp</span>
+                      <span>{t.quoteWa}</span>
                     </a>
 
                     {/* Botón Detalles Prémium */}
@@ -209,10 +217,10 @@ export function RoomsExplorer({
                       type="button"
                       onClick={() => onOpenDetail(room)}
                       className="py-3.5 px-4 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 hover:text-[#00C8D4] border border-slate-200 hover:border-[#00C8D4] font-bold text-xs transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer shrink-0 font-['Plus_Jakarta_Sans',sans-serif] shadow-xs group/det"
-                      title="Ver detalles completos de la habitación"
+                      title={t.details}
                     >
                       <Eye className="w-4 h-4 text-slate-500 group-hover/det:text-[#00C8D4] transition-colors" />
-                      <span className="hidden sm:inline">Detalles</span>
+                      <span className="hidden sm:inline">{t.details}</span>
                     </button>
                   </div>
 
@@ -220,10 +228,10 @@ export function RoomsExplorer({
                   <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 pt-2 border-t border-slate-100">
                     <span className="inline-flex items-center gap-1 text-emerald-600 font-bold">
                       <Check className="w-3.5 h-3.5 stroke-[2.5]" />
-                      <span>Reserva Directa</span>
+                      <span>{t.directBooking}</span>
                     </span>
                     <span className="text-[#00C8D4] font-bold uppercase tracking-wider text-[10px]">
-                      0% Comisiones
+                      {t.noCommission}
                     </span>
                   </div>
 
@@ -238,7 +246,7 @@ export function RoomsExplorer({
                       }`}
                     >
                       <Check className={`w-3.5 h-3.5 ${isInCart ? "text-[#FF0096]" : "opacity-0"}`} />
-                      <span>{isInCart ? "Agregada a solicitud múltiple" : "+ Añadir a cotización múltiple"}</span>
+                      <span>{isInCart ? (language === "es" ? "Agregada a cotización múltiple" : "Added to multi-booking") : (language === "es" ? "+ Añadir a cotización múltiple" : "+ Add to multi-booking")}</span>
                     </button>
                   )}
                 </div>
@@ -256,7 +264,7 @@ export function RoomsExplorer({
             className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-bold text-sm text-slate-900 bg-white hover:bg-slate-50 border border-slate-300 hover:border-[#00C8D4] transition-all shadow-sm hover:shadow-lg active:scale-95 cursor-pointer font-['Plus_Jakarta_Sans',sans-serif]"
           >
             <Layers className="w-4.5 h-4.5 text-[#00C8D4]" />
-            <span>Ver todas las opciones disponibles (Catálogo Completo)</span>
+            <span>{t.viewAll}</span>
             <ArrowRight className="w-4 h-4 text-[#FF0096] group-hover:translate-x-1 transition-transform" />
           </button>
         </div>

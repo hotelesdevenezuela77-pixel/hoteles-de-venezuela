@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import { ChevronDown, HelpCircle, Sparkles } from "lucide-react";
-import { APARTO_FAQS } from "../../lib/apartoPosadaData";
+import { type Language, APARTO_TRANSLATIONS } from "../../lib/apartoTranslations";
 
-export function FaqAccordion() {
+interface FaqAccordionProps {
+  language?: Language;
+}
+
+export function FaqAccordion({ language = "es" }: FaqAccordionProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0); // First item open by default
+  const t = APARTO_TRANSLATIONS[language].faq;
 
   const toggleIndex = (idx: number) => {
     setOpenIndex((prev) => (prev === idx ? null : idx));
@@ -17,21 +22,21 @@ export function FaqAccordion() {
         <div className="text-center space-y-4 max-w-2xl mx-auto">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00C8D4]/10 border border-[#00C8D4]/30 text-[#009da7] text-[11px] font-extrabold tracking-[0.25em] uppercase font-['Plus_Jakarta_Sans',sans-serif]">
             <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
-            CLARIDAD & ATENCIÓN DIRECTA
+            {t.badge}
           </div>
 
           <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight font-serif">
-            Preguntas Frecuentes
+            {t.title}
           </h2>
 
           <p className="text-slate-600 text-sm sm:text-base font-normal font-['Inter',sans-serif] leading-relaxed">
-            Todo lo que necesita conocer para planificar su estancia perfecta en Aparto Posada del Mar.
+            {t.subtitle}
           </p>
         </div>
 
         {/* Lista de Acordeón Limpia y Organizada con Estilo Hotel Boutique */}
         <div className="space-y-4">
-          {APARTO_FAQS.map((faq, idx) => {
+          {t.items.map((faq, idx) => {
             const isOpen = openIndex === idx;
 
             return (

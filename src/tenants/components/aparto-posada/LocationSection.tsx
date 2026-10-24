@@ -4,15 +4,18 @@ import {
   Sparkles, ShieldCheck, Compass, Award 
 } from "lucide-react";
 import { APARTO_LOCATION } from "../../lib/apartoPosadaData";
+import { type Language, APARTO_TRANSLATIONS } from "../../lib/apartoTranslations";
 
 interface LocationSectionProps {
   whatsappPhone: string;
   hotelName: string;
+  language?: Language;
 }
 
-export function LocationSection({ whatsappPhone, hotelName }: LocationSectionProps) {
+export function LocationSection({ whatsappPhone, hotelName, language = "es" }: LocationSectionProps) {
   const [mapMode, setMapMode] = useState<"satelite" | "estandar">("estandar");
   const [copied, setCopied] = useState<boolean>(false);
+  const t = APARTO_TRANSLATIONS[language].location;
 
   const cleanWa = whatsappPhone.replace(/\D/g, "");
   const coords = APARTO_LOCATION.coords;
@@ -24,26 +27,46 @@ export function LocationSection({ whatsappPhone, hotelName }: LocationSectionPro
   };
 
   const ctaWaUrl = `https://wa.me/${cleanWa}?text=${encodeURIComponent(
-    `Hola ${hotelName}, deseo cotizar una estancia directa y consultar disponibilidad. ¿Podrían orientarme con las mejores opciones y fechas?`
+    language === "es"
+      ? `Hola ${hotelName}, deseo cotizar una estancia directa y consultar disponibilidad. ¿Podrían orientarme con las mejores opciones y fechas?`
+      : `Hello ${hotelName}, I would like to inquire about availability and rates for an upcoming stay. Could you assist me with the best options?`
   )}`;
+
+  const instructions = language === "es" ? APARTO_LOCATION.drivingInstructions : [
+    {
+      step: "01",
+      title: "Toll Booth at Boca de Aroa",
+      desc: "Drive along the Morón-Coro National Highway towards Tucacas until reaching the entrance avenue."
+    },
+    {
+      step: "02",
+      title: "Turn onto Avenida Silva",
+      desc: "Take Avenida Silva in the central tourist and residential district of Tucacas."
+    },
+    {
+      step: "03",
+      title: "Private Gated Entrance",
+      desc: "Located steps from the main road with internal private parking and official entrance gate."
+    }
+  ];
 
   return (
     <section id="ubicacion" className="py-20 md:py-28 bg-white px-4 sm:px-6 lg:px-8 space-y-20">
       <div className="max-w-7xl mx-auto space-y-16">
         
-        {/* Encabezado */}
+        {/* Encabezado Editorial Boutique */}
         <div className="text-center space-y-4 max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00C8D4]/10 border border-[#00C8D4]/30 text-[#009da7] text-[11px] font-extrabold tracking-[0.25em] uppercase font-['Plus_Jakarta_Sans',sans-serif]">
             <Compass className="w-3.5 h-3.5 text-[#00C8D4]" />
-            ACCESO ESTRATÉGICO A PLAYAS Y CAYOS
+            {t.badge}
           </div>
 
-          <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight font-['Plus_Jakarta_Sans',sans-serif]">
-            Ubicación & Cómo Llegar
+          <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight font-serif">
+            {t.title}
           </h2>
 
-          <p className="text-slate-600 text-sm sm:text-base font-normal font-['Inter',sans-serif] max-w-2xl mx-auto">
-            {APARTO_LOCATION.address}
+          <p className="text-slate-600 text-sm sm:text-base font-normal font-['Inter',sans-serif] max-w-2xl mx-auto leading-relaxed">
+            {t.address}
           </p>
         </div>
 
@@ -55,17 +78,17 @@ export function LocationSection({ whatsappPhone, hotelName }: LocationSectionPro
             <div className="space-y-6">
               <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-slate-400 font-['Plus_Jakarta_Sans',sans-serif]">
                 <Navigation className="w-4 h-4 text-[#00C8D4]" />
-                <span>Instrucciones Claras de Llegada</span>
+                <span>{t.routeTitle}</span>
               </div>
 
               <div className="space-y-5">
-                {APARTO_LOCATION.drivingInstructions.map((step, idx) => (
+                {instructions.map((step, idx) => (
                   <div key={idx} className="flex gap-4">
                     <div className="w-8 h-8 rounded-full bg-[#00C8D4]/15 border border-[#00C8D4]/40 text-[#00C8D4] font-black text-xs flex items-center justify-center shrink-0 font-mono">
                       {step.step}
                     </div>
                     <div className="space-y-1">
-                      <h4 className="text-sm font-bold text-slate-900 font-['Plus_Jakarta_Sans',sans-serif]">
+                      <h4 className="text-sm font-bold text-slate-900 font-serif">
                         {step.title}
                       </h4>
                       <p className="text-xs text-slate-600 leading-relaxed font-['Inter',sans-serif]">
@@ -80,14 +103,14 @@ export function LocationSection({ whatsappPhone, hotelName }: LocationSectionPro
             {/* Enlaces y Coordenadas */}
             <div className="pt-4 border-t border-slate-200/80 space-y-3">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-semibold text-slate-500">Coordenadas GPS:</span>
+                <span className="font-semibold text-slate-500">GPS:</span>
                 <button
                   type="button"
                   onClick={handleCopyCoords}
                   className="inline-flex items-center gap-1.5 text-xs font-bold text-[#00C8D4] hover:text-[#009da7] cursor-pointer"
                 >
                   {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copied ? "¡Copiadas!" : `${coords.lat}, ${coords.lng}`}</span>
+                  <span>{copied ? t.copied : `${coords.lat}, ${coords.lng}`}</span>
                 </button>
               </div>
 
@@ -99,7 +122,7 @@ export function LocationSection({ whatsappPhone, hotelName }: LocationSectionPro
                   className="flex-1 py-2.5 px-3 rounded-xl bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs"
                 >
                   <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
-                  <span>Google Maps</span>
+                  <span>{t.openMaps}</span>
                 </a>
                 <a
                   href={`https://waze.com/ul?ll=${coords.lat},${coords.lng}&navigate=yes`}
@@ -108,13 +131,13 @@ export function LocationSection({ whatsappPhone, hotelName }: LocationSectionPro
                   className="flex-1 py-2.5 px-3 rounded-xl bg-[#00C8D4]/15 hover:bg-[#00C8D4]/25 border border-[#00C8D4]/40 text-[#009da7] text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs"
                 >
                   <Navigation className="w-3.5 h-3.5 text-[#00C8D4]" />
-                  <span>Abrir en Waze</span>
+                  <span>{t.openWaze}</span>
                 </a>
               </div>
             </div>
           </div>
 
-          {/* Columna Derecha: Mapa Interactivo con Cabecera en Magenta Degradado (Sin Negro ni Gris) */}
+          {/* Columna Derecha: Mapa Interactivo con Cabecera en Magenta Degradado */}
           <div className="lg:col-span-7 bg-white rounded-3xl overflow-hidden border-2 border-[#FF0096]/30 shadow-2xl flex flex-col min-h-[420px]">
             {/* Header del Mapa en Magenta Degradado Corporativo */}
             <div 
@@ -124,7 +147,7 @@ export function LocationSection({ whatsappPhone, hotelName }: LocationSectionPro
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-white" />
                 <span className="text-xs font-black uppercase tracking-wider font-['Plus_Jakarta_Sans',sans-serif] text-white">
-                  Vista Terrestre & Mapa Interactivo Morrocoy
+                  {language === "es" ? "Mapa Interactivo Morrocoy" : "Interactive Morrocoy Map"}
                 </span>
               </div>
               <div className="flex items-center gap-1 bg-white/20 backdrop-blur-md p-1 rounded-xl border border-white/30">
@@ -135,7 +158,7 @@ export function LocationSection({ whatsappPhone, hotelName }: LocationSectionPro
                     mapMode === "estandar" ? "bg-white text-[#FF0096] shadow-sm scale-105" : "text-white/80 hover:text-white"
                   }`}
                 >
-                  Mapa
+                  {t.mapView}
                 </button>
                 <button
                   type="button"
@@ -144,7 +167,7 @@ export function LocationSection({ whatsappPhone, hotelName }: LocationSectionPro
                     mapMode === "satelite" ? "bg-white text-[#FF0096] shadow-sm scale-105" : "text-white/80 hover:text-white"
                   }`}
                 >
-                  Satélite
+                  {t.satelliteView}
                 </button>
               </div>
             </div>
@@ -165,7 +188,7 @@ export function LocationSection({ whatsappPhone, hotelName }: LocationSectionPro
                 style={{ background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)" }}
               >
                 <span className="w-2.5 h-2.5 rounded-full bg-white animate-pulse" />
-                <span>ACCESO VERIFICADO • TUCACAS / MORROCOY</span>
+                <span>{t.verifiedAccess}</span>
               </div>
             </div>
           </div>
@@ -201,19 +224,18 @@ export function LocationSection({ whatsappPhone, hotelName }: LocationSectionPro
 
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-white text-[11px] font-extrabold tracking-[0.25em] uppercase font-['Plus_Jakarta_Sans',sans-serif]">
               <Sparkles className="w-3.5 h-3.5 text-white" />
-              RESERVA DIRECTA GARANTIZADA 0% COMISIONES
+              {language === "es" ? "RESERVA DIRECTA GARANTIZADA 0% COMISIONES" : "GUARANTEED DIRECT BOOKING 0% COMMISSIONS"}
             </div>
 
-            <h3 className="text-3xl sm:text-5xl md:text-6xl font-black font-['Plus_Jakarta_Sans',sans-serif] tracking-tight leading-[1.1] text-white drop-shadow-md">
-              Planifique su Próxima Escapada a Morrocoy
+            <h3 className="text-3xl sm:text-5xl md:text-6xl font-black font-serif tracking-tight leading-[1.1] text-white drop-shadow-md">
+              {t.ctaTitle}
             </h3>
 
             <p className="text-sm sm:text-base md:text-lg text-white/95 font-normal leading-relaxed font-['Inter',sans-serif] max-w-2xl mx-auto drop-shadow-xs">
-              Consulte tarifas oficiales y disponibilidad en tiempo real directamente con el equipo anfitrión de {hotelName}. Sin cobros ocultos ni intermediarios.
+              {t.ctaSub}
             </p>
 
             <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
-              {/* Botón oficial de acción blanco con texto magenta según AGENTS.md */}
               <a
                 href={ctaWaUrl}
                 target="_blank"
@@ -221,18 +243,18 @@ export function LocationSection({ whatsappPhone, hotelName }: LocationSectionPro
                 className="px-9 py-4 rounded-full font-extrabold text-sm sm:text-base text-[#FF0096] bg-white hover:bg-slate-100 transition-all shadow-2xl hover:scale-105 active:scale-95 flex items-center gap-3 cursor-pointer font-['Plus_Jakarta_Sans',sans-serif]"
               >
                 <MessageCircle className="w-5 h-5 fill-[#25D366] text-[#25D366]" />
-                <span>Contactar Recepción por WhatsApp</span>
+                <span>{t.ctaBtn}</span>
               </a>
             </div>
 
             <div className="pt-2 flex items-center justify-center gap-6 text-xs text-white/90 font-medium">
               <span className="flex items-center gap-1.5">
                 <Check className="w-4 h-4 text-emerald-300 stroke-[3]" />
-                Respuesta Inmediata
+                {language === "es" ? "Respuesta Inmediata" : "Instant Reply"}
               </span>
               <span className="flex items-center gap-1.5">
                 <Check className="w-4 h-4 text-emerald-300 stroke-[3]" />
-                Garantía de Mejor Tarifa
+                {language === "es" ? "Garantía de Mejor Tarifa" : "Best Rate Guarantee"}
               </span>
             </div>
           </div>

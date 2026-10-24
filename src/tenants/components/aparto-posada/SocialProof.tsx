@@ -1,11 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Star, ShieldCheck, Sparkles, CheckCircle2, ChevronLeft, ChevronRight, MapPin, Quote } from "lucide-react";
 import { APARTO_REVIEWS } from "../../lib/apartoPosadaData";
+import { type Language, APARTO_TRANSLATIONS } from "../../lib/apartoTranslations";
 
-export function SocialProof() {
+interface SocialProofProps {
+  language?: Language;
+}
+
+export function SocialProof({ language = "es" }: SocialProofProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const touchStartX = useRef<number | null>(null);
+  const t = APARTO_TRANSLATIONS[language].reviews;
 
   const totalReviews = APARTO_REVIEWS.length;
 
@@ -38,7 +44,6 @@ export function SocialProof() {
     touchStartX.current = null;
   };
 
-  // Obtenemos los 2 o 3 reviews a mostrar en viewport según desktop o móvil
   const visibleReview = APARTO_REVIEWS[currentIndex];
   const nextReview = APARTO_REVIEWS[(currentIndex + 1) % totalReviews];
 
@@ -50,11 +55,11 @@ export function SocialProof() {
         <div className="text-center space-y-4 max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00C8D4]/10 border border-[#00C8D4]/30 text-[#009da7] text-[11px] font-extrabold tracking-[0.25em] uppercase font-['Plus_Jakarta_Sans',sans-serif]">
             <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
-            EXPERIENCIAS REALES & CONFIANZA TOTAL
+            {t.badge}
           </div>
 
           <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight font-serif">
-            Opiniones de Nuestros Huéspedes
+            {t.title}
           </h2>
 
           <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
@@ -64,10 +69,7 @@ export function SocialProof() {
               ))}
             </div>
             <span className="text-sm font-black text-slate-900 font-['Plus_Jakarta_Sans',sans-serif]">
-              4.9 de 5 en Google Reviews
-            </span>
-            <span className="text-xs text-slate-400 font-medium">
-              (+120 evaluaciones verificadas)
+              {t.ratingText}
             </span>
           </div>
         </div>

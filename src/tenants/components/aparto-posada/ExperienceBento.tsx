@@ -2,12 +2,40 @@ import React from "react";
 import { Compass, Waves, Zap, Sparkles, ArrowUpRight, Camera, Maximize2, Eye, ShieldCheck, HeartHandshake } from "lucide-react";
 import { APARTO_DIFFERENTIALS, APARTO_BENTO_TILES } from "../../lib/apartoPosadaData";
 import { LuxuryHeroCarousel } from "./LuxuryHeroCarousel";
+import { type Language, APARTO_TRANSLATIONS } from "../../lib/apartoTranslations";
 
 interface ExperienceBentoProps {
   onOpenImage?: (imgUrl: string, caption: string) => void;
+  language?: Language;
 }
 
-export function ExperienceBento({ onOpenImage }: ExperienceBentoProps) {
+export function ExperienceBento({ onOpenImage, language = "es" }: ExperienceBentoProps) {
+  const t = APARTO_TRANSLATIONS[language];
+
+  const diffItems = [
+    {
+      number: "01",
+      title: t.differentials.diff1Title,
+      description: t.differentials.diff1Desc,
+      icon: Compass,
+      solidBg: "#00C8D4"
+    },
+    {
+      number: "02",
+      title: t.differentials.diff2Title,
+      description: t.differentials.diff2Desc,
+      icon: Waves,
+      solidBg: "#FF0096"
+    },
+    {
+      number: "03",
+      title: t.differentials.diff3Title,
+      description: t.differentials.diff3Desc,
+      icon: Zap,
+      solidBg: "#9B00CC"
+    }
+  ];
+
   return (
     <section id="experiencia" className="py-16 md:py-24 bg-white border-b border-slate-200/80 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-16">
@@ -31,24 +59,24 @@ export function ExperienceBento({ onOpenImage }: ExperienceBentoProps) {
 
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00C8D4]/10 border border-[#00C8D4]/30 text-[#009da7] text-[11px] font-extrabold tracking-[0.25em] uppercase font-['Plus_Jakarta_Sans',sans-serif]">
             <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
-            EXPERIENCIA & HOSPITALIDAD EXCLUSIVA EN MORROCOY
+            {t.presentation.badge}
           </div>
 
-          <h2 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.1] font-['Plus_Jakarta_Sans',sans-serif]">
-            Su Casa en las Playas de Morrocoy
+          <h2 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.1] font-serif">
+            {t.presentation.title}
           </h2>
 
           <p className="text-slate-600 text-sm sm:text-base md:text-lg font-normal leading-relaxed font-['Inter',sans-serif] max-w-2xl mx-auto">
-            Disfrute de la independencia de un apartamento totalmente equipado con la calidez, piscina cristalina y seguridad de una posada vacacional de primera línea.
+            {t.presentation.description}
           </p>
         </div>
 
         {/* ── NUEVO COMPONENTE: CARRUSEL DE IMÁGENES ANIMADO (ALTA GAMA) ── */}
-        <LuxuryHeroCarousel onOpenImage={onOpenImage} />
+        <LuxuryHeroCarousel onOpenImage={onOpenImage} language={language} />
 
         {/* 3 Pilares de Hospitalidad Boutique con Iconos Minimalistas de Trazo Fino */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
-          {APARTO_DIFFERENTIALS.map((item, idx) => {
+          {diffItems.map((item, idx) => {
             const IconComp = item.icon;
             return (
               <div
@@ -76,7 +104,9 @@ export function ExperienceBento({ onOpenImage }: ExperienceBentoProps) {
                 </div>
 
                 <div className="pt-5 mt-6 border-t border-slate-200/60 flex items-center justify-between text-xs font-bold text-slate-400 group-hover:text-slate-900 transition-colors">
-                  <span className="font-['Plus_Jakarta_Sans',sans-serif] tracking-wider uppercase text-[10px]">Estándar de Calidad</span>
+                  <span className="font-['Plus_Jakarta_Sans',sans-serif] tracking-wider uppercase text-[10px]">
+                    {t.differentials.qualityStandard}
+                  </span>
                   <ArrowUpRight className="w-4 h-4 text-[#00C8D4]" />
                 </div>
               </div>

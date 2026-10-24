@@ -23,6 +23,7 @@ import { SocialProof } from "./components/aparto-posada/SocialProof";
 import { FaqAccordion } from "./components/aparto-posada/FaqAccordion";
 import { LocationSection } from "./components/aparto-posada/LocationSection";
 import { ApartoFooter } from "./components/aparto-posada/ApartoFooter";
+import { type Language, APARTO_TRANSLATIONS } from "./lib/apartoTranslations";
 
 interface SaaSTenantLandingPageProps {
   config: TenantConfig;
@@ -104,6 +105,24 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
   const [orderCart, setOrderCart] = useState<{ dish: OleajeDish; count: number }[]>([]);
   const [isAllRoomsModalOpen, setIsAllRoomsModalOpen] = useState<boolean>(false);
 
+  // ── ESTADO DE IDIOMA GLOBAL (ES / EN) PARA APARTO POSADA DEL MAR ──
+  const [apartoLang, setApartoLang] = useState<Language>(() => {
+    try {
+      const saved = localStorage.getItem("aparto_posada_language");
+      if (saved === "es" || saved === "en") return saved;
+    } catch {}
+    return "es";
+  });
+
+  const handleApartoLangChange = (lang: Language) => {
+    setApartoLang(lang);
+    try {
+      localStorage.setItem("aparto_posada_language", lang);
+    } catch {}
+  };
+
+  const tAparto = APARTO_TRANSLATIONS[apartoLang];
+
   // ── ESTADOS DEL FILTRO DE TRES NIVELES (ESTILO HOTELES DE VENEZUELA) ──
   const [filterRoomType, setFilterRoomType] = useState<string>("all");
   const [filterCapacity, setFilterCapacity] = useState<string>("all");
@@ -156,9 +175,11 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
     appleLink.href = isApartoPosada ? "/images/aparto-posada/favicon-192.png" : faviconUrl;
 
     if (isApartoPosada) {
-      document.title = "Aparto Posada del Mar | Reservas Oficiales";
+      document.title = apartoLang === "es"
+        ? "Aparto Posada del Mar | Reservas Oficiales Tucacas"
+        : "Aparto Posada del Mar | Official Bookings Tucacas";
     }
-  }, [isApartoPosada, config.branding?.logo_url]);
+  }, [isApartoPosada, apartoLang, config.branding?.logo_url]);
 
   const addDishToCart = (dish: OleajeDish) => {
     setOrderCart(prev => {
@@ -707,6 +728,15 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               <a href="#galeria" className="hover:text-[#FF0096] transition-colors">Galería & Experiencias</a>
               <a href="#contacto" className="hover:text-[#FF0096] transition-colors">Ubicación</a>
             </nav>
+          ) : isApartoPosada ? (
+            <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-700">
+              <a href="#inicio" className="hover:text-[#FF0096] transition-colors">{tAparto.nav.home}</a>
+              <a href="#habitaciones" className="hover:text-[#FF0096] transition-colors">{tAparto.nav.rooms}</a>
+              <a href="#galeria" className="hover:text-[#FF0096] transition-colors">{tAparto.nav.gallery}</a>
+              <a href="#servicios" className="hover:text-[#FF0096] transition-colors">{tAparto.nav.services}</a>
+              <a href="#sobre-nosotros" className="hover:text-[#FF0096] transition-colors">{tAparto.nav.about}</a>
+              <a href="#contacto" className="hover:text-[#FF0096] transition-colors">{tAparto.nav.location}</a>
+            </nav>
           ) : (
             <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-700">
               <a href="#inicio" className="hover:text-[#FF0096] transition-colors">Inicio</a>
@@ -718,15 +748,49 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             </nav>
           )}
 
-          <a
-            href={generalWaUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-black text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-md hover:shadow-lg active:scale-95 shrink-0 cursor-pointer"
-          >
-            <MessageCircle className="w-4 h-4 fill-current" />
-            <span className="hidden sm:inline">WhatsApp Directo</span>
-          </a>
+          <div className="flex items-center gap-3">
+            {isApartoPosada && (
+              <div className="flex items-center bg-slate-100 hover:bg-slate-200/80 p-0.5 rounded-full border border-slate-200 shadow-inner">
+                <button
+                  type="button"
+                  onClick={() => handleApartoLangChange("es")}
+                  className={`px-2.5 py-1 rounded-full text-[11px] font-black tracking-wide transition-all flex items-center gap-1 cursor-pointer ${
+                    apartoLang === "es"
+                      ? "bg-[#00C8D4] text-white shadow-xs"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                  title="Cambiar a Español"
+                >
+                  <Globe className="w-3 h-3" />
+                  <span>ES</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleApartoLangChange("en")}
+                  className={`px-2.5 py-1 rounded-full text-[11px] font-black tracking-wide transition-all flex items-center gap-1 cursor-pointer ${
+                    apartoLang === "en"
+                      ? "bg-[#00C8D4] text-white shadow-xs"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                  title="Switch to English"
+                >
+                  <span>EN</span>
+                </button>
+              </div>
+            )}
+
+            <a
+              href={generalWaUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-black text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-md hover:shadow-lg active:scale-95 shrink-0 cursor-pointer"
+            >
+              <MessageCircle className="w-4 h-4 fill-current" />
+              <span className="hidden sm:inline">
+                {isApartoPosada ? tAparto.nav.directWa : "WhatsApp Directo"}
+              </span>
+            </a>
+          </div>
 
         </div>
 
@@ -745,14 +809,16 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             }}
           >
             <Hotel className="w-3.5 h-3.5 text-white" />
-            <span>Hospedaje de Selección</span>
+            <span>{isApartoPosada ? tAparto.topbar.lodgingTag : "Hospedaje de Selección"}</span>
           </div>
 
           {/* Centro: Contáctanos al +58 (414) 4815321 con Icono Blanco Moderno */}
           <div className="flex-1 flex items-center justify-center px-4">
             <a
               href={`https://wa.me/${cleanWhatsapp || "584144815321"}?text=${encodeURIComponent(
-                `Hola ${config.name}, deseo consultar tarifas y disponibilidad para reservar.`
+                isApartoPosada && apartoLang === "en"
+                  ? `Hello ${config.name}, I would like to check rates and availability to make a reservation.`
+                  : `Hola ${config.name}, deseo consultar tarifas y disponibilidad para reservar.`
               )}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -763,7 +829,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                 <PhoneCall className="w-3 h-3 text-white group-hover:text-[#FF0096] transition-colors" />
               </div>
               <span className="text-[11px] sm:text-xs font-bold tracking-wide">
-                Contáctanos al{" "}
+                {isApartoPosada ? tAparto.topbar.contactUs : "Contáctanos al"}{" "}
                 <span className="font-black underline underline-offset-2 decoration-white/70 group-hover:decoration-yellow-200">
                   +58 (414) 4815321
                 </span>
@@ -782,7 +848,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
             </span>
-            <span>Atención Inmediata</span>
+            <span>{isApartoPosada ? tAparto.topbar.immediateSupport : "Atención Inmediata"}</span>
             <span className="text-white/40">•</span>
             <span className="text-[10px] text-yellow-300 font-extrabold flex items-center gap-0.5">
               ★ <span className="text-white">5.0</span>
@@ -905,7 +971,13 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 backdrop-blur border border-[#00C8D4]/40 text-[#00C8D4] text-[11px] font-extrabold tracking-[0.25em] uppercase shadow-2xl">
               <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
-              {isMyCampers ? "DONDE EL SILENCIO SE VUELVE MÚSICA • CUBIRO, LARA" : isPerlaNegra ? "BIENVENIDOS A MORROCOY • POSADA PERLA NEGRA" : "EL PARAÍSO TE ESPERA • HOSPEDAJE DE EXCELENCIA"}
+              {isApartoPosada 
+                ? tAparto.hero.tagline 
+                : isMyCampers 
+                  ? "DONDE EL SILENCIO SE VUELVE MÚSICA • CUBIRO, LARA" 
+                  : isPerlaNegra 
+                    ? "BIENVENIDOS A MORROCOY • POSADA PERLA NEGRA" 
+                    : "EL PARAÍSO TE ESPERA • HOSPEDAJE DE EXCELENCIA"}
             </div>
 
             <h1 className={`text-4xl sm:text-6xl md:text-7xl font-black text-white tracking-tight leading-tight drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)] ${
@@ -923,7 +995,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                   </span>
                   <span className={`text-xs sm:text-sm font-black uppercase tracking-[0.2em] ${isApartoPosada ? "text-[#00C8D4]" : isMyCampers || isPerlaNegra ? "text-emerald-300" : "text-[#00C8D4]"} drop-shadow`}>
                     {isApartoPosada
-                      ? "🚀 PRÓXIMO LANZAMIENTO! • APLICACIÓN MULTI PLATAFORMA WEB EN ACTUALIZACIÓN"
+                      ? tAparto.hero.upcomingLaunch
                       : isMyCampers
                         ? "✨ SELLO OFICIAL DE EXCELENCIA • CUBIRO, LARA"
                         : isPerlaNegra
@@ -937,11 +1009,13 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                 className="text-sm sm:text-base md:text-lg text-white/95 font-normal max-w-2xl mx-auto leading-relaxed drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)] tracking-normal font-sans"
                 style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 400 }}
               >
-                {isMyCampers
-                  ? "Vive la experiencia de hospedarte en un Camper exclusivo rodeado del clima fresco y paisajes icónicos de Cubiro, Estado Lara. Confort de alta gama, fogatas nocturnas, vistas impresionantes y tranquilidad absoluta."
-                  : isPerlaNegra 
-                    ? "Descubra el verdadero significado de descansar en Morrocoy. 21 habitaciones confortables con aire acondicionado 24/7, piscina iluminada, WiFi Starlink, planta eléctrica y paseos directos a los cayos."
-                    : "Más que un Hospedaje, su refugio perfecto. Disfrute de una experiencia inolvidable con atención personalizada y garantía directa de tarifa."
+                {isApartoPosada
+                  ? tAparto.hero.subtitle
+                  : isMyCampers
+                    ? "Vive la experiencia de hospedarte en un Camper exclusivo rodeado del clima fresco y paisajes icónicos de Cubiro, Estado Lara. Confort de alta gama, fogatas nocturnas, vistas impresionantes y tranquilidad absoluta."
+                    : isPerlaNegra 
+                      ? "Descubra el verdadero significado de descansar en Morrocoy. 21 habitaciones confortables con aire acondicionado 24/7, piscina iluminada, WiFi Starlink, planta eléctrica y paseos directos a los cayos."
+                      : "Más que un Hospedaje, su refugio perfecto. Disfrute de una experiencia inolvidable con atención personalizada y garantía directa de tarifa."
                 }
               </p>
             </div>
@@ -975,7 +1049,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                     </div>
                     <div className="flex-1 min-w-0">
                       <label className="block text-[10px] uppercase font-black tracking-wider text-slate-400 cursor-pointer">
-                        TIPO DE HABITACIÓN
+                        {isApartoPosada ? tAparto.hero.roomType : "TIPO DE HABITACIÓN"}
                       </label>
                       <div className="flex items-center justify-between gap-1">
                         <span className="text-xs font-extrabold text-slate-900 truncate">
@@ -990,7 +1064,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                   {openRoomDropdown && (
                     <div className="absolute top-full left-0 mt-2.5 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl shadow-slate-950/40 border border-slate-200/90 py-2 z-[100] max-h-96 overflow-y-auto">
                       <div className="px-4 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100">
-                        Seleccionar Habitación
+                        {isApartoPosada && apartoLang === "en" ? "Select Room Type" : "Seleccionar Habitación"}
                       </div>
                       {APM_ROOM_TYPES.map((item) => {
                         const IconC = item.icon;
@@ -1036,7 +1110,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                     </div>
                     <div className="flex-1 min-w-0">
                       <label className="block text-[10px] uppercase font-black tracking-wider text-slate-400 cursor-pointer">
-                        HUÉSPEDES / CAPACIDAD
+                        {isApartoPosada ? tAparto.hero.guests : "HUÉSPEDES / CAPACIDAD"}
                       </label>
                       <div className="flex items-center justify-between gap-1">
                         <span className="text-xs font-extrabold text-slate-900 truncate">
@@ -1051,7 +1125,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                   {openCapDropdown && (
                     <div className="absolute top-full left-0 md:left-1/2 md:-translate-x-1/2 mt-2.5 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl shadow-slate-950/40 border border-slate-200/90 py-2 z-[100] max-h-96 overflow-y-auto">
                       <div className="px-4 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100">
-                        Capacidad de Huéspedes
+                        {isApartoPosada && apartoLang === "en" ? "Guest Capacity" : "Capacidad de Huéspedes"}
                       </div>
                       {APM_CAPACITIES.map((item) => {
                         const IconC = item.icon;
@@ -1097,7 +1171,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                     </div>
                     <div className="flex-1 min-w-0">
                       <label className="block text-[10px] uppercase font-black tracking-wider text-slate-400 cursor-pointer">
-                        INSTALACIONES & SERVICIOS
+                        {isApartoPosada ? tAparto.hero.amenitiesFilter : "INSTALACIONES & SERVICIOS"}
                       </label>
                       <div className="flex items-center justify-between gap-1">
                         <span className="text-xs font-extrabold text-slate-900 truncate">
@@ -1112,7 +1186,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                   {openFacDropdown && (
                     <div className="absolute top-full left-0 md:left-auto md:right-0 mt-2.5 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl shadow-slate-950/40 border border-slate-200/90 py-2 z-[100] max-h-96 overflow-y-auto">
                       <div className="px-4 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100">
-                        Instalaciones & Servicios
+                        {isApartoPosada && apartoLang === "en" ? "Facilities & Amenities" : "Instalaciones & Servicios"}
                       </div>
                       {APM_FACILITIES.map((item) => {
                         const IconC = item.icon;
@@ -1150,7 +1224,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                     className="w-full md:w-auto px-7 py-3.5 rounded-xl md:rounded-full bg-gradient-to-r from-[#00C8D4] to-[#00b2be] hover:from-[#00b2be] hover:to-[#00C8D4] text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#00C8D4]/30 hover:scale-[1.03] transition-all cursor-pointer"
                   >
                     <Search className="w-4 h-4 text-white stroke-[2.5]" />
-                    <span>Buscar</span>
+                    <span>{isApartoPosada ? tAparto.hero.searchBtn : "Buscar"}</span>
                   </button>
                 </div>
 
@@ -1160,11 +1234,21 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             {/* FILA INFERIOR: PILLS / FILTROS RÁPIDOS DE INSTALACIONES */}
             <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
               <span className="text-[10px] uppercase font-black tracking-wider text-slate-200 mr-1 hidden sm:inline drop-shadow">
-                Filtros Populares:
+                {isApartoPosada && apartoLang === "en" ? "Popular Filters:" : "Filtros Populares:"}
               </span>
 
               {APM_QUICK_FILTERS.map((pill, idx) => {
                 const IconComp = pill.icon;
+                let displayLabel = pill.label;
+                if (isApartoPosada && apartoLang === "en") {
+                  if (pill.facilityVal === "piscina") displayLabel = tAparto.hero.pills.piscina;
+                  else if (pill.facilityVal === "planta") displayLabel = tAparto.hero.pills.planta;
+                  else if (pill.facilityVal === "cayos") displayLabel = tAparto.hero.pills.cayos;
+                  else if (pill.roomVal === "apartamento") displayLabel = tAparto.hero.pills.cocina;
+                  else if (pill.roomVal === "matrimonial") displayLabel = tAparto.hero.pills.matrimoniales;
+                  else if (pill.facilityVal === "wifi") displayLabel = tAparto.hero.pills.wifi;
+                }
+
                 return (
                   <button
                     key={idx}
@@ -1183,14 +1267,14 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                     >
                       <IconComp className="w-2.5 h-2.5 text-white stroke-[2.5]" />
                     </div>
-                    <span>{pill.label}</span>
+                    <span>{displayLabel}</span>
                   </button>
                 );
               })}
             </div>
 
             {isApartoPosada ? (
-              <TrustBar />
+              <TrustBar language={apartoLang} />
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto pt-2">
                 <div className="p-3 bg-[#00C8D4]/25 backdrop-blur-md rounded-2xl border border-[#00C8D4]/50 text-center shadow-2xl hover:bg-[#00C8D4]/35 transition-all">
@@ -1230,7 +1314,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                 href="#habitaciones"
                 className="px-8 py-4 rounded-2xl font-extrabold text-sm text-white bg-[#00C8D4] hover:bg-[#00b0bc] transition-all shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer"
               >
-                <span>Ver Habitaciones & Tarifas</span>
+                <span>{isApartoPosada ? (apartoLang === "es" ? "Ver Habitaciones & Tarifas" : "Explore Rooms & Rates") : "Ver Habitaciones & Tarifas"}</span>
                 <ArrowRight className="w-4 h-4" />
               </a>
 
@@ -1241,7 +1325,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
                 className="px-8 py-4 rounded-2xl font-extrabold text-sm text-white bg-[#25D366] hover:bg-[#20bd5a] transition-all shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer"
               >
                 <MessageCircle className="w-4 h-4 fill-current" />
-                <span>Reservar Directo por WhatsApp</span>
+                <span>{isApartoPosada ? (apartoLang === "es" ? "Reservar Directo por WhatsApp" : "Book Directly on WhatsApp") : "Reservar Directo por WhatsApp"}</span>
               </a>
 
             </div>
@@ -1290,6 +1374,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           {/* ── SECCIÓN 1: STORYTELLING & EXPERIENCIA (POR ENCIMA DEL CATÁLOGO) ── */}
           <ExperienceBento
             onOpenImage={(url, cap) => setActiveLightboxImg({ url, category: cap })}
+            language={apartoLang}
           />
 
           {/* ── SECCIÓN 2: HABITACIONES Y SUITES (GRID MÁXIMO 6 TARJETAS + TABS FILTER) ── */}
@@ -1300,21 +1385,23 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
             onOpenAllRooms={() => setIsAllRoomsModalOpen(true)}
             onToggleCart={toggleCartRoom}
             cartRooms={cartRooms}
+            language={apartoLang}
           />
 
           {/* ── SECCIÓN 3: SERVICIOS E INSTALACIONES (LUCIDE ICONS EN CAJAS DE COLOR SÓLIDO) ── */}
-          <ServicesGrid />
+          <ServicesGrid language={apartoLang} />
 
           {/* ── SECCIÓN 4: PRUEBA SOCIAL / RESEÑAS REALES (GOOGLE REVIEWS 5 ESTRELLAS) ── */}
-          <SocialProof />
+          <SocialProof language={apartoLang} />
 
           {/* ── SECCIÓN 5: PREGUNTAS FRECUENTES (FAQ ACORDEÓN REACT) ── */}
-          <FaqAccordion />
+          <FaqAccordion language={apartoLang} />
 
           {/* ── SECCIÓN 6: UBICACIÓN, MAPA Y CTA FINAL EN GRADIENTE MAGENTA/PÚRPURA ── */}
           <LocationSection
             whatsappPhone={whatsapp}
             hotelName={config.name}
+            language={apartoLang}
           />
         </>
       ) : isRestaurant ? (
@@ -2126,6 +2213,8 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           whatsappPhone={whatsapp}
           hotelName={config.name}
           domain={config.domain}
+          language={apartoLang}
+          onLanguageChange={handleApartoLangChange}
         />
       ) : (
         <footer 
@@ -2300,6 +2389,7 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
         hotelName={config.name}
         whatsappPhone={whatsapp}
         onOpenDetail={(r) => setSelectedRoom(r)}
+        language={apartoLang}
       />
 
       <RoomDetailModal
