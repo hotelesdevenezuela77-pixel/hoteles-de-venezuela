@@ -62,6 +62,7 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
   const destRef = useRef<HTMLDivElement>(null);
   const catRef = useRef<HTMLDivElement>(null);
   const expRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   // Helper para calcular contador de visitas/búsquedas diarias dinámico según el día de la semana
   const getInitialVisitorCount = () => {
@@ -161,6 +162,28 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
     loadHeroConfig();
   }, []);
 
+  // Garantizar reproducción automática continua del video de fondo del Salto Ángel en todos los navegadores
+  useEffect(() => {
+    const vid = videoRef.current;
+    if (!vid) return;
+    vid.defaultMuted = true;
+    vid.muted = true;
+    const playPromise = vid.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        // Reintentar al primer evento de interacción o visibilidad
+        const retryPlay = () => {
+          if (videoRef.current) {
+            videoRef.current.muted = true;
+            videoRef.current.play().catch(() => {});
+          }
+        };
+        document.addEventListener("visibilitychange", retryPlay, { once: true });
+        window.addEventListener("pointerdown", retryPlay, { once: true });
+      });
+    }
+  }, [heroConfig.bgImage]);
+
   // Close dropdowns on outside click
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -204,24 +227,37 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
   return (
     <section className="relative w-full bg-slate-950 text-white min-h-[560px] lg:min-h-[620px] flex items-center justify-center pt-20 pb-12 overflow-hidden">
       
-      {/* Background Video full-bleed con lazy fallback y scale */}
+      {/* Background Video full-bleed con reproducción forzada y bruma animada */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <video
+          ref={videoRef}
+          src="/videos/angel-falls-hero.mp4"
           autoPlay
           loop
           muted
           playsInline
+          preload="auto"
           poster={heroConfig.bgImage || "/salto-angel-hero.jpg"}
+          onLoadedMetadata={(e) => {
+            e.currentTarget.muted = true;
+            e.currentTarget.play().catch(() => {});
+          }}
+          onCanPlay={(e) => {
+            e.currentTarget.muted = true;
+            e.currentTarget.play().catch(() => {});
+          }}
           className="w-full h-full object-cover scale-[1.08] filter brightness-105 contrast-[1.02]"
         >
           <source src="/videos/angel-falls-hero.mp4" type="video/mp4" />
-          <img
-            src={heroConfig.bgImage || "/salto-angel-hero.jpg"}
-            alt="Salto Ángel - Parque Nacional Canaima"
-            className="w-full h-full object-cover scale-[1.08] filter brightness-105"
-          />
         </video>
-        {/* Capa de degradado ligera y cristalina para máxima visibilidad de la imagen del Salto Ángel */}
+
+        {/* Efecto cinemático de caída de agua y bruma ambiental para movimiento garantizado */}
+        <div className="absolute inset-0 z-[5] pointer-events-none overflow-hidden">
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[900px] h-[260px] bg-gradient-to-t from-cyan-100/20 via-white/15 to-transparent rounded-full blur-3xl animate-mist-drift-1" />
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-[780px] h-[220px] bg-gradient-to-t from-white/25 via-cyan-50/10 to-transparent rounded-full blur-2xl animate-mist-drift-2" />
+        </div>
+
+        {/* Capa de degradado ligera y cristalina para máxima visibilidad del Salto Ángel */}
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/20 to-slate-950/80 z-10" />
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent z-15" />
       </div>
