@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,700&family=Montserrat:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -14,15 +15,16 @@
   --color-text-dark: #1F2937;
   --color-text-muted: #4B5563;
 
-  /* Tipografía Oficial HDV & Tenant */
-  --font-sans: 'Roboto', 'Source Sans 3', 'Montserrat', system-ui, sans-serif;
-  --font-heading: 'Montserrat', sans-serif;
-  --font-body: 'Roboto', 'Source Sans 3', sans-serif;
-  --font-serif: 'Playfair Display', 'Cinzel', serif;
-  --font-display: 'Montserrat', sans-serif;
+  /* Tipografía Oficial de Lujo y Alta Gama HDV */
+  --font-sans: 'Montserrat', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Playfair Display', Georgia, serif;
+  --font-body: 'Montserrat', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-display: 'Playfair Display', Georgia, serif;
   --font-montserrat: 'Montserrat', sans-serif;
-  --font-roboto: 'Roboto', 'Source Sans 3', sans-serif;
-  --font-caviar: 'Caviar Dreams', 'Montserrat', sans-serif;
+  --font-playfair: 'Playfair Display', Georgia, serif;
+  --font-roboto: 'Montserrat', sans-serif;
+  --font-caviar: 'Montserrat', sans-serif;
 
   /* Custom overrides for luxury dark slate-gray instead of pure black */
   --color-gray-950: #1e293b;
@@ -39,17 +41,38 @@
     scroll-behavior: smooth;
   }
 
+  html,
   body {
     background-color: var(--color-bg-light);
     color: var(--color-text-dark);
-    font-family: var(--font-sans);
+    font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-display);
-    letter-spacing: 0.04em;
-    color: var(--color-slate-900);
+  /* Títulos principales y encabezados (H1, H2, H3): Playfair Display con peso 700 */
+  h1, h2, h3 {
+    font-family: 'Playfair Display', Georgia, serif !important;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+
+  h4, h5, h6 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+
+  /* Cuerpo de texto, menús de navegación, botones y elementos de interfaz: Montserrat (400 a 600) */
+  p, li, label, input, select, textarea {
+    font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+  }
+
+  nav, nav a, button, .btn {
+    font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+    font-weight: 500;
   }
 
   /* Barras de desplazamiento */
@@ -294,11 +317,13 @@
 @keyframes priority-whatsapp-blink {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.75);
+    filter: brightness(1);
   }
   50% {
-    transform: scale(1.03);
-    box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+    transform: scale(1.025);
+    box-shadow: 0 0 18px 6px rgba(37, 211, 102, 0.45);
+    filter: brightness(1.14);
   }
 }
 
@@ -375,17 +400,24 @@
   text-orientation: mixed;
 }
 
-/* ── NUEVAS DIRECTRICES TIPOGRÁFICAS ── */
-.font-montserrat {
-  font-family: 'Montserrat', sans-serif !important;
+/* ── NUEVAS DIRECTRICES TIPOGRÁFICAS DE ALTA GAMA ── */
+.playfair,
+.font-playfair,
+.font-display,
+.font-serif {
+  font-family: 'Playfair Display', Georgia, serif !important;
+}
+
+.font-montserrat,
+.font-sans,
+.font-body {
+  font-family: 'Montserrat', system-ui, -apple-system, sans-serif !important;
 }
 
 .font-roboto {
-  font-family: 'Roboto', 'Source Sans 3', sans-serif !important;
+  font-family: 'Montserrat', system-ui, -apple-system, sans-serif !important;
 }
 
 .font-caviar {
-  font-family: 'Caviar Dreams', 'Montserrat', sans-serif !important;
+  font-family: 'Montserrat', system-ui, -apple-system, sans-serif !important;
 }
-
-
