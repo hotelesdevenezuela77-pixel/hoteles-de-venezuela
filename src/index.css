@@ -303,7 +303,7 @@
 }
 
 .animate-whatsapp-priority {
-  animation: priority-whatsapp-blink 1.8s infinite ease-in-out;
+  animation: priority-whatsapp-blink 1.25s infinite ease-in-out;
 }
 
 /* Animated Marquee Keyframes for 3-Row Reviews Section */

@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { DollarSign, BarChart2, RefreshCw, Zap, Star, Sparkles, Award } from "lucide-react";
 import type { Establishment } from "../layout/EstablishmentCard";
-import { getVirtualPrice } from "../layout/EstablishmentCard";
+import { getRealEstablishmentPrice } from "../layout/EstablishmentCard";
 
 interface PriceHistogramFilterProps {
   establishments: Establishment[];
@@ -18,10 +18,16 @@ export function PriceHistogramFilter({
   setMinPrice,
   setMaxPrice
 }: PriceHistogramFilterProps) {
-  // Calculamos los precios reales/virtuales de todo el catálogo
+  // Calculamos únicamente los precios numéricos reales configurados
   const prices = useMemo(() => {
-    return establishments.map(est => getVirtualPrice(est));
+    return establishments
+      .map(est => getRealEstablishmentPrice(est))
+      .filter((p): p is number => p !== null);
   }, [establishments]);
+
+  if (prices.length === 0) {
+    return null;
+  }
 
   const minAvailable = useMemo(() => (prices.length ? Math.min(...prices) : 20), [prices]);
   const maxAvailable = useMemo(() => (prices.length ? Math.max(...prices) : 600), [prices]);

@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { supabase } from "../lib/supabase";
 import { ESTABLISHMENTS_MOCK } from "../lib/establishmentsMock";
 import type { Establishment } from "../components/layout/EstablishmentCard";
-import { EstablishmentCard, EstablishmentListItem, getVirtualPrice } from "../components/layout/EstablishmentCard";
+import { EstablishmentCard, EstablishmentListItem, getRealEstablishmentPrice } from "../components/layout/EstablishmentCard";
 import { 
   Search, MapPin, ChevronDown, ChevronUp, X, Filter, Grid, List, Compass, Loader2, 
   Wifi, Car, Waves, Wind, Palmtree, Zap, Droplets, Dog, Star, Sparkles, RotateCcw,
@@ -445,6 +445,9 @@ export function Establecimientos() {
               rating_avg: item.rating_avg || 0,
               review_count: item.review_count || 0,
               price_level: item.price_level || "",
+              price_min: item.price_min,
+              base_price: item.base_price,
+              price: item.price,
               is_featured: item.is_featured || false,
               services: item.services || "[]",
               membership_tier: item.membership_tier || "basic",
@@ -472,7 +475,10 @@ export function Establecimientos() {
             primary_image: item.primary_image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
             rating_avg: item.rating_avg || 5.0,
             review_count: item.review_count || 1,
-            price_level: item.price_level || "$$",
+            price_level: item.price_level || "",
+            price_min: item.price_min,
+            base_price: item.base_price,
+            price: item.price,
             is_featured: item.is_featured || false,
             services: item.services || "[]",
             membership_tier: item.membership_tier || "basic",
@@ -517,8 +523,8 @@ export function Establecimientos() {
       est.address.toLowerCase().includes(searchQuery.toLowerCase());
 
     // Advanced filters logic
-    const price = getVirtualPrice(est);
-    const matchesPrice = price >= minPrice && price <= maxPrice;
+    const price = getRealEstablishmentPrice(est);
+    const matchesPrice = (minPrice === 0 && maxPrice >= 1000) || (price !== null && price >= minPrice && price <= maxPrice);
     const matchesRating = est.rating_avg >= minRating;
     const matchesCapacity = (adults + children) <= getVirtualCapacity(est);
     const matchesSubtype = !selectedSubtype || getSubtype(est) === selectedSubtype;

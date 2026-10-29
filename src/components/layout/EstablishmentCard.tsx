@@ -1,8 +1,9 @@
 import { Link } from "wouter";
-import { MapPin, Star, Wifi, Car, Waves, Utensils, TreePine, Dumbbell, Sparkles, Phone, BarChart3, Award, Calendar, Megaphone, Zap, Droplets, ShieldCheck, Heart } from "lucide-react";
+import { MapPin, Star, Wifi, Car, Waves, Utensils, TreePine, Dumbbell, Sparkles, Phone, BarChart3, Award, Calendar, Megaphone, Zap, Droplets, ShieldCheck, Heart, Eye } from "lucide-react";
 import { TrackedWhatsAppButton } from "./TrackedWhatsAppButton";
 import { parseServicesList, getAmenityLabel } from "@/lib/amenitiesList";
 import { optimizeImageUrl } from "@/lib/utils";
+import { OFFICIAL_WHATSAPP_NUMBER } from "@/config/whatsapp";
 
 export interface Establishment {
   id: number;
@@ -21,6 +22,9 @@ export interface Establishment {
   rating_avg: number;
   review_count: number;
   price_level: string;
+  price_min?: number | string | null;
+  base_price?: number | string | null;
+  price?: number | string | null;
   is_featured: boolean;
   services: string;
   membership_tier: string;
@@ -52,13 +56,37 @@ function parseServices(services: string | null): string[] {
   return parseServicesList(services);
 }
 
-export function getVirtualPrice(est: { id: number; price_level?: string }) {
-  const level = est.price_level || "$$";
-  if (level === "$") return 30 + (est.id % 15);
-  if (level === "$$") return 75 + (est.id % 45);
-  if (level === "$$$") return 160 + (est.id % 90);
-  if (level === "$$$$") return 350 + (est.id % 150);
-  return 100;
+/**
+ * Devuelve únicamente el precio numérico real si fue establecido explícitamente por el propietario/administrador.
+ * Si no se ha asignado precio numérico real (ej. solo tiene "$$", "moderado", vacío, etc.), devuelve null para no mostrar precios de ejemplo.
+ */
+export function getRealEstablishmentPrice(est?: {
+  price_min?: number | string | null;
+  base_price?: number | string | null;
+  price?: number | string | null;
+  price_level?: string | null;
+} | null): number | null {
+  if (!est) return null;
+  const candidates = [est.price_min, est.base_price, est.price];
+  for (const val of candidates) {
+    if (typeof val === "number" && val > 0) return val;
+    if (typeof val === "string" && /^\d+(\.\d+)?$/.test(val.trim())) {
+      const parsed = parseFloat(val.trim());
+      if (parsed > 0) return parsed;
+    }
+  }
+  if (typeof est.price_level === "string") {
+    const clean = est.price_level.trim();
+    if (/^\d+(\.\d+)?$/.test(clean)) {
+      const parsed = parseFloat(clean);
+      if (parsed > 0) return parsed;
+    }
+  }
+  return null;
+}
+
+export function getVirtualPrice(est: { id: number; price_level?: string; price_min?: number | string | null; base_price?: number | string | null; price?: number | string | null }) {
+  return getRealEstablishmentPrice(est);
 }
 
 export function EstablishmentCard({ 
@@ -75,6 +103,7 @@ export function EstablishmentCard({
   const placeholderImage = "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600&auto=format&fit=crop";
   const tier = tierConfig[establishment.membership_tier?.toLowerCase()] || tierConfig.basico;
   const services = parseServices(establishment.services);
+  const realPrice = getRealEstablishmentPrice(establishment);
 
   const wrapperClass = isPriority
     ? "priority-glow-card group shadow-md hover:shadow-2xl hover:shadow-[#FF0096]/10 transition-all duration-300"
@@ -101,10 +130,12 @@ export function EstablishmentCard({
             {/* Gradient Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
-            {/* Price Tag */}
-            <div className="absolute bottom-3 left-4 bg-slate-900/80 backdrop-blur-md border border-white/10 text-white px-3 py-1.5 rounded-xl text-[11px] font-black shadow-md flex items-center gap-1 z-10 select-none">
-              Desde <span className="text-[#00C8D4] text-xs font-black">${getVirtualPrice(establishment)}</span> / noche
-            </div>
+            {/* Price Tag - Solo se muestra si el propietario configuró un precio numérico real */}
+            {realPrice !== null && (
+              <div className="absolute bottom-3 left-4 bg-slate-900/80 backdrop-blur-md border border-white/10 text-white px-3 py-1.5 rounded-xl text-[11px] font-black shadow-md flex items-center gap-1 z-10 select-none">
+                Desde <span className="text-[#00C8D4] text-xs font-black">${realPrice}</span> / noche
+              </div>
+            )}
 
             {/* Top Badges */}
             <div className="absolute top-4 left-4 flex flex-col gap-2">
@@ -283,25 +314,28 @@ export function EstablishmentCard({
 
         {/* Action Buttons */}
         <div className="px-5 pb-5">
-          <div className={`flex flex-col gap-2 pt-4 border-t mt-4 ${isPriority ? "border-white/10" : "border-gray-50"}`}>
-            <div className="flex gap-2.5">
-              {(establishment.whatsapp || establishment.phone) ? (
-                <div className="flex-1">
-                  <TrackedWhatsAppButton
-                    whatsappNumber={establishment.whatsapp || establishment.phone}
-                    establishmentId={establishment.id}
-                    establishmentName={establishment.name}
-                    isPriority={isPriority}
-                  />
-                </div>
-              ) : null}
+          <div className={`flex flex-col gap-2.5 pt-4 border-t mt-4 ${isPriority ? "border-white/10" : "border-gray-50"}`}>
+            {/* 1. Botón Principal Parpadeante de WhatsApp Directo con el Propietario */}
+            <TrackedWhatsAppButton
+              whatsappNumber={establishment.whatsapp || establishment.phone || OFFICIAL_WHATSAPP_NUMBER}
+              establishmentId={establishment.id}
+              establishmentName={establishment.name}
+              customMessage={`Hola! Vi a ${establishment.name} en Hoteles de Venezuela (hotelesdevenezuela.com) y me gustaría cotizar ahora mismo.`}
+              isPriority={true}
+              directOpen={true}
+              className="w-full !bg-[#25D366] hover:!bg-[#1ebe57] text-white font-black text-xs py-3 px-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-[#25D366]/30 transition-all hover:scale-[1.02] active:scale-98 cursor-pointer uppercase tracking-wider animate-whatsapp-priority"
+            >
+              <span>Cotizar Ahora Mismo!</span>
+              <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+            </TrackedWhatsAppButton>
 
-              <Link href={`/establecimiento/${establishment.slug}`} className="flex-1">
-                <button className="w-full btn-cyan-gradient text-white text-xs font-extrabold py-2.5 px-4 rounded-xl flex items-center justify-center shadow-md shadow-brand-turquesa/10 hover:scale-102 transition-all cursor-pointer">
-                  Ver Ficha
-                </button>
-              </Link>
-            </div>
+            {/* 2. Segundo Botón Debajo: Ver Ficha y Reservar */}
+            <Link href={`/establecimiento/${establishment.slug}`} className="w-full">
+              <button className="w-full bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:opacity-95 text-white font-black text-xs py-3 px-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-[#FF0096]/20 transition-all hover:scale-[1.02] active:scale-98 cursor-pointer uppercase tracking-wider">
+                <Eye className="w-3.5 h-3.5 text-[#00C8D4]" />
+                <span>Ver Ficha y Reservar</span>
+              </button>
+            </Link>
 
             {/* CRO Guarantee Micro-Badge */}
             <div className={`flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl border text-[10px] font-black ${
@@ -332,6 +366,7 @@ export function EstablishmentListItem({
   const placeholderImage = "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600&auto=format&fit=crop";
   const tier = tierConfig[establishment.membership_tier?.toLowerCase()] || tierConfig.basico;
   const services = parseServices(establishment.services);
+  const realPrice = getRealEstablishmentPrice(establishment);
 
   const wrapperClass = isPriority
     ? "priority-glow-card group shadow-md hover:shadow-2xl hover:shadow-[#FF0096]/10 transition-all duration-300 w-full"
@@ -468,9 +503,11 @@ export function EstablishmentListItem({
                     </span>
                   )}
                 </div>
-                <div className={`text-[10px] font-bold ${isPriority ? "text-gray-300" : "text-gray-500"}`}>
-                  Desde <span className={`text-xs font-black ${isPriority ? "text-[#00C8D4]" : "text-brand-magenta"}`}>${getVirtualPrice(establishment)}</span> / noche
-                </div>
+                {realPrice !== null && (
+                  <div className={`text-[10px] font-bold ${isPriority ? "text-gray-300" : "text-gray-500"}`}>
+                    Desde <span className={`text-xs font-black ${isPriority ? "text-[#00C8D4]" : "text-brand-magenta"}`}>${realPrice}</span> / noche
+                  </div>
+                )}
               </div>
             </div>
 
@@ -503,21 +540,26 @@ export function EstablishmentListItem({
           </div>
 
           {/* Action Buttons */}
-          <div className={`flex gap-2.5 pt-4 border-t mt-4 w-full ${isPriority ? "border-white/10" : "border-gray-50"}`}>
-            {(establishment.whatsapp || establishment.phone) ? (
-              <div className="flex-1">
-                <TrackedWhatsAppButton
-                  whatsappNumber={establishment.whatsapp || establishment.phone}
-                  establishmentId={establishment.id}
-                  establishmentName={establishment.name}
-                  isPriority={isPriority}
-                />
-              </div>
-            ) : null}
+          <div className={`flex flex-col sm:flex-row gap-2.5 pt-4 border-t mt-4 w-full ${isPriority ? "border-white/10" : "border-gray-50"}`}>
+            <div className="flex-1">
+              <TrackedWhatsAppButton
+                whatsappNumber={establishment.whatsapp || establishment.phone || OFFICIAL_WHATSAPP_NUMBER}
+                establishmentId={establishment.id}
+                establishmentName={establishment.name}
+                customMessage={`Hola! Vi a ${establishment.name} en Hoteles de Venezuela (hotelesdevenezuela.com) y me gustaría cotizar ahora mismo.`}
+                isPriority={true}
+                directOpen={true}
+                className="w-full !bg-[#25D366] hover:!bg-[#1ebe57] text-white font-black text-xs py-3 px-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-[#25D366]/30 transition-all hover:scale-[1.02] active:scale-98 cursor-pointer uppercase tracking-wider animate-whatsapp-priority"
+              >
+                <span>Cotizar Ahora Mismo!</span>
+                <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+              </TrackedWhatsAppButton>
+            </div>
 
             <Link href={`/establecimiento/${establishment.slug}`} className="flex-1">
-              <button className="w-full btn-cyan-gradient text-white text-xs font-extrabold py-2.5 px-4 rounded-xl flex items-center justify-center shadow-md shadow-brand-turquesa/10 hover:scale-102 transition-all cursor-pointer">
-                Ver Detalles
+              <button className="w-full bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:opacity-95 text-white text-xs font-black py-3 px-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-[#FF0096]/20 hover:scale-[1.02] transition-all cursor-pointer uppercase tracking-wider">
+                <Eye className="w-3.5 h-3.5 text-[#00C8D4]" />
+                <span>Ver Ficha y Reservar</span>
               </button>
             </Link>
           </div>

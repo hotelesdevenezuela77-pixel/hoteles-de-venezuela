@@ -5,7 +5,7 @@ import {
   Palmtree, Mountain, Building2, Trees, Anchor
 } from "lucide-react";
 import type { Establishment } from "../layout/EstablishmentCard";
-import { getVirtualPrice } from "../layout/EstablishmentCard";
+import { getRealEstablishmentPrice } from "../layout/EstablishmentCard";
 
 export interface ZoneRegion {
   id: string;
@@ -241,7 +241,7 @@ export function InteractiveZoneMapView({
   onSelectZone: (zoneId: string) => void;
   onClose?: () => void;
 }) {
-  const [selectedPin, setSelectedPin] = useState<{ est: Establishment; price: number } | null>(null);
+  const [selectedPin, setSelectedPin] = useState<{ est: Establishment; price: number | null } | null>(null);
   const [mapMode, setMapMode] = useState<"satelite" | "noche">("satelite");
 
 
@@ -264,10 +264,10 @@ export function InteractiveZoneMapView({
           </div>
           <div>
             <h3 className="text-xs font-black tracking-wide text-white uppercase font-sans">
-              Mapa de Precios & Zonas Turísticas de Venezuela
+              Mapa de Hospedajes & Zonas Turísticas de Venezuela
             </h3>
             <p className="text-[10px] text-slate-400">
-              {displayEsts.length} hospedajes geolocalizados con tarifas $/noche en vivo
+              {displayEsts.length} hospedajes geolocalizados con contacto directo
             </p>
           </div>
         </div>
@@ -366,9 +366,9 @@ export function InteractiveZoneMapView({
           );
         })}
 
-        {/* Pins de Precio de Establecimientos sobre el Mapa */}
+        {/* Pins de Establecimientos sobre el Mapa */}
         {displayEsts.slice(0, 18).map((est, idx) => {
-          const price = getVirtualPrice(est);
+          const price = getRealEstablishmentPrice(est);
           const zone = TOURIST_ZONES.find(z => z.destinations.includes(est.destination_slug || "")) || TOURIST_ZONES[idx % TOURIST_ZONES.length];
           const offsetAngle = (idx * 137.5) * (Math.PI / 180);
           const radius = (idx % 4) * 4 + 3;
@@ -384,7 +384,7 @@ export function InteractiveZoneMapView({
               onClick={() => setSelectedPin({ est, price })}
               className="absolute -translate-x-1/2 -translate-y-1/2 z-15 cursor-pointer transition-all duration-300"
             >
-              {/* Pin Flotante con Precio $/noche */}
+              {/* Pin Flotante (muestra precio solo si está configurado, o pin de ubicación) */}
               <div
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black shadow-lg transition-all duration-300 border ${
                   isSelected
@@ -392,8 +392,17 @@ export function InteractiveZoneMapView({
                     : "bg-slate-900/90 text-[#00C8D4] border-[#00C8D4]/40 hover:bg-[#00C8D4] hover:text-slate-950 hover:scale-110"
                 }`}
               >
-                <DollarSign className="w-3 h-3" />
-                <span>{price}</span>
+                {price !== null ? (
+                  <>
+                    <DollarSign className="w-3 h-3" />
+                    <span>{price}</span>
+                  </>
+                ) : (
+                  <>
+                    <MapPin className="w-3 h-3" />
+                    <span className="max-w-[70px] truncate text-[10px]">{est.name.split(" ")[0]}</span>
+                  </>
+                )}
               </div>
             </div>
           );
@@ -434,10 +443,12 @@ export function InteractiveZoneMapView({
                       <span>{selectedPin.est.rating_avg.toFixed(1)}</span>
                     </div>
 
-                    <div className="text-right">
-                      <span className="text-[9px] text-slate-400 block uppercase font-bold">Desde</span>
-                      <span className="text-xs font-black text-[#FF0096]">${selectedPin.price} <span className="text-[9px] text-slate-400 font-normal">/ noche</span></span>
-                    </div>
+                    {selectedPin.price !== null && (
+                      <div className="text-right">
+                        <span className="text-[9px] text-slate-400 block uppercase font-bold">Desde</span>
+                        <span className="text-xs font-black text-[#FF0096]">${selectedPin.price} <span className="text-[9px] text-slate-400 font-normal">/ noche</span></span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Link } from "wouter";
 import { 
-  MapPin, Star, ShieldCheck, Zap, Droplets, Wifi, Dog, ChevronLeft, ChevronRight, Eye, Sparkles
+  MapPin, Star, ShieldCheck, Zap, Droplets, Wifi, Dog, ChevronLeft, ChevronRight, Eye
 } from "lucide-react";
 import type { Establishment } from "../layout/EstablishmentCard";
-import { getVirtualPrice } from "../layout/EstablishmentCard";
+import { getRealEstablishmentPrice } from "../layout/EstablishmentCard";
 import { TrackedWhatsAppButton } from "../layout/TrackedWhatsAppButton";
+import { OFFICIAL_WHATSAPP_NUMBER } from "@/config/whatsapp";
 
 interface BoutiqueEstablishmentCardProps {
   establishment: Establishment;
@@ -40,7 +41,7 @@ export function BoutiqueEstablishmentCard({ establishment }: BoutiqueEstablishme
     return list.slice(0, 4);
   }, [establishment]);
 
-  const price = getVirtualPrice(establishment);
+  const realPrice = getRealEstablishmentPrice(establishment);
 
   const nextImage = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -208,30 +209,50 @@ export function BoutiqueEstablishmentCard({ establishment }: BoutiqueEstablishme
           </p>
         </div>
 
-        {/* Sección de Precio & CTA Buttons */}
+        {/* Sección de Tarifa Directa & Botones de Conversión */}
         <div className={`pt-2.5 border-t space-y-2.5 ${isFeaturedCard ? "border-slate-800" : "border-slate-100"}`}>
           
-          {/* Tarifa Directa con Sello 0% Comisiones */}
+          {/* Tarifa Directa con Sello 0% Comisiones (Precio solo si fue configurado explícitamente) */}
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-[10px] text-slate-400 uppercase font-black tracking-wider">Tarifa Directa</span>
               <span className="text-[9px] text-[#00C8D4] font-black">0% Comisiones OTA</span>
             </div>
-            <div className="text-right">
-              <span className="text-xs text-slate-400 font-bold">Desde </span>
-              <span className="text-xl font-black text-[#FF0096]">${price}</span>
-              <span className={`text-[10px] font-normal ${isFeaturedCard ? "text-slate-400" : "text-slate-500"}`}> / noche</span>
-            </div>
+            {realPrice !== null ? (
+              <div className="text-right">
+                <span className="text-xs text-slate-400 font-bold">Desde </span>
+                <span className="text-xl font-black text-[#FF0096]">${realPrice}</span>
+                <span className={`text-[10px] font-normal ${isFeaturedCard ? "text-slate-400" : "text-slate-500"}`}> / noche</span>
+              </div>
+            ) : (
+              <div className="text-right">
+                <span className="text-[10px] text-[#25D366] uppercase font-black tracking-wider block">Trato Directo</span>
+                <span className={`text-[9px] font-bold ${isFeaturedCard ? "text-slate-400" : "text-slate-500"}`}>Contacto con Propietario</span>
+              </div>
+            )}
           </div>
 
-          {/* Botón de Conversión Principal: Ver Ficha & Contacto WhatsApp */}
+          {/* 1. Botón Principal Parpadeante de WhatsApp Directo con el Propietario */}
+          <TrackedWhatsAppButton
+            whatsappNumber={establishment.whatsapp || establishment.phone || OFFICIAL_WHATSAPP_NUMBER}
+            establishmentId={establishment.id}
+            establishmentName={establishment.name}
+            customMessage={`Hola! Vi a ${establishment.name} en Hoteles de Venezuela (hotelesdevenezuela.com) y me gustaría cotizar ahora mismo.`}
+            isPriority={true}
+            directOpen={true}
+            className="w-full !bg-[#25D366] hover:!bg-[#1ebe57] text-white font-black text-xs py-3 px-3 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-[#25D366]/30 transition-all hover:scale-[1.02] active:scale-98 cursor-pointer uppercase tracking-wider animate-whatsapp-priority"
+          >
+            <span>Cotizar Ahora Mismo!</span>
+            <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+          </TrackedWhatsAppButton>
+
+          {/* 2. Segundo Botón Debajo: Ver Ficha y Reservar */}
           <Link
             href={`/establecimiento/${establishment.slug}`}
             className="w-full bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:opacity-95 text-white font-black text-xs py-3 px-3 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-[#FF0096]/20 transition-all hover:scale-[1.02] active:scale-98 cursor-pointer uppercase tracking-wider"
           >
             <Eye className="w-3.5 h-3.5 text-[#00C8D4]" />
             <span>Ver Ficha y Reservar</span>
-            <div className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse" title="WhatsApp Directo Disponible" />
           </Link>
 
         </div>

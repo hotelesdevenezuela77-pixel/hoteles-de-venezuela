@@ -12,6 +12,7 @@ interface TrackedWhatsAppButtonProps {
   children?: React.ReactNode;
   iconOnly?: boolean;
   isPriority?: boolean;
+  directOpen?: boolean;
 }
 
 let cachedIp = "";
@@ -116,7 +117,8 @@ export function TrackedWhatsAppButton({
   className = "",
   children,
   iconOnly = false,
-  isPriority = false
+  isPriority = false,
+  directOpen = false
 }: TrackedWhatsAppButtonProps) {
   const activeMsg = customMessage || message;
   const [showModal, setShowModal] = useState(false);
@@ -206,6 +208,15 @@ export function TrackedWhatsAppButton({
   const handleButtonClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (directOpen) {
+      trackEvent("whatsapp_lead", establishmentId, {
+        establishment_name: establishmentName,
+        whatsapp_number: whatsappNumber,
+        source: "whatsapp_direct_card"
+      });
+      openWhatsApp(false);
+      return;
+    }
     setShowModal(true);
   };
 
