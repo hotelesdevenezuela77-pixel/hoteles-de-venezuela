@@ -7,13 +7,13 @@ import { TENANTS_REGISTRY } from "../tenants/tenantContext";
 import { TrackedWhatsAppButton, trackEvent } from "../components/layout/TrackedWhatsAppButton";
 import { AvailabilityCalendar } from "../components/AvailabilityCalendar";
 import { BookingWidget } from "../components/BookingWidget";
-import { 
-  MapPin, Phone, Globe, Mail, Clock, Star, 
+import {
+  MapPin, Phone, Globe, Mail, Clock, Star,
   ChevronLeft, ChevronRight, Share2, Heart,
   ArrowLeft, DollarSign, Navigation, Loader2, AlertTriangle, Sparkles,
   Coffee, Compass, Utensils, Plane, Car, Building2,
   Bed, Users, CheckCircle, Maximize2, X, Camera, MessageCircle, Layers,
-  Wine, ChefHat, ShoppingBag, ShieldCheck, Zap, Info, Calendar, CheckCircle2, Award
+  Wine, ChefHat, ShoppingBag, ShieldCheck, Zap, Info, Calendar, CheckCircle2, Award, Video, Wallet
 } from "lucide-react";
 
 import { parseServicesList, getAmenityLabel, getAmenityInfo, CERTIFICATIONS_DOCUMENT77 } from "../lib/amenitiesList";
@@ -93,7 +93,7 @@ interface EstablishmentDetail {
   status?: string;
 }
 
-export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: string]: any }) {
+export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: string]: any }) {
   const tenantSlug = props?.tenantSlug;
   const { slug: routeSlug } = useParams() as any;
   const urlParamSlug = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("tenant") : null;
@@ -114,7 +114,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
   const [selectedRoomImageIndex, setSelectedRoomImageIndex] = useState<Record<number, number>>({});
   const [selectedGalleryCategory, setSelectedGalleryCategory] = useState<string>("todas");
   const [activeLightbox, setActiveLightbox] = useState<{ url: string; title: string; category?: string } | null>(null);
-  
+
   // Estado para la Ficha Técnica Detallada Inmersiva (Habitación o Área Gastronómica)
   const [activeDetailModal, setActiveDetailModal] = useState<{
     type: "room" | "area" | "menu";
@@ -297,7 +297,6 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
 
         // 1. Try Supabase DB lookup by exact slug or alias
         let dbData: any = null;
-        // 1. Direct DB lookup
         try {
           const { data, error: dbErr } = await supabase
             .from("establishments")
@@ -313,12 +312,11 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
           if (!dbErr && data) {
             dbData = data;
           } else {
-            // Alias fallback: try replacing -dos- with -2- or -2- with -dos-
-            const altSlug = slug.includes("-dos-") 
-              ? slug.replace("-dos-", "-2-") 
-              : slug.includes("-2-") 
-              ? slug.replace("-2-", "-dos-") 
-              : slug;
+            const altSlug = slug.includes("-dos-")
+              ? slug.replace("-dos-", "-2-")
+              : slug.includes("-2-")
+                ? slug.replace("-2-", "-dos-")
+                : slug;
 
             if (altSlug !== slug) {
               const { data: altData } = await supabase
@@ -440,9 +438,9 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
           ];
 
           const slugLower = slug.toLowerCase();
-          const matchedDemo = demoProfiles.find(d => 
-            d.slug === slug || 
-            String(d.id) === slug || 
+          const matchedDemo = demoProfiles.find(d =>
+            d.slug === slug ||
+            String(d.id) === slug ||
             slug === `influencer-${d.id}` ||
             slug === "influencer-99901" ||
             slug === "influencer-1" ||
@@ -464,7 +462,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                 const raw99901 = localStorage.getItem("hdv_creator_profile_99901");
                 const saved = raw1 || raw99901;
                 if (saved) customProfile = JSON.parse(saved);
-              } catch (e) {}
+              } catch (e) { }
             }
 
             dbData = {
@@ -487,8 +485,8 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
         if (!dbData) {
           const localEstsKey = "hdv_mock_establishments";
           const localEsts = JSON.parse(localStorage.getItem(localEstsKey) || "[]");
-          const foundLocal = localEsts.find((e: any) => 
-            e.slug === slug || 
+          const foundLocal = localEsts.find((e: any) =>
+            e.slug === slug ||
             e.name?.toLowerCase().replace(/[^a-z0-9]+/g, "-") === slug
           );
           if (foundLocal) {
@@ -524,7 +522,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
               const list: any[] = JSON.parse(savedTenants);
               foundTenant = list.find((t: any) => t.slug === slug || (t.slug && slug && (t.slug.includes(slug) || slug.includes(t.slug))));
             }
-          } catch (e) {}
+          } catch (e) { }
 
           if (!foundTenant) {
             foundTenant = TENANTS_REGISTRY[slug] || Object.values(TENANTS_REGISTRY).find((t: any) => t.slug === slug);
@@ -569,13 +567,13 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
           const savedTenants = localStorage.getItem("hdv_tenants_configurations");
           if (savedTenants) {
             const tenantList: any[] = JSON.parse(savedTenants);
-            tenantConfigOverride = tenantList.find((t: any) => 
-              t.slug === slug || 
+            tenantConfigOverride = tenantList.find((t: any) =>
+              t.slug === slug ||
               String(t.establishment_id) === String(dbData?.id) ||
               (t.slug && slug && (t.slug.includes(slug) || slug.includes(t.slug)))
             );
           }
-        } catch (e) {}
+        } catch (e) { }
 
         if (dbData) {
           const tenantBranding = tenantConfigOverride?.branding;
@@ -583,9 +581,9 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
 
           const primaryImg = tenantBranding?.banner_url
             || dbData.primary_image
-            || dbData.establishment_images?.find((img: any) => img.is_primary)?.image_url 
-            || dbData.establishment_images?.[0]?.image_url 
-            || dbData.image 
+            || dbData.establishment_images?.find((img: any) => img.is_primary)?.image_url
+            || dbData.establishment_images?.[0]?.image_url
+            || dbData.image
             || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80";
 
           let allImages: string[] = dbData.establishment_images?.map((img: any) => img.image_url) || [];
@@ -647,7 +645,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
     if (slug) {
       fetchDetail();
     }
-    
+
     const handleCMSLiveUpdate = () => {
       fetchDetail();
     };
@@ -687,7 +685,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
       const savedRoomPhotos = localStorage.getItem("hdv_room_photos");
       let roomPhotosMap: Record<number, string[]> = {};
       if (savedRoomPhotos) {
-        try { roomPhotosMap = JSON.parse(savedRoomPhotos); } catch (e) {}
+        try { roomPhotosMap = JSON.parse(savedRoomPhotos); } catch (e) { }
       }
       setRoomPhotos(roomPhotosMap);
 
@@ -697,14 +695,14 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
       if (savedAreaPhotos) {
         try {
           const parsed = JSON.parse(savedAreaPhotos);
-          const matched = parsed[establishment.id] || 
-                          parsed[String(establishment.id)] || 
-                          parsed[establishment.slug] || 
-                          Object.values(parsed)[0];
+          const matched = parsed[establishment.id] ||
+            parsed[String(establishment.id)] ||
+            parsed[establishment.slug] ||
+            Object.values(parsed)[0];
           if (matched) {
             areaPhotosMap = matched;
           }
-        } catch (e) {}
+        } catch (e) { }
       }
       setAreaPhotos(areaPhotosMap);
     }
@@ -714,24 +712,24 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50/20 pt-24 pb-12 flex flex-col items-center justify-center">
-        <Loader2 className="w-10 h-10 text-brand-magenta animate-spin" />
-        <p className="text-gray-400 text-xs font-bold mt-4">Abriendo bitácora del establecimiento...</p>
+      <div className="min-h-screen bg-white pt-24 pb-12 flex flex-col items-center justify-center">
+        <Loader2 className="w-10 h-10 text-[#FF0096] animate-spin" />
+        <p className="text-slate-500 text-xs font-bold mt-4">Abriendo bitácora del establecimiento...</p>
       </div>
     );
   }
 
   if (error || !establishment) {
     return (
-      <div className="min-h-screen bg-gray-50/20 pt-24 pb-12">
-        <div className="max-w-4xl mx-auto px-6 text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
-          <AlertTriangle className="w-16 h-16 text-brand-magenta mx-auto mb-4" />
-          <h1 className="text-2xl font-black text-gray-800">Establecimiento No Encontrado</h1>
-          <p className="text-gray-400 text-xs mt-2 mb-8 leading-relaxed max-w-md mx-auto">
+      <div className="min-h-screen bg-white pt-24 pb-12">
+        <div className="max-w-4xl mx-auto px-6 text-center py-20 bg-white rounded-3xl border border-slate-200 shadow-sm">
+          <AlertTriangle className="w-16 h-16 text-[#FF0096] mx-auto mb-4" />
+          <h1 className="text-2xl font-black text-slate-900">Establecimiento No Encontrado</h1>
+          <p className="text-slate-500 text-xs mt-2 mb-8 leading-relaxed max-w-md mx-auto">
             El hotel o posada solicitado no existe o no se encuentra aprobado en la plataforma actualmente.
           </p>
           <Link href="/establecimientos">
-            <button className="btn-magenta-gradient px-8 py-3 rounded-full text-xs font-bold hover:scale-102 transition-all cursor-pointer shadow-md shadow-brand-magenta/10">
+            <button className="btn-magenta-gradient px-8 py-3 rounded-full text-xs font-bold hover:scale-102 transition-all cursor-pointer shadow-md">
               Volver al Buscador
             </button>
           </Link>
@@ -759,12 +757,12 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
   const isCreatorCategory = (establishment.category_slug || establishment.category_name || establishment.slug || "").toLowerCase().match(/(creador|influencer|viajera|creadora|aura-croce)/);
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-800 pb-24 font-sans">
-      
+    <div className="min-h-screen bg-white text-slate-800 pb-24 font-sans">
+
       {/* Notice Banner si el establecimiento está en proceso de revisión */}
       {establishment.status !== "approved" && (
         <div className="max-w-7xl mx-auto px-6 pt-4 mb-2">
-          <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-brand-magenta text-white p-4 rounded-2xl shadow-md flex items-center justify-between gap-4">
+          <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-[#FF0096] text-white p-4 rounded-2xl shadow-md flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <AlertTriangle className="w-5 h-5 text-white shrink-0" />
               <div>
@@ -777,7 +775,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
               const backTarget = isAdmin ? "/admin/aprobaciones" : "/mis-negocios";
               return (
                 <Link href={backTarget}>
-                  <button className="px-4 py-2 bg-white text-gray-900 font-bold text-xs rounded-xl shadow-xs hover:bg-gray-100 transition-all shrink-0 cursor-pointer">
+                  <button className="px-4 py-2 bg-white text-slate-900 font-bold text-xs rounded-xl shadow-xs hover:bg-slate-100 transition-all shrink-0 cursor-pointer">
                     {isAdmin ? "Volver a Aprobaciones" : "Volver a Mi Panel"}
                   </button>
                 </Link>
@@ -787,179 +785,249 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
         </div>
       )}
 
-      {/* ── 1. CABECERA DEGRADADA HERO DE ALTO IMPACTO ── */}
-      <section className="w-full relative overflow-hidden bg-[#0e011f] pt-12 pb-16 lg:pt-16 lg:pb-24 text-left shadow-xl">
-        {/* Banner de fondo con parallax suave y superposición de degradados */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-25 scale-[1.08] transition-transform duration-1000"
-          style={{ backgroundImage: `url(${establishment.primary_image})` }}
+      {/* ── 1. BANNER DE PORTADA FULL-BLEED CON DEGRADADO BLANCO INFERIOR (DIRECTRIZ AGENTS.MD) ── */}
+      <div className="w-full relative h-[380px] sm:h-[440px] md:h-[520px] overflow-hidden flex items-center justify-center bg-[#0e011f]">
+        <img
+          src={establishment.primary_image}
+          alt={establishment.name}
+          className="w-full h-full object-cover scale-[1.08] transition-transform duration-1000"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0e011f]/95 via-[#0e011f]/90 to-[#0e011f] z-0" />
-        
-        {/* Destellos de neón Cian (#00C8D4) y Púrpura (#9B00CC) */}
-        <div className="absolute top-[-15%] left-[-10%] w-[55%] h-[55%] bg-[#9B00CC] blur-[150px] opacity-35 pointer-events-none z-0" />
-        <div className="absolute bottom-[-15%] right-[-10%] w-[55%] h-[55%] bg-[#00C8D4] blur-[150px] opacity-25 pointer-events-none z-0" />
+        {/* Oscurecimiento superior elegante para contraste del título blanco */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0e011f]/75 via-[#0e011f]/40 to-transparent pointer-events-none" />
+        {/* Degradado blanco inferior obligatorio que se funde con el fondo blanco de la página */}
+        <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-white via-white/55 to-transparent pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto px-6 relative z-10 space-y-8">
-          
-          {/* Eyebrow badge espaciado y navegación rápida */}
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="text-[#00C8D4] text-[10px] md:text-xs font-black tracking-[0.25em] uppercase px-3.5 py-1.5 rounded-full bg-[#00C8D4]/10 border border-[#00C8D4]/30 shadow-xs">
-                {isGastronomyCategory ? "GASTRONOMÍA & ESPACIOS EXCLUSIVOS" : isCreatorCategory ? "CREADOR DE CONTENIDO & EXPEDICIONES VIP" : "HOSPEDAJE DE EXCELENCIA & DISTINCIÓN"}
+        {/* Títulos centrados vertical y horizontalmente dentro del banner */}
+        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center flex flex-col items-center justify-center -mt-6">
+          <div className="flex flex-wrap items-center justify-center gap-2.5 mb-3">
+            <span className="text-white/95 text-[10px] sm:text-xs font-extrabold tracking-[0.32em] uppercase drop-shadow-md">
+              EL PARAÍSO TE ESPERA
+            </span>
+            <span className="text-white/60">•</span>
+            <span className="bg-[#FF0096] text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-md">
+              {establishment.category_name}
+            </span>
+            {establishment.membership_tier && (
+              <span className={`bg-gradient-to-r ${tierColors[establishment.membership_tier?.toLowerCase()] || "from-slate-700 to-slate-800"} text-white font-black text-[10px] uppercase tracking-widest px-3 py-1 rounded-full border border-white/30 shadow-md flex items-center gap-1.5`}>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00C8D4] animate-pulse" />
+                Socio {establishment.membership_tier}
               </span>
-
-              <span className="bg-[#FF0096]/20 border border-[#FF0096]/40 text-[#FF0096] text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-full">
-                {establishment.category_name}
-              </span>
-
-              {establishment.membership_tier && (
-                <span className={`bg-gradient-to-r ${tierColors[establishment.membership_tier?.toLowerCase()] || "from-slate-700 to-slate-800"} text-white font-black text-[10px] md:text-xs uppercase tracking-widest px-3.5 py-1.5 rounded-full border border-white/20 shadow-md flex items-center gap-1.5`}>
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00C8D4] animate-pulse" />
-                  Socio {establishment.membership_tier}
-                </span>
-              )}
-            </div>
-
-            {/* Botón de retorno al Panel de Propietarios */}
-            <Link href="/panel-propietario">
-              <button
-                type="button"
-                className="px-4 py-2 bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:from-[#9B00CC] hover:to-[#FF0096] text-white text-xs font-black uppercase tracking-wider rounded-2xl border border-white/20 shadow-xl transition-all hover:scale-105 active:scale-95 flex items-center gap-2 cursor-pointer group shrink-0"
-              >
-                <ArrowLeft className="w-4 h-4 text-white group-hover:-translate-x-1 transition-transform" />
-                <span>Regresar al Panel de Propietarios</span>
-              </button>
-            </Link>
+            )}
           </div>
 
-          {/* Título Principal en Playfair Display / Cinzel con palabra destacada en gradiente */}
-          <div className="max-w-4xl space-y-4">
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight font-serif" style={{ fontFamily: "'Playfair Display', 'Cinzel', serif" }}>
-              {establishment.name}
-            </h1>
+          <h1
+            className="text-3xl sm:text-5xl md:text-6xl font-bold !text-white leading-tight drop-shadow-2xl max-w-4xl"
+            style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700 }}
+          >
+            {establishment.name}
+          </h1>
 
-            {/* Pulsing Badge */}
-            <div className="inline-flex items-center gap-2.5 p-[2px] rounded-2xl bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] shadow-2xl animate-pulse hover:scale-105 transition-all cursor-pointer my-1">
-              <div className="px-5 py-2 rounded-[14px] bg-slate-900/90 backdrop-blur flex items-center gap-2.5">
-                <span className="relative flex h-3 w-3 shrink-0">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00C8D4] opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-[#00C8D4]"></span>
+          <div className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#0e011f]/65 backdrop-blur-md border border-white/25 text-white text-xs font-semibold shadow-lg">
+            <MapPin className="w-3.5 h-3.5 text-[#00C8D4]" />
+            <span>{establishment.destination_name || establishment.city}, Venezuela</span>
+            <span className="text-white/40">|</span>
+            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+            <span className="font-bold">{establishment.rating_avg > 0 ? establishment.rating_avg.toFixed(1) : "5.0"}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── 1B. NAVEGACIÓN RÁPIDA Y SECCIÓN EDITORIAL + TARJETA TURQUESA (#00C8D4) ── */}
+      <section className="max-w-6xl mx-auto px-6 pt-2 pb-12 bg-white relative z-20">
+        {/* Barra superior de retorno */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-4 border-b border-slate-100">
+          <Link href="/establecimientos">
+            <span className="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#00C8D4] transition-colors cursor-pointer">
+              <ArrowLeft className="w-4 h-4" />
+              <span>Inicio / Explorar Establecimientos</span>
+            </span>
+          </Link>
+
+          <Link href="/panel-propietario">
+            <button
+              type="button"
+              className="px-4 py-2 bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:from-[#9B00CC] hover:to-[#FF0096] text-white text-[11px] font-black uppercase tracking-wider rounded-xl shadow-md transition-all hover:scale-105 cursor-pointer flex items-center gap-2"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-white" />
+              <span>Regresar al Panel de Propietarios</span>
+            </button>
+          </Link>
+        </div>
+
+        {/* Bloque de 2 Columnas al estilo del Segundo Print (Texto Editorial + Tarjeta Sólida Turquesa #00C8D4) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+          {/* Columna Izquierda (7 cols): Presentación Editorial */}
+          <div className="lg:col-span-7 space-y-5 text-left">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#00C8D4]/10 border border-[#00C8D4]/25 text-[#00C8D4] text-[10px] font-black uppercase tracking-[0.2em]">
+              <Sparkles className="w-3.5 h-3.5 text-[#00C8D4]" />
+              <span>
+                {isGastronomyCategory
+                  ? "GASTRONOMÍA & ESPACIOS EXCLUSIVOS"
+                  : isCreatorCategory
+                    ? "CREADOR DE CONTENIDO & EXPEDICIONES VIP"
+                    : "HOSPEDAJE DE EXCELENCIA & DISTINCIÓN"}
+              </span>
+            </div>
+
+            <h2
+              className="text-3xl sm:text-4xl font-bold text-slate-900 leading-tight"
+              style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700 }}
+            >
+              {isCreatorCategory ? (
+                <>Desk Hub de <span className="italic text-[#00C8D4]">Expediciones</span> y Alianzas</>
+              ) : isGastronomyCategory ? (
+                <>Experiencia <span className="italic text-[#00C8D4]">Gastronómica</span> de Selección</>
+              ) : (
+                <>Reserva <span className="italic text-[#00C8D4]">Directa</span> con su Anfitrión Oficial</>
+              )}
+            </h2>
+
+            <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-normal">
+              {establishment.description ||
+                "Disfruta de una estadía inolvidable con atención personalizada, instalaciones verificadas y contacto directo por WhatsApp sin comisiones ni intermediarios en la plataforma oficial Hoteles de Venezuela."}
+            </p>
+
+            {/* Fila de Puntuación y Dirección */}
+            <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-600 pt-1">
+              <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 px-3 py-1.5 rounded-xl">
+                <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                <span className="text-slate-900 font-bold">
+                  {establishment.rating_avg > 0 ? establishment.rating_avg.toFixed(1) : "5.0"}
                 </span>
-                <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-[#00C8D4] drop-shadow">
-                  {isCreatorCategory ? "🌟 DESK HUB DE CREADOR DE CONTENIDO & EXPEDICIONES" : "🛠️ PLATAFORMA OFICIAL • HOTELES DE VENEZUELA"}
+                <span className="text-slate-400">({establishment.review_count || 48} reseñas)</span>
+              </div>
+
+              <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 px-3 py-1.5 rounded-xl">
+                <MapPin className="w-4 h-4 text-[#00C8D4]" />
+                <span className="text-slate-700">
+                  {establishment.address || `${establishment.destination_name || establishment.city}, Venezuela`}
                 </span>
               </div>
             </div>
 
-            <p className="text-slate-300 text-sm md:text-base max-w-2xl leading-relaxed font-light">
-              {establishment.description?.slice(0, 160) || "Disfruta de una experiencia inolvidable con la garantía y altos estándares de la Red Hoteles de Venezuela."}...
-            </p>
-          </div>
+            {/* Botones de Acción Principales */}
+            <div className="flex flex-wrap items-center gap-3.5 pt-2">
+              {isGastronomyCategory ? (
+                <button
+                  type="button"
+                  onClick={() => setTableReservationModalOpen(true)}
+                  className="px-6 py-3.5 bg-[#00C8D4] hover:bg-[#00b2bd] text-white font-extrabold text-xs rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-2"
+                >
+                  <Utensils className="w-4 h-4 text-white" />
+                  <span>Reservar Mesa en Línea</span>
+                </button>
+              ) : (
+                <div className="w-full sm:w-auto min-w-[230px]">
+                  <TrackedWhatsAppButton
+                    whatsappNumber={establishment.whatsapp || establishment.phone}
+                    establishmentId={establishment.id}
+                    establishmentName={establishment.name}
+                    isPriority={true}
+                    directOpen={true}
+                    customMessage={`Hola! Vi la ficha de ${establishment.name} en Hoteles de Venezuela y me gustaría cotizar ahora mismo.`}
+                    className="!py-3.5 !px-6 !rounded-xl !text-xs !font-black uppercase tracking-wider"
+                  >
+                    Cotizar Ahora Mismo!
+                  </TrackedWhatsAppButton>
+                </div>
+              )}
 
-          {/* Fila de Ubicación, Puntuación y Rango */}
-          <div className="flex flex-wrap items-center gap-6 text-xs font-bold text-slate-300 pt-2 border-t border-slate-800/80 max-w-3xl">
-            <div className="flex items-center gap-2">
-              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-              <span className="text-white font-extrabold text-sm">{establishment.rating_avg > 0 ? establishment.rating_avg.toFixed(1) : "5.0"}</span>
-              <span className="text-slate-400">({establishment.review_count || 48} auditorías & reseñas)</span>
-            </div>
-            <span>•</span>
-            <div className="flex items-center gap-2 text-[#00C8D4]">
-              <MapPin className="w-4 h-4 text-[#00C8D4]" />
-              <span className="text-slate-200 font-semibold">{establishment.address || `${establishment.destination_name || establishment.city}, Venezuela`}</span>
-            </div>
-            {establishment.price_level && (
-              <>
-                <span>•</span>
-                <span className="text-[#FF0096] font-bold">Rango: {establishment.price_level}</span>
-              </>
-            )}
-          </div>
-
-          {/* Ticker / Strip de Estadísticas Rápida de Prestigio */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 max-w-4xl">
-            <div className="bg-[#1a0533]/80 backdrop-blur border border-[#9B00CC]/30 p-3.5 rounded-2xl">
-              <span className="text-xl md:text-2xl font-black text-[#00C8D4] block font-serif">
-                {isGastronomyCategory ? "4+ Áreas" : isCreatorCategory ? "50+ Rutas" : `${rooms.length || 10}+ Hab.`}
-              </span>
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
-                {isGastronomyCategory ? "Espacios Gastronómicos" : isCreatorCategory ? "Expediciones GPS & 4K" : "Unidades de Hospedaje"}
-              </span>
-            </div>
-            <div className="bg-[#1a0533]/80 backdrop-blur border border-[#9B00CC]/30 p-3.5 rounded-2xl">
-              <span className="text-xl md:text-2xl font-black text-[#FF0096] block font-serif">
-                {isCreatorCategory ? "$20 Base" : "4.9★"}
-              </span>
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
-                {isCreatorCategory ? "Honorarios / Viaje" : "Satisfacción Garantizada"}
-              </span>
-            </div>
-            <div className="bg-[#1a0533]/80 backdrop-blur border border-[#9B00CC]/30 p-3.5 rounded-2xl">
-              <span className="text-xl md:text-2xl font-black text-amber-400 block font-serif">100%</span>
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
-                {isCreatorCategory ? "Verificado HDV" : "Verificado HDV"}
-              </span>
-            </div>
-            <div className="bg-[#1a0533]/80 backdrop-blur border border-[#9B00CC]/30 p-3.5 rounded-2xl">
-              <span className="text-xl md:text-2xl font-black text-emerald-400 block font-serif">
-                {isCreatorCategory ? "+ Viáticos" : "Starlink"}
-              </span>
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
-                {isCreatorCategory ? "Cobertura de Ruta" : "Wi-Fi de Alta Velocidad"}
-              </span>
-            </div>
-          </div>
-
-          {/* Botones de Acción Directa en el Hero */}
-          <div className="flex flex-wrap items-center gap-4 pt-2">
-            {isGastronomyCategory ? (
               <button
                 type="button"
-                onClick={() => setTableReservationModalOpen(true)}
-                className="px-6 py-3.5 bg-gradient-to-r from-[#FF0096] to-[#9B00CC] text-white font-extrabold text-xs rounded-2xl shadow-lg hover:shadow-pink-500/25 hover:scale-[1.02] transition-all cursor-pointer flex items-center gap-2"
+                onClick={() => {
+                  const el = document.getElementById("seccion-catalogo");
+                  el?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="px-6 py-3.5 bg-white hover:bg-slate-50 text-slate-800 font-bold rounded-xl transition-all text-xs cursor-pointer border border-slate-200 shadow-2xs flex items-center gap-2"
               >
-                <Utensils className="w-4 h-4 text-white" />
-                <span>Reservar Mesa en Línea</span>
+                <Compass className="w-4 h-4 text-[#00C8D4]" />
+                <span>{isGastronomyCategory ? "Ver Áreas & Menú" : isCreatorCategory ? "Ver Rutas & Servicios" : "Ver Habitaciones"}</span>
               </button>
-            ) : isCreatorCategory ? (
-              <TrackedWhatsAppButton
-                whatsappNumber={establishment.whatsapp || establishment.phone}
-                establishmentId={establishment.id}
-                establishmentName={establishment.name}
-                customMessage={`Hola Aura Croce! Me gustaría coordinar una expedición, auditoría técnica de posada o alianza de contenido con ${establishment.name}.`}
-              >
-                Contactar por WhatsApp
-              </TrackedWhatsAppButton>
-            ) : (
-              <TrackedWhatsAppButton
-                whatsappNumber={establishment.whatsapp || establishment.phone}
-                establishmentId={establishment.id}
-                establishmentName={establishment.name}
-                customMessage={`Hola! Me interesa realizar una consulta y reserva directa para ${establishment.name}.`}
-              >
-                Consultar Disponibilidad
-              </TrackedWhatsAppButton>
-            )}
-
-            <button
-              onClick={() => {
-                const el = document.getElementById("seccion-catalogo");
-                el?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="px-6 py-3.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl backdrop-blur transition-all text-xs cursor-pointer border border-white/20 flex items-center gap-2"
-            >
-              <Compass className="w-4 h-4 text-[#00C8D4]" />
-              <span>{isGastronomyCategory ? "Ver Áreas & Menú" : isCreatorCategory ? "Ver Rutas & Servicios" : "Ver Habitaciones"}</span>
-            </button>
+            </div>
           </div>
 
+          {/* Columna Derecha (5 cols): Tarjeta Sólida Azul Turquesa (#00C8D4) idéntica al Segundo Print */}
+          <div className="lg:col-span-5">
+            <div className="bg-gradient-to-br from-[#00C8D4] to-[#009fb0] rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-[#00C8D4]/20 relative overflow-hidden">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white shrink-0">
+                  <ShieldCheck className="w-6 h-6 text-white" />
+                </div>
+                <div className="text-left">
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-white/85 font-bold block">
+                    FICHA VERIFICADA HDV
+                  </span>
+                  <h3
+                    className="text-lg sm:text-xl font-bold !text-white leading-tight"
+                    style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700 }}
+                  >
+                    Garantía & Estándares
+                  </h3>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3.5">
+                <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4 text-left border border-white/15">
+                  <span
+                    className="text-2xl sm:text-3xl font-bold !text-white block"
+                    style={{ fontFamily: "'Playfair Display', serif" }}
+                  >
+                    {isGastronomyCategory ? "4+ Áreas" : isCreatorCategory ? "50+ Rutas" : `${rooms.length || 10}+ Hab.`}
+                  </span>
+                  <span className="text-[11px] font-semibold text-white/90 mt-1 block">
+                    {isGastronomyCategory ? "Espacios Gastronómicos" : isCreatorCategory ? "Expediciones GPS & 4K" : "Unidades de Hospedaje"}
+                  </span>
+                </div>
+
+                <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4 text-left border border-white/15">
+                  <span
+                    className="text-2xl sm:text-3xl font-bold !text-white block"
+                    style={{ fontFamily: "'Playfair Display', serif" }}
+                  >
+                    {establishment.rating_avg > 0 ? `${establishment.rating_avg.toFixed(1)}★` : "4.9★"}
+                  </span>
+                  <span className="text-[11px] font-semibold text-white/90 mt-1 block">
+                    Satisfacción Garantizada
+                  </span>
+                </div>
+
+                <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4 text-left border border-white/15">
+                  <span
+                    className="text-2xl sm:text-3xl font-bold !text-white block"
+                    style={{ fontFamily: "'Playfair Display', serif" }}
+                  >
+                    0%
+                  </span>
+                  <span className="text-[11px] font-semibold text-white/90 mt-1 block">
+                    Comisiones OTA • Trato Directo
+                  </span>
+                </div>
+
+                <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4 text-left border border-white/15">
+                  <span
+                    className="text-2xl sm:text-3xl font-bold !text-white block"
+                    style={{ fontFamily: "'Playfair Display', serif" }}
+                  >
+                    Starlink
+                  </span>
+                  <span className="text-[11px] font-semibold text-white/90 mt-1 block">
+                    Wi-Fi & Respaldo Operativo
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-5 pt-4 border-t border-white/20 flex items-center gap-2 text-xs font-bold text-white/95">
+                <CheckCircle2 className="w-4 h-4 text-white shrink-0" />
+                <span>Atención directa por WhatsApp con el propietario</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ── Showcase de Galerías en Miniatura ── */}
-      <div className="max-w-7xl mx-auto px-6 -mt-8 relative z-20 mb-10">
-        <div className="relative rounded-3xl overflow-hidden bg-slate-900 h-[280px] md:h-[420px] shadow-2xl group border border-white/10">
+      {/* ── Showcase de Galerías en Miniatura sobre Fondo Blanco ── */}
+      <div className="max-w-7xl mx-auto px-6 relative z-20 mb-12">
+        <div className="relative rounded-3xl overflow-hidden bg-slate-100 h-[280px] md:h-[440px] shadow-lg group border border-slate-200/80">
           {establishment.images.length > 0 && establishment.images[currentImageIndex] ? (
             <img
               src={establishment.images[currentImageIndex]}
@@ -967,9 +1035,9 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
             />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-800 to-slate-950">
-              <MapPin className="w-16 h-16 text-slate-600 mb-2" />
-              <p className="text-slate-400 text-sm font-bold">{establishment.name}</p>
+            <div className="w-full h-full flex flex-col items-center justify-center bg-slate-100">
+              <MapPin className="w-16 h-16 text-slate-400 mb-2" />
+              <p className="text-slate-600 text-sm font-bold">{establishment.name}</p>
             </div>
           )}
 
@@ -977,13 +1045,13 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
             <>
               <button
                 onClick={prevImage}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/80 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors cursor-pointer"
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white text-slate-900 backdrop-blur-md rounded-full flex items-center justify-center shadow-md transition-colors cursor-pointer"
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
               <button
                 onClick={nextImage}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/40 hover:bg-black/80 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors cursor-pointer"
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white text-slate-900 backdrop-blur-md rounded-full flex items-center justify-center shadow-md transition-colors cursor-pointer"
               >
                 <ChevronRight className="w-6 h-6" />
               </button>
@@ -993,9 +1061,8 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
           <div className="absolute top-4 right-4 flex gap-2">
             <button
               onClick={() => setIsFavorite(!isFavorite)}
-              className={`w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md transition-colors cursor-pointer ${
-                isFavorite ? "bg-red-500 text-white" : "bg-black/40 hover:bg-black/60 text-white"
-              }`}
+              className={`w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md shadow-md transition-colors cursor-pointer ${isFavorite ? "bg-[#FF0096] text-white" : "bg-white/90 hover:bg-white text-slate-800"
+                }`}
             >
               <Heart className={`w-5 h-5 ${isFavorite ? "fill-current" : ""}`} />
             </button>
@@ -1008,9 +1075,8 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
               <button
                 key={i}
                 onClick={() => setCurrentImageIndex(i)}
-                className={`w-16 h-16 rounded-xl overflow-hidden border-2 shrink-0 cursor-pointer transition-all ${
-                  i === currentImageIndex ? "border-[#FF0096] scale-95" : "border-transparent opacity-70 hover:opacity-100"
-                }`}
+                className={`w-16 h-16 rounded-xl overflow-hidden border-2 shrink-0 cursor-pointer transition-all ${i === currentImageIndex ? "border-[#00C8D4] scale-95 shadow-sm" : "border-slate-200 opacity-75 hover:opacity-100"
+                  }`}
               >
                 <img src={img} alt="" className="w-full h-full object-cover" />
               </button>
@@ -1019,75 +1085,75 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
         )}
       </div>
 
-      {/* ── 2. SECCIÓN: PROPUESTA DE VALOR / PILARES ── */}
+      {/* ── 2. SECCIÓN: PROPUESTA DE VALOR / PILARES (ESTILO LIGHT TARJETAS LIMPIAS) ── */}
       <section className="max-w-7xl mx-auto px-6 mb-12">
         <div className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-10 shadow-sm space-y-8">
-          <div>
-            <span className="text-[10px] tracking-[0.25em] font-extrabold text-[#00C8D4] uppercase block mb-1">
-              {isCreatorCategory ? "COBERTURA MULTIMEDIA & EXPEDICIONES DE ALTO IMPACTO" : "CONCEBIDO PARA EL CONCERTADO RESTAURACIÓN Y DESCANSO"}
+          <div className="text-center max-w-3xl mx-auto">
+            <span className="text-[10px] tracking-[0.25em] font-extrabold text-[#00C8D4] uppercase block mb-2">
+              {isCreatorCategory ? "COBERTURA MULTIMEDIA & EXPEDICIONES DE ALTO IMPACTO" : "CONCEBIDO PARA SU DESCANSO Y CONFORT"}
             </span>
             <h2 className="text-2xl md:text-3xl font-black font-serif text-slate-900">
-              {isCreatorCategory ? "Desk Hub de Expediciones, Auditorías Técnicas y Alianzas B2B" : isGastronomyCategory ? "Más que una Gastronomía, una Experiencia Memorable" : "Más que un Hospedaje, Su Casa en la Playa"}
+              {isCreatorCategory ? "Desk Hub de Expediciones, Auditorías Técnicas y Alianzas B2B" : isGastronomyCategory ? "Más que una Gastronomía, una Experiencia Memorable" : "Beneficios de Reservar en Nuestro Establecimiento"}
             </h2>
-            <p className="text-xs md:text-sm text-slate-500 mt-2 max-w-3xl leading-relaxed">
+            <p className="text-xs md:text-sm text-slate-500 mt-2 leading-relaxed">
               {establishment.description || "Un refugio pensado para quienes valoran la privacidad, el confort impecable y el trato personalizado. Cada espacio ha sido acondicionado para garantizar recuerdos inolvidables."}
             </p>
           </div>
 
           {/* Grid de 4 pilares con iconos unicolor en cajas sólidas de color */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-4 bg-slate-50 border border-slate-200/60 rounded-2xl flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-[#00C8D4] flex items-center justify-center text-white shrink-0 shadow-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="p-5 bg-white border border-slate-200/80 rounded-2xl shadow-2xs hover:shadow-md transition-shadow text-left space-y-3">
+              <div className="w-11 h-11 rounded-xl bg-[#00C8D4] flex items-center justify-center text-white shrink-0 shadow-xs">
                 <MapPin className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+                <h4 className="text-sm font-bold text-slate-900">
                   {isCreatorCategory ? "Rutas Satelitales & GPS" : "Ubicación Privilegiada"}
                 </h4>
-                <p className="text-[11px] text-slate-500 mt-1 leading-normal">
-                  {isCreatorCategory ? "Coordenadas georreferenciadas y tracks satelitales en tiempo real." : "Acceso inmediato a los puntos turísticos y costeros más deseados."}
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  {isCreatorCategory ? "Coordenadas georreferenciadas y tracks satelitales en tiempo real." : "Acceso inmediato a los atractivos turísticos y costeros más deseados."}
                 </p>
               </div>
             </div>
 
-            <div className="p-4 bg-slate-50 border border-slate-200/60 rounded-2xl flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-[#9B00CC] flex items-center justify-center text-white shrink-0 shadow-xs">
+            <div className="p-5 bg-white border border-slate-200/80 rounded-2xl shadow-2xs hover:shadow-md transition-shadow text-left space-y-3">
+              <div className="w-11 h-11 rounded-xl bg-[#FF0096] flex items-center justify-center text-white shrink-0 shadow-xs">
                 <ShieldCheck className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+                <h4 className="text-sm font-bold text-slate-900">
                   {isCreatorCategory ? "Auditorías de Posadas" : "Seguridad & Privacidad"}
                 </h4>
-                <p className="text-[11px] text-slate-500 mt-1 leading-normal">
-                  {isCreatorCategory ? "Inspección técnica de Wi-Fi, plantas eléctricas, agua y estándares HDV." : "Estacionamiento privado y vigilancia las 24 horas del día."}
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  {isCreatorCategory ? "Inspección técnica de Wi-Fi, plantas eléctricas, agua y estándares HDV." : "Instalaciones verificadas, atención dedicada y tranquilidad garantizada."}
                 </p>
               </div>
             </div>
 
-            <div className="p-4 bg-slate-50 border border-slate-200/60 rounded-2xl flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-[#FF0096] flex items-center justify-center text-white shrink-0 shadow-xs">
+            <div className="p-5 bg-white border border-slate-200/80 rounded-2xl shadow-2xs hover:shadow-md transition-shadow text-left space-y-3">
+              <div className="w-11 h-11 rounded-xl bg-[#9B00CC] flex items-center justify-center text-white shrink-0 shadow-xs">
                 {isCreatorCategory ? <Video className="w-5 h-5 text-white" /> : isGastronomyCategory ? <Wine className="w-5 h-5 text-white" /> : <Coffee className="w-5 h-5 text-white" />}
               </div>
               <div>
-                <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+                <h4 className="text-sm font-bold text-slate-900">
                   {isCreatorCategory ? "Producción 4K & Reels" : isGastronomyCategory ? "Gastronomía Exclusiva" : "Áreas Recreativas"}
                 </h4>
-                <p className="text-[11px] text-slate-500 mt-1 leading-normal">
-                  {isCreatorCategory ? "Fotografía aérea con Drone, micro-documentales y piezas virales." : isGastronomyCategory ? "Chef ejecutivo y maridajes seleccionados de alta gama." : "Piscina, solárium y zonas de esparcimiento familiar."}
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  {isCreatorCategory ? "Fotografía aérea con Drone, micro-documentales y piezas virales." : isGastronomyCategory ? "Chef ejecutivo y maridajes seleccionados de alta gama." : "Piscina, solárium y zonas diseñadas para el esparcimiento."}
                 </p>
               </div>
             </div>
 
-            <div className="p-4 bg-slate-50 border border-slate-200/60 rounded-2xl flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white shrink-0 shadow-xs">
+            <div className="p-5 bg-white border border-slate-200/80 rounded-2xl shadow-2xs hover:shadow-md transition-shadow text-left space-y-3">
+              <div className="w-11 h-11 rounded-xl bg-emerald-500 flex items-center justify-center text-white shrink-0 shadow-xs">
                 {isCreatorCategory ? <Wallet className="w-5 h-5 text-white" /> : <Zap className="w-5 h-5 text-white" />}
               </div>
               <div>
-                <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+                <h4 className="text-sm font-bold text-slate-900">
                   {isCreatorCategory ? "Honorarios & Viáticos" : "Wi-Fi & Respaldo"}
                 </h4>
-                <p className="text-[11px] text-slate-500 mt-1 leading-normal">
-                  {isCreatorCategory ? "Tarifa base de $20 USD por viaje asignado más reembolso de viáticos de ruta." : "Conexión Starlink de alta velocidad y planta eléctrica auxiliar."}
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  {isCreatorCategory ? "Tarifa base de $20 USD por viaje asignado más reembolso de viáticos de ruta." : "Conectividad de alta velocidad y respaldo operativo continuo."}
                 </p>
               </div>
             </div>
@@ -1095,10 +1161,63 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
         </div>
       </section>
 
+      {/* ── 2B. BLOQUE DE CONTRASTE OSCURO (#0e011f a #1a0533): "¿CÓMO FUNCIONA TU RESERVA DIRECTA?" (IGUAL AL SEGUNDO PRINT) ── */}
+      <section className="max-w-7xl mx-auto px-6 mb-12">
+        <div
+          className="rounded-3xl p-8 md:p-12 text-white shadow-xl text-center space-y-8"
+          style={{ background: "linear-gradient(135deg, #0e011f 0%, #1a0533 100%)" }}
+        >
+          <div className="max-w-2xl mx-auto space-y-2">
+            <h2
+              className="text-2xl md:text-3xl font-bold !text-white"
+              style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700 }}
+            >
+              ¿Cómo Funciona tu Reserva Directa?
+            </h2>
+            <p className="text-xs sm:text-sm text-white/75">
+              Sin intermediarios ni sobrecargos ocultos: conectamos tu viaje directamente con la recepción de {establishment.name}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-2">
+            {[
+              {
+                step: "1",
+                title: "Explora la Ficha",
+                desc: "Revisa las habitaciones, áreas sociales, fotos verificadas y servicios incluidos."
+              },
+              {
+                step: "2",
+                title: "Cotiza por WhatsApp",
+                desc: "Haz clic en el botón de WhatsApp directo para consultar fechas y disponibilidad real."
+              },
+              {
+                step: "3",
+                title: "Trato con el Anfitrión",
+                desc: "Coordina tu llegada y método de pago directamente con el propietario del establecimiento."
+              },
+              {
+                step: "4",
+                title: "Disfruta sin Comisiones",
+                desc: "Obtén la mejor tarifa directa garantizada con 0% de recargos por plataforma."
+              }
+            ].map((item) => (
+              <div key={item.step} className="flex flex-col items-center text-center space-y-2.5 px-2">
+                <div className="w-11 h-11 rounded-full bg-[#00C8D4] text-white font-black text-sm flex items-center justify-center shadow-lg shadow-[#00C8D4]/30">
+                  {item.step}
+                </div>
+                <h4 className="text-sm font-bold !text-white">{item.title}</h4>
+                <p className="text-xs text-white/70 leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── MAIN CONTENT GRID (2 COLUMNAS) ── */}
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          
+
           <div className="lg:col-span-8 space-y-10">
 
             {/* ── 3. SECCIÓN: CATÁLOGO DE RUTAS / ÁREAS / HABITACIONES ── */}
@@ -1114,9 +1233,9 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                   <p className="text-xs text-slate-400 font-semibold mt-1">
                     {isCreatorCategory
                       ? "Conoce los paquetes de expedición, auditorías técnicas para posadas y honorarios base de cobertura."
-                      : isGastronomyCategory 
-                      ? "Conozca los distintos ambientes, aforos y cartas especiales para su reserva de mesa o evento." 
-                      : "Explore la distribución, equipamiento y tarifas de nuestras unidades de hospedaje."}
+                      : isGastronomyCategory
+                        ? "Conozca los distintos ambientes, aforos y cartas especiales para su reserva de mesa o evento."
+                        : "Explore la distribución, equipamiento y tarifas de nuestras unidades de hospedaje."}
                   </p>
                 </div>
                 <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 bg-[#00C8D4]/10 text-[#00C8D4] rounded-full border border-[#00C8D4]/20 shrink-0 self-start sm:self-center">
@@ -1308,14 +1427,14 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                 <div className="space-y-8">
                   {rooms.length === 0 ? (
                     <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-8 text-center space-y-4">
-                      <div className="w-14 h-14 bg-[#00C8D4]/10 rounded-2xl flex items-center justify-center mx-auto text-[#00C8D4]">
-                        <Bed className="w-7 h-7 text-[#00C8D4]" />
+                      <div className="w-14 h-14 bg-[#00C8D4] rounded-2xl flex items-center justify-center mx-auto text-white shadow-sm">
+                        <Bed className="w-7 h-7 text-white" />
                       </div>
                       <h3 className="text-lg font-serif font-black text-slate-800">Habitaciones & Tarifas Bajo Consulta Directa</h3>
                       <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed font-medium">
                         Este establecimiento gestiona la asignación de sus unidades y tarifas de temporada directamente a través de su recepción sin intermediarios ni comisiones adicionales.
                       </p>
-                      <div className="pt-2 flex justify-center">
+                      <div className="pt-2 flex justify-center max-w-xs mx-auto">
                         <TrackedWhatsAppButton
                           whatsappNumber={establishment.whatsapp || establishment.phone}
                           establishmentId={establishment.id}
@@ -1334,7 +1453,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
 
                       return (
                         <div key={room.id} className="bg-slate-50/70 border border-slate-200/80 rounded-3xl p-5 md:p-6 transition-all hover:border-slate-300 shadow-2xs grid grid-cols-1 lg:grid-cols-12 gap-6">
-                          
+
                           <div className="lg:col-span-5 space-y-3">
                             <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-slate-200 group shadow-xs">
                               <img
@@ -1342,7 +1461,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                                 alt={room.name}
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                               />
-                              
+
                               <button
                                 type="button"
                                 onClick={() => setActiveLightbox({ url: mainPhoto, title: room.name, category: "Habitación" })}
@@ -1364,9 +1483,8 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                                     key={pIdx}
                                     type="button"
                                     onClick={() => setSelectedRoomImageIndex(prev => ({ ...prev, [room.id]: pIdx }))}
-                                    className={`w-14 h-14 rounded-xl overflow-hidden border-2 shrink-0 cursor-pointer transition-all ${
-                                      pIdx === activeImgIdx ? "border-[#FF0096] scale-95" : "border-transparent opacity-60 hover:opacity-100"
-                                    }`}
+                                    className={`w-14 h-14 rounded-xl overflow-hidden border-2 shrink-0 cursor-pointer transition-all ${pIdx === activeImgIdx ? "border-[#FF0096] scale-95" : "border-transparent opacity-60 hover:opacity-100"
+                                      }`}
                                   >
                                     <img src={ph} alt="" className="w-full h-full object-cover" />
                                   </button>
@@ -1381,12 +1499,14 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                                 <h3 className="text-lg font-black text-slate-800 leading-tight font-serif">
                                   {room.name}
                                 </h3>
-                                <div className="text-right">
-                                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Tarifa por Noche</span>
-                                  <span className="text-xl font-black text-[#FF0096]">
-                                    ${room.price_per_night} <span className="text-xs font-bold text-slate-500">USD</span>
-                                  </span>
-                                </div>
+                                {Number(room.price_per_night) > 0 && Number(room.price_per_night) !== 100 && (
+                                  <div className="text-right">
+                                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Tarifa por Noche</span>
+                                    <span className="text-xl font-black text-[#FF0096]">
+                                      ${room.price_per_night} <span className="text-xs font-bold text-slate-500">USD</span>
+                                    </span>
+                                  </div>
+                                )}
                               </div>
 
                               <p className="text-xs text-slate-500 leading-relaxed mb-4">
@@ -1434,7 +1554,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                                   description: room.description,
                                   image: mainPhoto,
                                   gallery: photos,
-                                  price: room.price_per_night,
+                                  price: Number(room.price_per_night) > 0 && Number(room.price_per_night) !== 100 ? room.price_per_night : undefined,
                                   specs: [
                                     { label: "Capacidad", value: `${room.capacity || 2} Personas` },
                                     { label: "Superficie", value: "32 m² Aproximados" },
@@ -1442,7 +1562,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                                     { label: "Vista", value: "Vista Panorámica Exterior" }
                                   ],
                                   amenities: room.amenities ? room.amenities.split(",").map((a: string) => getRoomAmenityText(a)) : ["Aire Acondicionado", "Baño Privado", "Wi-Fi", "TV Cable"],
-                                  whatsappCustomMsg: `Hola! Estoy consultando la disponibilidad para la unidad: "${room.name}" (Tarifa: $${room.price_per_night} USD/noche) en ${establishment.name}.`
+                                  whatsappCustomMsg: `Hola! Estoy consultando la disponibilidad para la unidad: "${room.name}" en ${establishment.name}.`
                                 })}
                                 className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl transition-all cursor-pointer w-full sm:w-auto"
                               >
@@ -1453,7 +1573,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                                 whatsappNumber={establishment.whatsapp || establishment.phone}
                                 establishmentId={establishment.id}
                                 establishmentName={establishment.name}
-                                customMessage={`Hola! Estoy viendo la ficha de ${establishment.name} en Hoteles de Venezuela y me gustaría consultar disponibilidad para la unidad: "${room.name}" (Tarifa: $${room.price_per_night} USD/noche).`}
+                                customMessage={`Hola! Estoy viendo la ficha de ${establishment.name} en Hoteles de Venezuela y me gustaría consultar disponibilidad para la unidad: "${room.name}".`}
                               >
                                 Consultar Habitación
                               </TrackedWhatsAppButton>
@@ -1471,7 +1591,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
             {/* ── 4. SECCIÓN: GALERÍAS DE ÁREAS E INSTALACIONES ── */}
             {(() => {
               const categoriesPresent = Object.keys(areaPhotos).filter(catKey => areaPhotos[catKey] && areaPhotos[catKey].length > 0);
-              
+
               const allCategorizedPhotos: { url: string; category: string }[] = [];
               categoriesPresent.forEach(catKey => {
                 areaPhotos[catKey].forEach(url => {
@@ -1509,13 +1629,12 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                     <button
                       type="button"
                       onClick={() => setSelectedGalleryCategory("todas")}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer border ${
-                        selectedGalleryCategory === "todas"
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer border ${selectedGalleryCategory === "todas"
                           ? "bg-[#0e011f] text-white border-[#0e011f] shadow-xs"
                           : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
-                      }`}
+                        }`}
                     >
-                      <span>🖼️</span>
+                      <Layers className="w-3.5 h-3.5 text-[#00C8D4]" />
                       <span>Todas las Áreas</span>
                       <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-black ${selectedGalleryCategory === "todas" ? "bg-[#FF0096] text-white" : "bg-slate-200 text-slate-700"}`}>
                         {allCategorizedPhotos.length}
@@ -1523,7 +1642,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                     </button>
 
                     {categoriesPresent.map(catKey => {
-                      const catInfo = AREA_CATEGORY_INFO[catKey] || { label: catKey.toUpperCase(), icon: "📸" };
+                      const catInfo = AREA_CATEGORY_INFO[catKey] || { label: catKey.toUpperCase(), icon: "" };
                       const count = areaPhotos[catKey]?.length || 0;
                       const isSel = selectedGalleryCategory === catKey;
 
@@ -1532,13 +1651,11 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                           key={catKey}
                           type="button"
                           onClick={() => setSelectedGalleryCategory(catKey)}
-                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer border ${
-                            isSel
+                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer border ${isSel
                               ? "bg-[#0e011f] text-white border-[#0e011f] shadow-xs"
                               : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
-                          }`}
+                            }`}
                         >
-                          <span>{catInfo.icon}</span>
                           <span>{catInfo.label}</span>
                           <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-black ${isSel ? "bg-[#FF0096] text-white" : "bg-slate-200 text-slate-700"}`}>
                             {count}
@@ -1551,8 +1668,8 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                   {/* Photos Grid */}
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                     {displayPhotos.map((item, idx) => {
-                      const catInfo = AREA_CATEGORY_INFO[item.category] || { label: item.category.toUpperCase(), icon: "📷" };
-                      
+                      const catInfo = AREA_CATEGORY_INFO[item.category] || { label: item.category.toUpperCase(), icon: "" };
+
                       return (
                         <div
                           key={idx}
@@ -1569,7 +1686,6 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                               <Maximize2 className="w-3.5 h-3.5" />
                             </span>
                             <span className="text-[10px] font-black text-white uppercase tracking-wider flex items-center gap-1">
-                              <span>{catInfo.icon}</span>
                               <span>{catInfo.label}</span>
                             </span>
                           </div>
@@ -1587,7 +1703,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                   <div>
                     <h2 className="text-xl font-serif font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-gradient-to-r from-[#00C8D4] to-[#9B00CC] flex items-center justify-center text-white shrink-0 shadow-xs">
+                      <div className="w-8 h-8 rounded-xl bg-[#9B00CC] flex items-center justify-center text-white shrink-0 shadow-xs">
                         <Sparkles className="w-4 h-4 text-white" />
                       </div>
                       Infraestructura, Servicios y Políticas (Documento 77 V.2)
@@ -1703,8 +1819,10 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                 <span className="text-[10px] tracking-[0.25em] font-extrabold text-[#FF0096] uppercase block mb-1">
                   OPINIONES VERIFICADAS
                 </span>
-                <h2 className="text-xl font-serif font-black text-slate-900 tracking-tight flex items-center gap-2">
-                  <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
+                <h2 className="text-xl font-serif font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-amber-500 flex items-center justify-center text-white shrink-0 shadow-xs">
+                    <Star className="w-4 h-4 fill-white text-white" />
+                  </div>
                   Lo que dicen nuestros huéspedes y comensales
                 </h2>
               </div>
@@ -1740,8 +1858,10 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
             {surroundings.length > 0 && (
               <div className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm text-left space-y-6">
                 <div className="border-b border-slate-100 pb-4">
-                  <h2 className="text-xl font-serif font-black text-slate-900 tracking-tight flex items-center gap-2">
-                    <Building2 className="w-5 h-5 text-[#FF0096]" />
+                  <h2 className="text-xl font-serif font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-[#FF0096] flex items-center justify-center text-white shrink-0 shadow-xs">
+                      <Building2 className="w-4 h-4 text-white" />
+                    </div>
                     Alrededores y Ubicación en el Destino
                   </h2>
                   <p className="text-[11px] text-slate-400 font-semibold mt-1">Excelente ubicación con acceso a atractivos turísticos y comerciales.</p>
@@ -1810,9 +1930,9 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
 
             {/* Availability Calendar */}
             {establishment.has_reservations_enabled && (
-              <AvailabilityCalendar 
-                establishmentId={establishment.id} 
-                establishmentName={establishment.name} 
+              <AvailabilityCalendar
+                establishmentId={establishment.id}
+                establishmentName={establishment.name}
               />
             )}
 
@@ -1820,7 +1940,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
 
           {/* ── STICKY SIDEBAR: CONTACTO & RESERVAS ── */}
           <div className="lg:col-span-4 space-y-6">
-            
+
             {establishment.has_reservations_enabled && (
               <BookingWidget
                 establishmentId={establishment.id}
@@ -1838,7 +1958,9 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
               <div className="space-y-4">
                 {establishment.address && (
                   <div className="flex items-start gap-3">
-                    <MapPin className="w-5 h-5 text-[#FF0096] shrink-0 mt-0.5" />
+                    <div className="w-8 h-8 rounded-lg bg-[#FF0096] flex items-center justify-center text-white shrink-0 mt-0.5">
+                      <MapPin className="w-4 h-4 text-white" />
+                    </div>
                     <div>
                       <span className="block text-[9px] uppercase font-bold text-slate-400 tracking-wide">Dirección</span>
                       <p className="text-xs text-slate-700 leading-normal font-medium">{establishment.address}</p>
@@ -1848,7 +1970,9 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
 
                 {establishment.phone && (
                   <div className="flex items-start gap-3">
-                    <Phone className="w-5 h-5 text-[#00C8D4] shrink-0 mt-0.5" />
+                    <div className="w-8 h-8 rounded-lg bg-[#00C8D4] flex items-center justify-center text-white shrink-0 mt-0.5">
+                      <Phone className="w-4 h-4 text-white" />
+                    </div>
                     <div>
                       <span className="block text-[9px] uppercase font-bold text-slate-400 tracking-wide">Teléfono Directo</span>
                       <a href={`tel:${establishment.phone}`} className="text-xs text-slate-700 hover:text-[#FF0096] transition-colors font-bold">
@@ -1860,7 +1984,9 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
 
                 {establishment.email && (
                   <div className="flex items-start gap-3">
-                    <Mail className="w-5 h-5 text-[#FF0096] shrink-0 mt-0.5" />
+                    <div className="w-8 h-8 rounded-lg bg-[#9B00CC] flex items-center justify-center text-white shrink-0 mt-0.5">
+                      <Mail className="w-4 h-4 text-white" />
+                    </div>
                     <div>
                       <span className="block text-[9px] uppercase font-bold text-slate-400 tracking-wide">Correo Electrónico</span>
                       <a href={`mailto:${establishment.email}`} className="text-xs text-slate-700 hover:text-[#FF0096] transition-colors font-bold break-all">
@@ -1872,12 +1998,14 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
 
                 {establishment.website && (
                   <div className="flex items-start gap-3">
-                    <Globe className="w-5 h-5 text-[#00C8D4] shrink-0 mt-0.5" />
+                    <div className="w-8 h-8 rounded-lg bg-[#00C8D4] flex items-center justify-center text-white shrink-0 mt-0.5">
+                      <Globe className="w-4 h-4 text-white" />
+                    </div>
                     <div>
                       <span className="block text-[9px] uppercase font-bold text-slate-400 tracking-wide">Sitio Web Oficial</span>
-                      <a 
-                        href={establishment.website.startsWith("http") ? establishment.website : `https://${establishment.website}`} 
-                        target="_blank" 
+                      <a
+                        href={establishment.website.startsWith("http") ? establishment.website : `https://${establishment.website}`}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs text-slate-700 hover:text-[#FF0096] transition-colors font-bold break-all"
                       >
@@ -1889,7 +2017,9 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
 
                 {establishment.hours && (
                   <div className="flex items-start gap-3">
-                    <Clock className="w-5 h-5 text-[#FF0096] shrink-0 mt-0.5" />
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center text-white shrink-0 mt-0.5">
+                      <Clock className="w-4 h-4 text-white" />
+                    </div>
                     <div>
                       <span className="block text-[9px] uppercase font-bold text-slate-400 tracking-wide">Horarios de Atención</span>
                       <p className="text-xs text-slate-700 font-medium whitespace-pre-line">{establishment.hours}</p>
@@ -1920,8 +2050,10 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                     whatsappNumber={establishment.whatsapp || establishment.phone}
                     establishmentId={establishment.id}
                     establishmentName={establishment.name}
+                    isPriority={true}
+                    directOpen={true}
                   >
-                    Contactar vía WhatsApp
+                    Cotizar Ahora Mismo!
                   </TrackedWhatsAppButton>
                 )}
 
@@ -1932,7 +2064,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                     rel="noopener noreferrer"
                     className="block"
                   >
-                    <button className="w-full bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer">
+                    <button className="w-full bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer">
                       <Navigation className="w-4 h-4 text-[#00C8D4]" />
                       ¿Cómo llegar? (Ruta GPS)
                     </button>
@@ -1945,28 +2077,41 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
 
         </div>
 
-        {/* ── 8. SECCIÓN DE CIERRE CTA: "COMIENCE SU ESCAPADA / RESERVE SU MESA" ── */}
-        <div className="mt-16 rounded-3xl p-8 md:p-12 text-white text-center shadow-2xl relative overflow-hidden" style={{ background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)" }}>
-          <div className="relative z-10 max-w-3xl mx-auto space-y-6">
+        {/* ── 8. SECCIÓN DE CIERRE CTA (DIRECTRIZ AGENTS.MD #4: GRADIENTE MAGENTA/PÚRPURA CON BOTÓN BLANCO Y TEXTO MAGENTA) ── */}
+        <div
+          className="mt-16 rounded-3xl p-8 md:p-12 text-white text-center shadow-2xl relative overflow-hidden"
+          style={{ background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)" }}
+        >
+          <div className="relative z-10 max-w-3xl mx-auto space-y-5">
             <span className="text-[10px] uppercase tracking-[0.3em] font-black bg-white/20 text-white px-4 py-1.5 rounded-full inline-block">
               RESERVA DIRECTA GARANTIZADA
             </span>
-            <h2 className="text-3xl md:text-5xl font-black font-serif !text-white drop-shadow-md">
-              {isGastronomyCategory ? "Comience su Experiencia Gastronómica" : "Comience su Escapada Inolvidable"}
+            <h2
+              className="text-3xl md:text-5xl font-bold !text-white drop-shadow-md"
+              style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700 }}
+            >
+              {isGastronomyCategory ? "¿Listo para tu Experiencia Gastronómica?" : "¿Listo para tu Escapada Inolvidable?"}
             </h2>
             <p className="!text-white/95 text-sm md:text-base font-medium max-w-xl mx-auto leading-relaxed drop-shadow-sm">
-              Consulte disponibilidad en tiempo real directamente con el equipo de recepción de {establishment.name} sin intermediarios ni comisiones adicionales.
+              Consulta disponibilidad en tiempo real directamente con el anfitrión de {establishment.name} sin intermediarios ni comisiones adicionales.
             </p>
 
-            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <TrackedWhatsAppButton
-                whatsappNumber={establishment.whatsapp || establishment.phone}
-                establishmentId={establishment.id}
-                establishmentName={establishment.name}
-                customMessage={`Hola! Quisiera coordinar una reserva directa en ${establishment.name}.`}
-              >
-                {isGastronomyCategory ? "Solicitar Mesa por WhatsApp" : "Confirmar Disponibilidad por WhatsApp"}
-              </TrackedWhatsAppButton>
+            <div className="pt-3 flex flex-col items-center justify-center gap-3">
+              <div className="w-full sm:w-auto">
+                <TrackedWhatsAppButton
+                  whatsappNumber={establishment.whatsapp || establishment.phone}
+                  establishmentId={establishment.id}
+                  establishmentName={establishment.name}
+                  directOpen={true}
+                  customMessage={`Hola! Quisiera coordinar una reserva directa en ${establishment.name}.`}
+                  className="!w-auto !bg-white hover:!bg-slate-50 !text-[#FF0096] !font-black !text-xs sm:!text-sm !px-8 !py-4 !rounded-2xl !shadow-xl hover:scale-105 transition-transform mx-auto"
+                >
+                  {isGastronomyCategory ? "Solicitar Mesa por WhatsApp" : "Contactar por WhatsApp"}
+                </TrackedWhatsAppButton>
+              </div>
+              <span className="text-[11px] text-white/80 font-semibold">
+                Atención directa e inmediata • Sin costos ocultos
+              </span>
             </div>
           </div>
         </div>
@@ -1994,7 +2139,6 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
             className="fixed inset-0 z-[99999] bg-[#0e011f]/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-fade-in"
             onClick={() => setActiveDetailModal(null)}
           >
-            {/* Botón flotante 'X' de cierre garantizado visible en la esquina superior de la pantalla */}
             <button
               type="button"
               onClick={(e) => {
@@ -2012,7 +2156,6 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
               className="bg-white rounded-3xl max-w-3xl w-full p-6 md:p-8 space-y-6 text-left relative shadow-2xl my-auto max-h-[88vh] flex flex-col overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Header fijo interno con título y botón 'X' */}
               <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-100 shrink-0">
                 <div>
                   <div className="flex items-center gap-2 mb-1.5">
@@ -2041,14 +2184,11 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                 </button>
               </div>
 
-              {/* Cuerpo del modal con scroll interno */}
               <div className="overflow-y-auto space-y-6 pr-1 custom-scrollbar">
-                {/* Imagen Principal */}
                 <div className="aspect-[16/9] rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
                   <img src={activeDetailModal.image} alt={activeDetailModal.title} className="w-full h-full object-cover" />
                 </div>
 
-                {/* Grid de Especificaciones */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {activeDetailModal.specs.map((sp, idx) => (
                     <div key={idx} className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
@@ -2058,7 +2198,6 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                   ))}
                 </div>
 
-                {/* Lista de Amenidades */}
                 <div className="space-y-2">
                   <span className="text-xs font-black uppercase text-slate-800 block">Equipamiento e Infraestructura Incluida</span>
                   <div className="flex flex-wrap gap-2">
@@ -2072,7 +2211,6 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                 </div>
               </div>
 
-              {/* Pie con Botones de Acción */}
               <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3 shrink-0">
                 <button
                   type="button"
@@ -2202,7 +2340,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
                   >
                     Cancelar
                   </button>
-                  
+
                   <div className="flex-1">
                     <TrackedWhatsAppButton
                       whatsappNumber={establishment.whatsapp || establishment.phone}
@@ -2263,15 +2401,15 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
 
       </div>
 
-      {/* ── 9. STICKY FLOATING BOOKING BAR AL PIE DE PANTALLA ── */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#0e011f]/95 backdrop-blur-md border-t border-white/10 py-3 px-6 shadow-2xl">
+      {/* ── 9. STICKY FLOATING BOOKING BAR AL PIE DE PANTALLA (VERSIÓN LIGHT BLANCA) ── */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 py-3 px-6 shadow-2xl">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           <div className="hidden sm:flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-800 border border-white/20 shrink-0">
+            <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
               <img src={establishment.primary_image} alt="" className="w-full h-full object-cover" />
             </div>
             <div className="text-left">
-              <h4 className="text-xs font-black text-white truncate max-w-[200px]">{establishment.name}</h4>
+              <h4 className="text-xs font-black text-slate-900 truncate max-w-[240px]">{establishment.name}</h4>
               <span className="text-[10px] text-[#00C8D4] font-bold block">{establishment.destination_name || establishment.city}</span>
             </div>
           </div>
@@ -2279,16 +2417,18 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string; [key: stri
           <div className="flex items-center gap-3 ml-auto">
             <div className="text-right">
               <span className="text-[9px] uppercase font-bold text-slate-400 block">Garantía Directa</span>
-              <span className="text-xs font-black text-emerald-400">Reserva 100% Verificada</span>
+              <span className="text-xs font-black text-emerald-600">0% Comisiones • Trato Directo</span>
             </div>
 
             <TrackedWhatsAppButton
               whatsappNumber={establishment.whatsapp || establishment.phone}
               establishmentId={establishment.id}
               establishmentName={establishment.name}
-              customMessage={`Hola! Quisiera reservar directamente en ${establishment.name}.`}
+              isPriority={true}
+              directOpen={true}
+              customMessage={`Hola! Quisiera cotizar y reservar directamente en ${establishment.name}.`}
             >
-              {isGastronomyCategory ? "Reservar Mesa por WhatsApp" : "Reservar Ahora"}
+              {isGastronomyCategory ? "Reservar Mesa por WhatsApp" : "Cotizar Ahora Mismo!"}
             </TrackedWhatsAppButton>
           </div>
         </div>
