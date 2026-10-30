@@ -353,9 +353,9 @@ export function isCreatorOrInfluencer(est?: {
 
   // 2. Verificación por slug/nombre de creadores conocidos
   const isKnownCreator =
-    slug.includes("aura-croce") ||
+    slug.includes("creador-oficial-hdv") ||
     slug.includes("viajera-creadora") ||
-    name.includes("aura croce") ||
+    name.includes("creador oficial") ||
     (name.includes("creadora de contenido") || name.includes("creador de contenido"));
 
   return isKnownCreator;

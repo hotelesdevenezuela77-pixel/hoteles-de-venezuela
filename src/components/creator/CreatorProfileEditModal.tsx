@@ -239,7 +239,7 @@ export const CreatorProfileEditModal: React.FC<CreatorProfileEditModalProps> = (
                 type="text"
                 value={formData.instagram || ""}
                 onChange={e => setFormData(prev => ({ ...prev, instagram: e.target.value }))}
-                placeholder="@auracroce"
+                placeholder="@creador_hdv"
                 className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs focus:outline-none focus:border-[#FF0096]"
               />
             </div>
@@ -251,7 +251,7 @@ export const CreatorProfileEditModal: React.FC<CreatorProfileEditModalProps> = (
                 type="text"
                 value={formData.tiktok || ""}
                 onChange={e => setFormData(prev => ({ ...prev, tiktok: e.target.value }))}
-                placeholder="@auracroce_viajes"
+                placeholder="@creador_viajes"
                 className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-400"
               />
             </div>

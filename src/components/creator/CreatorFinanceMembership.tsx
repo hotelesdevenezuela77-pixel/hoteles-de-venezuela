@@ -32,7 +32,7 @@ export const CreatorFinanceMembership: React.FC<CreatorFinanceMembershipProps> =
   membership,
   deals,
   expenses,
-  creatorName = "Aura Croce",
+  creatorName = "Creador(a) Oficial HDV",
   onUpdateMembership
 }) => {
   const { bcvRate, formatBs } = useBcvExchangeRate();

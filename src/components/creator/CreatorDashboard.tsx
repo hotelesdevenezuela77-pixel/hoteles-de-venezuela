@@ -73,7 +73,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
   onSwitchToTraditionalDashboard
 }) => {
   const estId = establishment?.id || 1;
-  const creatorName = establishment?.name || "Aura Croce";
+  const creatorName = establishment?.name || "Creador(a) Oficial HDV";
 
   const {
     expeditions,

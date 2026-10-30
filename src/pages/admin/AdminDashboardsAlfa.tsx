@@ -223,8 +223,8 @@ const DASHBOARDS_ALFA_REGISTRY: DashboardAlfaMeta[] = [
     targetIndustry: "Creadores de Contenido Turístico, Fotógrafos de Viajes y Embajadores HDV",
     demoEstablishment: {
       id: 108,
-      name: "Aura Croce · Desk Hub Creadora Oficial",
-      slug: "aura-croce-creator",
+      name: "Consola de Influencer & Creador(a) Oficial HDV",
+      slug: "creador-oficial-hdv-creator",
       category_name: "Creadores de Contenido / Influencers"
     },
     keyFeatures: [

@@ -34,7 +34,7 @@ const WAYPOINT_ICONS: Record<PointType, { label: string; icon: string; color: st
 };
 
 export const CreatorRouteExplorer: React.FC<CreatorRouteExplorerProps> = ({
-  creatorName = "Aura Croce",
+  creatorName = "Creador(a) Oficial HDV",
   expeditions,
   waypoints,
   onAddWaypoint

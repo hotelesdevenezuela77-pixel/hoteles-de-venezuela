@@ -84,7 +84,7 @@ export function CreatorSupportModule({ establishmentId, creatorName }: CreatorSu
         category: "web_builder",
         priority: "media",
         status: "abierto",
-        description: "Configuración de DNS para apuntar auracroce.com al portal de creadora HDV.",
+        description: "Configuración de DNS para apuntar tudominio.com al portal de creadora HDV.",
         created_at: new Date().toISOString().split("T")[0]
       }
     ];

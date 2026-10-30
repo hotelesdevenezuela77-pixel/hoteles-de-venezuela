@@ -7,6 +7,7 @@ import { TENANTS_REGISTRY } from "../tenants/tenantContext";
 import { TrackedWhatsAppButton, trackEvent } from "../components/layout/TrackedWhatsAppButton";
 import { AvailabilityCalendar } from "../components/AvailabilityCalendar";
 import { BookingWidget } from "../components/BookingWidget";
+import { getQualifiedInfluencers } from "../lib/qualifiedInfluencersRegistry";
 import {
   MapPin, Phone, Globe, Mail, Clock, Star,
   ChevronLeft, ChevronRight, Share2, Heart,
@@ -338,42 +339,43 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
           console.warn("Error querying Supabase for detail:", e);
         }
 
-        // 1b. Built-in Special Profiles (Aura Croce, El Mundo De Los Niños, Agencia Global Travel DMC)
+        // 1b. Perfiles dinámicos de Influencers Calificados + Perfiles Especiales (El Mundo De Los Niños, Agencia Global Travel DMC)
         if (!dbData) {
+          const qualifiedInfluencerProfiles = getQualifiedInfluencers().map(inf => ({
+            id: inf.id,
+            name: inf.name,
+            slug: inf.slug,
+            description: inf.bio || "Viajero(a) y creador(a) de contenido audiovisual, expediciones por Venezuela, cobertura 4K con Drone y alianzas estratégicas con hoteles, posadas y marcas.",
+            address: inf.destination_focus || "Coberturas Nacionales (Venezuela)",
+            city: "Caracas",
+            state: "Distrito Capital",
+            phone: inf.phone || inf.whatsapp || "",
+            whatsapp: inf.whatsapp || inf.phone || "",
+            email: inf.claimed_by_email || inf.email || "",
+            website: inf.handle ? `https://instagram.com/${inf.handle.replace(/^@/, "")}` : "https://hotelesdevenezuela.com",
+            category_name: "Creadores de Contenido / Influencers",
+            category_slug: "influencers",
+            categories: { name: "Creadores de Contenido / Influencers", slug: "influencers" },
+            destination_name: inf.destination_focus || "Venezuela",
+            destination_slug: "los-roques",
+            destinations: { name: inf.destination_focus || "Venezuela", slug: "los-roques" },
+            primary_image: inf.avatar_url || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+            rating_avg: 5.0,
+            review_count: 24,
+            price_level: "$$$",
+            is_featured: true,
+            services: JSON.stringify(["Cobertura 4K & Drone", "Reels & TikTok Virales", "Reseñas de Hoteles & Posadas", "Expediciones Guiadas", "Embajadora de Marca"]),
+            membership_tier: "diamante",
+            has_hdv_seal: true,
+            has_reservations_enabled: true,
+            establishment_images: [
+              { image_url: inf.banner_url || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80", is_primary: true },
+              { image_url: inf.avatar_url || "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1600&q=80", is_primary: false }
+            ]
+          }));
+
           const demoProfiles = [
-            {
-              id: 99901,
-              name: "Aura Croce - Viajera & Creadora de Contenido",
-              slug: "aura-croce-viajera-creadora",
-              description: "Viajera y creadora de contenido audiovisual especializada en turismo de selección, expediciones por Venezuela, cobertura 4K con Drone y alianzas estratégicas con hoteles, posadas y marcas.",
-              address: "Caracas / Coberturas Nacionales (Los Roques, Canaima, Morrocoy, Roraima)",
-              city: "Caracas",
-              state: "Distrito Capital",
-              phone: "+58 414 123 4567",
-              whatsapp: "+58 414 123 4567",
-              email: "aura.croce@hdv.com",
-              website: "https://instagram.com/auracroce",
-              category_name: "Creadores de Contenido / Influencers",
-              category_slug: "influencers",
-              categories: { name: "Creadores de Contenido / Influencers", slug: "influencers" },
-              destination_name: "Los Roques & Morrocoy",
-              destination_slug: "los-roques",
-              destinations: { name: "Los Roques & Morrocoy", slug: "los-roques" },
-              primary_image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1600&q=80",
-              rating_avg: 5.0,
-              review_count: 48,
-              price_level: "$$$",
-              is_featured: true,
-              services: JSON.stringify(["Cobertura 4K & Drone", "Reels & TikTok Virales", "Reseñas de Hoteles & Posadas", "Expediciones Guiadas", "Embajadora de Marca"]),
-              membership_tier: "diamante",
-              has_hdv_seal: true,
-              has_reservations_enabled: true,
-              establishment_images: [
-                { image_url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1600&q=80", is_primary: true },
-                { image_url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80", is_primary: false },
-                { image_url: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1600&q=80", is_primary: false }
-              ]
-            },
+            ...qualifiedInfluencerProfiles,
             {
               id: 99902,
               name: "El Mundo De Los Niños Barquisimeto",
@@ -443,28 +445,19 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
             d.slug === slug ||
             String(d.id) === slug ||
             slug === `influencer-${d.id}` ||
-            slug === "influencer-99901" ||
-            slug === "influencer-1" ||
-            slug === "influencer-aura-croce" ||
-            slugLower.startsWith("influencer") ||
-            slugLower.includes("influencer") ||
             slugLower.includes(String(d.id)) ||
-            (slugLower.includes("aura") && d.id === 99901) ||
-            (slugLower.includes("croce") && d.id === 99901) ||
             (slugLower.includes("mundo") && d.id === 99902) ||
             (slugLower.includes("global") && d.id === 99903)
           );
 
           if (matchedDemo) {
             let customProfile: any = null;
-            if (matchedDemo.id === 99901) {
-              try {
-                const raw1 = localStorage.getItem("hdv_creator_profile_1");
-                const raw99901 = localStorage.getItem("hdv_creator_profile_99901");
-                const saved = raw1 || raw99901;
-                if (saved) customProfile = JSON.parse(saved);
-              } catch (e) { }
-            }
+            try {
+              const saved =
+                localStorage.getItem(`hdv_creator_profile_info_${matchedDemo.id}`) ||
+                localStorage.getItem(`hdv_creator_profile_${matchedDemo.id}`);
+              if (saved) customProfile = JSON.parse(saved);
+            } catch (e) { }
 
             dbData = {
               ...matchedDemo,

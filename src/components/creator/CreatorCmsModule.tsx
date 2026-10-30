@@ -26,9 +26,9 @@ export function CreatorCmsModule({
     bio: profileInfo?.bio || "Creadora de contenido especializada en turismo de naturaleza, vuelos de drone 4K y auditoría técnica de posadas y hoteles en Venezuela.",
     avatar_url: profileInfo?.avatar_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
     banner_url: profileInfo?.banner_url || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
-    instagram: profileInfo?.instagram || "@auracroce",
-    tiktok: profileInfo?.tiktok || "@auracroce_viajes",
-    youtube: profileInfo?.youtube || "AuraCroceExpediciones",
+    instagram: profileInfo?.instagram || "@creador_hdv",
+    tiktok: profileInfo?.tiktok || "@creador_viajes",
+    youtube: profileInfo?.youtube || "CreadorOficialHDV",
     phone: profileInfo?.phone || "+58 414-1234567",
     location: profileInfo?.location || "Caracas / Expediciones Nacionales",
     gear_equipment: profileInfo?.gear_equipment || "DJI Mavic 3 Pro • Sony Alpha 7 IV • Lentes 24-70mm • Starlink Mini"
@@ -51,11 +51,11 @@ export function CreatorCmsModule({
   });
 
   const [customDomain, setCustomDomain] = useState(() => {
-    return localStorage.getItem(`hdv_creator_domain_${establishmentId}`) || "auracroce.hotelesdevenezuela.com";
+    return localStorage.getItem(`hdv_creator_domain_${establishmentId}`) || "creadores.hotelesdevenezuela.com";
   });
 
   const livePublicSlug = establishmentId === 99901 || establishmentId === 1 
-    ? "aura-croce-viajera-creadora" 
+    ? "creador-oficial-hdv" 
     : `influencer-${establishmentId}`;
 
   const livePublicUrl = `https://hotelesdevenezuela.com/establecimiento/${livePublicSlug}`;
@@ -575,7 +575,7 @@ export function CreatorCmsModule({
                 {/* Nombre y Headline */}
                 <div>
                   <h4 className="text-base font-serif font-black text-white leading-tight">
-                    {formData.name || "Aura Croce"}
+                    {formData.name || "Creador(a) Oficial HDV"}
                   </h4>
                   <p className="text-[11px] text-[#00C8D4] font-semibold mt-0.5 leading-snug">
                     {formData.headline || "Viajera & Creadora Audiovisual"}

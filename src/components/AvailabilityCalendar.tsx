@@ -91,7 +91,7 @@ interface AvailabilityCalendarProps {
 
 export function getInfluencerStorageKeys(establishmentId: number): string[] {
   const keys = [`hdv_influencer_bookings_${establishmentId}`];
-  // Si es el perfil demo de Aura Croce (99901 o 1), sincronizar ambas claves para que el panel y la vista pública compartan reservas
+  // Si es el perfil demo de Creador(a) Oficial HDV (99901 o 1), sincronizar ambas claves para que el panel y la vista pública compartan reservas
   if (Number(establishmentId) === 99901 || Number(establishmentId) === 1) {
     if (!keys.includes("hdv_influencer_bookings_99901")) keys.push("hdv_influencer_bookings_99901");
     if (!keys.includes("hdv_influencer_bookings_1")) keys.push("hdv_influencer_bookings_1");

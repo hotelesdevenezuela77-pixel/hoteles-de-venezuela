@@ -36,6 +36,11 @@ import { AgencyDashboard } from "@/components/agency/AgencyDashboard";
 import { isTravelAgencyOrTourOperator } from "@/types/agencyTourOperator";
 import { CreatorDashboard } from "@/components/creator/CreatorDashboard";
 import { isCreatorOrInfluencer } from "@/types/creatorInfluencer";
+import {
+  getQualifiedInfluencers,
+  createQualifiedInfluencer,
+  updateQualifiedInfluencer,
+} from "@/lib/qualifiedInfluencersRegistry";
 import { RestaurantDashboard } from "@/components/restaurant/RestaurantDashboard";
 import { isRestaurantOrGastronomy } from "@/types/restaurantGastronomy";
 import { MarinaDashboard } from "@/components/marina/MarinaDashboard";
@@ -1077,11 +1082,63 @@ export function OwnerDashboard() {
     }
   }, [user, authLoading, setLocation]);
 
+  // Modal para que el Influencer configure su Nombre Oficial cuando ingresa por primera vez con su Gmail a través del link de invitación
+  const [influencerOnboardingOpen, setInfluencerOnboardingOpen] = useState(false);
+  const [onboardingInfluencerId, setOnboardingInfluencerId] = useState<number | null>(null);
+  const [onboardingInfluencerForm, setOnboardingInfluencerForm] = useState({
+    name: "",
+    handle: "",
+    whatsapp: "",
+    destination_focus: "Coberturas Nacionales (Venezuela)",
+    bio: "Viajero(a) y creador(a) de contenido audiovisual, cobertura 4K con Drone y alianzas estratégicas con hoteles, posadas y marcas.",
+  });
+
+  const handleSaveInfluencerOnboarding = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !onboardingInfluencerId) return;
+    const cleanName = onboardingInfluencerForm.name.trim();
+    if (!cleanName) {
+      alert("Por favor escribe tu nombre artístico o público como Influencer.");
+      return;
+    }
+
+    const updated = updateQualifiedInfluencer(onboardingInfluencerId, {
+      name: cleanName,
+      handle: onboardingInfluencerForm.handle.trim() || `@${cleanName.toLowerCase().replace(/[^a-z0-9]/g, "")}`,
+      whatsapp: onboardingInfluencerForm.whatsapp.trim(),
+      phone: onboardingInfluencerForm.whatsapp.trim(),
+      destination_focus: onboardingInfluencerForm.destination_focus.trim() || "Coberturas Nacionales (Venezuela)",
+      bio: onboardingInfluencerForm.bio.trim(),
+      claimed_by_user_id: user.id,
+      claimed_by_email: user.email || "",
+      status: "activo",
+      profile_completed_by_influencer: true,
+    });
+
+    if (updated) {
+      const userClaimsKey = `hdv_claimed_tenants_${user.id}`;
+      const existingClaims: string[] = JSON.parse(localStorage.getItem(userClaimsKey) || "[]");
+      if (!existingClaims.includes(updated.slug)) existingClaims.push(updated.slug);
+      if (!existingClaims.includes(String(updated.id))) existingClaims.push(String(updated.id));
+      localStorage.setItem(userClaimsKey, JSON.stringify(existingClaims));
+      localStorage.setItem(`hdv_claimed_tenant_${updated.slug}`, user.id);
+      localStorage.setItem(`hdv_claimed_tenant_${updated.id}`, user.id);
+    }
+
+    setInfluencerOnboardingOpen(false);
+    setClaimSuccessBanner(
+      `🎉 ¡Bienvenido(a) ${cleanName}! Tu perfil oficial de Influencer y tu Web App Pública ya están activos con tu nombre.`
+    );
+    fetchDashboardData();
+  };
+
   // Automatic Link/Claim Processing when user opens ?claim=slug-or-id
   useEffect(() => {
     if (!user || typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
     const claimParam = params.get("claim") || params.get("invite");
+    const roleParam = params.get("role");
+    const influencerIdParam = params.get("influencer_id");
 
     if (claimParam) {
       const claimLower = claimParam.toLowerCase().trim();
@@ -1091,12 +1148,79 @@ export function OwnerDashboard() {
         t => t.slug.toLowerCase() === claimLower || String(t.establishment_id) === claimLower
       );
       const demoMatch = [
-        { id: 99901, slug: "aura-croce-viajera-creadora", name: "Aura Croce - Viajera & Creadora de Contenido" },
         { id: 99902, slug: "el-mundo-de-los-ninos-barquisimeto", name: "El Mundo De Los Niños Barquisimeto" },
         { id: 99903, slug: "agencia-global-travel-tours-dmc", name: "Agencia Global Travel & Tours DMC" }
-      ].find(d => d.slug.toLowerCase() === claimLower || String(d.id) === claimLower || (claimLower.includes("aura") && d.id === 99901));
+      ].find(d => d.slug.toLowerCase() === claimLower || String(d.id) === claimLower);
 
-      if (staticMatch) {
+      // Verificar si es un link de invitación de Influencer
+      const qualifiedList = getQualifiedInfluencers();
+      const matchedInfluencer = qualifiedList.find(
+        inf =>
+          inf.slug.toLowerCase() === claimLower ||
+          String(inf.id) === claimLower ||
+          (influencerIdParam && inf.id === Number(influencerIdParam))
+      );
+      const isInfluencerClaim =
+        Boolean(matchedInfluencer) ||
+        roleParam === "influencer" ||
+        claimLower.startsWith("creador-hdv-") ||
+        claimLower.includes("influencer");
+
+      if (isInfluencerClaim) {
+        const googleDisplayName =
+          (user as any).user_metadata?.full_name ||
+          (user as any).user_metadata?.name ||
+          "";
+
+        let targetInf = matchedInfluencer;
+        if (!targetInf) {
+          targetInf = createQualifiedInfluencer({
+            id: influencerIdParam ? Number(influencerIdParam) : undefined,
+            name: googleDisplayName || "Influencer Invitado(a) HDV",
+            email: user.email || "",
+            claimed_by_user_id: user.id,
+            claimed_by_email: user.email || "",
+            status: "activo",
+          });
+        } else {
+          targetInf =
+            updateQualifiedInfluencer(targetInf.id, {
+              claimed_by_user_id: user.id,
+              claimed_by_email: user.email || "",
+              email: targetInf.email || user.email || "",
+              status: "activo",
+            }) || targetInf;
+        }
+
+        matchedName = targetInf.name;
+        localStorage.setItem(`hdv_claimed_tenant_${targetInf.slug}`, user.id);
+        localStorage.setItem(`hdv_claimed_tenant_${targetInf.id}`, user.id);
+
+        const isPendingCustomName =
+          !targetInf.profile_completed_by_influencer ||
+          targetInf.name.toLowerCase().includes("invitado");
+
+        if (isPendingCustomName) {
+          const initialName =
+            !targetInf.name.toLowerCase().includes("invitado")
+              ? targetInf.name
+              : googleDisplayName;
+          setOnboardingInfluencerId(targetInf.id);
+          setOnboardingInfluencerForm({
+            name: initialName || "",
+            handle:
+              targetInf.handle && targetInf.handle !== "@influencer_hdv"
+                ? targetInf.handle
+                : initialName
+                  ? `@${initialName.toLowerCase().replace(/[^a-z0-9]/g, "")}`
+                  : "",
+            whatsapp: targetInf.whatsapp || targetInf.phone || "",
+            destination_focus: targetInf.destination_focus || "Coberturas Nacionales (Venezuela)",
+            bio: targetInf.bio || "Viajero(a) y creador(a) de contenido audiovisual, cobertura 4K con Drone y alianzas estratégicas con hoteles, posadas y marcas.",
+          });
+          setInfluencerOnboardingOpen(true);
+        }
+      } else if (staticMatch) {
         matchedName = staticMatch.name;
         localStorage.setItem(`hdv_claimed_tenant_${staticMatch.slug}`, user.id);
         localStorage.setItem(`hdv_claimed_tenant_${staticMatch.establishment_id}`, user.id);
@@ -1104,10 +1228,6 @@ export function OwnerDashboard() {
         matchedName = demoMatch.name;
         localStorage.setItem(`hdv_claimed_tenant_${demoMatch.slug}`, user.id);
         localStorage.setItem(`hdv_claimed_tenant_${demoMatch.id}`, user.id);
-        if (demoMatch.id === 99901) {
-          localStorage.setItem("hdv_claimed_aura_croce_user_id", user.id);
-          localStorage.setItem("hdv_claimed_aura_croce_email", user.email || "");
-        }
       } else {
         localStorage.setItem(`hdv_claimed_tenant_${claimLower}`, user.id);
       }
@@ -1119,6 +1239,7 @@ export function OwnerDashboard() {
         existingClaims.push(claimLower);
         if (staticMatch) existingClaims.push(staticMatch.slug, String(staticMatch.establishment_id));
         if (demoMatch) existingClaims.push(demoMatch.slug, String(demoMatch.id));
+        if (matchedInfluencer) existingClaims.push(matchedInfluencer.slug, String(matchedInfluencer.id));
         localStorage.setItem(userClaimsKey, JSON.stringify(existingClaims));
       }
 
@@ -1126,7 +1247,7 @@ export function OwnerDashboard() {
       supabase.from("user_profiles").update({ role: "owner" }).eq("user_id", user.id).then(() => {});
       supabase.from("establishments").update({ owner_user_id: user.id }).or(`slug.eq.${claimLower},id.eq.${Number(claimLower) || 0}`).then(() => {});
 
-      setClaimSuccessBanner(`🎉 ¡Establecimiento Vinculado Exitosamente! Tu cuenta (${user.email}) ha sido asignada como Propietaria de "${matchedName}".`);
+      setClaimSuccessBanner(`🎉 ¡Cuenta Vinculada Exitosamente! Tu correo (${user.email}) ha sido asignado a "${matchedName}".`);
 
       // Clean URL parameter without reloading page
       window.history.replaceState({}, document.title, window.location.pathname);
@@ -1247,28 +1368,30 @@ export function OwnerDashboard() {
         services: ["Reservas Online", "POS", "CMS", "Finanzas"]
       }));
 
-      // Pool of demo establishments
+      // Pool of demo establishments (y registro dinámico de Influencers Calificados)
+      const dynamicInfluencerEsts: Establishment[] = getQualifiedInfluencers().map(inf => ({
+        id: inf.id,
+        name: inf.name,
+        slug: inf.slug,
+        status: "approved",
+        category_name: "Creadores de Contenido / Influencers",
+        category_id: 991,
+        destination_name: inf.destination_focus || "Venezuela",
+        destination_id: 1,
+        rating_avg: 5.0,
+        review_count: 24,
+        created_at: inf.created_at || new Date().toISOString(),
+        address: inf.destination_focus || "Coberturas Nacionales",
+        phone: inf.phone || inf.whatsapp || "",
+        whatsapp: inf.whatsapp || inf.phone || "",
+        website: inf.handle ? `https://instagram.com/${inf.handle.replace(/^@/, "")}` : "https://hotelesdevenezuela.com",
+        description: inf.bio,
+        membership_tier: "premium",
+        services: ["Cobertura 4K & Drone", "Canjes B2B", "Reseñas de Posadas", "Agenda de Servicios"]
+      }));
+
       const builtInDemoEsts: Establishment[] = [
-        {
-          id: 99901,
-          name: "Aura Croce - Viajera & Creadora de Contenido",
-          slug: "aura-croce-viajera-creadora",
-          status: "approved",
-          category_name: "Creadores de Contenido / Influencers",
-          category_id: 991,
-          destination_name: "Los Roques & Morrocoy",
-          destination_id: 1,
-          rating_avg: 5.0,
-          review_count: 48,
-          created_at: new Date().toISOString(),
-          address: "Caracas / Expediciones Nacionales",
-          phone: "+58 414-1234567",
-          whatsapp: "+58 414-1234567",
-          website: "https://instagram.com/auracroce",
-          description: "Desk Hub de expediciones post-viaje, alianzas de canje/monetización y bitácora multimedia de Aura Croce.",
-          membership_tier: "premium",
-          services: ["Rutas Satelitales", "Canjes B2B", "Auditoría de Posadas", "Agenda Drag&Drop"]
-        },
+        ...dynamicInfluencerEsts,
         {
           id: 99902,
           name: "El Mundo De Los Niños Barquisimeto",
@@ -1314,7 +1437,6 @@ export function OwnerDashboard() {
       // Multi-tenant strict isolation: ONLY load static tenants or demo establishments that belong to THIS user
       const userClaimsKey = `hdv_claimed_tenants_${activeOwnerId}`;
       const userClaimedSlugs: string[] = typeof window !== "undefined" ? JSON.parse(localStorage.getItem(userClaimsKey) || "[]") : [];
-      const claimedAuraUserId = typeof window !== "undefined" ? localStorage.getItem("hdv_claimed_aura_croce_user_id") : null;
       const userEmailLower = (user?.email || "").toLowerCase().trim();
 
       // Only match static tenants explicitly belonging/claimed to active user
@@ -1346,9 +1468,10 @@ export function OwnerDashboard() {
 
       // Only match demo establishments explicitly belonging/claimed to active user
       builtInDemoEsts.forEach(de => {
+        const matchedQualifiedInf = getQualifiedInfluencers().find(i => i.id === de.id);
         const isClaimedByUser = userClaimedSlugs.includes(de.slug.toLowerCase()) ||
                                 userClaimedSlugs.includes(String(de.id)) ||
-                                (de.id === 99901 && ((claimedAuraUserId && claimedAuraUserId === activeOwnerId) || userEmailLower.includes("aura"))) ||
+                                (matchedQualifiedInf && (matchedQualifiedInf.claimed_by_user_id === activeOwnerId || (userEmailLower !== "" && matchedQualifiedInf.email?.toLowerCase() === userEmailLower))) ||
                                 (typeof window !== "undefined" && (localStorage.getItem(`hdv_claimed_tenant_${de.slug}`) === activeOwnerId || localStorage.getItem(`hdv_claimed_tenant_${de.id}`) === activeOwnerId));
 
         const isEmailMatch = userEmailLower !== "" && (
@@ -2662,6 +2785,27 @@ export function OwnerDashboard() {
     const claimParam = params?.get("claim") || params?.get("invite");
 
     if (claimParam) {
+      const roleParam = params?.get("role");
+      const influencerIdParam = params?.get("influencer_id");
+      const matchedInf = getQualifiedInfluencers().find(
+        i =>
+          i.slug.toLowerCase() === claimParam.toLowerCase() ||
+          String(i.id) === claimParam ||
+          (influencerIdParam && i.id === Number(influencerIdParam))
+      );
+      const isInfluencerInvite =
+        Boolean(matchedInf) ||
+        roleParam === "influencer" ||
+        claimParam.toLowerCase().startsWith("creador-hdv-") ||
+        claimParam.toLowerCase().includes("influencer");
+
+      const displayGreetingName =
+        matchedInf && !matchedInf.name.toLowerCase().includes("invitado")
+          ? `¡Hola ${matchedInf.name}!`
+          : isInfluencerInvite
+            ? "¡Bienvenido(a), Influencer & Creador(a) Oficial!"
+            : "¡Bienvenido(a) a Hoteles de Venezuela!";
+
       return (
         <div className="min-h-[85vh] flex items-center justify-center p-4 bg-gradient-to-br from-[#0e011f] via-[#1a0533] to-[#0d1a2e]">
           <div className="max-w-lg w-full bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 text-center text-white shadow-2xl relative overflow-hidden animate-in zoom-in-95 duration-300 font-sans">
@@ -2675,20 +2819,20 @@ export function OwnerDashboard() {
             </div>
 
             <span className="inline-block bg-[#00C8D4]/20 border border-[#00C8D4]/40 text-[#00C8D4] text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-3">
-              ✨ INVITACIÓN OFICIAL DE PROPIETARIA & CREADORA
+              ✨ INVITACIÓN OFICIAL DE PROPIETARIO / CREADOR(A)
             </span>
 
             <h2 className="text-2xl md:text-3xl font-black tracking-tight text-white mb-3">
-              ¡Hola Aura Croce!
+              {displayGreetingName}
             </h2>
 
             <p className="text-xs text-slate-300 leading-relaxed mb-6 font-medium">
-              Has sido invitada a tomar el control directo de tu <strong>Consola Ejecutiva de Creadora de Contenido</strong> en Hoteles de Venezuela LLC. Para vincular tu bitácora multimedia, rutas satelitales y acuerdos de canje B2B con tu cuenta de <strong>Gmail</strong>, inicia sesión a continuación:
+              Has sido invitado(a) a activar tu perfil oficial y tomar el control directo de tu <strong>Consola Ejecutiva y Web App Pública</strong> en Hoteles de Venezuela LLC. Inicia sesión con tu cuenta de <strong>Gmail</strong> a continuación para registrar tu nombre oficial y activar tu cuenta:
             </p>
 
             <button
               type="button"
-              onClick={() => loginWithGoogle(window.location.origin + "/mis-negocios?claim=" + claimParam)}
+              onClick={() => loginWithGoogle(window.location.origin + "/mis-negocios" + window.location.search)}
               className="w-full py-4 px-6 bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:from-[#FF0096]/90 hover:to-[#9B00CC]/90 text-white font-black text-sm rounded-xl shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer mb-4"
             >
               <svg className="w-5 h-5 fill-current shrink-0" viewBox="0 0 24 24">
@@ -2698,7 +2842,7 @@ export function OwnerDashboard() {
             </button>
 
             <p className="text-[11px] text-slate-400 font-medium">
-              Al hacer clic, iniciarás sesión de forma segura con Google y tu dirección de correo quedará asignada de forma permanente a tu perfil oficial.
+              Al hacer clic, iniciarás sesión de forma segura con Google y podrás personalizar tu nombre artístico/público y tus datos de contacto.
             </p>
           </div>
         </div>
@@ -2812,6 +2956,94 @@ export function OwnerDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50/30 pb-20">
+
+      {/* Modal de Bienvenida para que el Influencer configure su Nombre Oficial tras iniciar sesión con su Gmail */}
+      {influencerOnboardingOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-100 p-6 md:p-8 text-left space-y-5">
+            <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#FF0096] to-[#9B00CC] flex items-center justify-center text-white shrink-0 shadow-md">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-[#00C8D4] block">
+                  ACTIVACIÓN DE PERFIL OFICIAL POR GMAIL
+                </span>
+                <h3 className="text-xl font-serif font-bold text-slate-900">
+                  Configura tu Nombre de Influencer
+                </h3>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Tu correo <strong>{user?.email}</strong> ha sido verificado. Escribe el <strong>Nombre Oficial</strong> con el que deseas aparecer en tu Web App Pública y en tu Panel de Creador de Hoteles de Venezuela:
+            </p>
+
+            <form onSubmit={handleSaveInfluencerOnboarding} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  Tu Nombre Oficial / Artístico de Influencer *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={onboardingInfluencerForm.name}
+                  onChange={e => setOnboardingInfluencerForm({ ...onboardingInfluencerForm, name: e.target.value })}
+                  placeholder="Ej: Tu Nombre o Marca Personal"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-[#00C8D4] focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    Usuario Instagram / TikTok
+                  </label>
+                  <input
+                    type="text"
+                    value={onboardingInfluencerForm.handle}
+                    onChange={e => setOnboardingInfluencerForm({ ...onboardingInfluencerForm, handle: e.target.value })}
+                    placeholder="@tu_usuario"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-[#00C8D4] focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    WhatsApp de Contacto
+                  </label>
+                  <input
+                    type="text"
+                    value={onboardingInfluencerForm.whatsapp}
+                    onChange={e => setOnboardingInfluencerForm({ ...onboardingInfluencerForm, whatsapp: e.target.value })}
+                    placeholder="+58 414 000 0000"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-[#00C8D4] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  Presentación / Especialidad
+                </label>
+                <textarea
+                  rows={2}
+                  value={onboardingInfluencerForm.bio}
+                  onChange={e => setOnboardingInfluencerForm({ ...onboardingInfluencerForm, bio: e.target.value })}
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-[#00C8D4] focus:outline-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:brightness-110 text-white text-xs font-black uppercase tracking-wider shadow-lg transition cursor-pointer"
+              >
+                Guardar mi Nombre y Activar mi Web App Oficial
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Claim Success Banner */}
       {claimSuccessBanner && (

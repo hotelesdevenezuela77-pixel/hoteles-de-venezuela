@@ -266,8 +266,8 @@ const INITIAL_AUTHORIZATIONS: InfluencerTravelAuthorization[] = [
   {
     id: "auth-101",
     influencer_id: 99901,
-    influencer_name: "Aura Croce",
-    influencer_handle: "@auracroce",
+    influencer_name: "Creador(a) Oficial HDV",
+    influencer_handle: "@creador_hdv",
     influencer_avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
     period_type: "dias",
     title: "Ventana de Expedición - Días 15 al 18 Octubre",
@@ -295,8 +295,8 @@ const INITIAL_AUTHORIZATIONS: InfluencerTravelAuthorization[] = [
   {
     id: "auth-102",
     influencer_id: 99901,
-    influencer_name: "Aura Croce",
-    influencer_handle: "@auracroce",
+    influencer_name: "Creador(a) Oficial HDV",
+    influencer_handle: "@creador_hdv",
     influencer_avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
     period_type: "semanas",
     assigned_week: "Semana 43 (20 al 26 Octubre)",
@@ -325,8 +325,8 @@ const INITIAL_AUTHORIZATIONS: InfluencerTravelAuthorization[] = [
   {
     id: "auth-103",
     influencer_id: 99901,
-    influencer_name: "Aura Croce",
-    influencer_handle: "@auracroce",
+    influencer_name: "Creador(a) Oficial HDV",
+    influencer_handle: "@creador_hdv",
     influencer_avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
     period_type: "mes",
     assigned_month: "Noviembre 2026",
@@ -598,14 +598,14 @@ const INITIAL_MEMBERSHIP: CreatorMembershipProfile = {
 };
 
 const INITIAL_PROFILE_INFO: CreatorProfileInfo = {
-  name: "Aura Croce",
+  name: "Creador(a) Oficial HDV",
   headline: "Viajera 4x4, expedicionaria audiovisual & auditora de turismo HDV",
   avatar_url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
   banner_url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
   bio: "Documentando los rincones más mágicos e inexplorados de Venezuela: desde expediciones 4x4 en los Andes y el Gran Roque hasta selvas y tepuyes de Canaima.",
-  instagram: "@auracroce",
-  tiktok: "@auracroce_viajes",
-  youtube: "Aura Croce Expediciones",
+  instagram: "@creador_hdv",
+  tiktok: "@creador_viajes",
+  youtube: "Creador Oficial HDV",
   phone: "+58 414-1234567",
   gear_equipment: "DJI Mavic 3 Pro • Sony Alpha 7 IV • Lente G-Master 24-70mm • Micrófonos Rode Wireless PRO • Starlink Mini",
   location: "Caracas / Expediciones Nacionales, Venezuela"
@@ -1113,8 +1113,8 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
     const newAuth: InfluencerTravelAuthorization = {
       id: `auth-${Date.now()}`,
       influencer_id: authData.influencer_id || 99901,
-      influencer_name: authData.influencer_name || "Aura Croce",
-      influencer_handle: authData.influencer_handle || "@auracroce",
+      influencer_name: authData.influencer_name || "Creador(a) Oficial HDV",
+      influencer_handle: authData.influencer_handle || "@creador_hdv",
       influencer_avatar: authData.influencer_avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
       period_type: authData.period_type || "dias",
       title: authData.title || "Asignación de Viaje Autorizada",

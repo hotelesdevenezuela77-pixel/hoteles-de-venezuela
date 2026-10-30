@@ -44,7 +44,7 @@ interface CreatorRouteExpeditionMapProps {
 
 export const CreatorRouteExpeditionMap: React.FC<CreatorRouteExpeditionMapProps> = ({
   establishmentId,
-  creatorName = "Aura Croce"
+  creatorName = "Creador(a) Oficial HDV"
 }) => {
   const [isTracking, setIsTracking] = useState(false);
   const [expeditions, setExpeditions] = useState<SavedCreatorExpedition[]>([]);

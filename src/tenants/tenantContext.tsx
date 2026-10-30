@@ -53,13 +53,13 @@ export const TENANTS_REGISTRY: Record<string, TenantConfig> = {
   "oleaje-beach-club": oleajeBeachClubConfig as TenantConfig,
   "complejo-los-roques": complejoLosRoquesConfig as TenantConfig,
   "hostal-entre-2-aguas": hostalEntre2AguasConfig as TenantConfig,
-  "influencer-aura-croce": {
+  "creador-oficial-hdv": {
     establishment_id: 99901,
-    slug: "influencer-aura-croce",
-    name: "Aura Croce - Viajera & Creadora HDV",
+    slug: "creador-oficial-hdv",
+    name: "Creador(a) Oficial HDV",
     template: "A",
     business_type: "creator",
-    domain: "auracroce.hotelesdevenezuela.com",
+    domain: "creadores.hotelesdevenezuela.com",
     branding: {
       primary_color: "#FF0096",
       secondary_color: "#9B00CC",
@@ -81,17 +81,17 @@ export const TENANTS_REGISTRY: Record<string, TenantConfig> = {
     contact: {
       phone: "+58 414 123 4567",
       whatsapp: "+58 414 123 4567",
-      email: "aura.croce@hdv.com",
-      instagram: "@auracroce"
+      email: "creadores@hotelesdevenezuela.com",
+      instagram: "@creador_hdv"
     }
   },
   "influencer-99901": {
     establishment_id: 99901,
     slug: "influencer-99901",
-    name: "Aura Croce - Viajera & Creadora HDV",
+    name: "Creador(a) Oficial HDV",
     template: "A",
     business_type: "creator",
-    domain: "auracroce.hotelesdevenezuela.com",
+    domain: "creadores.hotelesdevenezuela.com",
     branding: {
       primary_color: "#FF0096",
       secondary_color: "#9B00CC",
@@ -113,40 +113,8 @@ export const TENANTS_REGISTRY: Record<string, TenantConfig> = {
     contact: {
       phone: "+58 414 123 4567",
       whatsapp: "+58 414 123 4567",
-      email: "aura.croce@hdv.com",
-      instagram: "@auracroce"
-    }
-  },
-  "aura-croce-viajera-creadora": {
-    establishment_id: 99901,
-    slug: "aura-croce-viajera-creadora",
-    name: "Aura Croce - Viajera & Creadora HDV",
-    template: "A",
-    business_type: "creator",
-    domain: "auracroce.hotelesdevenezuela.com",
-    branding: {
-      primary_color: "#FF0096",
-      secondary_color: "#9B00CC",
-      accent_color: "#00C8D4",
-      font_title: "Playfair Display",
-      font_body: "Montserrat",
-      logo_url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
-      banner_url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80"
-    },
-    modules: {
-      reservas: true,
-      pos: false,
-      galeria: true,
-      contacto: true,
-      tareas: true,
-      cms: true,
-      finanzas: true
-    },
-    contact: {
-      phone: "+58 414 123 4567",
-      whatsapp: "+58 414 123 4567",
-      email: "aura.croce@hdv.com",
-      instagram: "@auracroce"
+      email: "creadores@hotelesdevenezuela.com",
+      instagram: "@creador_hdv"
     }
   }
 };

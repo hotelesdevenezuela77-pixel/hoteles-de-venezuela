@@ -37,7 +37,7 @@ export const CreatorQuotesManager: React.FC<CreatorQuotesManagerProps> = ({
   onUpdateQuote,
   onDeleteQuote,
   onConvertToDeal,
-  creatorName = "Aura Croce"
+  creatorName = "Creador(a) Oficial HDV"
 }) => {
   const { bcvRate, formatBs } = useBcvExchangeRate();
   const [filterStatus, setFilterStatus] = useState<QuoteStatus | "all">("all");

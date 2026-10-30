@@ -44,7 +44,7 @@ export const CreatorTripRemunerationModule: React.FC<CreatorTripRemunerationModu
   expeditions,
   travelAuthorizations = [],
   kpis,
-  creatorName = "Aura Croce",
+  creatorName = "Creador(a) Oficial HDV",
   onAddExpedition,
   onUpdateExpedition,
   onUpdatePayment,

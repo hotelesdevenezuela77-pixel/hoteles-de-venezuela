@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import {
   Building2, MapPin, Wifi, Zap, Droplets, Star, Plus,
-  ExternalLink, Search, Filter, CheckCircle, Clock,
-  Edit2, Trash2, Send, Check, ShieldCheck, Share2, Award,
-  Car, Utensils, Anchor, Compass, Globe, Sparkles, X, Eye
+  Search, Check, ShieldCheck, Award,
+  Compass, Sparkles, X, Eye, Edit2, Trash2, Send, Camera, Dog, Phone, ExternalLink
 } from "lucide-react";
-import type { 
-  CreatorVisitedEstablishment, 
+import { supabase } from "../../lib/supabase";
+import type {
+  CreatorVisitedEstablishment,
   EstablishmentCategoryType,
-  DealType 
+  DealType
 } from "../../types/creatorInfluencer";
 
 interface CreatorVisitedEstablishmentsProps {
@@ -34,12 +34,25 @@ const CATEGORIES: { id: EstablishmentCategoryType | "all"; label: string; icon: 
   { id: "sitios_turisticos", label: "Sitios Turísticos & Miradores", icon: "🏞️" }
 ];
 
+const QUICK_PREREG_CATEGORIES: {
+  id: EstablishmentCategoryType;
+  label: string;
+  sub: string;
+}[] = [
+  { id: "hoteles_posadas", label: "Posada / Hotel", sub: "Alojamiento" },
+  { id: "restaurantes_gastronomia", label: "Restaurante / Club", sub: "Gastronomía" },
+  { id: "marinas_yates", label: "Marina / Yate", sub: "Náutico" },
+  { id: "parques_complejos", label: "Parque / Campamento", sub: "Recreación" },
+  { id: "rent_a_car", label: "Rent-a-Car / 4x4", sub: "Transporte" },
+  { id: "sitios_turisticos", label: "Sitio Turístico", sub: "Destino" }
+];
+
 export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishmentsProps> = ({
   visitedEstablishments,
   onAddEstablishment,
   onUpdateEstablishment,
   onDeleteEstablishment,
-  creatorName = "Aura Croce"
+  creatorName = "Creador(a) Oficial HDV"
 }) => {
   const [activeCategory, setActiveCategory] = useState<EstablishmentCategoryType | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -47,27 +60,22 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
   const [editingEst, setEditingEst] = useState<CreatorVisitedEstablishment | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  // Estado del formulario
+  // Estado del Pre-Registro Express para Influencers (Corto, práctico y directo)
   const [form, setForm] = useState({
     name: "",
     destination: "",
+    whatsapp: "",
     category: "hoteles_posadas" as EstablishmentCategoryType,
-    category_label: "Hoteles & Posadas",
-    visit_date: new Date().toISOString().split("T")[0],
-    status: "auditado" as "auditado" | "en_ruta" | "pautado" | "por_visitar",
-    rating: 9.5,
-    is_recommended: true,
-    wifi_speed_mbps: 50,
-    power_generator: "si_automatica" as "si_automatica" | "si_manual" | "no_tiene",
-    water_supply: "si_pozo_propio" as "si_pozo_propio" | "tanque_reserva" | "no_tiene",
-    water_pressure: "excelente" as "excelente" | "aceptable" | "deficiente",
+    rating: 5.0,
+    has_power_plant: true,
+    has_water_247: true,
+    has_starlink: true,
+    is_pet_friendly: false,
+    has_hdv_seal: true,
     deal_type: "canje" as DealType,
-    deal_value_usd: 250,
     cover_image: "",
     latitude: undefined as number | undefined,
     longitude: undefined as number | undefined,
-    social_link: "",
-    hdv_slug: "",
     notes: ""
   });
 
@@ -80,18 +88,18 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
       return;
     }
     setIsCapturingGps(true);
-    setGpsStatusMsg("Obteniendo satélites GPS...");
+    setGpsStatusMsg("Obteniendo coordenadas GPS...");
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const lat = parseFloat(pos.coords.latitude.toFixed(5));
         const lng = parseFloat(pos.coords.longitude.toFixed(5));
         setForm(prev => ({ ...prev, latitude: lat, longitude: lng }));
         setIsCapturingGps(false);
-        setGpsStatusMsg(`GPS fijado: ${lat}, ${lng} (±${Math.round(pos.coords.accuracy)}m)`);
+        setGpsStatusMsg(`📍 GPS capturado: ${lat}, ${lng}`);
       },
       (err) => {
         setIsCapturingGps(false);
-        setGpsStatusMsg("Error al obtener señal GPS: " + err.message);
+        setGpsStatusMsg("No se pudo obtener GPS: " + err.message);
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );
@@ -115,23 +123,18 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
     setForm({
       name: "",
       destination: "",
+      whatsapp: "",
       category: "hoteles_posadas",
-      category_label: "Hoteles & Posadas",
-      visit_date: new Date().toISOString().split("T")[0],
-      status: "auditado",
-      rating: 9.5,
-      is_recommended: true,
-      wifi_speed_mbps: 50,
-      power_generator: "si_automatica",
-      water_supply: "si_pozo_propio",
-      water_pressure: "excelente",
+      rating: 5.0,
+      has_power_plant: true,
+      has_water_247: true,
+      has_starlink: true,
+      is_pet_friendly: false,
+      has_hdv_seal: true,
       deal_type: "canje",
-      deal_value_usd: 250,
       cover_image: "",
       latitude: undefined,
       longitude: undefined,
-      social_link: "",
-      hdv_slug: "",
       notes: ""
     });
     setShowModal(true);
@@ -139,60 +142,64 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
 
   const handleOpenEdit = (est: CreatorVisitedEstablishment) => {
     setEditingEst(est);
-    setGpsStatusMsg(est.latitude && est.longitude ? `Coordenadas: ${est.latitude}, ${est.longitude}` : null);
+    setGpsStatusMsg(est.latitude && est.longitude ? `📍 Coordenadas: ${est.latitude}, ${est.longitude}` : null);
     setForm({
       name: est.name,
       destination: est.destination,
+      whatsapp: est.social_link || "",
       category: est.category,
-      category_label: est.category_label,
-      visit_date: est.visit_date,
-      status: est.status,
-      rating: est.rating,
-      is_recommended: est.is_recommended,
-      wifi_speed_mbps: est.wifi_speed_mbps,
-      power_generator: est.power_generator,
-      water_supply: est.water_supply,
-      water_pressure: est.water_pressure,
+      rating: est.rating > 5 ? Number((est.rating / 2).toFixed(1)) : est.rating,
+      has_power_plant: est.power_generator !== "no_tiene",
+      has_water_247: est.water_supply !== "no_tiene",
+      has_starlink: (est.wifi_speed_mbps || 0) > 0,
+      is_pet_friendly: false,
+      has_hdv_seal: est.is_recommended,
       deal_type: est.deal_type || "canje",
-      deal_value_usd: est.deal_value_usd || 200,
       cover_image: est.cover_image || (est.photos && est.photos[0]) || "",
       latitude: est.latitude,
       longitude: est.longitude,
-      social_link: est.social_link || "",
-      hdv_slug: est.hdv_slug || "",
       notes: est.notes || ""
     });
     setShowModal(true);
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const generateSlug = (text: string) =>
+    text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim()) return;
 
     const catObj = CATEGORIES.find(c => c.id === form.category);
-    const catLabel = catObj ? catObj.label : "Establecimiento";
+    const catLabel = catObj ? catObj.label : "Hoteles & Posadas";
+    const generatedSlug = `${generateSlug(form.name)}-${generateSlug(form.destination || "venezuela")}`;
 
-    const payload = {
+    const payload: Partial<CreatorVisitedEstablishment> = {
       name: form.name.trim(),
-      destination: form.destination.trim(),
+      destination: form.destination.trim() || "Venezuela",
       category: form.category,
       category_label: catLabel,
-      visit_date: form.visit_date,
-      status: form.status,
-      rating: Number(form.rating),
-      is_recommended: form.is_recommended,
-      wifi_speed_mbps: Number(form.wifi_speed_mbps),
-      power_generator: form.power_generator,
-      water_supply: form.water_supply,
-      water_pressure: form.water_pressure,
+      visit_date: new Date().toISOString().split("T")[0],
+      status: "auditado",
+      rating: Number(form.rating) <= 5 ? Number((Number(form.rating) * 2).toFixed(1)) : Number(form.rating),
+      is_recommended: form.has_hdv_seal,
+      wifi_speed_mbps: form.has_starlink ? 100 : 0,
+      power_generator: form.has_power_plant ? "si_automatica" : "no_tiene",
+      water_supply: form.has_water_247 ? "si_pozo_propio" : "tanque_reserva",
+      water_pressure: "excelente",
       deal_type: form.deal_type,
-      deal_value_usd: Number(form.deal_value_usd),
+      deal_value_usd: 0,
       cover_image: form.cover_image,
       latitude: form.latitude,
       longitude: form.longitude,
       photos: form.cover_image ? [form.cover_image] : undefined,
-      social_link: form.social_link.trim(),
-      hdv_slug: form.hdv_slug.trim(),
+      social_link: form.whatsapp.trim(),
+      hdv_slug: generatedSlug,
       notes: form.notes.trim()
     };
 
@@ -202,23 +209,86 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
       onAddEstablishment(payload);
     }
 
+    // Guardar simultáneamente como Pre-Registro Express en localStorage y Supabase
+    try {
+      const preregPayload = {
+        service_category_id: 1,
+        subcategory_id: 6,
+        category_name: catLabel,
+        title: form.name.trim(),
+        slug: generatedSlug,
+        destination_name: form.destination.trim() || "Venezuela",
+        state: form.destination.trim() || "Venezuela",
+        city: form.destination.trim() || "Venezuela",
+        badges: {
+          has_power_plant: form.has_power_plant,
+          has_water_247: form.has_water_247,
+          has_starlink: form.has_starlink,
+          is_pet_friendly: form.is_pet_friendly,
+          has_hdv_seal: form.has_hdv_seal
+        },
+        rating_avg: Number(form.rating) > 5 ? 5.0 : Number(form.rating),
+        key_service_pills: [
+          form.has_power_plant ? "Planta Eléctrica" : "",
+          form.has_water_247 ? "Agua 24/7" : "",
+          form.has_starlink ? "Starlink / Wi-Fi" : "",
+          form.is_pet_friendly ? "Pet Friendly" : ""
+        ].filter(Boolean),
+        short_description:
+          form.notes.trim() ||
+          `Establecimiento pre-registrado en ruta por ${creatorName} en ${form.destination.trim() || "Venezuela"}.`,
+        base_price_from: 0,
+        whatsapp_number: form.whatsapp.trim(),
+        primary_image:
+          form.cover_image ||
+          "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop",
+        gallery_images: form.cover_image ? [form.cover_image] : []
+      };
+
+      localStorage.setItem(`hdv_prereg_${generatedSlug}`, JSON.stringify(preregPayload));
+
+      await supabase.from("properties").upsert(
+        {
+          service_category_id: 1,
+          subcategory_id: 6,
+          title: preregPayload.title,
+          slug: generatedSlug,
+          destination_name: preregPayload.destination_name,
+          state: preregPayload.state,
+          city: preregPayload.city,
+          latitude: form.latitude || null,
+          longitude: form.longitude || null,
+          short_description: preregPayload.short_description,
+          base_price_from: 0,
+          rating_avg: preregPayload.rating_avg,
+          whatsapp_number: preregPayload.whatsapp_number,
+          primary_image: preregPayload.primary_image,
+          has_power_plant: form.has_power_plant,
+          has_water_247: form.has_water_247,
+          has_starlink: form.has_starlink,
+          is_pet_friendly: form.is_pet_friendly,
+          has_hdv_seal: form.has_hdv_seal,
+          key_service_pills: preregPayload.key_service_pills,
+          onboarding_status: "PRE_REGISTERED",
+          status: "ACTIVE"
+        },
+        { onConflict: "slug" }
+      );
+    } catch {}
+
     setShowModal(false);
     setEditingEst(null);
   };
 
   const handleCopyWhatsAppAudit = (est: CreatorVisitedEstablishment) => {
-    const text = `🏆 *AUDITORÍA TÉCNICA OFICIAL HDV* 🇻🇪\n` +
-      `👤 *Auditor(a):* ${creatorName} (Creadora Verificada)\n` +
+    const text =
+      `🏆 *PRE-REGISTRO & RESEÑA OFICIAL HDV* 🇻🇪\n` +
+      `👤 *Creador(a):* ${creatorName}\n` +
       `🏨 *Establecimiento:* ${est.name}\n` +
       `📍 *Ubicación:* ${est.destination} (${est.category_label})\n` +
-      `⭐ *Calificación:* ${est.rating}/10 ${est.is_recommended ? '✅ [RECOMENDADO OFICIAL]' : ''}\n\n` +
-      `📡 *SERVICIOS CRÍTICOS Y CONECTIVIDAD:*\n` +
-      `• *Velocidad Wi-Fi:* ${est.wifi_speed_mbps} Mbps (Ideal Nómadas Digitales)\n` +
-      `• *Planta Eléctrica:* ${est.power_generator === 'si_automatica' ? '100% Automática Insonorizada' : est.power_generator === 'si_manual' ? 'Manual Operativa' : 'No Tiene'}\n` +
-      `• *Suministro de Agua:* ${est.water_supply === 'si_pozo_propio' ? 'Pozo Propio Continuo' : 'Tanque de Reserva'}\n` +
-      `• *Presión de Agua:* ${est.water_pressure.toUpperCase()}\n\n` +
-      `📝 *Notas del Creador:* ${est.notes || 'Excelente servicio y hospitalidad en ruta.'}\n\n` +
-      `_Ficha Oficial en Hoteles de Venezuela: https://hotelesdevenezuela.com/establecimiento/${est.hdv_slug || 'venezuela'}_`;
+      `⭐ *Valoración:* ${est.rating}/10 ${est.is_recommended ? "✅ [SELLO HDV]" : ""}\n` +
+      `📝 *Reseña:* ${est.notes || "Excelente atención y hospitalidad en ruta."}\n\n` +
+      `_Ficha Oficial en Hoteles de Venezuela: https://hotelesdevenezuela.com/establecimiento/${est.hdv_slug || "venezuela"}_`;
 
     navigator.clipboard.writeText(text);
     setCopiedId(est.id);
@@ -240,7 +310,6 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
 
   return (
     <div className="space-y-8 text-slate-100 font-sans">
-      
       {/* ── Banner Principal ── */}
       <div
         className="rounded-3xl p-6 md:p-8 border border-white/10 shadow-2xl relative overflow-hidden"
@@ -251,20 +320,22 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
 
         <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider"
-                 style={{ backgroundColor: `${CIAN}15`, color: CIAN, border: `1px solid ${CIAN}30` }}>
+            <div
+              className="inline-flex items-center gap-2 px-3.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider"
+              style={{ backgroundColor: `${CIAN}15`, color: CIAN, border: `1px solid ${CIAN}30` }}
+            >
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Inventario de Establecimientos Turísticos Visitados & Auditados</span>
+              <span>Pre-Registro Express en Ruta para Influencers</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold font-serif text-white tracking-wide">
               Establecimientos & Posadas Visitadas
             </h2>
             <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
-              En lugar de inventario de habitaciones, este módulo te permite gestionar todos los <strong className="text-white">Hoteles, Posadas, Restaurantes, Marinas, Parques y Rent-a-car</strong> que has auditado en tus viajes, con métricas de Wi-Fi, planta eléctrica y convenios.
+              Pre-registra de forma rápida y práctica los <strong className="text-white">Hoteles, Posadas, Restaurantes, Marinas y Parques</strong> que visites en tus viajes sin formularios extensos: solo nombre, destino, GPS, foto y servicios clave.
             </p>
           </div>
 
-          <div className="w-full lg:w-auto flex items-center justify-start lg:justify-end">
+          <div className="w-full lg:w-auto flex flex-wrap items-center justify-start lg:justify-end gap-3">
             <button
               onClick={handleOpenCreate}
               className="w-full sm:w-auto px-5 py-3 rounded-2xl text-xs font-black text-white shadow-xl hover:scale-103 active:scale-97 transition-all flex items-center justify-center gap-2 cursor-pointer border border-white/20"
@@ -301,7 +372,7 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
       {/* ── Buscador y Conteo ── */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 shadow-md">
         <div className="text-xs font-bold text-slate-300">
-          Mostrando <span className="text-[#00C8D4] font-black">{filteredEstablishments.length}</span> establecimientos registrados
+          Mostrando <span className="text-[#00C8D4] font-black">{filteredEstablishments.length}</span> establecimientos pre-registrados
         </div>
 
         <div className="relative w-full sm:w-80">
@@ -321,12 +392,12 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
         <div className="p-12 text-center rounded-3xl bg-white/5 border border-dashed border-white/15">
           <Building2 className="w-12 h-12 text-slate-500 mx-auto mb-3" />
           <h4 className="text-base font-bold text-white">No hay establecimientos en esta categoría</h4>
-          <p className="text-xs text-slate-400 mt-1">Registra la primera posada, restaurante o marina que hayas visitado en tu ruta.</p>
+          <p className="text-xs text-slate-400 mt-1">Haz clic abajo para abrir el Pre-Registro Rápido.</p>
           <button
             onClick={handleOpenCreate}
-            className="mt-4 px-4 py-2 rounded-xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] text-white text-xs font-bold"
+            className="mt-4 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] text-white text-xs font-bold cursor-pointer"
           >
-            Registrar Establecimiento
+            + Pre-Registrar Establecimiento
           </button>
         </div>
       ) : (
@@ -342,7 +413,6 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
                 className="rounded-3xl bg-gradient-to-b from-white/10 to-white/5 border border-white/15 p-5 shadow-xl backdrop-blur-md flex flex-col justify-between hover:border-[#00C8D4]/60 transition-all group"
               >
                 <div>
-                  {/* Badge de Categoría & Rating */}
                   <div className="flex items-center justify-between gap-2 mb-3">
                     <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#00C8D4]/20 text-[#00C8D4] border border-[#00C8D4]/40">
                       {est.category_label}
@@ -350,11 +420,10 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
 
                     <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-black">
                       <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                      <span>{est.rating.toFixed(1)}</span>
+                      <span>{(est.rating > 5 ? est.rating / 2 : est.rating).toFixed(1)}</span>
                     </div>
                   </div>
 
-                  {/* Título & Destino */}
                   <h3 className="text-base font-bold text-white font-serif leading-snug group-hover:text-[#00C8D4] transition">
                     {est.name}
                   </h3>
@@ -364,38 +433,33 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
                     <span className="truncate">{est.destination}</span>
                   </div>
 
-                  {/* Auditoría Técnica Grid */}
                   <div className="mt-4 p-3.5 rounded-2xl bg-black/40 border border-white/10 space-y-2 text-xs">
-                    <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                      Telemetría & Auditoría Técnica:
-                    </div>
-
                     <div className="grid grid-cols-2 gap-2">
                       <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white/5">
                         <Wifi className={`w-3.5 h-3.5 ${hasWifi ? "text-emerald-400" : "text-slate-500"}`} />
                         <span className="text-[11px] font-bold text-slate-200">
-                          {hasWifi ? `${est.wifi_speed_mbps} Mbps` : "Sin Wi-Fi"}
+                          {hasWifi ? "Starlink / Wi-Fi" : "Sin Wi-Fi"}
                         </span>
                       </div>
 
                       <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white/5">
                         <Zap className={`w-3.5 h-3.5 ${hasGenerator ? "text-amber-400" : "text-slate-500"}`} />
                         <span className="text-[11px] font-bold text-slate-200 truncate">
-                          {est.power_generator === "si_automatica" ? "Planta Auto" : est.power_generator === "si_manual" ? "Planta Manual" : "Sin Planta"}
+                          {hasGenerator ? "Planta Eléctrica" : "Sin Planta"}
                         </span>
                       </div>
 
                       <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white/5">
                         <Droplets className={`w-3.5 h-3.5 ${hasWell ? "text-[#00C8D4]" : "text-slate-500"}`} />
                         <span className="text-[11px] font-bold text-slate-200 truncate">
-                          {est.water_supply === "si_pozo_propio" ? "Pozo Propio" : "Tanque"}
+                          {hasWell ? "Agua 24/7" : " Básico"}
                         </span>
                       </div>
 
                       <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white/5">
                         <Award className="w-3.5 h-3.5 text-[#FF0096]" />
                         <span className="text-[11px] font-bold text-slate-200 uppercase">
-                          {est.deal_type || "Canje"}
+                          {est.is_recommended ? "Sello HDV" : "Visitado"}
                         </span>
                       </div>
                     </div>
@@ -408,15 +472,13 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
                   </div>
                 </div>
 
-                {/* Acciones de la Tarjeta */}
                 <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
                   <button
                     onClick={() => handleCopyWhatsAppAudit(est)}
                     className="flex-1 py-2 px-3 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer min-w-[120px]"
-                    title="Copiar auditoría para WhatsApp"
                   >
                     {copiedId === est.id ? <Check className="w-3.5 h-3.5" /> : <Send className="w-3.5 h-3.5" />}
-                    <span>{copiedId === est.id ? "¡Copiado!" : "WhatsApp"}</span>
+                    <span>{copiedId === est.id ? "¡Copiado!" : "Compartir WA"}</span>
                   </button>
 
                   <div className="flex items-center gap-1.5 shrink-0">
@@ -435,7 +497,7 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
                     <button
                       onClick={() => handleOpenEdit(est)}
                       className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 text-xs transition cursor-pointer"
-                      title="Editar auditoría"
+                      title="Editar Pre-Registro"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
@@ -459,92 +521,135 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
         </div>
       )}
 
-      {/* ── MODAL: REGISTRAR / EDITAR ESTABLECIMIENTO VISITADO ── */}
+      {/* ── MODAL DE PRE-REGISTRO EXPRESS PARA INFLUENCERS (CORTO, PRÁCTICO Y SIN FORMULARIOS EXTENSOS) ── */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fadeIn">
-          <div className="bg-[#1a0533] rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border border-white/15 p-6 md:p-8 text-slate-100">
-            
-            <div className="flex items-center justify-between pb-4 border-b border-white/10">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fadeIn">
+          <div className="bg-white rounded-3xl w-full max-w-xl max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-200 p-6 md:p-8 text-slate-900">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#00C8D4] to-[#9B00CC] flex items-center justify-center text-white shadow-lg">
-                  <Building2 className="w-5 h-5" />
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#FF0096] to-[#9B00CC] flex items-center justify-center text-white shadow-md shrink-0">
+                  <Sparkles className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold font-serif text-white">
-                    {editingEst ? "Editar Establecimiento Visitado" : "Registrar Establecimiento Visitado"}
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#00C8D4] block">
+                    PRE-REGISTRO EXPRESS DE INFLUENCER
+                  </span>
+                  <h3 className="text-xl font-bold font-serif text-slate-900 leading-tight">
+                    {editingEst ? "Editar Pre-Registro" : "Pre-Registro Rápido de Establecimiento"}
                   </h3>
-                  <p className="text-xs text-slate-300">Auditoría técnica de posada, restaurante, marina o parque en Venezuela</p>
                 </div>
               </div>
               <button
                 onClick={() => setShowModal(false)}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-300"
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-700 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleSave} className="space-y-4 mt-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
-                    Nombre del Establecimiento *
+            <form onSubmit={handleSave} className="space-y-5 mt-5">
+              {/* 1. Categoría en 1 Clic */}
+              <div>
+                <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-2">
+                  1. Tipo de Establecimiento
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {QUICK_PREREG_CATEGORIES.map(cat => {
+                    const isSel = form.category === cat.id;
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setForm({ ...form, category: cat.id })}
+                        className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                          isSel
+                            ? "bg-[#00C8D4]/15 border-[#00C8D4] text-[#008f99] ring-2 ring-[#00C8D4]/20"
+                            : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
+                        }`}
+                      >
+                        <span className="block text-xs font-black">{cat.label}</span>
+                        <span className="text-[10px] text-slate-400">{cat.sub}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 2. Nombre, Destino y WhatsApp */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div className="sm:col-span-2">
+                  <label className="block text-[11px] font-black uppercase tracking-wider text-slate-600 mb-1">
+                    2. Nombre del Establecimiento *
                   </label>
                   <input
                     type="text"
                     required
                     value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    placeholder="Ej: Posada Perla Negra"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-xs text-white focus:outline-none focus:border-[#00C8D4]"
+                    onChange={e => setForm({ ...form, name: e.target.value })}
+                    placeholder="Ej: Posada Paraíso Azul"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4] focus:bg-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
-                    Destino / Ubicación *
+                  <label className="block text-[11px] font-black uppercase tracking-wider text-slate-600 mb-1">
+                    3. Destino / Ubicación *
                   </label>
                   <input
                     type="text"
                     required
                     value={form.destination}
-                    onChange={(e) => setForm({ ...form, destination: e.target.value })}
-                    placeholder="Ej: Tucacas, Falcón / Mochima, Sucre"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-xs text-white focus:outline-none focus:border-[#00C8D4]"
+                    onChange={e => setForm({ ...form, destination: e.target.value })}
+                    placeholder="Ej: Morrocoy, Falcón"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4] focus:bg-white"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-black uppercase tracking-wider text-slate-600 mb-1">
+                    4. WhatsApp del Propietario
+                  </label>
+                  <div className="relative">
+                    <Phone className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-3" />
+                    <input
+                      type="text"
+                      value={form.whatsapp}
+                      onChange={e => setForm({ ...form, whatsapp: e.target.value })}
+                      placeholder="+58 412 000 0000"
+                      className="w-full pl-8 pr-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4] focus:bg-white"
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* GPS Geolocation & Photo Capture Buttons */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-2xl bg-[#0e011f] border border-[#00C8D4]/30">
-                {/* GPS Capture */}
+              {/* 5. Captura Rápida de GPS y Foto desde el Celular */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
                 <div className="space-y-1.5">
                   <span className="text-[10px] font-black uppercase tracking-wider text-[#00C8D4] block">
-                    📍 Coordenadas Satelitales GPS
+                    📍 Ubicación GPS en 1 Clic
                   </span>
                   <button
                     type="button"
                     onClick={handleGetGpsLocation}
                     disabled={isCapturingGps}
-                    className="w-full px-3 py-2 rounded-xl bg-cyan-950/80 hover:bg-cyan-900/90 border border-[#00C8D4]/40 text-[#00C8D4] text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="w-full px-3 py-2.5 rounded-xl bg-[#00C8D4] hover:bg-[#00b2bd] text-white text-xs font-extrabold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs disabled:opacity-50"
                   >
                     <Compass className={`w-4 h-4 ${isCapturingGps ? "animate-spin" : ""}`} />
-                    <span>{isCapturingGps ? "Fijando Satélites..." : "Capturar Mi GPS Ahora"}</span>
+                    <span>{isCapturingGps ? "Capturando GPS..." : "Capturar Mi GPS Aquí"}</span>
                   </button>
                   {gpsStatusMsg && (
-                    <p className="text-[10px] text-cyan-300 font-mono truncate">{gpsStatusMsg}</p>
+                    <p className="text-[10px] text-emerald-700 font-bold truncate">{gpsStatusMsg}</p>
                   )}
                 </div>
 
-                {/* Camera / Photo Upload */}
                 <div className="space-y-1.5">
                   <span className="text-[10px] font-black uppercase tracking-wider text-[#FF0096] block">
-                    📷 Foto en Sitio / Portada
+                    📷 Foto Principal del Lugar
                   </span>
                   <div className="flex items-center gap-2">
-                    <label className="flex-1 px-3 py-2 rounded-xl bg-[#FF0096]/20 hover:bg-[#FF0096]/30 border border-[#FF0096]/40 text-[#FF0096] text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer">
+                    <label className="flex-1 px-3 py-2.5 rounded-xl bg-[#FF0096] hover:bg-[#e00083] text-white text-xs font-extrabold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs">
                       <Camera className="w-4 h-4" />
-                      <span>{form.cover_image ? "Cambiar Foto" : "Tomar Foto / Subir"}</span>
+                      <span>{form.cover_image ? "Cambiar Foto" : "Tomar / Subir Foto"}</span>
                       <input
                         type="file"
                         accept="image/*"
@@ -554,159 +659,97 @@ export const CreatorVisitedEstablishments: React.FC<CreatorVisitedEstablishments
                       />
                     </label>
                     {form.cover_image && (
-                      <div className="w-9 h-9 rounded-lg overflow-hidden border border-[#FF0096] shrink-0 bg-black">
-                        <img src={form.cover_image} alt="Thumb" className="w-full h-full object-cover" />
+                      <div className="w-10 h-10 rounded-xl overflow-hidden border-2 border-[#FF0096] shrink-0">
+                        <img src={form.cover_image} alt="Vista previa" className="w-full h-full object-cover" />
                       </div>
                     )}
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">Categoría HDV</label>
-                  <select
-                    value={form.category}
-                    onChange={(e) => setForm({ ...form, category: e.target.value as any })}
-                    className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/15 text-xs text-white"
-                  >
-                    <option value="hoteles_posadas">🏨 Hoteles & Posadas</option>
-                    <option value="restaurantes_gastronomia">🍽️ Restaurantes & Gastronomía</option>
-                    <option value="marinas_yates">⚓ Marinas & Yates</option>
-                    <option value="rent_a_car">🚗 Rent-a-car & Flota 4x4</option>
-                    <option value="parques_complejos">🎢 Parques & Complejos</option>
-                    <option value="agencias_viajes">✈️ Agencias de Viajes</option>
-                    <option value="sitios_turisticos">🏞️ Sitios Turísticos & Miradores</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">Puntuación (1 a 10)</label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    min="1"
-                    max="10"
-                    value={form.rating}
-                    onChange={(e) => setForm({ ...form, rating: Number(e.target.value) })}
-                    className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/15 text-xs text-white font-bold"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">Fecha de Visita</label>
-                  <input
-                    type="date"
-                    value={form.visit_date}
-                    onChange={(e) => setForm({ ...form, visit_date: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/15 text-xs text-white"
-                  />
-                </div>
-              </div>
-
-              {/* Auditoría Técnica */}
-              <div className="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-3">
-                <div className="text-xs font-bold text-[#00C8D4] uppercase tracking-wider">
-                  Parámetros Técnicos de Infraestructura:
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label className="block text-[11px] text-slate-300 mb-1">📡 Wi-Fi Speed (Mbps)</label>
-                    <input
-                      type="number"
-                      value={form.wifi_speed_mbps}
-                      onChange={(e) => setForm({ ...form, wifi_speed_mbps: Number(e.target.value) })}
-                      className="w-full px-3 py-1.5 rounded-xl bg-white/5 border border-white/15 text-xs text-white font-bold"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] text-slate-300 mb-1">⚡ Planta Eléctrica</label>
-                    <select
-                      value={form.power_generator}
-                      onChange={(e) => setForm({ ...form, power_generator: e.target.value as any })}
-                      className="w-full px-3 py-1.5 rounded-xl bg-white/5 border border-white/15 text-xs text-white"
-                    >
-                      <option value="si_automatica">100% Automática</option>
-                      <option value="si_manual">Manual</option>
-                      <option value="no_tiene">No tiene</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] text-slate-300 mb-1">💧 Agua / Pozo</label>
-                    <select
-                      value={form.water_supply}
-                      onChange={(e) => setForm({ ...form, water_supply: e.target.value as any })}
-                      className="w-full px-3 py-1.5 rounded-xl bg-white/5 border border-white/15 text-xs text-white"
-                    >
-                      <option value="si_pozo_propio">Pozo Propio</option>
-                      <option value="tanque_reserva">Tanque de Reserva</option>
-                      <option value="no_tiene">Sin Reserva</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">Tipo de Convenio Comercial</label>
-                  <select
-                    value={form.deal_type}
-                    onChange={(e) => setForm({ ...form, deal_type: e.target.value as any })}
-                    className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/15 text-xs text-white"
-                  >
-                    <option value="canje">Canje de Hospedaje / Comida</option>
-                    <option value="monetario">Pauta Monetaria ($ USD)</option>
-                    <option value="mixto">Mixto (Canje + Dinero)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">Slug en HDV (Opcional)</label>
-                  <input
-                    type="text"
-                    value={form.hdv_slug}
-                    onChange={(e) => setForm({ ...form, hdv_slug: e.target.value })}
-                    placeholder="Ej: perla-negra"
-                    className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/15 text-xs text-white"
-                  />
-                </div>
-              </div>
-
+              {/* 6. Insignias Rápidas en 1 Clic */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">Notas de Experiencia / Conclusiones</label>
+                <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-2">
+                  5. Insignias Rápidas (Toca para activar/desactivar)
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {[
+                    { key: "has_power_plant" as const, label: "Planta Eléctrica", color: "bg-amber-500", icon: Zap },
+                    { key: "has_water_247" as const, label: "Agua 24/7", color: "bg-[#00C8D4]", icon: Droplets },
+                    { key: "has_starlink" as const, label: "Starlink / Wi-Fi", color: "bg-[#9B00CC]", icon: Wifi },
+                    { key: "is_pet_friendly" as const, label: "Pet Friendly", color: "bg-emerald-500", icon: Dog },
+                    { key: "has_hdv_seal" as const, label: "Recomendado HDV", color: "bg-[#FF0096]", icon: ShieldCheck }
+                  ].map(b => {
+                    const IconComp = b.icon;
+                    const active = form[b.key];
+                    return (
+                      <button
+                        key={b.key}
+                        type="button"
+                        onClick={() => setForm(prev => ({ ...prev, [b.key]: !prev[b.key] }))}
+                        className={`p-2.5 rounded-xl border text-left transition-all flex items-center gap-2.5 cursor-pointer ${
+                          active
+                            ? "bg-[#0e011f] text-white border-[#0e011f] shadow-sm"
+                            : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                        }`}
+                      >
+                        <div className={`w-7 h-7 rounded-lg ${b.color} flex items-center justify-center text-white shrink-0`}>
+                          <IconComp className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <span className="text-[11px] font-bold truncate">{b.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 7. Nota corta opcional */}
+              <div>
+                <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1">
+                  6. Breve Reseña o Nota (Opcional)
+                </label>
                 <textarea
                   rows={2}
                   value={form.notes}
-                  onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                  placeholder="Comentarios sobre el servicio, gastronomía, acceso vial y estado de las instalaciones..."
-                  className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/15 text-xs text-white focus:outline-none focus:border-[#00C8D4]"
+                  onChange={e => setForm({ ...form, notes: e.target.value })}
+                  placeholder="Ej: Excelente atención frente al mar, ideal para familias..."
+                  className="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-[#00C8D4] focus:bg-white"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 text-xs font-bold transition"
+              {/* Acciones */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-100">
+                <a
+                  href="/pre-registro"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[11px] font-bold text-[#00C8D4] hover:underline flex items-center gap-1"
                 >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:brightness-110 text-white text-xs font-bold shadow-lg shadow-[#FF0096]/20 transition"
-                >
-                  {editingEst ? "Guardar Cambios" : "Registrar Establecimiento"}
-                </button>
-              </div>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Abrir Vista Completa de Pre-Registro</span>
+                </a>
 
+                <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setShowModal(false)}
+                    className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2.5 rounded-xl text-white text-xs font-black uppercase tracking-wider shadow-lg cursor-pointer transition-all"
+                    style={{ background: `linear-gradient(135deg, ${FUCSIA} 0%, ${PURPURA} 100%)` }}
+                  >
+                    {editingEst ? "Guardar Cambios" : "Guardar Pre-Registro"}
+                  </button>
+                </div>
+              </div>
             </form>
           </div>
         </div>
       )}
-
     </div>
   );
 };

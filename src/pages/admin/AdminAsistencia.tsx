@@ -32,7 +32,7 @@ export default function AdminAsistencia() {
   const [copiedId, setCopiedId] = useState<number | null>(null);
 
   const handleCopyClaimLink = (row: EstablishmentRow) => {
-    const claimSlug = row.slug || (row.name.toLowerCase().includes("aura") ? "aura-croce" : String(row.id));
+    const claimSlug = row.slug || (row.name.toLowerCase().includes("aura") ? "creador-oficial-hdv" : String(row.id));
     const isPerla = row.slug === "perla-negra" || row.id === 102 || row.name.toLowerCase().includes("perla negra");
     const ownerEmail = isPerla ? "Posadaperlanegra@gmail.com" : row.owner_email;
     const link = `${window.location.origin}/mis-negocios?claim=${claimSlug}&email=${encodeURIComponent(ownerEmail)}`;
@@ -95,12 +95,12 @@ export default function AdminAsistencia() {
       const demoProfiles: EstablishmentRow[] = [
         {
           id: 99901,
-          name: "Aura Croce - Viajera & Creadora de Contenido",
-          slug: "aura-croce-viajera-creadora",
+          name: "Creador(a) Oficial HDV",
+          slug: "creador-oficial-hdv",
           status: "approved",
           owner_user_id: "aura_croce_user_id",
-          owner_name: "Aura Croce",
-          owner_email: "aura.croce@hdv.com",
+          owner_name: "Creador(a) Oficial HDV",
+          owner_email: "creadores@hotelesdevenezuela.com",
           category: "Creadores de Contenido / Influencers",
           destination: "Los Roques & Morrocoy"
         },
