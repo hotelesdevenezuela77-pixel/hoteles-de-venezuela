@@ -46,48 +46,17 @@ function SmartphoneIcon(props: any) {
 }
 
 export function CreatorSupportModule({ establishmentId, creatorName }: CreatorSupportModuleProps) {
-  const localKey = `hdv_creator_support_${establishmentId}`;
+  const localKey = `hdv_creator_support_v2_${establishmentId}`;
 
   const [tickets, setTickets] = useState<CreatorSupportTicket[]>(() => {
     try {
       const raw = localStorage.getItem(localKey);
-      if (raw) return JSON.parse(raw);
-    } catch (e) {}
-
-    return [
-      {
-        id: "tkt-1",
-        establishment_id: establishmentId,
-        subject: "Acreditación de Permiso Especial de Drone en Los Roques",
-        category: "permisos_inparques",
-        priority: "alta",
-        status: "en_proceso",
-        description: "Solicitud de salvoconducto de prensa para vuelo de drone sobre Cayo de Agua y Gran Roque.",
-        created_at: new Date(Date.now() - 24 * 3600000).toISOString().split("T")[0],
-        resolution_notes: "Permiso en trámite con Capitanía y Autoridad Única."
-      },
-      {
-        id: "tkt-2",
-        establishment_id: establishmentId,
-        subject: "Conciliación de Viáticos de Gasolina en Expedición Gran Sabana",
-        category: "honorarios_viaticos",
-        priority: "urgente",
-        status: "resuelto",
-        description: "Comprobante de tanqueo en estación internacional de Santa Elena por $50 USD.",
-        created_at: new Date(Date.now() - 3 * 24 * 3600000).toISOString().split("T")[0],
-        resolution_notes: "Aprobado y transferido por Pago Móvil a la tasa BCV del día."
-      },
-      {
-        id: "tkt-3",
-        establishment_id: establishmentId,
-        subject: "Vinculación de Dominio Personalizado en Web Builder",
-        category: "web_builder",
-        priority: "media",
-        status: "abierto",
-        description: "Configuración de DNS para apuntar tudominio.com al portal de creadora HDV.",
-        created_at: new Date().toISOString().split("T")[0]
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
       }
-    ];
+    } catch (e) {}
+    return [];
   });
 
   const [showModal, setShowModal] = useState(false);

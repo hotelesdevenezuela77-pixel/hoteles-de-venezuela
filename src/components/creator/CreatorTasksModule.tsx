@@ -44,68 +44,17 @@ const FORMAT_LABELS: Record<string, string> = {
 };
 
 export function CreatorTasksModule({ establishmentId, creatorName }: CreatorTasksModuleProps) {
-  const localKey = `hdv_creator_tasks_${establishmentId}`;
+  const localKey = `hdv_creator_tasks_v2_${establishmentId}`;
 
   const [tasks, setTasks] = useState<CreatorProductionTask[]>(() => {
     try {
       const raw = localStorage.getItem(localKey);
-      if (raw) return JSON.parse(raw);
-    } catch (e) {}
-
-    return [
-      {
-        id: "task-1",
-        establishment_id: establishmentId,
-        title: "Reel 4K: Los 3 Mejores Arrecifes de Morrocoy",
-        format: "reel_4k",
-        target_establishment: "Posada Perla Negra",
-        destination: "Tucacas / Morrocoy",
-        due_date: new Date(Date.now() + 2 * 24 * 3600000).toISOString().split("T")[0],
-        status: "rodaje",
-        sponsor: "Posada Perla Negra",
-        priority: "alta",
-        notes: "Incluir tomas aéreas de Cayo Sombrero y Cayo Muerto con tomas de desayuno."
-      },
-      {
-        id: "task-2",
-        establishment_id: establishmentId,
-        title: "Reseña Técnica HDV: Auditoría de Wi-Fi y Planta",
-        format: "hdv_review",
-        target_establishment: "Hotel Gran Sabana Lodge",
-        destination: "Gran Sabana",
-        due_date: new Date(Date.now() + 5 * 24 * 3600000).toISOString().split("T")[0],
-        status: "planificacion",
-        sponsor: "Hoteles de Venezuela",
-        priority: "urgente",
-        notes: "Verificar medición de 120 Mbps y conmutador automático de planta."
-      },
-      {
-        id: "task-3",
-        establishment_id: establishmentId,
-        title: "Edición Cinematic: Travesía 4x4 Paso de los Andes",
-        format: "youtube_vlog",
-        target_establishment: "Posada Los Nevados",
-        destination: "Mérida",
-        due_date: new Date(Date.now() + 7 * 24 * 3600000).toISOString().split("T")[0],
-        status: "edicion",
-        sponsor: "Marca Outdoor 4x4",
-        priority: "normal",
-        notes: "LUTs fríos para páramo andino y estabilización de tomas en carretera."
-      },
-      {
-        id: "task-4",
-        establishment_id: establishmentId,
-        title: "Pack de 5 Historias de Cobertura de Bienvenida",
-        format: "pack_historias",
-        target_establishment: "Aparto Posada del Mar",
-        destination: "Chichiriviche",
-        due_date: new Date().toISOString().split("T")[0],
-        status: "publicado",
-        sponsor: "Aparto Posada del Mar",
-        priority: "alta",
-        notes: "Etiquetar cuenta oficial y añadir enlace de reserva directa."
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
       }
-    ];
+    } catch (e) {}
+    return [];
   });
 
   // Modal State

@@ -148,7 +148,50 @@ export function PreRegistro() {
     );
   };
 
-  // Carga de Archivos de Fotos (Soporta cámara del celular y selección múltiple)
+  // Carga de Imagen Principal (Portada)
+  const handlePrimaryPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingPhoto(true);
+    let uploadedUrl = "";
+    const fileExt = file.name.split(".").pop() || "jpg";
+    const fileName = `prereg_cover_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+
+    try {
+      const { data, error } = await supabase.storage
+        .from("establecimientos")
+        .upload(fileName, file, { contentType: file.type || "image/jpeg", upsert: true });
+
+      if (!error && data) {
+        const { data: publicUrlData } = supabase.storage
+          .from("establecimientos")
+          .getPublicUrl(fileName);
+        if (publicUrlData?.publicUrl) {
+          uploadedUrl = publicUrlData.publicUrl;
+        }
+      }
+    } catch {}
+
+    if (!uploadedUrl) {
+      await new Promise<void>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (typeof reader.result === "string") uploadedUrl = reader.result;
+          resolve();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    if (uploadedUrl) {
+      setPrimaryImage(uploadedUrl);
+      setGalleryImages((prev) => (prev.includes(uploadedUrl) ? prev : [uploadedUrl, ...prev]));
+    }
+    setIsUploadingPhoto(false);
+    e.target.value = "";
+  };
+
+  // Carga de Múltiples Imágenes para la Galería del Establecimiento
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -200,6 +243,7 @@ export function PreRegistro() {
       return updated;
     });
     setIsUploadingPhoto(false);
+    e.target.value = "";
   };
 
   // Agregar foto vía URL manual
@@ -774,36 +818,62 @@ export function PreRegistro() {
                   </div>
                 </div>
 
-                {/* Subida Directa de Fotos con Cámara del Celular / Galería del Dispositivo */}
-                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
-                  <div className="flex items-center justify-between flex-wrap gap-2">
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                      <Camera className="w-4 h-4 text-[#FF0096]" />
-                      <span>Fotos del Establecimiento (Cámara o Galería Móvil)</span>
-                    </span>
+                {/* Subida Directa de Imagen Principal + Galería de Múltiples Fotos */}
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* 1. Imagen Principal (Portada) */}
+                    <div className="p-3.5 rounded-xl bg-white border border-slate-200 space-y-2">
+                      <span className="text-[11px] font-black uppercase tracking-wider text-[#FF0096] flex items-center gap-1.5">
+                        <Camera className="w-4 h-4 text-[#FF0096]" />
+                        <span>1. Imagen Principal (Portada)</span>
+                      </span>
+                      <p className="text-[10px] text-slate-500">
+                        Foto destacada de portada para la tarjeta y el banner del establecimiento.
+                      </p>
+                      <label className="w-full px-3.5 py-2.5 rounded-xl text-xs font-black text-white bg-[#FF0096] hover:bg-[#e00083] shadow-sm flex items-center justify-center gap-1.5 cursor-pointer transition-all">
+                        <Camera className="w-3.5 h-3.5" />
+                        <span>Subir Imagen Principal</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handlePrimaryPhotoUpload}
+                          disabled={isUploadingPhoto}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
 
-                    <label className="px-4 py-2 rounded-xl text-xs font-black text-white bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:opacity-95 shadow-md flex items-center gap-1.5 cursor-pointer transition-all">
-                      {isUploadingPhoto ? (
-                        <>
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          <span>Cargando Fotos...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="w-3.5 h-3.5" />
-                          <span>📸 Tomar o Subir Fotos</span>
-                        </>
-                      )}
-                      <input
-                        type="file"
-                        accept="image/*"
-                        capture="environment"
-                        multiple
-                        onChange={handleFileUpload}
-                        disabled={isUploadingPhoto}
-                        className="hidden"
-                      />
-                    </label>
+                    {/* 2. Galería de Múltiples Imágenes */}
+                    <div className="p-3.5 rounded-xl bg-white border border-slate-200 space-y-2">
+                      <span className="text-[11px] font-black uppercase tracking-wider text-[#9B00CC] flex items-center gap-1.5">
+                        <Upload className="w-4 h-4 text-[#9B00CC]" />
+                        <span>2. Galería (Múltiples Imágenes)</span>
+                      </span>
+                      <p className="text-[10px] text-slate-500">
+                        Selecciona varias fotos a la vez para la galería de áreas y habitaciones.
+                      </p>
+                      <label className="w-full px-3.5 py-2.5 rounded-xl text-xs font-black text-white bg-gradient-to-r from-[#9B00CC] to-[#00C8D4] hover:opacity-95 shadow-sm flex items-center justify-center gap-1.5 cursor-pointer transition-all">
+                        {isUploadingPhoto ? (
+                          <>
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            <span>Cargando Fotos...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-3.5 h-3.5" />
+                            <span>+ Agregar Múltiples Imágenes</span>
+                          </>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={handleFileUpload}
+                          disabled={isUploadingPhoto}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
                   </div>
 
                   {/* Input Alternativo por URL */}

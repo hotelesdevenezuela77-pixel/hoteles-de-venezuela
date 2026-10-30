@@ -93,7 +93,7 @@ export function CreatorAgendaModule({ establishmentId, creatorName }: CreatorAge
   // Drag and Drop State
   const [draggedEvent, setDraggedEvent] = useState<CreatorAgendaEvent | null>(null);
 
-  const localKey = `hdv_creator_agenda_${establishmentId}`;
+  const localKey = `hdv_creator_agenda_v2_${establishmentId}`;
 
   const fetchPublicBookings = () => {
     const keys = getInfluencerStorageKeys(establishmentId);
@@ -131,70 +131,9 @@ export function CreatorAgendaModule({ establishmentId, creatorName }: CreatorAge
       let localEvents: CreatorAgendaEvent[] = [];
       if (raw) {
         try {
-          localEvents = JSON.parse(raw);
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) localEvents = parsed;
         } catch (e) {}
-      }
-
-      if (localEvents.length === 0) {
-        const todayStr = new Date().toISOString().split("T")[0];
-        const tomorrowStr = new Date(Date.now() + 24 * 3600000).toISOString().split("T")[0];
-        const nextWeekStr = new Date(Date.now() + 5 * 24 * 3600000).toISOString().split("T")[0];
-
-        localEvents = [
-          {
-            id: "evt-cr-1",
-            establishment_id: establishmentId,
-            title: "🌅 Rodaje Golden Hour & Drone 4K en Cayo Sombrero",
-            description: "Captura de tomas aéreas a 60fps con luz de amanecer y tomas subacuáticas con arrecife.",
-            start_date: `${todayStr}T06:00`,
-            end_date: `${todayStr}T09:30`,
-            event_type: "drone_luz",
-            status: "en_progreso",
-            color: "#00C8D4",
-            location_target: "Parque Nacional Morrocoy",
-            brand_sponsor: "Posada Perla Negra"
-          },
-          {
-            id: "evt-cr-2",
-            establishment_id: establishmentId,
-            title: "🏨 Auditoría de Wi-Fi, Planta Eléctrica & Convenio",
-            description: "Prueba de velocidad de Starlink 120Mbps, inspección de insonorización y grabación de reseña.",
-            start_date: `${todayStr}T11:00`,
-            end_date: `${todayStr}T14:00`,
-            event_type: "auditoria_posada",
-            status: "pendiente",
-            color: "#9B00CC",
-            location_target: "Posada Gran Sabana Lodge",
-            brand_sponsor: "Alianza HDV"
-          },
-          {
-            id: "evt-cr-3",
-            establishment_id: establishmentId,
-            title: "🤝 Firma de Acuerdo Comercial de Pauta",
-            description: "Presentación de tarifario y propuesta de cobertura en redes para paquete de 3 Reels + Reseña.",
-            start_date: `${tomorrowStr}T16:00`,
-            end_date: `${tomorrowStr}T17:30`,
-            event_type: "reunion_marca",
-            status: "pendiente",
-            color: "#10b981",
-            location_target: "Caracas / Zoom",
-            brand_sponsor: "Marca Outdoor 4x4"
-          },
-          {
-            id: "evt-cr-4",
-            establishment_id: establishmentId,
-            title: "✂️ Edición de Reel 4K '5 Secretos de Morrocoy'",
-            description: "Corrección de color LUT cinematográfico, sincronización de audio y exportación en formato 9:16.",
-            start_date: `${nextWeekStr}T09:00`,
-            end_date: `${nextWeekStr}T13:00`,
-            event_type: "edicion_post",
-            status: "pendiente",
-            color: "#6366f1",
-            location_target: "Estudio de Producción",
-            brand_sponsor: "Hoteles de Venezuela"
-          }
-        ];
-        localStorage.setItem(localKey, JSON.stringify(localEvents));
       }
 
       setEvents(localEvents);

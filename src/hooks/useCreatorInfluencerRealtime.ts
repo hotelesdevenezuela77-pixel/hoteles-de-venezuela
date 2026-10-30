@@ -27,566 +27,29 @@ import { getBcvExchangeRate } from "./useBcvExchangeRate";
 
 const DEFAULT_EXCHANGE_RATE = getBcvExchangeRate();
 
-// Datos iniciales de demostración con honorarios base de $20 USD y desglose de viáticos
-const INITIAL_EXPEDITIONS: CreatorExpedition[] = [
-  {
-    id: "exp-201",
-    establishment_id: 1,
-    title: "Expedición Gran Sabana 4x4 & Roraima Off-Road",
-    destination: "Parque Nacional Canaima / Gran Sabana",
-    km_distance: 1420,
-    start_date: new Date(Date.now() - 10 * 24 * 3600000).toISOString().split("T")[0],
-    end_date: new Date(Date.now() - 2 * 24 * 3600000).toISOString().split("T")[0],
-    total_budget_usd: 850,
-    status: "completed",
-    base_fee_usd: 20.00,
-    viaticos_usd: 215.00,
-    viaticos_breakdown: {
-      combustible: 75.00,
-      guias_lancheros: 50.00,
-      comidas: 90.00,
-      peajes: 0.00,
-      hospedaje: 0.00,
-      otros: 0.00
-    },
-    total_remuneration_usd: 235.00, // $20 honorarios + $215 viáticos
-    payment_status: "liquidado",
-    payment_method: "pago_movil",
-    payment_reference: "REF-BANC-9821443",
-    payment_date: new Date(Date.now() - 2 * 24 * 3600000).toISOString().split("T")[0],
-    notes: "Honorarios $20.00 + viáticos 100% liquidados tras entrega de material 4K."
-  },
-  {
-    id: "exp-202",
-    establishment_id: 1,
-    title: "Ruta Playera Morrocoy & Cayo Agua 360°",
-    destination: "Tucacas - Chichiriviche",
-    km_distance: 680,
-    start_date: new Date(Date.now() + 5 * 24 * 3600000).toISOString().split("T")[0],
-    end_date: new Date(Date.now() + 8 * 24 * 3600000).toISOString().split("T")[0],
-    total_budget_usd: 400,
-    status: "active",
-    base_fee_usd: 20.00,
-    viaticos_usd: 145.00,
-    viaticos_breakdown: {
-      combustible: 45.00,
-      guias_lancheros: 60.00,
-      comidas: 30.00,
-      peajes: 10.00,
-      hospedaje: 0.00,
-      otros: 0.00
-    },
-    total_remuneration_usd: 165.00, // $20 honorarios + $145 viáticos
-    payment_status: "aprobado",
-    payment_method: "zelle",
-    payment_reference: "ZELLE-HDV-55102",
-    notes: "Viáticos aprobados para combustible de lancha y traslados. Honorarios $20 asignados."
-  },
-  {
-    id: "exp-203",
-    establishment_id: 1,
-    title: "Auditoría de Posadas & Ruta Médanos de Coro",
-    destination: "Coro & Península de Paraguaná",
-    km_distance: 920,
-    start_date: new Date(Date.now() + 14 * 24 * 3600000).toISOString().split("T")[0],
-    end_date: new Date(Date.now() + 18 * 24 * 3600000).toISOString().split("T")[0],
-    total_budget_usd: 520,
-    status: "active",
-    base_fee_usd: 20.00,
-    viaticos_usd: 180.00,
-    viaticos_breakdown: {
-      combustible: 60.00,
-      comidas: 50.00,
-      hospedaje: 40.00,
-      peajes: 15.00,
-      guias_lancheros: 0.00,
-      otros: 15.00
-    },
-    total_remuneration_usd: 200.00, // $20 honorarios + $180 viáticos
-    payment_status: "pendiente",
-    notes: "Viaje pautado. Pendiente de aprobación de fondos y confirmación de fechas."
-  }
-];
+// Estados iniciales en cero para cada nuevo influencer (100% real e independiente por creador)
+const INITIAL_EXPEDITIONS: CreatorExpedition[] = [];
+const INITIAL_WAYPOINTS: CreatorWaypoint[] = [];
+const INITIAL_DEALS: CreatorDeal[] = [];
+const INITIAL_DELIVERABLES: CreatorDeliverable[] = [];
+const INITIAL_EXPENSES: CreatorRouteExpense[] = [];
+const INITIAL_TASKS: CreatorEditorialTask[] = [];
+const INITIAL_AUDITS: CreatorEstablishmentAudit[] = [];
 
-const INITIAL_WAYPOINTS: CreatorWaypoint[] = [
-  {
-    id: "wp-1",
-    expedition_id: "exp-201",
-    latitude: 5.48512,
-    longitude: -61.2145,
-    altitude_meters: 1250,
-    point_type: "mirador",
-    title: "Mirador del Tepuy Kama-Merú",
-    description: "Excelente punto fotográfico al amanecer con vista frontal a la caída de agua."
-  },
-  {
-    id: "wp-2",
-    expedition_id: "exp-201",
-    latitude: 4.88124,
-    longitude: -61.1203,
-    altitude_meters: 980,
-    point_type: "gasolinera",
-    title: "Estación de Servicio Santa Elena de Uairén",
-    description: "Suministro operativo de Gasolina 95 octanos sin colas prolongadas."
-  },
-  {
-    id: "wp-3",
-    expedition_id: "exp-201",
-    latitude: 5.12098,
-    longitude: -60.7511,
-    altitude_meters: 1100,
-    point_type: "sendero_offroad",
-    title: "Paso del Río Tek (Cruce 4x4)",
-    description: "Vado de río profundo. Se requiere doble tracción activada."
-  }
-];
+const LOCAL_AUTH_KEY = "hdv_influencer_travel_authorizations_v2";
 
-const INITIAL_DEALS: CreatorDeal[] = [
-  {
-    id: "deal-301",
-    establishment_id: 1,
-    brand_name: "Posada VIP Gran Sabana Lodge",
-    deal_type: "mixto",
-    monetary_usd: 600,
-    barter_value_usd: 450,
-    status: "por_cobrar",
-    notes: "Canje 3N en suite ejecutiva + $600 por Reel colaborativo y mención HDV."
-  },
-  {
-    id: "deal-302",
-    establishment_id: 1,
-    brand_name: "Marcas de Equipaje & Cauchos Off-Road 4x4",
-    deal_type: "monetario",
-    monetary_usd: 800,
-    barter_value_usd: 0,
-    status: "en_produccion",
-    notes: "Patrocinio de combustible y prueba de cauchos en ruta Roraima."
-  }
-];
-
-const INITIAL_DELIVERABLES: CreatorDeliverable[] = [
-  {
-    id: "del-1",
-    deal_id: "deal-301",
-    title: "Reel Colaborativo 'Secretos de la Gran Sabana'",
-    platform: "instagram_reel",
-    due_date: new Date(Date.now() + 2 * 24 * 3600000).toISOString().split("T")[0],
-    status: "pending"
-  },
-  {
-    id: "del-2",
-    deal_id: "deal-301",
-    title: "Reseña Oficial con Auditoría Wi-Fi en Hoteles de Venezuela",
-    platform: "hdv_review",
-    due_date: new Date(Date.now() + 4 * 24 * 3600000).toISOString().split("T")[0],
-    status: "pending"
-  }
-];
-
-const INITIAL_EXPENSES: CreatorRouteExpense[] = [
-  {
-    id: "exp-g1",
-    establishment_id: 1,
-    expedition_id: "exp-201",
-    description: "Combustible 120L diésel y bidones para ruta",
-    category: "combustible",
-    amount_usd: 75,
-    amount_bs: 75 * DEFAULT_EXCHANGE_RATE,
-    logged_by: "Piloto 4x4"
-  },
-  {
-    id: "exp-g2",
-    establishment_id: 1,
-    expedition_id: "exp-201",
-    description: "Pago de Guía Pemón para cruce de ríos",
-    category: "lancheros",
-    amount_usd: 50,
-    amount_bs: 50 * DEFAULT_EXCHANGE_RATE,
-    logged_by: "Creador"
-  },
-  {
-    id: "exp-g3",
-    establishment_id: 1,
-    expedition_id: "exp-201",
-    description: "Víveres de carretera, hielo y agua mineral para 5 días",
-    category: "comidas",
-    amount_usd: 90,
-    amount_bs: 90 * DEFAULT_EXCHANGE_RATE,
-    logged_by: "Productor"
-  }
-];
-
-const INITIAL_TASKS: CreatorEditorialTask[] = [
-  {
-    id: "tsk-1",
-    establishment_id: 1,
-    task_name: "Selección de tomas aéreas con Drone (Roraima)",
-    platform: "instagram_reel",
-    due_date: new Date(Date.now() + 1 * 24 * 3600000).toISOString().split("T")[0],
-    status: "editing",
-    position_order: 1
-  },
-  {
-    id: "tsk-2",
-    establishment_id: 1,
-    task_name: "Edición de audio y diseño sonoro del Reel Gran Sabana",
-    platform: "tiktok",
-    due_date: new Date(Date.now() + 3 * 24 * 3600000).toISOString().split("T")[0],
-    status: "todo",
-    position_order: 2
-  },
-  {
-    id: "tsk-3",
-    establishment_id: 1,
-    task_name: "Revisión final de color con la Posada Patrocinadora",
-    platform: "hdv_review",
-    due_date: new Date(Date.now() + 5 * 24 * 3600000).toISOString().split("T")[0],
-    status: "review",
-    position_order: 3
-  }
-];
-
-const INITIAL_AUDITS: CreatorEstablishmentAudit[] = [
-  {
-    id: "aud-1",
-    establishment_id: 1,
-    visited_establishment_name: "Posada VIP Gran Sabana Lodge",
-    wifi_speed_mbps: 45.8,
-    water_pressure_status: "excelente",
-    power_generator_status: "si_automatica",
-    water_well_status: "si_pozo_propio",
-    overall_score: 9.5,
-    notes: "Planta eléctrica insonorizada 100% activa durante corte en el sector. Conexión de fibra ideal para edición y subida de archivos 4K."
-  }
-];
-
-const LOCAL_AUTH_KEY = "hdv_influencer_travel_authorizations";
-
-const INITIAL_AUTHORIZATIONS: InfluencerTravelAuthorization[] = [
-  {
-    id: "auth-101",
-    influencer_id: 99901,
-    influencer_name: "Creador(a) Oficial HDV",
-    influencer_handle: "@creador_hdv",
-    influencer_avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
-    period_type: "dias",
-    title: "Ventana de Expedición - Días 15 al 18 Octubre",
-    start_date: "2026-10-15",
-    end_date: "2026-10-18",
-    allowed_days_count: 4,
-    destination_target: "Ruta Playas de Mochima & Golfo de Cariaco (Sucre)",
-    authorized_trips_count: 1,
-    fee_per_trip_usd: 20.00,
-    total_honorarios_usd: 20.00,
-    approved_viaticos_budget_usd: 120.00,
-    viaticos_budget_breakdown: {
-      combustible: 40.00,
-      comidas: 35.00,
-      hospedaje: 25.00,
-      guias_lancheros: 20.00,
-      peajes: 0.00,
-      otros: 0.00
-    },
-    status: "habilitado",
-    enabled_by_admin: true,
-    admin_notes: "Habilitado por Admin HDV. Ruta de 4 días para grabación de posadas y playas.",
-    created_at: new Date().toISOString()
-  },
-  {
-    id: "auth-102",
-    influencer_id: 99901,
-    influencer_name: "Creador(a) Oficial HDV",
-    influencer_handle: "@creador_hdv",
-    influencer_avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
-    period_type: "semanas",
-    assigned_week: "Semana 43 (20 al 26 Octubre)",
-    title: "Semana Habilitada - Morrocoy, Cayos & Parque Nacional",
-    start_date: "2026-10-20",
-    end_date: "2026-10-26",
-    allowed_days_count: 7,
-    destination_target: "Tucacas, Chichiriviche & Cayo Sal (Falcón)",
-    authorized_trips_count: 2,
-    fee_per_trip_usd: 20.00,
-    total_honorarios_usd: 40.00,
-    approved_viaticos_budget_usd: 195.00,
-    viaticos_budget_breakdown: {
-      combustible: 60.00,
-      guias_lancheros: 75.00,
-      comidas: 40.00,
-      peajes: 20.00,
-      hospedaje: 0.00,
-      otros: 0.00
-    },
-    status: "habilitado",
-    enabled_by_admin: true,
-    admin_notes: "2 viajes autorizados en la semana ($40 total honorarios + $195 viáticos).",
-    created_at: new Date().toISOString()
-  },
-  {
-    id: "auth-103",
-    influencer_id: 99901,
-    influencer_name: "Creador(a) Oficial HDV",
-    influencer_handle: "@creador_hdv",
-    influencer_avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
-    period_type: "mes",
-    assigned_month: "Noviembre 2026",
-    title: "Mes Asignado - Circuito Andino Mérida & Pico Espejo",
-    start_date: "2026-11-01",
-    end_date: "2026-11-30",
-    allowed_days_count: 30,
-    destination_target: "Mérida, Sierra Nevada & Mucubají",
-    authorized_trips_count: 3,
-    fee_per_trip_usd: 20.00,
-    total_honorarios_usd: 60.00,
-    approved_viaticos_budget_usd: 320.00,
-    viaticos_budget_breakdown: {
-      combustible: 90.00,
-      hospedaje: 110.00,
-      comidas: 80.00,
-      peajes: 20.00,
-      guias_lancheros: 20.00,
-      otros: 0.00
-    },
-    status: "programado",
-    enabled_by_admin: true,
-    admin_notes: "Cupo mensual de 3 viajes asignados para temporada baja andina.",
-    created_at: new Date().toISOString()
-  }
-];
-
-const INITIAL_VISITED_ESTABLISHMENTS: CreatorVisitedEstablishment[] = [
-  {
-    id: "est-vis-1",
-    establishment_id: 1,
-    name: "Posada Perla Negra - Morrocoy",
-    destination: "Tucacas / Chichiriviche, Falcón",
-    category: "hoteles_posadas",
-    category_label: "Hoteles & Posadas",
-    visit_date: "2026-09-12",
-    status: "auditado",
-    rating: 9.8,
-    is_recommended: true,
-    wifi_speed_mbps: 78.5,
-    power_generator: "si_automatica",
-    water_supply: "si_pozo_propio",
-    water_pressure: "excelente",
-    coverage_types: ["instagram_reel", "hdv_review", "fotos_4k"],
-    social_link: "https://instagram.com/reel/perla_negra_hdv",
-    hdv_slug: "perla-negra",
-    deal_type: "mixto",
-    deal_value_usd: 350,
-    photos: ["https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80"],
-    notes: "Planta eléctrica 100% insonorizada. Excelente gastronomía marina y salida directa a los cayos."
-  },
-  {
-    id: "est-vis-2",
-    establishment_id: 1,
-    name: "Hostal Entre 2 Aguas",
-    destination: "Playa Grande, Choroní, Aragua",
-    category: "hoteles_posadas",
-    category_label: "Hoteles & Posadas",
-    visit_date: "2026-08-20",
-    status: "auditado",
-    rating: 9.5,
-    is_recommended: true,
-    wifi_speed_mbps: 45.0,
-    power_generator: "si_automatica",
-    water_supply: "tanque_reserva",
-    water_pressure: "excelente",
-    coverage_types: ["instagram_reel", "tiktok", "hdv_review"],
-    social_link: "https://instagram.com/reel/entre2aguas_choroni",
-    hdv_slug: "hostal-entre-2-aguas",
-    deal_type: "canje",
-    deal_value_usd: 250,
-    photos: ["https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=600&q=80"],
-    notes: "Ambiente colonial caribeño de alta gama. Desayunos criollos con cacao local."
-  },
-  {
-    id: "est-vis-3",
-    establishment_id: 1,
-    name: "Yilitas Restaurante & Bar de Playa",
-    destination: "Playa El Yaque, Isla de Margarita",
-    category: "restaurantes_gastronomia",
-    category_label: "Restaurantes & Gastronomía",
-    visit_date: "2026-08-05",
-    status: "auditado",
-    rating: 9.2,
-    is_recommended: true,
-    wifi_speed_mbps: 38.0,
-    power_generator: "si_manual",
-    water_supply: "tanque_reserva",
-    water_pressure: "aceptable",
-    coverage_types: ["instagram_reel", "tiktok"],
-    social_link: "https://instagram.com/p/yilitas_el_yaque",
-    hdv_slug: "yilitas-restaurante-mnie9b8z",
-    deal_type: "monetario",
-    deal_value_usd: 200,
-    photos: ["https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80"],
-    notes: "Especialidad en mariscos frescos, fosforera y vista directa a las escuelas de windsurf."
-  },
-  {
-    id: "est-vis-4",
-    establishment_id: 1,
-    name: "Marina & Yacht Charter Los Roques VIP",
-    destination: "Gran Roque / Cayo de Agua, Los Roques",
-    category: "marinas_yates",
-    category_label: "Marinas & Yates",
-    visit_date: "2026-07-18",
-    status: "auditado",
-    rating: 9.9,
-    is_recommended: true,
-    wifi_speed_mbps: 92.0,
-    power_generator: "si_automatica",
-    water_supply: "si_pozo_propio",
-    water_pressure: "excelente",
-    coverage_types: ["youtube", "instagram_reel", "fotos_4k"],
-    deal_type: "monetario",
-    deal_value_usd: 600,
-    photos: ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80"],
-    notes: "Catamarán de 48ft para expediciones privadas entre cayos. Certificación náutica internacional."
-  },
-  {
-    id: "est-vis-5",
-    establishment_id: 1,
-    name: "Parque El Mundo de los Niños",
-    destination: "Barquisimeto, Lara",
-    category: "parques_complejos",
-    category_label: "Parques & Complejos",
-    visit_date: "2026-06-25",
-    status: "auditado",
-    rating: 9.0,
-    is_recommended: true,
-    wifi_speed_mbps: 30.0,
-    power_generator: "si_automatica",
-    water_supply: "si_pozo_propio",
-    water_pressure: "excelente",
-    coverage_types: ["youtube", "tiktok"],
-    deal_type: "mixto",
-    deal_value_usd: 400,
-    photos: ["https://images.unsplash.com/photo-1513889961551-628c1e5e2ee9?auto=format&fit=crop&w=600&q=80"],
-    notes: "Complejo recreativo familiar y acuático. Relevamiento de atracciones y áreas temáticas."
-  },
-  {
-    id: "est-vis-6",
-    establishment_id: 1,
-    name: "Flota 4x4 Aventura Gran Sabana",
-    destination: "Santa Elena de Uairén, Bolívar",
-    category: "rent_a_car",
-    category_label: "Rent-a-car & Flota 4x4",
-    visit_date: "2026-09-01",
-    status: "auditado",
-    rating: 9.7,
-    is_recommended: true,
-    wifi_speed_mbps: 50.0,
-    power_generator: "si_automatica",
-    water_supply: "si_pozo_propio",
-    water_pressure: "excelente",
-    coverage_types: ["youtube", "instagram_reel"],
-    deal_type: "mixto",
-    deal_value_usd: 500,
-    photos: ["https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=600&q=80"],
-    notes: "Vehículos rústicos preparados para vadeo de ríos, cauchos M/T y snorkels para Roraima."
-  }
-];
-
-const INITIAL_QUOTES: CreatorQuote[] = [
-  {
-    id: "quote-001",
-    establishment_id: 1,
-    quote_number: "COT-2026-001",
-    client_name: "Posada Perla Negra",
-    client_contact: "Antonio (+58 412-555-1234)",
-    destination_target: "Morrocoy, Falcón",
-    created_date: "2026-09-10",
-    valid_until_date: "2026-10-10",
-    items: [
-      {
-        id: "qi-1",
-        service_name: "Reel Colaborativo en Instagram (4K Drone)",
-        description: "Reel cinematográfico con tomas aéreas y recorrido de suites",
-        quantity: 1,
-        unit_price_usd: 150,
-        total_usd: 150
-      },
-      {
-        id: "qi-2",
-        service_name: "Pack de 4 Stories con Enlace a Reservas HDV",
-        description: "Historias con swipe-up directo a la ficha en Hoteles de Venezuela",
-        quantity: 1,
-        unit_price_usd: 80,
-        total_usd: 80
-      },
-      {
-        id: "qi-3",
-        service_name: "Auditoría Técnica con Sello de Calidad HDV",
-        description: "Test de velocidad Wi-Fi, revisión de respaldo eléctrico y reporte oficial",
-        quantity: 1,
-        unit_price_usd: 120,
-        total_usd: 120
-      },
-      {
-        id: "qi-4",
-        service_name: "Galería de 15 Fotografías Profesionales",
-        description: "Fotografías editadas en alta resolución con derechos de uso para la posada",
-        quantity: 1,
-        unit_price_usd: 150,
-        total_usd: 150
-      }
-    ],
-    subtotal_usd: 500,
-    discount_usd: 50,
-    total_usd: 450,
-    total_bs: 450 * DEFAULT_EXCHANGE_RATE,
-    status: "aprobada",
-    notes: "Convenio aprobado. Se incluye hospedaje de cortesía para el equipo de filmación.",
-    converted_to_deal: true,
-    created_at: new Date().toISOString()
-  },
-  {
-    id: "quote-002",
-    establishment_id: 1,
-    quote_number: "COT-2026-002",
-    client_name: "Restaurante Yilitas",
-    client_contact: "Yilena (+58 424-888-9900)",
-    destination_target: "Playa El Yaque, Margarita",
-    created_date: "2026-09-18",
-    valid_until_date: "2026-10-18",
-    items: [
-      {
-        id: "qi-5",
-        service_name: "Reel Gastronómico 'Ruta del Pescado Fresco'",
-        description: "Video dinámico de preparación y degustación en primera fila de playa",
-        quantity: 1,
-        unit_price_usd: 120,
-        total_usd: 120
-      },
-      {
-        id: "qi-6",
-        service_name: "TikTok Viral de Experiencia en Playa",
-        description: "Formato vertical humor/lifestyle turístico",
-        quantity: 1,
-        unit_price_usd: 80,
-        total_usd: 80
-      }
-    ],
-    subtotal_usd: 200,
-    discount_usd: 0,
-    total_usd: 200,
-    total_bs: 200 * DEFAULT_EXCHANGE_RATE,
-    status: "enviada",
-    notes: "Propuesta enviada vía WhatsApp pendiente de confirmación de fecha de grabación.",
-    created_at: new Date().toISOString()
-  }
-];
+const INITIAL_AUTHORIZATIONS: InfluencerTravelAuthorization[] = [];
+const INITIAL_VISITED_ESTABLISHMENTS: CreatorVisitedEstablishment[] = [];
+const INITIAL_QUOTES: CreatorQuote[] = [];
 
 const INITIAL_MEMBERSHIP: CreatorMembershipProfile = {
   tier_name: "Black Creator Pass - Oficial HDV",
-  tier_badge: "CREADORA OFICIAL VERIFICADA",
+  tier_badge: "CREADOR(A) OFICIAL VERIFICADO(A)",
   status: "active",
-  member_since: "2025-01-15",
+  member_since: new Date().toISOString().split("T")[0],
   valid_thru: "2027-12-31",
-  qr_code_token: "HDV-PRESS-AURA-CROCE-99901-2027",
-  press_card_number: "HDV-PRESS-2026-9901",
+  qr_code_token: "HDV-PRESS-OFICIAL-2027",
+  press_card_number: "HDV-PRESS-2026-0001",
   benefits: [
     "Honorarios garantizados de $20.00 USD por cada expedición aprobada",
     "Tarifas 0% comisión de alojamiento en posadas afiliadas en misiones oficiales",
@@ -599,83 +62,40 @@ const INITIAL_MEMBERSHIP: CreatorMembershipProfile = {
 
 const INITIAL_PROFILE_INFO: CreatorProfileInfo = {
   name: "Creador(a) Oficial HDV",
-  headline: "Viajera 4x4, expedicionaria audiovisual & auditora de turismo HDV",
+  headline: "Creador(a) de contenido audiovisual, expediciones & auditoría turística HDV",
   avatar_url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
   banner_url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
-  bio: "Documentando los rincones más mágicos e inexplorados de Venezuela: desde expediciones 4x4 en los Andes y el Gran Roque hasta selvas y tepuyes de Canaima.",
-  instagram: "@creador_hdv",
-  tiktok: "@creador_viajes",
-  youtube: "Creador Oficial HDV",
-  phone: "+58 414-1234567",
-  gear_equipment: "DJI Mavic 3 Pro • Sony Alpha 7 IV • Lente G-Master 24-70mm • Micrófonos Rode Wireless PRO • Starlink Mini",
-  location: "Caracas / Expediciones Nacionales, Venezuela"
+  bio: "Documentando los destinos, posadas, hoteles y experiencias turísticas de Venezuela con cobertura oficial para Hoteles de Venezuela.",
+  instagram: "",
+  tiktok: "",
+  youtube: "",
+  phone: "",
+  gear_equipment: "",
+  location: "Venezuela"
 };
 
-const INITIAL_GALLERY_ALBUMS: CreatorGalleryAlbum[] = [
-  {
-    id: "album-1",
-    establishment_id: 1,
-    title: "Expedición Morrocoy & Cayo Sombrero",
-    destination: "Parque Nacional Morrocoy, Falcón",
-    trip_date: "2026-09-12",
-    cover_url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
-    notes_for_future_trips: "Mejor luz de vuelo drone entre 7:30 AM y 10:00 AM antes de que sople la brisa marina. Contactar al Capitán Manuel en el muelle de Tucacas.",
-    best_lighting_hours: "07:30 AM - 10:00 AM (Golden Hour)",
-    local_contacts: "Capitán Manuel (Lancha Rápida): +58 412-5550192 | Posada Perla Negra: +58 424-9988771",
-    tags: ["drone", "paisaje", "hospedaje"],
-    photos: [
-      {
-        id: "p-1",
-        photo_url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
-        title: "Aguas Cristalinas de Cayo Sombrero",
-        caption: "Toma cenital con DJI Mavic 3 a 120m de altura.",
-        tag: "drone"
-      },
-      {
-        id: "p-2",
-        photo_url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
-        title: "Atardecer en Posada Perla Negra",
-        caption: "Fachada iluminada al anochecer.",
-        tag: "hospedaje"
-      }
-    ]
-  },
-  {
-    id: "album-2",
-    establishment_id: 1,
-    title: "Travesía Sierra Nevada & Mucubají 4x4",
-    destination: "Mérida, Andes Venezolanos",
-    trip_date: "2026-08-15",
-    cover_url: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",
-    notes_for_future_trips: "Llevar baterías extra temperadas en bolsillos internos por el frío a 3.600 msnm. Parar en el Mirador de la Loca Luz Caraballo para tomas de neblina matutina.",
-    best_lighting_hours: "06:00 AM - 08:30 AM (Niebla y amanecer)",
-    local_contacts: "Guía de Páramo Carlos: +58 426-3334411 | Posada Los Frailes: +58 414-7788992",
-    tags: ["4x4", "paisaje", "drone"],
-    photos: [
-      {
-        id: "p-3",
-        photo_url: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",
-        title: "Laguna de Mucubají con Neblina",
-        caption: "Espejo de agua a 3.600 metros de altitud.",
-        tag: "paisaje"
-      }
-    ]
-  }
-];
+const INITIAL_GALLERY_ALBUMS: CreatorGalleryAlbum[] = [];
 
 export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
-  const localExpKey = `hdv_creator_expeditions_${establishmentId}`;
-  const localVisitedKey = `hdv_creator_visited_est_${establishmentId}`;
-  const localQuotesKey = `hdv_creator_quotes_${establishmentId}`;
-  const localMembershipKey = `hdv_creator_membership_${establishmentId}`;
+  const localExpKey = `hdv_creator_expeditions_v2_${establishmentId}`;
+  const localVisitedKey = `hdv_creator_visited_est_v2_${establishmentId}`;
+  const localQuotesKey = `hdv_creator_quotes_v2_${establishmentId}`;
+  const localMembershipKey = `hdv_creator_membership_v2_${establishmentId}`;
   const localProfileKey = `hdv_creator_profile_${establishmentId}`;
-  const localGalleryKey = `hdv_creator_gallery_${establishmentId}`;
-  const localWaypointsKey = `hdv_creator_waypoints_${establishmentId}`;
+  const localGalleryKey = `hdv_creator_gallery_v2_${establishmentId}`;
+  const localWaypointsKey = `hdv_creator_waypoints_v2_${establishmentId}`;
+  const localDealsKey = `hdv_creator_deals_v2_${establishmentId}`;
+  const localDeliverablesKey = `hdv_creator_deliverables_v2_${establishmentId}`;
+  const localExpensesKey = `hdv_creator_expenses_v2_${establishmentId}`;
+  const localTasksKey = `hdv_creator_editorial_tasks_v2_${establishmentId}`;
+  const localAuditsKey = `hdv_creator_audits_v2_${establishmentId}`;
 
   const [profileInfo, setProfileInfo] = useState<CreatorProfileInfo>(() => {
     if (typeof window !== "undefined") {
       try {
-        const saved = localStorage.getItem(localProfileKey);
+        const saved =
+          localStorage.getItem(localProfileKey) ||
+          localStorage.getItem(`hdv_creator_profile_info_${establishmentId}`);
         if (saved) {
           const parsed = JSON.parse(saved);
           if (parsed && parsed.name) return parsed;
@@ -691,7 +111,7 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
         const saved = localStorage.getItem(localGalleryKey);
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed)) return parsed;
         }
       } catch (e) {}
     }
@@ -716,7 +136,7 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
         const saved = localStorage.getItem(localExpKey);
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed)) return parsed;
         }
       } catch (e) {}
     }
@@ -729,7 +149,7 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
         const saved = localStorage.getItem(LOCAL_AUTH_KEY);
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed)) return parsed;
         }
       } catch (e) {}
     }
@@ -742,7 +162,7 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
         const saved = localStorage.getItem(localVisitedKey);
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed)) return parsed;
         }
       } catch (e) {}
     }
@@ -755,7 +175,7 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
         const saved = localStorage.getItem(localQuotesKey);
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed)) return parsed;
         }
       } catch (e) {}
     }
@@ -772,15 +192,91 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
         }
       } catch (e) {}
     }
-    return INITIAL_MEMBERSHIP;
+    return {
+      ...INITIAL_MEMBERSHIP,
+      qr_code_token: `HDV-PRESS-${establishmentId}-2027`,
+      press_card_number: `HDV-PRESS-2026-${establishmentId}`
+    };
   });
 
-  const [waypoints, setWaypoints] = useState<CreatorWaypoint[]>(INITIAL_WAYPOINTS);
-  const [deals, setDeals] = useState<CreatorDeal[]>(INITIAL_DEALS);
-  const [deliverables, setDeliverables] = useState<CreatorDeliverable[]>(INITIAL_DELIVERABLES);
-  const [routeExpenses, setRouteExpenses] = useState<CreatorRouteExpense[]>(INITIAL_EXPENSES);
-  const [tasks, setTasks] = useState<CreatorEditorialTask[]>(INITIAL_TASKS);
-  const [audits, setAudits] = useState<CreatorEstablishmentAudit[]>(INITIAL_AUDITS);
+  const [waypoints, setWaypoints] = useState<CreatorWaypoint[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem(localWaypointsKey);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch (e) {}
+    }
+    return INITIAL_WAYPOINTS;
+  });
+
+  const [deals, setDeals] = useState<CreatorDeal[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem(localDealsKey);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch (e) {}
+    }
+    return INITIAL_DEALS;
+  });
+
+  const [deliverables, setDeliverables] = useState<CreatorDeliverable[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem(localDeliverablesKey);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch (e) {}
+    }
+    return INITIAL_DELIVERABLES;
+  });
+
+  const [routeExpenses, setRouteExpenses] = useState<CreatorRouteExpense[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem(localExpensesKey);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch (e) {}
+    }
+    return INITIAL_EXPENSES;
+  });
+
+  const [tasks, setTasks] = useState<CreatorEditorialTask[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem(localTasksKey);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch (e) {}
+    }
+    return INITIAL_TASKS;
+  });
+
+  const [audits, setAudits] = useState<CreatorEstablishmentAudit[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem(localAuditsKey);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch (e) {}
+    }
+    return INITIAL_AUDITS;
+  });
+
   const [loading, setLoading] = useState(true);
 
   // Guardar en localStorage cuando cambien las expediciones
@@ -1286,7 +782,11 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
       notes: `Generado desde Cotización ${quote.quote_number}. Destino: ${quote.destination_target || 'Venezuela'}`,
       created_at: new Date().toISOString()
     };
-    setDeals(prev => [newDeal, ...prev]);
+    setDeals(prev => {
+      const next = [newDeal, ...prev];
+      try { localStorage.setItem(localDealsKey, JSON.stringify(next)); } catch {}
+      return next;
+    });
 
     // 3. Crear entregables y tareas editoriales por cada ítem
     quote.items.forEach((item, idx) => {
@@ -1300,7 +800,11 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
         position_order: tasks.length + idx + 1,
         created_at: new Date().toISOString()
       };
-      setTasks(prev => [...prev, task]);
+      setTasks(prev => {
+        const next = [...prev, task];
+        try { localStorage.setItem(localTasksKey, JSON.stringify(next)); } catch {}
+        return next;
+      });
     });
   };
 
@@ -1324,7 +828,11 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
       created_at: new Date().toISOString()
     }));
 
-    setWaypoints(prev => [...prev, ...created]);
+    setWaypoints(prev => {
+      const next = [...prev, ...created];
+      try { localStorage.setItem(localWaypointsKey, JSON.stringify(next)); } catch {}
+      return next;
+    });
   };
 
   const createDeal = async (dealData: Partial<CreatorDeal>): Promise<CreatorDeal> => {
@@ -1340,7 +848,11 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
       created_at: new Date().toISOString()
     };
 
-    setDeals(prev => [newDeal, ...prev]);
+    setDeals(prev => {
+      const next = [newDeal, ...prev];
+      try { localStorage.setItem(localDealsKey, JSON.stringify(next)); } catch {}
+      return next;
+    });
     return newDeal;
   };
 
@@ -1357,7 +869,11 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
       created_at: new Date().toISOString()
     };
 
-    setRouteExpenses(prev => [newExp, ...prev]);
+    setRouteExpenses(prev => {
+      const next = [newExp, ...prev];
+      try { localStorage.setItem(localExpensesKey, JSON.stringify(next)); } catch {}
+      return next;
+    });
   };
 
   const addEditorialTask = (taskData: Partial<CreatorEditorialTask>) => {
@@ -1372,11 +888,19 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
       created_at: new Date().toISOString()
     };
 
-    setTasks(prev => [...prev, newTask]);
+    setTasks(prev => {
+      const next = [...prev, newTask];
+      try { localStorage.setItem(localTasksKey, JSON.stringify(next)); } catch {}
+      return next;
+    });
   };
 
   const updateTaskStatus = (taskId: string, status: TaskStatus) => {
-    setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status } : t));
+    setTasks(prev => {
+      const next = prev.map(t => t.id === taskId ? { ...t, status } : t);
+      try { localStorage.setItem(localTasksKey, JSON.stringify(next)); } catch {}
+      return next;
+    });
   };
 
   const addAudit = (auditData: Partial<CreatorEstablishmentAudit>) => {
@@ -1393,7 +917,11 @@ export function useCreatorInfluencerRealtime(establishmentId: number = 1) {
       created_at: new Date().toISOString()
     };
 
-    setAudits(prev => [newAudit, ...prev]);
+    setAudits(prev => {
+      const next = [newAudit, ...prev];
+      try { localStorage.setItem(localAuditsKey, JSON.stringify(next)); } catch {}
+      return next;
+    });
   };
 
   // Gestión de Perfil de Creadora

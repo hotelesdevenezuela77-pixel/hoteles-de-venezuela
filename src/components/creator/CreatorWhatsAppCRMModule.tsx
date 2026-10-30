@@ -37,49 +37,17 @@ export function CreatorWhatsAppCRMModule({
   creatorName,
   whatsappNumber = "+584141234567"
 }: CreatorWhatsAppCRMModuleProps) {
-  const localKey = `hdv_creator_wa_crm_${establishmentId}`;
+  const localKey = `hdv_creator_wa_crm_v2_${establishmentId}`;
 
   const [leads, setLeads] = useState<CreatorWhatsAppLead[]>(() => {
     try {
       const raw = localStorage.getItem(localKey);
-      if (raw) return JSON.parse(raw);
-    } catch (e) {}
-
-    return [
-      {
-        id: "lead-1",
-        sender_name: "Gerencia General Posada Los Roques VIP",
-        sender_phone: "+584141234567",
-        category: "posada_hotel",
-        business_name: "Posada Los Roques VIP",
-        message: "Hola Aura, vimos tu cobertura en Morrocoy y nos gustaría coordinar una visita a Los Roques con estadía todo incluido para auditoría técnica y 2 Reels.",
-        proposed_budget_usd: 850,
-        status: "nuevo",
-        created_at: new Date(Date.now() - 2 * 3600000).toISOString().split("T")[0]
-      },
-      {
-        id: "lead-2",
-        sender_name: "Marketing Ropa & Accesorios 4x4",
-        sender_phone: "+584249876543",
-        category: "marca_sponsor",
-        business_name: "Overland Venezuela 4x4",
-        message: "Buenas tardes, queremos patrocinar tu próxima expedición a Roraima con indumentaria técnica impermeable y una pauta de $500 USD por video.",
-        proposed_budget_usd: 500,
-        status: "en_negociacion",
-        created_at: new Date(Date.now() - 24 * 3600000).toISOString().split("T")[0]
-      },
-      {
-        id: "lead-3",
-        sender_name: "Restaurante & Bodegón Marino",
-        sender_phone: "+584125556677",
-        category: "posada_hotel",
-        business_name: "La Cabaña de Mochima",
-        message: "Hola, queremos invitarte a degustar nuestro menú marino y grabar una reseña en tu canal de Hoteles de Venezuela.",
-        proposed_budget_usd: 200,
-        status: "pautado",
-        created_at: new Date(Date.now() - 48 * 3600000).toISOString().split("T")[0]
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
       }
-    ];
+    } catch (e) {}
+    return [];
   });
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -97,6 +65,7 @@ export function CreatorWhatsAppCRMModule({
   const saveLeads = (newLeads: CreatorWhatsAppLead[]) => {
     setLeads(newLeads);
     localStorage.setItem(localKey, JSON.stringify(newLeads));
+    window.dispatchEvent(new CustomEvent("hdv_creator_leads_changed", { detail: { establishmentId, count: newLeads.length } }));
   };
 
   const handleAddLead = (e: React.FormEvent) => {

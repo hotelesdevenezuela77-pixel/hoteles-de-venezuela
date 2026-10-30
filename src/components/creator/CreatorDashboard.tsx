@@ -135,17 +135,43 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
 
   const isLight = theme === "light";
 
-  // Contador de leads de WhatsApp (CRM)
+  // Contador de leads de WhatsApp (CRM) independiente por influencer (inicia en 0)
   const [leadsCount, setLeadsCount] = useState<number>(() => {
     try {
-      const raw = localStorage.getItem(`hdv_owner_wa_leads_${estId}`);
+      const raw = localStorage.getItem(`hdv_creator_wa_crm_v2_${estId}`);
       if (raw) {
         const arr = JSON.parse(raw);
-        if (Array.isArray(arr) && arr.length > 0) return arr.length;
+        if (Array.isArray(arr)) return arr.length;
       }
     } catch (e) {}
-    return 10;
+    return 0;
   });
+
+  React.useEffect(() => {
+    const syncLeadsCount = () => {
+      try {
+        const raw = localStorage.getItem(`hdv_creator_wa_crm_v2_${estId}`);
+        if (raw) {
+          const arr = JSON.parse(raw);
+          if (Array.isArray(arr)) {
+            setLeadsCount(arr.length);
+            return;
+          }
+        }
+        setLeadsCount(0);
+      } catch (e) {
+        setLeadsCount(0);
+      }
+    };
+    syncLeadsCount();
+    window.addEventListener("hdv_creator_leads_changed", syncLeadsCount);
+    return () => window.removeEventListener("hdv_creator_leads_changed", syncLeadsCount);
+  }, [estId]);
+
+  const myTravelAuthorizations = React.useMemo(
+    () => travelAuthorizations.filter(a => Number(a.influencer_id) === Number(estId)),
+    [travelAuthorizations, estId]
+  );
 
   const CREATOR_TABS: {
     id: CreatorTabType;
@@ -167,7 +193,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
       id: "remuneraciones",
       label: "Honorarios & Viáticos",
       icon: DollarSign,
-      badge: "$20 Base",
+      badge: `${expeditions.length} Viajes`,
       badgeColor: "bg-[#FF0096]/20 text-[#FF0096] border-[#FF0096]/40",
       accentGlow: "from-[#FF0096] via-[#9B00CC] to-[#00C8D4]"
     },
@@ -523,7 +549,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
         {activeTab === "remuneraciones" && (
           <CreatorTripRemunerationModule
             expeditions={expeditions}
-            travelAuthorizations={travelAuthorizations}
+            travelAuthorizations={myTravelAuthorizations}
             kpis={kpis}
             creatorName={creatorName}
             onAddExpedition={addExpedition}
@@ -594,6 +620,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
             onUpdateEstablishment={updateVisitedEstablishment}
             onDeleteEstablishment={deleteVisitedEstablishment}
             creatorName={creatorName}
+            theme={theme}
           />
         )}
 

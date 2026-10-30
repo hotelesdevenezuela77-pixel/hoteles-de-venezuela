@@ -475,7 +475,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
           }
         }
 
-        // 2. Fallback to localStorage mock establishments if not found in DB
+        // 2. Fallback to localStorage mock establishments or pre-registrations if not found in DB
         if (!dbData) {
           const localEstsKey = "hdv_mock_establishments";
           const localEsts = JSON.parse(localStorage.getItem(localEstsKey) || "[]");
@@ -484,12 +484,59 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
             e.name?.toLowerCase().replace(/[^a-z0-9]+/g, "-") === slug
           );
           if (foundLocal) {
+            const localGallery = Array.isArray(foundLocal.establishment_images) && foundLocal.establishment_images.length > 0
+              ? foundLocal.establishment_images
+              : Array.isArray(foundLocal.images) && foundLocal.images.length > 0
+                ? foundLocal.images.map((u: string, idx: number) => ({ image_url: u, is_primary: idx === 0 }))
+                : foundLocal.primary_image
+                  ? [{ image_url: foundLocal.primary_image, is_primary: true }]
+                  : [];
             dbData = {
               ...foundLocal,
               categories: { name: foundLocal.category_name || "Posadas", slug: "posadas" },
-              destinations: { name: foundLocal.destination_name || "Barquisimeto", slug: "barquisimeto" },
-              establishment_images: []
+              destinations: { name: foundLocal.destination_name || "Venezuela", slug: "venezuela" },
+              establishment_images: localGallery
             };
+          } else {
+            try {
+              const preregRaw = localStorage.getItem(`hdv_prereg_${slug}`);
+              if (preregRaw) {
+                const prereg = JSON.parse(preregRaw);
+                const galleryArr: string[] = Array.isArray(prereg.gallery_images) && prereg.gallery_images.length > 0
+                  ? prereg.gallery_images
+                  : prereg.primary_image
+                    ? [prereg.primary_image]
+                    : [];
+                dbData = {
+                  id: Date.now(),
+                  slug: prereg.slug || slug,
+                  name: prereg.title || "Establecimiento",
+                  description: prereg.short_description || "",
+                  address: prereg.destination_name || "Venezuela",
+                  city: prereg.city || "Venezuela",
+                  state: prereg.state || "Venezuela",
+                  phone: prereg.whatsapp_number || "",
+                  whatsapp: prereg.whatsapp_number || "",
+                  email: "",
+                  website: "",
+                  category_name: prereg.category_name || "Posadas",
+                  category_slug: "posadas",
+                  categories: { name: prereg.category_name || "Posadas", slug: "posadas" },
+                  destination_name: prereg.destination_name || "Venezuela",
+                  destination_slug: "venezuela",
+                  destinations: { name: prereg.destination_name || "Venezuela", slug: "venezuela" },
+                  primary_image: prereg.primary_image || galleryArr[0] || "",
+                  rating_avg: prereg.rating_avg || 5.0,
+                  review_count: 1,
+                  price_level: "$$",
+                  is_featured: true,
+                  services: JSON.stringify(prereg.key_service_pills || []),
+                  membership_tier: "basic",
+                  has_hdv_seal: prereg.badges?.has_hdv_seal ?? true,
+                  establishment_images: galleryArr.map((u: string, idx: number) => ({ image_url: u, is_primary: idx === 0 }))
+                };
+              }
+            } catch {}
           }
         }
 
