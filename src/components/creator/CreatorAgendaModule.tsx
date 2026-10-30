@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import {
+  getInfluencerStorageKeys,
+  getCreatorAgendaStorageKeys,
+  type InfluencerPublicBooking
+} from "@/components/AvailabilityCalendar";
 import { 
   Calendar as CalendarIcon, 
   Clock, 
@@ -56,16 +61,6 @@ const EVENT_TYPES = [
   { value: "permisos_inparques", label: "⚠️ Trámites & Permisos INPARQUES", color: "#ef4444", icon: AlertTriangle }
 ];
 
-const COLORS_PALETTE = [
-  "#FF0096", // Magenta Oficial
-  "#00C8D4", // Cyan Oficial
-  "#9B00CC", // Purple Oficial
-  "#10b981", // Emerald
-  "#eab308", // Yellow
-  "#6366f1", // Indigo
-  "#ef4444", // Red
-];
-
 interface CreatorAgendaModuleProps {
   establishmentId: number;
   creatorName: string;
@@ -73,15 +68,14 @@ interface CreatorAgendaModuleProps {
 
 export function CreatorAgendaModule({ establishmentId, creatorName }: CreatorAgendaModuleProps) {
   const [events, setEvents] = useState<CreatorAgendaEvent[]>([]);
+  const [publicBookings, setPublicBookings] = useState<InfluencerPublicBooking[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [viewMode, setViewMode] = useState<"month" | "week" | "day">("month");
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   
   // Sincronización Google Calendar
   const [googleConnected, setGoogleConnected] = useState<boolean>(() => {
     return localStorage.getItem(`hdv_google_cal_creator_${establishmentId}`) === "true";
   });
-  const [syncLoading, setSyncLoading] = useState<boolean>(false);
 
   // Modal State
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -95,15 +89,39 @@ export function CreatorAgendaModule({ establishmentId, creatorName }: CreatorAge
   const [formColor, setFormColor] = useState("#FF0096");
   const [formLocation, setFormLocation] = useState("");
   const [formSponsor, setFormSponsor] = useState("");
-  const [syncWithGoogle, setSyncWithGoogle] = useState(true);
 
   // Drag and Drop State
   const [draggedEvent, setDraggedEvent] = useState<CreatorAgendaEvent | null>(null);
 
   const localKey = `hdv_creator_agenda_${establishmentId}`;
 
+  const fetchPublicBookings = () => {
+    const keys = getInfluencerStorageKeys(establishmentId);
+    let combined: InfluencerPublicBooking[] = [];
+    keys.forEach((k) => {
+      try {
+        const raw = localStorage.getItem(k);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            parsed.forEach((b) => {
+              if (!combined.some((item) => item.id === b.id)) {
+                combined.push(b);
+              }
+            });
+          }
+        }
+      } catch (e) {}
+    });
+    setPublicBookings(combined);
+  };
+
   useEffect(() => {
     fetchEvents();
+    fetchPublicBookings();
+    const onBookingUpdate = () => fetchPublicBookings();
+    window.addEventListener("hdv_influencer_booking_updated", onBookingUpdate);
+    return () => window.removeEventListener("hdv_influencer_booking_updated", onBookingUpdate);
   }, [establishmentId]);
 
   const fetchEvents = async () => {
@@ -189,7 +207,50 @@ export function CreatorAgendaModule({ establishmentId, creatorName }: CreatorAge
 
   const saveEventsLocally = (newEvents: CreatorAgendaEvent[]) => {
     setEvents(newEvents);
-    localStorage.setItem(localKey, JSON.stringify(newEvents));
+    const agendaKeys = getCreatorAgendaStorageKeys(establishmentId);
+    agendaKeys.forEach((k) => {
+      localStorage.setItem(k, JSON.stringify(newEvents));
+    });
+    window.dispatchEvent(new CustomEvent("hdv_influencer_booking_updated"));
+  };
+
+  // Aprobar o Rechazar una Reserva Pública desde el Panel del Influencer
+  const handleUpdatePublicBookingStatus = (
+    booking: InfluencerPublicBooking,
+    newStatus: "confirmada" | "rechazada"
+  ) => {
+    const updatedList = publicBookings.map((b) =>
+      b.id === booking.id ? { ...b, status: newStatus } : b
+    );
+    setPublicBookings(updatedList);
+
+    const keys = getInfluencerStorageKeys(establishmentId);
+    keys.forEach((k) => {
+      localStorage.setItem(k, JSON.stringify(updatedList));
+    });
+
+    // Si el influencer aprueba la reserva, agregarla automáticamente a su calendario de rodajes/agenda
+    if (newStatus === "confirmada") {
+      const alreadyInAgenda = events.some((ev) => ev.id === `pub-${booking.id}`);
+      if (!alreadyInAgenda) {
+        const newAgendaEvt: CreatorAgendaEvent = {
+          id: `pub-${booking.id}`,
+          establishment_id: establishmentId,
+          title: `🎬 Reserva Web: ${booking.service_name} (${booking.client_brand || booking.client_name})`,
+          description: `Cliente: ${booking.client_name} (${booking.client_phone}). Código: ${booking.confirmation_code}. ${booking.notes || ""}`,
+          start_date: `${booking.start_date}T09:00`,
+          end_date: `${booking.end_date}T18:00`,
+          event_type: "rodaje",
+          status: "en_progreso",
+          color: "#FF0096",
+          location_target: booking.destination_location || "Locación Confirmada",
+          brand_sponsor: booking.client_brand || booking.client_name
+        };
+        saveEventsLocally([newAgendaEvt, ...events]);
+      }
+    }
+
+    window.dispatchEvent(new CustomEvent("hdv_influencer_booking_updated"));
   };
 
   const handleOpenModal = (eventToEdit?: CreatorAgendaEvent, defaultDateStr?: string) => {
@@ -347,18 +408,17 @@ export function CreatorAgendaModule({ establishmentId, creatorName }: CreatorAge
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider bg-[#00C8D4]/20 text-[#00C8D4] border border-[#00C8D4]/40">
               <CalendarIcon className="w-3.5 h-3.5" />
-              <span>AGENDA DE PRODUCCIÓN AUDIOVISUAL & EXPEDICIONES (DRAG & DROP)</span>
+              <span>AGENDA DE PRODUCCIÓN & RESERVAS PÚBLICAS ({creatorName.toUpperCase()})</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black font-serif text-white tracking-wide">
-              Calendario de Rodajes, Drones & Auditorías
+              Calendario de Rodajes, Drones & Reservas de tu Web App
             </h2>
             <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
-              Organiza tus vuelos de drone en horas doradas, rodajes 4K, auditorías técnicas de posadas, reuniones con marcas y lanzamientos de contenido con arrastrar y soltar (Drag & Drop) y sincronización con Google Calendar.
+              Gestiona tus rodajes y aprueba con un clic las solicitudes de reserva que hoteles, marcas y viajeros realizan directamente desde el calendario público de tu Web App.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-            {/* Botón Google Calendar */}
             <button
               onClick={() => {
                 const nextState = !googleConnected;
@@ -375,16 +435,133 @@ export function CreatorAgendaModule({ establishmentId, creatorName }: CreatorAge
               <span>{googleConnected ? "Google Calendar Conectado" : "Conectar Google Calendar"}</span>
             </button>
 
-            {/* Botón Nuevo Evento */}
             <button
               onClick={() => handleOpenModal()}
               className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#FF0096] to-[#00C8D4] hover:opacity-90 text-white font-black text-xs shadow-lg shadow-[#FF0096]/20 transition-all flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02]"
             >
               <Plus className="w-4 h-4" />
-              <span>+ Nuevo Evento de Rodaje</span>
+              <span>+ Nuevo Evento / Bloquear Fecha</span>
             </button>
           </div>
         </div>
+      </div>
+
+      {/* ── BANDEJA DE SOLICITUDES DE RESERVA DESDE LA WEB APP PÚBLICA DEL INFLUENCER ── */}
+      <div className="p-5 sm:p-6 rounded-3xl bg-[#1a0533]/90 border border-[#FF0096]/30 shadow-xl space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#FF0096] flex items-center justify-center text-white shrink-0">
+              <CalendarCheck2 className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h3 className="text-base sm:text-lg font-serif font-bold text-white">
+                Reservas de Servicios Recibidas desde tu Web App Pública
+              </h3>
+              <p className="text-xs text-slate-300">
+                Acepta las solicitudes para confirmar y bloquear automáticamente esos días en tu calendario público
+              </p>
+            </div>
+          </div>
+
+          <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase bg-[#00C8D4]/20 text-[#00C8D4] border border-[#00C8D4]/40">
+            {publicBookings.filter((b) => b.status === "pendiente").length} Pendientes de Confirmar
+          </span>
+        </div>
+
+        {publicBookings.length === 0 ? (
+          <div className="p-6 rounded-2xl bg-black/30 border border-white/10 text-center space-y-1">
+            <p className="text-xs font-bold text-slate-300">
+              Aún no tienes solicitudes de reserva pendientes desde tu calendario público.
+            </p>
+            <p className="text-[11px] text-slate-400">
+              Cuando un hotel, marca o seguidor seleccione fechas y un servicio en tu perfil público, aparecerán aquí para que las aceptes o rechaces.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {publicBookings.map((bk) => (
+              <div
+                key={bk.id}
+                className="p-4 rounded-2xl bg-black/40 border border-white/15 flex flex-col justify-between gap-3"
+              >
+                <div className="space-y-2 text-left">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-white/10 text-[#00C8D4]">
+                      {bk.confirmation_code}
+                    </span>
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                        bk.status === "confirmada"
+                          ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+                          : bk.status === "rechazada"
+                          ? "bg-rose-500/20 text-rose-300 border border-rose-500/40"
+                          : "bg-amber-500/20 text-amber-300 border border-amber-500/40"
+                      }`}
+                    >
+                      {bk.status === "confirmada"
+                        ? "Confirmada en Calendario"
+                        : bk.status === "rechazada"
+                        ? "Rechazada"
+                        : "Pendiente de Aprobación"}
+                    </span>
+                  </div>
+
+                  <h4 className="text-sm font-bold text-white">{bk.service_name}</h4>
+                  <p className="text-xs text-slate-300">
+                    <strong>Cliente / Marca:</strong> {bk.client_name}{" "}
+                    {bk.client_brand ? `(${bk.client_brand})` : ""}
+                  </p>
+                  <p className="text-xs text-[#00C8D4] font-bold">
+                    Fechas: {bk.start_date} al {bk.end_date} ({bk.days_count}{" "}
+                    {bk.days_count === 1 ? "día" : "días"})
+                  </p>
+                  {bk.destination_location && (
+                    <p className="text-[11px] text-slate-300">
+                      <strong>Destino:</strong> {bk.destination_location}
+                    </p>
+                  )}
+                  {bk.notes && <p className="text-[11px] text-slate-400 italic">"{bk.notes}"</p>}
+                </div>
+
+                <div className="pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
+                  <a
+                    href={`https://wa.me/${bk.client_phone.replace(/\D/g, "")}?text=${encodeURIComponent(
+                      `Hola ${bk.client_name}! Soy ${creatorName}, recibí tu solicitud de reserva (${bk.confirmation_code}) para "${bk.service_name}" del ${bk.start_date} al ${bk.end_date}.`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] font-bold text-emerald-400 hover:underline flex items-center gap-1"
+                  >
+                    <PhoneCall className="w-3.5 h-3.5" />
+                    <span>WhatsApp: {bk.client_phone}</span>
+                  </a>
+
+                  <div className="flex items-center gap-2">
+                    {bk.status !== "confirmada" && (
+                      <button
+                        type="button"
+                        onClick={() => handleUpdatePublicBookingStatus(bk, "confirmada")}
+                        className="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-black cursor-pointer transition-colors flex items-center gap-1"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Aceptar Reserva</span>
+                      </button>
+                    )}
+                    {bk.status !== "rechazada" && (
+                      <button
+                        type="button"
+                        onClick={() => handleUpdatePublicBookingStatus(bk, "rechazada")}
+                        className="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-[11px] font-bold cursor-pointer transition-colors"
+                      >
+                        Rechazar
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* ── BARRA DE TIPOS DE EVENTO (RATE CARD DE PRODUCCIÓN) ── */}
@@ -445,14 +622,12 @@ export function CreatorAgendaModule({ establishmentId, creatorName }: CreatorAge
         {/* ── CUADRÍCULA DEL CALENDARIO (MES) ── */}
         <div className="grid grid-cols-7 gap-2">
           
-          {/* Cabecera de Días de la semana */}
           {dayLabels.map((lbl, idx) => (
             <div key={idx} className="p-2 text-center text-xs font-black uppercase tracking-wider text-slate-400 bg-black/40 rounded-xl">
               {lbl}
             </div>
           ))}
 
-          {/* Días del Mes con Soporte HTML5 Drag & Drop */}
           {calendarDays.map((dayNum, idx) => {
             if (dayNum === null) {
               return <div key={`empty-${idx}`} className="min-h-[100px] rounded-2xl bg-white/[0.02] border border-transparent" />;
@@ -474,7 +649,6 @@ export function CreatorAgendaModule({ establishmentId, creatorName }: CreatorAge
                     : "bg-black/40 border-white/10 hover:border-[#00C8D4]/40 hover:bg-white/5"
                 }`}
               >
-                {/* Número del Día */}
                 <div className="flex items-center justify-between">
                   <span className={`text-xs font-black font-mono w-6 h-6 rounded-lg flex items-center justify-center ${
                     isToday ? "bg-[#FF0096] text-white" : "text-slate-300 group-hover:text-white"
@@ -485,7 +659,6 @@ export function CreatorAgendaModule({ establishmentId, creatorName }: CreatorAge
                   <Plus className="w-3.5 h-3.5 text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity text-[#00C8D4]" />
                 </div>
 
-                {/* Eventos del Día */}
                 <div className="space-y-1.5 mt-1.5 flex-1">
                   {dayEvents.map((evt) => (
                     <div
@@ -664,7 +837,6 @@ export function CreatorAgendaModule({ establishmentId, creatorName }: CreatorAge
                 />
               </div>
 
-              {/* Botones de Acción */}
               <div className="flex items-center justify-between pt-4 border-t border-white/10">
                 {selectedEvent ? (
                   <button

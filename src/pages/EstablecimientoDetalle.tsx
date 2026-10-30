@@ -114,6 +114,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
   const [selectedRoomImageIndex, setSelectedRoomImageIndex] = useState<Record<number, number>>({});
   const [selectedGalleryCategory, setSelectedGalleryCategory] = useState<string>("todas");
   const [activeLightbox, setActiveLightbox] = useState<{ url: string; title: string; category?: string } | null>(null);
+  const [preselectedCreatorService, setPreselectedCreatorService] = useState<string>("cobertura-4k-reels");
 
   // Estado para la Ficha Técnica Detallada Inmersiva (Habitación o Área Gastronómica)
   const [activeDetailModal, setActiveDetailModal] = useState<{
@@ -344,8 +345,8 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
               id: 99901,
               name: "Aura Croce - Viajera & Creadora de Contenido",
               slug: "aura-croce-viajera-creadora",
-              description: "Desk Hub oficial, bitácora multimedia, auditorías técnicas de posadas y expediciones turísticas de Aura Croce. Cobertura audiovisual 4K, rutas GPS satelitales y alianzas comerciales con hoteles y posadas de Venezuela.",
-              address: "Caracas / Expediciones Nacionales (Los Roques, Canaima, Morrocoy, Roraima)",
+              description: "Viajera y creadora de contenido audiovisual especializada en turismo de selección, expediciones por Venezuela, cobertura 4K con Drone y alianzas estratégicas con hoteles, posadas y marcas.",
+              address: "Caracas / Coberturas Nacionales (Los Roques, Canaima, Morrocoy, Roraima)",
               city: "Caracas",
               state: "Distrito Capital",
               phone: "+58 414 123 4567",
@@ -363,7 +364,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
               review_count: 48,
               price_level: "$$$",
               is_featured: true,
-              services: JSON.stringify(["Rutas Satelitales GPS", "Auditorías de Posadas", "Canjes B2B", "Producción 4K", "Honorarios $20/Viaje + Viáticos"]),
+              services: JSON.stringify(["Cobertura 4K & Drone", "Reels & TikTok Virales", "Reseñas de Hoteles & Posadas", "Expediciones Guiadas", "Embajadora de Marca"]),
               membership_tier: "diamante",
               has_hdv_seal: true,
               has_reservations_enabled: true,
@@ -880,7 +881,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
               style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700 }}
             >
               {isCreatorCategory ? (
-                <>Desk Hub de <span className="italic text-[#00C8D4]">Expediciones</span> y Alianzas</>
+                <>Portafolio de <span className="italic text-[#00C8D4]">Coberturas 4K</span> y Alianzas</>
               ) : isGastronomyCategory ? (
                 <>Experiencia <span className="italic text-[#00C8D4]">Gastronómica</span> de Selección</>
               ) : (
@@ -941,13 +942,18 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
               <button
                 type="button"
                 onClick={() => {
-                  const el = document.getElementById("seccion-catalogo");
+                  const targetId = isCreatorCategory ? "calendario-reservas-publico" : "seccion-catalogo";
+                  const el = document.getElementById(targetId) || document.getElementById("seccion-catalogo");
                   el?.scrollIntoView({ behavior: "smooth" });
                 }}
                 className="px-6 py-3.5 bg-white hover:bg-slate-50 text-slate-800 font-bold rounded-xl transition-all text-xs cursor-pointer border border-slate-200 shadow-2xs flex items-center gap-2"
               >
-                <Compass className="w-4 h-4 text-[#00C8D4]" />
-                <span>{isGastronomyCategory ? "Ver Áreas & Menú" : isCreatorCategory ? "Ver Rutas & Servicios" : "Ver Habitaciones"}</span>
+                {isCreatorCategory ? (
+                  <Calendar className="w-4 h-4 text-[#00C8D4]" />
+                ) : (
+                  <Compass className="w-4 h-4 text-[#00C8D4]" />
+                )}
+                <span>{isGastronomyCategory ? "Ver Áreas & Menú" : isCreatorCategory ? "Agendar en Calendario" : "Ver Habitaciones"}</span>
               </button>
             </div>
           </div>
@@ -961,13 +967,13 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                 </div>
                 <div className="text-left">
                   <span className="text-[10px] uppercase tracking-[0.2em] text-white/85 font-bold block">
-                    FICHA VERIFICADA HDV
+                    {isCreatorCategory ? "PERFIL OFICIAL VERIFICADO HDV" : "FICHA VERIFICADA HDV"}
                   </span>
                   <h3
                     className="text-lg sm:text-xl font-bold !text-white leading-tight"
                     style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700 }}
                   >
-                    Garantía & Estándares
+                    {isCreatorCategory ? "Alcance & Estándares" : "Garantía & Estándares"}
                   </h3>
                 </div>
               </div>
@@ -978,10 +984,10 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                     className="text-2xl sm:text-3xl font-bold !text-white block"
                     style={{ fontFamily: "'Playfair Display', serif" }}
                   >
-                    {isGastronomyCategory ? "4+ Áreas" : isCreatorCategory ? "50+ Rutas" : `${rooms.length || 10}+ Hab.`}
+                    {isGastronomyCategory ? "4+ Áreas" : isCreatorCategory ? "4+ Servicios" : `${rooms.length || 10}+ Hab.`}
                   </span>
                   <span className="text-[11px] font-semibold text-white/90 mt-1 block">
-                    {isGastronomyCategory ? "Espacios Gastronómicos" : isCreatorCategory ? "Expediciones GPS & 4K" : "Unidades de Hospedaje"}
+                    {isGastronomyCategory ? "Espacios Gastronómicos" : isCreatorCategory ? "Coberturas & Alianzas" : "Unidades de Hospedaje"}
                   </span>
                 </div>
 
@@ -993,7 +999,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                     {establishment.rating_avg > 0 ? `${establishment.rating_avg.toFixed(1)}★` : "4.9★"}
                   </span>
                   <span className="text-[11px] font-semibold text-white/90 mt-1 block">
-                    Satisfacción Garantizada
+                    {isCreatorCategory ? "Marcas & Hoteles" : "Satisfacción Garantizada"}
                   </span>
                 </div>
 
@@ -1005,7 +1011,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                     0%
                   </span>
                   <span className="text-[11px] font-semibold text-white/90 mt-1 block">
-                    Comisiones OTA • Trato Directo
+                    {isCreatorCategory ? "Intermediarios • Trato Directo" : "Comisiones OTA • Trato Directo"}
                   </span>
                 </div>
 
@@ -1014,17 +1020,17 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                     className="text-2xl sm:text-3xl font-bold !text-white block"
                     style={{ fontFamily: "'Playfair Display', serif" }}
                   >
-                    Starlink
+                    {isCreatorCategory ? "4K Drone" : "Starlink"}
                   </span>
                   <span className="text-[11px] font-semibold text-white/90 mt-1 block">
-                    Wi-Fi & Respaldo Operativo
+                    {isCreatorCategory ? "Producción Audiovisual" : "Wi-Fi & Respaldo Operativo"}
                   </span>
                 </div>
               </div>
 
               <div className="mt-5 pt-4 border-t border-white/20 flex items-center gap-2 text-xs font-bold text-white/95">
                 <CheckCircle2 className="w-4 h-4 text-white shrink-0" />
-                <span>Atención directa por WhatsApp con el propietario</span>
+                <span>{isCreatorCategory ? "Agenda fechas en línea o contacta directo por WhatsApp" : "Atención directa por WhatsApp con el propietario"}</span>
               </div>
             </div>
           </div>
@@ -1218,7 +1224,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
               {isCreatorCategory ? "COBERTURA MULTIMEDIA & EXPEDICIONES DE ALTO IMPACTO" : "CONCEBIDO PARA SU DESCANSO Y CONFORT"}
             </span>
             <h2 className="text-2xl md:text-3xl font-black font-serif text-slate-900">
-              {isCreatorCategory ? "Desk Hub de Expediciones, Auditorías Técnicas y Alianzas B2B" : isGastronomyCategory ? "Más que una Gastronomía, una Experiencia Memorable" : "Beneficios de Reservar en Nuestro Establecimiento"}
+              {isCreatorCategory ? "Servicios Audiovisuales, Expediciones y Alianzas de Marca" : isGastronomyCategory ? "Más que una Gastronomía, una Experiencia Memorable" : "Beneficios de Reservar en Nuestro Establecimiento"}
             </h2>
             <p className="text-xs md:text-sm text-slate-500 mt-2 leading-relaxed">
               {establishment.description || "Un refugio pensado para quienes valoran la privacidad, el confort impecable y el trato personalizado. Cada espacio ha sido acondicionado para garantizar recuerdos inolvidables."}
@@ -1233,10 +1239,10 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
               </div>
               <div>
                 <h4 className="text-sm font-bold text-slate-900">
-                  {isCreatorCategory ? "Rutas Satelitales & GPS" : "Ubicación Privilegiada"}
+                  {isCreatorCategory ? "Rutas & Destinos VIP" : "Ubicación Privilegiada"}
                 </h4>
                 <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                  {isCreatorCategory ? "Coordenadas georreferenciadas y tracks satelitales en tiempo real." : "Acceso inmediato a los atractivos turísticos y costeros más deseados."}
+                  {isCreatorCategory ? "Cobertura en los destinos turísticos más emblemáticos y exclusivos de Venezuela." : "Acceso inmediato a los atractivos turísticos y costeros más deseados."}
                 </p>
               </div>
             </div>
@@ -1247,10 +1253,10 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
               </div>
               <div>
                 <h4 className="text-sm font-bold text-slate-900">
-                  {isCreatorCategory ? "Auditorías de Posadas" : "Seguridad & Privacidad"}
+                  {isCreatorCategory ? "Reseñas & Posicionamiento" : "Seguridad & Privacidad"}
                 </h4>
                 <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                  {isCreatorCategory ? "Inspección técnica de Wi-Fi, plantas eléctricas, agua y estándares HDV." : "Instalaciones verificadas, atención dedicada y tranquilidad garantizada."}
+                  {isCreatorCategory ? "Storytelling auténtico para posicionar hoteles, posadas y experiencias turísticas." : "Instalaciones verificadas, atención dedicada y tranquilidad garantizada."}
                 </p>
               </div>
             </div>
@@ -1264,21 +1270,21 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                   {isCreatorCategory ? "Producción 4K & Reels" : isGastronomyCategory ? "Gastronomía Exclusiva" : "Áreas Recreativas"}
                 </h4>
                 <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                  {isCreatorCategory ? "Fotografía aérea con Drone, micro-documentales y piezas virales." : isGastronomyCategory ? "Chef ejecutivo y maridajes seleccionados de alta gama." : "Piscina, solárium y zonas diseñadas para el esparcimiento."}
+                  {isCreatorCategory ? "Fotografía aérea con Drone, micro-documentales y piezas virales de alta conversión." : isGastronomyCategory ? "Chef ejecutivo y maridajes seleccionados de alta gama." : "Piscina, solárium y zonas diseñadas para el esparcimiento."}
                 </p>
               </div>
             </div>
 
             <div className="p-5 bg-white border border-slate-200/80 rounded-2xl shadow-2xs hover:shadow-md transition-shadow text-left space-y-3">
               <div className="w-11 h-11 rounded-xl bg-emerald-500 flex items-center justify-center text-white shrink-0 shadow-xs">
-                {isCreatorCategory ? <Wallet className="w-5 h-5 text-white" /> : <Zap className="w-5 h-5 text-white" />}
+                {isCreatorCategory ? <Calendar className="w-5 h-5 text-white" /> : <Zap className="w-5 h-5 text-white" />}
               </div>
               <div>
                 <h4 className="text-sm font-bold text-slate-900">
-                  {isCreatorCategory ? "Honorarios & Viáticos" : "Wi-Fi & Respaldo"}
+                  {isCreatorCategory ? "Agenda & Reserva Online" : "Wi-Fi & Respaldo"}
                 </h4>
                 <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                  {isCreatorCategory ? "Tarifa base de $20 USD por viaje asignado más reembolso de viáticos de ruta." : "Conectividad de alta velocidad y respaldo operativo continuo."}
+                  {isCreatorCategory ? "Selecciona fechas libres en el calendario público para reservar servicios o campañas." : "Conectividad de alta velocidad y respaldo operativo continuo."}
                 </p>
               </div>
             </div>
@@ -1297,36 +1303,62 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
               className="text-2xl md:text-3xl font-bold !text-white"
               style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700 }}
             >
-              ¿Cómo Funciona tu Reserva Directa?
+              {isCreatorCategory ? "¿Cómo Agendar un Servicio o Cobertura?" : "¿Cómo Funciona tu Reserva Directa?"}
             </h2>
             <p className="text-xs sm:text-sm text-white/75">
-              Sin intermediarios ni sobrecargos ocultos: conectamos tu viaje directamente con la recepción de {establishment.name}
+              {isCreatorCategory
+                ? `Reserva fechas disponibles directamente en la Web App pública de ${establishment.name} sin intermediarios`
+                : `Sin intermediarios ni sobrecargos ocultos: conectamos tu viaje directamente con la recepción de ${establishment.name}`}
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-2">
-            {[
-              {
-                step: "1",
-                title: "Explora la Ficha",
-                desc: "Revisa las habitaciones, áreas sociales, fotos verificadas y servicios incluidos."
-              },
-              {
-                step: "2",
-                title: "Cotiza por WhatsApp",
-                desc: "Haz clic en el botón de WhatsApp directo para consultar fechas y disponibilidad real."
-              },
-              {
-                step: "3",
-                title: "Trato con el Anfitrión",
-                desc: "Coordina tu llegada y método de pago directamente con el propietario del establecimiento."
-              },
-              {
-                step: "4",
-                title: "Disfruta sin Comisiones",
-                desc: "Obtén la mejor tarifa directa garantizada con 0% de recargos por plataforma."
-              }
-            ].map((item) => (
+            {(isCreatorCategory
+              ? [
+                  {
+                    step: "1",
+                    title: "Elige el Servicio",
+                    desc: "Revisa los paquetes de cobertura 4K, reseña de hospedaje, expedición o campaña de marca."
+                  },
+                  {
+                    step: "2",
+                    title: "Selecciona tus Fechas",
+                    desc: "Haz clic sobre los días disponibles en verde dentro del Calendario de Disponibilidad."
+                  },
+                  {
+                    step: "3",
+                    title: "Envía tu Reserva",
+                    desc: "Completa los datos de tu marca, hotel o proyecto para bloquear la solicitud en su agenda."
+                  },
+                  {
+                    step: "4",
+                    title: "Confirmación Directa",
+                    desc: "El creador recibe y aprueba tu reserva desde su panel, coordinando detalles por WhatsApp."
+                  }
+                ]
+              : [
+                  {
+                    step: "1",
+                    title: "Explora la Ficha",
+                    desc: "Revisa las habitaciones, áreas sociales, fotos verificadas y servicios incluidos."
+                  },
+                  {
+                    step: "2",
+                    title: "Cotiza por WhatsApp",
+                    desc: "Haz clic en el botón de WhatsApp directo para consultar fechas y disponibilidad real."
+                  },
+                  {
+                    step: "3",
+                    title: "Trato con el Anfitrión",
+                    desc: "Coordina tu llegada y método de pago directamente con el propietario del establecimiento."
+                  },
+                  {
+                    step: "4",
+                    title: "Disfruta sin Comisiones",
+                    desc: "Obtén la mejor tarifa directa garantizada con 0% de recargos por plataforma."
+                  }
+                ]
+            ).map((item) => (
               <div key={item.step} className="flex flex-col items-center text-center space-y-2.5 px-2">
                 <div className="w-11 h-11 rounded-full bg-[#00C8D4] text-white font-black text-sm flex items-center justify-center shadow-lg shadow-[#00C8D4]/30">
                   {item.step}
@@ -1353,18 +1385,18 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                     <div className="w-8 h-8 rounded-xl bg-[#FF0096] flex items-center justify-center text-white shrink-0 shadow-xs">
                       {isCreatorCategory ? <Compass className="w-4 h-4 text-white" /> : isGastronomyCategory ? <ChefHat className="w-4 h-4 text-white" /> : <Bed className="w-4 h-4 text-white" />}
                     </div>
-                    {isCreatorCategory ? "Rutas Georreferenciadas & Servicios de Expedición" : isGastronomyCategory ? "Fichas de Áreas & Espacios Gastronómicos" : "Encuentre su Refugio Perfecto — Habitaciones"}
+                    {isCreatorCategory ? "Servicios Profesionales & Coberturas Disponibles" : isGastronomyCategory ? "Fichas de Áreas & Espacios Gastronómicos" : "Encuentre su Refugio Perfecto — Habitaciones"}
                   </h2>
                   <p className="text-xs text-slate-400 font-semibold mt-1">
                     {isCreatorCategory
-                      ? "Conoce los paquetes de expedición, auditorías técnicas para posadas y honorarios base de cobertura."
+                      ? "Selecciona el servicio que deseas contratar y agenda las fechas disponibles directamente en el calendario."
                       : isGastronomyCategory
                         ? "Conozca los distintos ambientes, aforos y cartas especiales para su reserva de mesa o evento."
                         : "Explore la distribución, equipamiento y tarifas de nuestras unidades de hospedaje."}
                   </p>
                 </div>
                 <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 bg-[#00C8D4]/10 text-[#00C8D4] rounded-full border border-[#00C8D4]/20 shrink-0 self-start sm:self-center">
-                  {isCreatorCategory ? "Servicios & Rutas Activas" : isGastronomyCategory ? "4 Espacios Disponibles" : `${rooms.length} Opciones Disponibles`}
+                  {isCreatorCategory ? "Reserva Online Activa" : isGastronomyCategory ? "4 Espacios Disponibles" : `${rooms.length} Opciones Disponibles`}
                 </span>
               </div>
 
@@ -1373,31 +1405,40 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                 <div className="space-y-6">
                   {[
                     {
-                      id: "exp-gran-sabana",
-                      title: "Expedición Gran Sabana 4x4 & Roraima Off-Road",
-                      description: "Cobertura completa de ruta 4x4, cruces de ríos, geodatos de miradores y auditoría de posadas en Santa Elena de Uairén.",
-                      category: "Expedición 4x4 & Drone",
-                      remuneration: "Honorarios $20.00 USD + Viáticos Combustible & Guías",
+                      id: "cobertura-4k-reels",
+                      title: "Cobertura Audiovisual 4K & Reels Virales",
+                      description: "Producción integral en locación para hoteles, posadas, restaurantes o marcas turísticas: tomas aéreas en Drone 4K, edición de Reels de alto impacto e historias con llamado a la acción.",
+                      category: "Producción 4K & Drone",
+                      badge: "Agenda Abierta",
                       image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80",
-                      features: ["1,420 Km Mapeados", "Auditoría Wi-Fi Satelital", "Tomas Aéreas 4K", "Reseña HDV Verificada"]
+                      features: ["Tomas Aéreas Drone 4K", "Reels & TikTok Virales", "Fotografía Editorial HDR", "Entrega de Material"]
                     },
                     {
-                      id: "exp-morrocoy",
-                      title: "Ruta Playera Morrocoy & Cayo Sombrero 360°",
-                      description: "Inspección de posadas boutique en Tucacas y Chichiriviche, traslados en lancha y cobertura de playas y cayos vírgenes.",
-                      category: "Ruta Náutica & Posadas",
-                      remuneration: "Honorarios $20.00 USD + Viáticos Lancheros & Logística",
-                      image: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1000&q=80",
-                      features: ["680 Km Mapeados", "Inspección de Plantas Eléctricas", "Reels Instagram", "Guía Gastronómica"]
-                    },
-                    {
-                      id: "serv-auditoria-posada",
-                      title: "Auditoría Técnica Integral para Hoteles & Posadas",
-                      description: "Servicio profesional B2B: test de velocidad de Wi-Fi, evaluación de presión de agua, tiempo de respuesta de plantas eléctricas y entrega de sello de calidad HDV.",
-                      category: "Auditoría Técnica B2B",
-                      remuneration: "Acuerdo Corporativo HDV + Mención en Redes",
+                      id: "visita-resena-hdv",
+                      title: "Visita & Reseña Oficial para Hoteles y Posadas",
+                      description: "Experiencia vivencial en tu propiedad mostrando habitaciones, gastronomía, atención y atractivos cercanos ante miles de viajeros potenciales.",
+                      category: "Hospitalidad & Reseña",
+                      badge: "Alta Demanda",
                       image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1000&q=80",
-                      features: ["Test Wi-Fi Mbps", "Inspección Eléctrica", "Ficha Fidedigna HDV", "Reel en Colaboración"]
+                      features: ["Recorrido de Instalaciones", "Storytelling de Experiencia", "Mención Destacada HDV", "Tráfico Directo al Anfitrión"]
+                    },
+                    {
+                      id: "expedicion-ruta",
+                      title: "Cobertura de Expedición, Tour o Ruta Turística",
+                      description: "Documentación audiovisual de rutas 4x4, paseos náuticos en cayos, campamentos y excursiones guiadas con contenido inmersivo en primera persona.",
+                      category: "Expedición & Aventura",
+                      badge: "Disponible en Calendario",
+                      image: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1000&q=80",
+                      features: ["Cobertura en Ruta", "Contenido de Aventura", "Guía para Viajeros", "Difusión Multicanal"]
+                    },
+                    {
+                      id: "campana-embajadora",
+                      title: "Campaña Publicitaria / Embajador(a) de Marca",
+                      description: "Alianza comercial para lanzamientos de temporada, eventos especiales o presencia de marca con sesiones fotográficas y cápsulas promocionales.",
+                      category: "Alianza Comercial",
+                      badge: "Personalizable",
+                      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1000&q=80",
+                      features: ["Imagen Comercial", "Set de Historias & Reels", "Exclusividad por Categoría", "Reporte de Alcance"]
                     }
                   ].map((item) => (
                     <div key={item.id} className="bg-slate-50/80 border border-slate-200/80 rounded-3xl p-5 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 hover:border-slate-300 transition-all">
@@ -1412,7 +1453,9 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                         <div>
                           <div className="flex flex-wrap justify-between items-start gap-2 mb-2">
                             <h3 className="text-lg font-serif font-black text-slate-900 leading-tight">{item.title}</h3>
-                            <span className="text-xs font-bold text-[#FF0096] bg-[#FF0096]/10 px-2.5 py-1 rounded-lg font-mono">{item.remuneration}</span>
+                            <span className="text-[10px] font-black uppercase tracking-wider text-[#00C8D4] bg-[#00C8D4]/10 border border-[#00C8D4]/25 px-2.5 py-1 rounded-full">
+                              {item.badge}
+                            </span>
                           </div>
 
                           <p className="text-xs text-slate-500 leading-relaxed mb-4">{item.description}</p>
@@ -1427,14 +1470,27 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                           </div>
                         </div>
 
-                        <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPreselectedCreatorService(item.id);
+                              const calEl = document.getElementById("calendario-reservas-publico");
+                              calEl?.scrollIntoView({ behavior: "smooth" });
+                            }}
+                            className="px-5 py-3 bg-[#00C8D4] hover:bg-[#00b2bd] text-white text-xs font-extrabold rounded-xl shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2"
+                          >
+                            <Calendar className="w-4 h-4 text-white" />
+                            <span>Reservar Fechas en Calendario</span>
+                          </button>
+
                           <TrackedWhatsAppButton
                             whatsappNumber={establishment.whatsapp || establishment.phone}
                             establishmentId={establishment.id}
                             establishmentName={establishment.name}
-                            customMessage={`Hola Aura Croce! Quisiera consultar sobre el servicio/expedición: "${item.title}".`}
+                            customMessage={`Hola ${establishment.name}! Quisiera consultar sobre el servicio: "${item.title}".`}
                           >
-                            Solicitar Cobertura / Alianza
+                            Consultar por WhatsApp
                           </TrackedWhatsAppButton>
                         </div>
                       </div>
@@ -1724,7 +1780,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                 });
               });
 
-              if (allCategorizedPhotos.length === 0 && establishment.images.length === 0) return null;
+              if (allCategorizedPhotos.length === 0 || isCreatorCategory) return null;
 
               const displayPhotos = selectedGalleryCategory === "todas"
                 ? allCategorizedPhotos
@@ -1822,8 +1878,8 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
               );
             })()}
 
-            {/* ── 5. SECCIÓN DE SERVICIOS DOCUMENTO 77 (TAXONOMÍA OFICIAL) ── */}
-            {servicesList.length > 0 && (
+            {/* ── 5. SECCIÓN DE SERVICIOS DOCUMENTO 77 (TAXONOMÍA OFICIAL - SOLO HOSPEDAJES Y ESTABLECIMIENTOS FÍSICOS) ── */}
+            {servicesList.length > 0 && !isCreatorCategory && (
               <div className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                   <div>
@@ -1938,26 +1994,61 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
               </div>
             )}
 
-            {/* ── 6. SECCIÓN DE TESTIMONIOS Y VALORACIONES DE HUÉSPEDES ── */}
+            {/* Availability Calendar (Para Influencers va justo debajo de sus Servicios para facilitar la reserva inmediata) */}
+            {(establishment.has_reservations_enabled || isCreatorCategory) && (
+              <AvailabilityCalendar
+                establishmentId={establishment.id}
+                establishmentName={establishment.name}
+                isCreatorCategory={Boolean(isCreatorCategory)}
+                whatsapp={establishment.whatsapp || establishment.phone}
+                preselectedServiceId={preselectedCreatorService}
+              />
+            )}
+
+            {/* ── 6. SECCIÓN DE TESTIMONIOS Y VALORACIONES ── */}
             <div className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm space-y-6 text-left">
               <div className="border-b border-slate-100 pb-4">
                 <span className="text-[10px] tracking-[0.25em] font-extrabold text-[#FF0096] uppercase block mb-1">
-                  OPINIONES VERIFICADAS
+                  {isCreatorCategory ? "ALIANZAS Y COBERTURAS VERIFICADAS" : "OPINIONES VERIFICADAS"}
                 </span>
                 <h2 className="text-xl font-serif font-black text-slate-900 tracking-tight flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-xl bg-amber-500 flex items-center justify-center text-white shrink-0 shadow-xs">
                     <Star className="w-4 h-4 fill-white text-white" />
                   </div>
-                  Lo que dicen nuestros huéspedes y comensales
+                  {isCreatorCategory
+                    ? "Lo que dicen los Hoteles, Posadas y Marcas Aliadas"
+                    : "Lo que dicen nuestros huéspedes y comensales"}
                 </h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {[
-                  { name: "Carlos Mendoza", date: "Julio 2026", text: "Excelente atención y comodidad impecable. El personal super atento desde nuestra llegada.", score: 5 },
-                  { name: "María Fernanda Silva", date: "Junio 2026", text: "Instalaciones impecables y la comida superó nuestras expectativas. Sin duda volveremos pronto.", score: 5 },
-                  { name: "Alejandro Rivas", date: "Mayo 2026", text: "La ubicación es inmejorable. Muy recomendado tanto para parejas como para vacaciones familiares.", score: 5 }
-                ].map((rev, i) => (
+                {(isCreatorCategory
+                  ? [
+                      {
+                        name: "Posada La Ardileña (Morrocoy)",
+                        date: "Septiembre 2026",
+                        text: "Agendamos una cobertura 4K y Reels desde su calendario público. Las reservas directas por WhatsApp aumentaron notablemente esa misma semana.",
+                        score: 5
+                      },
+                      {
+                        name: "Campamento Canaima",
+                        date: "Agosto 2026",
+                        text: "Profesionalismo impecable en toda la expedición. El material con Drone 4K y las historias transmitieron la esencia real de nuestro campamento.",
+                        score: 5
+                      },
+                      {
+                        name: "Cala Margarita Boutique",
+                        date: "Julio 2026",
+                        text: "Excelente alianza comercial. Muy fácil reservar sus fechas disponibles en la plataforma y coordinar toda la producción audiovisual.",
+                        score: 5
+                      }
+                    ]
+                  : [
+                      { name: "Carlos Mendoza", date: "Julio 2026", text: "Excelente atención y comodidad impecable. El personal super atento desde nuestra llegada.", score: 5 },
+                      { name: "María Fernanda Silva", date: "Junio 2026", text: "Instalaciones impecables y la comida superó nuestras expectativas. Sin duda volveremos pronto.", score: 5 },
+                      { name: "Alejandro Rivas", date: "Mayo 2026", text: "La ubicación es inmejorable. Muy recomendado tanto para parejas como para vacaciones familiares.", score: 5 }
+                    ]
+                ).map((rev, i) => (
                   <div key={i} className="p-4 bg-slate-50 border border-slate-200/60 rounded-2xl space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1 text-amber-400">
@@ -1979,8 +2070,8 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
               </div>
             </div>
 
-            {/* ── 7. SECCIÓN DE ALREDEDORES Y UBICACIÓN GPS ── */}
-            {surroundings.length > 0 && (
+            {/* ── 7. SECCIÓN DE ALREDEDORES Y UBICACIÓN GPS (SOLO ESTABLECIMIENTOS FÍSICOS) ── */}
+            {surroundings.length > 0 && !isCreatorCategory && (
               <div className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm text-left space-y-6">
                 <div className="border-b border-slate-100 pb-4">
                   <h2 className="text-xl font-serif font-black text-slate-900 tracking-tight flex items-center gap-2.5">
@@ -2053,26 +2144,52 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
               </div>
             )}
 
-            {/* Availability Calendar */}
-            {establishment.has_reservations_enabled && (
-              <AvailabilityCalendar
-                establishmentId={establishment.id}
-                establishmentName={establishment.name}
-              />
-            )}
-
           </div>
 
           {/* ── STICKY SIDEBAR: CONTACTO & RESERVAS ── */}
           <div className="lg:col-span-4 space-y-6">
 
-            {establishment.has_reservations_enabled && (
-              <BookingWidget
-                establishmentId={establishment.id}
-                establishmentName={establishment.name}
-                whatsapp={establishment.whatsapp}
-                categorySlug={establishment.category_slug}
-              />
+            {isCreatorCategory ? (
+              <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-md space-y-4 text-left">
+                <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
+                  <div className="w-10 h-10 rounded-xl bg-[#00C8D4] flex items-center justify-center text-white shrink-0 shadow-xs">
+                    <Calendar className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-[#00C8D4] block">
+                      AGENDA PÚBLICA EN LÍNEA
+                    </span>
+                    <h3 className="text-base font-serif font-bold text-slate-900 leading-tight">
+                      Reservar Servicios o Fechas
+                    </h3>
+                  </div>
+                </div>
+
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Consulta los días libres de <strong>{establishment.name}</strong> y agenda directamente tu cobertura audiovisual, visita a hotel/posada o campaña publicitaria.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const calEl = document.getElementById("calendario-reservas-publico");
+                    calEl?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  className="w-full py-3.5 px-5 bg-[#00C8D4] hover:bg-[#00b2bd] text-white font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <Calendar className="w-4 h-4 text-white" />
+                  <span>Seleccionar Días en el Calendario</span>
+                </button>
+              </div>
+            ) : (
+              establishment.has_reservations_enabled && (
+                <BookingWidget
+                  establishmentId={establishment.id}
+                  establishmentName={establishment.name}
+                  whatsapp={establishment.whatsapp}
+                  categorySlug={establishment.category_slug}
+                />
+              )
             )}
 
             <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-md sticky top-24 space-y-6 text-left">
@@ -2209,16 +2326,22 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
         >
           <div className="relative z-10 max-w-3xl mx-auto space-y-5">
             <span className="text-[10px] uppercase tracking-[0.3em] font-black bg-white/20 text-white px-4 py-1.5 rounded-full inline-block">
-              RESERVA DIRECTA GARANTIZADA
+              {isCreatorCategory ? "COBERTURAS & ALIANZAS DIRECTAS" : "RESERVA DIRECTA GARANTIZADA"}
             </span>
             <h2
               className="text-3xl md:text-5xl font-bold !text-white drop-shadow-md"
               style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700 }}
             >
-              {isGastronomyCategory ? "¿Listo para tu Experiencia Gastronómica?" : "¿Listo para tu Escapada Inolvidable?"}
+              {isCreatorCategory
+                ? "¿Listo para Impulsar tu Marca o Agendar una Cobertura?"
+                : isGastronomyCategory
+                  ? "¿Listo para tu Experiencia Gastronómica?"
+                  : "¿Listo para tu Escapada Inolvidable?"}
             </h2>
             <p className="!text-white/95 text-sm md:text-base font-medium max-w-xl mx-auto leading-relaxed drop-shadow-sm">
-              Consulta disponibilidad en tiempo real directamente con el anfitrión de {establishment.name} sin intermediarios ni comisiones adicionales.
+              {isCreatorCategory
+                ? `Reserva fechas disponibles en el calendario o conversa directamente con ${establishment.name} para coordinar tu próxima producción audiovisual o alianza comercial.`
+                : `Consulta disponibilidad en tiempo real directamente con el anfitrión de ${establishment.name} sin intermediarios ni comisiones adicionales.`}
             </p>
 
             <div className="pt-3 flex flex-col items-center justify-center gap-3">
@@ -2228,10 +2351,18 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                   establishmentId={establishment.id}
                   establishmentName={establishment.name}
                   directOpen={true}
-                  customMessage={`Hola! Quisiera coordinar una reserva directa en ${establishment.name}.`}
+                  customMessage={
+                    isCreatorCategory
+                      ? `Hola ${establishment.name}! Vi tu Web App en Hoteles de Venezuela y quisiera coordinar una cobertura o alianza.`
+                      : `Hola! Quisiera coordinar una reserva directa en ${establishment.name}.`
+                  }
                   className="!w-auto !bg-white hover:!bg-slate-50 !text-[#FF0096] !font-black !text-xs sm:!text-sm !px-8 !py-4 !rounded-2xl !shadow-xl hover:scale-105 transition-transform mx-auto"
                 >
-                  {isGastronomyCategory ? "Solicitar Mesa por WhatsApp" : "Contactar por WhatsApp"}
+                  {isCreatorCategory
+                    ? "Agendar Cobertura por WhatsApp"
+                    : isGastronomyCategory
+                      ? "Solicitar Mesa por WhatsApp"
+                      : "Contactar por WhatsApp"}
                 </TrackedWhatsAppButton>
               </div>
               <span className="text-[11px] text-white/80 font-semibold">
