@@ -785,30 +785,31 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
         </div>
       )}
 
-      {/* ── 1. BANNER DE PORTADA FULL-BLEED CON DEGRADADO BLANCO INFERIOR (DIRECTRIZ AGENTS.MD) ── */}
-      <div className="w-full relative h-[380px] sm:h-[440px] md:h-[520px] overflow-hidden flex items-center justify-center bg-[#0e011f]">
+      {/* ── 1. BANNER DE PORTADA FULL-BLEED CON FOTO 100% ANCHO Y CAJA TRANSLÚCIDA (ESTILO SAAS APARTO POSADA DEL MAR) ── */}
+      <div className="w-full relative h-[420px] sm:h-[480px] md:h-[540px] overflow-hidden flex items-center justify-center bg-slate-100">
+        {/* Foto de portada 100% full ancho (absolute inset-0) */}
         <img
           src={establishment.primary_image}
           alt={establishment.name}
-          className="w-full h-full object-cover scale-[1.08] transition-transform duration-1000"
+          className="absolute inset-0 w-full h-full object-cover scale-[1.08] transition-transform duration-1000"
         />
-        {/* Oscurecimiento superior elegante para contraste del título blanco */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0e011f]/75 via-[#0e011f]/40 to-transparent pointer-events-none" />
+        {/* Velo sutil para realzar la foto y la ventana translúcida */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/20 via-transparent to-white/30 pointer-events-none" />
         {/* Degradado blanco inferior obligatorio que se funde con el fondo blanco de la página */}
-        <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-white via-white/55 to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-white via-white/60 to-transparent pointer-events-none" />
 
-        {/* Títulos centrados vertical y horizontalmente dentro del banner */}
-        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center flex flex-col items-center justify-center -mt-6">
+        {/* Ventana / Caja Translúcida tipo Glassmorphism (al estilo Aparto Posada del Mar) */}
+        <div className="relative z-10 max-w-3xl w-full mx-4 sm:mx-6 px-6 py-7 sm:px-10 sm:py-9 rounded-3xl bg-white/75 backdrop-blur-md border border-white/85 shadow-[0_20px_50px_rgba(15,23,42,0.18)] text-center flex flex-col items-center justify-center">
           <div className="flex flex-wrap items-center justify-center gap-2.5 mb-3">
-            <span className="text-white/95 text-[10px] sm:text-xs font-extrabold tracking-[0.32em] uppercase drop-shadow-md">
+            <span className="text-[#009fb0] text-[10px] sm:text-xs font-extrabold tracking-[0.28em] uppercase">
               EL PARAÍSO TE ESPERA
             </span>
-            <span className="text-white/60">•</span>
-            <span className="bg-[#FF0096] text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-md">
+            <span className="text-slate-400">•</span>
+            <span className="bg-[#FF0096] text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">
               {establishment.category_name}
             </span>
             {establishment.membership_tier && (
-              <span className={`bg-gradient-to-r ${tierColors[establishment.membership_tier?.toLowerCase()] || "from-slate-700 to-slate-800"} text-white font-black text-[10px] uppercase tracking-widest px-3 py-1 rounded-full border border-white/30 shadow-md flex items-center gap-1.5`}>
+              <span className={`bg-gradient-to-r ${tierColors[establishment.membership_tier?.toLowerCase()] || "from-slate-700 to-slate-800"} text-white font-black text-[10px] uppercase tracking-widest px-3 py-1 rounded-full border border-white/40 shadow-sm flex items-center gap-1.5`}>
                 <span className="w-1.5 h-1.5 rounded-full bg-[#00C8D4] animate-pulse" />
                 Socio {establishment.membership_tier}
               </span>
@@ -816,18 +817,23 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
           </div>
 
           <h1
-            className="text-3xl sm:text-5xl md:text-6xl font-bold !text-white leading-tight drop-shadow-2xl max-w-4xl"
+            className="text-3xl sm:text-5xl md:text-6xl font-bold text-[#0f172a] leading-tight max-w-3xl"
             style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700 }}
           >
             {establishment.name}
           </h1>
 
-          <div className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#0e011f]/65 backdrop-blur-md border border-white/25 text-white text-xs font-semibold shadow-lg">
-            <MapPin className="w-3.5 h-3.5 text-[#00C8D4]" />
-            <span>{establishment.destination_name || establishment.city}, Venezuela</span>
-            <span className="text-white/40">|</span>
-            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-            <span className="font-bold">{establishment.rating_avg > 0 ? establishment.rating_avg.toFixed(1) : "5.0"}</span>
+          <div className="mt-5 inline-flex flex-wrap items-center justify-center gap-2.5 px-5 py-2 rounded-full bg-white/90 border border-slate-200/80 text-slate-800 text-xs font-bold shadow-sm">
+            <div className="flex items-center gap-1.5">
+              <MapPin className="w-4 h-4 text-[#00C8D4]" />
+              <span>{establishment.destination_name || establishment.city}, Venezuela</span>
+            </div>
+            <span className="text-slate-300">|</span>
+            <div className="flex items-center gap-1">
+              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+              <span className="font-extrabold text-slate-900">{establishment.rating_avg > 0 ? establishment.rating_avg.toFixed(1) : "5.0"}</span>
+              <span className="text-slate-500 font-semibold">({establishment.review_count || 48} reseñas)</span>
+            </div>
           </div>
         </div>
       </div>
