@@ -493,7 +493,7 @@ export function HomeV2({ isMainHome = false }: { isMainHome?: boolean }) {
       <HeroSectionV2 />
 
       {/* 2. Sección de Tarjetas Rediseñadas / Listing Cards (Sección B) */}
-      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 space-y-10">
+      <section className="relative z-10 py-20 max-w-7xl mx-auto px-4 sm:px-6 space-y-10">
         
         {/* Encabezado y Categorías de Filtro */}
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6">

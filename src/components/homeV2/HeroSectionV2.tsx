@@ -225,7 +225,7 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
   const SelectedExpIcon = selectedExpObj.icon;
 
   return (
-    <section className="relative w-full bg-slate-950 text-white min-h-[560px] lg:min-h-[620px] flex items-center justify-center pt-20 pb-12 overflow-hidden">
+    <section className="relative z-30 w-full bg-slate-950 text-white min-h-[560px] lg:min-h-[620px] flex items-center justify-center pt-20 pb-12 overflow-visible">
       
       {/* Background Video full-bleed con reproducción forzada y bruma animada */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -335,7 +335,7 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
         </div>
 
         {/* BARRA DE BÚSQUEDA FLOTANTE UNIFICADA CON DESPLEGABLES INTERACTIVOS DE ICONOS UNICOLOR */}
-        <div className="max-w-5xl mx-auto bg-white/95 backdrop-blur-xl p-2.5 sm:p-3.5 rounded-2xl md:rounded-full border border-white/50 shadow-2xl shadow-cyan-950/30 text-slate-800 relative z-40">
+        <div className="max-w-5xl mx-auto bg-white/95 backdrop-blur-xl p-2.5 sm:p-3.5 rounded-2xl md:rounded-full border border-white/50 shadow-2xl shadow-cyan-950/30 text-slate-800 relative z-50">
           <form onSubmit={handleSearchSubmit} className="flex flex-col md:flex-row items-center gap-2 md:gap-0 divide-y md:divide-y-0 md:divide-x divide-slate-200">
             
             {/* SEGMENTO 1: ¿A DÓNDE QUIERES IR? (Ubicación) */}
@@ -509,7 +509,7 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
         </div>
 
         {/* FILA INFERIOR: PILLS / FILTROS RÁPIDOS DE TENDENCIA */}
-        <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+        <div className="relative z-10 flex flex-wrap items-center justify-center gap-2 pt-2">
           <span className="text-[10px] uppercase font-black tracking-wider text-slate-400 mr-1 hidden sm:inline">
             Filtros Populares:
           </span>
@@ -545,7 +545,7 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
         </div>
 
         {/* CONTADOR DE VISITAS / BÚSQUEDAS EN TIEMPO REAL (ESTRATEGIA B2C / B2B) */}
-        <div className="pt-3 pb-1 flex justify-center">
+        <div className="relative z-10 pt-3 pb-1 flex justify-center">
           <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-slate-950/80 backdrop-blur-md border border-[#00C8D4]/30 shadow-[0_0_20px_rgba(0,200,212,0.2)] text-white text-xs font-semibold">
             <span className="relative flex h-2.5 w-2.5 shrink-0">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -568,7 +568,7 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
         </div>
 
         {/* MICRO-COPY DE CONFIANZA OPERATIVA */}
-        <div className="pt-2 flex items-center justify-center gap-2 text-xs font-semibold text-slate-300">
+        <div className="relative z-10 pt-2 flex items-center justify-center gap-2 text-xs font-semibold text-slate-300">
           <div className="w-6 h-6 rounded-lg bg-[#00C8D4] flex items-center justify-center text-white shrink-0 shadow-xs">
             <ShieldCheck className="w-3.5 h-3.5 text-white stroke-[2.2]" />
           </div>
