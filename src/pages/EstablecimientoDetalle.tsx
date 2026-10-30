@@ -1031,64 +1031,183 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
         </div>
       </section>
 
-      {/* ── Showcase de Galerías en Miniatura sobre Fondo Blanco ── */}
+      {/* ── Showcase de Galería Fotográfica Modernizada (50% Visor Completo Izquierda / 50% Mosaico de Miniaturas Derecha) ── */}
       <div className="max-w-7xl mx-auto px-6 relative z-20 mb-12">
-        <div className="relative rounded-3xl overflow-hidden bg-slate-100 h-[280px] md:h-[440px] shadow-lg group border border-slate-200/80">
-          {establishment.images.length > 0 && establishment.images[currentImageIndex] ? (
-            <img
-              src={establishment.images[currentImageIndex]}
-              alt={establishment.name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-            />
-          ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center bg-slate-100">
-              <MapPin className="w-16 h-16 text-slate-400 mb-2" />
-              <p className="text-slate-600 text-sm font-bold">{establishment.name}</p>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          {/* Lado Izquierdo (50% ancho): Fotografía Principal Completa sin recortes (object-contain) */}
+          <div className="lg:col-span-6">
+            <div className="relative rounded-3xl overflow-hidden bg-slate-100 h-[320px] sm:h-[380px] md:h-[420px] shadow-lg group border border-slate-200/80 flex items-center justify-center">
+              {establishment.images.length > 0 && establishment.images[currentImageIndex] ? (
+                <>
+                  {/* Fondo ambiental desenfocado de la misma foto para estética de lujo sin bordes vacíos */}
+                  <img
+                    src={establishment.images[currentImageIndex]}
+                    alt=""
+                    aria-hidden="true"
+                    className="absolute inset-0 w-full h-full object-cover blur-2xl scale-110 opacity-35 pointer-events-none"
+                  />
+                  {/* Fotografía completa sin recortar (object-contain) */}
+                  <img
+                    src={establishment.images[currentImageIndex]}
+                    alt={establishment.name}
+                    onClick={() =>
+                      setActiveLightbox({
+                        url: establishment.images[currentImageIndex],
+                        title: `${establishment.name} — Foto ${currentImageIndex + 1}`,
+                        category: "Galería Oficial",
+                      })
+                    }
+                    className="relative z-10 w-full h-full object-contain p-2 sm:p-3 cursor-zoom-in transition-transform duration-500"
+                  />
+                </>
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center bg-slate-100">
+                  <MapPin className="w-16 h-16 text-slate-400 mb-2" />
+                  <p className="text-slate-600 text-sm font-bold">{establishment.name}</p>
+                </div>
+              )}
+
+              {/* Contador de foto activa arriba a la izquierda */}
+              {establishment.images.length > 0 && (
+                <div className="absolute top-4 left-4 z-20 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-slate-200/80 text-slate-800 text-[11px] font-extrabold shadow-sm">
+                  Foto {currentImageIndex + 1} de {establishment.images.length}
+                </div>
+              )}
+
+              {/* Flechas de navegación sobre el visor izquierdo */}
+              {establishment.images.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={prevImage}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/90 hover:bg-white text-slate-900 backdrop-blur-md rounded-full flex items-center justify-center shadow-md transition-all hover:scale-105 cursor-pointer"
+                    title="Fotografía anterior"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={nextImage}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/90 hover:bg-white text-slate-900 backdrop-blur-md rounded-full flex items-center justify-center shadow-md transition-all hover:scale-105 cursor-pointer"
+                    title="Siguiente fotografía"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </>
+              )}
+
+              {/* Botones de Favorito y Pantalla Completa arriba a la derecha */}
+              <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+                {establishment.images.length > 0 && establishment.images[currentImageIndex] && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setActiveLightbox({
+                        url: establishment.images[currentImageIndex],
+                        title: `${establishment.name} — Foto ${currentImageIndex + 1}`,
+                        category: "Galería Oficial",
+                      })
+                    }
+                    className="w-10 h-10 rounded-full bg-white/90 hover:bg-white text-slate-800 flex items-center justify-center backdrop-blur-md shadow-md transition-colors cursor-pointer"
+                    title="Ampliar fotografía a pantalla completa"
+                  >
+                    <Maximize2 className="w-4 h-4" />
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setIsFavorite(!isFavorite)}
+                  className={`w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md shadow-md transition-colors cursor-pointer ${
+                    isFavorite ? "bg-[#FF0096] text-white" : "bg-white/90 hover:bg-white text-slate-800"
+                  }`}
+                  title="Guardar en favoritos"
+                >
+                  <Heart className={`w-5 h-5 ${isFavorite ? "fill-current" : ""}`} />
+                </button>
+              </div>
             </div>
-          )}
+          </div>
 
-          {establishment.images.length > 1 && (
-            <>
-              <button
-                onClick={prevImage}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white text-slate-900 backdrop-blur-md rounded-full flex items-center justify-center shadow-md transition-colors cursor-pointer"
-              >
-                <ChevronLeft className="w-6 h-6" />
-              </button>
-              <button
-                onClick={nextImage}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white text-slate-900 backdrop-blur-md rounded-full flex items-center justify-center shadow-md transition-colors cursor-pointer"
-              >
-                <ChevronRight className="w-6 h-6" />
-              </button>
-            </>
-          )}
+          {/* Lado Derecho (50% ancho): Selector de Cuadritos de Fotos en Miniatura */}
+          <div className="lg:col-span-6">
+            <div className="bg-white rounded-3xl border border-slate-200/80 p-5 sm:p-6 shadow-sm h-full flex flex-col justify-between space-y-4">
+              <div className="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-3 text-left">
+                  <div className="w-9 h-9 rounded-xl bg-[#00C8D4] flex items-center justify-center text-white shrink-0 shadow-xs">
+                    <Camera className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-serif font-bold text-slate-900 leading-tight">
+                      Galería Fotográfica
+                    </h3>
+                    <p className="text-[11px] text-slate-500 font-medium">
+                      Haz clic en cualquier miniatura para ver la imagen completa
+                    </p>
+                  </div>
+                </div>
+                <span className="px-3 py-1 rounded-full bg-[#00C8D4]/10 text-[#00C8D4] border border-[#00C8D4]/20 text-[10px] font-black uppercase tracking-wider shrink-0">
+                  {establishment.images.length} {establishment.images.length === 1 ? "Foto" : "Fotos"}
+                </span>
+              </div>
 
-          <div className="absolute top-4 right-4 flex gap-2">
-            <button
-              onClick={() => setIsFavorite(!isFavorite)}
-              className={`w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md shadow-md transition-colors cursor-pointer ${isFavorite ? "bg-[#FF0096] text-white" : "bg-white/90 hover:bg-white text-slate-800"
-                }`}
-            >
-              <Heart className={`w-5 h-5 ${isFavorite ? "fill-current" : ""}`} />
-            </button>
+              {/* Cuadrícula de miniaturas (cuadritos pequeños interactivos) */}
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 max-h-[250px] sm:max-h-[270px] overflow-y-auto pr-1">
+                {establishment.images.map((img, i) => {
+                  const isSelected = i === currentImageIndex;
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setCurrentImageIndex(i)}
+                      className={`relative aspect-square rounded-2xl overflow-hidden border-2 cursor-pointer transition-all group ${
+                        isSelected
+                          ? "border-[#FF0096] ring-2 ring-[#FF0096]/25 scale-[0.98] shadow-md"
+                          : "border-slate-200/80 opacity-80 hover:opacity-100 hover:border-[#00C8D4]"
+                      }`}
+                    >
+                      <img
+                        src={img}
+                        alt={`${establishment.name} miniatura ${i + 1}`}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <span
+                        className={`absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded-md text-[9px] font-black ${
+                          isSelected ? "bg-[#FF0096] text-white" : "bg-slate-900/65 text-white"
+                        }`}
+                      >
+                        {i + 1}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Pie de galería con botón para abrir visor a pantalla completa */}
+              <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+                <span className="text-[11px] text-slate-500 font-semibold">
+                  Fotografía seleccionada: <strong className="text-slate-800">#{currentImageIndex + 1}</strong>
+                </span>
+
+                {establishment.images.length > 0 && establishment.images[currentImageIndex] && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setActiveLightbox({
+                        url: establishment.images[currentImageIndex],
+                        title: `${establishment.name} — Foto ${currentImageIndex + 1}`,
+                        category: "Galería Oficial",
+                      })
+                    }
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-[#00C8D4] text-slate-800 hover:text-white text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                    <span>Ver Foto en Pantalla Completa</span>
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         </div>
-
-        {establishment.images.length > 1 && (
-          <div className="flex gap-2.5 mt-4 overflow-x-auto pb-2">
-            {establishment.images.map((img, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentImageIndex(i)}
-                className={`w-16 h-16 rounded-xl overflow-hidden border-2 shrink-0 cursor-pointer transition-all ${i === currentImageIndex ? "border-[#00C8D4] scale-95 shadow-sm" : "border-slate-200 opacity-75 hover:opacity-100"
-                  }`}
-              >
-                <img src={img} alt="" className="w-full h-full object-cover" />
-              </button>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* ── 2. SECCIÓN: PROPUESTA DE VALOR / PILARES (ESTILO LIGHT TARJETAS LIMPIAS) ── */}
