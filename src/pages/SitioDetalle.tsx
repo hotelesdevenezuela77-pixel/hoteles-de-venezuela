@@ -8,6 +8,8 @@ import type { Establishment } from "../components/layout/EstablishmentCard";
 import { 
   ArrowLeft, Compass, Sparkles, Loader2, MessageSquare, MapPin, Tag, Star
 } from "lucide-react";
+import { SeoHead } from "@/components/seo/SeoHead";
+import { ClusterAuthorityCtaBlock, buildClusterSchemas } from "@/components/seo/ClusterAuthorityCtaBlock";
 
 interface TouristSite {
   id: number;
@@ -268,8 +270,31 @@ export function SitioDetalle() {
     ? site.highlights.split(",").map(tag => tag.trim()).filter(Boolean)
     : [];
 
+  const seoSchemas = buildClusterSchemas({
+    contentType: "sitio",
+    slug: site.slug,
+    title: site.name,
+    description:
+      site.shortDescription ||
+      `Guía turística de ${site.name} y hoteles en Venezuela cercanos para reservar directo sin comisiones.`,
+    imageUrl: site.imageUrl,
+    stateOrRegion: destinationName || "Venezuela",
+    categoryName: site.category || "Sitios Turísticos de Venezuela",
+  });
+
   return (
     <div className="min-h-screen bg-gray-50/20 pb-24 font-sans text-[#1e293b]">
+      <SeoHead
+        title={`${site.name} | Sitios Turísticos y Hoteles en Venezuela`}
+        description={
+          site.shortDescription ||
+          `Descubre ${site.name} y reserva hoteles en Venezuela cercanos con trato directo y 0% comisiones.`
+        }
+        canonicalUrl={`https://hotelesdevenezuela.com/sitio/${site.slug}`}
+        ogImage={site.imageUrl || undefined}
+        ogType="place"
+        schemas={seoSchemas}
+      />
       
       {/* Portada Cover Image (Full-Bleed) */}
       <div className="w-full relative h-[400px] md:h-[500px] overflow-hidden">
@@ -306,9 +331,9 @@ export function SitioDetalle() {
         
         {/* Back navigation and category */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-6 mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 text-xs font-black text-gray-500 hover:text-[#FF0096] transition-colors cursor-pointer self-start">
+          <Link href="/" rel="dofollow" className="inline-flex items-center gap-2 text-xs font-black text-gray-500 hover:text-[#FF0096] transition-colors cursor-pointer self-start">
             <ArrowLeft className="w-4 h-4" />
-            <span>VOLVER AL INICIO</span>
+            <span>VOLVER AL INICIO · HOTELES EN VENEZUELA</span>
           </Link>
           
           <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400 font-semibold">
@@ -406,6 +431,15 @@ export function SitioDetalle() {
           </a>
         </div>
       </div>
+
+      {/* Matriz de Enlazado Interno Contextual en Clúster (Topic Cluster Architecture -> /) */}
+      <ClusterAuthorityCtaBlock
+        slug={site.slug}
+        title={site.name}
+        contentType="sitio"
+        destinationName={destinationName || undefined}
+        categoryLabel={site.category || "Sitio Turístico"}
+      />
 
     </div>
   );

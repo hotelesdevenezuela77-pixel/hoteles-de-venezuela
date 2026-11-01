@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 
 import { parseServicesList, getAmenityLabel, getAmenityInfo, CERTIFICATIONS_DOCUMENT77 } from "../lib/amenitiesList";
+import { SeoHead } from "@/components/seo/SeoHead";
+import { ClusterAuthorityCtaBlock, buildClusterSchemas } from "@/components/seo/ClusterAuthorityCtaBlock";
 
 const ROOM_AMENITIES_MAP: Record<string, string> = {
   toallas: "Toallas",
@@ -827,6 +829,34 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
       )}
 
       {/* ── 1. BANNER DE PORTADA FULL-BLEED CON FOTO 100% ANCHO Y CAJA TRANSLÚCIDA (ESTILO SAAS APARTO POSADA DEL MAR) ── */}
+      <SeoHead
+        title={`${establishment.name} (${establishment.destination_name || establishment.city}) | Hoteles en Venezuela`}
+        description={
+          (establishment.description || "").slice(0, 160) ||
+          `Reserva directa en ${establishment.name} (${establishment.destination_name || establishment.city}) sin comisiones en Hoteles de Venezuela.`
+        }
+        canonicalUrl={`https://hotelesdevenezuela.com/establecimiento/${establishment.slug}`}
+        ogImage={establishment.primary_image || undefined}
+        ogType="place"
+        schemas={buildClusterSchemas({
+          contentType: "establecimiento",
+          slug: establishment.slug,
+          title: establishment.name,
+          description:
+            establishment.description ||
+            `Reserva directa en ${establishment.name} (${establishment.destination_name || establishment.city}) en Hoteles de Venezuela.`,
+          imageUrl: establishment.primary_image,
+          stateOrRegion: establishment.destination_name || establishment.state || establishment.city,
+          categoryName: establishment.category_name,
+          address: establishment.address,
+          telephone: establishment.whatsapp || establishment.phone,
+          priceRange: establishment.price_level || "$$",
+          ratingValue: establishment.rating_avg || 5.0,
+          reviewCount: establishment.review_count || 48,
+          latitude: establishment.latitude,
+          longitude: establishment.longitude,
+        })}
+      />
       <div className="w-full relative h-[420px] sm:h-[480px] md:h-[540px] overflow-hidden flex items-center justify-center bg-slate-100">
         {/* Foto de portada 100% full ancho (absolute inset-0) */}
         <img
@@ -2694,6 +2724,15 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
             </div>
           </div>
         )}
+
+        {/* Matriz de Enlazado Interno Contextual en Clúster (Topic Cluster Architecture -> /) */}
+        <ClusterAuthorityCtaBlock
+          slug={establishment.slug}
+          title={establishment.name}
+          contentType="establecimiento"
+          destinationName={establishment.destination_name || establishment.city}
+          categoryLabel={establishment.category_name || "Hospedaje Verificado"}
+        />
 
       </div>
 

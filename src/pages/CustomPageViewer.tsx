@@ -13,6 +13,8 @@ import {
   Search, ShieldAlert, FileText, Anchor, DollarSign, Clock, KeyRound, Truck, Map, Phone
 } from "lucide-react";
 import { ConstellationBackground } from "../components/ConstellationBackground";
+import { SeoHead } from "@/components/seo/SeoHead";
+import { ClusterAuthorityCtaBlock, buildClusterSchemas } from "@/components/seo/ClusterAuthorityCtaBlock";
 
 interface CustomPage {
   id: number;
@@ -1285,6 +1287,14 @@ export function CustomPageViewer() {
           </div>
         </div>
       )}
+
+      {/* Matriz de Enlazado Interno Contextual en Clúster (Topic Cluster Architecture -> /) */}
+      <ClusterAuthorityCtaBlock
+        slug={page.slug}
+        title={page.h1Title || page.title}
+        contentType="custom"
+        categoryLabel="Guía Especial HDV"
+      />
 
       {/* Lightbox Pop-up Overlay */}
       {lightboxImage && (

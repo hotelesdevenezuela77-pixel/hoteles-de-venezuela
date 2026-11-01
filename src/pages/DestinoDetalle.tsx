@@ -7,6 +7,8 @@ import {
   ArrowLeft, MapPin, Sun, Plane, Calendar, Utensils, 
   Compass, Loader2, Sparkles, Image as ImageIcon, ExternalLink 
 } from "lucide-react";
+import { SeoHead } from "@/components/seo/SeoHead";
+import { ClusterAuthorityCtaBlock, buildClusterSchemas } from "@/components/seo/ClusterAuthorityCtaBlock";
 
 export function DestinoDetalle() {
   const [, params] = useRoute("/destinos/:slug");
@@ -81,12 +83,49 @@ export function DestinoDetalle() {
     ? destino.gallery_images.split(",").map(img => img.trim()).filter(Boolean)
     : [];
 
+  const resolvedHeroImage =
+    !destino.image_url ||
+    destino.image_url.startsWith("/") ||
+    destino.image_url.includes("localhost") ||
+    destino.image_url.includes("127.0.0.1") ||
+    destino.image_url.includes("/api/files/")
+      ? DESTINOS_MOCK.find((m) => m.slug === destino.slug)?.image_url ||
+        "https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&w=1200&q=80"
+      : destino.image_url;
+
+  const seoSchemas = buildClusterSchemas({
+    contentType: "destino",
+    slug: destino.slug,
+    title: destino.name,
+    description:
+      destino.description ||
+      `Guía turística, clima, atracciones y hoteles en ${destino.name} (${destino.state}) — Hoteles en Venezuela.`,
+    imageUrl: resolvedHeroImage,
+    stateOrRegion: destino.state,
+    categoryName: "Destinos Turísticos de Venezuela",
+  });
+
   return (
     <div className="min-h-screen bg-gray-50/20 pb-24">
+      <SeoHead
+        title={`Hoteles en ${destino.name} (${destino.state}) | Hoteles en Venezuela`}
+        description={
+          destino.description ||
+          `Descubre los mejores hoteles, posadas boutique y resorts en ${destino.name}, ${destino.state}. Reserva directo sin comisiones en Hoteles de Venezuela.`
+        }
+        canonicalUrl={`https://hotelesdevenezuela.com/destinos/${destino.slug}`}
+        ogImage={resolvedHeroImage}
+        ogType="place"
+        schemas={seoSchemas}
+      />
       {/* Botón Flotante para Volver */}
-      <div className="max-w-7xl mx-auto px-6 pt-6">
-        <Link href="/destinos" className="inline-flex items-center gap-2 text-xs font-black text-gray-500 hover:text-brand-magenta transition-colors">
+      <div className="max-w-7xl mx-auto px-6 pt-6 flex flex-wrap items-center gap-4">
+        <Link href="/" rel="dofollow" className="inline-flex items-center gap-2 text-xs font-black text-gray-500 hover:text-brand-magenta transition-colors">
           <ArrowLeft className="w-4 h-4" />
+          <span>INICIO · HOTELES EN VENEZUELA</span>
+        </Link>
+        <span className="text-gray-300">/</span>
+        <Link href="/destinos" rel="dofollow" className="inline-flex items-center gap-2 text-xs font-black text-gray-500 hover:text-brand-magenta transition-colors">
           <span>VOLVER A DESTINOS</span>
         </Link>
       </div>
@@ -285,16 +324,25 @@ export function DestinoDetalle() {
               Encuentra los mejores hoteles, posadas y restaurantes con el Sello de Calidad de Hoteles de Venezuela en {destino.name}.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href={`/establecimientos?destino=${destino.slug}`} className="btn-magenta-gradient px-8 py-3.5 rounded-2xl font-black text-xs shadow-lg shadow-brand-magenta/15 w-full sm:w-auto text-center cursor-pointer active:scale-98">
+              <Link href={`/establecimientos?destino=${destino.slug}`} rel="dofollow" className="btn-magenta-gradient px-8 py-3.5 rounded-2xl font-black text-xs shadow-lg shadow-brand-magenta/15 w-full sm:w-auto text-center cursor-pointer active:scale-98">
                 Ver Hospedajes en {destino.name}
               </Link>
-              <Link href="/destinos" className="bg-white/10 hover:bg-white/15 px-8 py-3.5 rounded-2xl font-black text-xs border border-white/10 w-full sm:w-auto text-center transition-colors cursor-pointer">
+              <Link href="/destinos" rel="dofollow" className="bg-white/10 hover:bg-white/15 px-8 py-3.5 rounded-2xl font-black text-xs border border-white/10 w-full sm:w-auto text-center transition-colors cursor-pointer">
                 Ver otros destinos
               </Link>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Matriz de Enlazado Interno Contextual en Clúster (Topic Cluster Architecture -> /) */}
+      <ClusterAuthorityCtaBlock
+        slug={destino.slug}
+        title={destino.name}
+        contentType="destino"
+        destinationName={destino.state}
+        categoryLabel={`Destino · ${destino.state}`}
+      />
     </div>
   );
 }

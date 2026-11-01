@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link, useLocation } from "wouter";
 import { Navbar } from "./Navbar";
 import { TickerBar } from "./TickerBar";
@@ -6,9 +6,15 @@ import { RouteAlertsBanner } from "../alerts/RouteAlertsBanner";
 import { BackgroundMusicPlayer } from "./BackgroundMusicPlayer";
 import { ChatWidget } from "./ChatWidget";
 import {
-  MapPin, Phone, PhoneCall, MessageSquare, Send, X, Headphones, Mail
+  MapPin, PhoneCall, Headphones, Mail
 } from "lucide-react";
 import { FOOTER_PHONE_BUTTONS } from "@/config/whatsapp";
+import { SeoHead } from "@/components/seo/SeoHead";
+import {
+  ClusterAuthorityCtaBlock,
+  buildClusterSchemas,
+  type ClusterContentType,
+} from "@/components/seo/ClusterAuthorityCtaBlock";
 
 const DESTINATIONS = [
   { name: "Morrocoy",        slug: "morrocoy" },
@@ -36,6 +42,196 @@ const DESTINATIONS = [
   { name: "Mochima",         slug: "mochima" },
 ];
 
+/**
+ * Mapa de metadatos SEO para todas las rutas de directorio, mapas, B2B y páginas estáticas
+ * garantizando que el 100% de las URLs del dominio inyecten autoridad contextual hacia `/`
+ */
+const STATIC_ROUTE_SEO_META: Record<
+  string,
+  {
+    title: string;
+    description: string;
+    contentType: ClusterContentType;
+    categoryLabel: string;
+  }
+> = {
+  "/establecimientos": {
+    title: "Directorio Oficial de Hoteles y Posadas en Venezuela",
+    description:
+      "Explora el catálogo completo de hoteles en Venezuela, posadas boutique, resorts y campamentos con reserva directa por WhatsApp y 0% comisiones.",
+    contentType: "directorio",
+    categoryLabel: "Directorio Nacional",
+  },
+  "/explorar": {
+    title: "Explorar Hoteles, Posadas y Alojamientos en Venezuela",
+    description:
+      "Buscador avanzado de hoteles en Venezuela filtrados por destino, categoría, planta eléctrica y conectividad Starlink.",
+    contentType: "directorio",
+    categoryLabel: "Buscador Oficial",
+  },
+  "/destinos": {
+    title: "25 Destinos Turísticos y Regiones de Venezuela",
+    description:
+      "Guía completa de los 25 mejores destinos turísticos de Venezuela: Los Roques, Canaima, Morrocoy, Margarita, Mérida y más con hoteles verificados.",
+    contentType: "directorio",
+    categoryLabel: "Guía de Destinos",
+  },
+  "/blog": {
+    title: "Reportajes, Crónicas y Guías de Viaje por Venezuela",
+    description:
+      "Lee nuestros 142 reportajes periodísticos sobre turismo, playas, montañas, rutas gastronómicas y hoteles en Venezuela.",
+    contentType: "directorio",
+    categoryLabel: "Portal Editorial HDV",
+  },
+  "/sitios-turisticos": {
+    title: "Sitios Turísticos Emblemáticos y Maravillas Naturales de Venezuela",
+    description:
+      "Descubre los monumentos naturales, cayos, cascadas y sitios turísticos imprescindibles de Venezuela con hospedajes cercanos recomendados.",
+    contentType: "directorio",
+    categoryLabel: "Patrimonio Turístico",
+  },
+  "/parques": {
+    title: "Parques Nacionales de Venezuela · Ecoturismo y Hospedajes",
+    description:
+      "Recorre los Parques Nacionales de Venezuela con mapas satelitales interactivos, recomendaciones de viaje y posadas cercanas.",
+    contentType: "directorio",
+    categoryLabel: "Parques Nacionales",
+  },
+  "/mapa": {
+    title: "Mapa Satelital Interactivo de Hoteles y Destinos en Venezuela",
+    description:
+      "Ubica en tiempo real los mejores hoteles en Venezuela, posadas, marinas y parques nacionales sobre nuestro mapa interactivo.",
+    contentType: "directorio",
+    categoryLabel: "Geolocalización HDV",
+  },
+  "/paquetes": {
+    title: "Paquetes Turísticos, Expediciones y Todo Incluido en Venezuela",
+    description:
+      "Cotiza paquetes de viaje a Los Roques, Canaima, Morrocoy y Mérida directamente con operadores y hoteles en Venezuela sin intermediarios.",
+    contentType: "directorio",
+    categoryLabel: "Paquetes y Tours",
+  },
+  "/servicios-b2b": {
+    title: "Marketplace B2B y Directorio de Proveedores Hoteleros en Venezuela",
+    description:
+      "Ecosistema corporativo B2B que conecta hoteles en Venezuela con proveedores de suministros, tecnología y equipamiento turístico.",
+    contentType: "directorio",
+    categoryLabel: "Ecosistema B2B",
+  },
+  "/comparar": {
+    title: "Comparador Inteligente de Hoteles y Posadas en Venezuela",
+    description:
+      "Compara tarifas, servicios, planta eléctrica, Wi-Fi Starlink y ubicación entre los mejores hoteles en Venezuela.",
+    contentType: "directorio",
+    categoryLabel: "Comparador HDV",
+  },
+  "/viaje-ia": {
+    title: "Planificador de Viajes con Inteligencia Artificial en Venezuela",
+    description:
+      "Diseña tu itinerario personalizado por Venezuela y encuentra recomendaciones de hoteles y posadas adaptadas a tu presupuesto.",
+    contentType: "directorio",
+    categoryLabel: "Tecnología Turística",
+  },
+  "/membresias": {
+    title: "Planes y Membresías Oficiales para Hoteles y Posadas en Venezuela",
+    description:
+      "Afilia tu hotel, posada o restaurante a la plataforma líder de turismo en Venezuela y recibe reservas directas con 0% comisiones.",
+    contentType: "estatica",
+    categoryLabel: "Afiliación B2B",
+  },
+  "/prestigio-2026": {
+    title: "Colección Prestigio 2026 · Hoteles de Lujo y Posadas VIP en Venezuela",
+    description:
+      "Selección curada de los hoteles y posadas boutique más exclusivos de Venezuela certificados con el Sello Prestigio 2026.",
+    contentType: "directorio",
+    categoryLabel: "Colección Prestigio",
+  },
+  "/los-10-mejores-hoteles": {
+    title: "Los 10 Mejores Hoteles en Venezuela · Ranking Oficial Verificado",
+    description:
+      "Conoce el ranking oficial de los 10 mejores hoteles en Venezuela auditados por calidad de servicio, infraestructura y gastronomía.",
+    contentType: "directorio",
+    categoryLabel: "Ranking Top 10",
+  },
+  "/top-10-hoteles": {
+    title: "Top 10 Hoteles Selección Oficial en Venezuela",
+    description:
+      "Descubre nuestra selección especial de los 10 hoteles y resorts más destacados para vacacionar o viajar por negocios en Venezuela.",
+    contentType: "directorio",
+    categoryLabel: "Ranking Top 10",
+  },
+  "/50-fundadores": {
+    title: "Programa Exclusivo 50 Hoteles Fundadores de Venezuela",
+    description:
+      "Beneficios vitalicios y posicionamiento preferencial para los primeros 50 hoteles y posadas fundadores de nuestra red nacional.",
+    contentType: "estatica",
+    categoryLabel: "Programa Fundadores",
+  },
+  "/alianzas-para-agencias": {
+    title: "Alianzas Estratégicas para Agencias de Viajes y Mayoristas",
+    description:
+      "Conecta tu agencia de viajes o tour operadora con el inventario verificado de hoteles en Venezuela.",
+    contentType: "estatica",
+    categoryLabel: "Alianzas B2B",
+  },
+  "/pre-registro": {
+    title: "Pre-Registro Express de Establecimientos Turísticos en Venezuela",
+    description:
+      "Inscribe tu hotel, posada, restaurante o marina en menos de 2 minutos en el directorio oficial de Hoteles de Venezuela.",
+    contentType: "estatica",
+    categoryLabel: "Registro Express",
+  },
+  "/sobre-nosotros": {
+    title: "Sobre Nosotros · Misión y Equipo de Hoteles de Venezuela LLC",
+    description:
+      "Conoce la historia, tecnología y equipo detrás de Hoteles de Venezuela LLC, la plataforma líder en reservas directas sin comisiones.",
+    contentType: "estatica",
+    categoryLabel: "Corporativo HDV",
+  },
+  "/soporte": {
+    title: "Centro de Asistencia y Soporte Técnico 24/7 · Hoteles de Venezuela",
+    description:
+      "Atención personalizada 24/7 para viajeros, turistas y propietarios de hoteles en Venezuela.",
+    contentType: "estatica",
+    categoryLabel: "Soporte 24/7",
+  },
+  "/reportar-pago": {
+    title: "Centro de Validación y Reporte de Pagos · Hoteles de Venezuela",
+    description:
+      "Reporta y verifica el pago de tu membresía corporativa o servicio en Hoteles de Venezuela.",
+    contentType: "estatica",
+    categoryLabel: "Gestión de Pagos",
+  },
+  "/privacidad": {
+    title: "Política de Privacidad y Protección de Datos · Hoteles de Venezuela",
+    description:
+      "Consulta nuestras políticas de privacidad, tratamiento de datos y seguridad tecnológica en Hoteles de Venezuela LLC.",
+    contentType: "estatica",
+    categoryLabel: "Marco Legal",
+  },
+  "/terminos": {
+    title: "Términos y Condiciones de Uso · Hoteles de Venezuela",
+    description:
+      "Condiciones generales de uso de la plataforma y directorio turístico Hoteles de Venezuela LLC.",
+    contentType: "estatica",
+    categoryLabel: "Marco Legal",
+  },
+  "/sitemap": {
+    title: "Mapa del Sitio Completo y Estructura de Contenidos · Hoteles en Venezuela",
+    description:
+      "Índice completo de destinos, reportajes, hoteles, posadas y secciones de la plataforma Hoteles de Venezuela.",
+    contentType: "directorio",
+    categoryLabel: "Índice General",
+  },
+  "/links": {
+    title: "Enlaces Oficiales y Canales Directos · Hoteles de Venezuela",
+    description:
+      "Acceso rápido a todos los canales oficiales, redes sociales, directorio de hoteles en Venezuela y contacto por WhatsApp.",
+    contentType: "estatica",
+    categoryLabel: "Canales Oficiales",
+  },
+};
+
 function Footer() {
   return (
     <footer className="font-sans text-white">
@@ -49,18 +245,24 @@ function Footer() {
           {/* Marca */}
           <div>
             <div className="mb-4">
-              <img
-                src="/images/logo-hdv-transparent.png"
-                alt="Hoteles de Venezuela"
-                className="h-12 w-[160px] object-contain"
-                style={{ filter: "brightness(0) invert(1)" }}
-                loading="lazy"
-                width="160"
-                height="48"
-              />
+              <Link href="/" rel="dofollow" title="Hoteles en Venezuela - Inicio Oficial">
+                <img
+                  src="/images/logo-hdv-transparent.png"
+                  alt="Hoteles en Venezuela - Hoteles de Venezuela"
+                  className="h-12 w-[160px] object-contain cursor-pointer"
+                  style={{ filter: "brightness(0) invert(1)" }}
+                  loading="lazy"
+                  width="160"
+                  height="48"
+                />
+              </Link>
             </div>
             <p className="text-gray-300 text-sm leading-relaxed max-w-xs font-light">
-              Tu guía definitiva para descubrir los mejores hoteles, posadas y experiencias turísticas de Venezuela.
+              Tu guía definitiva para descubrir los mejores{" "}
+              <Link href="/" rel="dofollow" className="text-[#00C8D4] hover:underline font-medium">
+                hoteles en Venezuela
+              </Link>
+              , posadas boutique y experiencias turísticas verificadas.
             </p>
             <div className="flex gap-3 mt-5">
               <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"
@@ -80,13 +282,14 @@ function Footer() {
               <a href="https://youtube.com" target="_blank" rel="noopener noreferrer"
                 className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all">
                 <svg className="w-4 h-4 fill-current text-white" viewBox="0 0 24 24">
-                  <path d="M23.498 6.163c-.272-.98-1.09-1.755-2.115-2.013C19.51 3.75 12 3.75 12 3.75s-7.51 0-9.383.5c-1.025.258-1.843 1.033-2.115 2.013C0 7.962 0 12 0 12s0 4.038.5 5.837c.272.98.109 1.755 2.115 2.013c1.873.5 9.383.5 9.383.5s7.51 0 9.383-.5c1.025-.258 1.843-1.033 2.115-2.013c.5-1.8.5-5.837.5-5.837s0-4.038-.5-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  <path d="M23.498 6.163c-.272-.98-1.09-1.755-2.115-2.013C19.51 3.75 12 3.75 12 3.75s-7.51 0-9.383.5c-1.025.258-1.843 1.033-2.115 2.013C0 7.962 0 12 0 12s0 4.038.5 5.837c.272.98.109 1.755 2.115 2.013c1.873.5 9.383.5 9.383.5s7.51 0 9.383-.5c1.025-.258 1.843-1.033 2.115-2.013.5-1.8.5-5.837.5-5.837s0-4.038-.5-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                 </svg>
               </a>
             </div>
             <div className="mt-6">
               <Link
                 href="/soporte"
+                rel="dofollow"
                 className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-2xl text-xs font-extrabold text-white transition-all shadow-lg hover:shadow-cyan-500/25 hover:scale-105 active:scale-95 border border-white/15 group"
                 style={{ background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)" }}
               >
@@ -109,7 +312,8 @@ function Footer() {
             </div>
             <ul className="space-y-2.5">
               {[
-                { href: "/establecimientos?category=hoteles", label: "Hoteles de Venezuela" },
+                { href: "/", label: "Hoteles en Venezuela (Inicio)" },
+                { href: "/establecimientos?category=hoteles", label: "Directorio de Hoteles" },
                 { href: "/establecimientos?category=posadas", label: "Posadas Boutique" },
                 { href: "/establecimientos?category=restaurantes", label: "Restaurantes & Sabor" },
                 { href: "/sitios-turisticos", label: "Sitios Turísticos Iconos" },
@@ -117,7 +321,7 @@ function Footer() {
                 { href: "/destinos", label: "Todos los Destinos" },
               ].map((l) => (
                 <li key={l.href}>
-                  <Link href={l.href} className="text-gray-300 text-xs hover:text-pink-400 transition-colors flex items-center gap-1.5 font-medium">
+                  <Link href={l.href} rel="dofollow" className="text-gray-300 text-xs hover:text-pink-400 transition-colors flex items-center gap-1.5 font-medium">
                     <span className="text-pink-500 font-bold">•</span> {l.label}
                   </Link>
                 </li>
@@ -136,12 +340,12 @@ function Footer() {
                 { href: "/blog/morrocoy-guia-definitiva-cayos", label: "Guía Morrocoy & Cayos" },
                 { href: "/blog/canaima-salto-angel-guia", label: "Guía Canaima & Salto Ángel" },
                 { href: "/blog/los-roques-mejor-epoca-del-ano", label: "Guía Los Roques" },
-                { href: "/blog", label: "Tips de Viaje & 20 Reportajes" },
+                { href: "/blog", label: "Tips de Viaje & 142 Reportajes" },
                 { href: "/top-10-hoteles", label: "Top 10 Hoteles Selección" },
                 { href: "/prestigio-2026", label: "Colección Prestigio 2026" },
               ].map((l, i) => (
                 <li key={i}>
-                  <Link href={l.href} className="text-gray-300 text-xs hover:text-cyan-400 transition-colors flex items-center gap-1.5 font-medium">
+                  <Link href={l.href} rel="dofollow" className="text-gray-300 text-xs hover:text-cyan-400 transition-colors flex items-center gap-1.5 font-medium">
                     <span className="text-cyan-400 font-bold">•</span> {l.label}
                   </Link>
                 </li>
@@ -164,7 +368,7 @@ function Footer() {
                 { href: "/reportar-pago", label: "Reportar Pago Local" },
               ].map((l, i) => (
                 <li key={i}>
-                  <Link href={l.href} className="text-gray-300 text-xs hover:text-purple-400 transition-colors flex items-center gap-1.5 font-medium">
+                  <Link href={l.href} rel="dofollow" className="text-gray-300 text-xs hover:text-purple-400 transition-colors flex items-center gap-1.5 font-medium">
                     <span className="text-purple-400 font-bold">•</span> {l.label}
                   </Link>
                 </li>
@@ -172,6 +376,7 @@ function Footer() {
               <li className="pt-2">
                 <Link
                   href="/soporte"
+                  rel="dofollow"
                   className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-extrabold text-white transition-all shadow-md hover:scale-105 active:scale-95 border border-[#00C8D4]/40 hover:border-[#00C8D4]"
                   style={{ background: "linear-gradient(135deg, #00C8D4 0%, #1a0533 100%)" }}
                 >
@@ -278,15 +483,20 @@ function Footer() {
       <div style={{ background: "#12022a" }} className="py-8 px-6 border-t border-white/5">
         <div className="max-w-5xl mx-auto">
           <div className="flex justify-center mb-5">
-            <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-white text-xs font-bold uppercase tracking-wider bg-white/5 border border-white/10 shadow-sm">
-              <MapPin className="w-3.5 h-3.5 text-brand-magenta" /> Hoteles de Venezuela
-            </span>
+            <Link
+              href="/"
+              rel="dofollow"
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-white hover:text-[#00C8D4] text-xs font-bold uppercase tracking-wider bg-white/5 border border-white/10 shadow-sm transition-colors cursor-pointer"
+            >
+              <MapPin className="w-3.5 h-3.5 text-brand-magenta" /> Hoteles en Venezuela · Red Nacional
+            </Link>
           </div>
           <div className="flex flex-wrap justify-center gap-2 max-w-4xl mx-auto">
             {DESTINATIONS.map((dest) => (
               <Link
                 key={dest.slug}
                 href={`/destinos/${dest.slug}`}
+                rel="dofollow"
                 className="px-3 py-1.5 rounded-full border border-white/20 text-white text-xs font-semibold hover:border-brand-magenta hover:text-brand-magenta transition-all duration-200"
               >
                 {dest.name}
@@ -301,9 +511,9 @@ function Footer() {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-gray-400 font-semibold tracking-wide">
           <div className="flex flex-col gap-1 items-center sm:items-start text-center sm:text-left">
             <span className="flex items-center gap-1.5 flex-wrap justify-center sm:justify-start">
-              <span>
+              <Link href="/" rel="dofollow" className="hover:text-white transition-colors">
                 © {new Date().getFullYear()} Hoteles de Venezuela LLC<sup className="text-[8px]">®</sup>
-              </span>
+              </Link>
               <span className="opacity-30">·</span>
               <span>Todos los derechos reservados</span>
               <span className="opacity-30">·</span>
@@ -322,15 +532,17 @@ function Footer() {
             </span>
           </div>
           <div className="flex items-center gap-4 flex-wrap justify-center">
-            <Link href="/privacidad" className="hover:text-white transition-colors">Política de Privacidad</Link>
+            <Link href="/" rel="dofollow" className="hover:text-white transition-colors text-[#00C8D4] font-bold">Hoteles en Venezuela</Link>
             <span className="text-gray-700">|</span>
-            <Link href="/terminos" className="hover:text-white transition-colors">Términos y Condiciones</Link>
+            <Link href="/privacidad" rel="dofollow" className="hover:text-white transition-colors">Política de Privacidad</Link>
             <span className="text-gray-700">|</span>
-            <Link href="/sobre-nosotros" className="hover:text-white transition-colors">Sobre Nosotros</Link>
+            <Link href="/terminos" rel="dofollow" className="hover:text-white transition-colors">Términos y Condiciones</Link>
             <span className="text-gray-700">|</span>
-            <Link href="/blog" className="hover:text-white transition-colors">Blog</Link>
+            <Link href="/sobre-nosotros" rel="dofollow" className="hover:text-white transition-colors">Sobre Nosotros</Link>
             <span className="text-gray-700">|</span>
-            <Link href="/sitemap" className="hover:text-white transition-colors">Mapa del sitio</Link>
+            <Link href="/blog" rel="dofollow" className="hover:text-white transition-colors">Blog</Link>
+            <span className="text-gray-700">|</span>
+            <Link href="/sitemap" rel="dofollow" className="hover:text-white transition-colors">Mapa del sitio</Link>
           </div>
         </div>
       </div>
@@ -344,7 +556,12 @@ interface MainLayoutProps {
 
 export function MainLayout({ children }: MainLayoutProps) {
   const [location] = useLocation();
-  const isAdminRoute = location.startsWith("/admin") || location === "/crm" || location === "/centaurus" || location === "/andromeda";
+  const cleanPath = (location.split("?")[0] || "/").replace(/\/+$/, "") || "/";
+  const isAdminRoute =
+    cleanPath.startsWith("/admin") ||
+    cleanPath === "/crm" ||
+    cleanPath === "/centaurus" ||
+    cleanPath === "/andromeda";
 
   // Si nos encontramos dentro de la consola administrativa o dashboards de control,
   // permitimos que AdminLayout tome el 100% del viewport sin barras públicas superpuestas
@@ -356,6 +573,9 @@ export function MainLayout({ children }: MainLayoutProps) {
     );
   }
 
+  const staticRouteMeta = STATIC_ROUTE_SEO_META[cleanPath];
+  const staticSlug = cleanPath.replace(/^\/+/, "") || "home";
+
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-800 font-sans">
       <Navbar />
@@ -363,6 +583,28 @@ export function MainLayout({ children }: MainLayoutProps) {
       <RouteAlertsBanner />
       <main className="flex-1">
         {children}
+        {staticRouteMeta && (
+          <>
+            <SeoHead
+              title={`${staticRouteMeta.title} | Hoteles en Venezuela`}
+              description={staticRouteMeta.description}
+              canonicalUrl={`https://hotelesdevenezuela.com${cleanPath}`}
+              schemas={buildClusterSchemas({
+                contentType: staticRouteMeta.contentType,
+                slug: staticSlug,
+                title: staticRouteMeta.title,
+                description: staticRouteMeta.description,
+                categoryName: staticRouteMeta.categoryLabel,
+              })}
+            />
+            <ClusterAuthorityCtaBlock
+              slug={staticSlug}
+              title={staticRouteMeta.title}
+              contentType={staticRouteMeta.contentType}
+              categoryLabel={staticRouteMeta.categoryLabel}
+            />
+          </>
+        )}
       </main>
       <Footer />
       <ChatWidget />
@@ -370,4 +612,3 @@ export function MainLayout({ children }: MainLayoutProps) {
     </div>
   );
 }
-

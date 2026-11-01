@@ -9,6 +9,8 @@ import {
   ChevronRight, Compass, Info, Heart
 } from "lucide-react";
 import { NATIONAL_PARKS_MOCK, type NationalPark } from "../lib/nationalParksMock";
+import { SeoHead } from "@/components/seo/SeoHead";
+import { ClusterAuthorityCtaBlock, buildClusterSchemas } from "@/components/seo/ClusterAuthorityCtaBlock";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   mountain: Mountain,
@@ -194,8 +196,31 @@ export function NationalParkDetail() {
   const IconComponent = iconMap[park.icon_type] || Mountain;
   const highlights = getHighlightsArray(park.highlights);
 
+  const seoSchemas = buildClusterSchemas({
+    contentType: "parque",
+    slug: park.slug,
+    title: park.name,
+    description:
+      park.short_description ||
+      `Guía oficial del ${park.name} y hoteles en Venezuela cercanos para reservar sin comisiones.`,
+    imageUrl: park.image_url,
+    stateOrRegion: park.destination_name,
+    categoryName: "Parques Nacionales de Venezuela",
+  });
+
   return (
     <div className="min-h-screen bg-gray-50/20 pb-20">
+      <SeoHead
+        title={`${park.name} | Parques Nacionales y Hoteles en Venezuela`}
+        description={
+          park.short_description ||
+          `Descubre el ${park.name} (${park.destination_name}) y reserva hoteles en Venezuela cercanos con trato directo.`
+        }
+        canonicalUrl={`https://hotelesdevenezuela.com/parque/${park.slug}`}
+        ogImage={park.image_url || undefined}
+        ogType="place"
+        schemas={seoSchemas}
+      />
       
       {/* Banner / Hero Section */}
       <section className="relative h-[45vh] md:h-[55vh] overflow-hidden bg-gray-900">
@@ -407,6 +432,15 @@ export function NationalParkDetail() {
 
         </div>
       </main>
+
+      {/* Matriz de Enlazado Interno Contextual en Clúster (Topic Cluster Architecture -> /) */}
+      <ClusterAuthorityCtaBlock
+        slug={park.slug}
+        title={park.name}
+        contentType="parque"
+        destinationName={park.destination_name}
+        categoryLabel="Parque Nacional"
+      />
 
     </div>
   );
