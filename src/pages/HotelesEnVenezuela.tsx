@@ -1675,7 +1675,12 @@ export function HotelesEnVenezuela() {
       </section>
 
       {/* Bloque de Autoridad de Clúster Transversal */}
-      <ClusterAuthorityCtaBlock />
+      <ClusterAuthorityCtaBlock
+        slug="hoteles-en-venezuela"
+        title="Hoteles en Venezuela: Guía Definitiva de Alojamiento y Reservas Directas"
+        contentType="directorio"
+        categoryLabel="Pilar Oficial SEO V15"
+      />
     </div>
   );
 }

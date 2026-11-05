@@ -450,17 +450,17 @@ export function buildClusterSchemas(params: {
 }
 
 interface ClusterAuthorityCtaBlockProps {
-  slug: string;
-  title: string;
-  contentType: ClusterContentType;
+  slug?: string;
+  title?: string;
+  contentType?: ClusterContentType;
   destinationName?: string;
   categoryLabel?: string;
 }
 
 export function ClusterAuthorityCtaBlock({
-  slug,
-  title,
-  contentType,
+  slug = "hoteles-en-venezuela",
+  title = "Hoteles en Venezuela",
+  contentType = "directorio",
   destinationName,
   categoryLabel,
 }: ClusterAuthorityCtaBlockProps) {
@@ -480,7 +480,7 @@ export function ClusterAuthorityCtaBlock({
     custom: { label: "Directorio de Hospedajes", href: "/establecimientos" },
   };
 
-  const currentHub = hubLinks[contentType];
+  const currentHub = hubLinks[contentType] || hubLinks.directorio;
 
   useEffect(() => {
     // Automated SEO Diagnostic Log confirming Topic Cluster Link Juice Integration
