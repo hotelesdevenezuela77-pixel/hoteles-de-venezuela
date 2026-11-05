@@ -30,6 +30,7 @@ import { OwnerAgendaModule } from "@/components/owner/OwnerAgendaModule";
 import { OwnerTechnicalSupportModule } from "@/components/owner/OwnerTechnicalSupportModule";
 import { OwnerWhatsAppCRMModule } from "@/components/owner/OwnerWhatsAppCRMModule";
 import { AddEstablishmentWizardModal } from "@/components/owner/AddEstablishmentWizardModal";
+import { PropertyWizardV15 } from "@/components/owner/PropertyWizardV15";
 import { ParkComplexDashboard } from "@/components/park/ParkComplexDashboard";
 import { isTouristComplexOrWaterPark } from "@/types/parkComplex";
 import { AgencyDashboard } from "@/components/agency/AgencyDashboard";
@@ -3536,6 +3537,7 @@ export function OwnerDashboard() {
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
                 {[
                   { id: "resumen", label: "Dashboard Ejecutivo", icon: BarChart3, enabled: true },
+                  { id: "wizard_v15", label: "Configuración Propiedad V15", icon: Sparkles, enabled: true, badge: "Wizard V15" },
                   { id: "crm_whatsapp", label: "CRM Leads WhatsApp", icon: MessageSquare, enabled: true, badge: leads.length > 0 ? `${leads.length}` : "WhatsApp" },
                   { id: "agenda", label: "Agenda & Calendario", icon: Calendar, enabled: true, badge: "Drag & Drop" },
                   { id: "soporte", label: "Soporte Técnico", icon: Wrench, enabled: true, badge: "Tickets D&D" },
@@ -3623,6 +3625,19 @@ export function OwnerDashboard() {
       ) : (
         <main className="max-w-7xl mx-auto px-6 mt-8">
 
+
+        {/* PANEL DE CONFIGURACIÓN DE LA PROPIEDAD V15 (WIZARD POR PASOS + JSONB) */}
+        {activeTab === "wizard_v15" && (
+          <div className="mb-10">
+            <PropertyWizardV15
+              establishmentId={activeEstablishment?.id || "default"}
+              initialName={activeEstablishment?.name || ""}
+              onSaveComplete={() => {
+                fetchDashboardData();
+              }}
+            />
+          </div>
+        )}
 
         {/* DASHBOARD EJECUTIVO TAB */}
         {activeTab === "resumen" && (

@@ -20,6 +20,7 @@ import {
 import { parseServicesList, getAmenityLabel, getAmenityInfo, CERTIFICATIONS_DOCUMENT77 } from "../lib/amenitiesList";
 import { SeoHead } from "@/components/seo/SeoHead";
 import { ClusterAuthorityCtaBlock, buildClusterSchemas } from "@/components/seo/ClusterAuthorityCtaBlock";
+import { EstablishmentV15DetailSections } from "@/components/establishment/EstablishmentV15DetailSections";
 
 const ROOM_AMENITIES_MAP: Record<string, string> = {
   toallas: "Toallas",
@@ -2388,6 +2389,32 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
           </div>
 
         </div>
+
+        {/* ── 7.5. FICHA DE DETALLE DE LA PROPIEDAD V15 (VISTA GENERAL, INFO Y PRECIOS USD/VES, SERVICIOS, NORMAS DE LA CASA, INFORMACIÓN LEGAL DEPURADA SIN CADIVI/COVID, COMENTARIOS Y GUÍA DE LA ZONA) ── */}
+        {!isCreatorCategory && !isGastronomyCategory && (
+          <EstablishmentV15DetailSections
+            establishment={{
+              id: establishment.id,
+              slug: establishment.slug,
+              name: establishment.name,
+              description: establishment.description,
+              address: establishment.address,
+              city: establishment.city,
+              state: establishment.state,
+              destination_name: establishment.destination_name,
+              category_name: establishment.category_name,
+              rating_avg: establishment.rating_avg,
+              review_count: establishment.review_count,
+              whatsapp: establishment.whatsapp,
+              phone: establishment.phone,
+              latitude: establishment.latitude,
+              longitude: establishment.longitude,
+              services: establishment.services,
+            }}
+            rooms={rooms}
+            surroundings={surroundings}
+          />
+        )}
 
         {/* ── 8. SECCIÓN DE CIERRE CTA (DIRECTRIZ AGENTS.MD #4: GRADIENTE MAGENTA/PÚRPURA CON BOTÓN BLANCO Y TEXTO MAGENTA) ── */}
         <div
