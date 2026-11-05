@@ -869,15 +869,39 @@ export function SaaSTenantLandingPage({ config }: SaaSTenantLandingPageProps) {
           {videoUrl ? (
             <video
               autoPlay
-              loop
+              loop={!isApartoPosada}
               muted
               playsInline
+              preload="auto"
               poster={bannerImage}
+              onLoadedMetadata={(e) => {
+                const vid = e.currentTarget;
+                vid.muted = true;
+                if (isApartoPosada && vid.currentTime < 4) {
+                  vid.currentTime = 4;
+                }
+                vid.play().catch(() => {});
+              }}
+              onTimeUpdate={(e) => {
+                if (!isApartoPosada) return;
+                const vid = e.currentTarget;
+                if (vid.currentTime < 4) {
+                  vid.currentTime = 4;
+                } else if (vid.duration && vid.currentTime >= vid.duration - 0.12) {
+                  vid.currentTime = 4;
+                  vid.play().catch(() => {});
+                }
+              }}
+              onEnded={(e) => {
+                const vid = e.currentTarget;
+                vid.currentTime = isApartoPosada ? 4 : 0;
+                vid.play().catch(() => {});
+              }}
               className={`w-full h-full object-cover scale-[1.08] ${
                 isApartoPosada ? "filter brightness-105 contrast-[1.02]" : "filter brightness-95"
               }`}
             >
-              <source src={videoUrl} type="video/mp4" />
+              <source src={isApartoPosada && !videoUrl.includes("#t=") ? `${videoUrl}#t=4` : videoUrl} type="video/mp4" />
               <img
                 src={bannerImage}
                 alt={config.name}
