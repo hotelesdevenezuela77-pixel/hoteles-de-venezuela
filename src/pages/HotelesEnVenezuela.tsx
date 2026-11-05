@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronRight,
+  ChevronLeft,
   Building2,
   Sparkles,
   Wallet,
@@ -32,11 +33,142 @@ import {
 } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import { ESTABLISHMENTS_MOCK } from "../lib/establishmentsMock";
+import { getRealEstablishmentPrice } from "../components/layout/EstablishmentCard";
 import { SeoHead } from "../components/seo/SeoHead";
 import { ClusterAuthorityCtaBlock } from "../components/seo/ClusterAuthorityCtaBlock";
 
 // ============================================================================
-// CLÚSTERES DE DESTINOS CLAVE (V15 REGIONS - C00.1.25)
+// CONSTANTES DE IMÁGENES REALES SUPABASE STORAGE CDN
+// ============================================================================
+const SUPABASE_STORAGE_BASE =
+  "https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public";
+
+const HERO_FALLBACK_IMAGE = `${SUPABASE_STORAGE_BASE}/establecimientos/destinos/salto-angel-hero-v2.jpg`;
+
+const REAL_HOTEL_FALLBACK_IMAGES: Record<string, string> = {
+  "los-roques": `${SUPABASE_STORAGE_BASE}/establecimientos/1783290743284-y0vst.jpg`,
+  morrocoy: `${SUPABASE_STORAGE_BASE}/establecimientos/1783301992150-hw7c7.jpg`,
+  margarita: `${SUPABASE_STORAGE_BASE}/establecimientos/1783289926828-ouq19.jpg`,
+  canaima: `${SUPABASE_STORAGE_BASE}/establecimientos/1783127525912-szr0f.jpg`,
+  caracas: `${SUPABASE_STORAGE_BASE}/establecimientos/1783128485200-oj99e.jpg`,
+  maracay: `${SUPABASE_STORAGE_BASE}/establecimientos/1783301505918-v07aa.jpg`,
+  barquisimeto: `${SUPABASE_STORAGE_BASE}/establecimientos/1784684867433-hkhpp.jpg`,
+  cubiro: `${SUPABASE_STORAGE_BASE}/establecimientos/1783302672927-hetuj.jpg`,
+  default: `${SUPABASE_STORAGE_BASE}/establecimientos/1783290743284-y0vst.jpg`
+};
+
+/**
+ * Normaliza y valida cualquier URL de imagen proveniente de Supabase / R2,
+ * descartando rutas locales rotas (/api/files/..., localhost) y corrigiendo
+ * rutas relativas de Supabase Storage.
+ */
+function normalizeRealImageUrl(rawUrl: unknown): string | null {
+  if (!rawUrl || typeof rawUrl !== "string") return null;
+  const trimmed = rawUrl.trim();
+  if (!trimmed) return null;
+
+  // Permitir imágenes Base64 reales guardadas en DB (ej. Aparto Posada del Mar)
+  if (trimmed.startsWith("data:image/")) {
+    return trimmed;
+  }
+
+  // Descartar rutas locales obsoletas que rompen la carga en producción
+  if (
+    trimmed.startsWith("/api/files/") ||
+    trimmed.includes("localhost") ||
+    trimmed.includes("127.0.0.1") ||
+    trimmed === "null" ||
+    trimmed === "undefined"
+  ) {
+    return null;
+  }
+
+  // Si es una ruta relativa al bucket de Supabase Storage, anteponer el dominio oficial
+  if (trimmed.startsWith("/storage/v1/object/public/")) {
+    return `https://ghgetcznlrilgocwigmj.supabase.co${trimmed}`;
+  }
+  if (trimmed.startsWith("establecimientos/")) {
+    return `${SUPABASE_STORAGE_BASE}/${trimmed}`;
+  }
+
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
+  }
+
+  return null;
+}
+
+/**
+ * Extrae todas las fotos reales subidas por el propietario desde `establishment_images`,
+ * `images`, `photos`, `gallery` o `facility_photos`, priorizando la foto principal (`is_primary`).
+ */
+function extractRealEstablishmentGallery(raw: any, destSlug: string): string[] {
+  const gallery: string[] = [];
+  const pushUnique = (candidate: unknown) => {
+    const valid = normalizeRealImageUrl(candidate);
+    if (valid && !gallery.includes(valid)) {
+      gallery.push(valid);
+    }
+  };
+
+  // 1. Relación oficial `establishment_images` de Supabase (con prioridad a is_primary = true)
+  if (Array.isArray(raw.establishment_images) && raw.establishment_images.length > 0) {
+    const sorted = [...raw.establishment_images].sort((a, b) =>
+      b?.is_primary ? 1 : a?.is_primary ? -1 : 0
+    );
+    for (const imgObj of sorted) {
+      if (typeof imgObj === "string") {
+        pushUnique(imgObj);
+      } else if (imgObj && typeof imgObj === "object") {
+        pushUnique(imgObj.image_url || imgObj.url || imgObj.src);
+      }
+    }
+  }
+
+  // 2. Campos alternativos en la fila (`images`, `photos`, `gallery`, `primary_image`, `cover_image`)
+  if (Array.isArray(raw.images)) {
+    for (const img of raw.images) {
+      pushUnique(typeof img === "string" ? img : img?.image_url || img?.url);
+    }
+  }
+  if (Array.isArray(raw.photos)) {
+    for (const img of raw.photos) {
+      pushUnique(typeof img === "string" ? img : img?.image_url || img?.url);
+    }
+  }
+  if (Array.isArray(raw.gallery)) {
+    for (const img of raw.gallery) {
+      pushUnique(typeof img === "string" ? img : img?.image_url || img?.url);
+    }
+  }
+
+  pushUnique(raw.primary_image);
+  pushUnique(raw.cover_image);
+  pushUnique(raw.image_url);
+  pushUnique(raw.featured_image);
+
+  // 3. Fotos de áreas / instalaciones (`facility_photos` JSONB) si el array principal estuviera vacío
+  if (gallery.length === 0 && raw.facility_photos && typeof raw.facility_photos === "object") {
+    for (const areaList of Object.values(raw.facility_photos)) {
+      if (Array.isArray(areaList)) {
+        for (const u of areaList) pushUnique(u);
+      }
+    }
+  }
+
+  // 4. Solo si el establecimiento no tiene ninguna imagen válida cargada, usar foto real del bucket según destino
+  if (gallery.length === 0) {
+    const fallbackByDest =
+      Object.entries(REAL_HOTEL_FALLBACK_IMAGES).find(([k]) => destSlug.includes(k))?.[1] ||
+      REAL_HOTEL_FALLBACK_IMAGES.default;
+    gallery.push(fallbackByDest);
+  }
+
+  return gallery;
+}
+
+// ============================================================================
+// CLÚSTERES DE DESTINOS CLAVE (V15 REGIONS - C00.1.25 CON FOTOS REALES SUPABASE)
 // ============================================================================
 interface DestinationCluster {
   id: string;
@@ -63,12 +195,11 @@ const DESTINATION_CLUSTERS: DestinationCluster[] = [
     description:
       "Posadas boutique de autor en el Gran Roque con gastronomía gourmet, paseos privados en lancha a Cayo de Agua y Franciskí, planta eléctrica 24/7 y desalinizadora propia.",
     destinationUrl: "/destinos/los-roques",
-    establishmentsUrl: "/establecimientos?destino=los-roques",
-    image:
-      "https://r2.hotelesdevenezuela.com/storage/v1/object/public/imagenes/Banners%20cintillos/cintillos/Banner%20los%20roques.jpg",
+    establishmentsUrl: "/establecimientos?destination=los-roques",
+    image: `${SUPABASE_STORAGE_BASE}/establecimientos/destinos/main-1783186885340-wqclx.jpg`,
     accentColor: "#00C8D4",
     highlights: ["Planta Eléctrica 24/7", "Pensión Completa VIP", "Traslado a Cayos"],
-    avgRateUsd: "Desde $180 USD / noche"
+    avgRateUsd: "Trato Directo VIP"
   },
   {
     id: "morrocoy",
@@ -79,12 +210,11 @@ const DESTINATION_CLUSTERS: DestinationCluster[] = [
     description:
       "Hoteles frente al mar, marinas privadas con muelle propio, posadas familiares y villas náuticas para zarpar hacia Cayo Sombrero, Playuela y Mayorquina.",
     destinationUrl: "/destinos/morrocoy",
-    establishmentsUrl: "/establecimientos?destino=morrocoy",
-    image:
-      "https://r2.hotelesdevenezuela.com/storage/v1/object/public/imagenes/Banners%20cintillos/cintillos/Banner%20morrocoy.jpg",
+    establishmentsUrl: "/establecimientos?destination=morrocoy",
+    image: `${SUPABASE_STORAGE_BASE}/establecimientos/destinos/main-1783187512226-p6tmz.jpg`,
     accentColor: "#FF0096",
     highlights: ["Muelle y Marina Privada", "Tanque de Agua Continuo", "Piscina Infinita"],
-    avgRateUsd: "Desde $85 USD / noche"
+    avgRateUsd: "Reserva Directa"
   },
   {
     id: "margarita",
@@ -95,12 +225,11 @@ const DESTINATION_CLUSTERS: DestinationCluster[] = [
     description:
       "Complejos vacacionales 5 estrellas en Playa El Agua, Pampatar y Pedro González, hoteles ejecutivos en Porlamar y resorts frente al mar en Isla de Coche.",
     destinationUrl: "/destinos/isla-de-margarita",
-    establishmentsUrl: "/establecimientos?destino=margarita",
-    image:
-      "https://r2.hotelesdevenezuela.com/storage/v1/object/public/imagenes/Banners%20cintillos/cintillos/Banner%20margarita.jpg",
+    establishmentsUrl: "/establecimientos?destination=margarita",
+    image: `${SUPABASE_STORAGE_BASE}/establecimientos/destinos/main-1783186579172-mi21g.jpg`,
     accentColor: "#9B00CC",
     highlights: ["Acceso Directo a Playa", "Todo Incluido / Club", "Sello Legal HDV"],
-    avgRateUsd: "Desde $75 USD / noche"
+    avgRateUsd: "0% Comisiones"
   },
   {
     id: "merida",
@@ -111,12 +240,11 @@ const DESTINATION_CLUSTERS: DestinationCluster[] = [
     description:
       "Cabañas alpinas con chimenea, hoteles coloniales en Mérida, La Culata y Santo Domingo, con agua caliente garantizada, calefacción y vistas al Pico Bolívar.",
     destinationUrl: "/destinos/merida",
-    establishmentsUrl: "/establecimientos?destino=merida",
-    image:
-      "https://r2.hotelesdevenezuela.com/storage/v1/object/public/imagenes/Banners%20cintillos/cintillos/Banner%20merida.jpg",
+    establishmentsUrl: "/establecimientos?destination=merida",
+    image: `${SUPABASE_STORAGE_BASE}/establecimientos/destinos/main-1783187454493-boqoa.jpg`,
     accentColor: "#00C8D4",
     highlights: ["Agua Caliente 24h", "Chimenea y Montaña", "Rutas de Páramo"],
-    avgRateUsd: "Desde $55 USD / noche"
+    avgRateUsd: "Tarifa de Anfitrión"
   },
   {
     id: "canaima",
@@ -127,12 +255,11 @@ const DESTINATION_CLUSTERS: DestinationCluster[] = [
     description:
       "Eco-lodges de lujo frente a la Laguna de Canaima y campamentos expedicionarios hacia el Kerepakupai Vená (Salto Ángel) con logística aérea y fluvial incluida.",
     destinationUrl: "/destinos/canaima",
-    establishmentsUrl: "/establecimientos?destino=canaima",
-    image:
-      "https://r2.hotelesdevenezuela.com/storage/v1/object/public/imagenes/Banners%20cintillos/cintillos/Banner%20canaima.jpg",
+    establishmentsUrl: "/establecimientos?destination=canaima",
+    image: `${SUPABASE_STORAGE_BASE}/establecimientos/destinos/main-1783185563983-25j2c.jpg`,
     accentColor: "#FF0096",
     highlights: ["Expedición Salto Ángel", "Todo Incluido Selva", "Energía Continua"],
-    avgRateUsd: "Desde $240 USD / noche"
+    avgRateUsd: "Campamentos Oficiales"
   }
 ];
 
@@ -179,7 +306,7 @@ const FAQ_ITEMS: FaqItem[] = [
 ];
 
 // ============================================================================
-// HELPER DE ENRIQUECIMIENTO V15 PARA PROPIEDADES
+// MODELO ENRIQUECIDO DE PROPIEDADES CON GALERÍA REAL DE SUPABASE
 // ============================================================================
 interface EnrichedProperty {
   id: number | string;
@@ -194,10 +321,11 @@ interface EnrichedProperty {
   destination_name: string;
   destination_slug: string;
   primary_image: string;
+  images: string[];
   rating_avg: number;
   review_count: number;
   price_level: string;
-  referencePriceUsd: number;
+  realPriceUsd: number | null;
   is_featured: boolean;
   has_hdv_seal: boolean;
   hasPowerPlant247: boolean;
@@ -222,10 +350,12 @@ function enrichEstablishmentForVenezuelaLanding(raw: any): EnrichedProperty {
     }
   }
 
-  const destSlug = (raw.destination_slug || raw.destination_name || "caracas")
+  const destName = raw.destinations?.name || raw.destination_name || raw.city || "Venezuela";
+  const destSlug = (raw.destinations?.slug || raw.destination_slug || destName)
     .toString()
     .toLowerCase();
-  const catSlug = (raw.category_slug || raw.category_name || "hoteles")
+  const catName = raw.categories?.name || raw.category_name || "Hoteles";
+  const catSlug = (raw.categories?.slug || raw.category_slug || catName)
     .toString()
     .toLowerCase();
   const nameLower = (raw.name || "").toString().toLowerCase();
@@ -242,33 +372,27 @@ function enrichEstablishmentForVenezuelaLanding(raw: any): EnrichedProperty {
     "mochima",
     "chichiriviche",
     "tucacas",
+    "cata",
     "playa"
   ];
   const isCoastal =
-    coastalKeywords.some((k) => destSlug.includes(k) || nameLower.includes(k) || descLower.includes(k)) ||
-    parsedServices.includes("playa");
+    coastalKeywords.some(
+      (k) => destSlug.includes(k) || nameLower.includes(k) || descLower.includes(k)
+    ) || parsedServices.includes("playa");
 
-  // Suministros V15 (lee v15_tags si existe en DB o infiere de forma determinista)
   const v15Tags = raw.v15_tags || {};
   const hasPowerPlant247 =
-    v15Tags["C01.4.1"] !== undefined
-      ? Boolean(v15Tags["C01.4.1"])
-      : true; // Todos los hoteles verificados del catálogo principal cuentan con respaldo eléctrico
+    v15Tags["C01.4.1"] !== undefined ? Boolean(v15Tags["C01.4.1"]) : true;
   const hasWaterTank247 =
-    v15Tags["C01.4.2"] !== undefined
-      ? Boolean(v15Tags["C01.4.2"])
-      : true; // Tanque de reserva / hidroneumático continuo
+    v15Tags["C01.4.2"] !== undefined ? Boolean(v15Tags["C01.4.2"]) : true;
   const hasBeachAccess =
     v15Tags["C01.2.16"] !== undefined ? Boolean(v15Tags["C01.2.16"]) : isCoastal;
 
-  const priceLevelStr = raw.price_level || "$$$";
-  const priceMap: Record<string, number> = {
-    $: 55,
-    $$: 85,
-    $$$: 135,
-    $$$$: 220
-  };
-  const referencePriceUsd = Number(raw.base_price_usd) || priceMap[priceLevelStr] || 110;
+  // Extraer todas las fotos reales subidas en `establishment_images` de Supabase
+  const galleryImages = extractRealEstablishmentGallery(raw, destSlug);
+  const primaryImg = galleryImages[0];
+
+  const realPriceUsd = getRealEstablishmentPrice(raw);
 
   return {
     id: raw.id,
@@ -277,23 +401,24 @@ function enrichEstablishmentForVenezuelaLanding(raw: any): EnrichedProperty {
     description:
       raw.description ||
       "Alojamiento turístico verificado por Hoteles de Venezuela con atención directa y reserva sin comisiones.",
-    address: raw.address || `${raw.destination_name || "Venezuela"}`,
+    address: raw.address || `${destName}, Venezuela`,
     phone: raw.phone || "+58 412 2248192",
     whatsapp: raw.whatsapp || raw.phone || "+584122248192",
-    category_name: raw.category_name || "Hoteles",
+    category_name: catName,
     category_slug: catSlug,
-    destination_name: raw.destination_name || "Venezuela",
+    destination_name: destName,
     destination_slug: destSlug,
-    primary_image:
-      raw.primary_image ||
-      raw.cover_image ||
-      "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop",
-    rating_avg: Number(raw.rating_avg) || 4.8,
-    review_count: Number(raw.review_count) || 95,
-    price_level: priceLevelStr,
-    referencePriceUsd,
+    primary_image: primaryImg,
+    images: galleryImages,
+    rating_avg: Number(raw.rating_avg) > 0 ? Number(raw.rating_avg) : 4.8,
+    review_count: Number(raw.review_count) > 0 ? Number(raw.review_count) : 24,
+    price_level: raw.price_level || "$$$",
+    realPriceUsd,
     is_featured: Boolean(raw.is_featured),
-    has_hdv_seal: raw.has_hdv_seal !== undefined ? Boolean(raw.has_hdv_seal) : true,
+    has_hdv_seal:
+      raw.has_hdv_seal !== undefined
+        ? Boolean(raw.has_hdv_seal)
+        : Boolean(raw.is_featured || raw.homepage_priority),
     hasPowerPlant247,
     hasWaterTank247,
     hasBeachAccess,
@@ -303,9 +428,219 @@ function enrichEstablishmentForVenezuelaLanding(raw: any): EnrichedProperty {
 }
 
 // ============================================================================
+// TARJETA DE HOTEL CON CARRUSEL DE FOTOS REALES DE SUPABASE
+// ============================================================================
+function RealHotelLandingCard({
+  hotel,
+  currencyMode,
+  bcvRate
+}: {
+  hotel: EnrichedProperty;
+  currencyMode: "USD" | "VES";
+  bcvRate: number;
+}) {
+  const [imgIdx, setImgIdx] = useState(0);
+  const totalImages = hotel.images.length;
+  const currentSrc = hotel.images[imgIdx] || hotel.primary_image;
+
+  const cleanWa = hotel.whatsapp.replace(/[^\d]/g, "") || "584122248192";
+  const waUrl = `https://wa.me/${cleanWa}?text=${encodeURIComponent(
+    `Hola, vi a *${hotel.name}* en la guía oficial de Hoteles de Venezuela (hotelesdevenezuela.com/hoteles-en-venezuela) y deseo consultar disponibilidad y tarifa directa sin intermediarios.`
+  )}`;
+
+  const formattedPrice =
+    hotel.realPriceUsd !== null
+      ? currencyMode === "USD"
+        ? `Desde $${hotel.realPriceUsd} USD`
+        : `Desde Bs. ${Math.round(hotel.realPriceUsd * bcvRate).toLocaleString("es-VE")}`
+      : "Tarifa Directa Recepción";
+
+  const handlePrevImg = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setImgIdx((prev) => (prev - 1 + totalImages) % totalImages);
+  };
+
+  const handleNextImg = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setImgIdx((prev) => (prev + 1) % totalImages);
+  };
+
+  return (
+    <article className="group bg-white rounded-2xl border border-slate-200 hover:border-[#00C8D4] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between">
+      <div>
+        {/* Galería de fotos reales de Supabase con fallback seguro */}
+        <div className="relative h-60 w-full overflow-hidden bg-[#0e011f] select-none">
+          <img
+            src={currentSrc}
+            alt={`${hotel.name} en ${hotel.destination_name}, Venezuela`}
+            loading="lazy"
+            decoding="async"
+            onError={(e) => {
+              const target = e.currentTarget;
+              const fallback =
+                REAL_HOTEL_FALLBACK_IMAGES[hotel.destination_slug] ||
+                REAL_HOTEL_FALLBACK_IMAGES.default;
+              if (target.src !== fallback) {
+                target.src = fallback;
+              }
+            }}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+          />
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(14,1,31,0.18) 0%, rgba(14,1,31,0.1) 50%, rgba(14,1,31,0.72) 100%)"
+            }}
+          />
+
+          {/* Controles del carrusel si el establecimiento tiene múltiples fotos reales */}
+          {totalImages > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={handlePrevImg}
+                aria-label="Foto anterior"
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-[#0e011f]/70 hover:bg-[#0e011f] text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20 backdrop-blur-sm"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={handleNextImg}
+                aria-label="Siguiente foto"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-[#0e011f]/70 hover:bg-[#0e011f] text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20 backdrop-blur-sm"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+
+              {/* Indicador de cantidad de fotos reales */}
+              <div className="absolute bottom-14 right-3 px-2 py-0.5 rounded-md bg-[#0e011f]/75 text-white text-[10px] font-bold backdrop-blur-sm z-10">
+                Foto {imgIdx + 1} / {totalImages}
+              </div>
+            </>
+          )}
+
+          {/* Badges Superiores */}
+          <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 z-10">
+            <span className="px-3 py-1 rounded-full bg-[#0e011f]/85 text-white text-[10px] font-extrabold uppercase tracking-wider border border-white/15 backdrop-blur-sm">
+              {hotel.category_name} · {hotel.destination_name}
+            </span>
+            {hotel.has_hdv_seal && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#00C8D4] text-white text-[10px] font-extrabold uppercase tracking-wider shadow">
+                <ShieldCheck className="w-3 h-3 text-white" />
+                Sello HDV
+              </span>
+            )}
+          </div>
+
+          {/* Valoración y Tarifa Directa */}
+          <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-2 z-10">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0e011f]/90 text-white text-xs font-extrabold border border-white/15">
+              <span className="w-4 h-4 rounded bg-[#FF0096] flex items-center justify-center">
+                <Star className="w-2.5 h-2.5 text-white fill-white" />
+              </span>
+              <span>{hotel.rating_avg.toFixed(1)}</span>
+              <span className="text-white/75 font-medium text-[11px]">
+                ({hotel.review_count})
+              </span>
+            </div>
+
+            <div className="text-right bg-white/95 backdrop-blur-md px-3 py-1 rounded-xl shadow">
+              <span className="block text-[9px] uppercase font-extrabold tracking-wider text-slate-500">
+                Reserva Sin Comisiones
+              </span>
+              <span className="text-xs font-black text-[#0f172a]">{formattedPrice}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Contenido de la Tarjeta */}
+        <div className="p-5">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-[#00C8D4] mb-1">
+            <MapPin className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">{hotel.address}</span>
+          </div>
+
+          <h3
+            className="text-lg font-bold text-[#0f172a] group-hover:text-[#00C8D4] transition-colors line-clamp-1 mb-2"
+            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+          >
+            <Link href={`/establecimiento/${hotel.slug}`}>{hotel.name}</Link>
+          </h3>
+
+          <p className="text-xs text-[#1e293b]/80 line-clamp-2 leading-relaxed mb-4">
+            {hotel.description}
+          </p>
+
+          {/* Etiquetas de Suministros V15 */}
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {hotel.hasPowerPlant247 && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-[#0f172a] text-[10px] font-bold">
+                <span className="w-3.5 h-3.5 rounded bg-[#00C8D4] flex items-center justify-center">
+                  <Zap className="w-2.5 h-2.5 text-white" />
+                </span>
+                Planta 24/7
+              </span>
+            )}
+            {hotel.hasWaterTank247 && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-[#0f172a] text-[10px] font-bold">
+                <span className="w-3.5 h-3.5 rounded bg-[#9B00CC] flex items-center justify-center">
+                  <Droplets className="w-2.5 h-2.5 text-white" />
+                </span>
+                Agua Continua
+              </span>
+            )}
+            {hotel.hasBeachAccess && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-[#0f172a] text-[10px] font-bold">
+                <span className="w-3.5 h-3.5 rounded bg-[#FF0096] flex items-center justify-center">
+                  <Waves className="w-2.5 h-2.5 text-white" />
+                </span>
+                Playa / Costa
+              </span>
+            )}
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-[#0f172a] text-[10px] font-bold">
+              Pago Móvil · Zelle
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Botones de Llamada a la Acción Directos */}
+      <div className="px-5 pb-5 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2.5">
+        <Link
+          href={`/establecimiento/${hotel.slug}`}
+          className="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-[#0e011f] text-[#0f172a] hover:text-white text-xs font-extrabold text-center transition-colors flex items-center justify-center gap-1.5"
+        >
+          <Building2 className="w-3.5 h-3.5" />
+          <span>Ver Hotel</span>
+        </Link>
+
+        <a
+          href={waUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="py-2.5 px-3 rounded-xl text-white text-xs font-extrabold text-center transition-opacity hover:opacity-95 flex items-center justify-center gap-1.5 shadow-sm"
+          style={{
+            background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)"
+          }}
+        >
+          <PhoneCall className="w-3.5 h-3.5" />
+          <span>Reservar Directo</span>
+        </a>
+      </div>
+    </article>
+  );
+}
+
+// ============================================================================
 // COMPONENTE PRINCIPAL: /hoteles-en-venezuela
 // ============================================================================
 export function HotelesEnVenezuela() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   // Estados de búsqueda y filtrado inteligente V15
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRegion, setSelectedRegion] = useState<string>("todos");
@@ -320,37 +655,65 @@ export function HotelesEnVenezuela() {
   // Tasa referencial BCV para visualización dual USD / VES
   const bcvRate = 45.8;
 
-  // Consulta en vivo a Supabase combinada con el catálogo base verificado
+  // Garantizar reproducción automática continua del video de fondo del Hero en todos los navegadores
+  useEffect(() => {
+    const vid = videoRef.current;
+    if (!vid) return;
+    vid.defaultMuted = true;
+    vid.muted = true;
+    const playPromise = vid.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        const retryPlay = () => {
+          if (videoRef.current) {
+            videoRef.current.muted = true;
+            videoRef.current.play().catch(() => {});
+          }
+        };
+        document.addEventListener("visibilitychange", retryPlay, { once: true });
+        window.addEventListener("pointerdown", retryPlay, { once: true });
+      });
+    }
+  }, []);
+
+  // Consulta en vivo a Supabase incluyendo `establishment_images (image_url, is_primary)`, `categories` y `destinations`
   const { data: properties = [], isLoading } = useQuery<EnrichedProperty[]>({
-    queryKey: ["hoteles-en-venezuela-seo-landing"],
+    queryKey: ["hoteles-en-venezuela-seo-landing-v2"],
     queryFn: async () => {
       try {
         const { data, error } = await supabase
           .from("establishments")
-          .select("*")
-          .order("is_featured", { ascending: false })
-          .limit(60);
+          .select(`
+            *,
+            categories (name, slug),
+            destinations (name, slug),
+            establishment_images (image_url, is_primary)
+          `)
+          .eq("status", "approved")
+          .order("homepage_priority", { ascending: true, nullsFirst: false })
+          .order("is_featured", { ascending: false });
 
         if (error) throw error;
 
-        // Combinamos resultados de Supabase con el catálogo curado evitando duplicados por slug
         const dbList = Array.isArray(data) ? data : [];
         const seenSlugs = new Set<string>();
         const merged: EnrichedProperty[] = [];
 
-        for (const item of [...dbList, ...ESTABLISHMENTS_MOCK]) {
-          // Solo alojamientos (excluir restaurantes puros o agencias si se busca hoteles/posadas/resorts/campamentos)
-          const catSlug = String(item.category_slug || item.category_name || "hoteles").toLowerCase();
-          const isLodging =
-            catSlug.includes("hotel") ||
-            catSlug.includes("posada") ||
-            catSlug.includes("resort") ||
-            catSlug.includes("campamento") ||
-            catSlug.includes("caba") ||
-            catSlug.includes("alojamiento") ||
-            !catSlug.includes("restaurante");
+        // Priorizar todos los establecimientos aprobados reales de Supabase que tienen fotos reales en `establishment_images`
+        const sortedDbList = [...dbList].sort((a, b) => {
+          const aHasRealImgs =
+            Array.isArray(a.establishment_images) && a.establishment_images.length > 0 ? 1 : 0;
+          const bHasRealImgs =
+            Array.isArray(b.establishment_images) && b.establishment_images.length > 0 ? 1 : 0;
+          return bHasRealImgs - aHasRealImgs;
+        });
 
-          if (!isLodging) continue;
+        for (const item of sortedDbList) {
+          const catSlug = String(
+            item.categories?.slug || item.category_slug || item.categories?.name || "hoteles"
+          ).toLowerCase();
+          // Excluir agencias de viajes o sitios turísticos puros para que el listado sea de alojamientos y complejos
+          if (catSlug.includes("agencia") || catSlug.includes("sitio")) continue;
 
           const enriched = enrichEstablishmentForVenezuelaLanding(item);
           if (!seenSlugs.has(enriched.slug)) {
@@ -359,17 +722,14 @@ export function HotelesEnVenezuela() {
           }
         }
 
-        return merged;
-      } catch {
-        return ESTABLISHMENTS_MOCK.filter((item) => {
-          const catSlug = String(item.category_slug || "").toLowerCase();
-          return (
-            catSlug.includes("hotel") ||
-            catSlug.includes("posada") ||
-            catSlug.includes("resort") ||
-            catSlug.includes("campamento")
-          );
-        }).map(enrichEstablishmentForVenezuelaLanding);
+        if (merged.length > 0) {
+          return merged;
+        }
+
+        return ESTABLISHMENTS_MOCK.map(enrichEstablishmentForVenezuelaLanding);
+      } catch (err) {
+        console.warn("Error consultando establecimientos en Supabase:", err);
+        return ESTABLISHMENTS_MOCK.map(enrichEstablishmentForVenezuelaLanding);
       }
     }
   });
@@ -499,17 +859,19 @@ export function HotelesEnVenezuela() {
       name: "Mejores Hoteles, Posadas y Resorts Verificados en Venezuela",
       description:
         "Listado oficial de hoteles en Venezuela con reserva directa, Sello de Garantía Legal HDV y suministros continuos verificados.",
-      numberOfItems: Math.min(filteredProperties.length, 12),
-      itemListElement: filteredProperties.slice(0, 12).map((prop, idx) => ({
+      numberOfItems: Math.min(filteredProperties.length, 15),
+      itemListElement: filteredProperties.slice(0, 15).map((prop, idx) => ({
         "@type": "ListItem",
         position: idx + 1,
         item: {
           "@type": "Hotel",
           name: prop.name,
           description: prop.description,
-          image: prop.primary_image,
+          image: prop.primary_image.startsWith("data:")
+            ? HERO_FALLBACK_IMAGE
+            : prop.primary_image,
           url: `https://hotelesdevenezuela.com/establecimiento/${prop.slug}`,
-          priceRange: prop.price_level,
+          priceRange: prop.price_level || "$$$",
           address: {
             "@type": "PostalAddress",
             streetAddress: prop.address,
@@ -552,40 +914,56 @@ export function HotelesEnVenezuela() {
         description="Reserva hoteles en Venezuela sin comisiones intermediarias. 14 años conectando hoteles, posadas y resorts en Los Roques, Margarita, Morrocoy, Mérida y Canaima con tarifas directas, Pago Móvil, Zelle y Sello de Garantía Legal HDV."
         keywords="hoteles en venezuela, reservar hoteles en venezuela, posadas en venezuela, resorts en venezuela, hoteles en margarita, posadas en los roques, hoteles en morrocoy, hoteles en merida, hoteles en caracas, hoteles con planta electrica venezuela"
         canonicalUrl="https://hotelesdevenezuela.com/hoteles-en-venezuela"
-        ogImage="https://r2.hotelesdevenezuela.com/storage/v1/object/public/imagenes/Banners%20cintillos/cintillos/Banner%20los%20roques.jpg"
+        ogImage={HERO_FALLBACK_IMAGE}
         ogType="website"
         schemas={seoSchemas}
       />
 
       {/* =====================================================================
-          1. CABECERA Y HERO SECTION (FULL-BLEED BANNER + SEO H1 + BUSCADOR)
+          1. CABECERA Y HERO SECTION (FULL-BLEED VIDEO BACKGROUND + SEO H1)
       ===================================================================== */}
-      <header className="relative w-full min-h-[600px] md:min-h-[680px] flex flex-col items-center justify-center overflow-hidden">
-        {/* Imagen de Fondo Full-Bleed con scale-[1.08] reglamentario */}
-        <img
-          src="https://r2.hotelesdevenezuela.com/storage/v1/object/public/imagenes/Banners%20cintillos/cintillos/Banner%20los%20roques.jpg"
-          alt="Hoteles en Venezuela - Directorio Oficial de Alojamiento y Reservas Directas"
-          className="absolute inset-0 w-full h-full object-cover scale-[1.08] transform transition-transform duration-1000"
-          fetchPriority="high"
-          decoding="async"
-        />
+      <header className="relative w-full min-h-[600px] md:min-h-[680px] bg-[#0e011f] flex flex-col items-center justify-center overflow-hidden">
+        {/* Video de Fondo Full-Bleed con scale-[1.08] reglamentario y fallback de imagen optimizada */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <video
+            ref={videoRef}
+            src="/videos/angel-falls-hero.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            poster={HERO_FALLBACK_IMAGE}
+            onLoadedMetadata={(e) => {
+              e.currentTarget.muted = true;
+              e.currentTarget.play().catch(() => {});
+            }}
+            onCanPlay={(e) => {
+              e.currentTarget.muted = true;
+              e.currentTarget.play().catch(() => {});
+            }}
+            className="w-full h-full object-cover scale-[1.08] filter brightness-105 contrast-[1.02]"
+          >
+            <source src="/videos/angel-falls-hero.mp4" type="video/mp4" />
+          </video>
 
-        {/* Overlay Corporativo Oscuro Púrpura Profundo (Sin Negro Puro) */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(14,1,31,0.78) 0%, rgba(26,5,51,0.72) 60%, rgba(255,255,255,0.15) 100%)"
-          }}
-        />
+          {/* Efecto cinemático de caída de agua y bruma ambiental idéntico a la página principal */}
+          <div className="absolute inset-0 z-[5] pointer-events-none overflow-hidden">
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[900px] h-[260px] bg-gradient-to-t from-cyan-100/20 via-white/15 to-transparent rounded-full blur-3xl animate-mist-drift-1" />
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-[780px] h-[220px] bg-gradient-to-t from-white/25 via-cyan-50/10 to-transparent rounded-full blur-2xl animate-mist-drift-2" />
+          </div>
 
-        {/* Degradado Blanco Inferior Reglamentario (Fusión invisible con la página) */}
-        <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none z-10" />
+          {/* Overlay ligero y cristalino (sin ocultar el movimiento del video del Salto Ángel) */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0e011f]/40 via-[#0e011f]/20 to-[#0e011f]/70 z-10" />
+        </div>
+
+        {/* Degradado Blanco Inferior Reglamentario (Fusión suave con el fondo blanco de la página) */}
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none z-15" />
 
         {/* Contenido Central Hero */}
         <div className="relative z-20 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-28 text-center flex flex-col items-center">
           {/* Pre-título Espaciado en Mayúsculas */}
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#0e011f]/80 border border-[#00C8D4]/40 backdrop-blur-md mb-5 shadow-lg">
+          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#0e011f]/75 border border-[#00C8D4]/40 backdrop-blur-md mb-5 shadow-lg">
             <span className="w-5 h-5 rounded-md bg-[#00C8D4] flex items-center justify-center">
               <ShieldCheck className="w-3.5 h-3.5 text-white" />
             </span>
@@ -603,7 +981,7 @@ export function HotelesEnVenezuela() {
           </h1>
 
           {/* Subtítulo Persuasivo (14 Años + 0% Comisiones + Sello Legal HDV) */}
-          <p className="mt-5 text-base sm:text-lg md:text-xl text-white/95 max-w-3xl font-medium leading-relaxed drop-shadow">
+          <p className="mt-5 text-base sm:text-lg md:text-xl text-white/95 max-w-3xl font-medium leading-relaxed drop-shadow-[0_2px_12px_rgba(14,1,31,0.85)]">
             <strong className="text-[#00C8D4] font-bold">14 años de trayectoria oficial</strong>{" "}
             conectando viajeros con hoteles, posadas de autor, resorts y campamentos turísticos{" "}
             <span className="underline decoration-[#FF0096] decoration-2 underline-offset-4 font-bold">
@@ -615,19 +993,19 @@ export function HotelesEnVenezuela() {
 
           {/* Píldoras de Confianza Rápida */}
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs font-bold text-white">
-            <div className="flex items-center gap-2 bg-[#1a0533]/85 border border-white/15 px-3.5 py-2 rounded-xl backdrop-blur-sm">
+            <div className="flex items-center gap-2 bg-[#1a0533]/80 border border-white/15 px-3.5 py-2 rounded-xl backdrop-blur-sm">
               <span className="w-5 h-5 rounded-md bg-[#00C8D4] flex items-center justify-center">
                 <Zap className="w-3 h-3 text-white" />
               </span>
               <span>Planta Eléctrica 24/7 (C01.4.1)</span>
             </div>
-            <div className="flex items-center gap-2 bg-[#1a0533]/85 border border-white/15 px-3.5 py-2 rounded-xl backdrop-blur-sm">
+            <div className="flex items-center gap-2 bg-[#1a0533]/80 border border-white/15 px-3.5 py-2 rounded-xl backdrop-blur-sm">
               <span className="w-5 h-5 rounded-md bg-[#FF0096] flex items-center justify-center">
                 <Droplets className="w-3 h-3 text-white" />
               </span>
               <span>Tanque de Agua Continuo (C01.4.2)</span>
             </div>
-            <div className="flex items-center gap-2 bg-[#1a0533]/85 border border-white/15 px-3.5 py-2 rounded-xl backdrop-blur-sm">
+            <div className="flex items-center gap-2 bg-[#1a0533]/80 border border-white/15 px-3.5 py-2 rounded-xl backdrop-blur-sm">
               <span className="w-5 h-5 rounded-md bg-[#9B00CC] flex items-center justify-center">
                 <Wallet className="w-3 h-3 text-white" />
               </span>
@@ -655,7 +1033,7 @@ export function HotelesEnVenezuela() {
                     type="text"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Ej. Tamanaco, Los Roques, Margarita, Mérida..."
+                    placeholder="Ej. Sabbia, Los Roques, Morrocoy, Canaima..."
                     className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-semibold text-[#0f172a] placeholder:text-slate-400 focus:outline-none focus:border-[#00C8D4] focus:ring-2 focus:ring-[#00C8D4]/20"
                   />
                 </div>
@@ -686,7 +1064,8 @@ export function HotelesEnVenezuela() {
                     <option value="merida">Los Andes / Mérida</option>
                     <option value="canaima">Canaima y La Gran Sabana</option>
                     <option value="caracas">Caracas y Distrito Capital</option>
-                    <option value="la-guaira">La Guaira y Litoral Central</option>
+                    <option value="barquisimeto">Barquisimeto y Cubiro (Lara)</option>
+                    <option value="maracay">Maracay y Costa de Aragua</option>
                   </select>
                 </div>
               </div>
@@ -706,9 +1085,9 @@ export function HotelesEnVenezuela() {
                   className="w-full px-3.5 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-semibold text-[#0f172a] focus:outline-none focus:border-[#00C8D4]"
                 >
                   <option value="todos">Todos (CS-01/02)</option>
-                  <option value="hoteles">Hoteles Ejecutivos</option>
+                  <option value="hoteles">Hoteles & Resorts</option>
                   <option value="posadas">Posadas Boutique</option>
-                  <option value="resorts">Resorts de Playa</option>
+                  <option value="complejos">Complejos Turísticos</option>
                   <option value="campamentos">Campamentos & Eco-Lodges</option>
                 </select>
               </div>
@@ -763,7 +1142,7 @@ export function HotelesEnVenezuela() {
               <span className="w-4 h-4 rounded bg-[#00C8D4] flex items-center justify-center">
                 <BadgeCheck className="w-3 h-3 text-white" />
               </span>
-              Catálogo Auditado V15 · 0% Comisiones
+              Catálogo Auditado V15 · Fotos Reales Verificadas
             </span>
           </div>
         </nav>
@@ -802,7 +1181,7 @@ export function HotelesEnVenezuela() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {DESTINATION_CLUSTERS.map((cluster, idx) => {
             const isSelected = selectedRegion === cluster.regionKey;
-            const isWideCard = idx === 0; // Destacar Los Roques en pantallas grandes
+            const isWideCard = idx === 0;
             return (
               <article
                 key={cluster.id}
@@ -814,20 +1193,23 @@ export function HotelesEnVenezuela() {
                     : "border-slate-200 hover:border-[#00C8D4]/60"
                 }`}
               >
-                {/* Imagen con degradado oscuro corporativo */}
+                {/* Imagen Real del Destino con degradado oscuro corporativo */}
                 <div className="relative h-56 sm:h-64 w-full overflow-hidden bg-[#0e011f]">
                   <img
                     src={cluster.image}
                     alt={`${cluster.title} - ${cluster.subtitle}`}
                     loading="lazy"
                     decoding="async"
+                    onError={(e) => {
+                      e.currentTarget.src = HERO_FALLBACK_IMAGE;
+                    }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                   <div
                     className="absolute inset-0"
                     style={{
                       background:
-                        "linear-gradient(180deg, rgba(14,1,31,0.25) 0%, rgba(14,1,31,0.88) 100%)"
+                        "linear-gradient(180deg, rgba(14,1,31,0.2) 0%, rgba(14,1,31,0.85) 100%)"
                     }}
                   />
 
@@ -956,7 +1338,7 @@ export function HotelesEnVenezuela() {
       </section>
 
       {/* =====================================================================
-          3. BLOQUE DE FILTRADO DINÁMICO CONECTADO A SUPABASE
+          3. BLOQUE DE FILTRADO DINÁMICO CONECTADO A SUPABASE (FOTOS REALES)
       ===================================================================== */}
       <section
         id="directorio-hoteles-venezuela"
@@ -971,7 +1353,7 @@ export function HotelesEnVenezuela() {
                 <span className="w-6 h-6 rounded-lg bg-[#FF0096] flex items-center justify-center">
                   <SlidersHorizontal className="w-3.5 h-3.5 text-white" />
                 </span>
-                <span>MOTOR INTERACTIVO SUPABASE · ETIQUETAS V15</span>
+                <span>INVENTARIO OFICIAL SUPABASE · FOTOS REALES VERIFICADAS</span>
               </div>
               <h2
                 id="directorio-hoteles-heading"
@@ -1027,7 +1409,7 @@ export function HotelesEnVenezuela() {
               </span>
               <span className="text-xs font-bold text-slate-500">
                 Mostrando <strong className="text-[#0f172a]">{filteredProperties.length}</strong>{" "}
-                alojamientos verificados
+                alojamientos verificados en Supabase
               </span>
             </div>
 
@@ -1109,12 +1491,12 @@ export function HotelesEnVenezuela() {
                 >
                   <ShieldCheck className="w-3.5 h-3.5 text-white" />
                 </span>
-                <span>Solo Sello Legal HDV</span>
+                <span>Solo Destacados / Sello HDV</span>
               </button>
             </div>
           </div>
 
-          {/* Grid de Tarjetas de Hoteles Conectado a Supabase */}
+          {/* Grid de Tarjetas de Hoteles Conectado a Supabase con Fotos Reales */}
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3, 4, 5, 6].map((sk) => (
@@ -1155,162 +1537,24 @@ export function HotelesEnVenezuela() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProperties.slice(0, 12).map((hotel) => {
-                const cleanWa = hotel.whatsapp.replace(/[^\d]/g, "") || "584122248192";
-                const waUrl = `https://wa.me/${cleanWa}?text=${encodeURIComponent(
-                  `Hola, vi a *${hotel.name}* en la guía oficial de Hoteles de Venezuela (hotelesdevenezuela.com/hoteles-en-venezuela) y deseo consultar disponibilidad y tarifa directa sin intermediarios.`
-                )}`;
-                const formattedPrice =
-                  currencyMode === "USD"
-                    ? `$${hotel.referencePriceUsd} USD`
-                    : `Bs. ${Math.round(hotel.referencePriceUsd * bcvRate).toLocaleString("es-VE")}`;
-
-                return (
-                  <article
-                    key={hotel.slug}
-                    className="group bg-white rounded-2xl border border-slate-200 hover:border-[#00C8D4] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between"
-                  >
-                    <div>
-                      {/* Imagen de la propiedad con lazy-loading */}
-                      <div className="relative h-56 w-full overflow-hidden bg-[#0e011f]">
-                        <img
-                          src={hotel.primary_image}
-                          alt={`${hotel.name} en ${hotel.destination_name}, Venezuela`}
-                          loading="lazy"
-                          decoding="async"
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                        />
-                        <div
-                          className="absolute inset-0"
-                          style={{
-                            background:
-                              "linear-gradient(180deg, rgba(14,1,31,0.2) 0%, rgba(14,1,31,0.75) 100%)"
-                          }}
-                        />
-
-                        {/* Badges Superiores */}
-                        <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
-                          <span className="px-3 py-1 rounded-full bg-[#0e011f]/85 text-white text-[10px] font-extrabold uppercase tracking-wider border border-white/15 backdrop-blur-sm">
-                            {hotel.category_name}
-                          </span>
-                          {hotel.has_hdv_seal && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#00C8D4] text-white text-[10px] font-extrabold uppercase tracking-wider shadow">
-                              <ShieldCheck className="w-3 h-3 text-white" />
-                              Sello HDV
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Valoración y Precio Referencial Dual */}
-                        <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-2">
-                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0e011f]/90 text-white text-xs font-extrabold border border-white/15">
-                            <span className="w-4 h-4 rounded bg-[#FF0096] flex items-center justify-center">
-                              <Star className="w-2.5 h-2.5 text-white fill-white" />
-                            </span>
-                            <span>{hotel.rating_avg.toFixed(1)}</span>
-                            <span className="text-white/70 font-medium text-[11px]">
-                              ({hotel.review_count})
-                            </span>
-                          </div>
-
-                          <div className="text-right bg-white/95 backdrop-blur-md px-3 py-1 rounded-xl shadow">
-                            <span className="block text-[9px] uppercase font-extrabold tracking-wider text-slate-500">
-                              Tarifa Directa Ref.
-                            </span>
-                            <span className="text-sm font-black text-[#0f172a]">
-                              {formattedPrice}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Contenido de la Tarjeta */}
-                      <div className="p-5">
-                        <div className="flex items-center gap-1.5 text-xs font-bold text-[#00C8D4] mb-1">
-                          <MapPin className="w-3.5 h-3.5 shrink-0" />
-                          <span className="truncate">{hotel.address}</span>
-                        </div>
-
-                        <h3
-                          className="text-lg font-bold text-[#0f172a] group-hover:text-[#00C8D4] transition-colors line-clamp-1 mb-2"
-                          style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                        >
-                          <Link href={`/establecimiento/${hotel.slug}`}>{hotel.name}</Link>
-                        </h3>
-
-                        <p className="text-xs text-[#1e293b]/80 line-clamp-2 leading-relaxed mb-4">
-                          {hotel.description}
-                        </p>
-
-                        {/* Etiquetas de Suministros V15 */}
-                        <div className="flex flex-wrap gap-1.5 mb-4">
-                          {hotel.hasPowerPlant247 && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-[#0f172a] text-[10px] font-bold">
-                              <span className="w-3.5 h-3.5 rounded bg-[#00C8D4] flex items-center justify-center">
-                                <Zap className="w-2.5 h-2.5 text-white" />
-                              </span>
-                              Planta 24/7
-                            </span>
-                          )}
-                          {hotel.hasWaterTank247 && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-[#0f172a] text-[10px] font-bold">
-                              <span className="w-3.5 h-3.5 rounded bg-[#9B00CC] flex items-center justify-center">
-                                <Droplets className="w-2.5 h-2.5 text-white" />
-                              </span>
-                              Agua Continua
-                            </span>
-                          )}
-                          {hotel.hasBeachAccess && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-[#0f172a] text-[10px] font-bold">
-                              <span className="w-3.5 h-3.5 rounded bg-[#FF0096] flex items-center justify-center">
-                                <Waves className="w-2.5 h-2.5 text-white" />
-                              </span>
-                              Playa / Costa
-                            </span>
-                          )}
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-[#0f172a] text-[10px] font-bold">
-                            Pago Móvil · Zelle
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Botones de Llamada a la Acción Directos */}
-                    <div className="px-5 pb-5 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2.5">
-                      <Link
-                        href={`/establecimiento/${hotel.slug}`}
-                        className="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-[#0e011f] text-[#0f172a] hover:text-white text-xs font-extrabold text-center transition-colors flex items-center justify-center gap-1.5"
-                      >
-                        <Building2 className="w-3.5 h-3.5" />
-                        <span>Ver Hotel</span>
-                      </Link>
-
-                      <a
-                        href={waUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="py-2.5 px-3 rounded-xl text-white text-xs font-extrabold text-center transition-opacity hover:opacity-95 flex items-center justify-center gap-1.5 shadow-sm"
-                        style={{
-                          background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)"
-                        }}
-                      >
-                        <PhoneCall className="w-3.5 h-3.5" />
-                        <span>Reservar Directo</span>
-                      </a>
-                    </div>
-                  </article>
-                );
-              })}
+              {filteredProperties.slice(0, 15).map((hotel) => (
+                <RealHotelLandingCard
+                  key={hotel.slug}
+                  hotel={hotel}
+                  currencyMode={currencyMode}
+                  bcvRate={bcvRate}
+                />
+              ))}
             </div>
           )}
 
-          {/* Enlace para abrir el catálogo completo si hay más propiedades */}
+          {/* Enlace para abrir el catálogo completo */}
           <div className="mt-10 text-center">
             <Link
               href="/establecimientos"
               className="inline-flex items-center gap-2.5 px-7 py-4 rounded-2xl bg-[#0e011f] hover:bg-[#1a0533] text-white text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-lg transition-all"
             >
-              <span>Explorar los +170 Establecimientos del Directorio Nacional</span>
+              <span>Explorar el Directorio Nacional Completo</span>
               <ArrowRight className="w-4 h-4 text-[#00C8D4]" />
             </Link>
           </div>
@@ -1351,7 +1595,7 @@ export function HotelesEnVenezuela() {
                 </strong>
                 . Durante más de <strong>14 años ininterrumpidos</strong> hemos auditado la
                 infraestructura hotelera nacional, desde los grandes hoteles ejecutivos de Caracas,
-                Valencia y Maracaibo hasta las posadas de autor en Los Roques, Morrocoy, Isla de
+                Valencia y Barquisimeto hasta las posadas de autor en Los Roques, Morrocoy, Isla de
                 Margarita, Mérida y Canaima.
               </p>
 
@@ -1480,9 +1724,8 @@ export function HotelesEnVenezuela() {
             </div>
           </div>
 
-          {/* Opción Destacada / Recomendada: Hoteles de Venezuela (Gradiente Púrpura Profundo + Etiqueta Rosa Recomendado) */}
+          {/* Opción Destacada / Recomendada: Hoteles de Venezuela */}
           <div className="relative rounded-2xl bg-gradient-to-br from-[#0e011f] to-[#1a0533] text-white p-6 sm:p-8 shadow-xl border-2 border-[#00C8D4] flex flex-col justify-between">
-            {/* Etiqueta Rosa de "Recomendado" */}
             <div className="absolute -top-3.5 right-6 px-4 py-1 rounded-full bg-[#FF0096] text-white text-[11px] font-extrabold uppercase tracking-widest shadow-lg">
               Recomendado · Reserva Directa
             </div>
@@ -1686,4 +1929,3 @@ export function HotelesEnVenezuela() {
 }
 
 export default HotelesEnVenezuela;
-
