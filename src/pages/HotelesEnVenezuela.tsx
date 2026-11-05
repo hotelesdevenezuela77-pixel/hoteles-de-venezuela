@@ -191,7 +191,7 @@ const DESTINATION_CLUSTERS: DestinationCluster[] = [
     regionKey: "los-roques",
     title: "Archipiélago de Los Roques",
     subtitle: "Posadas de lujo y cayos cristalinos",
-    badge: "Caribe VIP · V15",
+    badge: "Caribe VIP · Los Roques",
     description:
       "Posadas boutique de autor en el Gran Roque con gastronomía gourmet, paseos privados en lancha a Cayo de Agua y Franciskí, planta eléctrica 24/7 y desalinizadora propia.",
     destinationUrl: "/destinos/los-roques",
@@ -277,31 +277,31 @@ const FAQ_ITEMS: FaqItem[] = [
     question: "¿Cómo reservar hoteles en Venezuela de forma segura?",
     answer:
       "Para reservar hoteles en Venezuela de forma 100% segura, utiliza el directorio oficial de Hoteles de Venezuela (hotelesdevenezuela.com) seleccionando propiedades verificadas con el Sello de Garantía Legal HDV (RIF jurídico validado, Registro Turístico Nacional RTN vigente e inspección física). Nuestra plataforma te conecta directamente con la recepción oficial y el WhatsApp verificado del establecimiento sin intermediarios, evitando recargos ocultos, estafas por perfiles falsos en redes sociales o bloqueos de tarjetas internacionales.",
-    tagCode: "Seguridad & Sello HDV (C00.5.9)"
+    tagCode: "Seguridad & Sello de Garantía HDV"
   },
   {
     question: "¿Qué métodos de pago aceptan los alojamientos afiliados?",
     answer:
       "Los hoteles, posadas y resorts afiliados a Hoteles de Venezuela están adaptados a la realidad transaccional y multimoneda del país (USD / VES). Aceptan Pago Móvil Interbancario y transferencias nacionales en Bolívares (VES) a tasa oficial del Banco Central de Venezuela (BCV), Zelle en dólares, Binance Pay (USDT), transferencias internacionales (Banesco Panamá / Mercantil Panamá), cuentas custodia en divisas (Bancamiga / BNC / Banesco), tarjetas de débito/crédito internacionales y efectivo en divisas directamente en recepción.",
-    tagCode: "Pasarelas Venezuela (C04.7)"
+    tagCode: "Métodos de Pago en Venezuela"
   },
   {
     question: "¿Cuáles son las mejores zonas turísticas para hospedarse en la costa y los Andes?",
     answer:
       "En la costa caribeña destacan el Archipiélago de Los Roques (ideal para posadas VIP y deportes acuáticos en aguas cristalinas), el Parque Nacional Morrocoy en Tucacas y Chichiriviche (favorito para escapadas en lancha a los cayos), e Isla de Margarita y Coche (líder en resorts familiares Todo Incluido y vida gastronómica en Pampatar). En los Andes Venezolanos, las mejores zonas son el Valle de La Culata, Mucuchíes, Santo Domingo y el casco histórico de Mérida, famosos por sus cabañas de montaña con chimenea, clima frío y cercanía al Teleférico Mukumbarí.",
-    tagCode: "Clústeres Regionales (C00.1.25)"
+    tagCode: "Destinos y Regiones Turísticas"
   },
   {
     question: "¿Qué ventajas ofrece la plataforma frente a agencias internacionales de intermediación?",
     answer:
-      "A diferencia de las OTAs extranjeras que cobran entre un 18% y un 30% de comisión y carecen de soporte bancario local en Venezuela, Hoteles de Venezuela lleva 14 años operando bajo un modelo de Reserva Directa con 0% de comisión por intermediación. Esto garantiza al viajero la tarifa oficial más baja del hotel, confirmación inmediata por WhatsApp con la recepción real, flexibilidad en pagos mixtos (Zelle, Pago Móvil, Binance Pay) y filtros técnicos exclusivos para el mercado venezolano como Planta Eléctrica 24/7 (C01.4.1) y Tanque de Agua continuo (C01.4.2).",
+      "A diferencia de las OTAs extranjeras que cobran entre un 18% y un 30% de comisión y carecen de soporte bancario local en Venezuela, Hoteles de Venezuela lleva 14 años operando bajo un modelo de Reserva Directa con 0% de comisión por intermediación. Esto garantiza al viajero la tarifa oficial más baja del hotel, confirmación inmediata por WhatsApp con la recepción real, flexibilidad en pagos mixtos (Zelle, Pago Móvil, Binance Pay) y filtros exclusivos para el mercado venezolano como Planta Eléctrica 24/7 y Tanque de Agua continuo.",
     tagCode: "0% Comisiones · 14 Años de Autoridad"
   },
   {
     question: "¿Cómo saber si un hotel o posada cuenta con Planta Eléctrica 24/7 y suministro continuo de agua?",
     answer:
-      "En nuestro motor de búsqueda V15 hemos estandarizado la certificación de suministros críticos mediante el Maestro de Etiquetas Oficial: cada propiedad especifica si dispone de Planta Eléctrica 100% operativa (C01.4.1 — para áreas comunes y aires acondicionados en habitaciones) y Pozo Profundo o Tanque de Agua de gran capacidad (C01.4.2), además de conectividad fibra óptica o Starlink para teletrabajo.",
-    tagCode: "Suministros Críticos (C01.4.1 / C01.4.2)"
+      "En nuestro directorio oficial verificamos los suministros operativos de cada establecimiento: cada propiedad especifica si dispone de Planta Eléctrica 100% operativa (para áreas comunes y climatización en habitaciones) y Pozo Profundo o Tanque de Agua de gran capacidad, además de conectividad por fibra óptica o internet satelital para teletrabajo.",
+    tagCode: "Garantía de Servicios Operativos"
   }
 ];
 
@@ -968,7 +968,7 @@ export function HotelesEnVenezuela() {
               <ShieldCheck className="w-3.5 h-3.5 text-white" />
             </span>
             <span className="text-[11px] sm:text-xs font-extrabold uppercase tracking-[0.28em] text-[#00C8D4]">
-              EL PARAÍSO TE ESPERA · DIRECTORIO OFICIAL V15
+              EL PARAÍSO TE ESPERA · DIRECTORIO OFICIAL DE VENEZUELA
             </span>
           </div>
 
@@ -997,13 +997,13 @@ export function HotelesEnVenezuela() {
               <span className="w-5 h-5 rounded-md bg-[#00C8D4] flex items-center justify-center">
                 <Zap className="w-3 h-3 text-white" />
               </span>
-              <span>Planta Eléctrica 24/7 (C01.4.1)</span>
+              <span>Planta Eléctrica 24/7</span>
             </div>
             <div className="flex items-center gap-2 bg-[#1a0533]/80 border border-white/15 px-3.5 py-2 rounded-xl backdrop-blur-sm">
               <span className="w-5 h-5 rounded-md bg-[#FF0096] flex items-center justify-center">
                 <Droplets className="w-3 h-3 text-white" />
               </span>
-              <span>Tanque de Agua Continuo (C01.4.2)</span>
+              <span>Tanque de Agua Continuo</span>
             </div>
             <div className="flex items-center gap-2 bg-[#1a0533]/80 border border-white/15 px-3.5 py-2 rounded-xl backdrop-blur-sm">
               <span className="w-5 h-5 rounded-md bg-[#9B00CC] flex items-center justify-center">
@@ -1084,7 +1084,7 @@ export function HotelesEnVenezuela() {
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   className="w-full px-3.5 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-semibold text-[#0f172a] focus:outline-none focus:border-[#00C8D4]"
                 >
-                  <option value="todos">Todos (CS-01/02)</option>
+                  <option value="todos">Todos los Alojamientos</option>
                   <option value="hoteles">Hoteles & Resorts</option>
                   <option value="posadas">Posadas Boutique</option>
                   <option value="complejos">Complejos Turísticos</option>
@@ -1142,7 +1142,7 @@ export function HotelesEnVenezuela() {
               <span className="w-4 h-4 rounded bg-[#00C8D4] flex items-center justify-center">
                 <BadgeCheck className="w-3 h-3 text-white" />
               </span>
-              Catálogo Auditado V15 · Fotos Reales Verificadas
+              Catálogo Verificado · 0% Comisiones
             </span>
           </div>
         </nav>
@@ -1161,14 +1161,14 @@ export function HotelesEnVenezuela() {
               <span className="w-6 h-6 rounded-lg bg-[#00C8D4] flex items-center justify-center">
                 <Compass className="w-3.5 h-3.5 text-white" />
               </span>
-              <span>ARQUITECTURA DE DESTINOS TURÍSTICOS (C00.1.25)</span>
+              <span>GUÍA DE REGIONES TURÍSTICAS DE VENEZUELA</span>
             </div>
             <h2
               id="clusteres-destinos-heading"
               className="text-2xl sm:text-4xl font-bold text-[#0f172a]"
               style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
             >
-              Regiones y Clústeres Clave para Hospedarse en Venezuela
+              Principales Destinos y Regiones Turísticas en Venezuela
             </h2>
           </div>
           <p className="text-sm text-[#1e293b]/80 max-w-md">
@@ -1405,16 +1405,16 @@ export function HotelesEnVenezuela() {
           <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm mb-8">
             <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
               <span className="text-xs font-extrabold uppercase tracking-wider text-[#0f172a]">
-                Filtros Críticos de Garantía Operativa en Venezuela:
+                Filtros de Comodidad y Servicios Garantizados:
               </span>
               <span className="text-xs font-bold text-slate-500">
                 Mostrando <strong className="text-[#0f172a]">{filteredProperties.length}</strong>{" "}
-                alojamientos verificados en Supabase
+                alojamientos verificados
               </span>
             </div>
 
             <div className="flex flex-wrap items-center gap-2.5">
-              {/* Toggle 1: Planta Eléctrica 24/7 (C01.4.1) */}
+              {/* Toggle 1: Planta Eléctrica 24/7 */}
               <button
                 type="button"
                 onClick={() => setFilterPowerPlant(!filterPowerPlant)}
@@ -1431,10 +1431,10 @@ export function HotelesEnVenezuela() {
                 >
                   <Zap className="w-3.5 h-3.5 text-white" />
                 </span>
-                <span>Planta Eléctrica 24/7 (C01.4.1)</span>
+                <span>Planta Eléctrica 24/7</span>
               </button>
 
-              {/* Toggle 2: Tanque de Agua continuo (C01.4.2) */}
+              {/* Toggle 2: Tanque de Agua continuo */}
               <button
                 type="button"
                 onClick={() => setFilterWaterTank(!filterWaterTank)}
@@ -1451,7 +1451,7 @@ export function HotelesEnVenezuela() {
                 >
                   <Droplets className="w-3.5 h-3.5 text-white" />
                 </span>
-                <span>Tanque de Agua Continuo (C01.4.2)</span>
+                <span>Tanque de Agua Continuo</span>
               </button>
 
               {/* Toggle 3: Acceso directo a la playa (C01.2.16) */}
@@ -1601,8 +1601,8 @@ export function HotelesEnVenezuela() {
 
               <p className="text-sm sm:text-base text-white/85 leading-relaxed">
                 A diferencia de los portales extranjeros que aplican recargos de hasta un 25% y no
-                procesan pagos en moneda local ni billeteras venezolanas, nuestro estándar{" "}
-                <strong>V15 Multi-Tenant</strong> verifica el Registro de Información Fiscal (RIF),
+                procesan pagos en moneda local ni billeteras venezolanas, nuestro protocolo de{" "}
+                <strong>Verificación Oficial</strong> valida el Registro de Información Fiscal (RIF),
                 el Registro Turístico Nacional (RTN), la titularidad bancaria y la operatividad real
                 de <strong>Planta Eléctrica 24/7</strong> y <strong>Tanque de Agua continuo</strong>{" "}
                 antes de otorgar el <strong>Sello de Garantía Legal HDV</strong>.
@@ -1659,8 +1659,8 @@ export function HotelesEnVenezuela() {
               </ul>
 
               <div className="pt-3 border-t border-white/15 flex items-center justify-between text-[11px] text-[#00C8D4] font-bold">
-                <span>Auditoría Normativa V15</span>
-                <span>País: Venezuela (VE)</span>
+                <span>Auditoría Legal y Operativa</span>
+                <span>Cobertura Nacional · Venezuela</span>
               </div>
             </div>
           </div>
@@ -1735,73 +1735,73 @@ export function HotelesEnVenezuela() {
                 <span className="w-10 h-10 rounded-xl bg-[#00C8D4] flex items-center justify-center">
                   <ShieldCheck className="w-5 h-5 text-white" />
                 </span>
-                <div>
-                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#00C8D4]">
-                    Plataforma Oficial V15
-                  </span>
-                  <h3
-                    className="text-xl font-bold text-white"
-                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                  >
-                    Hoteles de Venezuela (hotelesdevenezuela.com)
-                  </h3>
-                </div>
+              <div>
+                <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#00C8D4]">
+                  Plataforma Oficial de Reserva Directa
+                </span>
+                <h3
+                  className="text-xl font-bold text-white"
+                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                >
+                  Hoteles de Venezuela (hotelesdevenezuela.com)
+                </h3>
               </div>
-
-              <ul className="space-y-3.5 text-sm text-white mt-6">
-                <li className="flex items-start gap-3">
-                  <span className="w-5 h-5 rounded-md bg-[#00C8D4] flex items-center justify-center shrink-0 mt-0.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-white" />
-                  </span>
-                  <span>
-                    <strong>0% Comisiones de Intermediación:</strong> Trato directo con la gerencia
-                    y recepción oficial del hotel o posada.
-                  </span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="w-5 h-5 rounded-md bg-[#00C8D4] flex items-center justify-center shrink-0 mt-0.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-white" />
-                  </span>
-                  <span>
-                    <strong>Flexibilidad Financiera Venezolana:</strong> Paga con Pago Móvil, Zelle,
-                    Binance Pay (USDT), Banesco Panamá o efectivo USD/VES.
-                  </span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="w-5 h-5 rounded-md bg-[#00C8D4] flex items-center justify-center shrink-0 mt-0.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-white" />
-                  </span>
-                  <span>
-                    <strong>Certificación Técnica V15:</strong> Filtros verificados de Planta
-                    Eléctrica 24/7 (C01.4.1), Tanque de Agua (C01.4.2) y Sello Legal HDV.
-                  </span>
-                </li>
-              </ul>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-white/15 flex items-center justify-between text-xs font-extrabold text-[#00C8D4]">
-              <span>Atención Inmediata por WhatsApp Oficial</span>
-              <span>100% Garantizado</span>
-            </div>
+            <ul className="space-y-3.5 text-sm text-white mt-6">
+              <li className="flex items-start gap-3">
+                <span className="w-5 h-5 rounded-md bg-[#00C8D4] flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                </span>
+                <span>
+                  <strong>0% Comisiones de Intermediación:</strong> Trato directo con la gerencia
+                  y recepción oficial del hotel o posada.
+                </span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="w-5 h-5 rounded-md bg-[#00C8D4] flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                </span>
+                <span>
+                  <strong>Flexibilidad Financiera Venezolana:</strong> Paga con Pago Móvil, Zelle,
+                  Binance Pay (USDT), Banesco Panamá o efectivo USD/VES.
+                </span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="w-5 h-5 rounded-md bg-[#00C8D4] flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                </span>
+                <span>
+                  <strong>Garantía de Suministros y Legalidad:</strong> Filtros verificados de Planta
+                  Eléctrica 24/7, Tanque de Agua continuo y Sello Legal HDV.
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="mt-6 pt-4 border-t border-white/15 flex items-center justify-between text-xs font-extrabold text-[#00C8D4]">
+            <span>Atención Inmediata por WhatsApp Oficial</span>
+            <span>100% Garantizado</span>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      {/* =====================================================================
-          5. PREGUNTAS FRECUENTES (FAQ ACCORDION + SCHEMA MARKUP)
-      ===================================================================== */}
-      <section
-        aria-labelledby="faq-hoteles-venezuela-heading"
-        className="py-14 bg-slate-50 border-t border-slate-200/80"
-      >
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.2em] text-[#9B00CC] mb-2">
-              <span className="w-6 h-6 rounded-lg bg-[#9B00CC] flex items-center justify-center">
-                <HelpCircle className="w-3.5 h-3.5 text-white" />
-              </span>
-              <span>CENTRO DE RESPUESTAS AL VIAJERO · SCHEMA FAQPAGE</span>
-            </div>
+    {/* =====================================================================
+        5. PREGUNTAS FRECUENTES (FAQ ACCORDION + SCHEMA MARKUP)
+    ===================================================================== */}
+    <section
+      aria-labelledby="faq-hoteles-venezuela-heading"
+      className="py-14 bg-slate-50 border-t border-slate-200/80"
+    >
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.2em] text-[#9B00CC] mb-2">
+            <span className="w-6 h-6 rounded-lg bg-[#9B00CC] flex items-center justify-center">
+              <HelpCircle className="w-3.5 h-3.5 text-white" />
+            </span>
+            <span>CENTRO DE RESPUESTAS Y AYUDA AL VIAJERO</span>
+          </div>
             <h2
               id="faq-hoteles-venezuela-heading"
               className="text-2xl sm:text-4xl font-bold text-[#0f172a]"
@@ -1881,18 +1881,18 @@ export function HotelesEnVenezuela() {
         >
           <div className="max-w-2xl text-center lg:text-left">
             <span className="inline-block px-3.5 py-1 rounded-full bg-white/20 text-white text-[11px] font-extrabold uppercase tracking-widest mb-3">
-              Atención al Viajero & Afiliación B2B de Propietarios
+              Asistencia Directa en tu Reserva
             </span>
             <h2
               className="text-2xl sm:text-4xl font-bold text-white leading-tight mb-3"
               style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
             >
-              ¿Buscas asesoría personalizada para tu viaje o deseas afiliar tu hotel al catálogo V15?
+              ¿Necesitas ayuda para elegir y reservar tu próximo hotel en Venezuela?
             </h2>
             <p className="text-sm sm:text-base text-white/90 leading-relaxed">
-              Nuestro equipo de Concierge Turístico te ayuda sin costo a cotizar estadías grupales,
-              corporativas o familiares en toda Venezuela, o a registrar tu propiedad con el Sello
-              de Garantía Legal HDV.
+              Escríbenos por WhatsApp y recibe asistencia directa y gratuita para confirmar
+              disponibilidad, comparar opciones verificadas y reservar sin comisiones en cualquier
+              destino del país.
             </p>
           </div>
 
@@ -1904,14 +1904,14 @@ export function HotelesEnVenezuela() {
               className="px-7 py-4 rounded-2xl bg-white text-[#FF0096] font-extrabold text-xs sm:text-sm uppercase tracking-wider shadow-xl hover:scale-[1.02] transition-transform flex items-center gap-2.5"
             >
               <MessageCircle className="w-5 h-5 text-[#FF0096]" />
-              <span>Contactar por WhatsApp Oficial</span>
+              <span>Asistencia para Reservar</span>
             </a>
 
             <Link
               href="/mis-negocios"
               className="px-6 py-4 rounded-2xl bg-[#0e011f]/40 hover:bg-[#0e011f]/60 border border-white/30 text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider transition-colors"
             >
-              Registrar mi Propiedad (Wizard V15)
+              Afiliar mi Hotel o Posada
             </Link>
           </div>
         </div>
@@ -1922,7 +1922,7 @@ export function HotelesEnVenezuela() {
         slug="hoteles-en-venezuela"
         title="Hoteles en Venezuela: Guía Definitiva de Alojamiento y Reservas Directas"
         contentType="directorio"
-        categoryLabel="Pilar Oficial SEO V15"
+        categoryLabel="Guía Oficial de Alojamiento"
       />
     </div>
   );
