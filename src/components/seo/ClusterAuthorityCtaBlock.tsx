@@ -653,6 +653,14 @@ export function ClusterAuthorityCtaBlock({
             {/* Enlaces Satélite de Refuerzo Semántico */}
             <div className="flex flex-wrap items-center gap-4 text-[11px] text-slate-300 font-semibold">
               <Link
+                href="/hoteles-en-venezuela"
+                rel="dofollow"
+                className="text-[#00C8D4] hover:text-white font-bold transition-colors cursor-pointer"
+              >
+                Hoteles en Venezuela
+              </Link>
+              <span className="opacity-30">•</span>
+              <Link
                 href="/destinos"
                 rel="dofollow"
                 className="hover:text-[#00C8D4] transition-colors cursor-pointer"

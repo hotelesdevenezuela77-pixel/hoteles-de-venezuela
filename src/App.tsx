@@ -209,6 +209,7 @@ const Destinos = lazyNamed(() => import("./pages/Destinos"), "Destinos");
 const DestinoDetalle = lazyNamed(() => import("./pages/DestinoDetalle"), "DestinoDetalle");
 const Establecimientos = lazyNamed(() => import("./pages/Establecimientos"), "Establecimientos");
 const EstablecimientoDetalle = lazyNamed(() => import("./pages/EstablecimientoDetalle"), "EstablecimientoDetalle");
+const HotelesEnVenezuela = lazyNamed(() => import("./pages/HotelesEnVenezuela"), "HotelesEnVenezuela");
 const OwnerDashboard = lazyNamed(() => import("./pages/OwnerDashboard"), "OwnerDashboard");
 const AndromedaPanel = lazyNamed(() => import("./pages/AndromedaPanel"), "AndromedaPanel");
 const InteractiveMap = lazyNamed(() => import("./pages/InteractiveMap"), "InteractiveMap");
@@ -481,6 +482,7 @@ function App() {
             <Route path="/panel-turista" component={Perfil} />
             <Route path="/perfil/kyc" component={PerfilKYC} />
             <Route path="/hdv-acceso-llc2027" component={AdminLogin} />
+            <Route path="/hoteles-en-venezuela" component={HotelesEnVenezuela} />
             <Route path="/establecimientos" component={Establecimientos} />
             <Route path="/establecimiento/:slug" component={EstablecimientoDetalle} />
             <Route path="/app/:slug" component={EstablecimientoDetalle} />
