@@ -129,7 +129,7 @@ async function generateSitemap() {
       }
     };
 
-    // 1. HOME PRINCIPAL (Prioridad 1.0)
+    // 1. HOME PRINCIPAL Y PILAR SEO (Prioridad 1.0)
     addUrlEntry(
       "/",
       "1.0",
@@ -137,6 +137,14 @@ async function generateSitemap() {
       today,
       "HOME_PILLAR",
       "WebSite + Organization"
+    );
+    addUrlEntry(
+      "/hoteles-en-venezuela",
+      "1.0",
+      "daily",
+      today,
+      "SEO_PILLAR",
+      "WebPage + ItemList + FAQPage"
     );
 
     // 2. DIRECTORIOS Y SECCIONES PRINCIPALES (Prioridad 0.9)
