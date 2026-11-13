@@ -46,3 +46,14 @@ Queda prohibido el uso de negro puro (`#000000`) o gris carbón genérico (`#1a1
 - **Observación Minuciosa de Capturas de Pantalla**: Inspeccionar en detalle cada elemento visual que comparta el usuario (estados en blanco, verificaciones pendientes, configuraciones) antes de solicitar pruebas redundantes.
 - **Coherencia y Memoria del Flujo**: Mantener un hilo lógico de las tareas ya completadas y no repetir pruebas sobre módulos cuyo bloqueo proviene de proveedores externos (como la verificación de negocio en Meta).
 
+---
+
+## 6. Regla Inmutable de SEO Raíz (Meta Title de la Home)
+- **Título Oficial Obligatorio de la Página Principal (`/`):**
+  ```html
+  <title>Hoteles de Venezuela | Reservas sin intermediarios | Hoteles en Venezuela</title>
+  ```
+- **Prohibición Absoluta de Alteración:** Queda terminantemente prohibido modificar, acortar, agregar coletillas o reemplazar el `<title>`, `og:title` o `twitter:title` de la página de inicio (`index.html`, `HomeV2.tsx`, `Home.tsx` y el valor por defecto de `SeoHead.tsx`). Siempre debe conservar exactamente la estructura de tres bloques separados por barras verticales:
+  `Hoteles de Venezuela | Reservas sin intermediarios | Hoteles en Venezuela`.
+
+
