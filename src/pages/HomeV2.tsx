@@ -143,9 +143,9 @@ export function HomeV2({ isMainHome = false }: { isMainHome?: boolean }) {
   const [editorialTab, setEditorialTab] = useState<"destinos" | "tips">("destinos");
 
   const [seoConfig, setSeoConfig] = useState({
-    title: "Hoteles de Venezuela | Hoteles, Posadas y Guía Turística",
+    title: "Hoteles de Venezuela | Reservas sin intermediarios | Hoteles en Venezuela",
     description: "Guía turística y directorio oficial de hoteles, posadas boutique, resorts y campamentos en Venezuela. Reserva directo con los anfitriones por WhatsApp sin intermediarios.",
-    keywords: "hoteles venezuela, posadas venezuela, reservas sin intermediarios, turismo venezuela, los roques, canaima, morrocoy, merida, posadas boutique, resorts venezuela, campamentos turismo",
+    keywords: "hoteles en venezuela, hoteles venezuela, posadas venezuela, reservas sin intermediarios, turismo venezuela, los roques, canaima, morrocoy, merida, posadas boutique, resorts venezuela, campamentos turismo",
     ogImage: "https://ghgetcznlrilgocwigmj.supabase.co/storage/v1/object/public/establecimientos/destinos/salto-angel-hero-v2.jpg"
   });
 
@@ -223,7 +223,7 @@ export function HomeV2({ isMainHome = false }: { isMainHome?: boolean }) {
           const match = seoRes.data.find((s: any) => (s.page_key || s.pageKey) === "home-v2") || seoRes.data[0];
           if (match) {
             setSeoConfig(prev => ({
-              title: match.page_title || match.pageTitle || prev.title,
+              title: "Hoteles de Venezuela | Reservas sin intermediarios | Hoteles en Venezuela",
               description: match.meta_description || match.metaDescription || prev.description,
               keywords: match.meta_keywords || match.metaKeywords || prev.keywords,
               ogImage: match.og_image || match.ogImage || prev.ogImage

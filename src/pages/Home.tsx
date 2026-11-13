@@ -214,7 +214,7 @@ export function Home() {
 
   // Load compared hotels on mount
   useEffect(() => {
-    document.title = "Hoteles de Venezuela | Reservas sin Intermediarios | Guía Turística";
+    document.title = "Hoteles de Venezuela | Reservas sin intermediarios | Hoteles en Venezuela";
     const stored = localStorage.getItem("hdv_compare_list");
     if (stored) setComparedIds(JSON.parse(stored));
   }, []);
