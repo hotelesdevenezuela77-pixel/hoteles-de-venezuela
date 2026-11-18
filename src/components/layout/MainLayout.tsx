@@ -312,7 +312,8 @@ function Footer() {
             </div>
             <ul className="space-y-2.5">
               {[
-                { href: "/", label: "Hoteles en Venezuela (Inicio)" },
+                { href: "/", label: "Inicio — Hoteles de Venezuela" },
+                { href: "/hoteles-en-venezuela", label: "Guía de Hoteles en Venezuela" },
                 { href: "/establecimientos?category=hoteles", label: "Directorio de Hoteles" },
                 { href: "/establecimientos?category=posadas", label: "Posadas Boutique" },
                 { href: "/establecimientos?category=restaurantes", label: "Restaurantes & Sabor" },

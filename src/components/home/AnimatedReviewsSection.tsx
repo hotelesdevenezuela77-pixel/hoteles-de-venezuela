@@ -144,7 +144,7 @@ function ReviewCard({ review }: { review: FeaturedReview }) {
             )}
             <div>
               <div className="flex items-center gap-1">
-                <h4 className="text-xs font-bold text-gray-900 leading-tight">{review.user_name}</h4>
+                <h3 className="text-xs font-bold text-gray-900 leading-tight">{review.user_name}</h3>
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#00C8D4] fill-cyan-50" />
               </div>
               <span className="text-[10px] text-gray-400 font-semibold block mt-0.5">

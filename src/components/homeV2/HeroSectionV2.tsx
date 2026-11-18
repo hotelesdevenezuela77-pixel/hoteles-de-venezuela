@@ -304,12 +304,17 @@ export function HeroSectionV2({ onSearch }: HeroSectionV2Props) {
             <span>{heroConfig.badge}</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-display font-extrabold tracking-tight leading-tight md:leading-[1.15] drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]">
+          {/* H1 Semántico Oficial para Googlebot y Motores de Búsqueda (sin alterar el diseño visual) */}
+          <h1 style={{ display: "none" }}>
+            Hoteles de Venezuela | Reservas sin intermediarios | Hoteles en Venezuela
+          </h1>
+
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-display font-extrabold tracking-tight leading-tight md:leading-[1.15] drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]">
             <span className="text-white block">{heroConfig.titleLine1}</span>
             <span className="bg-gradient-to-r from-[#00C8D4] via-cyan-300 to-[#FF0096] bg-clip-text text-transparent block mt-1 drop-shadow-lg">
               {heroConfig.titleLine2}
             </span>
-          </h1>
+          </h2>
 
           {/* Botón Titilante estilo Oleaje Tucacas: Próximo Lanzamiento */}
           <div className="pt-2 pb-1 flex justify-center">

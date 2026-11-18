@@ -48,12 +48,27 @@ Queda prohibido el uso de negro puro (`#000000`) o gris carbón genérico (`#1a1
 
 ---
 
-## 6. Regla Inmutable de SEO Raíz (Meta Title de la Home)
-- **Título Oficial Obligatorio de la Página Principal (`/`):**
-  ```html
-  <title>Hoteles de Venezuela | Reservas sin intermediarios | Hoteles en Venezuela</title>
-  ```
-- **Prohibición Absoluta de Alteración:** Queda terminantemente prohibido modificar, acortar, agregar coletillas o reemplazar el `<title>`, `og:title` o `twitter:title` de la página de inicio (`index.html`, `HomeV2.tsx`, `Home.tsx` y el valor por defecto de `SeoHead.tsx`). Siempre debe conservar exactamente la estructura de tres bloques separados por barras verticales:
-  `Hoteles de Venezuela | Reservas sin intermediarios | Hoteles en Venezuela`.
+## 6. Directiva Crítica de SEO y Mantenimiento de Autoridad (Reglas Inquebrantables)
+Cualquier cambio en el diseño, la interfaz (UI) o la jerarquía visual **NUNCA debe alterar, modificar a la ligera ni corromper los metadatos y la estructura SEO** que posicionan a `hotelesdevenezuela.com` en el 1er lugar de Google para `"hoteles en venezuela"` y `"hoteles de venezuela"`.
+
+1. **Meta Título Intocable (Home Principal `/`):**
+   - El `<title>` oficial y estrictamente obligatorio para la página de inicio es:
+     ```html
+     <title>Hoteles de Venezuela | Reservas sin intermediarios | Hoteles en Venezuela</title>
+     ```
+   - Está terminantemente prohibido cambiarlo, parafrasearlo, acortarlo o adaptarlo en `index.html`, `HomeV2.tsx`, `Home.tsx` y `SeoHead.tsx` a menos que se indique explícitamente una estrategia SEO auditada.
+
+2. **Meta Descripción Oficial:**
+   - La descripción debe mantenerse alineada con la intención de búsqueda directa:
+     ```html
+     <meta name="description" content="Guía turística y directorio oficial de hoteles, posadas boutique, resorts y campamentos en Venezuela. Reserva directo con los anfitriones por WhatsApp sin intermediarios." />
+     ```
+
+3. **Jerarquía Visual vs. Semántica (`<h1>` / Headings):**
+   - Si se ajusta la jerarquía visual del diseño por motivos estéticos, **la estructura semántica en el código HTML debe permanecer intacta**.
+   - Debe existir un único y claro `<h1>` en la página principal (`Hoteles de Venezuela | Reservas sin intermediarios | Hoteles en Venezuela`), pudiendo aplicarse `display: none;` o estilos visuales independientes si el diseño minimalista lo requiere, pero el crawler de Google y herramientas como Seobility **deben** leer el `<h1>`, los encabezados (`<h2>`, `<h3>`) y el bloque semántico pre-renderizado (`#hdv-seo-prerender` en `index.html`) estructurados correctamente sin alterar ni provocar parpadeos en el diseño visual.
+
+4. **Protocolo ante Rediseños:**
+   - Antes de modificar componentes visuales principales, verificar siempre que los enlaces internos (hacia las más de 300 URLs del directorio) y los metadatos permanezcan estables para preservar la puntuación máxima en SEO técnico.
 
 

@@ -224,7 +224,7 @@ export function HomeV2({ isMainHome = false }: { isMainHome?: boolean }) {
           if (match) {
             setSeoConfig(prev => ({
               title: "Hoteles de Venezuela | Reservas sin intermediarios | Hoteles en Venezuela",
-              description: match.meta_description || match.metaDescription || prev.description,
+              description: "Guía turística y directorio oficial de hoteles, posadas boutique, resorts y campamentos en Venezuela. Reserva directo con los anfitriones por WhatsApp sin intermediarios.",
               keywords: match.meta_keywords || match.metaKeywords || prev.keywords,
               ogImage: match.og_image || match.ogImage || prev.ogImage
             }));
