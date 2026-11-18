@@ -818,7 +818,7 @@ export function HotelesEnVenezuela() {
       url: canonical,
       name: "Hoteles en Venezuela: Guía Definitiva de Alojamiento y Reservas Directas",
       description:
-        "Reserva hoteles en Venezuela sin comisiones intermediarias. 14 años conectando viajeros con hoteles, posadas y resorts verificados con Planta Eléctrica 24/7, Pago Móvil, Zelle y Sello Legal HDV.",
+        "Guía oficial para reservar hoteles en Venezuela sin intermediarios. Posadas, resorts y campamentos en Los Roques, Morrocoy, Margarita, Mérida y Canaima.",
       inLanguage: "es-VE",
       isPartOf: {
         "@type": "WebSite",
@@ -911,7 +911,7 @@ export function HotelesEnVenezuela() {
       ===================================================================== */}
       <SeoHead
         title="Hoteles en Venezuela: Guía Definitiva de Alojamiento y Reservas Directas"
-        description="Reserva hoteles en Venezuela sin comisiones intermediarias. 14 años conectando hoteles, posadas y resorts en Los Roques, Margarita, Morrocoy, Mérida y Canaima con tarifas directas, Pago Móvil, Zelle y Sello de Garantía Legal HDV."
+        description="Guía oficial para reservar hoteles en Venezuela sin intermediarios. Posadas, resorts y campamentos en Los Roques, Morrocoy, Margarita, Mérida y Canaima."
         keywords="hoteles en venezuela, reservar hoteles en venezuela, posadas en venezuela, resorts en venezuela, hoteles en margarita, posadas en los roques, hoteles en morrocoy, hoteles en merida, hoteles en caracas, hoteles con planta electrica venezuela"
         canonicalUrl="https://hotelesdevenezuela.com/hoteles-en-venezuela"
         ogImage={HERO_FALLBACK_IMAGE}
@@ -1592,7 +1592,14 @@ export function HotelesEnVenezuela() {
                 Redactado por el{" "}
                 <strong className="text-[#00C8D4]">
                   Consejo Editorial y de Auditoría Turística de Hoteles de Venezuela LLC
-                </strong>
+                </strong>{" "}
+                en el{" "}
+                <Link
+                  href="/"
+                  className="text-[#00C8D4] underline decoration-[#00C8D4]/50 hover:decoration-[#00C8D4] font-bold transition-colors"
+                >
+                  portal principal de Hoteles de Venezuela
+                </Link>
                 . Durante más de <strong>14 años ininterrumpidos</strong> hemos auditado la
                 infraestructura hotelera nacional, desde los grandes hoteles ejecutivos de Caracas,
                 Valencia y Barquisimeto hasta las posadas de autor en Los Roques, Morrocoy, Isla de
