@@ -206,6 +206,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     {
       name: "Marketing y Ventas",
       items: [
+        { label: "Departamento de Ventas", href: "/admin/departamento-ventas", icon: Briefcase },
         { label: "Gestión Comercial", href: "/admin/comercial", icon: Briefcase },
         { label: "Influencers & Creadores", href: "/admin/influencers", icon: Sparkles },
         { label: "Turistas y Usuarios", href: "/admin/usuarios?filter=tourist", icon: Users },

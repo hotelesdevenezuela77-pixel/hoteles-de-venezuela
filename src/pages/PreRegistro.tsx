@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { 
   Zap, 
@@ -30,14 +30,36 @@ import {
   Trash2,
   Globe,
   Radio,
-  Share2
+  Share2,
+  Award,
+  UserCheck,
+  Briefcase,
+  QrCode,
+  Lock
 } from "lucide-react";
 import { supabase } from "../lib/supabase";
+import { useAuth } from "../lib/auth";
+import { useBcvExchangeRate } from "../hooks/useBcvExchangeRate";
 import type { PreRegistrationPayload, PreRegistrationBadgeFlags } from "../types/preRegistration";
 import { FlexibleBedroomConfigurator } from "../components/units/FlexibleBedroomConfigurator";
+import {
+  SAAS_COMMERCIAL_PLANS,
+  OFFICIAL_SALES_AGENTS,
+  MAX_FOUNDERS_QUOTA,
+  getSalesCounters,
+  syncSalesStateFromSupabase,
+  processSalesPreRegistration,
+  type RegistrationOrigin,
+  type MembershipModality,
+  type SalesPreRegistrationReceipt,
+  type SalesCountersState
+} from "../lib/salesDepartmentStore";
+import { PreRegistrationReceiptModal } from "../components/sales/PreRegistrationReceiptModal";
 
 export function PreRegistro() {
   const [, setLocation] = useLocation();
+  const { user } = useAuth();
+  const { bcvRate } = useBcvExchangeRate();
 
   // Estados del Formulario de Pre-Registro (Ficha Pública)
   const [serviceCategoryId, setServiceCategoryId] = useState<number>(1);
@@ -96,6 +118,39 @@ export function PreRegistro() {
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<"card_form" | "bedrooms_config">("card_form");
+
+  // =========================================================================
+  // NUEVOS ESTADOS DEL DEPARTAMENTO DE VENTAS Y SINCRONIZACIÓN FINANCIERA V13
+  // =========================================================================
+  const [origin, setOrigin] = useState<RegistrationOrigin>("propietario");
+  const [ownerOrManagerName, setOwnerOrManagerName] = useState<string>("");
+  const [selectedAgentCode, setSelectedAgentCode] = useState<string>(OFFICIAL_SALES_AGENTS[0].code);
+  const [customAgentName, setCustomAgentName] = useState<string>(OFFICIAL_SALES_AGENTS[0].name);
+
+  const [modality, setModality] = useState<MembershipModality>("fundadores_50");
+  const [selectedPlanId, setSelectedPlanId] = useState<string>("premium");
+  const [customMonthlyUsd, setCustomMonthlyUsd] = useState<number>(100);
+  const [initialPaymentStatus, setInitialPaymentStatus] = useState<"pendiente_pago" | "pagado">("pendiente_pago");
+  const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  const [salesCounters, setSalesCounters] = useState<SalesCountersState>(() => getSalesCounters());
+  const [emittedReceipt, setEmittedReceipt] = useState<SalesPreRegistrationReceipt | null>(null);
+
+  useEffect(() => {
+    syncSalesStateFromSupabase().then((res) => {
+      setSalesCounters(res.counters);
+    });
+    const handleSync = () => setSalesCounters(getSalesCounters());
+    window.addEventListener("hdv_sales_v13_updated", handleSync);
+    return () => window.removeEventListener("hdv_sales_v13_updated", handleSync);
+  }, []);
+
+  const currentPlanObj =
+    SAAS_COMMERCIAL_PLANS.find((p) => p.id === selectedPlanId) || SAAS_COMMERCIAL_PLANS[6];
+
+  const foundersOccupied = Math.min(MAX_FOUNDERS_QUOTA, salesCounters.foundersCounter);
+  const foundersAvailable = Math.max(0, MAX_FOUNDERS_QUOTA - foundersOccupied);
 
   const defaultPillSuggestions = [
     "Muelle privado",
@@ -296,6 +351,27 @@ export function PreRegistro() {
   };
 
   const handleSavePreRegistration = async () => {
+    setValidationError(null);
+
+    if (!title.trim() || !destinationName.trim() || !whatsappNumber.trim()) {
+      setValidationError(
+        "Por favor completa el Nombre Comercial, el Destino Turístico y el WhatsApp de Contacto."
+      );
+      return;
+    }
+
+    if (origin === "agente_ventas" && !customAgentName.trim()) {
+      setValidationError("Por favor indica el nombre o código del Agente de Ventas HDV.");
+      return;
+    }
+
+    if (!termsAccepted) {
+      setValidationError(
+        "Debes marcar la casilla obligatoria de Términos Legales y Derechos de Imagen para emitir el comprobante oficial."
+      );
+      return;
+    }
+
     try {
       setIsSaving(true);
       const slug = `${generateSlug(title)}-${generateSlug(destinationName)}`;
@@ -322,12 +398,45 @@ export function PreRegistro() {
         gallery_images: galleryImages
       };
 
-      // Construcción JSONB para features
+      // 1. Procesar el Pre-Registro en el Motor del Departamento de Ventas + Finanzas + CRM + Logs
+      const receipt = await processSalesPreRegistration({
+        establishmentTitle: title.trim(),
+        establishmentSlug: slug,
+        categoryName,
+        destinationName: destinationName.trim(),
+        state: state.trim(),
+        city: city.trim(),
+        whatsappNumber: whatsappNumber.trim(),
+        primaryImage,
+        basePriceFrom,
+        origin,
+        ownerOrManagerName: ownerOrManagerName.trim() || undefined,
+        salesAgentCode: origin === "agente_ventas" ? selectedAgentCode : undefined,
+        salesAgentName: origin === "agente_ventas" ? customAgentName.trim() : undefined,
+        modality,
+        planId: selectedPlanId,
+        customMonthlyUsd: origin === "agente_ventas" ? customMonthlyUsd : currentPlanObj.defaultMonthlyUsd,
+        initialPaymentStatus,
+        bcvRate: bcvRate || 45.8,
+        termsAccepted,
+        userId: user?.id || null,
+        userEmail: user?.email || null
+      });
+
+      // Construcción JSONB para features incluyendo trazabilidad del folio y finanzas
       const initialFeatures = {
         pre_registration: {
-          captured_at: new Date().toISOString(),
-          source: "FICHA_PUBLICA_FAST_ONBOARDING",
-          published_directly: publishDirectly
+          captured_at: receipt.createdAtIso,
+          source: "DEPARTAMENTO_VENTAS_V13",
+          published_directly: publishDirectly,
+          folio: receipt.folio,
+          financial_correlative: receipt.financialCorrelative,
+          modality: receipt.modality,
+          modality_label: receipt.modalityLabel,
+          origin: receipt.origin,
+          registrant: receipt.registrantName,
+          client_ip: receipt.clientIp,
+          terms_accepted: true
         },
         gps: {
           latitude: latitude || null,
@@ -353,47 +462,69 @@ export function PreRegistro() {
         gallery: galleryImages
       };
 
-      // Intentar guardar en Supabase si está disponible, o almacenar localmente de respaldo
+      // 2. Guardar o actualizar el establecimiento en Supabase (`properties` y `establishments`)
       try {
-        const { error } = await supabase.from("properties").upsert({
-          service_category_id: serviceCategoryId,
-          subcategory_id: subcategoryId,
-          title,
-          slug,
-          destination_name: destinationName,
-          state,
-          city,
-          latitude: latitude ? parseFloat(latitude) : null,
-          longitude: longitude ? parseFloat(longitude) : null,
-          short_description: shortDescription,
-          base_price_from: basePriceFrom,
-          rating_avg: ratingAvg,
-          whatsapp_number: whatsappNumber,
-          primary_image: primaryImage,
-          has_power_plant: badges.has_power_plant,
-          has_water_247: badges.has_water_247,
-          has_starlink: badges.has_starlink,
-          is_pet_friendly: badges.is_pet_friendly,
-          has_hdv_seal: badges.has_hdv_seal,
-          key_service_pills: pills,
-          onboarding_status: onboardingStatus,
-          status: status,
-          features: initialFeatures
-        }, { onConflict: "slug" });
-
-        if (error) {
-          console.warn("Aviso al guardar en Supabase:", error.message);
-        }
+        await Promise.allSettled([
+          supabase.from("properties").upsert({
+            service_category_id: serviceCategoryId,
+            subcategory_id: subcategoryId,
+            title,
+            slug,
+            destination_name: destinationName,
+            state,
+            city,
+            latitude: latitude ? parseFloat(latitude) : null,
+            longitude: longitude ? parseFloat(longitude) : null,
+            short_description: shortDescription,
+            base_price_from: basePriceFrom,
+            rating_avg: ratingAvg,
+            whatsapp_number: whatsappNumber,
+            primary_image: primaryImage,
+            has_power_plant: badges.has_power_plant,
+            has_water_247: badges.has_water_247,
+            has_starlink: badges.has_starlink,
+            is_pet_friendly: badges.is_pet_friendly,
+            has_hdv_seal: badges.has_hdv_seal,
+            key_service_pills: pills,
+            onboarding_status: onboardingStatus,
+            status: status,
+            features: initialFeatures
+          }, { onConflict: "slug" }),
+          supabase.from("establishments").upsert({
+            name: title,
+            slug,
+            description: shortDescription,
+            address: `${city}, ${state}`,
+            phone: whatsappNumber,
+            whatsapp: whatsappNumber,
+            rating_avg: ratingAvg,
+            price_min: basePriceFrom,
+            base_price: basePriceFrom,
+            is_featured: modality !== "comercial_estandar" || selectedPlanId === "premium" || selectedPlanId === "gold",
+            has_hdv_seal: badges.has_hdv_seal,
+            membership_tier:
+              modality === "fundadores_50"
+                ? "fundador"
+                : modality === "exclusivo_prestigio"
+                ? "diamante"
+                : currentPlanObj.tierKey,
+            status: publishDirectly ? "approved" : "pending",
+            services: JSON.stringify(pills)
+          }, { onConflict: "slug" })
+        ]);
       } catch (err) {
         console.warn("Modo local activo:", err);
       }
 
       // Guardar también en localStorage para persistencia inmediata en la sesión del cliente
       localStorage.setItem(`hdv_prereg_${slug}`, JSON.stringify(payload));
+      setSalesCounters(getSalesCounters());
+      setEmittedReceipt(receipt);
       setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 5000);
+      setTimeout(() => setSaveSuccess(false), 6000);
     } catch (err) {
       console.error("Error al procesar pre-registro:", err);
+      setValidationError("Ocurrió un error al procesar el registro. Intenta nuevamente.");
     } finally {
       setIsSaving(false);
     }
@@ -953,7 +1084,7 @@ export function PreRegistro() {
                   >
                     <div className="flex items-center gap-2 font-bold text-xs text-emerald-300 mb-0.5">
                       <CheckCircle2 className="w-4 h-4" />
-                      <span>🚀 Publicar Ahora Mismo</span>
+                      <span>Publicar Ahora Mismo</span>
                     </div>
                     <p className="text-[10px] text-slate-300">
                       Publica de inmediato la ficha con el GPS y fotos capturadas en la plataforma pública.
@@ -971,7 +1102,7 @@ export function PreRegistro() {
                   >
                     <div className="flex items-center gap-2 font-bold text-xs text-[#00C8D4] mb-0.5">
                       <FileText className="w-4 h-4" />
-                      <span>📝 Guardar como Pre-Registro</span>
+                      <span>Guardar como Pre-Registro</span>
                     </div>
                     <p className="text-[10px] text-slate-300">
                       Guarda la ficha como borrador en estado <code>PRE_REGISTERED</code> para revisiones posteriores.
@@ -980,13 +1111,435 @@ export function PreRegistro() {
                 </div>
               </div>
 
-              {/* Botón Principal de Guardado / Publicación Directa */}
+              {/* ========================================================================
+                  10. CLASIFICACIÓN COMERCIAL • DEPARTAMENTO DE VENTAS & FINANZAS HDV
+              ======================================================================== */}
+              <div className="rounded-3xl bg-gradient-to-br from-[#0e011f] via-[#15062c] to-[#1a0533] text-white p-5 sm:p-6 border border-[#00C8D4]/40 shadow-xl space-y-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#00C8D4] flex items-center gap-1.5">
+                      <Briefcase className="w-3.5 h-3.5 text-[#FF0096]" />
+                      <span>10. Clasificación Comercial • Departamento de Ventas HDV</span>
+                    </span>
+                    <h3
+                      className="text-lg sm:text-xl font-bold text-white mt-0.5"
+                      style={{ fontFamily: "'Playfair Display', serif" }}
+                    >
+                      Origen, Membresía y Sincronización Financiera
+                    </h3>
+                  </div>
+
+                  {/* Contador en Vivo 50 Fundadores */}
+                  <div className="px-3.5 py-2 rounded-2xl bg-white/10 border border-[#00C8D4]/30 text-right shrink-0">
+                    <span className="block text-[9px] font-black uppercase tracking-wider text-[#00C8D4]">
+                      Cupos 50 Fundadores
+                    </span>
+                    <span className="text-xs font-mono font-black text-white">
+                      {foundersOccupied} / {MAX_FOUNDERS_QUOTA} Ocupados ({foundersAvailable} disp.)
+                    </span>
+                  </div>
+                </div>
+
+                {/* A. ORIGEN DEL REGISTRO (Radio / Check Obligatorio) */}
+                <div className="space-y-3">
+                  <label className="block text-[11px] font-black uppercase tracking-wider text-slate-200">
+                    A. Origen del Registro (Obligatorio) *
+                  </label>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setOrigin("propietario")}
+                      className={`p-3.5 rounded-2xl border text-left transition-all flex items-start gap-3 cursor-pointer ${
+                        origin === "propietario"
+                          ? "bg-[#00C8D4] text-slate-950 border-white shadow-lg"
+                          : "bg-white/5 border-white/15 text-slate-200 hover:bg-white/10"
+                      }`}
+                    >
+                      <div
+                        className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                          origin === "propietario"
+                            ? "bg-[#0e011f] text-white"
+                            : "bg-[#00C8D4] text-white"
+                        }`}
+                      >
+                        <UserCheck className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="block text-xs font-black">
+                          Propietario / Gerente del Establecimiento
+                        </span>
+                        <span
+                          className={`text-[10px] block mt-0.5 ${
+                            origin === "propietario" ? "text-slate-800 font-semibold" : "text-slate-400"
+                          }`}
+                        >
+                          Registro directo por el titular o representante del hospedaje.
+                        </span>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setOrigin("agente_ventas")}
+                      className={`p-3.5 rounded-2xl border text-left transition-all flex items-start gap-3 cursor-pointer ${
+                        origin === "agente_ventas"
+                          ? "bg-[#FF0096] text-white border-white shadow-lg"
+                          : "bg-white/5 border-white/15 text-slate-200 hover:bg-white/10"
+                      }`}
+                    >
+                      <div
+                        className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                          origin === "agente_ventas"
+                            ? "bg-[#0e011f] text-white"
+                            : "bg-[#FF0096] text-white"
+                        }`}
+                      >
+                        <Briefcase className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="block text-xs font-black">Agente de Ventas HDV</span>
+                        <span
+                          className={`text-[10px] block mt-0.5 ${
+                            origin === "agente_ventas" ? "text-white/90 font-semibold" : "text-slate-400"
+                          }`}
+                        >
+                          Afiliación comercial asistida con asignación de plan y monto SaaS.
+                        </span>
+                      </div>
+                    </button>
+                  </div>
+
+                  {/* Campos condicionales según el Origen */}
+                  {origin === "propietario" ? (
+                    <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10">
+                      <label className="block text-[10px] font-black uppercase tracking-wider text-[#00C8D4] mb-1">
+                        Nombre del Propietario o Gerente Responsable
+                      </label>
+                      <input
+                        type="text"
+                        value={ownerOrManagerName}
+                        onChange={(e) => setOwnerOrManagerName(e.target.value)}
+                        placeholder="Ej. Lic. Carlos Rodríguez (Propietario / Gerente General)"
+                        className="w-full px-3.5 py-2 rounded-xl bg-white text-slate-900 text-xs font-bold focus:outline-none"
+                      />
+                    </div>
+                  ) : (
+                    <div className="p-4 rounded-2xl bg-white/10 border border-[#FF0096]/40 space-y-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[10px] font-black uppercase tracking-wider text-[#00C8D4] mb-1">
+                            Seleccionar Ejecutivo / Código de Agente
+                          </label>
+                          <select
+                            value={selectedAgentCode}
+                            onChange={(e) => {
+                              const code = e.target.value;
+                              setSelectedAgentCode(code);
+                              const found = OFFICIAL_SALES_AGENTS.find((a) => a.code === code);
+                              if (found) setCustomAgentName(found.name);
+                            }}
+                            className="w-full px-3 py-2 rounded-xl bg-white text-slate-900 text-xs font-bold focus:outline-none cursor-pointer"
+                          >
+                            {OFFICIAL_SALES_AGENTS.map((ag) => (
+                              <option key={ag.code} value={ag.code}>
+                                {ag.code} — {ag.name}
+                              </option>
+                            ))}
+                            <option value="AG-CUSTOM">Otro Código / Agente Autorizado</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] font-black uppercase tracking-wider text-[#00C8D4] mb-1">
+                            Nombre o Código del Agente de Ventas HDV *
+                          </label>
+                          <input
+                            type="text"
+                            value={customAgentName}
+                            onChange={(e) => setCustomAgentName(e.target.value)}
+                            placeholder="Nombre y Apellido del Agente HDV"
+                            className="w-full px-3 py-2 rounded-xl bg-white text-slate-900 text-xs font-bold focus:outline-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* B. MODALIDAD DE INGRESO / MEMBRESÍA */}
+                <div className="space-y-3">
+                  <label className="block text-[11px] font-black uppercase tracking-wider text-slate-200">
+                    B. Modalidad de Ingreso / Membresía *
+                  </label>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {/* Opción 1: Programa 50 Fundadores */}
+                    <button
+                      type="button"
+                      onClick={() => setModality("fundadores_50")}
+                      className={`p-3.5 rounded-2xl border text-left transition-all flex flex-col justify-between cursor-pointer ${
+                        modality === "fundadores_50"
+                          ? "bg-[#00C8D4] text-slate-950 border-white shadow-lg"
+                          : "bg-white/5 border-white/15 text-white hover:bg-white/10"
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-center justify-between gap-2 mb-1.5">
+                          <div
+                            className={`w-7 h-7 rounded-lg flex items-center justify-center ${
+                              modality === "fundadores_50"
+                                ? "bg-[#0e011f] text-white"
+                                : "bg-[#00C8D4] text-white"
+                            }`}
+                          >
+                            <Award className="w-4 h-4" />
+                          </div>
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
+                              modality === "fundadores_50"
+                                ? "bg-[#FF0096] text-white"
+                                : "bg-white/15 text-[#00C8D4]"
+                            }`}
+                          >
+                            Cupos: {foundersOccupied}/50
+                          </span>
+                        </div>
+                        <span className="block text-xs font-black">Programa 50 Fundadores</span>
+                        <span
+                          className={`text-[10px] block mt-1 ${
+                            modality === "fundadores_50"
+                              ? "text-slate-900 font-bold"
+                              : "text-slate-300"
+                          }`}
+                        >
+                          Membresía Exonerada - Alianza 50 Fundadores ($0.00)
+                        </span>
+                      </div>
+                    </button>
+
+                    {/* Opción 2: Cliente Exclusivo / Prestigio 2026 */}
+                    <button
+                      type="button"
+                      onClick={() => setModality("exclusivo_prestigio")}
+                      className={`p-3.5 rounded-2xl border text-left transition-all flex flex-col justify-between cursor-pointer ${
+                        modality === "exclusivo_prestigio"
+                          ? "bg-[#FF0096] text-white border-white shadow-lg"
+                          : "bg-white/5 border-white/15 text-white hover:bg-white/10"
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-center justify-between gap-2 mb-1.5">
+                          <div
+                            className={`w-7 h-7 rounded-lg flex items-center justify-center ${
+                              modality === "exclusivo_prestigio"
+                                ? "bg-[#0e011f] text-white"
+                                : "bg-[#FF0096] text-white"
+                            }`}
+                          >
+                            <Sparkles className="w-4 h-4" />
+                          </div>
+                          <span className="px-2 py-0.5 rounded-full bg-white/20 text-white text-[9px] font-black uppercase">
+                            VIP Exonerado
+                          </span>
+                        </div>
+                        <span className="block text-xs font-black">
+                          Cliente Exclusivo / Prestigio 2026
+                        </span>
+                        <span
+                          className={`text-[10px] block mt-1 ${
+                            modality === "exclusivo_prestigio"
+                              ? "text-white font-bold"
+                              : "text-slate-300"
+                          }`}
+                        >
+                          Membresía Exonerada - Selección Exclusiva ($0.00)
+                        </span>
+                      </div>
+                    </button>
+
+                    {/* Opción 3: Membresía Comercial / Estándar */}
+                    <button
+                      type="button"
+                      onClick={() => setModality("comercial_estandar")}
+                      className={`p-3.5 rounded-2xl border text-left transition-all flex flex-col justify-between cursor-pointer ${
+                        modality === "comercial_estandar"
+                          ? "bg-[#9B00CC] text-white border-white shadow-lg"
+                          : "bg-white/5 border-white/15 text-white hover:bg-white/10"
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-center justify-between gap-2 mb-1.5">
+                          <div
+                            className={`w-7 h-7 rounded-lg flex items-center justify-center ${
+                              modality === "comercial_estandar"
+                                ? "bg-[#0e011f] text-white"
+                                : "bg-[#9B00CC] text-white"
+                            }`}
+                          >
+                            <DollarSign className="w-4 h-4" />
+                          </div>
+                          <span className="px-2 py-0.5 rounded-full bg-white/20 text-white text-[9px] font-black uppercase">
+                            Factura HDV-FAC
+                          </span>
+                        </div>
+                        <span className="block text-xs font-black">
+                          Membresía Comercial / Estándar
+                        </span>
+                        <span
+                          className={`text-[10px] block mt-1 ${
+                            modality === "comercial_estandar"
+                              ? "text-white font-bold"
+                              : "text-slate-300"
+                          }`}
+                        >
+                          Genera Orden de Cobro / Factura Correlativa en Finanzas.
+                        </span>
+                      </div>
+                    </button>
+                  </div>
+
+                  {/* Selector de Plan de Membresía SaaS (Con o sin monto según origen) */}
+                  {(modality === "comercial_estandar" || origin === "agente_ventas") && (
+                    <div className="p-4 rounded-2xl bg-white/10 border border-white/15 space-y-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[10px] font-black uppercase tracking-wider text-[#00C8D4] mb-1">
+                            Plan / Membresía Asignada (Catálogo SaaS)
+                          </label>
+                          <select
+                            value={selectedPlanId}
+                            onChange={(e) => {
+                              const pid = e.target.value;
+                              setSelectedPlanId(pid);
+                              const plan = SAAS_COMMERCIAL_PLANS.find((p) => p.id === pid);
+                              if (plan) setCustomMonthlyUsd(plan.defaultMonthlyUsd);
+                            }}
+                            className="w-full px-3 py-2 rounded-xl bg-white text-slate-900 text-xs font-bold focus:outline-none cursor-pointer"
+                          >
+                            {SAAS_COMMERCIAL_PLANS.map((plan) => (
+                              <option key={plan.id} value={plan.id}>
+                                {origin === "agente_ventas"
+                                  ? `${plan.name} (${plan.rangeLabel} • Sugerido $${plan.defaultMonthlyUsd})`
+                                  : plan.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Monto mensual visible y editable SOLO cuando lo registra un Agente de Ventas HDV */}
+                        {origin === "agente_ventas" ? (
+                          <div>
+                            <label className="block text-[10px] font-black uppercase tracking-wider text-[#00C8D4] mb-1">
+                              Monto Mensual Acordado (USD / Equivalente BCV)
+                            </label>
+                            <div className="flex items-center gap-2">
+                              <div className="relative flex-1">
+                                <span className="absolute left-3 top-2 text-xs font-black text-slate-400">
+                                  $
+                                </span>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  value={modality === "comercial_estandar" ? customMonthlyUsd : 0}
+                                  disabled={modality !== "comercial_estandar"}
+                                  onChange={(e) => setCustomMonthlyUsd(Number(e.target.value))}
+                                  className="w-full pl-7 pr-12 py-2 rounded-xl bg-white text-slate-900 text-xs font-black focus:outline-none disabled:opacity-60"
+                                />
+                                <span className="absolute right-2.5 top-2 text-[10px] font-bold text-slate-400">
+                                  USD
+                                </span>
+                              </div>
+
+                              {modality === "comercial_estandar" && (
+                                <select
+                                  value={initialPaymentStatus}
+                                  onChange={(e) =>
+                                    setInitialPaymentStatus(
+                                      e.target.value as "pendiente_pago" | "pagado"
+                                    )
+                                  }
+                                  className="px-2.5 py-2 rounded-xl bg-white text-slate-900 text-[11px] font-black focus:outline-none cursor-pointer"
+                                >
+                                  <option value="pendiente_pago">Pendiente de Pago</option>
+                                  <option value="pagado">Pagado</option>
+                                </select>
+                              )}
+                            </div>
+                            {modality === "comercial_estandar" && (
+                              <span className="block text-[10px] text-[#00C8D4] font-bold mt-1">
+                                Equivalente BCV: Bs.{" "}
+                                {(customMonthlyUsd * (bcvRate || 45.8)).toLocaleString("es-VE", {
+                                  minimumFractionDigits: 2
+                                })}{" "}
+                                / mes
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="flex flex-col justify-center">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-[#00C8D4]">
+                              Asignación Directa de Membresía
+                            </span>
+                            <p className="text-xs font-bold text-white mt-0.5">
+                              {currentPlanObj.name}
+                            </p>
+                            <span className="text-[10px] text-slate-300">
+                              {currentPlanObj.description}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* C. CHECK OBLIGATORIO DE TÉRMINOS Y DERECHOS DE IMAGEN */}
+                <label className="flex items-start gap-3 p-4 rounded-2xl bg-white/10 border border-white/20 cursor-pointer hover:bg-white/15 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={termsAccepted}
+                    onChange={(e) => {
+                      setTermsAccepted(e.target.checked);
+                      if (e.target.checked) setValidationError(null);
+                    }}
+                    className="mt-0.5 w-4 h-4 accent-[#00C8D4] rounded cursor-pointer shrink-0"
+                  />
+                  <div className="text-xs leading-relaxed text-slate-100">
+                    <span className="font-black text-[#00C8D4] uppercase tracking-wider block mb-0.5">
+                      Confirmación Legal de Titularidad y Derechos de Imagen (Obligatorio) *
+                    </span>
+                    Declaro ser propietario, gerente o agente autorizado del establecimiento y otorgo
+                    autorización expresa a <strong>Hoteles de Venezuela LLC</strong> para la
+                    publicación comercial de las fotografías, logotipos, coordenadas GPS y tarifas
+                    suministradas en este Pre-Registro Oficial.
+                  </div>
+                </label>
+
+                {validationError && (
+                  <div className="p-3.5 rounded-2xl bg-rose-500/20 border border-rose-400 text-rose-100 text-xs font-bold flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-rose-300 shrink-0" />
+                    <span>{validationError}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Botón Principal de Guardado / Emisión de Comprobante Oficial con QR */}
               <div className="pt-4 border-t border-slate-100 flex items-center justify-between flex-wrap gap-3">
-                <p className="text-[11px] text-slate-500 max-w-xs">
-                  {publishDirectly
-                    ? "Publicará inmediatamente la propiedad activa en la plataforma."
-                    : "Generará la propiedad en estado PRE_REGISTERED para ser completada luego."}
-                </p>
+                <div className="space-y-0.5">
+                  <p className="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
+                    <QrCode className="w-3.5 h-3.5 text-[#00C8D4]" />
+                    <span>
+                      Próximo Folio Correlativo:{" "}
+                      <strong className="font-mono text-[#0e011f]">
+                        HDV-PR-2026-{String(salesCounters.preRegCounter + 1).padStart(4, "0")}
+                      </strong>
+                    </span>
+                  </p>
+                  <p className="text-[10px] text-slate-500 max-w-xs">
+                    Emite comprobante automático con QR y sincroniza con Finanzas, CRM y Logs.
+                  </p>
+                </div>
 
                 <button
                   type="button"
@@ -997,12 +1550,16 @@ export function PreRegistro() {
                   {isSaving ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Guardando Ficha...</span>
+                      <span>Emitiendo Comprobante QR...</span>
                     </>
                   ) : (
                     <>
-                      <CheckCircle2 className="w-4.5 h-4.5" />
-                      <span>{publishDirectly ? "🚀 Publicar Ahora en HDV" : "Completar Pre-Registro"}</span>
+                      <QrCode className="w-4.5 h-4.5" />
+                      <span>
+                        {publishDirectly
+                          ? "Publicar y Emitir Comprobante con QR"
+                          : "Guardar Pre-Registro y Emitir Comprobante QR"}
+                      </span>
                     </>
                   )}
                 </button>
@@ -1149,6 +1706,48 @@ export function PreRegistro() {
 
               </div>
 
+              {/* Resumen en Vivo de Clasificación Comercial y Correlativo Financiero */}
+              <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-lg space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                    Resumen Comercial en Vivo
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-md bg-[#0e011f] text-[#00C8D4] font-mono text-[10px] font-black">
+                    HDV-PR-2026-{String(salesCounters.preRegCounter + 1).padStart(4, "0")}
+                  </span>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
+                  <span className="block text-[10px] font-black uppercase text-[#FF0096]">
+                    {modality === "fundadores_50"
+                      ? `Membresía Exonerada - Alianza 50 Fundadores (Cupo ${Math.min(
+                          50,
+                          foundersOccupied + 1
+                        )}/50)`
+                      : modality === "exclusivo_prestigio"
+                      ? "Membresía Exonerada - Selección Exclusiva (Prestigio 2026)"
+                      : `Membresía Comercial — ${currentPlanObj.name}`}
+                  </span>
+                  <p className="text-xs font-extrabold text-slate-900">
+                    {modality !== "comercial_estandar" && foundersOccupied < MAX_FOUNDERS_QUOTA
+                      ? "Asiento en Finanzas: $0.00 USD (Exonerado - Lanzamiento)"
+                      : origin === "agente_ventas"
+                      ? `Factura Correlativa HDV-FAC-2026-${String(
+                          salesCounters.invoiceCounter + 1
+                        ).padStart(4, "0")} • $${customMonthlyUsd.toFixed(2)} USD/mes`
+                      : `Orden Comercial HDV-FAC-2026-${String(
+                          salesCounters.invoiceCounter + 1
+                        ).padStart(4, "0")} • ${currentPlanObj.name}`}
+                  </p>
+                  <span className="block text-[10px] text-slate-500 font-semibold">
+                    Origen:{" "}
+                    {origin === "agente_ventas"
+                      ? `Agente de Ventas HDV (${customAgentName})`
+                      : `Propietario / Gerente (${ownerOrManagerName || title})`}
+                  </span>
+                </div>
+              </div>
+
             </div>
 
           </div>
@@ -1166,6 +1765,12 @@ export function PreRegistro() {
         )}
 
       </div>
+
+      {/* Modal Automático de Comprobante Oficial de Pre-Registro con Código QR */}
+      <PreRegistrationReceiptModal
+        receipt={emittedReceipt}
+        onClose={() => setEmittedReceipt(null)}
+      />
 
     </div>
   );

@@ -7,8 +7,14 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   DollarSign, TrendingUp, TrendingDown, Plus, Trash2,
   CreditCard, Users, FileText, BarChart3,
-  CheckCircle, Clock, X, Loader2, Wallet, ArrowLeftRight, Percent
+  CheckCircle, Clock, X, Loader2, Wallet, ArrowLeftRight, Percent, Award, QrCode
 } from "lucide-react";
+import {
+  ensureSalesAndFinanceZeroInitialized,
+  getSalesCounters,
+  MAX_FOUNDERS_QUOTA,
+  syncSalesStateFromSupabase
+} from "@/lib/salesDepartmentStore";
 
 const F = "#FF0096";
 const T = "#00C8D4";
@@ -34,25 +40,22 @@ export function AdminFinanzas() {
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("resumen");
 
+  const [salesCounters, setSalesCounters] = useState(() => getSalesCounters());
+
   useEffect(() => {
-    localStorage.removeItem("hdv_mock_expenses");
-    localStorage.removeItem("hdv_mock_membership_payments");
+    ensureSalesAndFinanceZeroInitialized();
+    syncSalesStateFromSupabase().then((res) => {
+      setSalesCounters(res.counters);
+      qc.invalidateQueries({ queryKey: ["admin-membership-payments"] });
+    });
 
-    async function purgeDatabaseTestRecords() {
-      try {
-        await supabase.from("expenses").delete().neq("id", -999999);
-        await supabase.from("membership_payments").delete().neq("id", -999999);
-        qc.invalidateQueries({ queryKey: ["admin-expenses"] });
-        qc.invalidateQueries({ queryKey: ["admin-membership-payments"] });
-      } catch (err) {
-        console.warn("Purge error:", err);
-      }
-    }
-
-    if (user) {
-      purgeDatabaseTestRecords();
-    }
-  }, [user]);
+    const handleSalesUpdate = () => {
+      setSalesCounters(getSalesCounters());
+      qc.invalidateQueries({ queryKey: ["admin-membership-payments"] });
+    };
+    window.addEventListener("hdv_sales_v13_updated", handleSalesUpdate);
+    return () => window.removeEventListener("hdv_sales_v13_updated", handleSalesUpdate);
+  }, [qc]);
 
   useEffect(() => {
     if (!authLoading && (!user || (profile?.role !== "admin" && user?.email?.toLowerCase() !== "hotelesdevenezuela77@gmail.com"))) {
@@ -67,6 +70,9 @@ export function AdminFinanzas() {
   const { data: payments = [], isLoading: loadingPayments } = useQuery<any[]>({
     queryKey: ["admin-membership-payments"],
     queryFn: async () => {
+      const localIncomeKey = "hdv_mock_membership_payments";
+      const localPay: any[] = JSON.parse(localStorage.getItem(localIncomeKey) || "[]");
+
       try {
         const { data, error } = await supabase
           .from("membership_payments")
@@ -74,11 +80,20 @@ export function AdminFinanzas() {
           .order("payment_date", { ascending: false });
         
         if (error) throw error;
-        return data || [];
+        const dbList = data || [];
+        const seenRefs = new Set<string>();
+        const combined: any[] = [];
+
+        for (const item of [...localPay, ...dbList]) {
+          const refKey = item.payment_reference || `${item.id}-${item.establishment_id}`;
+          if (!seenRefs.has(refKey)) {
+            seenRefs.add(refKey);
+            combined.push(item);
+          }
+        }
+        return combined;
       } catch (err) {
         console.warn("Error cargando pagos de membresía de Supabase:", err);
-        const localIncomeKey = "hdv_mock_membership_payments";
-        const localPay = JSON.parse(localStorage.getItem(localIncomeKey) || "[]");
         return localPay;
       }
     },
@@ -500,6 +515,37 @@ export function AdminFinanzas() {
       <AdminTabBar />
 
       <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
+        {/* Sincronización Correlativa en Vivo con Departamento de Ventas y 50 Fundadores */}
+        <div className="rounded-2xl bg-gradient-to-r from-[#0e011f] to-[#1a0533] text-white p-5 border border-[#00C8D4]/30 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-[#00C8D4] text-white flex items-center justify-center shrink-0 shadow-md">
+              <Award className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-widest text-[#00C8D4] block">
+                Sincronización Correlativa • Departamento de Ventas & Finanzas
+              </span>
+              <p className="text-sm sm:text-base font-black text-white">
+                Programa 50 Fundadores: {Math.min(MAX_FOUNDERS_QUOTA, salesCounters.foundersCounter)} / {MAX_FOUNDERS_QUOTA} Ocupados ({Math.max(0, MAX_FOUNDERS_QUOTA - salesCounters.foundersCounter)} disponibles en $0.00)
+              </p>
+              <span className="text-[11px] text-slate-300 font-semibold">
+                Pre-Registros Emitidos: {salesCounters.preRegCounter} • Exoneraciones (HDV-EXO): {salesCounters.exoneratedCounter} • Facturas Comerciales (HDV-FAC): {salesCounters.invoiceCounter}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => setLocation("/admin/departamento-ventas")}
+              className="px-4 py-2 rounded-xl bg-[#FF0096] hover:opacity-95 text-white text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md cursor-pointer"
+            >
+              <QrCode className="w-3.5 h-3.5" />
+              <span>Ver Departamento de Ventas</span>
+            </button>
+          </div>
+        </div>
+
         {/* KPIs */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[

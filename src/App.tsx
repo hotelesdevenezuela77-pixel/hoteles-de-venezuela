@@ -280,6 +280,8 @@ const AsistenteViajesIA = lazyNamed(() => import("./pages/AsistenteViajesIA"), "
 const PublicSupportPage = lazyNamed(() => import("./pages/PublicSupportPage"), "PublicSupportPage");
 const AdminIaViajes = lazyNamed(() => import("./pages/admin/AdminIaViajes"), "AdminIaViajes");
 const AdminExpedicionRutas = lazyNamed(() => import("./pages/admin/AdminExpedicionRutas"), "AdminExpedicionRutas");
+const AdminDepartamentoVentas = lazyNamed(() => import("./pages/admin/AdminDepartamentoVentas"), "AdminDepartamentoVentas");
+const VerificarRegistro = lazyNamed(() => import("./pages/VerificarRegistro"), "VerificarRegistro");
 const AdminAsistencia = lazyWithRetry(() => import("./pages/admin/AdminAsistencia"));
 const AdminContabilidad = lazyWithRetry(() => import("./pages/admin/AdminContabilidad"));
 const AdminInfluencers = lazyWithRetry(() => import("./pages/admin/AdminInfluencers"));
@@ -316,6 +318,8 @@ function AdminShell() {
         <Route path="/admin/seo" component={AdminSeoHome} />
         <Route path="/admin/seo-home" component={AdminSeoHome} />
         <Route path="/admin/b2b" component={AdminB2B} />
+        <Route path="/admin/departamento-ventas" component={AdminDepartamentoVentas} />
+        <Route path="/admin/ventas" component={AdminDepartamentoVentas} />
         <Route path="/admin/comercial" component={AdminComercial} />
         <Route path="/admin/analiticas" component={AdminAnaliticas} />
         <Route path="/admin/linkhub" component={AdminLinkHub} />
@@ -478,6 +482,7 @@ function App() {
             <Route path="/registro" component={Registro} />
             <Route path="/pre-registro" component={PreRegistro} />
             <Route path="/registro-rapido" component={PreRegistro} />
+            <Route path="/verificar-registro/:folio" component={VerificarRegistro} />
             <Route path="/perfil" component={Perfil} />
             <Route path="/panel-turista" component={Perfil} />
             <Route path="/perfil/kyc" component={PerfilKYC} />

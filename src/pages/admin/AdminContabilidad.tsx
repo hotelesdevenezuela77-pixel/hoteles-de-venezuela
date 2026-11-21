@@ -83,17 +83,28 @@ export default function AdminContabilidad() {
   const { data: payments = [], isLoading: loadingPayments } = useQuery<any[]>({
     queryKey: ["admin-accounting-payments"],
     queryFn: async () => {
+      const localKey = "hdv_mock_membership_payments";
+      const localPay: any[] = JSON.parse(localStorage.getItem(localKey) || "[]");
       try {
         const { data, error } = await supabase
           .from("membership_payments")
           .select("*")
           .order("payment_date", { ascending: false });
         if (error) throw error;
-        return data || [];
+        const dbList = data || [];
+        const seenRefs = new Set<string>();
+        const combined: any[] = [];
+        for (const item of [...localPay, ...dbList]) {
+          const refKey = item.payment_reference || `${item.id}-${item.establishment_id}`;
+          if (!seenRefs.has(refKey)) {
+            seenRefs.add(refKey);
+            combined.push(item);
+          }
+        }
+        return combined;
       } catch (err) {
         console.warn("DB Inflows error, fetching mock data:", err);
-        const localKey = "hdv_mock_membership_payments";
-        return JSON.parse(localStorage.getItem(localKey) || "[]");
+        return localPay;
       }
     }
   });
