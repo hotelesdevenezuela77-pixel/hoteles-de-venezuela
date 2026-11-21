@@ -265,13 +265,13 @@ function Footer() {
               , posadas boutique y experiencias turísticas verificadas.
             </p>
             <div className="flex gap-3 mt-5">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"
+              <a href="https://www.facebook.com/hotelesdevenezuela" target="_blank" rel="noopener noreferrer"
                 className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all">
                 <svg className="w-4 h-4 fill-current text-white" viewBox="0 0 24 24">
                   <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
                 </svg>
               </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"
+              <a href="https://www.instagram.com/hotelesdevenezuela" target="_blank" rel="noopener noreferrer"
                 className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all">
                 <svg className="w-4 h-4 fill-none stroke-current stroke-2 text-white" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
@@ -279,7 +279,7 @@ function Footer() {
                   <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
                 </svg>
               </a>
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer"
+              <a href="https://www.youtube.com/@hotelesdevenezuela" target="_blank" rel="noopener noreferrer"
                 className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all">
                 <svg className="w-4 h-4 fill-current text-white" viewBox="0 0 24 24">
                   <path d="M23.498 6.163c-.272-.98-1.09-1.755-2.115-2.013C19.51 3.75 12 3.75 12 3.75s-7.51 0-9.383.5c-1.025.258-1.843 1.033-2.115 2.013C0 7.962 0 12 0 12s0 4.038.5 5.837c.272.98.109 1.755 2.115 2.013c1.873.5 9.383.5 9.383.5s7.51 0 9.383-.5c1.025-.258 1.843-1.033 2.115-2.013.5-1.8.5-5.837.5-5.837s0-4.038-.5-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
@@ -539,11 +539,11 @@ function Footer() {
             <span className="text-gray-700">|</span>
             <Link href="/terminos" rel="dofollow" className="hover:text-white transition-colors">Términos y Condiciones</Link>
             <span className="text-gray-700">|</span>
-            <Link href="/sobre-nosotros" rel="dofollow" className="hover:text-white transition-colors">Sobre Nosotros</Link>
+            <Link href="/quienes-somos" rel="dofollow" className="hover:text-white transition-colors">Sobre Nosotros</Link>
             <span className="text-gray-700">|</span>
             <Link href="/blog" rel="dofollow" className="hover:text-white transition-colors">Blog</Link>
             <span className="text-gray-700">|</span>
-            <Link href="/sitemap" rel="dofollow" className="hover:text-white transition-colors">Mapa del sitio</Link>
+            <a href="/sitemap.xml" target="_blank" rel="dofollow" className="hover:text-white transition-colors">Mapa del sitio</a>
           </div>
         </div>
       </div>

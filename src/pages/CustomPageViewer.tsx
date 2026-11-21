@@ -52,7 +52,11 @@ function getEmbedUrl(url: string): string {
 
 export function CustomPageViewer() {
   const [, params] = useRoute("/:slug");
-  const slug = (params as any)?.slug;
+  const rawSlug = (params as any)?.slug;
+  const slug =
+    rawSlug === "sobre-nosotros" || rawSlug === "nosotros"
+      ? "quienes-somos"
+      : rawSlug;
 
   const [page, setPage] = useState<CustomPage | null>(null);
   const [loading, setLoading] = useState(true);
@@ -107,6 +111,22 @@ export function CustomPageViewer() {
             relatedEstablishments: matched.related_establishments ?? matched.relatedEstablishments ?? ""
           };
           setPage(mapped);
+        } else if (slug === "quienes-somos") {
+          setPage({
+            id: 1,
+            slug: "quienes-somos",
+            title: "Quiénes Somos · Hoteles de Venezuela LLC",
+            h1Title: "PANEL ADMINISTRATIVO CENTRAL: EL CORAZÓN DE HOTELES DE VENEZUELA LLC",
+            metaDescription:
+              "Conoce la historia, tecnología y equipo detrás de Hoteles de Venezuela LLC, la plataforma líder en reservas directas sin comisiones.",
+            metaKeywords: "quienes somos, sobre nosotros, hoteles de venezuela llc",
+            content: "",
+            isPublished: true,
+            featuredImage: "/images/quienes-somos/banner_hv_pareja.jpg",
+            videoUrl: "",
+            galleryImages: "",
+            relatedEstablishments: ""
+          });
         } else {
           setPage(null);
         }

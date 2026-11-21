@@ -514,8 +514,17 @@ function App() {
             <Route path="/terminos-y-condiciones" component={Terminos} />
             <Route path="/condiciones" component={Terminos} />
             <Route path="/prestigio-2026" component={ExcelenciaLanding} />
+            <Route path="/top-10-hoteles" component={Top10Hoteles} />
             <Route path="/los-10-mejores-hoteles" component={Top10Hoteles} />
             <Route path="/mejores-hoteles-venezuela" component={Top10Hoteles} />
+            <Route path="/sitemap">
+              {() => {
+                if (typeof window !== "undefined") {
+                  window.location.replace("/sitemap.xml");
+                }
+                return null;
+              }}
+            </Route>
             <Route path="/viaje-ia" component={AsistenteViajesIA} />
             <Route path="/soporte" component={PublicSupportPage} />
             <Route path="/soporte-tecnico" component={PublicSupportPage} />
