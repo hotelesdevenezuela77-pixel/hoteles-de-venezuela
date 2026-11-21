@@ -1494,25 +1494,36 @@ export function PreRegistro() {
                   )}
                 </div>
 
-                {/* C. CHECK OBLIGATORIO DE TÉRMINOS Y DERECHOS DE IMAGEN */}
-                <label className="flex items-start gap-3 p-4 rounded-2xl bg-white/10 border border-white/20 cursor-pointer hover:bg-white/15 transition-colors">
+                {/* C. CHECK OBLIGATORIO DE TÉRMINOS, CONDICIONES Y DERECHOS DE IMAGEN */}
+                <label className="flex items-start gap-3 p-4 rounded-2xl bg-white/10 border border-white/25 cursor-pointer hover:bg-white/15 transition-colors">
                   <input
                     type="checkbox"
+                    required
                     checked={termsAccepted}
                     onChange={(e) => {
                       setTermsAccepted(e.target.checked);
                       if (e.target.checked) setValidationError(null);
                     }}
-                    className="mt-0.5 w-4 h-4 accent-[#00C8D4] rounded cursor-pointer shrink-0"
+                    className="mt-0.5 w-4.5 h-4.5 accent-[#00C8D4] rounded cursor-pointer shrink-0"
                   />
                   <div className="text-xs leading-relaxed text-slate-100">
                     <span className="font-black text-[#00C8D4] uppercase tracking-wider block mb-0.5">
-                      Confirmación Legal de Titularidad y Derechos de Imagen (Obligatorio) *
+                      Confirmación Legal y Derechos de Imagen (Obligatorio) *
                     </span>
-                    Declaro ser propietario, gerente o agente autorizado del establecimiento y otorgo
-                    autorización expresa a <strong>Hoteles de Venezuela LLC</strong> para la
-                    publicación comercial de las fotografías, logotipos, coordenadas GPS y tarifas
-                    suministradas en este Pre-Registro Oficial.
+                    <span>
+                      Acepto los{" "}
+                      <a
+                        href="/terminos"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-[#00C8D4] underline hover:text-white font-black inline-flex items-center gap-1"
+                      >
+                        <span>Términos y Condiciones</span>
+                        <ExternalLink className="w-3 h-3 inline" />
+                      </a>{" "}
+                      de Hoteles de Venezuela y autorizo expresamente la publicación y uso promocional de la información comercial, logotipo y fotografías del establecimiento.
+                    </span>
                   </div>
                 </label>
 
@@ -1537,15 +1548,22 @@ export function PreRegistro() {
                     </span>
                   </p>
                   <p className="text-[10px] text-slate-500 max-w-xs">
-                    Emite comprobante automático con QR y sincroniza con Finanzas, CRM y Logs.
+                    {!termsAccepted
+                      ? "Marca la casilla de Términos y Derechos de Imagen para habilitar el envío."
+                      : "Emite comprobante automático con QR y sincroniza con Finanzas, CRM y Logs."}
                   </p>
                 </div>
 
                 <button
                   type="button"
                   onClick={handleSavePreRegistration}
-                  disabled={isSaving}
-                  className="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] hover:opacity-95 text-white font-black text-xs shadow-xl shadow-pink-900/20 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 hover:scale-102 active:scale-98"
+                  disabled={isSaving || !termsAccepted}
+                  title={
+                    !termsAccepted
+                      ? "Debes aceptar los Términos y Condiciones y Derechos de Imagen para continuar"
+                      : "Emitir Comprobante Oficial con Código QR"
+                  }
+                  className="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] hover:opacity-95 text-white font-black text-xs shadow-xl shadow-pink-900/20 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed hover:scale-102 active:scale-98"
                 >
                   {isSaving ? (
                     <>

@@ -100,11 +100,23 @@ export function Terminos() {
                 la marca.
               </li>
               <li>
+                Al marcar la casilla obligatoria de consentimiento en el formulario (
+                <em>
+                  "Acepto los Términos y Condiciones de Hoteles de Venezuela y autorizo expresamente
+                  la publicación y uso promocional de la información comercial, logotipo y
+                  fotografías del establecimiento."
+                </em>
+                ), dicha aceptación queda asentada de forma inalterable en el{" "}
+                <strong>Comprobante Oficial de Pre-Registro (`HDV-PR-2026-XXXX`)</strong> y en la{" "}
+                <strong>Auditoría de Logs del Sistema</strong> junto con la fecha, hora exacta,
+                dirección IP del dispositivo, User-Agent y firma digital de validación.
+              </li>
+              <li>
                 Cada alta comercial emite un <strong>Comprobante Oficial con Código QR</strong>{" "}
                 (`HDV-PR-2026-XXXX`) y su correlativo financiero vinculado (`HDV-EXO-2026-XXXX` para
                 membresías exoneradas del Programa 50 Fundadores y Selección Exclusiva Prestigio
-                2026, o `HDV-FAC-2026-XXXX` para planes comerciales SaaS), junto con registro de
-                dirección IP y sello digital de validación.
+                2026, o `HDV-FAC-2026-XXXX` para planes comerciales SaaS), verificable públicamente
+                en <code>/verificar-registro/:folio</code>.
               </li>
             </ul>
           </section>

@@ -572,7 +572,7 @@ export async function processSalesPreRegistration(
     financialStatusLabel,
     termsAccepted: input.termsAccepted,
     termsAcceptedText:
-      "Confirmación legal de titularidad/representación y autorización expresa de derechos de imagen, fotografías y datos comerciales en Hoteles de Venezuela LLC.",
+      "Acepto los Términos y Condiciones de Hoteles de Venezuela y autorizo expresamente la publicación y uso promocional de la información comercial, logotipo y fotografías del establecimiento.",
     clientIp,
     userAgent,
     createdAtIso,
@@ -886,7 +886,7 @@ export async function processSalesPreRegistration(
     `Finanzas: ${financialCorrelative} (${financialStatusLabel})`,
     `Establecimiento: ${input.establishmentTitle} (${input.categoryName} - ${input.destinationName})`,
     `Origen: ${registrantName}`,
-    `Términos y Derechos de Imagen: ACEPTADO LEGALMENTE`,
+    `Cláusula Legal Aceptada: "${newReceipt.termsAcceptedText}"`,
     `IP Cliente: ${clientIp}`,
     `Timestamp: ${createdAtFormatted} (${createdAtIso})`,
     `User-Agent: ${userAgent}`

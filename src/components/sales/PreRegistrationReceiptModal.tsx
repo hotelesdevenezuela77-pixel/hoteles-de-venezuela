@@ -262,7 +262,8 @@ export function printOfficialPreRegistrationReceipt(receipt: SalesPreRegistratio
             ✓ Sello Digital de Validación HDV • ${receipt.digitalSignatureHash}
           </div>
           <p class="legal-text">
-            <strong>Términos y Derechos de Imagen Aceptados:</strong> ${receipt.termsAcceptedText}
+            <strong>Cláusula Legal y Derechos de Imagen Aceptados:</strong> "${receipt.termsAcceptedText}"<br/>
+            <span>Consentimiento digital registrado el <strong>${receipt.createdAtFormatted}</strong> desde la dirección IP <strong>${receipt.clientIp}</strong> conforme a los Términos y Condiciones oficiales (https://hotelesdevenezuela.com/terminos).</span>
           </p>
           <p class="legal-text" style="margin-top: 6px;">
             <strong>URL Pública de Verificación:</strong> ${verificationUrl}
@@ -484,8 +485,20 @@ export function PreRegistrationReceiptModal({
                 <span>Sello Digital: {receipt.digitalSignatureHash}</span>
               </div>
 
-              <p className="text-[11px] text-slate-600 leading-relaxed font-medium">
-                {receipt.termsAcceptedText}
+              <p className="text-[11px] text-slate-700 leading-relaxed font-semibold">
+                "{receipt.termsAcceptedText}"
+              </p>
+              <p className="text-[10px] text-slate-500 font-medium">
+                Aceptación legal asentada el <strong>{receipt.createdAtFormatted}</strong> desde la IP{" "}
+                <strong className="font-mono">{receipt.clientIp}</strong> •{" "}
+                <a
+                  href="/terminos"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#008f99] underline font-bold hover:text-[#FF0096]"
+                >
+                  Ver Términos y Condiciones
+                </a>
               </p>
 
               <div className="pt-1 flex flex-wrap items-center justify-center sm:justify-start gap-2">
