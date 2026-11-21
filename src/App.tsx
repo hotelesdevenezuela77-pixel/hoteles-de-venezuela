@@ -220,6 +220,7 @@ const Comparar = lazyNamed(() => import("./pages/Comparar"), "Comparar");
 const Membresias = lazyNamed(() => import("./pages/Membresias"), "Membresias");
 const ReportarPago = lazyNamed(() => import("./pages/ReportarPago"), "ReportarPago");
 const Privacidad = lazyNamed(() => import("./pages/Privacidad"), "Privacidad");
+const Terminos = lazyNamed(() => import("./pages/Terminos"), "Terminos");
 const AdminPagos = lazyNamed(() => import("./pages/admin/AdminPagos"), "AdminPagos");
 
 // Admin Sub-routed Panels
@@ -509,6 +510,9 @@ function App() {
             <Route path="/membresias" component={Membresias} />
             <Route path="/reportar-pago" component={ReportarPago} />
             <Route path="/privacidad" component={Privacidad} />
+            <Route path="/terminos" component={Terminos} />
+            <Route path="/terminos-y-condiciones" component={Terminos} />
+            <Route path="/condiciones" component={Terminos} />
             <Route path="/prestigio-2026" component={ExcelenciaLanding} />
             <Route path="/los-10-mejores-hoteles" component={Top10Hoteles} />
             <Route path="/mejores-hoteles-venezuela" component={Top10Hoteles} />
