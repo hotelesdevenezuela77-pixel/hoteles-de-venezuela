@@ -35,13 +35,18 @@ import {
   UserCheck,
   Briefcase,
   QrCode,
-  Lock
+  Lock,
+  ChevronDown
 } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/auth";
 import { useBcvExchangeRate } from "../hooks/useBcvExchangeRate";
 import type { PreRegistrationPayload, PreRegistrationBadgeFlags } from "../types/preRegistration";
 import { FlexibleBedroomConfigurator } from "../components/units/FlexibleBedroomConfigurator";
+import {
+  SERVICE_CATEGORIES_V15,
+  SERVICE_SUBCATEGORIES_V15
+} from "../lib/v15MasterCatalog";
 import {
   SAAS_COMMERCIAL_PLANS,
   OFFICIAL_SALES_AGENTS,
@@ -60,6 +65,62 @@ import {
 } from "../lib/salesDepartmentStore";
 import { PreRegistrationReceiptModal } from "../components/sales/PreRegistrationReceiptModal";
 
+export interface UnifiedPreRegCategoryOption {
+  id: string;
+  label: string;
+  directorySlug: string;
+  groupCode: string;
+  groupTitle: string;
+  serviceCategoryId: number;
+  subcategoryId: number;
+}
+
+/**
+ * Catálogo Central Unificado de Categorías de la Plataforma (Sincronizado con V15 Master Catalog + Directorio + Buscador)
+ */
+export const UNIFIED_PLATFORM_CATEGORIES: UnifiedPreRegCategoryOption[] = [
+  // CS-01: Hoteles y Hospedajes con Recepción
+  { id: "posada-boutique", label: "Posada Boutique", directorySlug: "posadas", groupCode: "CS-01", groupTitle: "Hoteles, Posadas y Hospedajes", serviceCategoryId: 1, subcategoryId: 2 },
+  { id: "posadas", label: "Posadas", directorySlug: "posadas", groupCode: "CS-01", groupTitle: "Hoteles, Posadas y Hospedajes", serviceCategoryId: 1, subcategoryId: 2 },
+  { id: "hotel-exclusivo", label: "Hotel Exclusivo", directorySlug: "hoteles", groupCode: "CS-01", groupTitle: "Hoteles, Posadas y Hospedajes", serviceCategoryId: 1, subcategoryId: 1 },
+  { id: "hoteles", label: "Hoteles", directorySlug: "hoteles", groupCode: "CS-01", groupTitle: "Hoteles, Posadas y Hospedajes", serviceCategoryId: 1, subcategoryId: 1 },
+  { id: "hotel-boutique", label: "Hotel Boutique", directorySlug: "hoteles", groupCode: "CS-01", groupTitle: "Hoteles, Posadas y Hospedajes", serviceCategoryId: 1, subcategoryId: 1 },
+  { id: "hostal-bed-breakfast", label: "Hostal / Bed & Breakfast (B&B)", directorySlug: "posadas", groupCode: "CS-01", groupTitle: "Hoteles, Posadas y Hospedajes", serviceCategoryId: 1, subcategoryId: 2 },
+  { id: "love-hotel-suite", label: "Love Hotel / Suite & Motel", directorySlug: "hoteles", groupCode: "CS-01", groupTitle: "Hoteles, Posadas y Hospedajes", serviceCategoryId: 1, subcategoryId: 6 },
+  { id: "albergue-capsula", label: "Albergue Turístico / Hotel Cápsula", directorySlug: "hoteles", groupCode: "CS-01", groupTitle: "Hoteles, Posadas y Hospedajes", serviceCategoryId: 1, subcategoryId: 3 },
+
+  // CS-02: Resorts, Campamentos, Glamping y Complejos Vacacionales
+  { id: "resorts-complejos", label: "Resorts & Complejos Vacacionales", directorySlug: "complejos", groupCode: "CS-02", groupTitle: "Resorts, Campamentos, Glamping y Complejos", serviceCategoryId: 2, subcategoryId: 9 },
+  { id: "complejos-turisticos", label: "Complejos Turísticos", directorySlug: "complejos", groupCode: "CS-02", groupTitle: "Resorts, Campamentos, Glamping y Complejos", serviceCategoryId: 2, subcategoryId: 9 },
+  { id: "campamento-eco-lodge", label: "Campamento / Eco-Lodge", directorySlug: "campamentos", groupCode: "CS-02", groupTitle: "Resorts, Campamentos, Glamping y Complejos", serviceCategoryId: 2, subcategoryId: 8 },
+  { id: "eco-lodges-ranchos", label: "Eco-Lodges & Ranchos", directorySlug: "ecolodges", groupCode: "CS-02", groupTitle: "Resorts, Campamentos, Glamping y Complejos", serviceCategoryId: 2, subcategoryId: 8 },
+  { id: "glamping-domos", label: "Glamping & Domos", directorySlug: "glamping", groupCode: "CS-02", groupTitle: "Resorts, Campamentos, Glamping y Complejos", serviceCategoryId: 2, subcategoryId: 8 },
+  { id: "apartahoteles", label: "Apartahoteles & Suites Ejecutivas", directorySlug: "hoteles", groupCode: "CS-02", groupTitle: "Resorts, Campamentos, Glamping y Complejos", serviceCategoryId: 2, subcategoryId: 7 },
+  { id: "marinas-club-nautico", label: "Marinas & Clubes Náuticos", directorySlug: "complejos", groupCode: "CS-02", groupTitle: "Resorts, Campamentos, Glamping y Complejos", serviceCategoryId: 2, subcategoryId: 10 },
+
+  // CS-03: Villas, Casas, Cabañas y Apartamentos Vacacionales
+  { id: "villa-casa-playa", label: "Villa / Casa de Playa", directorySlug: "casas", groupCode: "CS-03", groupTitle: "Villas, Casas, Cabañas y Apartamentos", serviceCategoryId: 3, subcategoryId: 11 },
+  { id: "casas-chalets-fincas", label: "Casas, Chalets, Villas, Hatos y Haciendas", directorySlug: "casas", groupCode: "CS-03", groupTitle: "Villas, Casas, Cabañas y Apartamentos", serviceCategoryId: 3, subcategoryId: 11 },
+  { id: "cabanas-montana", label: "Cabañas & Chalets de Montaña / Páramo", directorySlug: "casas", groupCode: "CS-03", groupTitle: "Villas, Casas, Cabañas y Apartamentos", serviceCategoryId: 3, subcategoryId: 12 },
+  { id: "apartamentos-vacacionales", label: "Apartamentos Turísticos & Vacacionales", directorySlug: "casas", groupCode: "CS-03", groupTitle: "Villas, Casas, Cabañas y Apartamentos", serviceCategoryId: 3, subcategoryId: 13 },
+
+  // CS-04: Embarcaciones y Servicios Náuticos
+  { id: "yate-barco-marina", label: "Yate / Barco en Marina (Alojamiento Estático)", directorySlug: "nautico", groupCode: "CS-04", groupTitle: "Embarcaciones, Yates y Servicios Náuticos", serviceCategoryId: 4, subcategoryId: 15 },
+  { id: "yate-charter-navegacion", label: "Yate / Catamarán con Navegación Diaria (Charter)", directorySlug: "nautico", groupCode: "CS-04", groupTitle: "Embarcaciones, Yates y Servicios Náuticos", serviceCategoryId: 4, subcategoryId: 16 },
+
+  // CS-05 & CS-06: Restaurantes, Beach Clubs, Gastronomía y Vida Nocturna
+  { id: "restaurante-beach-club", label: "Restaurante & Beach Club", directorySlug: "restaurantes", groupCode: "CS-05", groupTitle: "Restaurantes, Beach Clubs & Gastronomía", serviceCategoryId: 5, subcategoryId: 31 },
+  { id: "restaurantes-gastronomia", label: "Restaurantes & Gastronomía", directorySlug: "restaurantes", groupCode: "CS-05", groupTitle: "Restaurantes, Beach Clubs & Gastronomía", serviceCategoryId: 5, subcategoryId: 31 },
+  { id: "cafeterias-bares-tapas", label: "Cafeterías, Bistró & Bares de Tapas", directorySlug: "restaurantes", groupCode: "CS-05", groupTitle: "Restaurantes, Beach Clubs & Gastronomía", serviceCategoryId: 5, subcategoryId: 32 },
+  { id: "discotecas-rooftop-lounge", label: "Rooftop, Lounge & Vida Nocturna", directorySlug: "restaurantes", groupCode: "CS-06", groupTitle: "Restaurantes, Beach Clubs & Gastronomía", serviceCategoryId: 6, subcategoryId: 34 },
+
+  // CS-07, CS-08 & CS-09: Parques, Transporte, Agencias y Creadores Oficiales
+  { id: "parques-acuaticos-tematicos", label: "Parques Acuáticos & Atracciones Turísticas", directorySlug: "parques", groupCode: "CS-07", groupTitle: "Parques, Agencias, Transporte y Creadores", serviceCategoryId: 7, subcategoryId: 35 },
+  { id: "agencias-tour-operadores", label: "Agencias de Viajes, Tour Operadores & DMC", directorySlug: "agencias", groupCode: "CS-09", groupTitle: "Parques, Agencias, Transporte y Creadores", serviceCategoryId: 9, subcategoryId: 37 },
+  { id: "rent-a-car-transporte", label: "Rent-a-Car & Transporte Turístico / Lanchas", directorySlug: "transporte", groupCode: "CS-08", groupTitle: "Parques, Agencias, Transporte y Creadores", serviceCategoryId: 8, subcategoryId: 39 },
+  { id: "creadores-influencers", label: "Creadores de Contenido & Influencers Oficiales", directorySlug: "influencers", groupCode: "CS-09", groupTitle: "Parques, Agencias, Transporte y Creadores", serviceCategoryId: 9, subcategoryId: 38 }
+];
+
 export function PreRegistro() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
@@ -67,8 +128,68 @@ export function PreRegistro() {
 
   // Estados del Formulario de Pre-Registro (Ficha Pública)
   const [serviceCategoryId, setServiceCategoryId] = useState<number>(1);
-  const [subcategoryId, setSubcategoryId] = useState<number>(6); // Posadas por defecto
+  const [subcategoryId, setSubcategoryId] = useState<number>(2); // Posadas por defecto
   const [categoryName, setCategoryName] = useState<string>("Posada Boutique");
+  const [dynamicCategories, setDynamicCategories] = useState<UnifiedPreRegCategoryOption[]>(UNIFIED_PLATFORM_CATEGORIES);
+
+  // Cargar y fusionar categorías adicionales desde Supabase `categories` y `SERVICE_SUBCATEGORIES_V15` para 100% cobertura
+  useEffect(() => {
+    async function loadUnifiedCategories() {
+      const merged = [...UNIFIED_PLATFORM_CATEGORIES];
+      const existingLabels = new Set(merged.map((c) => c.label.toLowerCase().trim()));
+
+      // Incorporar cualquier subcategoría oficial del catálogo maestro V15 que no esté explícita
+      for (const sub of SERVICE_SUBCATEGORIES_V15) {
+        if (!existingLabels.has(sub.name.toLowerCase().trim())) {
+          const parentCat = SERVICE_CATEGORIES_V15.find((c) => c.id === sub.serviceCategoryId);
+          existingLabels.add(sub.name.toLowerCase().trim());
+          merged.push({
+            id: `v15-${sub.code.toLowerCase()}`,
+            label: sub.name,
+            directorySlug: sub.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+            groupCode: parentCat?.code || "CS-01",
+            groupTitle: parentCat?.frontTitle || "Otras Categorías Oficiales V15",
+            serviceCategoryId: sub.serviceCategoryId,
+            subcategoryId: sub.id
+          });
+        }
+      }
+
+      try {
+        const { data } = await supabase.from("categories").select("id, name, slug").order("name");
+        if (Array.isArray(data)) {
+          for (const dbCat of data) {
+            if (dbCat?.name && !existingLabels.has(String(dbCat.name).toLowerCase().trim())) {
+              existingLabels.add(String(dbCat.name).toLowerCase().trim());
+              merged.push({
+                id: `db-${dbCat.slug || dbCat.id}`,
+                label: dbCat.name,
+                directorySlug: dbCat.slug || String(dbCat.name).toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+                groupCode: "DB-CAT",
+                groupTitle: "Categorías del Directorio Activo",
+                serviceCategoryId: 1,
+                subcategoryId: 1
+              });
+            }
+          }
+        }
+      } catch {}
+
+      setDynamicCategories(merged);
+    }
+    loadUnifiedCategories();
+  }, []);
+
+  const handleSelectCategoryByName = (selectedLabel: string) => {
+    setCategoryName(selectedLabel);
+    const found = dynamicCategories.find(
+      (c) => c.label.toLowerCase().trim() === selectedLabel.toLowerCase().trim()
+    );
+    if (found) {
+      setServiceCategoryId(found.serviceCategoryId);
+      setSubcategoryId(found.subcategoryId);
+    }
+  };
   const [title, setTitle] = useState<string>("Posada Paraíso Azul");
   const [destinationName, setDestinationName] = useState<string>("Morrocoy");
   const [state, setState] = useState<string>("Falcón");
@@ -837,39 +958,66 @@ export function PreRegistro() {
                 </p>
               </div>
 
-              {/* 1. Categoría Principal */}
+              {/* 1. Categoría Principal del Establecimiento (Lista Desplegable Unificada de Toda la Plataforma) */}
               <div>
-                <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-2">
-                  1. Categoría Principal del Establecimiento
-                </label>
-                <div className="grid grid-cols-3 gap-2.5">
-                  {[
-                    { catId: 1, subId: 6, label: "Posada Boutique", sub: "Posadas" },
-                    { catId: 1, subId: 5, label: "Hotel Exclusivo", sub: "Hoteles" },
-                    { catId: 3, subId: 13, label: "Campamento / Eco-Lodge", sub: "Campings & Eco" },
-                    { catId: 2, subId: 3, label: "Villa / Casa de Playa", sub: "Casas & Villas" },
-                    { catId: 4, subId: 16, label: "Yate / Barco en Marina", sub: "Náutico" },
-                    { catId: 1, subId: 12, label: "Love Hotel / Suite", sub: "Love Hotels" }
-                  ].map(cat => (
-                    <button
-                      key={cat.label}
-                      type="button"
-                      onClick={() => {
-                        setServiceCategoryId(cat.catId);
-                        setSubcategoryId(cat.subId);
-                        setCategoryName(cat.label);
-                      }}
-                      className={`p-3 rounded-2xl border text-left text-xs font-bold transition-all cursor-pointer ${
-                        categoryName === cat.label
-                          ? "bg-[#00C8D4]/15 border-[#00C8D4] text-[#008f99] shadow-sm ring-2 ring-[#00C8D4]/20"
-                          : "bg-slate-50 hover:bg-slate-100/80 border-slate-200 text-slate-600"
-                      }`}
-                    >
-                      <span className="block font-black">{cat.label}</span>
-                      <span className="text-[10px] text-slate-400 font-normal">{cat.sub}</span>
-                    </button>
-                  ))}
+                <div className="flex items-center justify-between gap-2 mb-1.5">
+                  <label
+                    htmlFor="prereg-category-select"
+                    className="block text-[11px] font-black uppercase tracking-wider text-slate-500"
+                  >
+                    1. Categoría Principal del Establecimiento *
+                  </label>
+                  <span className="text-[10px] font-bold text-[#008f99] bg-[#00C8D4]/10 border border-[#00C8D4]/25 px-2.5 py-0.5 rounded-full">
+                    Catálogo Oficial Unificado ({dynamicCategories.length} categorías)
+                  </span>
                 </div>
+
+                <div className="relative">
+                  <div className="w-8 h-8 rounded-xl bg-[#00C8D4] text-white flex items-center justify-center absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none shadow-xs">
+                    <Building className="w-4 h-4 text-white" />
+                  </div>
+
+                  <select
+                    id="prereg-category-select"
+                    value={categoryName}
+                    onChange={(e) => handleSelectCategoryByName(e.target.value)}
+                    className="w-full appearance-none bg-slate-50 hover:bg-white border-2 border-slate-200 focus:border-[#00C8D4] rounded-2xl pl-13 pr-10 py-3.5 text-sm font-black text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#00C8D4]/15 transition-all cursor-pointer shadow-2xs"
+                  >
+                    {/* Si al cargar una ficha existente su categoría tiene un nombre personalizado fuera de la lista base, la incluimos */}
+                    {!dynamicCategories.some(
+                      (c) => c.label.toLowerCase().trim() === categoryName.toLowerCase().trim()
+                    ) && (
+                      <option value={categoryName}>{categoryName} (Categoría Actual)</option>
+                    )}
+
+                    {Array.from(new Set(dynamicCategories.map((c) => c.groupTitle))).map(
+                      (groupTitle) => (
+                        <optgroup key={groupTitle} label={`── ${groupTitle} ──`}>
+                          {dynamicCategories
+                            .filter((c) => c.groupTitle === groupTitle)
+                            .map((cat) => (
+                              <option key={cat.id} value={cat.label}>
+                                {cat.label}
+                              </option>
+                            ))}
+                        </optgroup>
+                      )
+                    )}
+                  </select>
+
+                  <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
+                    <ChevronDown className="w-4.5 h-4.5 stroke-[2.5]" />
+                  </div>
+                </div>
+
+                <p className="text-[10px] text-slate-400 font-semibold mt-1.5 flex items-center justify-between">
+                  <span>
+                    Incluye Hospedajes, Eco-Lodges, Glamping, Complejos, Náutico, Restaurante & Beach Club, Agencias y más.
+                  </span>
+                  <span className="font-mono text-slate-500">
+                    CS-{String(serviceCategoryId).padStart(2, "0")} / SCS-{String(subcategoryId).padStart(2, "0")}
+                  </span>
+                </p>
               </div>
 
               {/* 2. Nombre de la Propiedad con Reconocimiento Automático de Establecimientos Existentes */}
@@ -905,7 +1053,7 @@ export function PreRegistro() {
                       type="button"
                       onClick={() => {
                         if (detectedExistingMatch.name) setTitle(detectedExistingMatch.name);
-                        if (detectedExistingMatch.categoryName) setCategoryName(detectedExistingMatch.categoryName);
+                        if (detectedExistingMatch.categoryName) handleSelectCategoryByName(detectedExistingMatch.categoryName);
                         if (detectedExistingMatch.destinationName) setDestinationName(detectedExistingMatch.destinationName);
                         if (detectedExistingMatch.state) setState(detectedExistingMatch.state);
                         if (detectedExistingMatch.city) setCity(detectedExistingMatch.city);
