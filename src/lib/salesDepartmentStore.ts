@@ -467,8 +467,8 @@ function buildDigitalSignature(folio: string, financialCorrelative: string, time
 }
 
 /**
- * Inicializa en cero (0) los contadores de pre-registro y finanzas una única vez
- * para arrancar la operación comercial limpia desde 0.
+ * Asegura la inicialización de la estructura de contadores preservando estrictamente
+ * cualquier registro, folio o comprobante histórico ya existente (Directiva No Destructiva).
  */
 export function ensureSalesAndFinanceZeroInitialized(): SalesCountersState {
   if (typeof window === "undefined") {
@@ -481,27 +481,45 @@ export function ensureSalesAndFinanceZeroInitialized(): SalesCountersState {
     };
   }
 
-  const alreadyInitialized = localStorage.getItem(STORAGE_KEYS.ZERO_INIT_FLAG);
-  if (!alreadyInitialized) {
-    const initialCounters: SalesCountersState = {
-      preRegCounter: 0,
-      foundersCounter: 0,
-      exoneratedCounter: 0,
-      invoiceCounter: 0,
-      initializedAt: new Date().toISOString()
-    };
-    localStorage.setItem(STORAGE_KEYS.COUNTERS, JSON.stringify(initialCounters));
-    localStorage.setItem(STORAGE_KEYS.RECEIPTS, JSON.stringify([]));
-    localStorage.setItem(STORAGE_KEYS.FINANCE_PAYMENTS, JSON.stringify([]));
-    localStorage.setItem(STORAGE_KEYS.FINANCE_EXPENSES, JSON.stringify([]));
-    localStorage.setItem(STORAGE_KEYS.ZERO_INIT_FLAG, "true");
-    return initialCounters;
-  }
-
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.COUNTERS);
-    if (raw) {
-      return JSON.parse(raw);
+    const rawCounters = localStorage.getItem(STORAGE_KEYS.COUNTERS);
+    const rawReceipts = localStorage.getItem(STORAGE_KEYS.RECEIPTS);
+    const existingReceipts: SalesPreRegistrationReceipt[] = rawReceipts ? JSON.parse(rawReceipts) : [];
+
+    if (rawCounters) {
+      const parsed: SalesCountersState = JSON.parse(rawCounters);
+      // Asegurar que los contadores nunca sean menores a los comprobantes históricos reales
+      const safeCounters: SalesCountersState = {
+        preRegCounter: Math.max(parsed.preRegCounter || 0, existingReceipts.length),
+        foundersCounter: Math.max(
+          parsed.foundersCounter || 0,
+          existingReceipts.filter((r) => r.modality === "fundadores_50" && r.founderSlotNumber !== null).length
+        ),
+        exoneratedCounter: Math.max(
+          parsed.exoneratedCounter || 0,
+          existingReceipts.filter((r) => r.financialStatus === "exonerado").length
+        ),
+        invoiceCounter: Math.max(
+          parsed.invoiceCounter || 0,
+          existingReceipts.filter((r) => r.invoiceNumber !== null).length
+        ),
+        initializedAt: parsed.initializedAt || new Date().toISOString()
+      };
+      localStorage.setItem(STORAGE_KEYS.ZERO_INIT_FLAG, "true");
+      return safeCounters;
+    }
+
+    if (existingReceipts.length > 0) {
+      const derivedCounters: SalesCountersState = {
+        preRegCounter: existingReceipts.length,
+        foundersCounter: existingReceipts.filter((r) => r.modality === "fundadores_50" && r.founderSlotNumber !== null).length,
+        exoneratedCounter: existingReceipts.filter((r) => r.financialStatus === "exonerado").length,
+        invoiceCounter: existingReceipts.filter((r) => r.invoiceNumber !== null).length,
+        initializedAt: new Date().toISOString()
+      };
+      localStorage.setItem(STORAGE_KEYS.COUNTERS, JSON.stringify(derivedCounters));
+      localStorage.setItem(STORAGE_KEYS.ZERO_INIT_FLAG, "true");
+      return derivedCounters;
     }
   } catch {}
 
@@ -513,48 +531,24 @@ export function ensureSalesAndFinanceZeroInitialized(): SalesCountersState {
     initializedAt: new Date().toISOString()
   };
   localStorage.setItem(STORAGE_KEYS.COUNTERS, JSON.stringify(fallback));
+  if (!localStorage.getItem(STORAGE_KEYS.RECEIPTS)) {
+    localStorage.setItem(STORAGE_KEYS.RECEIPTS, JSON.stringify([]));
+  }
+  localStorage.setItem(STORAGE_KEYS.ZERO_INIT_FLAG, "true");
   return fallback;
 }
 
 /**
- * Permite reiniciar manualmente en cero (0) los contadores y asientos de pre-registro/finanzas
+ * Función protegida bajo la Directiva Arquitectónica No Destructiva:
+ * En lugar de borrar registros históricos, sincroniza y recalcula los contadores desde Supabase + almacenamiento local
+ * preservando el 100% de los folios, comprobantes, pagos y auditorías existentes.
  */
 export async function resetAllSalesAndFinanceCountersToZero(): Promise<SalesCountersState> {
-  const zeroState: SalesCountersState = {
-    preRegCounter: 0,
-    foundersCounter: 0,
-    exoneratedCounter: 0,
-    invoiceCounter: 0,
-    initializedAt: new Date().toISOString()
-  };
-
-  if (typeof window !== "undefined") {
-    localStorage.setItem(STORAGE_KEYS.COUNTERS, JSON.stringify(zeroState));
-    localStorage.setItem(STORAGE_KEYS.RECEIPTS, JSON.stringify([]));
-    localStorage.setItem(STORAGE_KEYS.FINANCE_PAYMENTS, JSON.stringify([]));
-    localStorage.setItem(STORAGE_KEYS.FINANCE_EXPENSES, JSON.stringify([]));
-    localStorage.setItem(STORAGE_KEYS.ZERO_INIT_FLAG, "true");
-  }
-
-  try {
-    await supabase.from("membership_payments").delete().neq("id", -999999);
-    await supabase.from("expenses").delete().neq("id", -999999);
-    await supabase.from("site_settings").upsert(
-      {
-        setting_key: "hdv_sales_v13_state",
-        setting_value: JSON.stringify({ counters: zeroState, receipts: [] })
-      },
-      { onConflict: "setting_key" }
-    );
-  } catch (err) {
-    console.warn("Aviso sincronizando reinicio en Supabase:", err);
-  }
-
+  const synced = await syncSalesStateFromSupabase();
   if (typeof window !== "undefined") {
     window.dispatchEvent(new Event("hdv_sales_v13_updated"));
   }
-
-  return zeroState;
+  return synced.counters;
 }
 
 export function getSalesCounters(): SalesCountersState {

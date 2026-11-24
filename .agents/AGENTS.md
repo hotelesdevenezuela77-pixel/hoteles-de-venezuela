@@ -71,4 +71,23 @@ Cualquier cambio en el diseño, la interfaz (UI) o la jerarquía visual **NUNCA 
 4. **Protocolo ante Rediseños:**
    - Antes de modificar componentes visuales principales, verificar siempre que los enlaces internos (hacia las más de 300 URLs del directorio) y los metadatos permanezcan estables para preservar la puntuación máxima en SEO técnico.
 
+---
+
+## 7. Directiva Arquitectónica y Estratégica Obligatoria (No Destructiva)
+Toda modificación o nueva directriz que se aplique sobre el sistema debe respetar estas reglas como principio base de ingeniería y estrategia comercial:
+
+1. **Preservación Estricta de Datos, Historial y Estructura Existente (Regla Anti-Borrado):**
+   - **Nunca borrar, limpiar, truncar ni reiniciar** registros históricos de pre-registros, folios (`HDV-PR-...`, `HDV-EXO-...`, `HDV-FAC-...`), cupos de Alianza 50 Fundadores, auditorías de IP/consentimiento ni fichas consolidadas existentes en Supabase o almacenamiento persistente.
+   - No reemplazar ni eliminar funcionalidades, rutas, módulos ni campos ya operativos al aplicar mejoras visuales o de catálogo; trabajar siempre de forma **aditiva, retrocompatible y mediante `upsert` / `merge` seguro**.
+   - Cualquier cambio de esquema o estructura debe ser compatible con los datos ya guardados y conservar el historial íntegro.
+
+2. **Estrategia Comercial en `/pre-registro` (Puerta de Entrada Ágil, Sin Fricción):**
+   - Mantener `/pre-registro` enfocado en la conversión y el cierre rápido en 1 sola hoja: datos esenciales del establecimiento, categoría (lista desplegable unificada), ubicación/destino, captura de coordenadas GPS, foto representativa/frontal, contacto directo, aceptación legal y emisión inmediata de su credencial/comprobante con QR.
+   - Evitar convertir el pre-registro inicial en un cuestionario o wizard pesado con cientos de etiquetas o configuraciones profundas que frenen el cierre comercial.
+   - Conservar la riqueza de categorías, etiquetas y configuración avanzada (Documento 77 V15) para el catálogo integral, la ficha ampliada y la etapa posterior de inducción/atención al cliente según las necesidades de cada establecimiento.
+
+3. **Criterio de Ejecución:**
+   - Antes de editar archivos o proponer cambios, verificar el estado actual del código y los datos persistidos para no romper nada ya validado, compilar sin errores (`npx tsc --noEmit`) y hacer `commit` + `git push origin main` cuando esté verificado.
+
+
 
