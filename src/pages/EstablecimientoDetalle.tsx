@@ -118,7 +118,9 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
   const [areaPhotos, setAreaPhotos] = useState<Record<string, string[]>>({});
   const [selectedRoomImageIndex, setSelectedRoomImageIndex] = useState<Record<number, number>>({});
   const [selectedGalleryCategory, setSelectedGalleryCategory] = useState<string>("todas");
-  const [activeLightbox, setActiveLightbox] = useState<{ url: string; title: string; category?: string } | null>(null);
+  const [showAllMainThumbnails, setShowAllMainThumbnails] = useState<boolean>(false);
+  const [showAllAreaPhotos, setShowAllAreaPhotos] = useState<boolean>(false);
+  const [activeLightbox, setActiveLightbox] = useState<{ url: string; title: string; category?: string; index?: number } | null>(null);
   const [preselectedCreatorService, setPreselectedCreatorService] = useState<string>("cobertura-4k-reels");
 
   // Estado para la Ficha Técnica Detallada Inmersiva (Habitación o Área Gastronómica)
@@ -631,7 +633,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
             || dbData.image
             || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80";
 
-          let allImages: string[] = dbData.establishment_images?.map((img: any) => img.image_url) || [];
+          let allImages: string[] = (dbData.establishment_images?.map((img: any) => img?.image_url) || []).filter(Boolean);
           if (tenantBranding?.banner_url && !allImages.includes(tenantBranding.banner_url)) {
             allImages.unshift(tenantBranding.banner_url);
           }
@@ -641,6 +643,8 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
           if (allImages.length === 0 && primaryImg) {
             allImages.push(primaryImg);
           }
+          // Deduplicar URLs de imágenes manteniendo el orden curado
+          allImages = Array.from(new Set(allImages.map((u) => String(u).trim()).filter(Boolean)));
 
           const mapped: EstablishmentDetail = {
             id: dbData.id,
@@ -722,30 +726,57 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
 
       let combined = [...dbRooms, ...localRooms];
 
-      // Filter active rooms
-      const activeRooms = combined.filter((r: any) => r.is_active !== false);
-      setRooms(activeRooms);
+      // Filter active rooms and deduplicate by normalized room name/number (avoiding historical duplicate rows)
+      const activeRoomsRaw = combined.filter((r: any) => r && r.is_active !== false);
+      const uniqueRoomsMap = new Map<string, any>();
+      for (const rm of activeRoomsRaw) {
+        const normRoomKey = String(rm.name || rm.room_number || rm.id || "")
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase()
+          .replace(/\s+/g, " ")
+          .trim();
+        if (!normRoomKey) continue;
+        // Conservar el registro más completo o reciente sin duplicar la unidad
+        uniqueRoomsMap.set(normRoomKey, { ...(uniqueRoomsMap.get(normRoomKey) || {}), ...rm });
+      }
+      const deduplicatedRooms = Array.from(uniqueRoomsMap.values()).slice(0, 8);
+      setRooms(deduplicatedRooms);
 
-      // Load Room Photos
+      // Load Room Photos (deduplicated and capped at 8 curated photos per room)
       const savedRoomPhotos = localStorage.getItem("hdv_room_photos");
       let roomPhotosMap: Record<number, string[]> = {};
       if (savedRoomPhotos) {
-        try { roomPhotosMap = JSON.parse(savedRoomPhotos); } catch (e) { }
+        try {
+          const rawMap = JSON.parse(savedRoomPhotos);
+          if (rawMap && typeof rawMap === "object") {
+            Object.keys(rawMap).forEach((k) => {
+              const arr = Array.isArray(rawMap[k]) ? rawMap[k] : [];
+              roomPhotosMap[Number(k)] = Array.from(new Set(arr.map((u: any) => String(u).trim()).filter(Boolean))).slice(0, 8);
+            });
+          }
+        } catch (e) { }
       }
       setRoomPhotos(roomPhotosMap);
 
-      // Load Area Photos
+      // Load Area Photos (ONLY if explicitly matched to this establishment ID or slug — never fallback to another hotel's photos)
       const savedAreaPhotos = localStorage.getItem("hdv_area_photos");
       let areaPhotosMap: Record<string, string[]> = {};
       if (savedAreaPhotos) {
         try {
           const parsed = JSON.parse(savedAreaPhotos);
-          const matched = parsed[establishment.id] ||
+          const matched =
+            parsed[establishment.id] ||
             parsed[String(establishment.id)] ||
-            parsed[establishment.slug] ||
-            Object.values(parsed)[0];
-          if (matched) {
-            areaPhotosMap = matched;
+            parsed[establishment.slug];
+          if (matched && typeof matched === "object") {
+            Object.keys(matched).forEach((catKey) => {
+              const arr = Array.isArray(matched[catKey]) ? matched[catKey] : [];
+              const uniqueUrls = Array.from(new Set(arr.map((u: any) => String(u).trim()).filter(Boolean))).slice(0, 8);
+              if (uniqueUrls.length > 0) {
+                areaPhotosMap[catKey] = uniqueUrls;
+              }
+            });
           }
         } catch (e) { }
       }
@@ -1206,84 +1237,137 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
             </div>
           </div>
 
-          {/* Lado Derecho (50% ancho): Selector de Cuadritos de Fotos en Miniatura */}
+          {/* Lado Derecho (50% ancho): Cuadrícula Estándar Limpia de 8 Fotos Curadas (4x2 aspect-[4/3]) */}
           <div className="lg:col-span-6">
-            <div className="bg-white rounded-3xl border border-slate-200/80 p-5 sm:p-6 shadow-sm h-full flex flex-col justify-between space-y-4">
-              <div className="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
-                <div className="flex items-center gap-3 text-left">
-                  <div className="w-9 h-9 rounded-xl bg-[#00C8D4] flex items-center justify-center text-white shrink-0 shadow-xs">
-                    <Camera className="w-4 h-4 text-white" />
+            {(() => {
+              const STANDARD_GALLERY_LIMIT = 8;
+              const totalPhotos = establishment.images.length;
+              const visibleThumbnails = showAllMainThumbnails
+                ? establishment.images
+                : establishment.images.slice(0, STANDARD_GALLERY_LIMIT);
+              const hiddenPhotosCount = Math.max(0, totalPhotos - STANDARD_GALLERY_LIMIT);
+
+              return (
+                <div className="bg-white rounded-3xl border border-slate-200/80 p-5 sm:p-6 shadow-sm h-full flex flex-col justify-between space-y-4">
+                  <div className="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                    <div className="flex items-center gap-3 text-left">
+                      <div className="w-9 h-9 rounded-xl bg-[#00C8D4] flex items-center justify-center text-white shrink-0 shadow-xs">
+                        <Camera className="w-4 h-4 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-base sm:text-lg font-serif font-bold text-slate-900 leading-tight">
+                          Galería Fotográfica Oficial
+                        </h3>
+                        <p className="text-[11px] text-slate-500 font-medium">
+                          Selección curada de hasta { Math.min(totalPhotos, STANDARD_GALLERY_LIMIT) } fotografías principales
+                        </p>
+                      </div>
+                    </div>
+                    <span className="px-3 py-1 rounded-full bg-[#00C8D4]/10 text-[#00C8D4] border border-[#00C8D4]/20 text-[10px] font-black uppercase tracking-wider shrink-0">
+                      {Math.min(totalPhotos, STANDARD_GALLERY_LIMIT)} / {totalPhotos} {totalPhotos === 1 ? "Foto" : "Fotos"}
+                    </span>
                   </div>
-                  <div>
-                    <h3 className="text-base sm:text-lg font-serif font-bold text-slate-900 leading-tight">
-                      Galería Fotográfica
-                    </h3>
-                    <p className="text-[11px] text-slate-500 font-medium">
-                      Haz clic en cualquier miniatura para ver la imagen completa
-                    </p>
+
+                  {/* Cuadrícula limpia y espaciada: 4 columnas x 2 filas (8 fotos estándar) con aspect-[4/3] y gap-3 */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {visibleThumbnails.map((img, i) => {
+                      const isSelected = i === currentImageIndex;
+                      const isLastCuratedSlotWithMore =
+                        !showAllMainThumbnails &&
+                        i === STANDARD_GALLERY_LIMIT - 1 &&
+                        hiddenPhotosCount > 0;
+
+                      return (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => {
+                            setCurrentImageIndex(i);
+                            if (isLastCuratedSlotWithMore) {
+                              setActiveLightbox({
+                                url: img,
+                                title: `${establishment.name} — Foto ${i + 1} de ${totalPhotos}`,
+                                category: "Galería Oficial Completa",
+                                index: i
+                              });
+                            }
+                          }}
+                          className={`relative aspect-[4/3] rounded-2xl overflow-hidden border-2 cursor-pointer transition-all group ${
+                            isSelected
+                              ? "border-[#FF0096] ring-2 ring-[#FF0096]/25 scale-[0.99] shadow-md"
+                              : "border-slate-200/80 opacity-90 hover:opacity-100 hover:border-[#00C8D4]"
+                          }`}
+                        >
+                          <img
+                            src={img}
+                            alt={`${establishment.name} miniatura ${i + 1}`}
+                            loading="lazy"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+
+                          {isLastCuratedSlotWithMore ? (
+                            <div className="absolute inset-0 bg-[#0e011f]/75 backdrop-blur-[2px] flex flex-col items-center justify-center text-white p-1 transition-colors group-hover:bg-[#0e011f]/85">
+                              <span className="text-sm sm:text-base font-black text-[#00C8D4]">
+                                +{hiddenPhotosCount + 1}
+                              </span>
+                              <span className="text-[9px] font-extrabold uppercase tracking-wider text-white">
+                                Ver todas
+                              </span>
+                            </div>
+                          ) : (
+                            <span
+                              className={`absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded-md text-[9px] font-black ${
+                                isSelected ? "bg-[#FF0096] text-white" : "bg-slate-900/70 text-white"
+                              }`}
+                            >
+                              {i + 1}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Pie de galería con controles limpios para ver en Lightbox o desplegar resto */}
+                  <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] text-slate-500 font-semibold">
+                        Foto activa: <strong className="text-slate-800">#{currentImageIndex + 1}</strong> de {totalPhotos}
+                      </span>
+                      {hiddenPhotosCount > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => setShowAllMainThumbnails((prev) => !prev)}
+                          className="text-[11px] font-black text-[#FF0096] hover:underline cursor-pointer ml-1"
+                        >
+                          {showAllMainThumbnails
+                            ? "Mostrar 8 fotos estándar"
+                            : `Ver las ${totalPhotos} miniaturas`}
+                        </button>
+                      )}
+                    </div>
+
+                    {establishment.images.length > 0 && establishment.images[currentImageIndex] && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setActiveLightbox({
+                            url: establishment.images[currentImageIndex],
+                            title: `${establishment.name} — Foto ${currentImageIndex + 1}`,
+                            category: "Galería Oficial",
+                            index: currentImageIndex
+                          })
+                        }
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-[#00C8D4] text-slate-800 hover:text-white text-xs font-bold transition-colors cursor-pointer"
+                      >
+                        <Maximize2 className="w-3.5 h-3.5" />
+                        <span>Abrir Galería en Pantalla Completa</span>
+                      </button>
+                    )}
                   </div>
                 </div>
-                <span className="px-3 py-1 rounded-full bg-[#00C8D4]/10 text-[#00C8D4] border border-[#00C8D4]/20 text-[10px] font-black uppercase tracking-wider shrink-0">
-                  {establishment.images.length} {establishment.images.length === 1 ? "Foto" : "Fotos"}
-                </span>
-              </div>
-
-              {/* Cuadrícula de miniaturas (cuadritos pequeños interactivos) */}
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 max-h-[250px] sm:max-h-[270px] overflow-y-auto pr-1">
-                {establishment.images.map((img, i) => {
-                  const isSelected = i === currentImageIndex;
-                  return (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => setCurrentImageIndex(i)}
-                      className={`relative aspect-square rounded-2xl overflow-hidden border-2 cursor-pointer transition-all group ${
-                        isSelected
-                          ? "border-[#FF0096] ring-2 ring-[#FF0096]/25 scale-[0.98] shadow-md"
-                          : "border-slate-200/80 opacity-80 hover:opacity-100 hover:border-[#00C8D4]"
-                      }`}
-                    >
-                      <img
-                        src={img}
-                        alt={`${establishment.name} miniatura ${i + 1}`}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <span
-                        className={`absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded-md text-[9px] font-black ${
-                          isSelected ? "bg-[#FF0096] text-white" : "bg-slate-900/65 text-white"
-                        }`}
-                      >
-                        {i + 1}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Pie de galería con botón para abrir visor a pantalla completa */}
-              <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
-                <span className="text-[11px] text-slate-500 font-semibold">
-                  Fotografía seleccionada: <strong className="text-slate-800">#{currentImageIndex + 1}</strong>
-                </span>
-
-                {establishment.images.length > 0 && establishment.images[currentImageIndex] && (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setActiveLightbox({
-                        url: establishment.images[currentImageIndex],
-                        title: `${establishment.name} — Foto ${currentImageIndex + 1}`,
-                        category: "Galería Oficial",
-                      })
-                    }
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-[#00C8D4] text-slate-800 hover:text-white text-xs font-bold transition-colors cursor-pointer"
-                  >
-                    <Maximize2 className="w-3.5 h-3.5" />
-                    <span>Ver Foto en Pantalla Completa</span>
-                  </button>
-                )}
-              </div>
-            </div>
+              );
+            })()}
           </div>
         </div>
       </div>
@@ -1730,16 +1814,19 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                             </div>
 
                             {photos.length > 1 && (
-                              <div className="flex gap-2 overflow-x-auto pb-1">
-                                {photos.map((ph: string, pIdx: number) => (
+                              <div className="grid grid-cols-4 gap-2 pt-1">
+                                {photos.slice(0, 8).map((ph: string, pIdx: number) => (
                                   <button
                                     key={pIdx}
                                     type="button"
                                     onClick={() => setSelectedRoomImageIndex(prev => ({ ...prev, [room.id]: pIdx }))}
-                                    className={`w-14 h-14 rounded-xl overflow-hidden border-2 shrink-0 cursor-pointer transition-all ${pIdx === activeImgIdx ? "border-[#FF0096] scale-95" : "border-transparent opacity-60 hover:opacity-100"
-                                      }`}
+                                    className={`aspect-[4/3] rounded-xl overflow-hidden border-2 cursor-pointer transition-all ${
+                                      pIdx === activeImgIdx
+                                        ? "border-[#FF0096] ring-1 ring-[#FF0096]/30 shadow-xs"
+                                        : "border-slate-200/80 opacity-75 hover:opacity-100 hover:border-[#00C8D4]"
+                                    }`}
                                   >
-                                    <img src={ph} alt="" className="w-full h-full object-cover" />
+                                    <img src={ph} alt="" loading="lazy" className="w-full h-full object-cover" />
                                   </button>
                                 ))}
                               </div>
@@ -1861,9 +1948,15 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
 
               if (allCategorizedPhotos.length === 0 || isCreatorCategory) return null;
 
-              const displayPhotos = selectedGalleryCategory === "todas"
+              const allDisplayPhotos = selectedGalleryCategory === "todas"
                 ? allCategorizedPhotos
                 : (areaPhotos[selectedGalleryCategory] || []).map(url => ({ url, category: selectedGalleryCategory }));
+
+              const AREA_GALLERY_LIMIT = 8;
+              const displayPhotos = showAllAreaPhotos
+                ? allDisplayPhotos
+                : allDisplayPhotos.slice(0, AREA_GALLERY_LIMIT);
+              const hiddenAreaPhotosCount = Math.max(0, allDisplayPhotos.length - AREA_GALLERY_LIMIT);
 
               return (
                 <div className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm space-y-6 text-left">
@@ -1880,15 +1973,18 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                       </p>
                     </div>
                     <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 bg-purple-50 text-[#9B00CC] rounded-full border border-purple-200 shrink-0 self-start sm:self-center">
-                      {displayPhotos.length} {displayPhotos.length === 1 ? "Fotografía" : "Fotografías"}
+                      {displayPhotos.length} de {allDisplayPhotos.length} {allDisplayPhotos.length === 1 ? "Fotografía" : "Fotografías"}
                     </span>
                   </div>
 
                   {/* Category Pills Filters */}
-                  <div className="flex flex-wrap gap-2 pb-2 overflow-x-auto max-w-full">
+                  <div className="flex flex-wrap gap-2 pb-1">
                     <button
                       type="button"
-                      onClick={() => setSelectedGalleryCategory("todas")}
+                      onClick={() => {
+                        setSelectedGalleryCategory("todas");
+                        setShowAllAreaPhotos(false);
+                      }}
                       className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer border ${selectedGalleryCategory === "todas"
                           ? "bg-[#0e011f] text-white border-[#0e011f] shadow-xs"
                           : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
@@ -1910,7 +2006,10 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                         <button
                           key={catKey}
                           type="button"
-                          onClick={() => setSelectedGalleryCategory(catKey)}
+                          onClick={() => {
+                            setSelectedGalleryCategory(catKey);
+                            setShowAllAreaPhotos(false);
+                          }}
                           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer border ${isSel
                               ? "bg-[#0e011f] text-white border-[#0e011f] shadow-xs"
                               : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
@@ -1925,8 +2024,8 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                     })}
                   </div>
 
-                  {/* Photos Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {/* Photos Grid: 4 columnas proporcionadas con aspect-[4/3] y gap-3 (Máximo 8 por defecto) */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                     {displayPhotos.map((item, idx) => {
                       const catInfo = AREA_CATEGORY_INFO[item.category] || { label: item.category.toUpperCase(), icon: "" };
 
@@ -1934,12 +2033,13 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                         <div
                           key={idx}
                           onClick={() => setActiveLightbox({ url: item.url, title: `${establishment.name} — ${catInfo.label}`, category: catInfo.label })}
-                          className="relative aspect-4/3 rounded-2xl overflow-hidden bg-slate-100 group shadow-xs cursor-pointer border border-slate-200/60"
+                          className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-slate-100 group shadow-xs cursor-pointer border border-slate-200/70"
                         >
                           <img
                             src={item.url}
                             alt={catInfo.label}
-                            className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                            loading="lazy"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
                             <span className="self-end p-1.5 bg-black/60 backdrop-blur-md rounded-lg text-white">
@@ -1953,6 +2053,20 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                       );
                     })}
                   </div>
+
+                  {hiddenAreaPhotosCount > 0 && (
+                    <div className="pt-2 flex justify-center">
+                      <button
+                        type="button"
+                        onClick={() => setShowAllAreaPhotos((prev) => !prev)}
+                        className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-[#0e011f] text-slate-800 hover:text-white text-xs font-extrabold transition-colors cursor-pointer"
+                      >
+                        {showAllAreaPhotos
+                          ? "Mostrar selección estándar (8 fotos)"
+                          : `Ver+${hiddenAreaPhotosCount} fotografías adicionales de áreas`}
+                      </button>
+                    </div>
+                  )}
                 </div>
               );
             })()}
@@ -2722,7 +2836,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
           </div>
         )}
 
-        {/* Fullscreen Lightbox Modal */}
+        {/* Fullscreen Lightbox Modal con Navegación de Galería Completa */}
         {activeLightbox && (
           <div
             className="fixed inset-0 z-[99999] bg-[#0e011f]/95 backdrop-blur-md flex items-center justify-center p-4"
@@ -2741,15 +2855,63 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
             </button>
 
             <div
-              className="max-w-4xl w-full space-y-4 text-center"
+              className="max-w-5xl w-full space-y-4 text-center"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="relative max-h-[75vh] mx-auto rounded-3xl overflow-hidden shadow-2xl border border-white/10">
+              <div className="relative max-h-[72vh] mx-auto rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-slate-950/60 flex items-center justify-center">
+                {establishment.images.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const currIdx = establishment.images.indexOf(activeLightbox.url);
+                      const nextIdx =
+                        currIdx >= 0
+                          ? (currIdx - 1 + establishment.images.length) % establishment.images.length
+                          : 0;
+                      setCurrentImageIndex(nextIdx);
+                      setActiveLightbox({
+                        ...activeLightbox,
+                        url: establishment.images[nextIdx],
+                        title: `${establishment.name} — Foto ${nextIdx + 1} de ${establishment.images.length}`,
+                        index: nextIdx
+                      });
+                    }}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/20 hover:bg-[#00C8D4] text-white flex items-center justify-center backdrop-blur-md transition-colors cursor-pointer"
+                    title="Anterior"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+                )}
+
                 <img
                   src={activeLightbox.url}
                   alt={activeLightbox.title}
-                  className="w-full h-full max-h-[75vh] object-contain mx-auto"
+                  className="w-full h-full max-h-[72vh] object-contain mx-auto"
                 />
+
+                {establishment.images.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const currIdx = establishment.images.indexOf(activeLightbox.url);
+                      const nextIdx =
+                        currIdx >= 0
+                          ? (currIdx + 1) % establishment.images.length
+                          : 0;
+                      setCurrentImageIndex(nextIdx);
+                      setActiveLightbox({
+                        ...activeLightbox,
+                        url: establishment.images[nextIdx],
+                        title: `${establishment.name} — Foto ${nextIdx + 1} de ${establishment.images.length}`,
+                        index: nextIdx
+                      });
+                    }}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/20 hover:bg-[#00C8D4] text-white flex items-center justify-center backdrop-blur-md transition-colors cursor-pointer"
+                    title="Siguiente"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+                )}
               </div>
 
               <div className="space-y-1">

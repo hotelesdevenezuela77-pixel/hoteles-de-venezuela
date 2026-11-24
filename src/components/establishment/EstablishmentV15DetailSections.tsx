@@ -98,7 +98,7 @@ export function EstablishmentV15DetailSections({
           }))
         : null;
 
-    const baseRooms =
+    const rawBaseRooms =
       rooms && rooms.length > 0
         ? rooms.map((r) => ({
             ...r,
@@ -136,6 +136,20 @@ export function EstablishmentV15DetailSections({
             amenities: "wifi,aire_acondicionado,balcon,cocina_equipada,banio_privado,nevera,caja_fuerte,tv_cable"
           }
         ];
+
+    // Deduplicar unidades por nombre normalizado y limitar a un máximo limpio de 8 filas
+    const uniqueMap = new Map<string, any>();
+    for (const item of rawBaseRooms) {
+      const key = String(item.name || item.id || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .trim();
+      if (!key) continue;
+      uniqueMap.set(key, { ...(uniqueMap.get(key) || {}), ...item });
+    }
+    const baseRooms = Array.from(uniqueMap.values()).slice(0, 8);
 
     if (unitFilter === "habitaciones") {
       return baseRooms.filter(r => !String(r.name || "").toLowerCase().includes("suite"));
