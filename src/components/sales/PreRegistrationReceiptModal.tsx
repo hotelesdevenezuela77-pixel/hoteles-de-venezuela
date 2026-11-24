@@ -26,6 +26,37 @@ interface PreRegistrationReceiptModalProps {
   onClose: () => void;
 }
 
+const DEFAULT_ESTABLISHMENT_PHOTO =
+  "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop";
+
+/**
+ * Resuelve la fotografía destacada del establecimiento afiliado:
+ * 1. `receipt.primaryImage`
+ * 2. Galería guardada en `hdv_prereg_<slug>` o `hdv_mock_establishments`
+ * 3. Fallback fotográfico limpio
+ */
+export function resolveReceiptEstablishmentImage(receipt: SalesPreRegistrationReceipt): string {
+  if (receipt.primaryImage && receipt.primaryImage.trim().length > 5) {
+    return receipt.primaryImage.trim();
+  }
+  if (typeof window !== "undefined" && receipt.establishmentSlug) {
+    try {
+      const preregRaw = localStorage.getItem(`hdv_prereg_${receipt.establishmentSlug}`);
+      if (preregRaw) {
+        const parsed = JSON.parse(preregRaw);
+        if (parsed?.primary_image) return String(parsed.primary_image);
+        if (Array.isArray(parsed?.gallery_images) && parsed.gallery_images[0]) {
+          return String(parsed.gallery_images[0]);
+        }
+      }
+      const localEsts = JSON.parse(localStorage.getItem("hdv_mock_establishments") || "[]");
+      const found = localEsts.find((e: any) => e?.slug === receipt.establishmentSlug);
+      if (found?.primary_image) return String(found.primary_image);
+    } catch {}
+  }
+  return DEFAULT_ESTABLISHMENT_PHOTO;
+}
+
 /**
  * Construye la URL de verificación pública absoluta para el Código QR
  */
@@ -38,169 +69,313 @@ export function getPublicVerificationUrl(receipt: SalesPreRegistrationReceipt): 
 }
 
 /**
- * Imprime o exporta a PDF el Comprobante Oficial de Pre-Registro HDV en 1 sola hoja
+ * Imprime o exporta a PDF el Comprobante Oficial de Pre-Registro HDV en 1 sola hoja (Diseño Credencial VIP Ejecutiva)
  */
 export function printOfficialPreRegistrationReceipt(receipt: SalesPreRegistrationReceipt) {
   const verificationUrl = getPublicVerificationUrl(receipt);
   const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&color=0e011f&bgcolor=ffffff&data=${encodeURIComponent(
     verificationUrl
   )}`;
+  const estImageUrl = resolveReceiptEstablishmentImage(receipt);
 
   const win = window.open("", "_blank");
   if (!win) return;
 
+  const founderOrTierBadge = receipt.founderSlotNumber
+    ? `ALIANZA 50 FUNDADORES • CUPO OFICIAL #${receipt.founderSlotNumber} / 50`
+    : receipt.modality === "exclusivo_prestigio"
+    ? "SELECCIÓN EXCLUSIVA • COLECCIÓN PRESTIGIO 2026"
+    : `AFILIACIÓN COMERCIAL OFICIAL • ${receipt.planName.toUpperCase()}`;
+
+  const consolidationBadge = receipt.wasConsolidatedExisting
+    ? "✓ Ficha Oficial Consolidada (Sin Duplicados)"
+    : "✓ Ficha Oficial Verificada HDV";
+
   const amountHtml =
     receipt.financialStatus === "exonerado"
-      ? `<div class="amount-pill exonerated">$0.00 USD — EXONERADO (100% BECADO / LANZAMIENTO)</div>`
+      ? `<div class="amount-pill exonerated">MONTO: $0.00 USD — MEMBRESÍA 100% EXONERADA (LANZAMIENTO)</div>`
       : receipt.showAmountOnReceipt
-      ? `<div class="amount-pill commercial">$${receipt.monthlyAmountUsd.toFixed(
+      ? `<div class="amount-pill commercial">PLAN: ${receipt.planName.toUpperCase()} • $${receipt.monthlyAmountUsd.toFixed(
           2
-        )} USD / mes (Bs. ${receipt.monthlyAmountVes.toLocaleString("es-VE", {
+        )} USD / MES (Bs. ${receipt.monthlyAmountVes.toLocaleString("es-VE", {
           minimumFractionDigits: 2
-        })} a tasa BCV)</div>`
-      : `<div class="amount-pill standard">${receipt.planName} — Asignación Oficial</div>`;
+        })} BCV)</div>`
+      : `<div class="amount-pill standard">MEMBRESÍA ASIGNADA: ${receipt.planName.toUpperCase()}</div>`;
 
   win.document.write(`<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>Comprobante Oficial ${receipt.folio} - Hoteles de Venezuela</title>
+  <title>Credencial Oficial ${receipt.folio} - ${receipt.establishmentTitle}</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap');
-    * { box-sizing: border-box; }
+    @page {
+      size: A4 portrait;
+      margin: 10mm;
+    }
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
     body {
       font-family: 'Montserrat', sans-serif;
       color: #0f172a;
       background: #ffffff;
       margin: 0;
-      padding: 24px;
+      padding: 12px;
     }
     .sheet {
-      max-width: 820px;
+      max-width: 790px;
       margin: 0 auto;
       border: 2px solid #0e011f;
-      border-radius: 20px;
+      border-radius: 18px;
       overflow: hidden;
+      background: #ffffff;
+      page-break-inside: avoid;
     }
     .header {
       background: linear-gradient(135deg, #0e011f 0%, #1a0533 100%);
       color: #ffffff;
-      padding: 24px 28px;
+      padding: 18px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 16px;
       border-bottom: 4px solid #00C8D4;
+    }
+    .vip-kicker {
+      display: inline-block;
+      background: rgba(0, 200, 212, 0.18);
+      border: 1px solid rgba(0, 200, 212, 0.55);
+      color: #00C8D4;
+      font-size: 9px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin-bottom: 6px;
     }
     .brand-title {
       font-family: 'Playfair Display', serif;
-      font-size: 24px;
+      font-size: 21px;
       font-weight: 800;
       margin: 0;
+      color: #ffffff;
+      line-height: 1.15;
     }
     .brand-sub {
       font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      color: #00C8D4;
-      font-weight: 800;
-      margin-bottom: 4px;
+      color: #cbd5e1;
+      font-weight: 600;
+      margin-top: 3px;
       display: block;
     }
     .folio-box {
       text-align: right;
+      flex-shrink: 0;
     }
     .folio-badge {
       display: inline-block;
-      background: #FF0096;
+      background: linear-gradient(135deg, #FF0096 0%, #9B00CC 100%);
       color: #ffffff;
       font-weight: 900;
-      font-size: 14px;
+      font-size: 13px;
       padding: 6px 14px;
       border-radius: 10px;
       letter-spacing: 0.05em;
+      border: 1px solid rgba(255,255,255,0.25);
     }
     .fin-badge {
       display: block;
-      font-size: 11px;
+      font-size: 10px;
       color: #00C8D4;
       font-weight: 800;
-      margin-top: 6px;
+      margin-top: 5px;
+      letter-spacing: 0.04em;
     }
     .content {
-      padding: 24px 28px;
+      padding: 18px 24px;
     }
-    .grid-2 {
+    /* Bloque VIP con Fotografía Prominente del Establecimiento */
+    .hero-credential {
+      display: grid;
+      grid-template-columns: 230px 1fr;
+      gap: 16px;
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 16px;
+      padding: 12px;
+      margin-bottom: 14px;
+      align-items: stretch;
+    }
+    .photo-frame {
+      position: relative;
+      width: 100%;
+      height: 158px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #0e011f;
+      border: 2px solid #00C8D4;
+    }
+    .photo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .photo-seal {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: #FF0096;
+      color: #ffffff;
+      font-size: 8px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 3px 8px;
+      border-radius: 999px;
+    }
+    .photo-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(180deg, transparent 0%, rgba(14,1,31,0.88) 100%);
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 12px 8px 6px 8px;
+    }
+    .hero-details {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 2px 4px;
+    }
+    .est-category-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .cat-pill {
+      display: inline-block;
+      background: #0e011f;
+      color: #00C8D4;
+      font-size: 9px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 3px 9px;
+      border-radius: 6px;
+    }
+    .consolidation-pill {
+      display: inline-block;
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+    .est-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 5px 0 3px 0;
+      line-height: 1.15;
+    }
+    .est-meta-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 18px;
-    }
-    .card {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 14px;
-      padding: 14px 16px;
+      gap: 8px;
+      margin-top: 6px;
+      padding-top: 8px;
+      border-top: 1px solid #e2e8f0;
     }
     .label {
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: #64748b;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
       display: block;
     }
     .val {
-      font-size: 13px;
+      font-size: 11.5px;
       font-weight: 800;
       color: #0f172a;
     }
     .modality-banner {
       background: linear-gradient(135deg, #0e011f 0%, #1a0533 100%);
       color: #ffffff;
-      border-radius: 16px;
-      padding: 18px 20px;
-      margin-bottom: 18px;
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin-bottom: 14px;
+      border: 1px solid rgba(155, 0, 204, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
     }
     .modality-title {
       font-family: 'Playfair Display', serif;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
       color: #00C8D4;
-      margin: 0 0 6px 0;
+      margin: 2px 0 3px 0;
     }
     .amount-pill {
       display: inline-block;
-      margin-top: 8px;
-      padding: 6px 12px;
+      margin-top: 6px;
+      padding: 5px 11px;
       border-radius: 8px;
-      font-size: 12px;
-      font-weight: 800;
+      font-size: 10.5px;
+      font-weight: 900;
+      letter-spacing: 0.03em;
     }
     .exonerated { background: #00C8D4; color: #0e011f; }
     .commercial { background: #FF0096; color: #ffffff; }
     .standard { background: #9B00CC; color: #ffffff; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 10px 14px;
+    }
     .qr-section {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 20px;
-      border-top: 2px dashed #cbd5e1;
-      padding-top: 18px;
-      margin-top: 12px;
+      gap: 16px;
+      border-top: 1.5px dashed #cbd5e1;
+      padding-top: 12px;
     }
     .qr-box {
       text-align: center;
       border: 2px solid #0e011f;
-      border-radius: 14px;
-      padding: 10px;
+      border-radius: 12px;
+      padding: 8px;
       background: #ffffff;
-      shrink: 0;
+      flex-shrink: 0;
     }
     .legal-text {
-      font-size: 10px;
+      font-size: 9.2px;
       color: #475569;
-      line-height: 1.5;
+      line-height: 1.42;
+      margin: 0;
     }
     @media print {
       body { padding: 0; }
@@ -212,73 +387,119 @@ export function printOfficialPreRegistrationReceipt(receipt: SalesPreRegistratio
   <div class="sheet">
     <div class="header">
       <div>
-        <span class="brand-sub">Departamento Oficial de Ventas • Hoteles de Venezuela LLC</span>
-        <h1 class="brand-title">Comprobante Oficial de Pre-Registro</h1>
+        <span class="vip-kicker">★ ${founderOrTierBadge}</span>
+        <h1 class="brand-title">Credencial Oficial de Afiliación & Pre-Registro</h1>
+        <span class="brand-sub">Departamento Oficial de Ventas • Hoteles de Venezuela LLC (hotelesdevenezuela.com)</span>
       </div>
       <div class="folio-box">
         <span class="folio-badge">${receipt.folio}</span>
-        <span class="fin-badge">Asiento Financiero: ${receipt.financialCorrelative}</span>
+        <span class="fin-badge">Correlativo Finanzas: ${receipt.financialCorrelative}</span>
       </div>
     </div>
 
     <div class="content">
-      <div class="grid-2">
-        <div class="card">
-          <span class="label">Establecimiento Afiliado</span>
-          <div class="val">${receipt.establishmentTitle}</div>
-          <div style="font-size: 11px; color: #475569; margin-top: 3px;">${receipt.categoryName} • ${receipt.wasConsolidatedExisting ? "Ficha Existente Consolidada (Sin Duplicados)" : "Ficha Oficial Activa"}</div>
+      <!-- Tarjeta Principal VIP con Fotografía Prominente del Establecimiento -->
+      <div class="hero-credential">
+        <div class="photo-frame">
+          <img
+            src="${estImageUrl}"
+            alt="${receipt.establishmentTitle}"
+            onerror="this.onerror=null;this.src='${DEFAULT_ESTABLISHMENT_PHOTO}';"
+          />
+          <span class="photo-seal">SELLO HDV 2026</span>
+          <div class="photo-caption">${receipt.destinationName} • Venezuela</div>
         </div>
-        <div class="card">
-          <span class="label">Destino y Contacto Oficial</span>
-          <div class="val">${receipt.destinationName} (${receipt.city}, ${receipt.state})</div>
-          <div style="font-size: 11px; color: #475569; margin-top: 3px;">WhatsApp: ${receipt.whatsappNumber}</div>
+
+        <div class="hero-details">
+          <div>
+            <div class="est-category-row">
+              <span class="cat-pill">${receipt.categoryName}</span>
+              <span class="consolidation-pill">${consolidationBadge}</span>
+            </div>
+            <h2 class="est-title">${receipt.establishmentTitle}</h2>
+            <div style="font-size: 10.5px; color: #475569; font-weight: 600;">
+              URL Oficial en Directorio: <strong>hotelesdevenezuela.com/establecimiento/${receipt.establishmentSlug}</strong>
+            </div>
+          </div>
+
+          <div class="est-meta-grid">
+            <div>
+              <span class="label">Ubicación / Destino Turístico</span>
+              <div class="val">${receipt.destinationName} (${receipt.city}, ${receipt.state})</div>
+            </div>
+            <div>
+              <span class="label">WhatsApp Directo Verificado</span>
+              <div class="val" style="color: #047857;">${receipt.whatsappNumber}</div>
+            </div>
+            <div>
+              <span class="label">Modalidad de Tarifas Públicas</span>
+              <div class="val" style="color: #008f99;">Tarifa directa a consultar (0% Comisión)</div>
+            </div>
+            <div>
+              <span class="label">Folio Único de Afiliación</span>
+              <div class="val">${receipt.folio}</div>
+            </div>
+          </div>
         </div>
       </div>
 
+      <!-- Banner Ejecutivo de Clasificación Comercial y Estatus Financiero -->
       <div class="modality-banner">
-        <span style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: #FF0096; font-weight: 800;">
-          Clasificación Comercial y Estatus Financiero
-        </span>
-        <h2 class="modality-title">${receipt.modalityLabel}</h2>
-        <div style="font-size: 12px; color: #e2e8f0; font-weight: 600;">${receipt.financialStatusLabel}</div>
-        ${amountHtml}
+        <div>
+          <span style="font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: #FF0096; font-weight: 900;">
+            Clasificación Comercial y Sincronización con Módulo de Finanzas
+          </span>
+          <h3 class="modality-title">${receipt.modalityLabel}</h3>
+          <div style="font-size: 11px; color: #e2e8f0; font-weight: 600;">${receipt.financialStatusLabel}</div>
+          ${amountHtml}
+        </div>
+        ${
+          receipt.founderSlotNumber
+            ? `<div style="text-align: center; background: rgba(255,255,255,0.08); border: 1.5px solid #00C8D4; border-radius: 12px; padding: 8px 14px; flex-shrink: 0;">
+                 <span style="display: block; font-size: 8.5px; font-weight: 900; color: #00C8D4; text-transform: uppercase; letter-spacing: 0.1em;">Cupo Fundador</span>
+                 <span style="font-size: 18px; font-weight: 900; color: #ffffff;">#${receipt.founderSlotNumber}<span style="font-size: 11px; color: #94a3b8;">/50</span></span>
+               </div>`
+            : ""
+        }
       </div>
 
+      <!-- Trazabilidad de Origen y Auditoría -->
       <div class="grid-2">
         <div class="card">
-          <span class="label">Registrado Por (Origen)</span>
+          <span class="label">Originador del Registro</span>
           <div class="val">${receipt.registrantName}</div>
         </div>
         <div class="card">
-          <span class="label">Fecha, Hora e IP de Auditoría</span>
+          <span class="label">Fecha, Hora Exacta e IP de Auditoría</span>
           <div class="val">${receipt.createdAtFormatted}</div>
-          <div style="font-size: 10px; color: #64748b; margin-top: 2px;">IP: ${receipt.clientIp}</div>
+          <div style="font-size: 9.5px; color: #64748b; font-weight: 700; margin-top: 2px;">IP Dispositivo: ${receipt.clientIp}</div>
         </div>
       </div>
 
+      <!-- Sección Legal, Firma Digital y Código QR -->
       <div class="qr-section">
         <div style="flex: 1;">
-          <div style="display: inline-block; background: #e6f9fa; color: #008f99; border: 1px solid #00C8D4; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 900; text-transform: uppercase; margin-bottom: 8px;">
+          <div style="display: inline-block; background: #e6f9fa; color: #008f99; border: 1px solid #00C8D4; padding: 3px 10px; border-radius: 6px; font-size: 9.5px; font-weight: 900; text-transform: uppercase; margin-bottom: 6px;">
             ✓ Sello Digital de Validación HDV • ${receipt.digitalSignatureHash}
           </div>
           <p class="legal-text">
             <strong>Cláusula Legal y Derechos de Imagen Aceptados:</strong> "${receipt.termsAcceptedText}"<br/>
             <span>Consentimiento digital registrado el <strong>${receipt.createdAtFormatted}</strong> desde la dirección IP <strong>${receipt.clientIp}</strong> conforme a los Términos y Condiciones oficiales (https://hotelesdevenezuela.com/terminos).</span>
           </p>
-          <p class="legal-text" style="margin-top: 6px;">
-            <strong>URL Pública de Verificación:</strong> ${verificationUrl}
+          <p class="legal-text" style="margin-top: 4px;">
+            <strong>Verificación Pública QR:</strong> ${verificationUrl}
           </p>
         </div>
         <div class="qr-box">
-          <img src="${qrImageUrl}" alt="QR Verificación ${receipt.folio}" width="130" height="130" />
-          <div style="font-size: 9px; font-weight: 800; color: #0e011f; margin-top: 4px;">ESCANEAR PARA VALIDAR</div>
+          <img src="${qrImageUrl}" alt="QR Verificación ${receipt.folio}" width="112" height="112" />
+          <div style="font-size: 8px; font-weight: 900; color: #0e011f; margin-top: 3px; letter-spacing: 0.05em;">VALIDAR AUTENTICIDAD</div>
         </div>
       </div>
     </div>
   </div>
   <script>
     window.onload = function() {
-      setTimeout(function() { window.print(); }, 400);
+      setTimeout(function() { window.print(); }, 450);
     };
   </script>
 </body>
@@ -298,6 +519,7 @@ export function PreRegistrationReceiptModal({
   const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&color=0e011f&bgcolor=ffffff&data=${encodeURIComponent(
     verificationUrl
   )}`;
+  const establishmentPhoto = resolveReceiptEstablishmentImage(receipt);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(verificationUrl);
@@ -306,9 +528,9 @@ export function PreRegistrationReceiptModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0e011f]/80 backdrop-blur-md animate-fade-in overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-[#00C8D4]/40 overflow-hidden my-8">
-        {/* Cabecera Oficial Oscura (#0e011f a #1a0533 - Regla AGENTS.md sin negro puro) */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0e011f]/85 backdrop-blur-md animate-fade-in overflow-y-auto">
+      <div className="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl border-2 border-[#00C8D4]/50 overflow-hidden my-6">
+        {/* Cabecera Ejecutiva de Credencial VIP (#0e011f a #1a0533 - Regla AGENTS.md sin negro puro) */}
         <div className="bg-gradient-to-r from-[#0e011f] via-[#15062c] to-[#1a0533] text-white p-6 sm:p-7 border-b-4 border-[#00C8D4] relative">
           <button
             type="button"
@@ -321,67 +543,139 @@ export function PreRegistrationReceiptModal({
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pr-8">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00C8D4]/20 border border-[#00C8D4]/40 text-[#00C8D4] text-[10px] font-black uppercase tracking-widest mb-2">
-                <Sparkles className="w-3 h-3 text-[#FF0096]" />
-                <span>Departamento de Ventas • Comprobante Oficial</span>
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00C8D4]/20 border border-[#00C8D4]/50 text-[#00C8D4] text-[10px] font-black uppercase tracking-widest">
+                  <Sparkles className="w-3 h-3 text-[#FF0096]" />
+                  <span>Credencial Oficial de Afiliación HDV</span>
+                </span>
+                {receipt.founderSlotNumber && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#FF0096] text-white text-[10px] font-black uppercase tracking-wider shadow">
+                    <Award className="w-3 h-3" />
+                    <span>Alianza 50 Fundadores • Cupo #{receipt.founderSlotNumber}/50</span>
+                  </span>
+                )}
               </div>
               <h2
                 className="text-2xl sm:text-3xl font-black text-white tracking-tight"
                 style={{ fontFamily: "'Playfair Display', serif" }}
               >
-                Comprobante de Pre-Registro HDV
+                {receipt.establishmentTitle}
               </h2>
+              <p className="text-xs text-slate-300 font-semibold mt-0.5">
+                {receipt.categoryName} • {receipt.destinationName} ({receipt.city}, {receipt.state})
+              </p>
             </div>
 
-            <div className="sm:text-right shrink-0">
-              <span className="inline-block px-3.5 py-1.5 rounded-xl bg-[#FF0096] text-white font-mono font-black text-sm shadow-lg">
+            <div className="sm:text-right shrink-0 bg-white/5 border border-white/15 rounded-2xl p-3">
+              <span className="block text-[9px] font-black uppercase tracking-widest text-slate-300 mb-1">
+                Folio Oficial Pre-Registro
+              </span>
+              <span className="inline-block px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] text-white font-mono font-black text-sm shadow-lg">
                 {receipt.folio}
               </span>
-              <span className="block text-[11px] font-mono font-extrabold text-[#00C8D4] mt-1">
+              <span className="block text-[11px] font-mono font-extrabold text-[#00C8D4] mt-1.5">
                 Finanzas: {receipt.financialCorrelative}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Cuerpo del Comprobante */}
+        {/* Cuerpo del Comprobante VIP */}
         <div className="p-6 sm:p-7 space-y-5 text-slate-800">
-          {/* Datos del Establecimiento */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[#00C8D4] text-white flex items-center justify-center shrink-0 shadow-sm">
-                <Building2 className="w-4.5 h-4.5" />
-              </div>
-              <div className="min-w-0">
-                <span className="block text-[10px] font-black uppercase tracking-wider text-slate-400">
-                  Establecimiento
+          {/* Bloque Principal de Credencial: Fotografía Prominente + Ficha del Establecimiento */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 rounded-3xl bg-slate-50 border border-slate-200/90 shadow-inner items-stretch">
+            {/* Fotografía Prominente del Establecimiento */}
+            <div className="md:col-span-5 relative rounded-2xl overflow-hidden bg-[#0e011f] border-2 border-[#00C8D4]/60 shadow-md min-h-[185px] aspect-[4/3] md:aspect-auto">
+              <img
+                src={establishmentPhoto}
+                alt={receipt.establishmentTitle}
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = DEFAULT_ESTABLISHMENT_PHOTO;
+                }}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0e011f]/85 via-transparent to-[#0e011f]/30 pointer-events-none" />
+
+              <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FF0096] text-white text-[9px] font-black uppercase tracking-wider shadow">
+                <ShieldCheck className="w-3 h-3" />
+                <span>Sello HDV Verificado</span>
+              </span>
+
+              <div className="absolute bottom-2.5 left-3 right-3 text-white">
+                <span className="text-[9px] font-black uppercase tracking-widest text-[#00C8D4] block">
+                  {receipt.categoryName}
                 </span>
-                <p className="text-sm font-black text-slate-900 truncate">
-                  {receipt.establishmentTitle}
-                </p>
-                <span className="text-xs font-bold text-[#008f99] block">{receipt.categoryName}</span>
-                {receipt.wasConsolidatedExisting && (
-                  <span className="inline-block mt-1 px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[9px] font-black uppercase tracking-wider">
-                    ✓ Ficha Existente Consolidada (Sin Duplicados)
-                  </span>
-                )}
+                <p className="text-xs font-black truncate">{receipt.establishmentTitle}</p>
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[#FF0096] text-white flex items-center justify-center shrink-0 shadow-sm">
-                <MapPin className="w-4.5 h-4.5" />
-              </div>
-              <div className="min-w-0">
-                <span className="block text-[10px] font-black uppercase tracking-wider text-slate-400">
-                  Destino & WhatsApp Oficial
-                </span>
-                <p className="text-sm font-black text-slate-900 truncate">
-                  {receipt.destinationName} ({receipt.city}, {receipt.state})
+            {/* Datos Ejecutivos del Establecimiento Afiliado */}
+            <div className="md:col-span-7 flex flex-col justify-between space-y-3 py-1">
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="px-2.5 py-1 rounded-lg bg-[#0e011f] text-[#00C8D4] text-[10px] font-black uppercase tracking-wider">
+                    {receipt.categoryName}
+                  </span>
+                  {receipt.wasConsolidatedExisting ? (
+                    <span className="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-black uppercase tracking-wider">
+                      ✓ Ficha Existente Consolidada (Sin Duplicados)
+                    </span>
+                  ) : (
+                    <span className="px-2.5 py-1 rounded-lg bg-cyan-50 text-cyan-800 border border-cyan-200 text-[10px] font-black uppercase tracking-wider">
+                      ✓ Ficha Oficial Activa en Directorio
+                    </span>
+                  )}
+                </div>
+
+                <h3
+                  className="text-xl font-black text-slate-900 leading-snug"
+                  style={{ fontFamily: "'Playfair Display', serif" }}
+                >
+                  {receipt.establishmentTitle}
+                </h3>
+
+                <p className="text-[11px] text-slate-500 font-semibold">
+                  URL Oficial:{" "}
+                  <strong className="text-slate-800 font-mono">
+                    hotelesdevenezuela.com/establecimiento/{receipt.establishmentSlug}
+                  </strong>
                 </p>
-                <span className="text-xs font-bold text-emerald-700 flex items-center gap-1">
-                  <Phone className="w-3 h-3" /> {receipt.whatsappNumber}
-                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 border-t border-slate-200">
+                <div className="p-2.5 rounded-xl bg-white border border-slate-200/80 flex items-start gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-[#FF0096] text-white flex items-center justify-center shrink-0 mt-0.5">
+                    <MapPin className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="block text-[9px] font-black uppercase tracking-wider text-slate-400">
+                      Destino Turístico
+                    </span>
+                    <p className="text-xs font-black text-slate-900 truncate">
+                      {receipt.destinationName}
+                    </p>
+                    <span className="text-[10px] text-slate-500 font-semibold block truncate">
+                      {receipt.city}, {receipt.state}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-white border border-slate-200/80 flex items-start gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+                    <Phone className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="block text-[9px] font-black uppercase tracking-wider text-slate-400">
+                      WhatsApp Directo
+                    </span>
+                    <p className="text-xs font-black text-emerald-700 truncate">
+                      {receipt.whatsappNumber}
+                    </p>
+                    <span className="text-[10px] text-[#008f99] font-bold block">
+                      Tarifa directa a consultar
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

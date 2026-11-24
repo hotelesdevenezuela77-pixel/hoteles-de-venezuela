@@ -22,7 +22,8 @@ import {
 } from "../lib/salesDepartmentStore";
 import {
   getPublicVerificationUrl,
-  printOfficialPreRegistrationReceipt
+  printOfficialPreRegistrationReceipt,
+  resolveReceiptEstablishmentImage
 } from "../components/sales/PreRegistrationReceiptModal";
 
 export function VerificarRegistro() {
@@ -147,36 +148,63 @@ export function VerificarRegistro() {
       {/* Contenido del Certificado */}
       <div className="max-w-4xl mx-auto px-4 mt-8">
         <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-6 sm:p-8 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#00C8D4] text-white flex items-center justify-center shrink-0">
-                <Building2 className="w-5 h-5" />
-              </div>
-              <div>
-                <span className="block text-[10px] font-black uppercase tracking-wider text-slate-400">
-                  Establecimiento Verificado
-                </span>
-                <p className="text-base font-black text-slate-900">
-                  {receipt.establishmentTitle}
-                </p>
-                <span className="text-xs font-bold text-[#008f99]">{receipt.categoryName}</span>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-5 p-4 rounded-3xl bg-slate-50 border border-slate-200 items-stretch">
+            <div className="md:col-span-5 relative rounded-2xl overflow-hidden bg-[#0e011f] border-2 border-[#00C8D4]/60 min-h-[190px] aspect-[4/3] md:aspect-auto">
+              <img
+                src={resolveReceiptEstablishmentImage(receipt)}
+                alt={receipt.establishmentTitle}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0e011f]/80 via-transparent to-transparent" />
+              <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-[#FF0096] text-white text-[9px] font-black uppercase tracking-wider">
+                Sello HDV Verificado
+              </span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#FF0096] text-white flex items-center justify-center shrink-0">
-                <MapPin className="w-5 h-5" />
-              </div>
+            <div className="md:col-span-7 flex flex-col justify-between space-y-3 py-1">
               <div>
-                <span className="block text-[10px] font-black uppercase tracking-wider text-slate-400">
-                  Ubicación y Contacto
+                <span className="inline-block px-2.5 py-1 rounded-lg bg-[#0e011f] text-[#00C8D4] text-[10px] font-black uppercase tracking-wider mb-1.5">
+                  {receipt.categoryName}
                 </span>
-                <p className="text-base font-black text-slate-900">
-                  {receipt.destinationName} ({receipt.city}, {receipt.state})
+                <h2
+                  className="text-2xl font-black text-slate-900"
+                  style={{ fontFamily: "'Playfair Display', serif" }}
+                >
+                  {receipt.establishmentTitle}
+                </h2>
+                <p className="text-xs text-slate-500 font-semibold mt-0.5">
+                  Ficha Oficial: hotelesdevenezuela.com/establecimiento/{receipt.establishmentSlug}
                 </p>
-                <span className="text-xs font-bold text-emerald-700 flex items-center gap-1">
-                  <Phone className="w-3.5 h-3.5" /> {receipt.whatsappNumber}
-                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-200">
+                <div className="p-3 rounded-xl bg-white border border-slate-200 flex items-start gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-[#FF0096] text-white flex items-center justify-center shrink-0">
+                    <MapPin className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="block text-[9px] font-black uppercase tracking-wider text-slate-400">
+                      Ubicación
+                    </span>
+                    <p className="text-xs font-black text-slate-900">
+                      {receipt.destinationName} ({receipt.city}, {receipt.state})
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-xl bg-white border border-slate-200 flex items-start gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                    <Phone className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="block text-[9px] font-black uppercase tracking-wider text-slate-400">
+                      WhatsApp Oficial
+                    </span>
+                    <p className="text-xs font-black text-emerald-700">
+                      {receipt.whatsappNumber}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
