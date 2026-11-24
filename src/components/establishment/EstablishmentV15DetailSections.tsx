@@ -7,6 +7,7 @@ import {
   FileCheck, Award, Phone, Navigation
 } from "lucide-react";
 import { TrackedWhatsAppButton } from "@/components/layout/TrackedWhatsAppButton";
+import { isOfficialPriceEnabled } from "@/components/layout/EstablishmentCard";
 import {
   formatDualCurrencyVenezuela,
   sanitizeVenezuelaLegalNotices,
@@ -75,7 +76,9 @@ export function EstablishmentV15DetailSections({
   // Sanitized legal notices (Strictly purges CADIVI and COVID-19)
   const sanitizedCustomLegal = sanitizeVenezuelaLegalNotices(savedWizardConfig?.customLegalNotices || "");
 
-  // Filtered rooms for "Asegura tus fechas" (Prioriza rooms_distribution JSONB V15 o rooms de BD)
+  const officialPricesActive = isOfficialPriceEnabled(establishment);
+
+  // Filtered rooms for "Asegura tus fechas" (Prioriza rooms_distribution JSONB V15 o rooms de BD, sin precios inventados)
   const displayRooms = useMemo(() => {
     const jsonbUnits = savedWizardConfig?.roomsDistribution;
     const mappedJsonbRooms =
@@ -84,7 +87,7 @@ export function EstablishmentV15DetailSections({
             id: 950 + idx,
             name: u.unitName,
             category: u.unitType,
-            price_per_night: u.pricePerNightUsd,
+            price_per_night: officialPricesActive ? Number(u.pricePerNightUsd) || 0 : 0,
             capacity: u.maxOccupancy,
             size_m2: u.sizeSqm,
             beds_summary: `${u.kingBeds > 0 ? `${u.kingBeds} King ` : ""}${
@@ -97,13 +100,16 @@ export function EstablishmentV15DetailSections({
 
     const baseRooms =
       rooms && rooms.length > 0
-        ? rooms
+        ? rooms.map((r) => ({
+            ...r,
+            price_per_night: officialPricesActive ? Number(r.price_per_night) || 0 : 0
+          }))
         : mappedJsonbRooms || [
           {
             id: 901,
             name: "Habitación Doble Deluxe (1 o 2 camas)",
             category: "Habitación Ejecutiva",
-            price_per_night: 85,
+            price_per_night: 0,
             capacity: 2,
             size_m2: 32,
             beds_summary: "1 cama doble extragrande (King) o 2 camas individuales",
@@ -113,7 +119,7 @@ export function EstablishmentV15DetailSections({
             id: 902,
             name: "Suite Junior con Vista Panorámica",
             category: "Suite",
-            price_per_night: 125,
+            price_per_night: 0,
             capacity: 3,
             size_m2: 48,
             beds_summary: "1 cama King Size + 1 sofá cama",
@@ -123,7 +129,7 @@ export function EstablishmentV15DetailSections({
             id: 903,
             name: "Suite Presidencial Familiar",
             category: "Suite Familiar",
-            price_per_night: 165,
+            price_per_night: 0,
             capacity: 4,
             size_m2: 65,
             beds_summary: "1 cama King Size + 2 camas individuales",
@@ -138,7 +144,7 @@ export function EstablishmentV15DetailSections({
       return baseRooms.filter(r => String(r.name || "").toLowerCase().includes("suite"));
     }
     return baseRooms;
-  }, [rooms, unitFilter]);
+  }, [rooms, unitFilter, officialPricesActive, savedWizardConfig]);
 
   const scrollToSection = (tabId: string, elementId: string) => {
     setActiveNavTab(tabId);
@@ -161,7 +167,7 @@ export function EstablishmentV15DetailSections({
   const totalSelectedRooms = Object.values(selectedQuantities).reduce((acc, q) => acc + q, 0);
   const totalSelectedUsd = displayRooms.reduce((acc, r) => {
     const qty = selectedQuantities[r.id] || 0;
-    const price = Number(r.price_per_night || 85);
+    const price = officialPricesActive && Number(r.price_per_night) > 0 ? Number(r.price_per_night) : 0;
     return acc + qty * price * nightsCount;
   }, 0);
 
@@ -443,59 +449,70 @@ export function EstablishmentV15DetailSections({
         </div>
       </section>
 
-      {/* ── 3. INFO Y PRECIOS: "ASEGURA TUS FECHAS" CON DUALIDAD MONETARIA NATIVA (USD / VES) ── */}
+      {/* ── 3. INFO Y PRECIOS: "ASEGURA TUS FECHAS" (MODO POR DEFECTO TARIFA DIRECTA A CONSULTAR) ── */}
       <section id="v15-info-precios" className="scroll-mt-32 bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm space-y-6">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-5">
           <div>
             <span className="text-[10px] font-black uppercase tracking-widest text-[#FF0096] block">
-              DISPONIBILIDAD Y PRECIOS DIRECTOS · SIN INTERMEDIARIOS
+              DISPONIBILIDAD Y TRATO DIRECTO · SIN INTERMEDIARIOS
             </span>
             <h2 className="text-2xl font-serif font-bold text-slate-900 mt-0.5">
-              Asegura tus fechas — Tarifas en Dólares ($ USD) y Bolívares (Bs. VES)
+              {officialPricesActive
+                ? "Asegura tus fechas — Tarifas en Dólares ($ USD) y Bolívares (Bs. VES)"
+                : "Asegura tus fechas — Tarifa directa a consultar con el anfitrión"}
             </h2>
             <p className="text-xs text-slate-500 font-medium mt-1">
-              Visualización bimonetaria nativa adaptada a Venezuela (`country_category_id = 1`). Sin recargos ocultos.
+              {officialPricesActive
+                ? "Visualización bimonetaria nativa adaptada a Venezuela. Sin recargos ocultos."
+                : "Cotización directa por WhatsApp con la recepción oficial del establecimiento (0% comisiones por intermediación)."}
             </p>
           </div>
 
-          {/* Controles de Dualidad Monetaria USD / VES y Tasa BCV */}
-          <div className="flex flex-wrap items-center gap-2.5 bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white rounded-xl border border-slate-200">
-              <RefreshCw className="w-3.5 h-3.5 text-[#00C8D4]" />
-              <span className="text-[11px] font-bold text-slate-600">Tasa BCV:</span>
-              <input
-                type="number"
-                step="0.1"
-                min="1"
-                value={bcvRate}
-                onChange={(e) => setBcvRate(Math.max(1, Number(e.target.value) || 66.5))}
-                className="w-16 text-xs font-black text-slate-900 bg-transparent focus:outline-none border-b border-dashed border-slate-300 text-center"
-                title="Ajustar tasa referencial BCV (Bs./USD)"
-              />
-              <span className="text-[10px] font-bold text-slate-400">Bs./$</span>
-            </div>
+          {/* Controles de Dualidad Monetaria USD / VES solo si el propietario activó tarifas oficiales */}
+          {officialPricesActive ? (
+            <div className="flex flex-wrap items-center gap-2.5 bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white rounded-xl border border-slate-200">
+                <RefreshCw className="w-3.5 h-3.5 text-[#00C8D4]" />
+                <span className="text-[11px] font-bold text-slate-600">Tasa BCV:</span>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="1"
+                  value={bcvRate}
+                  onChange={(e) => setBcvRate(Math.max(1, Number(e.target.value) || 66.5))}
+                  className="w-16 text-xs font-black text-slate-900 bg-transparent focus:outline-none border-b border-dashed border-slate-300 text-center"
+                  title="Ajustar tasa referencial BCV (Bs./USD)"
+                />
+                <span className="text-[10px] font-bold text-slate-400">Bs./$</span>
+              </div>
 
-            <div className="flex items-center gap-1">
-              {[
-                { id: "dual", label: "Dual ($ USD + Bs. VES)" },
-                { id: "usd", label: "Solo $ USD" },
-                { id: "ves", label: "Solo Bs. VES" }
-              ].map((m) => (
-                <button
-                  key={m.id}
-                  type="button"
-                  onClick={() => setCurrencyMode(m.id as any)}
-                  className={`px-3 py-1.5 rounded-xl text-[11px] font-black transition-all cursor-pointer ${
-                    currencyMode === m.id
-                      ? "bg-[#0e011f] text-white shadow-xs"
-                      : "text-slate-600 hover:bg-slate-200/70"
-                  }`}
-                >
-                  {m.label}
-                </button>
-              ))}
+              <div className="flex items-center gap-1">
+                {[
+                  { id: "dual", label: "Dual ($ USD + Bs. VES)" },
+                  { id: "usd", label: "Solo $ USD" },
+                  { id: "ves", label: "Solo Bs. VES" }
+                ].map((m) => (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => setCurrencyMode(m.id as any)}
+                    className={`px-3 py-1.5 rounded-xl text-[11px] font-black transition-all cursor-pointer ${
+                      currencyMode === m.id
+                        ? "bg-[#0e011f] text-white shadow-xs"
+                        : "text-slate-600 hover:bg-slate-200/70"
+                    }`}
+                  >
+                    {m.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-[#00C8D4]/10 border border-[#00C8D4]/30 text-[#0f172a]">
+              <ShieldCheck className="w-4 h-4 text-[#00C8D4] shrink-0" />
+              <span className="text-xs font-black">Tarifa directa a consultar · 0% Comisiones</span>
+            </div>
+          )}
         </div>
 
         {/* Barra selectora de Noches, Huéspedes y Filtros de Unidad */}
@@ -565,15 +582,18 @@ export function EstablishmentV15DetailSections({
                 <th className="p-4 border-r border-white/15 w-[34%]">Tipo de habitación / unidad</th>
                 <th className="p-4 border-r border-white/15 w-[12%] text-center">Capacidad</th>
                 <th className="p-4 border-r border-white/15 w-[22%]">
-                  Precio por {nightsCount} {nightsCount === 1 ? "noche" : "noches"}
+                  {officialPricesActive
+                    ? `Precio por ${nightsCount} ${nightsCount === 1 ? "noche" : "noches"}`
+                    : "Modalidad de tarifa"}
                 </th>
-                <th className="p-4 border-r border-white/15 w-[20%]">Tus opciones y métodos de pago</th>
-                <th className="p-4 w-[12%] text-center">Seleccionar</th>
+                <th className="p-4 border-r border-white/15 w-[18%]">Tus opciones y métodos de pago</th>
+                <th className="p-4 w-[14%] text-center">Acción directa</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 text-xs">
               {displayRooms.map((room) => {
-                const nightlyUsd = Number(room.price_per_night || 85);
+                const hasVerifiedRoomPrice = officialPricesActive && Number(room.price_per_night) > 0;
+                const nightlyUsd = hasVerifiedRoomPrice ? Number(room.price_per_night) : 0;
                 const totalStayUsd = nightlyUsd * nightsCount;
                 const dualPrice = formatDualCurrencyVenezuela(totalStayUsd, bcvRate);
                 const nightlyDual = formatDualCurrencyVenezuela(nightlyUsd, bcvRate);
@@ -629,24 +649,41 @@ export function EstablishmentV15DetailSections({
                       </span>
                     </td>
 
-                    {/* Columna 3: Precio Dual USD / VES */}
+                    {/* Columna 3: Tarifa directa a consultar o Precio Oficial verificado */}
                     <td className="p-4 border-r border-slate-200 space-y-1.5">
-                      {(currencyMode === "dual" || currencyMode === "usd") && (
-                        <div className="text-lg font-black text-slate-900">
-                          {dualPrice.usdFormatted}
+                      {hasVerifiedRoomPrice ? (
+                        <>
+                          {(currencyMode === "dual" || currencyMode === "usd") && (
+                            <div className="text-lg font-black text-slate-900">
+                              {dualPrice.usdFormatted}
+                            </div>
+                          )}
+                          {(currencyMode === "dual" || currencyMode === "ves") && (
+                            <div className="text-xs font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg inline-block">
+                              {dualPrice.vesFormatted}
+                            </div>
+                          )}
+                          <div className="text-[10px] text-slate-500 font-medium">
+                            Equivale a {nightlyDual.usdFormatted} ({nightlyDual.vesFormatted}) / noche
+                          </div>
+                          <div className="text-[10px] text-emerald-600 font-bold">
+                            Incluye impuestos y cargos · 0% comisión
+                          </div>
+                        </>
+                      ) : (
+                        <div className="space-y-1.5">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#00C8D4]/10 border border-[#00C8D4]/30 text-[#0f172a] text-xs font-black">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#00C8D4]" />
+                            Tarifa directa a consultar
+                          </span>
+                          <p className="text-[10px] text-slate-500 font-semibold leading-snug">
+                            Cotización oficial por temporada directamente con recepción.
+                          </p>
+                          <div className="text-[10px] text-emerald-600 font-bold">
+                            Trato directo · 0% comisión por plataforma
+                          </div>
                         </div>
                       )}
-                      {(currencyMode === "dual" || currencyMode === "ves") && (
-                        <div className="text-xs font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg inline-block">
-                          {dualPrice.vesFormatted}
-                        </div>
-                      )}
-                      <div className="text-[10px] text-slate-500 font-medium">
-                        Equivale a {nightlyDual.usdFormatted} ({nightlyDual.vesFormatted}) / noche
-                      </div>
-                      <div className="text-[10px] text-emerald-600 font-bold">
-                        Incluye impuestos y cargos · 0% comisión
-                      </div>
                     </td>
 
                     {/* Columna 4: Opciones y Métodos de Pago Venezolanos */}
@@ -699,9 +736,13 @@ export function EstablishmentV15DetailSections({
                         whatsappNumber={establishment.whatsapp || establishment.phone}
                         establishmentId={establishment.id}
                         establishmentName={establishment.name}
-                        customMessage={`Hola! Quiero reservar la unidad "${room.name}" por ${nightsCount} noche(s) (${dualPrice.combinedLabel}) en ${establishment.name}.`}
+                        customMessage={
+                          hasVerifiedRoomPrice
+                            ? `Hola! Quiero consultar y reservar la unidad "${room.name}" por ${nightsCount} noche(s) (${dualPrice.combinedLabel}) en ${establishment.name}.`
+                            : `Hola! Quiero consultar precio y disponibilidad para la unidad "${room.name}" por ${nightsCount} noche(s) (${adultsCount} adulto(s)) en ${establishment.name}.`
+                        }
                       >
-                        Reservar
+                        Consultar precio por WhatsApp
                       </TrackedWhatsAppButton>
                     </td>
                   </tr>
@@ -722,16 +763,26 @@ export function EstablishmentV15DetailSections({
                 {totalSelectedRooms} {totalSelectedRooms === 1 ? "habitación seleccionada" : "habitaciones seleccionadas"} por {nightsCount} {nightsCount === 1 ? "noche" : "noches"}
               </h4>
               <p className="text-xs text-white/80 mt-0.5">
-                Total estimado: <strong>{formatDualCurrencyVenezuela(totalSelectedUsd, bcvRate).combinedLabel}</strong> (Tasa BCV: {bcvRate} Bs./$)
+                {officialPricesActive && totalSelectedUsd > 0 ? (
+                  <>
+                    Total estimado: <strong>{formatDualCurrencyVenezuela(totalSelectedUsd, bcvRate).combinedLabel}</strong> (Tasa BCV: {bcvRate} Bs./$)
+                  </>
+                ) : (
+                  <>Modalidad activa: <strong>Tarifa directa a consultar</strong> directamente con el propietario</>
+                )}
               </p>
             </div>
             <TrackedWhatsAppButton
               whatsappNumber={establishment.whatsapp || establishment.phone}
               establishmentId={establishment.id}
               establishmentName={establishment.name}
-              customMessage={`Hola! Deseo confirmar la reserva de ${totalSelectedRooms} habitación(es) por ${nightsCount} noche(s) en ${establishment.name}. Total estimado: ${formatDualCurrencyVenezuela(totalSelectedUsd, bcvRate).combinedLabel}.`}
+              customMessage={
+                officialPricesActive && totalSelectedUsd > 0
+                  ? `Hola! Deseo confirmar la reserva de ${totalSelectedRooms} habitación(es) por ${nightsCount} noche(s) en ${establishment.name}. Total estimado: ${formatDualCurrencyVenezuela(totalSelectedUsd, bcvRate).combinedLabel}.`
+                  : `Hola! Deseo consultar precio por WhatsApp para ${totalSelectedRooms} habitación(es) por ${nightsCount} noche(s) en ${establishment.name}.`
+              }
             >
-              Confirmar Selección por WhatsApp
+              Consultar precio por WhatsApp
             </TrackedWhatsAppButton>
           </div>
         )}

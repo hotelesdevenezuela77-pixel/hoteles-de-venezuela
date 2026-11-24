@@ -133,15 +133,15 @@ export function ZoneMapFilter({
             <path d="M 80 80 C 140 60, 240 50, 320 90 C 360 110, 380 160, 340 200 C 280 230, 180 220, 110 190 C 60 160, 50 110, 80 80 Z" />
           </svg>
 
-          {/* Pins de precios neón simulados */}
+          {/* Pins de zonas turísticas neón */}
           <div className="absolute top-[35%] left-[65%] flex items-center gap-0.5 bg-[#FF0096] text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-lg shadow-[#FF0096]/50 animate-pulse">
-            <DollarSign className="w-2.5 h-2.5" />100
+            <MapPin className="w-2.5 h-2.5" />Caribe
           </div>
           <div className="absolute top-[55%] left-[32%] flex items-center gap-0.5 bg-[#00C8D4] text-slate-950 text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-lg shadow-[#00C8D4]/50">
-            <DollarSign className="w-2.5 h-2.5" />75
+            <MapPin className="w-2.5 h-2.5" />Andes
           </div>
           <div className="absolute top-[40%] left-[45%] flex items-center gap-0.5 bg-[#9B00CC] text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-lg shadow-[#9B00CC]/50">
-            <DollarSign className="w-2.5 h-2.5" />150
+            <MapPin className="w-2.5 h-2.5" />Centro
           </div>
 
           {/* Botón flotante al hover */}
@@ -443,10 +443,14 @@ export function InteractiveZoneMapView({
                       <span>{selectedPin.est.rating_avg.toFixed(1)}</span>
                     </div>
 
-                    {selectedPin.price !== null && (
+                    {selectedPin.price !== null ? (
                       <div className="text-right">
                         <span className="text-[9px] text-slate-400 block uppercase font-bold">Desde</span>
                         <span className="text-xs font-black text-[#FF0096]">${selectedPin.price} <span className="text-[9px] text-slate-400 font-normal">/ noche</span></span>
+                      </div>
+                    ) : (
+                      <div className="text-right">
+                        <span className="text-[10px] font-black text-[#00C8D4]">Tarifa directa a consultar</span>
                       </div>
                     )}
                   </div>

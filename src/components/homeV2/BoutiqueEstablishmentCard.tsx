@@ -212,10 +212,10 @@ export function BoutiqueEstablishmentCard({ establishment }: BoutiqueEstablishme
         {/* Sección de Tarifa Directa & Botones de Conversión */}
         <div className={`pt-2.5 border-t space-y-2.5 ${isFeaturedCard ? "border-slate-800" : "border-slate-100"}`}>
           
-          {/* Tarifa Directa con Sello 0% Comisiones (Precio solo si fue configurado explícitamente) */}
+          {/* Tarifa Directa con Sello 0% Comisiones (Modo por defecto "Tarifa directa a consultar") */}
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-[10px] text-slate-400 uppercase font-black tracking-wider">Tarifa Directa</span>
+              <span className="text-[10px] text-slate-400 uppercase font-black tracking-wider">Modalidad Oficial</span>
               <span className="text-[9px] text-[#00C8D4] font-black">0% Comisiones OTA</span>
             </div>
             {realPrice !== null ? (
@@ -226,8 +226,8 @@ export function BoutiqueEstablishmentCard({ establishment }: BoutiqueEstablishme
               </div>
             ) : (
               <div className="text-right">
-                <span className="text-[10px] text-[#25D366] uppercase font-black tracking-wider block">Trato Directo</span>
-                <span className={`text-[9px] font-bold ${isFeaturedCard ? "text-slate-400" : "text-slate-500"}`}>Contacto con Propietario</span>
+                <span className={`text-xs font-black block ${isFeaturedCard ? "text-white" : "text-slate-900"}`}>Tarifa directa a consultar</span>
+                <span className="text-[9px] font-bold text-[#25D366]">Trato directo con el anfitrión</span>
               </div>
             )}
           </div>
@@ -237,12 +237,12 @@ export function BoutiqueEstablishmentCard({ establishment }: BoutiqueEstablishme
             whatsappNumber={establishment.whatsapp || establishment.phone || OFFICIAL_WHATSAPP_NUMBER}
             establishmentId={establishment.id}
             establishmentName={establishment.name}
-            customMessage={`Hola! Vi a ${establishment.name} en Hoteles de Venezuela (hotelesdevenezuela.com) y me gustaría cotizar ahora mismo.`}
+            customMessage={`Hola! Vi a ${establishment.name} en Hoteles de Venezuela (hotelesdevenezuela.com) y me gustaría consultar precio y disponibilidad directa.`}
             isPriority={true}
             directOpen={true}
             className="w-full !bg-[#25D366] hover:!bg-[#1ebe57] text-white font-black text-xs py-3 px-3 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-[#25D366]/30 transition-all hover:scale-[1.02] active:scale-98 cursor-pointer uppercase tracking-wider animate-whatsapp-priority"
           >
-            <span>Cotizar Ahora Mismo!</span>
+            <span>Consultar precio por WhatsApp</span>
             <span className="w-2 h-2 rounded-full bg-white animate-ping" />
           </TrackedWhatsAppButton>
 

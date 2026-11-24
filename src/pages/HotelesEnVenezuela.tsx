@@ -453,7 +453,7 @@ function RealHotelLandingCard({
       ? currencyMode === "USD"
         ? `Desde $${hotel.realPriceUsd} USD`
         : `Desde Bs. ${Math.round(hotel.realPriceUsd * bcvRate).toLocaleString("es-VE")}`
-      : "Tarifa Directa Recepción";
+      : "Tarifa directa a consultar";
 
   const handlePrevImg = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -622,13 +622,13 @@ function RealHotelLandingCard({
           href={waUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="py-2.5 px-3 rounded-xl text-white text-xs font-extrabold text-center transition-opacity hover:opacity-95 flex items-center justify-center gap-1.5 shadow-sm"
+          className="py-2.5 px-3 rounded-xl text-white text-[11px] font-extrabold text-center transition-opacity hover:opacity-95 flex items-center justify-center gap-1.5 shadow-sm"
           style={{
             background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)"
           }}
         >
-          <PhoneCall className="w-3.5 h-3.5" />
-          <span>Reservar Directo</span>
+          <PhoneCall className="w-3.5 h-3.5 shrink-0" />
+          <span>Consultar precio por WhatsApp</span>
         </a>
       </div>
     </article>

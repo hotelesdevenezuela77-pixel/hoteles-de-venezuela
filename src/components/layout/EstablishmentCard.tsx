@@ -57,16 +57,41 @@ function parseServices(services: string | null): string[] {
 }
 
 /**
- * Devuelve únicamente el precio numérico real si fue establecido explícitamente por el propietario/administrador.
- * Si no se ha asignado precio numérico real (ej. solo tiene "$$", "moderado", vacío, etc.), devuelve null para no mostrar precios de ejemplo.
+ * Verifica si el establecimiento tiene activada explícitamente la opción de mostrar tarifas oficiales verificadas.
+ * Por defecto está desactivada (false) para que toda la plataforma arranque desde cero en modo "Tarifa directa a consultar".
+ */
+export function isOfficialPriceEnabled(est?: {
+  id?: number | string | null;
+  slug?: string | null;
+  show_official_prices?: boolean | null;
+  features?: any;
+} | null): boolean {
+  if (!est) return false;
+  if (est.show_official_prices === true) return true;
+  if (est.features?.commercial?.show_official_prices === true) return true;
+  if (typeof window !== "undefined") {
+    const keyBySlug = est.slug ? localStorage.getItem(`hdv_show_official_prices_${est.slug}`) : null;
+    const keyById = est.id ? localStorage.getItem(`hdv_show_official_prices_${est.id}`) : null;
+    if (keyBySlug === "true" || keyById === "true") return true;
+  }
+  return false;
+}
+
+/**
+ * Devuelve únicamente el precio numérico real si el propietario activó explícitamente la visualización de tarifas oficiales.
+ * Mientras no esté activado, devuelve null para mostrar el modo estándar "Tarifa directa a consultar".
  */
 export function getRealEstablishmentPrice(est?: {
+  id?: number | string | null;
+  slug?: string | null;
+  show_official_prices?: boolean | null;
+  features?: any;
   price_min?: number | string | null;
   base_price?: number | string | null;
   price?: number | string | null;
   price_level?: string | null;
 } | null): number | null {
-  if (!est) return null;
+  if (!est || !isOfficialPriceEnabled(est)) return null;
   const candidates = [est.price_min, est.base_price, est.price];
   for (const val of candidates) {
     if (typeof val === "number" && val > 0) return val;
@@ -130,10 +155,15 @@ export function EstablishmentCard({
             {/* Gradient Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
-            {/* Price Tag - Solo se muestra si el propietario configuró un precio numérico real */}
-            {realPrice !== null && (
+            {/* Price Tag - Modo oficial o por defecto "Tarifa directa a consultar" */}
+            {realPrice !== null ? (
               <div className="absolute bottom-3 left-4 bg-slate-900/80 backdrop-blur-md border border-white/10 text-white px-3 py-1.5 rounded-xl text-[11px] font-black shadow-md flex items-center gap-1 z-10 select-none">
                 Desde <span className="text-[#00C8D4] text-xs font-black">${realPrice}</span> / noche
+              </div>
+            ) : (
+              <div className="absolute bottom-3 left-4 bg-slate-900/85 backdrop-blur-md border border-[#00C8D4]/30 text-white px-3 py-1.5 rounded-xl text-[10px] font-black shadow-md flex items-center gap-1.5 z-10 select-none">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00C8D4]" />
+                <span>Tarifa directa a consultar</span>
               </div>
             )}
 
@@ -320,12 +350,12 @@ export function EstablishmentCard({
               whatsappNumber={establishment.whatsapp || establishment.phone || OFFICIAL_WHATSAPP_NUMBER}
               establishmentId={establishment.id}
               establishmentName={establishment.name}
-              customMessage={`Hola! Vi a ${establishment.name} en Hoteles de Venezuela (hotelesdevenezuela.com) y me gustaría cotizar ahora mismo.`}
+              customMessage={`Hola! Vi a ${establishment.name} en Hoteles de Venezuela (hotelesdevenezuela.com) y me gustaría consultar precio y disponibilidad directa.`}
               isPriority={true}
               directOpen={true}
               className="w-full !bg-[#25D366] hover:!bg-[#1ebe57] text-white font-black text-xs py-3 px-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-[#25D366]/30 transition-all hover:scale-[1.02] active:scale-98 cursor-pointer uppercase tracking-wider animate-whatsapp-priority"
             >
-              <span>Cotizar Ahora Mismo!</span>
+              <span>Consultar precio por WhatsApp</span>
               <span className="w-2 h-2 rounded-full bg-white animate-ping" />
             </TrackedWhatsAppButton>
 
@@ -503,9 +533,13 @@ export function EstablishmentListItem({
                     </span>
                   )}
                 </div>
-                {realPrice !== null && (
+                {realPrice !== null ? (
                   <div className={`text-[10px] font-bold ${isPriority ? "text-gray-300" : "text-gray-500"}`}>
                     Desde <span className={`text-xs font-black ${isPriority ? "text-[#00C8D4]" : "text-brand-magenta"}`}>${realPrice}</span> / noche
+                  </div>
+                ) : (
+                  <div className={`text-[10px] font-black px-2.5 py-1 rounded-lg border ${isPriority ? "bg-white/10 border-[#00C8D4]/40 text-[#00C8D4]" : "bg-cyan-50 border-cyan-200 text-cyan-800"}`}>
+                    Tarifa directa a consultar
                   </div>
                 )}
               </div>
@@ -546,12 +580,12 @@ export function EstablishmentListItem({
                 whatsappNumber={establishment.whatsapp || establishment.phone || OFFICIAL_WHATSAPP_NUMBER}
                 establishmentId={establishment.id}
                 establishmentName={establishment.name}
-                customMessage={`Hola! Vi a ${establishment.name} en Hoteles de Venezuela (hotelesdevenezuela.com) y me gustaría cotizar ahora mismo.`}
+                customMessage={`Hola! Vi a ${establishment.name} en Hoteles de Venezuela (hotelesdevenezuela.com) y me gustaría consultar precio y disponibilidad directa.`}
                 isPriority={true}
                 directOpen={true}
                 className="w-full !bg-[#25D366] hover:!bg-[#1ebe57] text-white font-black text-xs py-3 px-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-[#25D366]/30 transition-all hover:scale-[1.02] active:scale-98 cursor-pointer uppercase tracking-wider animate-whatsapp-priority"
               >
-                <span>Cotizar Ahora Mismo!</span>
+                <span>Consultar precio por WhatsApp</span>
                 <span className="w-2 h-2 rounded-full bg-white animate-ping" />
               </TrackedWhatsAppButton>
             </div>

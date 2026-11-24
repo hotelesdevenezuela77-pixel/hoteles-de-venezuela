@@ -73,7 +73,8 @@ export function PreRegistro() {
   const [shortDescription, setShortDescription] = useState<string>(
     "Exclusiva posada frente a los cayos más cristalinos de Morrocoy. Muelle privado, gastronomía marina y atención de primer nivel."
   );
-  const [basePriceFrom, setBasePriceFrom] = useState<number>(140);
+  const [showOfficialPrice, setShowOfficialPrice] = useState<boolean>(false);
+  const [basePriceFrom, setBasePriceFrom] = useState<number>(0);
   const [whatsappNumber, setWhatsappNumber] = useState<string>("+58 412 1234567");
 
   // GPS & Ubicación en tiempo real desde celular/dispositivo
@@ -379,6 +380,8 @@ export function PreRegistro() {
       const onboardingStatus = publishDirectly ? "COMPLETED" : "PRE_REGISTERED";
       const status = publishDirectly ? "ACTIVE" : "ACTIVE";
 
+      const effectiveBasePrice = showOfficialPrice && basePriceFrom > 0 ? basePriceFrom : 0;
+
       const payload: PreRegistrationPayload = {
         service_category_id: serviceCategoryId,
         subcategory_id: subcategoryId,
@@ -392,7 +395,7 @@ export function PreRegistro() {
         rating_avg: ratingAvg,
         key_service_pills: pills,
         short_description: shortDescription,
-        base_price_from: basePriceFrom,
+        base_price_from: effectiveBasePrice,
         whatsapp_number: whatsappNumber,
         primary_image: primaryImage,
         gallery_images: galleryImages
@@ -408,7 +411,7 @@ export function PreRegistro() {
         city: city.trim(),
         whatsappNumber: whatsappNumber.trim(),
         primaryImage,
-        basePriceFrom,
+        basePriceFrom: effectiveBasePrice,
         origin,
         ownerOrManagerName: ownerOrManagerName.trim() || undefined,
         salesAgentCode: origin === "agente_ventas" ? selectedAgentCode : undefined,
@@ -453,7 +456,8 @@ export function PreRegistro() {
           "C00.1.1": title,
           "C00.1.9": shortDescription,
           rating: ratingAvg,
-          price_from: basePriceFrom,
+          price_from: effectiveBasePrice,
+          show_official_prices: showOfficialPrice && effectiveBasePrice > 0,
           pills: pills
         },
         contact: {
@@ -476,7 +480,7 @@ export function PreRegistro() {
             latitude: latitude ? parseFloat(latitude) : null,
             longitude: longitude ? parseFloat(longitude) : null,
             short_description: shortDescription,
-            base_price_from: basePriceFrom,
+            base_price_from: effectiveBasePrice,
             rating_avg: ratingAvg,
             whatsapp_number: whatsappNumber,
             primary_image: primaryImage,
@@ -498,8 +502,8 @@ export function PreRegistro() {
             phone: whatsappNumber,
             whatsapp: whatsappNumber,
             rating_avg: ratingAvg,
-            price_min: basePriceFrom,
-            base_price: basePriceFrom,
+            price_min: effectiveBasePrice > 0 ? effectiveBasePrice : null,
+            base_price: effectiveBasePrice > 0 ? effectiveBasePrice : null,
             is_featured: modality !== "comercial_estandar" || selectedPlanId === "premium" || selectedPlanId === "gold",
             has_hdv_seal: badges.has_hdv_seal,
             membership_tier:
@@ -518,6 +522,11 @@ export function PreRegistro() {
 
       // Guardar también en localStorage para persistencia inmediata en la sesión del cliente
       localStorage.setItem(`hdv_prereg_${slug}`, JSON.stringify(payload));
+      if (showOfficialPrice && effectiveBasePrice > 0) {
+        localStorage.setItem(`hdv_show_official_prices_${slug}`, "true");
+      } else {
+        localStorage.removeItem(`hdv_show_official_prices_${slug}`);
+      }
       setSalesCounters(getSalesCounters());
       setEmittedReceipt(receipt);
       setSaveSuccess(true);
@@ -850,19 +859,49 @@ export function PreRegistro() {
 
                 <div>
                   <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1.5">
-                    8. Precio Base Visible ("Desde $X / noche")
+                    8. Modalidad de Visualización de Tarifas
                   </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-2.5 text-xs font-black text-slate-400">$</span>
-                    <input
-                      type="number"
-                      min="0"
-                      value={basePriceFrom}
-                      onChange={(e) => setBasePriceFrom(Number(e.target.value))}
-                      placeholder="140"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-16 py-2.5 text-sm font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
-                    />
-                    <span className="absolute right-3 top-2.5 text-xs text-slate-400 font-bold">/ noche</span>
+                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <div>
+                        <span className="text-xs font-black text-slate-900 block">
+                          Tarifa directa a consultar
+                        </span>
+                        <span className="text-[10px] text-emerald-700 font-bold">
+                          Modo estándar activo por defecto (Sin precios estimados)
+                        </span>
+                      </div>
+                      <label className="inline-flex items-center gap-1.5 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={showOfficialPrice}
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            setShowOfficialPrice(checked);
+                            if (!checked) setBasePriceFrom(0);
+                          }}
+                          className="w-4 h-4 accent-[#00C8D4] rounded cursor-pointer"
+                        />
+                        <span className="text-[10px] font-black uppercase text-slate-600">
+                          Activar tarifa oficial
+                        </span>
+                      </label>
+                    </div>
+
+                    {showOfficialPrice && (
+                      <div className="relative pt-1 border-t border-slate-200/80">
+                        <span className="absolute left-3 top-3.5 text-xs font-black text-slate-400">$</span>
+                        <input
+                          type="number"
+                          min="0"
+                          value={basePriceFrom || ""}
+                          onChange={(e) => setBasePriceFrom(Number(e.target.value))}
+                          placeholder="Ej. 120 (Tarifa oficial verificada)"
+                          className="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-16 py-2 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                        />
+                        <span className="absolute right-3 top-3.5 text-[11px] text-slate-400 font-bold">/ noche</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1689,33 +1728,48 @@ export function PreRegistro() {
                     {shortDescription || "Breve descripción comercial..."}
                   </p>
 
-                  {/* Precio y Botones de Acción Directos */}
-                  <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-3">
-                    <div>
-                      <span className="text-[9px] uppercase font-bold text-slate-400 block">Desde</span>
-                      <span className="text-base font-black text-[#00C8D4]">${basePriceFrom}</span>
-                      <span className="text-[10px] text-slate-400 font-normal"> / noche</span>
+                  {/* Precio y Botones de Acción Directos (Modo estándar: Tarifa directa a consultar) */}
+                  <div className="pt-3 border-t border-white/10 space-y-2.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <div>
+                        <span className="text-[9px] uppercase font-black text-slate-400 block">Modalidad Oficial</span>
+                        <span className="text-[9px] text-[#00C8D4] font-black">0% Comisiones OTA</span>
+                      </div>
+
+                      {showOfficialPrice && basePriceFrom > 0 ? (
+                        <div className="text-right">
+                          <span className="text-[9px] uppercase font-bold text-slate-400 block">Desde</span>
+                          <span className="text-base font-black text-[#FF0096]">${basePriceFrom}</span>
+                          <span className="text-[10px] text-slate-400 font-normal"> / noche</span>
+                        </div>
+                      ) : (
+                        <div className="text-right">
+                          <span className="text-xs font-black text-white block">Tarifa directa a consultar</span>
+                          <span className="text-[9px] font-bold text-[#25D366]">Trato directo con el anfitrión</span>
+                        </div>
+                      )}
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      {/* Botón WhatsApp */}
+                    <div className="flex flex-col gap-2">
+                      {/* Botón Principal WhatsApp */}
                       <a
                         href={`https://wa.me/${whatsappNumber.replace(/[^0-9]/g, "")}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="p-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-md flex items-center justify-center"
-                        title="Contactar por WhatsApp"
+                        className="w-full py-2.5 px-3 rounded-2xl bg-[#25D366] hover:bg-[#1ebe57] text-white font-black text-xs transition-all shadow-lg shadow-[#25D366]/30 flex items-center justify-center gap-2 uppercase tracking-wider"
+                        title="Consultar precio por WhatsApp"
                       >
                         <MessageCircle className="w-4 h-4" />
+                        <span>Consultar precio por WhatsApp</span>
                       </a>
 
                       {/* Botón Ver Ficha */}
                       <button
                         type="button"
-                        className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-900 text-xs font-black transition-all flex items-center gap-1.5 shadow-sm"
+                        className="w-full py-2.5 px-3.5 rounded-2xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:opacity-95 text-white text-xs font-black transition-all flex items-center justify-center gap-1.5 shadow-sm uppercase tracking-wider"
                       >
-                        <span>Ver Ficha</span>
-                        <ExternalLink className="w-3 h-3 text-[#FF0096]" />
+                        <Eye className="w-3.5 h-3.5 text-[#00C8D4]" />
+                        <span>Ver Ficha y Reservar</span>
                       </button>
                     </div>
                   </div>

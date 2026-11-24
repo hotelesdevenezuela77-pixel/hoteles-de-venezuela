@@ -5,6 +5,7 @@ import { useAuth } from "../lib/auth";
 import { ESTABLISHMENTS_MOCK } from "../lib/establishmentsMock";
 import { TENANTS_REGISTRY } from "../tenants/tenantContext";
 import { TrackedWhatsAppButton, trackEvent } from "../components/layout/TrackedWhatsAppButton";
+import { isOfficialPriceEnabled } from "../components/layout/EstablishmentCard";
 import { AvailabilityCalendar } from "../components/AvailabilityCalendar";
 import { BookingWidget } from "../components/BookingWidget";
 import { getQualifiedInfluencers } from "../lib/qualifiedInfluencersRegistry";
@@ -1002,10 +1003,10 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                     establishmentName={establishment.name}
                     isPriority={true}
                     directOpen={true}
-                    customMessage={`Hola! Vi la ficha de ${establishment.name} en Hoteles de Venezuela y me gustaría cotizar ahora mismo.`}
+                    customMessage={`Hola! Vi la ficha de ${establishment.name} en Hoteles de Venezuela y me gustaría consultar precio y disponibilidad directa.`}
                     className="!py-3.5 !px-6 !rounded-xl !text-xs !font-black uppercase tracking-wider"
                   >
-                    Cotizar Ahora Mismo!
+                    Consultar precio por WhatsApp
                   </TrackedWhatsAppButton>
                 </div>
               )}
@@ -1751,11 +1752,18 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                                 <h3 className="text-lg font-black text-slate-800 leading-tight font-serif">
                                   {room.name}
                                 </h3>
-                                {Number(room.price_per_night) > 0 && Number(room.price_per_night) !== 100 && (
+                                {isOfficialPriceEnabled(establishment) && Number(room.price_per_night) > 0 && Number(room.price_per_night) !== 100 ? (
                                   <div className="text-right">
                                     <span className="text-[10px] uppercase font-bold text-slate-400 block">Tarifa por Noche</span>
                                     <span className="text-xl font-black text-[#FF0096]">
                                       ${room.price_per_night} <span className="text-xs font-bold text-slate-500">USD</span>
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <div className="text-right">
+                                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Modalidad Directa</span>
+                                    <span className="text-xs font-black text-[#00C8D4] bg-[#00C8D4]/10 border border-[#00C8D4]/25 px-2.5 py-1 rounded-lg inline-block mt-0.5">
+                                      Tarifa directa a consultar
                                     </span>
                                   </div>
                                 )}
@@ -1806,7 +1814,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                                   description: room.description,
                                   image: mainPhoto,
                                   gallery: photos,
-                                  price: Number(room.price_per_night) > 0 && Number(room.price_per_night) !== 100 ? room.price_per_night : undefined,
+                                  price: isOfficialPriceEnabled(establishment) && Number(room.price_per_night) > 0 && Number(room.price_per_night) !== 100 ? room.price_per_night : undefined,
                                   specs: [
                                     { label: "Capacidad", value: `${room.capacity || 2} Personas` },
                                     { label: "Superficie", value: "32 m² Aproximados" },
@@ -1825,9 +1833,9 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                                 whatsappNumber={establishment.whatsapp || establishment.phone}
                                 establishmentId={establishment.id}
                                 establishmentName={establishment.name}
-                                customMessage={`Hola! Estoy viendo la ficha de ${establishment.name} en Hoteles de Venezuela y me gustaría consultar disponibilidad para la unidad: "${room.name}".`}
+                                customMessage={`Hola! Estoy viendo la ficha de ${establishment.name} en Hoteles de Venezuela y me gustaría consultar precio y disponibilidad para la unidad: "${room.name}".`}
                               >
-                                Consultar Habitación
+                                Consultar precio por WhatsApp
                               </TrackedWhatsAppButton>
                             </div>
                           </div>
@@ -2366,7 +2374,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                     isPriority={true}
                     directOpen={true}
                   >
-                    Cotizar Ahora Mismo!
+                    Consultar precio por WhatsApp
                   </TrackedWhatsAppButton>
                 )}
 
@@ -2515,9 +2523,13 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                     <span className="px-3 py-1 bg-[#FF0096]/10 text-[#FF0096] text-[10px] font-black uppercase rounded-full tracking-wider">
                       Ficha Técnica Detallada
                     </span>
-                    {activeDetailModal.price && (
+                    {activeDetailModal.price ? (
                       <span className="text-xs sm:text-sm font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
                         Tarifa: ${activeDetailModal.price} USD / Noche
+                      </span>
+                    ) : (
+                      <span className="text-xs font-black text-[#00C8D4] bg-[#00C8D4]/10 px-3 py-1 rounded-full border border-[#00C8D4]/25">
+                        Tarifa directa a consultar
                       </span>
                     )}
                   </div>
@@ -2578,7 +2590,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                   establishmentName={establishment.name}
                   customMessage={activeDetailModal.whatsappCustomMsg}
                 >
-                  Solicitar Reserva Directa por WhatsApp
+                  Consultar precio por WhatsApp
                 </TrackedWhatsAppButton>
               </div>
             </div>
@@ -2778,7 +2790,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
 
           <div className="flex items-center gap-3 ml-auto">
             <div className="text-right">
-              <span className="text-[9px] uppercase font-bold text-slate-400 block">Garantía Directa</span>
+              <span className="text-[9px] uppercase font-bold text-slate-400 block">Tarifa directa a consultar</span>
               <span className="text-xs font-black text-emerald-600">0% Comisiones • Trato Directo</span>
             </div>
 
@@ -2788,9 +2800,9 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
               establishmentName={establishment.name}
               isPriority={true}
               directOpen={true}
-              customMessage={`Hola! Quisiera cotizar y reservar directamente en ${establishment.name}.`}
+              customMessage={`Hola! Quisiera consultar precio y disponibilidad directa en ${establishment.name}.`}
             >
-              {isGastronomyCategory ? "Reservar Mesa por WhatsApp" : "Cotizar Ahora Mismo!"}
+              {isGastronomyCategory ? "Reservar Mesa por WhatsApp" : "Consultar precio por WhatsApp"}
             </TrackedWhatsAppButton>
           </div>
         </div>
