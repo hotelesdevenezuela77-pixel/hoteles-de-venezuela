@@ -120,6 +120,8 @@ export function PreRegistro() {
   ]);
 
   const [customPillInput, setCustomPillInput] = useState<string>("");
+  const [customPillSuggestions, setCustomPillSuggestions] = useState<string[]>([]);
+  const [pillErrorMsg, setPillErrorMsg] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<"card_form" | "bedrooms_config">("card_form");
@@ -344,24 +346,69 @@ export function PreRegistro() {
     setBadges(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
+  const MAX_PILLS_COUNT = 6;
+  const MAX_PILL_CHARS = 24;
+
   const togglePill = (pill: string) => {
+    setPillErrorMsg(null);
     if (pills.includes(pill)) {
-      setPills(pills.filter(p => p !== pill));
+      setPills(pills.filter((p) => p !== pill));
     } else {
-      if (pills.length < 6) {
-        setPills([...pills, pill]);
+      if (pills.length >= MAX_PILLS_COUNT) {
+        setPillErrorMsg(
+          `Ya seleccionaste el máximo de ${MAX_PILLS_COUNT} etiquetas. Desmarca alguna para seleccionar o añadir otra.`
+        );
+        return;
       }
+      setPills([...pills, pill]);
     }
   };
 
-  const handleAddCustomPill = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (customPillInput.trim() && !pills.includes(customPillInput.trim())) {
-      if (pills.length < 6) {
-        setPills([...pills, customPillInput.trim()]);
-        setCustomPillInput("");
-      }
+  const handleAddCustomPill = (e?: React.FormEvent | React.MouseEvent) => {
+    if (e) e.preventDefault();
+    setPillErrorMsg(null);
+
+    const cleaned = customPillInput
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, MAX_PILL_CHARS);
+
+    if (!cleaned) {
+      setPillErrorMsg("Escribe el nombre de la etiqueta antes de pulsar Añadir Pill.");
+      return;
     }
+
+    const existingMatch = [...defaultPillSuggestions, ...customPillSuggestions, ...pills].find(
+      (p) => p.toLowerCase() === cleaned.toLowerCase()
+    );
+    const finalPill = existingMatch || cleaned;
+
+    // Si ya está activa, limpiar input e informar
+    if (pills.some((p) => p.toLowerCase() === finalPill.toLowerCase())) {
+      setCustomPillInput("");
+      setPillErrorMsg(`La etiqueta "${finalPill}" ya está seleccionada y activa.`);
+      return;
+    }
+
+    // Si alcanzó el límite de 6, mostrar mensaje claro
+    if (pills.length >= MAX_PILLS_COUNT) {
+      setPillErrorMsg(
+        `Alcanzaste el límite máximo de ${MAX_PILLS_COUNT} etiquetas activas. Desmarca alguna etiqueta de la lista para añadir "${finalPill}".`
+      );
+      return;
+    }
+
+    // Agregar al catálogo de pills visibles si no está en las sugerencias base
+    if (
+      !defaultPillSuggestions.some((p) => p.toLowerCase() === finalPill.toLowerCase()) &&
+      !customPillSuggestions.some((p) => p.toLowerCase() === finalPill.toLowerCase())
+    ) {
+      setCustomPillSuggestions((prev) => [...prev, finalPill]);
+    }
+
+    // Seleccionar / activar inmediatamente la nueva pill
+    setPills((prev) => [...prev, finalPill]);
+    setCustomPillInput("");
   };
 
   const generateSlug = (text: string) => {
@@ -1102,47 +1149,79 @@ export function PreRegistro() {
 
               {/* 6. Pills / Etiquetas Secundarias de Servicios Clave */}
               <div>
-                <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-2">
-                  6. Pills / Etiquetas Secundarias de Servicios Clave (Máx 6)
-                </label>
-                
-                {/* Sugerencias Rápidas */}
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                  {defaultPillSuggestions.map(pill => {
-                    const isSelected = pills.includes(pill);
-                    return (
-                      <button
-                        key={pill}
-                        type="button"
-                        onClick={() => togglePill(pill)}
-                        className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                          isSelected
-                            ? "bg-[#FF0096] text-white shadow-sm"
-                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                        }`}
-                      >
-                        {isSelected ? "✓ " : "+ "}
-                        {pill}
-                      </button>
-                    );
-                  })}
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500">
+                    6. Pills / Etiquetas Secundarias de Servicios Clave (Máx {MAX_PILLS_COUNT})
+                  </label>
+                  <span
+                    className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                      pills.length >= MAX_PILLS_COUNT
+                        ? "bg-amber-100 text-amber-800 border border-amber-300"
+                        : "bg-slate-100 text-slate-600"
+                    }`}
+                  >
+                    {pills.length} / {MAX_PILLS_COUNT} seleccionadas
+                  </span>
                 </div>
 
-                {/* Input para agregar pill personalizada */}
-                <form onSubmit={handleAddCustomPill} className="flex gap-2">
-                  <input
-                    type="text"
-                    value={customPillInput}
-                    onChange={(e) => setCustomPillInput(e.target.value)}
-                    placeholder="Escribe otra etiqueta personalizada..."
-                    className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:border-[#00C8D4]"
-                  />
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold cursor-pointer"
-                  >
-                    Añadir Pill
-                  </button>
+                {/* Lista unificada de Sugerencias + Pills Personalizadas creadas */}
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {Array.from(new Set([...defaultPillSuggestions, ...customPillSuggestions, ...pills])).map(
+                    (pill) => {
+                      const isSelected = pills.includes(pill);
+                      return (
+                        <button
+                          key={pill}
+                          type="button"
+                          onClick={() => togglePill(pill)}
+                          title={pill}
+                          className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer inline-flex items-center gap-1 max-w-[180px] ${
+                            isSelected
+                              ? "bg-[#FF0096] text-white shadow-sm"
+                              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                          }`}
+                        >
+                          <span className="shrink-0">{isSelected ? "✓" : "+"}</span>
+                          <span className="truncate">{pill}</span>
+                        </button>
+                      );
+                    }
+                  )}
+                </div>
+
+                {/* Input para agregar pill personalizada (Máx 24 caracteres) */}
+                <form onSubmit={handleAddCustomPill} className="space-y-1.5">
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <input
+                        type="text"
+                        value={customPillInput}
+                        maxLength={MAX_PILL_CHARS}
+                        onChange={(e) => {
+                          setCustomPillInput(e.target.value.slice(0, MAX_PILL_CHARS));
+                          if (pillErrorMsg) setPillErrorMsg(null);
+                        }}
+                        placeholder="Escribe otra etiqueta personalizada (máx. 24 car.)..."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-3 pr-14 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:border-[#00C8D4]"
+                      />
+                      <span className="absolute right-2.5 top-2.5 text-[10px] font-bold text-slate-400 select-none">
+                        {customPillInput.length}/{MAX_PILL_CHARS}
+                      </span>
+                    </div>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold cursor-pointer shrink-0 transition-colors"
+                    >
+                      Añadir Pill
+                    </button>
+                  </div>
+
+                  {pillErrorMsg && (
+                    <p className="text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-1.5 flex items-center gap-1.5">
+                      <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                      <span>{pillErrorMsg}</span>
+                    </p>
+                  )}
                 </form>
               </div>
 
@@ -1906,12 +1985,17 @@ export function PreRegistro() {
                     )}
                   </div>
 
-                  {/* Pills Secundarias */}
+                  {/* Pills Secundarias (Compactas con truncado limpio para no deformar la tarjeta) */}
                   {pills.length > 0 && (
                     <div className="flex flex-wrap gap-1">
-                      {pills.map(p => (
-                        <span key={p} className="text-[10px] px-2 py-0.5 rounded-md bg-white/10 text-slate-300 border border-white/5">
-                          • {p}
+                      {pills.map((p) => (
+                        <span
+                          key={p}
+                          title={p}
+                          className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-md bg-white/10 text-slate-300 border border-white/5 max-w-[145px]"
+                        >
+                          <span className="shrink-0">•</span>
+                          <span className="truncate">{p}</span>
                         </span>
                       ))}
                     </div>
