@@ -6,7 +6,8 @@ interface AgencySupplierSettlementProps {
   supplierPayments?: SupplierPayment[];
   expeditionExpenses?: ExpeditionExpense[];
   onPaySupplier: (paymentId: string, bankRef: string) => void;
-  onAddExpeditionExpense: (expense: Partial<ExpeditionExpense>) => void;
+  onAddExpeditionExpense?: (expense: Partial<ExpeditionExpense>) => void;
+  onAddExpense?: (expense: Partial<ExpeditionExpense>) => void;
 }
 
 const CATEGORY_LABELS: { [key in ExpenseCategory]: string } = {
@@ -22,7 +23,8 @@ export const AgencySupplierSettlement: React.FC<AgencySupplierSettlementProps> =
   supplierPayments = [],
   expeditionExpenses = [],
   onPaySupplier,
-  onAddExpeditionExpense
+  onAddExpeditionExpense,
+  onAddExpense
 }) => {
   const [activeSubTab, setActiveSubTab] = useState<"liquidaciones" | "gastos_campo">("liquidaciones");
   
@@ -59,12 +61,15 @@ export const AgencySupplierSettlement: React.FC<AgencySupplierSettlementProps> =
     const val = parseFloat(amountUsd);
     if (!description.trim() || isNaN(val) || val <= 0) return;
 
-    onAddExpeditionExpense({
-      description: description.trim(),
-      category: expenseCategory,
-      amount_usd: val,
-      logged_by: loggedBy.trim()
-    });
+    const submitExpense = onAddExpeditionExpense || onAddExpense;
+    if (submitExpense) {
+      submitExpense({
+        description: description.trim(),
+        category: expenseCategory,
+        amount_usd: val,
+        logged_by: loggedBy.trim()
+      });
+    }
 
     setDescription("");
     setAmountUsd("");

@@ -194,7 +194,13 @@ export const AgencyDashboard: React.FC<AgencyDashboardProps> = ({
         )}
 
         {activeTab === "liquidaciones" && (
-          <AgencySupplierSettlement supplierPayments={supplierPayments || []} expeditionExpenses={expeditionExpenses || []} onPaySupplier={paySupplier} onAddExpense={addExpeditionExpense} />
+          <AgencySupplierSettlement
+            supplierPayments={supplierPayments || []}
+            expeditionExpenses={expeditionExpenses || []}
+            onPaySupplier={paySupplier}
+            onAddExpeditionExpense={addExpeditionExpense}
+            onAddExpense={addExpeditionExpense}
+          />
         )}
 
         {activeTab === "manifiesto" && (
