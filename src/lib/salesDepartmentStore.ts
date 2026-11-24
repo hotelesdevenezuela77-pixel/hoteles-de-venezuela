@@ -1,5 +1,282 @@
 import { supabase } from "./supabase";
 import { logActivity } from "./activityLogger";
+import { ESTABLISHMENTS_MOCK } from "./establishmentsMock";
+
+/**
+ * Normaliza un nombre comercial ignorando mayúsculas, tildes, puntuación y espacios extra
+ * para detección exacta o equivalente sin duplicados.
+ */
+export function normalizeEstablishmentName(value?: string | null): string {
+  if (!value) return "";
+  return String(value)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Normaliza un número de WhatsApp o teléfono dejando los últimos dígitos significativos
+ * (ej. últimos 10 dígitos para comparar +58 412-1234567 con 04121234567 o 584121234567).
+ */
+export function normalizePhoneKey(value?: string | null): string {
+  if (!value) return "";
+  const digits = String(value).replace(/\D/g, "");
+  if (digits.length < 7) return "";
+  return digits.slice(-10);
+}
+
+/**
+ * Verifica si dos nombres o números de teléfono corresponden al mismo establecimiento/cliente.
+ */
+export function isSameEstablishmentOrClient(
+  a: { name?: string | null; phone?: string | null; whatsapp?: string | null; slug?: string | null },
+  b: { name?: string | null; phone?: string | null; whatsapp?: string | null; slug?: string | null }
+): boolean {
+  if (a.slug && b.slug && a.slug.trim().toLowerCase() === b.slug.trim().toLowerCase()) {
+    return true;
+  }
+  const nameA = normalizeEstablishmentName(a.name);
+  const nameB = normalizeEstablishmentName(b.name);
+  if (nameA && nameB && nameA === nameB) {
+    return true;
+  }
+  const phoneA = normalizePhoneKey(a.whatsapp || a.phone);
+  const phoneB = normalizePhoneKey(b.whatsapp || b.phone);
+  // Evitar falsos positivos con el número genérico de ejemplo "+58 412 1234567" si los nombres son distintos
+  const isPlaceholderPhone = phoneA === "4121234567" || phoneB === "4121234567";
+  if (phoneA && phoneB && phoneA === phoneB && !isPlaceholderPhone) {
+    return true;
+  }
+  return false;
+}
+
+export interface ExistingEstablishmentMatch {
+  matched: boolean;
+  matchReason: "nombre" | "whatsapp" | "slug" | null;
+  source: "supabase" | "local" | "mock" | null;
+  id?: number | string;
+  slug: string;
+  name: string;
+  categoryName?: string;
+  destinationName?: string;
+  state?: string;
+  city?: string;
+  address?: string;
+  whatsapp?: string;
+  phone?: string;
+  description?: string;
+  primaryImage?: string;
+  galleryImages?: string[];
+  ratingAvg?: number;
+  services?: string[];
+  latitude?: number | null;
+  longitude?: number | null;
+}
+
+/**
+ * Busca en Supabase (`establishments` y `properties`), `localStorage` (`hdv_mock_establishments`) y `ESTABLISHMENTS_MOCK`
+ * si ya existe un establecimiento con el mismo nombre normalizado o el mismo WhatsApp/teléfono principal.
+ */
+export async function findExistingEstablishmentMatch(params: {
+  title: string;
+  whatsappNumber?: string;
+  candidateSlug?: string;
+}): Promise<ExistingEstablishmentMatch | null> {
+  const normTitle = normalizeEstablishmentName(params.title);
+  const normPhone = normalizePhoneKey(params.whatsappNumber);
+  const isPlaceholderPhone = normPhone === "4121234567";
+
+  if (!normTitle && !normPhone) return null;
+
+  // 1. Buscar en Supabase `establishments`
+  try {
+    const { data: dbEsts } = await supabase
+      .from("establishments")
+      .select(`
+        *,
+        categories (name, slug),
+        destinations (name, slug, state),
+        establishment_images (image_url, is_primary)
+      `);
+
+    if (Array.isArray(dbEsts) && dbEsts.length > 0) {
+      for (const item of dbEsts) {
+        const itemNameNorm = normalizeEstablishmentName(item.name);
+        const itemPhoneNorm = normalizePhoneKey(item.whatsapp || item.phone);
+        const bySlug =
+          params.candidateSlug &&
+          item.slug &&
+          String(item.slug).toLowerCase() === params.candidateSlug.toLowerCase();
+        const byName = Boolean(normTitle && itemNameNorm && normTitle === itemNameNorm);
+        const byPhone = Boolean(
+          normPhone &&
+            !isPlaceholderPhone &&
+            itemPhoneNorm &&
+            normPhone === itemPhoneNorm
+        );
+
+        if (byName || byPhone || bySlug) {
+          const imgs: string[] = Array.isArray(item.establishment_images)
+            ? item.establishment_images
+                .map((img: any) => img?.image_url)
+                .filter(Boolean)
+            : [];
+          const primary =
+            item.establishment_images?.find((img: any) => img?.is_primary)?.image_url ||
+            imgs[0] ||
+            item.primary_image ||
+            "";
+
+          return {
+            matched: true,
+            matchReason: byName ? "nombre" : byPhone ? "whatsapp" : "slug",
+            source: "supabase",
+            id: item.id,
+            slug: item.slug,
+            name: item.name,
+            categoryName: item.categories?.name || item.category_name,
+            destinationName: item.destinations?.name || item.destination_name,
+            state: item.destinations?.state || item.state,
+            city: item.city,
+            address: item.address,
+            whatsapp: item.whatsapp || item.phone,
+            phone: item.phone || item.whatsapp,
+            description: item.description,
+            primaryImage: primary,
+            galleryImages: imgs,
+            ratingAvg: Number(item.rating_avg) || 4.8,
+            latitude: item.latitude ?? null,
+            longitude: item.longitude ?? null
+          };
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("Aviso consultando establecimientos existentes en Supabase:", err);
+  }
+
+  // 2. Buscar en localStorage `hdv_mock_establishments`
+  if (typeof window !== "undefined") {
+    try {
+      const localEsts: any[] = JSON.parse(
+        localStorage.getItem("hdv_mock_establishments") || "[]"
+      );
+      for (const item of localEsts) {
+        const itemNameNorm = normalizeEstablishmentName(item.name);
+        const itemPhoneNorm = normalizePhoneKey(item.whatsapp || item.phone);
+        const bySlug =
+          params.candidateSlug &&
+          item.slug &&
+          String(item.slug).toLowerCase() === params.candidateSlug.toLowerCase();
+        const byName = Boolean(normTitle && itemNameNorm && normTitle === itemNameNorm);
+        const byPhone = Boolean(
+          normPhone &&
+            !isPlaceholderPhone &&
+            itemPhoneNorm &&
+            normPhone === itemPhoneNorm
+        );
+
+        if (byName || byPhone || bySlug) {
+          return {
+            matched: true,
+            matchReason: byName ? "nombre" : byPhone ? "whatsapp" : "slug",
+            source: "local",
+            id: item.id,
+            slug: item.slug,
+            name: item.name,
+            categoryName: item.category_name,
+            destinationName: item.destination_name,
+            state: item.state,
+            city: item.city,
+            address: item.address,
+            whatsapp: item.whatsapp || item.phone,
+            phone: item.phone || item.whatsapp,
+            description: item.description,
+            primaryImage: item.primary_image,
+            galleryImages: Array.isArray(item.images) ? item.images : item.primary_image ? [item.primary_image] : [],
+            ratingAvg: Number(item.rating_avg) || 4.8,
+            latitude: item.latitude ?? null,
+            longitude: item.longitude ?? null
+          };
+        }
+      }
+    } catch {}
+  }
+
+  // 3. Buscar en fichas precargadas de muestra `ESTABLISHMENTS_MOCK`
+  for (const item of ESTABLISHMENTS_MOCK) {
+    const itemNameNorm = normalizeEstablishmentName(item.name);
+    const itemPhoneNorm = normalizePhoneKey(item.whatsapp || item.phone);
+    const bySlug =
+      params.candidateSlug &&
+      item.slug &&
+      String(item.slug).toLowerCase() === params.candidateSlug.toLowerCase();
+    const byName = Boolean(normTitle && itemNameNorm && normTitle === itemNameNorm);
+    const byPhone = Boolean(
+      normPhone &&
+        !isPlaceholderPhone &&
+        itemPhoneNorm &&
+        normPhone === itemPhoneNorm
+    );
+
+    if (byName || byPhone || bySlug) {
+      return {
+        matched: true,
+        matchReason: byName ? "nombre" : byPhone ? "whatsapp" : "slug",
+        source: "mock",
+        id: item.id,
+        slug: item.slug,
+        name: item.name,
+        categoryName: item.category_name,
+        destinationName: item.destination_name,
+        address: item.address,
+        whatsapp: item.whatsapp || item.phone,
+        phone: item.phone || item.whatsapp,
+        description: item.description,
+        primaryImage: item.primary_image,
+        galleryImages: item.primary_image ? [item.primary_image] : [],
+        ratingAvg: Number(item.rating_avg) || 4.8
+      };
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Consolida y deduplica una lista de establecimientos (de Supabase + localStorage + mocks)
+ * priorizando los registros actualizados desde /pre-registro y evitando tarjetas repetidas
+ * por slug, nombre normalizado o número de WhatsApp.
+ */
+export function consolidateAndDeduplicateEstablishments<T extends {
+  id?: number | string;
+  slug?: string;
+  name?: string;
+  phone?: string;
+  whatsapp?: string;
+}>(items: T[]): T[] {
+  const result: T[] = [];
+  for (const candidate of items) {
+    if (!candidate) continue;
+    const existingIdx = result.findIndex((existing) =>
+      isSameEstablishmentOrClient(existing, candidate)
+    );
+    if (existingIdx === -1) {
+      result.push(candidate);
+    } else {
+      // Consolidar: mantener el registro con datos más recientes (el candidato si viene de actualización local/pre-registro)
+      result[existingIdx] = {
+        ...result[existingIdx],
+        ...candidate,
+        slug: result[existingIdx].slug || candidate.slug
+      };
+    }
+  }
+  return result;
+}
 
 export type RegistrationOrigin = "propietario" | "agente_ventas";
 
@@ -121,7 +398,10 @@ export interface SalesPreRegistrationReceipt {
   correlativeSequence: number;      // 1, 2, 3...
   founderSlotNumber: number | null; // 1..50 si aplica a 50 Fundadores
 
-  // Datos del Establecimiento
+  // Datos del Establecimiento (Consolidado sin duplicados)
+  establishmentId?: number | string | null;
+  wasConsolidatedExisting?: boolean;
+  consolidatedMatchReason?: "nombre" | "whatsapp" | "slug" | null;
   establishmentTitle: string;
   establishmentSlug: string;
   categoryName: string;
@@ -396,6 +676,9 @@ export async function detectClientPublicIp(): Promise<string> {
 }
 
 export interface CreateSalesPreRegistrationInput {
+  establishmentId?: number | string | null;
+  wasConsolidatedExisting?: boolean;
+  consolidatedMatchReason?: "nombre" | "whatsapp" | "slug" | null;
   establishmentTitle: string;
   establishmentSlug: string;
   categoryName: string;
@@ -547,6 +830,9 @@ export async function processSalesPreRegistration(
     invoiceNumber,
     correlativeSequence: nextPreRegSeq,
     founderSlotNumber,
+    establishmentId: input.establishmentId ?? null,
+    wasConsolidatedExisting: Boolean(input.wasConsolidatedExisting),
+    consolidatedMatchReason: input.consolidatedMatchReason ?? null,
     establishmentTitle: input.establishmentTitle,
     establishmentSlug: input.establishmentSlug,
     categoryName: input.categoryName,
@@ -766,10 +1052,16 @@ export async function processSalesPreRegistration(
     } catch {}
   }
 
-  // 3. SINCRONIZACIÓN AUTOMÁTICA CON BASE DE CLIENTES Y PIPELINE CRM / WHATSAPP CRM
+  // 3. SINCRONIZACIÓN AUTOMÁTICA CON BASE DE CLIENTES Y PIPELINE CRM / WHATSAPP CRM (UPSERT SIN DUPLICADOS)
+  const consolidationTag = input.wasConsolidatedExisting
+    ? `Registro Existente Consolidado (Detectado por ${input.consolidatedMatchReason || "nombre/WhatsApp"})`
+    : "Nuevo Registro Oficial";
+
   const crmNotes = [
     `Folio Pre-Registro: ${folio}`,
     `Documento Financiero: ${financialCorrelative}`,
+    `Consolidación: ${consolidationTag}`,
+    `Slug Oficial: ${input.establishmentSlug}`,
     `Modalidad: ${modalityLabel}`,
     founderSlotNumber ? `Cupo 50 Fundadores: #${founderSlotNumber}/${MAX_FOUNDERS_QUOTA}` : null,
     `Plan: ${selectedPlan.name}`,
@@ -829,53 +1121,162 @@ export async function processSalesPreRegistration(
     createdAt: createdAtIso
   };
 
+  const targetNameNorm = normalizeEstablishmentName(input.establishmentTitle);
+  const targetPhoneNorm = normalizePhoneKey(input.whatsappNumber);
+  const isPlaceholderTargetPhone = targetPhoneNorm === "4121234567";
+
   try {
     if (typeof window !== "undefined") {
-      const localLeads = JSON.parse(
+      // Upsert sin duplicados en localStorage `hdv_mock_whatsapp_leads`
+      const localLeads: any[] = JSON.parse(
         localStorage.getItem(STORAGE_KEYS.WHATSAPP_LEADS) || "[]"
       );
+      const filteredLeads = localLeads.filter((l: any) => {
+        const lNameNorm = normalizeEstablishmentName(
+          String(l.name || "").split("(")[0]
+        );
+        const lPhoneNorm = normalizePhoneKey(l.phone);
+        const sameName = Boolean(targetNameNorm && lNameNorm && targetNameNorm === lNameNorm);
+        const samePhone = Boolean(
+          targetPhoneNorm &&
+            !isPlaceholderTargetPhone &&
+            lPhoneNorm &&
+            targetPhoneNorm === lPhoneNorm
+        );
+        return !(sameName || samePhone);
+      });
       localStorage.setItem(
         STORAGE_KEYS.WHATSAPP_LEADS,
-        JSON.stringify([leadPayload, ...localLeads])
+        JSON.stringify([leadPayload, ...filteredLeads])
       );
 
-      const localProspects = JSON.parse(
+      // Upsert sin duplicados en localStorage `hdv_mock_commercial_prospects`
+      const localProspects: any[] = JSON.parse(
         localStorage.getItem(STORAGE_KEYS.COMMERCIAL_PROSPECTS) || "[]"
       );
+      const filteredProspects = localProspects.filter((p: any) => {
+        const pNameNorm = normalizeEstablishmentName(
+          p.establishment_name || p.establishmentName
+        );
+        const pPhoneNorm = normalizePhoneKey(p.phone);
+        const sameName = Boolean(targetNameNorm && pNameNorm && targetNameNorm === pNameNorm);
+        const samePhone = Boolean(
+          targetPhoneNorm &&
+            !isPlaceholderTargetPhone &&
+            pPhoneNorm &&
+            targetPhoneNorm === pPhoneNorm
+        );
+        return !(sameName || samePhone);
+      });
       localStorage.setItem(
         STORAGE_KEYS.COMMERCIAL_PROSPECTS,
-        JSON.stringify([prospectPayload, ...localProspects])
+        JSON.stringify([prospectPayload, ...filteredProspects])
       );
     }
 
-    await Promise.allSettled([
-      supabase.from("whatsapp_leads").insert({
-        name: leadPayload.name,
-        email: leadPayload.email,
-        phone: leadPayload.phone,
-        source: leadPayload.source,
-        interest: leadPayload.interest,
-        status: leadPayload.status,
-        lead_type: leadPayload.lead_type,
-        business_type: leadPayload.business_type,
-        assigned_to: leadPayload.assigned_to,
-        notes: leadPayload.notes
-      }),
-      supabase.from("commercial_prospects").insert({
-        establishment_name: prospectPayload.establishment_name,
-        contact_name: prospectPayload.contact_name,
-        phone: prospectPayload.phone,
-        email: prospectPayload.email,
-        destination_name: prospectPayload.destination_name,
-        zone: prospectPayload.zone,
-        address: prospectPayload.address,
-        category: prospectPayload.category,
-        status: prospectPayload.status,
-        priority: prospectPayload.priority,
-        contract_url: prospectPayload.contract_url,
-        notes: prospectPayload.notes
-      })
-    ]);
+    // Upsert sin duplicados en Supabase `whatsapp_leads`
+    try {
+      const { data: existingLeads } = await supabase
+        .from("whatsapp_leads")
+        .select("id, name, phone");
+      const matchedLead = (existingLeads || []).find((l: any) => {
+        const lNameNorm = normalizeEstablishmentName(String(l.name || "").split("(")[0]);
+        const lPhoneNorm = normalizePhoneKey(l.phone);
+        const sameName = Boolean(targetNameNorm && lNameNorm && targetNameNorm === lNameNorm);
+        const samePhone = Boolean(
+          targetPhoneNorm &&
+            !isPlaceholderTargetPhone &&
+            lPhoneNorm &&
+            targetPhoneNorm === lPhoneNorm
+        );
+        return sameName || samePhone;
+      });
+
+      if (matchedLead?.id) {
+        await supabase
+          .from("whatsapp_leads")
+          .update({
+            name: leadPayload.name,
+            email: leadPayload.email,
+            phone: leadPayload.phone,
+            source: leadPayload.source,
+            interest: leadPayload.interest,
+            status: leadPayload.status,
+            lead_type: leadPayload.lead_type,
+            business_type: leadPayload.business_type,
+            assigned_to: leadPayload.assigned_to,
+            notes: leadPayload.notes
+          })
+          .eq("id", matchedLead.id);
+      } else {
+        await supabase.from("whatsapp_leads").insert({
+          name: leadPayload.name,
+          email: leadPayload.email,
+          phone: leadPayload.phone,
+          source: leadPayload.source,
+          interest: leadPayload.interest,
+          status: leadPayload.status,
+          lead_type: leadPayload.lead_type,
+          business_type: leadPayload.business_type,
+          assigned_to: leadPayload.assigned_to,
+          notes: leadPayload.notes
+        });
+      }
+    } catch {}
+
+    // Upsert sin duplicados en Supabase `commercial_prospects`
+    try {
+      const { data: existingProspects } = await supabase
+        .from("commercial_prospects")
+        .select("id, establishment_name, phone");
+      const matchedProspect = (existingProspects || []).find((p: any) => {
+        const pNameNorm = normalizeEstablishmentName(p.establishment_name);
+        const pPhoneNorm = normalizePhoneKey(p.phone);
+        const sameName = Boolean(targetNameNorm && pNameNorm && targetNameNorm === pNameNorm);
+        const samePhone = Boolean(
+          targetPhoneNorm &&
+            !isPlaceholderTargetPhone &&
+            pPhoneNorm &&
+            targetPhoneNorm === pPhoneNorm
+        );
+        return sameName || samePhone;
+      });
+
+      if (matchedProspect?.id) {
+        await supabase
+          .from("commercial_prospects")
+          .update({
+            establishment_name: prospectPayload.establishment_name,
+            contact_name: prospectPayload.contact_name,
+            phone: prospectPayload.phone,
+            email: prospectPayload.email,
+            destination_name: prospectPayload.destination_name,
+            zone: prospectPayload.zone,
+            address: prospectPayload.address,
+            category: prospectPayload.category,
+            status: prospectPayload.status,
+            priority: prospectPayload.priority,
+            contract_url: prospectPayload.contract_url,
+            notes: prospectPayload.notes
+          })
+          .eq("id", matchedProspect.id);
+      } else {
+        await supabase.from("commercial_prospects").insert({
+          establishment_name: prospectPayload.establishment_name,
+          contact_name: prospectPayload.contact_name,
+          phone: prospectPayload.phone,
+          email: prospectPayload.email,
+          destination_name: prospectPayload.destination_name,
+          zone: prospectPayload.zone,
+          address: prospectPayload.address,
+          category: prospectPayload.category,
+          status: prospectPayload.status,
+          priority: prospectPayload.priority,
+          contract_url: prospectPayload.contract_url,
+          notes: prospectPayload.notes
+        });
+      }
+    } catch {}
   } catch (err) {
     console.warn("Aviso sincronizando CRM:", err);
   }
@@ -884,7 +1285,8 @@ export async function processSalesPreRegistration(
   const auditDetails = [
     `Folio: ${folio}`,
     `Finanzas: ${financialCorrelative} (${financialStatusLabel})`,
-    `Establecimiento: ${input.establishmentTitle} (${input.categoryName} - ${input.destinationName})`,
+    `Consolidación: ${consolidationTag}`,
+    `Establecimiento: ${input.establishmentTitle} [slug: ${input.establishmentSlug}] (${input.categoryName} - ${input.destinationName})`,
     `Origen: ${registrantName}`,
     `Cláusula Legal Aceptada: "${newReceipt.termsAcceptedText}"`,
     `IP Cliente: ${clientIp}`,

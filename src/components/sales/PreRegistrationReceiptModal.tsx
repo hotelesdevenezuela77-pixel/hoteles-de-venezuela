@@ -226,7 +226,7 @@ export function printOfficialPreRegistrationReceipt(receipt: SalesPreRegistratio
         <div class="card">
           <span class="label">Establecimiento Afiliado</span>
           <div class="val">${receipt.establishmentTitle}</div>
-          <div style="font-size: 11px; color: #475569; margin-top: 3px;">${receipt.categoryName}</div>
+          <div style="font-size: 11px; color: #475569; margin-top: 3px;">${receipt.categoryName} • ${receipt.wasConsolidatedExisting ? "Ficha Existente Consolidada (Sin Duplicados)" : "Ficha Oficial Activa"}</div>
         </div>
         <div class="card">
           <span class="label">Destino y Contacto Oficial</span>
@@ -359,7 +359,12 @@ export function PreRegistrationReceiptModal({
                 <p className="text-sm font-black text-slate-900 truncate">
                   {receipt.establishmentTitle}
                 </p>
-                <span className="text-xs font-bold text-[#008f99]">{receipt.categoryName}</span>
+                <span className="text-xs font-bold text-[#008f99] block">{receipt.categoryName}</span>
+                {receipt.wasConsolidatedExisting && (
+                  <span className="inline-block mt-1 px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[9px] font-black uppercase tracking-wider">
+                    ✓ Ficha Existente Consolidada (Sin Duplicados)
+                  </span>
+                )}
               </div>
             </div>
 

@@ -4,6 +4,7 @@ import { supabase } from "../lib/supabase";
 import { ESTABLISHMENTS_MOCK } from "../lib/establishmentsMock";
 import type { Establishment } from "../components/layout/EstablishmentCard";
 import { EstablishmentCard, EstablishmentListItem, getRealEstablishmentPrice } from "../components/layout/EstablishmentCard";
+import { consolidateAndDeduplicateEstablishments } from "../lib/salesDepartmentStore";
 import { 
   Search, MapPin, ChevronDown, ChevronUp, X, Filter, Grid, List, Compass, Loader2, 
   Wifi, Car, Waves, Wind, Palmtree, Zap, Droplets, Dog, Star, Sparkles, RotateCcw,
@@ -487,17 +488,17 @@ export function Establecimientos() {
             is_ads_enabled: item.is_ads_enabled || false
           }));
 
-          setEstablishments([...mapped, ...mappedLocal]);
+          setEstablishments(consolidateAndDeduplicateEstablishments([...mapped, ...mappedLocal]));
         } else {
           const localEstsKey = "hdv_mock_establishments";
           const localEsts = JSON.parse(localStorage.getItem(localEstsKey) || "[]");
-          setEstablishments([...ESTABLISHMENTS_MOCK, ...localEsts]);
+          setEstablishments(consolidateAndDeduplicateEstablishments([...ESTABLISHMENTS_MOCK, ...localEsts]));
         }
       } catch (err) {
         console.warn("Error consultando Supabase para establecimientos, usando datos de demostración:", err);
         const localEstsKey = "hdv_mock_establishments";
         const localEsts = JSON.parse(localStorage.getItem(localEstsKey) || "[]");
-        setEstablishments([...ESTABLISHMENTS_MOCK, ...localEsts]);
+        setEstablishments(consolidateAndDeduplicateEstablishments([...ESTABLISHMENTS_MOCK, ...localEsts]));
       } finally {
         setLoading(false);
       }

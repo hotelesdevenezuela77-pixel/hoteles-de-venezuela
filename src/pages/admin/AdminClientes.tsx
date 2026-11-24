@@ -3,6 +3,7 @@ import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
 import { supabase } from "@/lib/supabase";
 import { AdminTabBar } from "@/components/admin/AdminTabBar";
+import { normalizeEstablishmentName, normalizePhoneKey } from "@/lib/salesDepartmentStore";
 import {
   Users, MessageSquare, Phone, Mail, Bot, Download,
   Plus, Search, Filter, MailCheck, Send, CheckCircle,
@@ -108,11 +109,28 @@ export function AdminClientes() {
       const localLeadsKey = "hdv_mock_whatsapp_leads";
       const localLeads = JSON.parse(localStorage.getItem(localLeadsKey) || "[]");
 
-      // Combine and format
-      const combinedLeads = [...(dbLeads || []), ...localLeads];
+      // Combine, deduplicate (by normalized name or phone) and format
+      const combinedLeads = [...localLeads, ...(dbLeads || [])];
+      const uniqueLeads: any[] = [];
+      for (const candidate of combinedLeads) {
+        if (!candidate) continue;
+        const candName = normalizeEstablishmentName(String(candidate.name || "").split("(")[0]);
+        const candPhone = normalizePhoneKey(candidate.phone);
+        const isPlaceholder = candPhone === "4121234567";
+        const exists = uniqueLeads.some((existing) => {
+          const exName = normalizeEstablishmentName(String(existing.name || "").split("(")[0]);
+          const exPhone = normalizePhoneKey(existing.phone);
+          const sameName = Boolean(candName && exName && candName === exName);
+          const samePhone = Boolean(candPhone && !isPlaceholder && exPhone && candPhone === exPhone);
+          return sameName || samePhone;
+        });
+        if (!exists) {
+          uniqueLeads.push(candidate);
+        }
+      }
       
       // Map to Client interface
-      const formatted: Client[] = combinedLeads.map((l: any, index: number) => ({
+      const formatted: Client[] = uniqueLeads.map((l: any, index: number) => ({
         id: l.id || `lead-${index}-${Date.now()}`,
         name: l.name || "Cliente Sin Nombre",
         email: l.email || "sin_correo@hdv.com",

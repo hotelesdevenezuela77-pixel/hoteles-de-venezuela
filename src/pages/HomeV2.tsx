@@ -5,6 +5,7 @@ import { ESTABLISHMENTS_MOCK } from "../lib/establishmentsMock";
 import { optimizeImageUrl } from "../lib/utils";
 import { DESTINOS_MOCK } from "../lib/destinosMock";
 import type { Establishment } from "../components/layout/EstablishmentCard";
+import { consolidateAndDeduplicateEstablishments } from "../lib/salesDepartmentStore";
 
 import { HeroSectionV2 } from "../components/homeV2/HeroSectionV2";
 import { BoutiqueEstablishmentCard } from "../components/homeV2/BoutiqueEstablishmentCard";
@@ -202,9 +203,11 @@ export function HomeV2({ isMainHome = false }: { isMainHome?: boolean }) {
               is_ads_enabled: item.is_ads_enabled || false
             };
           });
-          setEstablishments(mapped);
+          const localEsts = JSON.parse(localStorage.getItem("hdv_mock_establishments") || "[]");
+          setEstablishments(consolidateAndDeduplicateEstablishments([...mapped, ...localEsts]));
         } else {
-          setEstablishments(ESTABLISHMENTS_MOCK);
+          const localEsts = JSON.parse(localStorage.getItem("hdv_mock_establishments") || "[]");
+          setEstablishments(consolidateAndDeduplicateEstablishments([...ESTABLISHMENTS_MOCK, ...localEsts]));
         }
 
         if (destRes.data && destRes.data.length > 0) {

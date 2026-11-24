@@ -34,6 +34,7 @@ import {
 import { supabase } from "../lib/supabase";
 import { ESTABLISHMENTS_MOCK } from "../lib/establishmentsMock";
 import { getRealEstablishmentPrice } from "../components/layout/EstablishmentCard";
+import { consolidateAndDeduplicateEstablishments } from "../lib/salesDepartmentStore";
 import { SeoHead } from "../components/seo/SeoHead";
 import { ClusterAuthorityCtaBlock } from "../components/seo/ClusterAuthorityCtaBlock";
 
@@ -708,7 +709,17 @@ export function HotelesEnVenezuela() {
           return bHasRealImgs - aHasRealImgs;
         });
 
-        for (const item of sortedDbList) {
+        let localEsts: any[] = [];
+        try {
+          localEsts = JSON.parse(localStorage.getItem("hdv_mock_establishments") || "[]");
+        } catch {}
+
+        const combinedSource = consolidateAndDeduplicateEstablishments([
+          ...sortedDbList,
+          ...localEsts
+        ]);
+
+        for (const item of combinedSource) {
           const catSlug = String(
             item.categories?.slug || item.category_slug || item.categories?.name || "hoteles"
           ).toLowerCase();
@@ -726,7 +737,10 @@ export function HotelesEnVenezuela() {
           return merged;
         }
 
-        return ESTABLISHMENTS_MOCK.map(enrichEstablishmentForVenezuelaLanding);
+        return consolidateAndDeduplicateEstablishments([
+          ...ESTABLISHMENTS_MOCK,
+          ...localEsts
+        ]).map(enrichEstablishmentForVenezuelaLanding);
       } catch (err) {
         console.warn("Error consultando establecimientos en Supabase:", err);
         return ESTABLISHMENTS_MOCK.map(enrichEstablishmentForVenezuelaLanding);

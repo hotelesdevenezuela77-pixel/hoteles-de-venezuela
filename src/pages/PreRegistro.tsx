@@ -49,6 +49,10 @@ import {
   getSalesCounters,
   syncSalesStateFromSupabase,
   processSalesPreRegistration,
+  findExistingEstablishmentMatch,
+  normalizeEstablishmentName,
+  normalizePhoneKey,
+  type ExistingEstablishmentMatch,
   type RegistrationOrigin,
   type MembershipModality,
   type SalesPreRegistrationReceipt,
@@ -137,6 +141,23 @@ export function PreRegistro() {
 
   const [salesCounters, setSalesCounters] = useState<SalesCountersState>(() => getSalesCounters());
   const [emittedReceipt, setEmittedReceipt] = useState<SalesPreRegistrationReceipt | null>(null);
+  const [detectedExistingMatch, setDetectedExistingMatch] = useState<ExistingEstablishmentMatch | null>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!title.trim() && !whatsappNumber.trim()) {
+        setDetectedExistingMatch(null);
+        return;
+      }
+      findExistingEstablishmentMatch({
+        title: title.trim(),
+        whatsappNumber: whatsappNumber.trim()
+      }).then((match) => {
+        setDetectedExistingMatch(match);
+      });
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [title, whatsappNumber]);
 
   useEffect(() => {
     syncSalesStateFromSupabase().then((res) => {
@@ -375,7 +396,21 @@ export function PreRegistro() {
 
     try {
       setIsSaving(true);
-      const slug = `${generateSlug(title)}-${generateSlug(destinationName)}`;
+      const generatedCandidateSlug = `${generateSlug(title)}-${generateSlug(destinationName)}`;
+
+      // 0. RECONOCIMIENTO AUTOMÁTICO (UPSERT SIN DUPLICADOS):
+      // Verificar si ya existe un establecimiento o cliente con el mismo nombre normalizado o el mismo WhatsApp/teléfono
+      const existingMatch = await findExistingEstablishmentMatch({
+        title: title.trim(),
+        whatsappNumber: whatsappNumber.trim(),
+        candidateSlug: generatedCandidateSlug
+      });
+
+      // Mantener limpio el slug/URL original si ya existía, o usar el nuevo si es un registro nuevo
+      const slug = existingMatch?.slug ? existingMatch.slug : generatedCandidateSlug;
+      const wasConsolidatedExisting = Boolean(existingMatch?.matched);
+      const consolidatedMatchReason = existingMatch?.matchReason || null;
+      const existingEstId = existingMatch?.id ?? null;
 
       const onboardingStatus = publishDirectly ? "COMPLETED" : "PRE_REGISTERED";
       const status = publishDirectly ? "ACTIVE" : "ACTIVE";
@@ -403,6 +438,9 @@ export function PreRegistro() {
 
       // 1. Procesar el Pre-Registro en el Motor del Departamento de Ventas + Finanzas + CRM + Logs
       const receipt = await processSalesPreRegistration({
+        establishmentId: existingEstId,
+        wasConsolidatedExisting,
+        consolidatedMatchReason,
         establishmentTitle: title.trim(),
         establishmentSlug: slug,
         categoryName,
@@ -432,6 +470,8 @@ export function PreRegistro() {
           captured_at: receipt.createdAtIso,
           source: "DEPARTAMENTO_VENTAS_V13",
           published_directly: publishDirectly,
+          was_consolidated_existing: wasConsolidatedExisting,
+          consolidated_match_reason: consolidatedMatchReason,
           folio: receipt.folio,
           financial_correlative: receipt.financialCorrelative,
           modality: receipt.modality,
@@ -466,23 +506,38 @@ export function PreRegistro() {
         gallery: galleryImages
       };
 
-      // 2. Guardar o actualizar el establecimiento en Supabase (`properties` y `establishments`)
+      const resolvedTier =
+        modality === "fundadores_50"
+          ? "fundador"
+          : modality === "exclusivo_prestigio"
+          ? "diamante"
+          : currentPlanObj.tierKey;
+
+      const resolvedIsFeatured =
+        modality !== "comercial_estandar" || selectedPlanId === "premium" || selectedPlanId === "gold";
+
+      const allPhotosToSave = Array.from(
+        new Set([primaryImage, ...galleryImages].filter(Boolean))
+      );
+
+      // 2. ACTUALIZACIÓN Y CONSOLIDACIÓN EN SUPABASE (`properties`, `establishments` y `establishment_images`) SIN DUPLICAR
+      let consolidatedDbId: number | string | null = existingEstId;
       try {
-        await Promise.allSettled([
-          supabase.from("properties").upsert({
+        await supabase.from("properties").upsert(
+          {
             service_category_id: serviceCategoryId,
             subcategory_id: subcategoryId,
-            title,
+            title: title.trim(),
             slug,
-            destination_name: destinationName,
-            state,
-            city,
+            destination_name: destinationName.trim(),
+            state: state.trim(),
+            city: city.trim(),
             latitude: latitude ? parseFloat(latitude) : null,
             longitude: longitude ? parseFloat(longitude) : null,
-            short_description: shortDescription,
+            short_description: shortDescription.trim(),
             base_price_from: effectiveBasePrice,
             rating_avg: ratingAvg,
-            whatsapp_number: whatsappNumber,
+            whatsapp_number: whatsappNumber.trim(),
             primary_image: primaryImage,
             has_power_plant: badges.has_power_plant,
             has_water_247: badges.has_water_247,
@@ -493,35 +548,134 @@ export function PreRegistro() {
             onboarding_status: onboardingStatus,
             status: status,
             features: initialFeatures
-          }, { onConflict: "slug" }),
-          supabase.from("establishments").upsert({
-            name: title,
-            slug,
-            description: shortDescription,
-            address: `${city}, ${state}`,
-            phone: whatsappNumber,
-            whatsapp: whatsappNumber,
-            rating_avg: ratingAvg,
-            price_min: effectiveBasePrice > 0 ? effectiveBasePrice : null,
-            base_price: effectiveBasePrice > 0 ? effectiveBasePrice : null,
-            is_featured: modality !== "comercial_estandar" || selectedPlanId === "premium" || selectedPlanId === "gold",
-            has_hdv_seal: badges.has_hdv_seal,
-            membership_tier:
-              modality === "fundadores_50"
-                ? "fundador"
-                : modality === "exclusivo_prestigio"
-                ? "diamante"
-                : currentPlanObj.tierKey,
-            status: publishDirectly ? "approved" : "pending",
-            services: JSON.stringify(pills)
-          }, { onConflict: "slug" })
-        ]);
+          },
+          { onConflict: "slug" }
+        );
+
+        const establishmentRecordPayload: Record<string, any> = {
+          name: title.trim(),
+          slug,
+          description: shortDescription.trim(),
+          address: `${city.trim()}, ${state.trim()}`,
+          city: city.trim(),
+          state: state.trim(),
+          phone: whatsappNumber.trim(),
+          whatsapp: whatsappNumber.trim(),
+          rating_avg: ratingAvg,
+          price_min: effectiveBasePrice > 0 ? effectiveBasePrice : null,
+          base_price: effectiveBasePrice > 0 ? effectiveBasePrice : null,
+          is_featured: resolvedIsFeatured,
+          has_hdv_seal: badges.has_hdv_seal,
+          membership_tier: resolvedTier,
+          status: publishDirectly ? "approved" : "pending",
+          services: JSON.stringify(pills),
+          latitude: latitude ? parseFloat(latitude) : null,
+          longitude: longitude ? parseFloat(longitude) : null
+        };
+
+        if (existingMatch?.source === "supabase" && existingMatch.id) {
+          const { data: updatedEst } = await supabase
+            .from("establishments")
+            .update(establishmentRecordPayload)
+            .eq("id", existingMatch.id)
+            .select("id")
+            .maybeSingle();
+          if (updatedEst?.id) consolidatedDbId = updatedEst.id;
+        } else {
+          const { data: upsertedEst } = await supabase
+            .from("establishments")
+            .upsert(establishmentRecordPayload, { onConflict: "slug" })
+            .select("id")
+            .maybeSingle();
+          if (upsertedEst?.id) consolidatedDbId = upsertedEst.id;
+        }
+
+        // Sincronizar galería de fotos reales en `establishment_images` para el registro único consolidado
+        if (consolidatedDbId && typeof consolidatedDbId === "number" && allPhotosToSave.length > 0) {
+          await supabase
+            .from("establishment_images")
+            .delete()
+            .eq("establishment_id", consolidatedDbId);
+          await supabase.from("establishment_images").insert(
+            allPhotosToSave.map((imgUrl, idx) => ({
+              establishment_id: consolidatedDbId,
+              image_url: imgUrl,
+              is_primary: idx === 0
+            }))
+          );
+        }
       } catch (err) {
-        console.warn("Modo local activo:", err);
+        console.warn("Modo local activo al consolidar establecimiento:", err);
       }
 
-      // Guardar también en localStorage para persistencia inmediata en la sesión del cliente
+      // 3. CONSOLIDACIÓN EN LOCALSTORAGE (`hdv_mock_establishments` y `hdv_prereg_<slug>`) SIN DUPLICAR TARJETAS
       localStorage.setItem(`hdv_prereg_${slug}`, JSON.stringify(payload));
+      try {
+        const localEstsKey = "hdv_mock_establishments";
+        const localEsts: any[] = JSON.parse(localStorage.getItem(localEstsKey) || "[]");
+        const normNewName = normalizeEstablishmentName(title);
+        const normNewPhone = normalizePhoneKey(whatsappNumber);
+        const isPlaceholderPhone = normNewPhone === "4121234567";
+
+        const filteredLocal = localEsts.filter((item: any) => {
+          if (!item) return false;
+          if (item.slug && String(item.slug).toLowerCase() === slug.toLowerCase()) return false;
+          const itemNameNorm = normalizeEstablishmentName(item.name);
+          if (normNewName && itemNameNorm && normNewName === itemNameNorm) return false;
+          const itemPhoneNorm = normalizePhoneKey(item.whatsapp || item.phone);
+          if (
+            normNewPhone &&
+            !isPlaceholderPhone &&
+            itemPhoneNorm &&
+            normNewPhone === itemPhoneNorm
+          ) {
+            return false;
+          }
+          return true;
+        });
+
+        const consolidatedLocalEntry = {
+          id: typeof consolidatedDbId === "number" ? consolidatedDbId : existingMatch?.id || Date.now(),
+          slug,
+          name: title.trim(),
+          description: shortDescription.trim(),
+          address: `${city.trim()}, ${state.trim()}`,
+          city: city.trim(),
+          state: state.trim(),
+          phone: whatsappNumber.trim(),
+          whatsapp: whatsappNumber.trim(),
+          website: "",
+          category_name: categoryName,
+          category_slug: generateSlug(categoryName),
+          destination_name: destinationName.trim(),
+          destination_slug: generateSlug(destinationName),
+          primary_image: primaryImage,
+          images: allPhotosToSave,
+          establishment_images: allPhotosToSave.map((url, idx) => ({
+            image_url: url,
+            is_primary: idx === 0
+          })),
+          rating_avg: ratingAvg,
+          review_count: 12,
+          price_level: "$$$",
+          price_min: effectiveBasePrice > 0 ? effectiveBasePrice : null,
+          base_price: effectiveBasePrice > 0 ? effectiveBasePrice : null,
+          show_official_prices: showOfficialPrice && effectiveBasePrice > 0,
+          is_featured: resolvedIsFeatured,
+          services: JSON.stringify(pills),
+          membership_tier: resolvedTier,
+          has_hdv_seal: badges.has_hdv_seal,
+          latitude: latitude ? parseFloat(latitude) : null,
+          longitude: longitude ? parseFloat(longitude) : null,
+          status: publishDirectly ? "approved" : "pending"
+        };
+
+        localStorage.setItem(
+          localEstsKey,
+          JSON.stringify([consolidatedLocalEntry, ...filteredLocal])
+        );
+      } catch {}
+
       if (showOfficialPrice && effectiveBasePrice > 0) {
         localStorage.setItem(`hdv_show_official_prices_${slug}`, "true");
       } else {
@@ -671,7 +825,7 @@ export function PreRegistro() {
                 </div>
               </div>
 
-              {/* 2. Nombre de la Propiedad */}
+              {/* 2. Nombre de la Propiedad con Reconocimiento Automático de Establecimientos Existentes */}
               <div>
                 <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1.5">
                   2. Nombre Comercial de la Propiedad / Establecimiento
@@ -683,6 +837,46 @@ export function PreRegistro() {
                   placeholder="Ej. Posada Paraíso Azul"
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4] focus:bg-white transition-all"
                 />
+
+                {detectedExistingMatch && (
+                  <div className="mt-2.5 p-3 rounded-2xl bg-[#00C8D4]/10 border border-[#00C8D4]/35 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                    <div className="flex items-start gap-2.5">
+                      <div className="w-7 h-7 rounded-xl bg-[#00C8D4] text-white flex items-center justify-center shrink-0 mt-0.5">
+                        <CheckCircle2 className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="text-[11px] font-black text-slate-900 block">
+                          Establecimiento Existente Detectado ({detectedExistingMatch.name})
+                        </span>
+                        <span className="text-[10px] text-slate-600 font-semibold block">
+                          Coincidencia por {detectedExistingMatch.matchReason === "whatsapp" ? "WhatsApp/Teléfono" : "Nombre comercial"} • Se actualizará y consolidará su ficha única (<code>/establecimiento/{detectedExistingMatch.slug}</code>) sin crear duplicados.
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (detectedExistingMatch.name) setTitle(detectedExistingMatch.name);
+                        if (detectedExistingMatch.categoryName) setCategoryName(detectedExistingMatch.categoryName);
+                        if (detectedExistingMatch.destinationName) setDestinationName(detectedExistingMatch.destinationName);
+                        if (detectedExistingMatch.state) setState(detectedExistingMatch.state);
+                        if (detectedExistingMatch.city) setCity(detectedExistingMatch.city);
+                        if (detectedExistingMatch.whatsapp) setWhatsappNumber(detectedExistingMatch.whatsapp);
+                        if (detectedExistingMatch.description) setShortDescription(detectedExistingMatch.description);
+                        if (detectedExistingMatch.primaryImage) setPrimaryImage(detectedExistingMatch.primaryImage);
+                        if (detectedExistingMatch.galleryImages && detectedExistingMatch.galleryImages.length > 0) {
+                          setGalleryImages(detectedExistingMatch.galleryImages);
+                        }
+                        if (detectedExistingMatch.latitude) setLatitude(String(detectedExistingMatch.latitude));
+                        if (detectedExistingMatch.longitude) setLongitude(String(detectedExistingMatch.longitude));
+                      }}
+                      className="px-3 py-1.5 rounded-xl bg-[#0e011f] hover:bg-[#1a0533] text-[#00C8D4] text-[10px] font-black uppercase tracking-wider shrink-0 cursor-pointer transition-colors"
+                    >
+                      Cargar Datos Actuales
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* 3. Ubicación / Destino & Captura de GPS inteligente */}
