@@ -35,7 +35,8 @@ import {
 } from "@/lib/salesDepartmentStore";
 import {
   PreRegistrationReceiptModal,
-  printOfficialPreRegistrationReceipt
+  printOfficialPreRegistrationReceipt,
+  resolveReceiptEstablishmentImage
 } from "@/components/sales/PreRegistrationReceiptModal";
 
 export function AdminDepartamentoVentas() {
@@ -52,6 +53,7 @@ export function AdminDepartamentoVentas() {
   const [modalityFilter, setModalityFilter] = useState<string>("all");
   const [originFilter, setOriginFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [consolidationFilter, setConsolidationFilter] = useState<string>("all");
 
   useEffect(() => {
     if (
@@ -118,16 +120,19 @@ export function AdminDepartamentoVentas() {
       if (modalityFilter !== "all" && r.modality !== modalityFilter) return false;
       if (originFilter !== "all" && r.origin !== originFilter) return false;
       if (statusFilter !== "all" && r.financialStatus !== statusFilter) return false;
+      if (consolidationFilter === "consolidated" && !r.wasConsolidatedExisting) return false;
+      if (consolidationFilter === "new" && r.wasConsolidatedExisting) return false;
 
       return true;
     });
-  }, [receipts, searchQuery, modalityFilter, originFilter, statusFilter]);
+  }, [receipts, searchQuery, modalityFilter, originFilter, statusFilter, consolidationFilter]);
 
   const foundersOccupied = Math.min(MAX_FOUNDERS_QUOTA, counters.foundersCounter);
   const foundersRemaining = Math.max(0, MAX_FOUNDERS_QUOTA - foundersOccupied);
   const foundersPct = Math.min(100, Math.round((foundersOccupied / MAX_FOUNDERS_QUOTA) * 100));
 
   const totalExonerated = receipts.filter((r) => r.financialStatus === "exonerado").length;
+  const totalConsolidated = receipts.filter((r) => r.wasConsolidatedExisting).length;
   const totalInvoices = receipts.filter((r) => r.invoiceNumber !== null).length;
   const totalBilledUsd = receipts
     .filter((r) => r.financialStatus !== "exonerado")
@@ -240,15 +245,16 @@ export function AdminDepartamentoVentas() {
           </div>
         </div>
 
-        {/* Tarjetas KPI de Operaciones Comerciales y Financieras */}
+        {/* Tarjetas KPI de Operaciones Comerciales, Auditoría y Consolidación */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* 1. Total de Pre-Registros */}
           <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-[#00C8D4] text-white flex items-center justify-center shrink-0 shadow-md">
               <FileText className="w-6 h-6" />
             </div>
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
-                Comprobantes Emitidos
+                Total Pre-Registros
               </span>
               <p className="text-2xl font-black text-slate-900 font-mono">
                 {receipts.length}
@@ -259,65 +265,100 @@ export function AdminDepartamentoVentas() {
             </div>
           </div>
 
+          {/* 2. Cupos Utilizados Alianza 50 Fundadores */}
           <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-[#FF0096] text-white flex items-center justify-center shrink-0 shadow-md">
+              <Award className="w-6 h-6" />
+            </div>
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
+                Alianza 50 Fundadores
+              </span>
+              <p className="text-2xl font-black text-slate-900 font-mono">
+                {foundersOccupied} <span className="text-sm text-slate-400">/ {MAX_FOUNDERS_QUOTA}</span>
+              </p>
+              <span className="text-[11px] font-bold text-[#FF0096]">
+                {foundersRemaining} cupos disponibles
+              </span>
+            </div>
+          </div>
+
+          {/* 3. Registros Exonerados ($0.00) & Facturación */}
+          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-[#9B00CC] text-white flex items-center justify-center shrink-0 shadow-md">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
-                Membresías Exoneradas ($0.00)
+                Registros Exonerados ($0.00)
               </span>
               <p className="text-2xl font-black text-slate-900 font-mono">
                 {totalExonerated}
               </p>
-              <span className="text-[11px] font-bold text-pink-600">
-                50 Fundadores & Prestigio 2026
+              <span className="text-[11px] font-bold text-purple-700">
+                Facturas HDV-FAC: {totalInvoices} (${totalBilledUsd.toFixed(0)} USD)
               </span>
             </div>
           </div>
 
+          {/* 4. Fichas Consolidadas (Sin Duplicados) */}
           <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-[#9B00CC] text-white flex items-center justify-center shrink-0 shadow-md">
-              <DollarSign className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md">
+              <CheckCircle2 className="w-6 h-6" />
             </div>
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
-                Facturas / Órdenes (HDV-FAC)
+                Fichas Consolidadas
               </span>
               <p className="text-2xl font-black text-slate-900 font-mono">
-                {totalInvoices}
+                {totalConsolidated}
               </p>
-              <span className="text-[11px] font-bold text-purple-700">
-                Facturación Comercial: ${totalBilledUsd.toFixed(2)} USD
+              <span className="text-[11px] font-bold text-emerald-700">
+                Upsert inteligente sin duplicados
               </span>
             </div>
           </div>
+        </div>
 
-          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
-              Accesos Rápidos Sincronizados
+        {/* Barra de Accesos Rápidos entre Módulos Vinculados y Formulario /pre-registro */}
+        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-2xs flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 mr-1">
+              Módulos Sincronizados:
             </span>
-            <div className="flex flex-wrap gap-2 mt-2">
-              <Link
-                href="/admin/finanzas"
-                className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-[#00C8D4] hover:text-slate-950 text-slate-700 text-[11px] font-extrabold transition-colors"
-              >
-                Libro de Finanzas
-              </Link>
-              <Link
-                href="/admin/comercial"
-                className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-[#FF0096] hover:text-white text-slate-700 text-[11px] font-extrabold transition-colors"
-              >
-                Pipeline CRM
-              </Link>
-              <Link
-                href="/admin/logs"
-                className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-[#9B00CC] hover:text-white text-slate-700 text-[11px] font-extrabold transition-colors"
-              >
-                Logs IP
-              </Link>
-            </div>
+            <Link
+              href="/admin/finanzas"
+              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-[#00C8D4] hover:text-slate-950 text-slate-700 text-[11px] font-extrabold transition-colors"
+            >
+              Libro de Finanzas
+            </Link>
+            <Link
+              href="/admin/comercial"
+              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-[#FF0096] hover:text-white text-slate-700 text-[11px] font-extrabold transition-colors"
+            >
+              Pipeline CRM
+            </Link>
+            <Link
+              href="/admin/clientes"
+              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-[#00C8D4] hover:text-slate-950 text-slate-700 text-[11px] font-extrabold transition-colors"
+            >
+              Base de Clientes
+            </Link>
+            <Link
+              href="/admin/logs"
+              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-[#9B00CC] hover:text-white text-slate-700 text-[11px] font-extrabold transition-colors"
+            >
+              Auditoría de Logs (IP)
+            </Link>
           </div>
+
+          <Link
+            href="/pre-registro"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0e011f] hover:bg-[#1a0533] text-[#00C8D4] text-xs font-black uppercase tracking-wider transition-colors shadow-sm"
+          >
+            <Plus className="w-3.5 h-3.5 text-[#FF0096]" />
+            <span>Ir al Formulario /pre-registro (Crear o Consolidar)</span>
+          </Link>
         </div>
 
         {/* Barra de Filtros y Buscador */}
@@ -369,6 +410,16 @@ export function AdminDepartamentoVentas() {
                 <option value="pendiente_pago">Factura Pendiente de Pago</option>
                 <option value="pagado">Factura Pagada</option>
               </select>
+
+              <select
+                value={consolidationFilter}
+                onChange={(e) => setConsolidationFilter(e.target.value)}
+                className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 focus:outline-none cursor-pointer"
+              >
+                <option value="all">Todos los Tipos de Ficha</option>
+                <option value="consolidated">Fichas Consolidadas (Existentes)</option>
+                <option value="new">Fichas Nuevas</option>
+              </select>
             </div>
           </div>
 
@@ -404,12 +455,12 @@ export function AdminDepartamentoVentas() {
                 <thead>
                   <tr className="border-b border-slate-200 text-[10px] font-black uppercase tracking-wider text-slate-400">
                     <th className="py-3 px-3">Folio & Finanzas</th>
-                    <th className="py-3 px-3">Establecimiento & Destino</th>
-                    <th className="py-3 px-3">Modalidad / Membresía</th>
-                    <th className="py-3 px-3">Origen / Agente</th>
+                    <th className="py-3 px-3">Establecimiento, Categoría & Destino</th>
+                    <th className="py-3 px-3">Modalidad / Cupo</th>
+                    <th className="py-3 px-3">Originador & Términos Legales</th>
                     <th className="py-3 px-3">Fecha/Hora & IP</th>
                     <th className="py-3 px-3">Estatus Financiero</th>
-                    <th className="py-3 px-3 text-right">Acciones & QR</th>
+                    <th className="py-3 px-3 text-right">Acciones Rápidas</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-xs">
@@ -425,13 +476,29 @@ export function AdminDepartamentoVentas() {
                       </td>
 
                       <td className="py-3.5 px-3">
-                        <p className="font-black text-slate-900">{r.establishmentTitle}</p>
-                        <span className="text-[11px] text-slate-500 font-semibold block">
-                          {r.categoryName} • {r.destinationName} ({r.city})
-                        </span>
-                        <span className="text-[10px] text-emerald-700 font-bold">
-                          WhatsApp: {r.whatsappNumber}
-                        </span>
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={resolveReceiptEstablishmentImage(r)}
+                            alt={r.establishmentTitle}
+                            className="w-12 h-12 rounded-xl object-cover border border-slate-200 shrink-0"
+                          />
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <p className="font-black text-slate-900 truncate">{r.establishmentTitle}</p>
+                              {r.wasConsolidatedExisting && (
+                                <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[9px] font-black uppercase">
+                                  Consolidada
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-[11px] text-slate-500 font-semibold block">
+                              {r.categoryName} • {r.destinationName} ({r.city}, {r.state})
+                            </span>
+                            <span className="text-[10px] text-emerald-700 font-bold">
+                              WhatsApp: {r.whatsappNumber}
+                            </span>
+                          </div>
+                        </div>
                       </td>
 
                       <td className="py-3.5 px-3">
@@ -455,9 +522,16 @@ export function AdminDepartamentoVentas() {
 
                       <td className="py-3.5 px-3">
                         <span className="font-bold text-slate-800 block">{r.registrantName}</span>
-                        <span className="text-[10px] text-emerald-700 font-bold">
-                          ✓ Términos e Imagen Aceptados
-                        </span>
+                        {r.termsAccepted !== false ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] text-emerald-700 font-bold mt-0.5">
+                            <CheckCircle2 className="w-3 h-3" />
+                            <span>Términos y Derechos de Imagen Aceptados</span>
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-rose-600 font-bold">
+                            Pendiente de confirmación
+                          </span>
+                        )}
                       </td>
 
                       <td className="py-3.5 px-3">
@@ -520,7 +594,7 @@ export function AdminDepartamentoVentas() {
                             type="button"
                             onClick={() => setSelectedReceipt(r)}
                             className="px-2.5 py-1.5 rounded-xl bg-[#00C8D4] text-slate-950 text-[10px] font-black flex items-center gap-1 hover:opacity-90 cursor-pointer"
-                            title="Ver Comprobante con Código QR"
+                            title="Ver Credencial / Comprobante con Código QR"
                           >
                             <QrCode className="w-3.5 h-3.5" />
                             <span>Ver QR</span>
@@ -530,18 +604,30 @@ export function AdminDepartamentoVentas() {
                             type="button"
                             onClick={() => printOfficialPreRegistrationReceipt(r)}
                             className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer"
-                            title="Reimprimir Comprobante PDF"
+                            title="Reimprimir Comprobante PDF en 1 Hoja"
                           >
                             <Printer className="w-3.5 h-3.5" />
                           </button>
 
-                          <Link
-                            href="/admin/comercial"
-                            className="p-1.5 rounded-xl bg-pink-50 hover:bg-pink-100 text-[#FF0096]"
-                            title="Ver Lead en Pipeline CRM"
+                          <a
+                            href={`/establecimiento/${r.establishmentSlug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-1.5 rounded-xl bg-cyan-50 hover:bg-cyan-100 text-[#008f99]"
+                            title="Abrir Ficha Pública del Establecimiento"
+                          >
+                            <Building2 className="w-3.5 h-3.5" />
+                          </a>
+
+                          <a
+                            href={r.verificationPath}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-[#9B00CC]"
+                            title="Abrir Certificado Público de Verificación QR"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
-                          </Link>
+                          </a>
                         </div>
                       </td>
                     </tr>

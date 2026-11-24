@@ -39,6 +39,8 @@ const STATUS_ICON: Record<string, { icon: typeof CheckCircle; color: string; lab
 };
 
 const NAV_CARDS = [
+  { href: "/admin/pre-registros",     icon: Award,     label: "Pre-Registros & Ventas", desc: "Folios QR y 50 Fundadores", color: C.fucsia },
+  { href: "/pre-registro",            icon: ShieldCheck, label: "Formulario /pre-registro", desc: "Crear o consolidar ficha", color: C.teal },
   { href: "/admin/dashboards-alfa",   icon: Layers,    label: "Dashboards Alfa HDV", desc: "Showcase y sandbox de 8 suites", color: C.teal   },
   { href: "/admin/establecimientos", icon: Building2, label: "Establecimientos", desc: "Hoteles y posadas",       color: C.fucsia },
   { href: "/admin/destinos",         icon: MapPin,    label: "Destinos",          desc: "Destinos turísticos",    color: C.teal   },

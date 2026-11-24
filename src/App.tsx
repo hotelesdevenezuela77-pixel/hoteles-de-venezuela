@@ -319,6 +319,8 @@ function AdminShell() {
         <Route path="/admin/seo" component={AdminSeoHome} />
         <Route path="/admin/seo-home" component={AdminSeoHome} />
         <Route path="/admin/b2b" component={AdminB2B} />
+        <Route path="/admin/pre-registros" component={AdminDepartamentoVentas} />
+        <Route path="/admin/pre-registro" component={AdminDepartamentoVentas} />
         <Route path="/admin/departamento-ventas" component={AdminDepartamentoVentas} />
         <Route path="/admin/ventas" component={AdminDepartamentoVentas} />
         <Route path="/admin/comercial" component={AdminComercial} />
