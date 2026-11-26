@@ -438,6 +438,12 @@ export interface SalesPreRegistrationReceipt {
   createdAtFormatted: string;
   digitalSignatureHash: string;
   verificationPath: string;         // /verificar-registro/HDV-PR-2026-0001
+
+  // Metadatos opcionales de Edición Administrativa (No destructivos)
+  notes?: string;
+  updatedAtIso?: string;
+  updatedAtFormatted?: string;
+  updatedByEmail?: string;
 }
 
 const STORAGE_KEYS = {
@@ -1356,4 +1362,245 @@ export async function updateReceiptFinancialStatus(
   if (typeof window !== "undefined") {
     window.dispatchEvent(new Event("hdv_sales_v13_updated"));
   }
+}
+
+export interface UpdateSalesReceiptOperationalInput {
+  folio: string;
+  establishmentTitle: string;
+  categoryName: string;
+  destinationName: string;
+  city: string;
+  state: string;
+  whatsappNumber: string;
+  registrantName: string;
+  modality: MembershipModality;
+  notes?: string;
+  primaryImage?: string;
+  updatedByEmail?: string | null;
+  updatedByUserId?: string | null;
+}
+
+/**
+ * Edición Rápida No Destructiva desde /admin/pre-registros:
+ * - Actualiza datos operativos (nombre del establecimiento, categoría, destino, ciudad, estado, WhatsApp, originador, modalidad y notas).
+ * - Mantiene 100% protegidos e intactos los campos de auditoría originales (folio HDV-PR-2026-..., asiento financiero HDV-EXO/HDV-FAC, cupo #X/50, IP, fecha/hora original y cláusula legal).
+ * - Sincroniza mediante upsert/merge seguro con la ficha consolidada del establecimiento en Supabase y localStorage.
+ * - Registra la marca de edición (updatedAtFormatted) y el evento en Auditoría de Logs.
+ */
+export async function updateSalesPreRegistrationReceipt(
+  input: UpdateSalesReceiptOperationalInput
+): Promise<SalesPreRegistrationReceipt | null> {
+  const receipts = getSalesReceipts();
+  const target = receipts.find((r) => r.folio === input.folio);
+  if (!target) return null;
+
+  const now = new Date();
+  const updatedAtIso = now.toISOString();
+  const updatedAtFormatted = now.toLocaleString("es-VE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true
+  });
+
+  const selectedPlan =
+    SAAS_COMMERCIAL_PLANS.find((p) => p.id === target.planId) || SAAS_COMMERCIAL_PLANS[6];
+
+  let nextModalityLabel = target.modalityLabel;
+  if (input.modality === "fundadores_50") {
+    nextModalityLabel = "Membresía Exonerada - Alianza 50 Fundadores";
+  } else if (input.modality === "exclusivo_prestigio") {
+    nextModalityLabel = "Membresía Exonerada - Selección Exclusiva";
+  } else if (input.modality === "comercial_estandar") {
+    nextModalityLabel = `Membresía Comercial — ${selectedPlan.name}`;
+  }
+
+  const updatedReceipt: SalesPreRegistrationReceipt = {
+    ...target,
+    // Campos de auditoría estrictamente inmutables:
+    folio: target.folio,
+    financialCorrelative: target.financialCorrelative,
+    invoiceNumber: target.invoiceNumber,
+    correlativeSequence: target.correlativeSequence,
+    founderSlotNumber: target.founderSlotNumber,
+    clientIp: target.clientIp,
+    userAgent: target.userAgent,
+    createdAtIso: target.createdAtIso,
+    createdAtFormatted: target.createdAtFormatted,
+    termsAccepted: target.termsAccepted,
+    termsAcceptedText: target.termsAcceptedText,
+    digitalSignatureHash: target.digitalSignatureHash,
+    verificationPath: target.verificationPath,
+
+    // Campos operativos editables:
+    establishmentTitle: input.establishmentTitle.trim() || target.establishmentTitle,
+    categoryName: input.categoryName.trim() || target.categoryName,
+    destinationName: input.destinationName.trim() || target.destinationName,
+    city: input.city.trim() || target.city,
+    state: input.state.trim() || target.state,
+    whatsappNumber: input.whatsappNumber.trim() || target.whatsappNumber,
+    registrantName: input.registrantName.trim() || target.registrantName,
+    modality: input.modality,
+    modalityLabel: nextModalityLabel,
+    primaryImage: input.primaryImage?.trim() || target.primaryImage,
+    notes: input.notes !== undefined ? input.notes.trim() : target.notes,
+    updatedAtIso,
+    updatedAtFormatted,
+    updatedByEmail: input.updatedByEmail || target.updatedByEmail || "admin@hotelesdevenezuela.com"
+  };
+
+  const updatedList = receipts.map((r) => (r.folio === input.folio ? updatedReceipt : r));
+
+  if (typeof window !== "undefined") {
+    localStorage.setItem(STORAGE_KEYS.RECEIPTS, JSON.stringify(updatedList));
+  }
+
+  // 1. Sincronizar estado de comprobantes en Supabase (`site_settings`) sin alterar contadores
+  try {
+    const counters = getSalesCounters();
+    await supabase.from("site_settings").upsert(
+      {
+        setting_key: "hdv_sales_v13_state",
+        setting_value: JSON.stringify({
+          counters,
+          receipts: updatedList.slice(0, 500)
+        })
+      },
+      { onConflict: "setting_key" }
+    );
+  } catch (err) {
+    console.warn("Aviso guardando edición de pre-registro en site_settings:", err);
+  }
+
+  // 2. Sincronizar con la ficha consolidada del establecimiento (Upsert/Merge no destructivo)
+  const slug = updatedReceipt.establishmentSlug;
+  const resolvedTier =
+    updatedReceipt.modality === "fundadores_50"
+      ? "fundador"
+      : updatedReceipt.modality === "exclusivo_prestigio"
+      ? "diamante"
+      : selectedPlan.tierKey;
+
+  if (typeof window !== "undefined") {
+    try {
+      const preregKey = `hdv_prereg_${slug}`;
+      const existingPreregRaw = localStorage.getItem(preregKey);
+      if (existingPreregRaw) {
+        const parsedPrereg = JSON.parse(existingPreregRaw);
+        localStorage.setItem(
+          preregKey,
+          JSON.stringify({
+            ...parsedPrereg,
+            title: updatedReceipt.establishmentTitle,
+            category_name: updatedReceipt.categoryName,
+            destination_name: updatedReceipt.destinationName,
+            city: updatedReceipt.city,
+            state: updatedReceipt.state,
+            whatsapp_number: updatedReceipt.whatsappNumber,
+            primary_image: updatedReceipt.primaryImage || parsedPrereg.primary_image
+          })
+        );
+      }
+
+      const localEstsKey = "hdv_mock_establishments";
+      const localEsts: any[] = JSON.parse(localStorage.getItem(localEstsKey) || "[]");
+      let foundInLocal = false;
+      const updatedLocalEsts = localEsts.map((item: any) => {
+        if (!item) return item;
+        const sameSlug = item.slug && String(item.slug).toLowerCase() === slug.toLowerCase();
+        const sameName =
+          normalizeEstablishmentName(item.name) ===
+          normalizeEstablishmentName(target.establishmentTitle);
+        if (sameSlug || sameName) {
+          foundInLocal = true;
+          return {
+            ...item,
+            name: updatedReceipt.establishmentTitle,
+            category_name: updatedReceipt.categoryName,
+            destination_name: updatedReceipt.destinationName,
+            city: updatedReceipt.city,
+            state: updatedReceipt.state,
+            address: `${updatedReceipt.city}, ${updatedReceipt.state}`,
+            phone: updatedReceipt.whatsappNumber,
+            whatsapp: updatedReceipt.whatsappNumber,
+            membership_tier: resolvedTier,
+            primary_image: updatedReceipt.primaryImage || item.primary_image
+          };
+        }
+        return item;
+      });
+
+      if (!foundInLocal) {
+        updatedLocalEsts.unshift({
+          id: updatedReceipt.establishmentId || Date.now(),
+          slug,
+          name: updatedReceipt.establishmentTitle,
+          description: updatedReceipt.notes || "Alojamiento turístico verificado por Hoteles de Venezuela con atención directa y reserva sin comisiones.",
+          address: `${updatedReceipt.city}, ${updatedReceipt.state}`,
+          city: updatedReceipt.city,
+          state: updatedReceipt.state,
+          phone: updatedReceipt.whatsappNumber,
+          whatsapp: updatedReceipt.whatsappNumber,
+          category_name: updatedReceipt.categoryName,
+          destination_name: updatedReceipt.destinationName,
+          primary_image: updatedReceipt.primaryImage,
+          rating_avg: 4.9,
+          review_count: 12,
+          price_level: "$$$",
+          is_featured: true,
+          has_hdv_seal: true,
+          membership_tier: resolvedTier,
+          status: "approved"
+        });
+      }
+
+      localStorage.setItem(localEstsKey, JSON.stringify(updatedLocalEsts));
+    } catch {}
+  }
+
+  try {
+    await Promise.allSettled([
+      supabase
+        .from("establishments")
+        .update({
+          name: updatedReceipt.establishmentTitle,
+          address: `${updatedReceipt.city}, ${updatedReceipt.state}`,
+          city: updatedReceipt.city,
+          state: updatedReceipt.state,
+          phone: updatedReceipt.whatsappNumber,
+          whatsapp: updatedReceipt.whatsappNumber,
+          membership_tier: resolvedTier
+        })
+        .eq("slug", slug),
+      supabase
+        .from("properties")
+        .update({
+          title: updatedReceipt.establishmentTitle,
+          destination_name: updatedReceipt.destinationName,
+          city: updatedReceipt.city,
+          state: updatedReceipt.state,
+          whatsapp_number: updatedReceipt.whatsappNumber
+        })
+        .eq("slug", slug)
+    ]);
+  } catch (err) {
+    console.warn("Aviso sincronizando edición de ficha en Supabase:", err);
+  }
+
+  // 3. Registrar evento de edición en Auditoría de Logs
+  await logActivity(
+    input.updatedByUserId || null,
+    input.updatedByEmail || "admin@hotelesdevenezuela.com",
+    "EDICION_PRE_REGISTRO_ADMIN",
+    `Folio Protegido: ${updatedReceipt.folio} (${updatedReceipt.financialCorrelative}) | Establecimiento Actualizado: ${updatedReceipt.establishmentTitle} (${updatedReceipt.categoryName} - ${updatedReceipt.destinationName}) | WhatsApp: ${updatedReceipt.whatsappNumber} | Originador: ${updatedReceipt.registrantName} | Modalidad: ${updatedReceipt.modalityLabel} | Editado el: ${updatedAtFormatted}`
+  );
+
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("hdv_sales_v13_updated"));
+  }
+
+  return updatedReceipt;
 }

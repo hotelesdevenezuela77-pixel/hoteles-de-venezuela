@@ -8,19 +8,25 @@ import {
   CheckCircle2,
   Clock,
   DollarSign,
+  Edit3,
   ExternalLink,
   FileText,
   Filter,
+  Lock,
+  MapPin,
+  Phone,
   Plus,
   Printer,
   QrCode,
   RefreshCw,
   RotateCcw,
+  Save,
   Search,
   ShieldCheck,
   Sparkles,
   UserCheck,
-  Users
+  Users,
+  X
 } from "lucide-react";
 import {
   getSalesCounters,
@@ -29,10 +35,13 @@ import {
   resetAllSalesAndFinanceCountersToZero,
   syncSalesStateFromSupabase,
   updateReceiptFinancialStatus,
+  updateSalesPreRegistrationReceipt,
   type FinancialStatus,
+  type MembershipModality,
   type SalesCountersState,
   type SalesPreRegistrationReceipt
 } from "@/lib/salesDepartmentStore";
+import { UNIFIED_PLATFORM_CATEGORIES } from "@/pages/PreRegistro";
 import {
   PreRegistrationReceiptModal,
   printOfficialPreRegistrationReceipt,
@@ -54,6 +63,64 @@ export function AdminDepartamentoVentas() {
   const [originFilter, setOriginFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [consolidationFilter, setConsolidationFilter] = useState<string>("all");
+
+  // Estados del Modal de Edición Rápida (No destructiva)
+  const [editingReceipt, setEditingReceipt] = useState<SalesPreRegistrationReceipt | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editCategory, setEditCategory] = useState("");
+  const [editDestination, setEditDestination] = useState("");
+  const [editCity, setEditCity] = useState("");
+  const [editState, setEditState] = useState("");
+  const [editWhatsapp, setEditWhatsapp] = useState("");
+  const [editRegistrant, setEditRegistrant] = useState("");
+  const [editModality, setEditModality] = useState<MembershipModality>("fundadores_50");
+  const [editNotes, setEditNotes] = useState("");
+  const [editPrimaryImage, setEditPrimaryImage] = useState("");
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+
+  const openEditModal = (r: SalesPreRegistrationReceipt) => {
+    setEditingReceipt(r);
+    setEditTitle(r.establishmentTitle || "");
+    setEditCategory(r.categoryName || "Posada Boutique");
+    setEditDestination(r.destinationName || "");
+    setEditCity(r.city || "");
+    setEditState(r.state || "");
+    setEditWhatsapp(r.whatsappNumber || "");
+    setEditRegistrant(r.registrantName || "");
+    setEditModality(r.modality || "fundadores_50");
+    setEditNotes(r.notes || "");
+    setEditPrimaryImage(r.primaryImage || "");
+  };
+
+  const handleSaveEditedReceipt = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingReceipt || !editTitle.trim()) return;
+    setIsSavingEdit(true);
+    try {
+      const updated = await updateSalesPreRegistrationReceipt({
+        folio: editingReceipt.folio,
+        establishmentTitle: editTitle.trim(),
+        categoryName: editCategory.trim(),
+        destinationName: editDestination.trim(),
+        city: editCity.trim(),
+        state: editState.trim(),
+        whatsappNumber: editWhatsapp.trim(),
+        registrantName: editRegistrant.trim(),
+        modality: editModality,
+        notes: editNotes.trim(),
+        primaryImage: editPrimaryImage.trim(),
+        updatedByEmail: user?.email || "admin@hotelesdevenezuela.com",
+        updatedByUserId: user?.id || null
+      });
+      setReceipts(getSalesReceipts());
+      if (updated && selectedReceipt?.folio === updated.folio) {
+        setSelectedReceipt(updated);
+      }
+      setEditingReceipt(null);
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
 
   useEffect(() => {
     if (
@@ -528,6 +595,11 @@ export function AdminDepartamentoVentas() {
                             Pendiente de confirmación
                           </span>
                         )}
+                        {r.notes && (
+                          <span className="block text-[10px] text-slate-500 font-medium mt-0.5 truncate max-w-[220px]" title={r.notes}>
+                            Nota: {r.notes}
+                          </span>
+                        )}
                       </td>
 
                       <td className="py-3.5 px-3">
@@ -537,6 +609,11 @@ export function AdminDepartamentoVentas() {
                         <span className="font-mono text-[10px] text-slate-500 block">
                           IP: {r.clientIp}
                         </span>
+                        {r.updatedAtFormatted && (
+                          <span className="inline-block mt-1 px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-300 text-[9px] font-black uppercase">
+                            Editado: {r.updatedAtFormatted}
+                          </span>
+                        )}
                       </td>
 
                       <td className="py-3.5 px-3">
@@ -585,44 +662,62 @@ export function AdminDepartamentoVentas() {
                       </td>
 
                       <td className="py-3.5 px-3 text-right">
-                        <div className="inline-flex items-center gap-1.5">
+                        <div className="inline-flex flex-wrap items-center justify-end gap-1.5">
+                          {/* 1. Ver QR (Turquesa Cian #00C8D4) */}
                           <button
                             type="button"
                             onClick={() => setSelectedReceipt(r)}
-                            className="px-2.5 py-1.5 rounded-xl bg-[#00C8D4] text-slate-950 text-[10px] font-black flex items-center gap-1 hover:opacity-90 cursor-pointer"
+                            className="px-2.5 py-1.5 rounded-xl bg-[#00C8D4] hover:bg-[#00b2bd] text-slate-950 text-[10px] font-black inline-flex items-center gap-1 shadow-sm hover:shadow transition-all cursor-pointer"
                             title="Ver Credencial / Comprobante con Código QR"
                           >
                             <QrCode className="w-3.5 h-3.5" />
                             <span>Ver QR</span>
                           </button>
 
+                          {/* 2. Editar Registro Operativo (Magenta / Púrpura #FF0096) */}
+                          <button
+                            type="button"
+                            onClick={() => openEditModal(r)}
+                            className="px-2.5 py-1.5 rounded-xl bg-[#FF0096] hover:bg-[#e00083] text-white text-[10px] font-black inline-flex items-center gap-1 shadow-sm hover:shadow transition-all cursor-pointer"
+                            title="Editar datos operativos del pre-registro y sincronizar ficha"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>Editar</span>
+                          </button>
+
+                          {/* 3. Imprimir / PDF en 1 Hoja (Oscuro Corporativo #0e011f con texto Blanco y acento Cian) */}
                           <button
                             type="button"
                             onClick={() => printOfficialPreRegistrationReceipt(r)}
-                            className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer"
+                            className="px-2.5 py-1.5 rounded-xl bg-[#0e011f] hover:bg-[#1a0533] text-white border border-[#00C8D4]/40 text-[10px] font-black inline-flex items-center gap-1 shadow-sm hover:shadow transition-all cursor-pointer"
                             title="Reimprimir Comprobante PDF en 1 Hoja"
                           >
-                            <Printer className="w-3.5 h-3.5" />
+                            <Printer className="w-3.5 h-3.5 text-[#00C8D4]" />
+                            <span>PDF</span>
                           </button>
 
+                          {/* 4. Abrir Ficha Pública del Establecimiento (Esmeralda Sólido) */}
                           <a
                             href={`/establecimiento/${r.establishmentSlug}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-1.5 rounded-xl bg-cyan-50 hover:bg-cyan-100 text-[#008f99]"
+                            className="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-black inline-flex items-center gap-1 shadow-sm hover:shadow transition-all"
                             title="Abrir Ficha Pública del Establecimiento"
                           >
                             <Building2 className="w-3.5 h-3.5" />
+                            <span>Ficha</span>
                           </a>
 
+                          {/* 5. Abrir Certificado Público de Verificación QR (Púrpura Profundo #9B00CC) */}
                           <a
                             href={r.verificationPath}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-[#9B00CC]"
+                            className="px-2.5 py-1.5 rounded-xl bg-[#9B00CC] hover:bg-[#8200ab] text-white text-[10px] font-black inline-flex items-center gap-1 shadow-sm hover:shadow transition-all"
                             title="Abrir Certificado Público de Verificación QR"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
+                            <span>Verificar</span>
                           </a>
                         </div>
                       </td>
@@ -634,6 +729,245 @@ export function AdminDepartamentoVentas() {
           )}
         </div>
       </div>
+
+      {/* Modal de Edición Rápida No Destructiva del Pre-Registro */}
+      {editingReceipt && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0e011f]/85 backdrop-blur-md animate-fade-in overflow-y-auto"
+          onClick={() => setEditingReceipt(null)}
+        >
+          <div
+            className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border-2 border-[#00C8D4]/50 overflow-hidden my-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Cabecera del Modal de Edición */}
+            <div className="bg-gradient-to-r from-[#0e011f] via-[#15062c] to-[#1a0533] text-white p-6 border-b-4 border-[#00C8D4] relative">
+              <button
+                type="button"
+                onClick={() => setEditingReceipt(null)}
+                className="absolute top-4 right-4 w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+                title="Cerrar ventana"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pr-8">
+                <div>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FF0096] text-white text-[10px] font-black uppercase tracking-wider mb-2">
+                    <Edit3 className="w-3 h-3" />
+                    <span>Edición Rápida • Sincronizada con Ficha Consolidada</span>
+                  </span>
+                  <h2
+                    className="text-xl sm:text-2xl font-black text-white"
+                    style={{ fontFamily: "'Playfair Display', serif" }}
+                  >
+                    Editar Pre-Registro: {editingReceipt.establishmentTitle}
+                  </h2>
+                </div>
+
+                <div className="sm:text-right shrink-0">
+                  <span className="inline-block px-3 py-1 rounded-xl bg-white/10 border border-[#00C8D4]/40 text-[#00C8D4] font-mono font-black text-xs">
+                    {editingReceipt.folio}
+                  </span>
+                  <span className="block text-[10px] font-mono text-slate-300 mt-1">
+                    {editingReceipt.financialCorrelative}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Formulario de Edición Operativa */}
+            <form onSubmit={handleSaveEditedReceipt} className="p-6 space-y-4 text-slate-800">
+              {/* Bloque de Datos de Auditoría Protegidos (Inmutables) */}
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 flex items-center gap-1.5">
+                    <Lock className="w-3.5 h-3.5" />
+                    <span>Trazabilidad y Auditoría Original Protegida (No Modificable)</span>
+                  </span>
+                  {editingReceipt.founderSlotNumber && (
+                    <span className="px-2.5 py-0.5 rounded-full bg-[#FF0096] text-white text-[10px] font-black">
+                      Cupo Fundador Protegido: #{editingReceipt.founderSlotNumber} / {MAX_FOUNDERS_QUOTA}
+                    </span>
+                  )}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] text-slate-600 font-semibold pt-1">
+                  <div>
+                    <span className="text-slate-400 font-bold">Folio:</span>{" "}
+                    <strong className="font-mono text-slate-900">{editingReceipt.folio}</strong>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-bold">Fecha Original:</span>{" "}
+                    <strong className="text-slate-900">{editingReceipt.createdAtFormatted}</strong>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-bold">IP / Consentimiento:</span>{" "}
+                    <strong className="font-mono text-slate-900">{editingReceipt.clientIp} (✓ Legal)</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Campos Operativos Editables */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-[11px] font-black uppercase tracking-wider text-slate-600 mb-1">
+                    Nombre del Establecimiento *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-black uppercase tracking-wider text-slate-600 mb-1">
+                    Categoría Principal *
+                  </label>
+                  <select
+                    value={editCategory}
+                    onChange={(e) => setEditCategory(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4] cursor-pointer"
+                  >
+                    {!UNIFIED_PLATFORM_CATEGORIES.some(
+                      (c) => c.label.toLowerCase() === editCategory.toLowerCase()
+                    ) && <option value={editCategory}>{editCategory}</option>}
+                    {UNIFIED_PLATFORM_CATEGORIES.map((cat) => (
+                      <option key={cat.id} value={cat.label}>
+                        {cat.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-black uppercase tracking-wider text-slate-600 mb-1">
+                    Destino Turístico *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editDestination}
+                    onChange={(e) => setEditDestination(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-[11px] font-black uppercase tracking-wider text-slate-600 mb-1">
+                      Ciudad
+                    </label>
+                    <input
+                      type="text"
+                      value={editCity}
+                      onChange={(e) => setEditCity(e.target.value)}
+                      className="w-full px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-black uppercase tracking-wider text-slate-600 mb-1">
+                      Estado
+                    </label>
+                    <input
+                      type="text"
+                      value={editState}
+                      onChange={(e) => setEditState(e.target.value)}
+                      className="w-full px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-black uppercase tracking-wider text-slate-600 mb-1">
+                    Número de WhatsApp Directo *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editWhatsapp}
+                    onChange={(e) => setEditWhatsapp(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-black uppercase tracking-wider text-slate-600 mb-1">
+                    Originador (Propietario / Gerente / Agente)
+                  </label>
+                  <input
+                    type="text"
+                    value={editRegistrant}
+                    onChange={(e) => setEditRegistrant(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-black uppercase tracking-wider text-slate-600 mb-1">
+                    Modalidad de Membresía
+                  </label>
+                  <select
+                    value={editModality}
+                    onChange={(e) => setEditModality(e.target.value as MembershipModality)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4] cursor-pointer"
+                  >
+                    <option value="fundadores_50">Programa 50 Fundadores (Exonerado)</option>
+                    <option value="exclusivo_prestigio">Cliente Exclusivo / Prestigio 2026</option>
+                    <option value="comercial_estandar">Membresía Comercial / Estándar</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-black uppercase tracking-wider text-slate-600 mb-1">
+                    URL de Imagen Principal (Opcional)
+                  </label>
+                  <input
+                    type="text"
+                    value={editPrimaryImage}
+                    onChange={(e) => setEditPrimaryImage(e.target.value)}
+                    placeholder="https://..."
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-black uppercase tracking-wider text-slate-600 mb-1">
+                  Notas u Observaciones Administrativas
+                </label>
+                <textarea
+                  rows={2}
+                  value={editNotes}
+                  onChange={(e) => setEditNotes(e.target.value)}
+                  placeholder="Añade notas operativas o comentarios de seguimiento comercial..."
+                  className="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                />
+              </div>
+
+              <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setEditingReceipt(null)}
+                  className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingEdit}
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:opacity-95 text-white text-xs font-black uppercase tracking-wider flex items-center gap-2 shadow-lg cursor-pointer disabled:opacity-50"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>{isSavingEdit ? "Guardando..." : "Guardar Cambios y Sincronizar"}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Modal de Comprobante Oficial con QR */}
       <PreRegistrationReceiptModal

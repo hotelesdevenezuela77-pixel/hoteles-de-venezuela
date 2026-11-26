@@ -10,7 +10,7 @@ import {
   FileText, ShieldCheck, Phone, Mail, Clock, DollarSign, Award, Compass,
   Heart, Mountain, Tent, Ship, Coffee, Utensils, Check, Bed, Users, Accessibility,
   Zap, Droplets, Ban, VolumeX, Eye, AlertTriangle, Lock, Car, Waves, Flame, Sun,
-  Home, Edit3, Info, EyeOff, HelpCircle, ArrowUpSquare, Globe
+  Home, Edit3, Info, EyeOff, HelpCircle, ArrowUpSquare, Globe, Camera
 } from "lucide-react";
 import { fetchEstablishmentFromGoogleAi } from "@/lib/services/googleAiFillService";
 import {

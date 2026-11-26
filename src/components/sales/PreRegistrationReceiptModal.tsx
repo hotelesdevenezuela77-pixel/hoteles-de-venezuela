@@ -52,7 +52,7 @@ export function resolveReceiptEstablishmentImage(receipt: SalesPreRegistrationRe
       const localEsts = JSON.parse(localStorage.getItem("hdv_mock_establishments") || "[]");
       const found = localEsts.find((e: any) => e?.slug === receipt.establishmentSlug);
       if (found?.primary_image) return String(found.primary_image);
-    } catch {}
+    } catch { }
   }
   return DEFAULT_ESTABLISHMENT_PHOTO;
 }
@@ -84,8 +84,8 @@ export function printOfficialPreRegistrationReceipt(receipt: SalesPreRegistratio
   const founderOrTierBadge = receipt.founderSlotNumber
     ? `ALIANZA 50 FUNDADORES • CUPO OFICIAL #${receipt.founderSlotNumber} / 50`
     : receipt.modality === "exclusivo_prestigio"
-    ? "SELECCIÓN EXCLUSIVA • COLECCIÓN PRESTIGIO 2026"
-    : `AFILIACIÓN COMERCIAL OFICIAL • ${receipt.planName.toUpperCase()}`;
+      ? "SELECCIÓN EXCLUSIVA • COLECCIÓN PRESTIGIO 2026"
+      : `AFILIACIÓN COMERCIAL OFICIAL • ${receipt.planName.toUpperCase()}`;
 
   const consolidationBadge = receipt.wasConsolidatedExisting
     ? "✓ Ficha Oficial Consolidada (Sin Duplicados)"
@@ -95,12 +95,12 @@ export function printOfficialPreRegistrationReceipt(receipt: SalesPreRegistratio
     receipt.financialStatus === "exonerado"
       ? `<div class="amount-pill exonerated">MONTO: $0.00 USD — MEMBRESÍA 100% EXONERADA (LANZAMIENTO)</div>`
       : receipt.showAmountOnReceipt
-      ? `<div class="amount-pill commercial">PLAN: ${receipt.planName.toUpperCase()} • $${receipt.monthlyAmountUsd.toFixed(
+        ? `<div class="amount-pill commercial">PLAN: ${receipt.planName.toUpperCase()} • $${receipt.monthlyAmountUsd.toFixed(
           2
         )} USD / MES (Bs. ${receipt.monthlyAmountVes.toLocaleString("es-VE", {
           minimumFractionDigits: 2
         })} BCV)</div>`
-      : `<div class="amount-pill standard">MEMBRESÍA ASIGNADA: ${receipt.planName.toUpperCase()}</div>`;
+        : `<div class="amount-pill standard">MEMBRESÍA ASIGNADA: ${receipt.planName.toUpperCase()}</div>`;
 
   win.document.write(`<!DOCTYPE html>
 <html lang="es">
@@ -453,14 +453,13 @@ export function printOfficialPreRegistrationReceipt(receipt: SalesPreRegistratio
           <div style="font-size: 11px; color: #e2e8f0; font-weight: 600;">${receipt.financialStatusLabel}</div>
           ${amountHtml}
         </div>
-        ${
-          receipt.founderSlotNumber
-            ? `<div style="text-align: center; background: rgba(255,255,255,0.08); border: 1.5px solid #00C8D4; border-radius: 12px; padding: 8px 14px; flex-shrink: 0;">
+        ${receipt.founderSlotNumber
+      ? `<div style="text-align: center; background: rgba(255,255,255,0.08); border: 1.5px solid #00C8D4; border-radius: 12px; padding: 8px 14px; flex-shrink: 0;">
                  <span style="display: block; font-size: 8.5px; font-weight: 900; color: #00C8D4; text-transform: uppercase; letter-spacing: 0.1em;">Cupo Fundador</span>
                  <span style="font-size: 18px; font-weight: 900; color: #ffffff;">#${receipt.founderSlotNumber}<span style="font-size: 11px; color: #94a3b8;">/50</span></span>
                </div>`
-            : ""
-        }
+      : ""
+    }
       </div>
 
       <!-- Trazabilidad de Origen y Auditoría -->
@@ -468,11 +467,12 @@ export function printOfficialPreRegistrationReceipt(receipt: SalesPreRegistratio
         <div class="card">
           <span class="label">Originador del Registro</span>
           <div class="val">${receipt.registrantName}</div>
+          ${receipt.notes ? `<div style="font-size: 9.5px; color: #475569; margin-top: 2px;">Notas: ${receipt.notes}</div>` : ""}
         </div>
         <div class="card">
           <span class="label">Fecha, Hora Exacta e IP de Auditoría</span>
           <div class="val">${receipt.createdAtFormatted}</div>
-          <div style="font-size: 9.5px; color: #64748b; font-weight: 700; margin-top: 2px;">IP Dispositivo: ${receipt.clientIp}</div>
+          <div style="font-size: 9.5px; color: #64748b; font-weight: 700; margin-top: 2px;">IP Dispositivo: ${receipt.clientIp}${receipt.updatedAtFormatted ? ` • Editado: ${receipt.updatedAtFormatted}` : ""}</div>
         </div>
       </div>
 
@@ -744,6 +744,11 @@ export function PreRegistrationReceiptModal({
                   Originador del Registro
                 </span>
                 <p className="text-xs font-extrabold text-slate-900">{receipt.registrantName}</p>
+                {receipt.notes && (
+                  <p className="text-[10px] text-slate-500 font-semibold mt-0.5">
+                    Notas: {receipt.notes}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -758,9 +763,14 @@ export function PreRegistrationReceiptModal({
                 <p className="text-xs font-extrabold text-slate-900">
                   {receipt.createdAtFormatted}
                 </p>
-                <span className="text-[10px] font-mono font-bold text-slate-500">
+                <span className="text-[10px] font-mono font-bold text-slate-500 block">
                   IP: {receipt.clientIp}
                 </span>
+                {receipt.updatedAtFormatted && (
+                  <span className="inline-block mt-1 px-2 py-0.5 rounded bg-amber-100 text-amber-800 text-[9px] font-black uppercase">
+                    Editado: {receipt.updatedAtFormatted}
+                  </span>
+                )}
               </div>
             </div>
           </div>
