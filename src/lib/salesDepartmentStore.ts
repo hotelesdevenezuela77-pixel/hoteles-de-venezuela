@@ -476,6 +476,109 @@ function buildDigitalSignature(folio: string, financialCorrelative: string, time
 }
 
 /**
+ * Garantiza de forma no destructiva que cualquier registro histórico exonerado
+ * de "Alianza 50 Fundadores" o "Cliente Exclusivo / Prestigio 2026" conserve su
+ * número de cupo (#1/50, #2/50, #3/50...) o reciba su posición correlativa si fue
+ * creado como Prestigio antes de unificar el contador, sin alterar ningún cupo ya asignado.
+ */
+export function ensureUnifiedQuotaSlotsOnReceipts(
+  receipts: SalesPreRegistrationReceipt[]
+): { receipts: SalesPreRegistrationReceipt[]; changed: boolean } {
+  if (!Array.isArray(receipts) || receipts.length === 0) {
+    return { receipts: [], changed: false };
+  }
+
+  const usedSlots = new Set<number>();
+  for (const r of receipts) {
+    if (typeof r.founderSlotNumber === "number" && r.founderSlotNumber > 0) {
+      usedSlots.add(r.founderSlotNumber);
+    }
+  }
+
+  // Ordenar cronológicamente por secuencia correlativa para asignar en orden estricto si algún Prestigio histórico tenía null
+  const chronological = [...receipts].sort(
+    (a, b) => (a.correlativeSequence || 0) - (b.correlativeSequence || 0)
+  );
+
+  let changed = false;
+  const slotByFolio = new Map<string, number>();
+
+  for (const r of chronological) {
+    const isUnifiedQuotaModality =
+      r.modality === "fundadores_50" || r.modality === "exclusivo_prestigio";
+    if (!isUnifiedQuotaModality || r.financialStatus !== "exonerado") continue;
+
+    if (typeof r.founderSlotNumber === "number" && r.founderSlotNumber > 0) {
+      slotByFolio.set(r.folio, r.founderSlotNumber);
+      usedSlots.add(r.founderSlotNumber);
+    } else if (usedSlots.size < MAX_FOUNDERS_QUOTA) {
+      const candidate =
+        r.correlativeSequence &&
+        r.correlativeSequence > 0 &&
+        r.correlativeSequence <= MAX_FOUNDERS_QUOTA &&
+        !usedSlots.has(r.correlativeSequence)
+          ? r.correlativeSequence
+          : Math.max(0, ...Array.from(usedSlots)) + 1;
+
+      if (candidate <= MAX_FOUNDERS_QUOTA) {
+        usedSlots.add(candidate);
+        slotByFolio.set(r.folio, candidate);
+        changed = true;
+      }
+    }
+  }
+
+  if (!changed) {
+    return { receipts, changed: false };
+  }
+
+  const normalized = receipts.map((r) => {
+    if (typeof r.founderSlotNumber === "number" && r.founderSlotNumber > 0) {
+      return r;
+    }
+    const assignedSlot = slotByFolio.get(r.folio);
+    if (!assignedSlot) return r;
+    const updatedLabel =
+      r.modality === "exclusivo_prestigio"
+        ? `Exonerado ($0.00) — Selección Exclusiva Prestigio 2026 [Cupo #${assignedSlot}/${MAX_FOUNDERS_QUOTA}]`
+        : `Exonerado ($0.00) — Alianza 50 Fundadores [Cupo #${assignedSlot}/${MAX_FOUNDERS_QUOTA}]`;
+    return {
+      ...r,
+      founderSlotNumber: assignedSlot,
+      financialStatusLabel: updatedLabel
+    };
+  });
+
+  return { receipts: normalized, changed: true };
+}
+
+/**
+ * Calcula el correlativo global unificado de los 50 cupos de exoneración
+ * compartidos entre "Alianza 50 Fundadores" y "Cliente Exclusivo / Prestigio 2026",
+ * respetando de forma no destructiva los cupos ya emitidos (#1/50, #2/50, #3/50...).
+ */
+export function computeUnifiedExoneratedQuotaCount(
+  receipts: SalesPreRegistrationReceipt[],
+  storedCounter = 0
+): number {
+  const { receipts: normalized } = ensureUnifiedQuotaSlotsOnReceipts(receipts);
+  const maxSlotAssigned = normalized.reduce(
+    (max, r) => Math.max(max, typeof r.founderSlotNumber === "number" ? r.founderSlotNumber : 0),
+    0
+  );
+  const totalQuotaReceipts = normalized.filter(
+    (r) =>
+      (r.modality === "fundadores_50" || r.modality === "exclusivo_prestigio") &&
+      (r.founderSlotNumber !== null || r.financialStatus === "exonerado")
+  ).length;
+
+  return Math.min(
+    MAX_FOUNDERS_QUOTA,
+    Math.max(storedCounter || 0, maxSlotAssigned, totalQuotaReceipts)
+  );
+}
+
+/**
  * Asegura la inicialización de la estructura de contadores preservando estrictamente
  * cualquier registro, folio o comprobante histórico ya existente (Directiva No Destructiva).
  */
@@ -500,10 +603,7 @@ export function ensureSalesAndFinanceZeroInitialized(): SalesCountersState {
       // Asegurar que los contadores nunca sean menores a los comprobantes históricos reales
       const safeCounters: SalesCountersState = {
         preRegCounter: Math.max(parsed.preRegCounter || 0, existingReceipts.length),
-        foundersCounter: Math.max(
-          parsed.foundersCounter || 0,
-          existingReceipts.filter((r) => r.modality === "fundadores_50" && r.founderSlotNumber !== null).length
-        ),
+        foundersCounter: computeUnifiedExoneratedQuotaCount(existingReceipts, parsed.foundersCounter || 0),
         exoneratedCounter: Math.max(
           parsed.exoneratedCounter || 0,
           existingReceipts.filter((r) => r.financialStatus === "exonerado").length
@@ -521,7 +621,7 @@ export function ensureSalesAndFinanceZeroInitialized(): SalesCountersState {
     if (existingReceipts.length > 0) {
       const derivedCounters: SalesCountersState = {
         preRegCounter: existingReceipts.length,
-        foundersCounter: existingReceipts.filter((r) => r.modality === "fundadores_50" && r.founderSlotNumber !== null).length,
+        foundersCounter: computeUnifiedExoneratedQuotaCount(existingReceipts, 0),
         exoneratedCounter: existingReceipts.filter((r) => r.financialStatus === "exonerado").length,
         invoiceCounter: existingReceipts.filter((r) => r.invoiceNumber !== null).length,
         initializedAt: new Date().toISOString()
@@ -569,7 +669,12 @@ export function getSalesReceipts(): SalesPreRegistrationReceipt[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.RECEIPTS);
-    return raw ? JSON.parse(raw) : [];
+    const parsed: SalesPreRegistrationReceipt[] = raw ? JSON.parse(raw) : [];
+    const { receipts: normalized, changed } = ensureUnifiedQuotaSlotsOnReceipts(parsed);
+    if (changed) {
+      localStorage.setItem(STORAGE_KEYS.RECEIPTS, JSON.stringify(normalized));
+    }
+    return normalized;
   } catch {
     return [];
   }
@@ -611,16 +716,16 @@ export async function syncSalesStateFromSupabase(): Promise<{
       for (const r of remoteReceipts) mergedMap.set(r.folio, r);
       for (const r of localReceipts) mergedMap.set(r.folio, r);
 
-      const mergedReceipts = Array.from(mergedMap.values()).sort(
+      const rawMergedReceipts = Array.from(mergedMap.values()).sort(
         (a, b) => new Date(b.createdAtIso).getTime() - new Date(a.createdAtIso).getTime()
       );
+      const { receipts: mergedReceipts } = ensureUnifiedQuotaSlotsOnReceipts(rawMergedReceipts);
 
       const mergedCounters: SalesCountersState = {
         preRegCounter: Math.max(localCounters.preRegCounter, remoteCounters.preRegCounter, mergedReceipts.length),
-        foundersCounter: Math.max(
-          localCounters.foundersCounter,
-          remoteCounters.foundersCounter,
-          mergedReceipts.filter((r) => r.modality === "fundadores_50" && r.founderSlotNumber !== null).length
+        foundersCounter: computeUnifiedExoneratedQuotaCount(
+          mergedReceipts,
+          Math.max(localCounters.foundersCounter || 0, remoteCounters.foundersCounter || 0)
         ),
         exoneratedCounter: Math.max(
           localCounters.exoneratedCounter,
@@ -756,36 +861,33 @@ export async function processSalesPreRegistration(
   let monthlyAmountUsd = 0;
   let showAmountOnReceipt = true;
 
-  // Regla de Sincronización Correlativa:
-  // Si selecciona 50 Fundadores y aún hay cupos (1 a 50): Exonerado $0.00
-  // Si ya se completaron los 50 cupos de Fundadores, se activa automáticamente la facturación correlativa HDV-FAC
-  if (effectiveModality === "fundadores_50") {
-    if (counters.foundersCounter < MAX_FOUNDERS_QUOTA) {
-      nextFoundersCounter = counters.foundersCounter + 1;
+  // Regla de Sincronización Correlativa Unificada (50 Cupos Globales = Fundadores + Prestigio 2026):
+  // Tanto "Alianza 50 Fundadores" como "Cliente Exclusivo / Prestigio 2026" consumen del mismo
+  // contador global de 50 cupos (Cupo #1/50 .. #50/50), continuando desde el #4/50 sin reiniciar.
+  // Si ya se completaron los 50 cupos globales, se activa automáticamente la facturación correlativa HDV-FAC.
+  if (effectiveModality === "fundadores_50" || effectiveModality === "exclusivo_prestigio") {
+    const currentUnifiedUsed = computeUnifiedExoneratedQuotaCount(receipts, counters.foundersCounter);
+    if (currentUnifiedUsed < MAX_FOUNDERS_QUOTA) {
+      nextFoundersCounter = currentUnifiedUsed + 1;
       founderSlotNumber = nextFoundersCounter;
       nextExoneratedCounter = counters.exoneratedCounter + 1;
       financialCorrelative = `HDV-EXO-2026-${pad4(nextExoneratedCounter)}`;
       invoiceNumber = null;
       financialStatus = "exonerado";
-      financialStatusLabel = `Exonerado ($0.00) — Alianza 50 Fundadores [Cupo ${founderSlotNumber}/${MAX_FOUNDERS_QUOTA}]`;
-      modalityLabel = "Membresía Exonerada - Alianza 50 Fundadores";
       monthlyAmountUsd = 0;
       showAmountOnReceipt = true;
+
+      if (effectiveModality === "fundadores_50") {
+        modalityLabel = "Membresía Exonerada - Alianza 50 Fundadores";
+        financialStatusLabel = `Exonerado ($0.00) — Alianza 50 Fundadores [Cupo #${founderSlotNumber}/${MAX_FOUNDERS_QUOTA}]`;
+      } else {
+        modalityLabel = "Membresía Exonerada - Selección Exclusiva Prestigio 2026";
+        financialStatusLabel = `Exonerado ($0.00) — Selección Exclusiva Prestigio 2026 [Cupo #${founderSlotNumber}/${MAX_FOUNDERS_QUOTA}]`;
+      }
     } else {
-      // Cupo 50 superado -> Activación Post-50 de Facturación Correlativa
+      // Cupo global 50 superado -> Activación Post-50 de Facturación Correlativa
       effectiveModality = "comercial_estandar";
     }
-  }
-
-  if (effectiveModality === "exclusivo_prestigio") {
-    nextExoneratedCounter = counters.exoneratedCounter + 1;
-    financialCorrelative = `HDV-EXO-2026-${pad4(nextExoneratedCounter)}`;
-    invoiceNumber = null;
-    financialStatus = "exonerado";
-    financialStatusLabel = "Exonerado ($0.00) — Selección Exclusiva Prestigio 2026";
-    modalityLabel = "Membresía Exonerada - Selección Exclusiva";
-    monthlyAmountUsd = 0;
-    showAmountOnReceipt = true;
   }
 
   if (effectiveModality === "comercial_estandar") {
@@ -1412,11 +1514,24 @@ export async function updateSalesPreRegistrationReceipt(
   const selectedPlan =
     SAAS_COMMERCIAL_PLANS.find((p) => p.id === target.planId) || SAAS_COMMERCIAL_PLANS[6];
 
+  const preservedSlotNumber = target.founderSlotNumber;
   let nextModalityLabel = target.modalityLabel;
+  let nextFinancialStatusLabel = target.financialStatusLabel;
+
   if (input.modality === "fundadores_50") {
     nextModalityLabel = "Membresía Exonerada - Alianza 50 Fundadores";
+    if (target.financialStatus === "exonerado") {
+      nextFinancialStatusLabel = preservedSlotNumber
+        ? `Exonerado ($0.00) — Alianza 50 Fundadores [Cupo #${preservedSlotNumber}/${MAX_FOUNDERS_QUOTA}]`
+        : "Exonerado ($0.00) — Alianza 50 Fundadores";
+    }
   } else if (input.modality === "exclusivo_prestigio") {
-    nextModalityLabel = "Membresía Exonerada - Selección Exclusiva";
+    nextModalityLabel = "Membresía Exonerada - Selección Exclusiva Prestigio 2026";
+    if (target.financialStatus === "exonerado") {
+      nextFinancialStatusLabel = preservedSlotNumber
+        ? `Exonerado ($0.00) — Selección Exclusiva Prestigio 2026 [Cupo #${preservedSlotNumber}/${MAX_FOUNDERS_QUOTA}]`
+        : "Exonerado ($0.00) — Selección Exclusiva Prestigio 2026";
+    }
   } else if (input.modality === "comercial_estandar") {
     nextModalityLabel = `Membresía Comercial — ${selectedPlan.name}`;
   }
@@ -1428,7 +1543,7 @@ export async function updateSalesPreRegistrationReceipt(
     financialCorrelative: target.financialCorrelative,
     invoiceNumber: target.invoiceNumber,
     correlativeSequence: target.correlativeSequence,
-    founderSlotNumber: target.founderSlotNumber,
+    founderSlotNumber: preservedSlotNumber,
     clientIp: target.clientIp,
     userAgent: target.userAgent,
     createdAtIso: target.createdAtIso,
@@ -1448,6 +1563,7 @@ export async function updateSalesPreRegistrationReceipt(
     registrantName: input.registrantName.trim() || target.registrantName,
     modality: input.modality,
     modalityLabel: nextModalityLabel,
+    financialStatusLabel: nextFinancialStatusLabel,
     primaryImage: input.primaryImage?.trim() || target.primaryImage,
     notes: input.notes !== undefined ? input.notes.trim() : target.notes,
     updatedAtIso,

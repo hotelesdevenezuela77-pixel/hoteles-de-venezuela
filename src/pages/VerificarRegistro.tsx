@@ -217,8 +217,14 @@ export function VerificarRegistro() {
                 <span>Modalidad de Membresía & Estatus Financiero</span>
               </span>
               {receipt.founderSlotNumber && (
-                <span className="px-3 py-1 rounded-full bg-[#FF0096] text-white text-xs font-black uppercase">
-                  Cupo 50 Fundadores: #{receipt.founderSlotNumber} / 50
+                <span
+                  className={`px-3 py-1 rounded-full text-white text-xs font-black uppercase ${
+                    receipt.modality === "exclusivo_prestigio" ? "bg-[#9B00CC]" : "bg-[#FF0096]"
+                  }`}
+                >
+                  {receipt.modality === "exclusivo_prestigio"
+                    ? `Cupo Prestigio 2026: #${receipt.founderSlotNumber} / 50`
+                    : `Cupo 50 Fundadores: #${receipt.founderSlotNumber} / 50`}
                 </span>
               )}
             </div>

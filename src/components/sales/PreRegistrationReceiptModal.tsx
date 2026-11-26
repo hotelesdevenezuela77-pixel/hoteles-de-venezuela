@@ -81,11 +81,17 @@ export function printOfficialPreRegistrationReceipt(receipt: SalesPreRegistratio
   const win = window.open("", "_blank");
   if (!win) return;
 
-  const founderOrTierBadge = receipt.founderSlotNumber
-    ? `ALIANZA 50 FUNDADORES • CUPO OFICIAL #${receipt.founderSlotNumber} / 50`
-    : receipt.modality === "exclusivo_prestigio"
-      ? "SELECCIÓN EXCLUSIVA • COLECCIÓN PRESTIGIO 2026"
-      : `AFILIACIÓN COMERCIAL OFICIAL • ${receipt.planName.toUpperCase()}`;
+  const founderOrTierBadge =
+    receipt.modality === "exclusivo_prestigio"
+      ? receipt.founderSlotNumber
+        ? `SELECCIÓN EXCLUSIVA PRESTIGIO 2026 • CUPO OFICIAL #${receipt.founderSlotNumber} / 50`
+        : "SELECCIÓN EXCLUSIVA • COLECCIÓN PRESTIGIO 2026"
+      : receipt.founderSlotNumber
+        ? `ALIANZA 50 FUNDADORES • CUPO OFICIAL #${receipt.founderSlotNumber} / 50`
+        : `AFILIACIÓN COMERCIAL OFICIAL • ${receipt.planName.toUpperCase()}`;
+
+  const slotBoxTitle =
+    receipt.modality === "exclusivo_prestigio" ? "Cupo Prestigio" : "Cupo Fundador";
 
   const consolidationBadge = receipt.wasConsolidatedExisting
     ? "✓ Ficha Oficial Consolidada (Sin Duplicados)"
@@ -455,7 +461,7 @@ export function printOfficialPreRegistrationReceipt(receipt: SalesPreRegistratio
         </div>
         ${receipt.founderSlotNumber
       ? `<div style="text-align: center; background: rgba(255,255,255,0.08); border: 1.5px solid #00C8D4; border-radius: 12px; padding: 8px 14px; flex-shrink: 0;">
-                 <span style="display: block; font-size: 8.5px; font-weight: 900; color: #00C8D4; text-transform: uppercase; letter-spacing: 0.1em;">Cupo Fundador</span>
+                 <span style="display: block; font-size: 8.5px; font-weight: 900; color: #00C8D4; text-transform: uppercase; letter-spacing: 0.1em;">${slotBoxTitle}</span>
                  <span style="font-size: 18px; font-weight: 900; color: #ffffff;">#${receipt.founderSlotNumber}<span style="font-size: 11px; color: #94a3b8;">/50</span></span>
                </div>`
       : ""
@@ -549,9 +555,17 @@ export function PreRegistrationReceiptModal({
                   <span>Credencial Oficial de Afiliación HDV</span>
                 </span>
                 {receipt.founderSlotNumber && (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#FF0096] text-white text-[10px] font-black uppercase tracking-wider shadow">
+                  <span
+                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-white text-[10px] font-black uppercase tracking-wider shadow ${
+                      receipt.modality === "exclusivo_prestigio" ? "bg-[#9B00CC]" : "bg-[#FF0096]"
+                    }`}
+                  >
                     <Award className="w-3 h-3" />
-                    <span>Alianza 50 Fundadores • Cupo #{receipt.founderSlotNumber}/50</span>
+                    <span>
+                      {receipt.modality === "exclusivo_prestigio"
+                        ? `Selección Exclusiva Prestigio • Cupo #${receipt.founderSlotNumber}/50`
+                        : `Alianza 50 Fundadores • Cupo #${receipt.founderSlotNumber}/50`}
+                    </span>
                   </span>
                 )}
               </div>
@@ -689,8 +703,14 @@ export function PreRegistrationReceiptModal({
               </span>
 
               {receipt.founderSlotNumber && (
-                <span className="px-2.5 py-0.5 rounded-full bg-[#FF0096] text-white text-[10px] font-black uppercase">
-                  Cupo Fundador #{receipt.founderSlotNumber} / 50
+                <span
+                  className={`px-2.5 py-0.5 rounded-full text-white text-[10px] font-black uppercase ${
+                    receipt.modality === "exclusivo_prestigio" ? "bg-[#9B00CC]" : "bg-[#FF0096]"
+                  }`}
+                >
+                  {receipt.modality === "exclusivo_prestigio"
+                    ? `Cupo Prestigio #${receipt.founderSlotNumber} / 50`
+                    : `Cupo Fundador #${receipt.founderSlotNumber} / 50`}
                 </span>
               )}
             </div>

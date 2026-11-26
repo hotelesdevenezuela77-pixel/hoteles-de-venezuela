@@ -1610,10 +1610,10 @@ export function PreRegistro() {
                     </h3>
                   </div>
 
-                  {/* Contador en Vivo 50 Fundadores */}
+                  {/* Contador en Vivo 50 Cupos Globales (Fundadores + Prestigio) */}
                   <div className="px-3.5 py-2 rounded-2xl bg-white/10 border border-[#00C8D4]/30 text-right shrink-0">
                     <span className="block text-[9px] font-black uppercase tracking-wider text-[#00C8D4]">
-                      Cupos 50 Fundadores
+                      Cupo Global 50 (Fundadores + Prestigio)
                     </span>
                     <span className="text-xs font-mono font-black text-white">
                       {foundersOccupied} / {MAX_FOUNDERS_QUOTA} Ocupados ({foundersAvailable} disp.)
@@ -2239,12 +2239,15 @@ export function PreRegistro() {
                 <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
                   <span className="block text-[10px] font-black uppercase text-[#FF0096]">
                     {modality === "fundadores_50"
-                      ? `Membresía Exonerada - Alianza 50 Fundadores (Cupo ${Math.min(
+                      ? `Membresía Exonerada - Alianza 50 Fundadores (Cupo #${Math.min(
                           50,
                           foundersOccupied + 1
                         )}/50)`
                       : modality === "exclusivo_prestigio"
-                      ? "Membresía Exonerada - Selección Exclusiva (Prestigio 2026)"
+                      ? `Membresía Exonerada - Selección Exclusiva Prestigio 2026 (Cupo #${Math.min(
+                          50,
+                          foundersOccupied + 1
+                        )}/50)`
                       : `Membresía Comercial — ${currentPlanObj.name}`}
                   </span>
                   <p className="text-xs font-extrabold text-slate-900">

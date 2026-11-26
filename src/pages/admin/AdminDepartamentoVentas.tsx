@@ -194,7 +194,16 @@ export function AdminDepartamentoVentas() {
     });
   }, [receipts, searchQuery, modalityFilter, originFilter, statusFilter, consolidationFilter]);
 
-  const foundersOccupied = Math.min(MAX_FOUNDERS_QUOTA, counters.foundersCounter);
+  const foundersCount = receipts.filter(
+    (r) => r.modality === "fundadores_50" && (r.founderSlotNumber !== null || r.financialStatus === "exonerado")
+  ).length;
+  const prestigioCount = receipts.filter(
+    (r) => r.modality === "exclusivo_prestigio" && (r.founderSlotNumber !== null || r.financialStatus === "exonerado")
+  ).length;
+  const foundersOccupied = Math.min(
+    MAX_FOUNDERS_QUOTA,
+    Math.max(counters.foundersCounter, foundersCount + prestigioCount)
+  );
   const foundersRemaining = Math.max(0, MAX_FOUNDERS_QUOTA - foundersOccupied);
   const foundersPct = Math.min(100, Math.round((foundersOccupied / MAX_FOUNDERS_QUOTA) * 100));
 
@@ -256,7 +265,7 @@ export function AdminDepartamentoVentas() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 mt-8 space-y-8">
-        {/* Barra de Progreso Oficial: Programa 50 Fundadores y Activación Post-50 */}
+        {/* Barra de Progreso Oficial: Cupo Global Unificado 50 Exoneraciones (Fundadores + Prestigio) */}
         <div className="rounded-3xl bg-gradient-to-br from-[#0e011f] to-[#1a0533] text-white p-6 sm:p-7 border border-[#00C8D4]/30 shadow-xl">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-3.5">
@@ -265,14 +274,25 @@ export function AdminDepartamentoVentas() {
               </div>
               <div>
                 <span className="text-[10px] font-black uppercase tracking-widest text-[#00C8D4] block">
-                  Control Correlativo • Alianza 50 Fundadores
+                  Contador Global Unificado • Alianza 50 Fundadores + Prestigio 2026
                 </span>
                 <h2
                   className="text-xl sm:text-2xl font-bold text-white"
                   style={{ fontFamily: "'Playfair Display', serif" }}
                 >
-                  Cupos 50 Fundadores: {foundersOccupied} Ocupados / {foundersRemaining} Disponibles
+                  Cupos de Exoneración: {foundersOccupied} / {MAX_FOUNDERS_QUOTA} Ocupados · {foundersRemaining} Disponibles
                 </h2>
+                <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#FF0096]/25 border border-[#FF0096]/50 text-pink-200 text-[10px] font-black uppercase">
+                    Alianza 50 Fundadores: {foundersCount}
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#9B00CC]/30 border border-[#9B00CC]/60 text-purple-200 text-[10px] font-black uppercase">
+                    Prestigio / Exclusivos: {prestigioCount}
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#00C8D4]/20 border border-[#00C8D4]/45 text-[#00C8D4] text-[10px] font-black uppercase">
+                    Próximo Cupo Correlativo: #{Math.min(MAX_FOUNDERS_QUOTA, foundersOccupied + 1)} / {MAX_FOUNDERS_QUOTA}
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -301,10 +321,10 @@ export function AdminDepartamentoVentas() {
             />
           </div>
 
-          <div className="flex items-center justify-between text-[11px] font-bold text-slate-300 mt-2">
-            <span>Inicio en Cero (0 / 50)</span>
-            <span>Progreso actual: {foundersPct}% ({foundersOccupied} / 50)</span>
-            <span>Meta 50 Fundadores (Activación Facturación HDV-FAC)</span>
+          <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-bold text-slate-300 mt-2">
+            <span>Desglose activo: {foundersCount} Fundadores + {prestigioCount} Prestigio</span>
+            <span>Progreso unificado: {foundersPct}% ({foundersOccupied} / {MAX_FOUNDERS_QUOTA} ocupados)</span>
+            <span>Meta Global 50 Cupos (Activación Facturación HDV-FAC)</span>
           </div>
         </div>
 
@@ -328,20 +348,20 @@ export function AdminDepartamentoVentas() {
             </div>
           </div>
 
-          {/* 2. Cupos Utilizados Alianza 50 Fundadores */}
+          {/* 2. Cupos Utilizados Global 50 (Fundadores + Prestigio) */}
           <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-[#FF0096] text-white flex items-center justify-center shrink-0 shadow-md">
               <Award className="w-6 h-6" />
             </div>
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
-                Alianza 50 Fundadores
+                Cupo Unificado 50 (Fund. + Prest.)
               </span>
               <p className="text-2xl font-black text-slate-900 font-mono">
                 {foundersOccupied} <span className="text-sm text-slate-400">/ {MAX_FOUNDERS_QUOTA}</span>
               </p>
-              <span className="text-[11px] font-bold text-[#FF0096]">
-                {foundersRemaining} cupos disponibles
+              <span className="text-[11px] font-bold text-[#FF0096] block">
+                {foundersCount} Fundadores · {prestigioCount} Prestigio ({foundersRemaining} disp.)
               </span>
             </div>
           </div>
@@ -577,8 +597,13 @@ export function AdminDepartamentoVentas() {
                           {r.modalityLabel}
                         </span>
                         {r.founderSlotNumber && (
-                          <span className="block text-[10px] font-extrabold text-[#FF0096] mt-1">
-                            Cupo #{r.founderSlotNumber} / {MAX_FOUNDERS_QUOTA}
+                          <span
+                            className={`block text-[10px] font-extrabold mt-1 ${
+                              r.modality === "exclusivo_prestigio" ? "text-[#9B00CC]" : "text-[#FF0096]"
+                            }`}
+                          >
+                            Cupo #{r.founderSlotNumber} / {MAX_FOUNDERS_QUOTA} (
+                            {r.modality === "exclusivo_prestigio" ? "Prestigio 2026" : "Fundador"})
                           </span>
                         )}
                       </td>
@@ -786,8 +811,14 @@ export function AdminDepartamentoVentas() {
                     <span>Trazabilidad y Auditoría Original Protegida (No Modificable)</span>
                   </span>
                   {editingReceipt.founderSlotNumber && (
-                    <span className="px-2.5 py-0.5 rounded-full bg-[#FF0096] text-white text-[10px] font-black">
-                      Cupo Fundador Protegido: #{editingReceipt.founderSlotNumber} / {MAX_FOUNDERS_QUOTA}
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full text-white text-[10px] font-black ${
+                        editModality === "exclusivo_prestigio" ? "bg-[#9B00CC]" : "bg-[#FF0096]"
+                      }`}
+                    >
+                      {editModality === "exclusivo_prestigio"
+                        ? `Cupo Prestigio Protegido: #${editingReceipt.founderSlotNumber} / ${MAX_FOUNDERS_QUOTA}`
+                        : `Cupo Fundador Protegido: #${editingReceipt.founderSlotNumber} / ${MAX_FOUNDERS_QUOTA}`}
                     </span>
                   )}
                 </div>
@@ -914,8 +945,12 @@ export function AdminDepartamentoVentas() {
                     onChange={(e) => setEditModality(e.target.value as MembershipModality)}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4] cursor-pointer"
                   >
-                    <option value="fundadores_50">Programa 50 Fundadores (Exonerado)</option>
-                    <option value="exclusivo_prestigio">Cliente Exclusivo / Prestigio 2026</option>
+                    <option value="fundadores_50">
+                      Programa 50 Fundadores (Exonerado{editingReceipt.founderSlotNumber ? ` • Cupo #${editingReceipt.founderSlotNumber}/50` : ""})
+                    </option>
+                    <option value="exclusivo_prestigio">
+                      Cliente Exclusivo / Prestigio 2026 (Exonerado{editingReceipt.founderSlotNumber ? ` • Cupo #${editingReceipt.founderSlotNumber}/50` : ""})
+                    </option>
                     <option value="comercial_estandar">Membresía Comercial / Estándar</option>
                   </select>
                 </div>
