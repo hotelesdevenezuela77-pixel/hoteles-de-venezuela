@@ -111,12 +111,13 @@ async function resolveRouteSeo(pathname, env) {
   if (estMatch) {
     const slug = decodeURIComponent(estMatch[1]);
     const rows = await querySupabase(
-      `establishments?select=name,slug,short_description,description,city,state,main_image&slug=eq.${encodeURIComponent(slug)}&status=eq.approved&limit=1`,
+      `establishments?select=*&slug=eq.${encodeURIComponent(slug)}&status=eq.approved&limit=1`,
       env
     );
     if (!rows || rows.length === 0) return { exists: false };
     const est = rows[0];
-    const title = `${est.name} en ${est.city || est.state || "Venezuela"} | Hoteles de Venezuela`;
+    const locLabel = est.city || est.state || est.destino || est.destination || "Venezuela";
+    const title = `${est.name} en ${locLabel} | Hoteles de Venezuela`;
     const desc = clampDescription(
       est.short_description || est.description || `${est.name} en ${est.city || "Venezuela"}. Reserva directa sin comisiones con Hoteles de Venezuela.`
     );
@@ -126,7 +127,7 @@ async function resolveRouteSeo(pathname, env) {
       title,
       description: desc,
       canonical,
-      ogImage: est.main_image || DEFAULT_OG_IMAGE,
+      ogImage: imgUrl || DEFAULT_OG_IMAGE,
       ogType: "hotel",
       schemas: [
         {
@@ -134,7 +135,7 @@ async function resolveRouteSeo(pathname, env) {
           "@type": "LodgingBusiness",
           name: est.name,
           url: canonical,
-          image: est.main_image || DEFAULT_OG_IMAGE,
+          image: imgUrl || DEFAULT_OG_IMAGE,
           address: {
             "@type": "PostalAddress",
             addressLocality: est.city || "",
