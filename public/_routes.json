@@ -1,9 +1,18 @@
 {
   "version": 1,
   "include": [
-    "/sitemap.xml",
-    "/api/sitemap"
+    "/*"
   ],
-  "exclude": []
+  "exclude": [
+    "/sitemap.xml",
+    "/api/sitemap",
+    "/images/*",
+    "/videos/*",
+    "/assets/*",
+    "/favicon.svg",
+    "/icons.svg",
+    "/placeholder-hotel.jpg",
+    "/salto-angel-hero.jpg",
+    "/ra4gpl4v796c05gwjx9ort6peoysiz.html"
+  ]
 }
-

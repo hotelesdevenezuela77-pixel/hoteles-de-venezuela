@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Compass, Home } from "lucide-react";
+import { Compass, Home, MapPin } from "lucide-react";
 
 export function NotFound() {
   return (
@@ -18,12 +18,21 @@ export function NotFound() {
           La página o destino que buscas no se encuentra en nuestro itinerario actual. Puede haber cambiado de coordenadas o haber sido archivada temporalmente.
         </p>
 
-        <Link href="/">
-          <button className="btn-gold-glow w-full flex items-center justify-center gap-2 bg-brand-gold text-black font-bold py-3.5 rounded-xl hover:scale-102 active:scale-98 transition-all text-sm">
-            <Home className="w-4 h-4" />
-            <span>Volver al Inicio</span>
-          </button>
-        </Link>
+        <div className="flex flex-col gap-3">
+          <Link href="/hoteles-en-venezuela">
+            <button className="w-full flex items-center justify-center gap-2 bg-white/10 hover:bg-white/15 text-white font-bold py-3 rounded-xl border border-white/15 transition-all text-sm cursor-pointer">
+              <MapPin className="w-4 h-4" />
+              <span>Explorar Hoteles en Venezuela</span>
+            </button>
+          </Link>
+
+          <Link href="/">
+            <button className="btn-gold-glow w-full flex items-center justify-center gap-2 bg-brand-gold text-black font-bold py-3.5 rounded-xl hover:scale-102 active:scale-98 transition-all text-sm cursor-pointer">
+              <Home className="w-4 h-4" />
+              <span>Volver al Inicio</span>
+            </button>
+          </Link>
+        </div>
       </div>
     </div>
   );
