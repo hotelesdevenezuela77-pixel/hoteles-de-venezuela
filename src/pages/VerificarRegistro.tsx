@@ -27,8 +27,9 @@ import {
 } from "../components/sales/PreRegistrationReceiptModal";
 
 export function VerificarRegistro() {
-  const [, params] = useRoute("/verificar-registro/:folio");
-  const folioParam = decodeURIComponent(params?.folio || "").trim().toUpperCase();
+  const [match, params] = useRoute<{ folio: string }>("/verificar-registro/:folio");
+  const rawFolio = match && params ? params.folio : "";
+  const folioParam = decodeURIComponent(rawFolio || "").trim().toUpperCase();
 
   const [receipt, setReceipt] = useState<SalesPreRegistrationReceipt | null>(() =>
     getReceiptByFolio(folioParam)
