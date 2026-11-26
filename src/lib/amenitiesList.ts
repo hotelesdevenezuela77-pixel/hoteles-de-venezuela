@@ -22,7 +22,7 @@ export interface AmenityItem {
   category: "habitacion" | "recreacion" | "gastronomia" | "servicios" | "general" | "especificos" | "configuracion";
   subCategory: string;
   scope: AmenityScope;
-  iconName: string;
+  iconName?: string;
   isCompletable?: boolean; // Subrayado en azul turquesa en Documento 77 V.11 (Campo completable no marcable)
   placeholder?: string;
 }
