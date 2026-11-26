@@ -84,9 +84,7 @@ async function resolveRouteSeo(pathname, env) {
     return {
       exists: true,
       title: HOME_TITLE,
-      description: clampDescription(
-        "Guía turística y directorio oficial de hoteles, posadas boutique, resorts y campamentos en Venezuela. Reserva directo con los anfitriones por WhatsApp sin intermediarios."
-      ),
+      description: clampDescription(DEFAULT_DESC),
       canonical: `${BASE_URL}/`,
       ogImage: DEFAULT_OG_IMAGE,
       ogType: "website",
@@ -117,9 +115,10 @@ async function resolveRouteSeo(pathname, env) {
     if (!rows || rows.length === 0) return { exists: false };
     const est = rows[0];
     const locLabel = est.city || est.state || est.destino || est.destination || "Venezuela";
+    const imgUrl = est.main_image || est.image_url || est.cover_image || DEFAULT_OG_IMAGE;
     const title = `${est.name} en ${locLabel} | Hoteles de Venezuela`;
     const desc = clampDescription(
-      est.short_description || est.description || `${est.name} en ${est.city || "Venezuela"}. Reserva directa sin comisiones con Hoteles de Venezuela.`
+      est.short_description || est.description || `${est.name} en ${locLabel}. Reserva directa sin comisiones con Hoteles de Venezuela.`
     );
     const canonical = `${BASE_URL}${cleanPath}`;
     return {
@@ -127,7 +126,7 @@ async function resolveRouteSeo(pathname, env) {
       title,
       description: desc,
       canonical,
-      ogImage: imgUrl || DEFAULT_OG_IMAGE,
+      ogImage: imgUrl,
       ogType: "hotel",
       schemas: [
         {
@@ -135,7 +134,7 @@ async function resolveRouteSeo(pathname, env) {
           "@type": "LodgingBusiness",
           name: est.name,
           url: canonical,
-          image: imgUrl || DEFAULT_OG_IMAGE,
+          image: imgUrl,
           address: {
             "@type": "PostalAddress",
             addressLocality: est.city || "",
@@ -160,11 +159,12 @@ async function resolveRouteSeo(pathname, env) {
   if (destMatch) {
     const slug = decodeURIComponent(destMatch[1]);
     const rows = await querySupabase(
-      `destinations?select=name,slug,description,image_url&slug=eq.${encodeURIComponent(slug)}&limit=1`,
+      `destinations?select=*&slug=eq.${encodeURIComponent(slug)}&limit=1`,
       env
     );
     if (!rows || rows.length === 0) return { exists: false };
     const dest = rows[0];
+    const destImg = dest.image_url || dest.main_image || DEFAULT_OG_IMAGE;
     const title = `Hoteles en ${dest.name} | Hoteles de Venezuela`;
     const desc = clampDescription(
       dest.description || `Descubre hoteles, posadas y alojamientos en ${dest.name} con trato directo sin intermediarios en Hoteles de Venezuela.`
@@ -175,7 +175,7 @@ async function resolveRouteSeo(pathname, env) {
       title,
       description: desc,
       canonical,
-      ogImage: dest.image_url || DEFAULT_OG_IMAGE,
+      ogImage: destImg,
       ogType: "website",
       schemas: [
         {
@@ -195,11 +195,12 @@ async function resolveRouteSeo(pathname, env) {
   if (blogMatch) {
     const slug = decodeURIComponent(blogMatch[1]);
     const rows = await querySupabase(
-      `blog_posts?select=title,slug,excerpt,meta_description,cover_image&slug=eq.${encodeURIComponent(slug)}&status=eq.published&limit=1`,
+      `blog_posts?select=*&slug=eq.${encodeURIComponent(slug)}&status=eq.published&limit=1`,
       env
     );
     if (!rows || rows.length === 0) return { exists: false };
     const post = rows[0];
+    const postImg = post.cover_image || post.image_url || DEFAULT_OG_IMAGE;
     const title = `${post.title} | Blog Hoteles de Venezuela`;
     const desc = clampDescription(
       post.meta_description || post.excerpt || `${post.title} — Guía y turismo en Venezuela con Hoteles de Venezuela.`
@@ -209,7 +210,7 @@ async function resolveRouteSeo(pathname, env) {
       title,
       description: desc,
       canonical: `${BASE_URL}${cleanPath}`,
-      ogImage: post.cover_image || DEFAULT_OG_IMAGE,
+      ogImage: postImg,
       ogType: "article",
       schemas: []
     };
@@ -219,17 +220,18 @@ async function resolveRouteSeo(pathname, env) {
   if (siteMatch) {
     const slug = decodeURIComponent(siteMatch[1]);
     const rows = await querySupabase(
-      `tourist_sites?select=name,slug,description,image_url&slug=eq.${encodeURIComponent(slug)}&is_active=eq.true&limit=1`,
+      `tourist_sites?select=*&slug=eq.${encodeURIComponent(slug)}&is_active=eq.true&limit=1`,
       env
     );
     if (!rows || rows.length === 0) return { exists: false };
     const site = rows[0];
+    const siteImg = site.image_url || site.main_image || DEFAULT_OG_IMAGE;
     return {
       exists: true,
       title: `${site.name} | Sitios Turísticos de Venezuela`,
       description: clampDescription(site.description || `Conoce ${site.name} y alojamientos cercanos sin comisiones en Hoteles de Venezuela.`),
       canonical: `${BASE_URL}${cleanPath}`,
-      ogImage: site.image_url || DEFAULT_OG_IMAGE,
+      ogImage: siteImg,
       ogType: "website",
       schemas: []
     };
@@ -239,17 +241,18 @@ async function resolveRouteSeo(pathname, env) {
   if (parkMatch) {
     const slug = decodeURIComponent(parkMatch[1]);
     const rows = await querySupabase(
-      `national_parks?select=name,slug,description,image_url&slug=eq.${encodeURIComponent(slug)}&limit=1`,
+      `national_parks?select=*&slug=eq.${encodeURIComponent(slug)}&limit=1`,
       env
     );
     if (!rows || rows.length === 0) return { exists: false };
     const park = rows[0];
+    const parkImg = park.image_url || park.main_image || DEFAULT_OG_IMAGE;
     return {
       exists: true,
       title: `${park.name} | Parques Nacionales de Venezuela`,
       description: clampDescription(park.description || `Guía del Parque Nacional ${park.name} y hospedajes cercanos en Hoteles de Venezuela.`),
       canonical: `${BASE_URL}${cleanPath}`,
-      ogImage: park.image_url || DEFAULT_OG_IMAGE,
+      ogImage: parkImg,
       ogType: "website",
       schemas: []
     };
@@ -273,17 +276,18 @@ async function resolveRouteSeo(pathname, env) {
   const customSlug = cleanPath.replace(/^\//, "");
   if (customSlug && !customSlug.includes("/")) {
     const customRows = await querySupabase(
-      `custom_pages?select=title,slug,meta_description,featured_image&slug=eq.${encodeURIComponent(customSlug)}&is_published=eq.true&limit=1`,
+      `custom_pages?select=*&slug=eq.${encodeURIComponent(customSlug)}&is_published=eq.true&limit=1`,
       env
     );
     if (customRows && customRows.length > 0) {
       const page = customRows[0];
+      const pageImg = page.featured_image || page.image_url || DEFAULT_OG_IMAGE;
       return {
         exists: true,
         title: `${page.title} | Hoteles de Venezuela`,
         description: clampDescription(page.meta_description || DEFAULT_DESC),
         canonical: `${BASE_URL}${cleanPath}`,
-        ogImage: page.featured_image || DEFAULT_OG_IMAGE,
+        ogImage: pageImg,
         ogType: "website",
         schemas: []
       };
@@ -294,95 +298,99 @@ async function resolveRouteSeo(pathname, env) {
 }
 
 export async function onRequest(context) {
-  const { request, next, env } = context;
-  const url = new URL(request.url);
+  try {
+    const { request, next, env } = context;
+    const url = new URL(request.url);
 
-  if (url.hostname === "www.hotelesdevenezuela.com") {
-    url.hostname = "hotelesdevenezuela.com";
-    return Response.redirect(url.toString(), 301);
-  }
+    if (url.hostname === "www.hotelesdevenezuela.com") {
+      url.hostname = "hotelesdevenezuela.com";
+      return Response.redirect(url.toString(), 301);
+    }
 
-  const pathname = url.pathname;
+    const pathname = url.pathname;
 
-  if (
-    pathname.startsWith("/api/") ||
-    pathname.includes("webhook") ||
-    pathname.startsWith("/verificar-registro/") ||
-    pathname.startsWith("/pre-registro") ||
-    pathname.startsWith("/admin") ||
-    pathname === "/hdv-acceso-llc2027" ||
-    pathname === "/sitemap.xml" ||
-    /\.[a-zA-Z0-9]{2,6}$/.test(pathname)
-  ) {
-    return next();
-  }
+    if (
+      pathname.startsWith("/api/") ||
+      pathname.includes("webhook") ||
+      pathname.startsWith("/verificar-registro/") ||
+      pathname.startsWith("/pre-registro") ||
+      pathname.startsWith("/admin") ||
+      pathname === "/hdv-acceso-llc2027" ||
+      pathname === "/sitemap.xml" ||
+      /\.[a-zA-Z0-9]{2,6}$/.test(pathname)
+    ) {
+      return next();
+    }
 
-  if (pathname === "/establecimiento/apartoposada-del-mar") {
-    url.pathname = "/establecimiento/aparto-posada-del-mar";
-    return Response.redirect(url.toString(), 301);
-  }
+    if (pathname === "/establecimiento/apartoposada-del-mar") {
+      url.pathname = "/establecimiento/aparto-posada-del-mar";
+      return Response.redirect(url.toString(), 301);
+    }
 
-  if (pathname.length > 1 && pathname.endsWith("/")) {
-    url.pathname = pathname.replace(/\/+$/, "");
-    return Response.redirect(url.toString(), 301);
-  }
+    if (pathname.length > 1 && pathname.endsWith("/")) {
+      url.pathname = pathname.replace(/\/+$/, "");
+      return Response.redirect(url.toString(), 301);
+    }
 
-  const seoData = await resolveRouteSeo(pathname, env);
-  const assetRequest = new Request(new URL("/index.html", url.origin).toString(), {
-    method: "GET",
-    headers: request.headers
-  });
-
-  const baseResponse = env?.ASSETS
-    ? await env.ASSETS.fetch(assetRequest)
-    : await next();
-
-  const statusCode = seoData.exists ? 200 : 404;
-  const canonicalHref = `${BASE_URL}${pathname === "/" ? "/" : pathname}`;
-  const titleText = seoData.exists ? seoData.title : "404 — Página no encontrada | Hoteles de Venezuela";
-  const descText = seoData.exists
-    ? seoData.description
-    : clampDescription("La página solicitada no existe. Explora hoteles en Venezuela sin intermediarios.");
-
-  const rewriter = new HTMLRewriter()
-    .on("title", {
-      element(el) {
-        el.setInnerContent(titleText);
-      }
-    })
-    .on('meta[name="description"]', {
-      element(el) {
-        el.setAttribute("content", descText);
-      }
-    })
-    .on('link[rel="canonical"]', {
-      element(el) {
-        el.setAttribute("href", canonicalHref);
-      }
-    })
-    .on("head", {
-      element(el) {
-        if (!seoData.exists) {
-          el.append('<meta name="robots" content="noindex, follow" />', { html: true });
-        }
-        el.append(`<meta property="og:title" content="${escapeAttr(titleText)}" />`, { html: true });
-        el.append(`<meta property="og:description" content="${escapeAttr(descText)}" />`, { html: true });
-        el.append(`<meta property="og:url" content="${escapeAttr(canonicalHref)}" />`, { html: true });
-        el.append(`<meta property="og:image" content="${escapeAttr(seoData.ogImage || DEFAULT_OG_IMAGE)}" />`, { html: true });
-        if (seoData.exists && Array.isArray(seoData.schemas) && seoData.schemas.length > 0) {
-          el.append(
-            `<script type="application/ld+json">${JSON.stringify(seoData.schemas)}</script>`,
-            { html: true }
-          );
-        }
-      }
+    const seoData = await resolveRouteSeo(pathname, env);
+    const assetRequest = new Request(new URL("/index.html", url.origin).toString(), {
+      method: "GET",
+      headers: request.headers
     });
 
-  const headers = new Headers(baseResponse.headers);
-  headers.set("Content-Type", "text/html; charset=utf-8");
+    const baseResponse = env?.ASSETS
+      ? await env.ASSETS.fetch(assetRequest)
+      : await next();
 
-  return new Response(rewriter.transform(baseResponse).body, {
-    status: statusCode,
-    headers
-  });
+    const statusCode = seoData.exists ? 200 : 404;
+    const canonicalHref = `${BASE_URL}${pathname === "/" ? "/" : pathname}`;
+    const titleText = seoData.exists ? seoData.title : "404 — Página no encontrada | Hoteles de Venezuela";
+    const descText = seoData.exists
+      ? seoData.description
+      : clampDescription("La página solicitada no existe. Explora hoteles en Venezuela sin intermediarios.");
+
+    const rewriter = new HTMLRewriter()
+      .on("title", {
+        element(el) {
+          el.setInnerContent(titleText);
+        }
+      })
+      .on('meta[name="description"]', {
+        element(el) {
+          el.setAttribute("content", descText);
+        }
+      })
+      .on('link[rel="canonical"]', {
+        element(el) {
+          el.setAttribute("href", canonicalHref);
+        }
+      })
+      .on("head", {
+        element(el) {
+          if (!seoData.exists) {
+            el.append('<meta name="robots" content="noindex, follow" />', { html: true });
+          }
+          el.append(`<meta property="og:title" content="${escapeAttr(titleText)}" />`, { html: true });
+          el.append(`<meta property="og:description" content="${escapeAttr(descText)}" />`, { html: true });
+          el.append(`<meta property="og:url" content="${escapeAttr(canonicalHref)}" />`, { html: true });
+          el.append(`<meta property="og:image" content="${escapeAttr(seoData.ogImage || DEFAULT_OG_IMAGE)}" />`, { html: true });
+          if (seoData.exists && Array.isArray(seoData.schemas) && seoData.schemas.length > 0) {
+            el.append(
+              `<script type="application/ld+json">${JSON.stringify(seoData.schemas)}</script>`,
+              { html: true }
+            );
+          }
+        }
+      });
+
+    const headers = new Headers(baseResponse.headers);
+    headers.set("Content-Type", "text/html; charset=utf-8");
+
+    return new Response(rewriter.transform(baseResponse).body, {
+      status: statusCode,
+      headers
+    });
+  } catch {
+    return context.next();
+  }
 }
