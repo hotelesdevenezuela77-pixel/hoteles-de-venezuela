@@ -969,6 +969,286 @@ export function parseServicesList(servicesInput: any): string[] {
   return [];
 }
 
+function normalizeTagToken(val: string): string {
+  return String(val || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9/+\s_-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+export function isPowerPlantTag(raw: string): boolean {
+  const n = normalizeTagToken(raw);
+  return (
+    n === "planta_electrica" ||
+    n === "planta electrica" ||
+    n.includes("planta electrica") ||
+    n === "planta 24/7" ||
+    n === "planta 100%" ||
+    n.includes("generador electrico") ||
+    n === "c01.4.1" ||
+    n === "c03.4.1"
+  );
+}
+
+export function isWater247Tag(raw: string): boolean {
+  const n = normalizeTagToken(raw);
+  return (
+    n === "tanque_agua" ||
+    n === "tanque de agua" ||
+    n.includes("tanque de agua") ||
+    n.includes("agua 24/7") ||
+    n.includes("agua continua") ||
+    n.includes("pozo de agua") ||
+    n.includes("pozo propio") ||
+    n === "c01.4.2" ||
+    n === "c03.4.2"
+  );
+}
+
+export function isStarlinkTag(raw: string): boolean {
+  const n = normalizeTagToken(raw);
+  return (
+    n.includes("starlink") ||
+    n.includes("internet satelital") ||
+    n.includes("wifi satelital") ||
+    n.includes("wi fi satelital") ||
+    n === "c09.4.6" ||
+    n === "c11.4.6"
+  );
+}
+
+export function isPetFriendlyTag(raw: string): boolean {
+  const n = normalizeTagToken(raw);
+  return (
+    n === "pet_friendly" ||
+    n.includes("pet friendly") ||
+    n.includes("mascota") ||
+    n.includes("qualidog") ||
+    n === "c04.3" ||
+    n === "c06.2.1"
+  );
+}
+
+export interface RealEstablishmentBadgesAndTags {
+  hasPowerPlant: boolean;
+  hasWater247: boolean;
+  hasStarlink: boolean;
+  isPetFriendly: boolean;
+  hasHdvSeal: boolean;
+  /** Todas las etiquetas crudas reales asignadas al establecimiento (sin rellenos por defecto) */
+  rawServices: string[];
+  /** Etiquetas legibles que no duplican los 4 badges operativos principales */
+  displayPills: string[];
+  /** Todas las etiquetas legibles reales (incluyendo badges activos + pills seleccionadas) sin duplicados */
+  allDisplayTags: string[];
+}
+
+/**
+ * Construye el arreglo consolidado de servicios reales al guardar desde /pre-registro,
+ * uniendo únicamente los badges que estén verdaderamente activos con las pills seleccionadas,
+ * y excluyendo cualquier badge que haya sido desmarcado.
+ */
+export function buildConsolidatedServicesArray(
+  pills: string[],
+  badges?: {
+    has_power_plant?: boolean;
+    has_water_247?: boolean;
+    has_starlink?: boolean;
+    is_pet_friendly?: boolean;
+  } | null
+): string[] {
+  const cleanPills = (Array.isArray(pills) ? pills : [])
+    .map((p) => String(p || "").trim())
+    .filter(Boolean);
+
+  const result: string[] = [...cleanPills];
+
+  if (badges) {
+    if (badges.has_power_plant === true && !result.some(isPowerPlantTag)) {
+      result.push("Planta Eléctrica 24/7");
+    }
+    if (badges.has_water_247 === true && !result.some(isWater247Tag)) {
+      result.push("Agua 24/7");
+    }
+    if (badges.has_starlink === true && !result.some(isStarlinkTag)) {
+      result.push("Starlink");
+    }
+    if (badges.is_pet_friendly === true && !result.some(isPetFriendlyTag)) {
+      result.push("Pet Friendly");
+    }
+  }
+
+  return Array.from(new Set(result));
+}
+
+/**
+ * Extrae EXCLUSIVAMENTE los badges operativos y etiquetas/amenidades reales que tiene asignados
+ * un establecimiento en sus datos (sin inyecciones por defecto, sin módulo `id % 2` / `id % 3`,
+ * y sin confundir WiFi común con Starlink).
+ */
+export function getRealEstablishmentBadgesAndTags(est: any): RealEstablishmentBadgesAndTags {
+  if (!est) {
+    return {
+      hasPowerPlant: false,
+      hasWater247: false,
+      hasStarlink: false,
+      isPetFriendly: false,
+      hasHdvSeal: false,
+      rawServices: [],
+      displayPills: [],
+      allDisplayTags: []
+    };
+  }
+
+  // Verificar si existe payload local de pre-registro actualizado para este slug
+  let localPrereg: any = null;
+  if (typeof window !== "undefined" && est.slug) {
+    try {
+      const raw = localStorage.getItem(`hdv_prereg_${est.slug}`);
+      if (raw) localPrereg = JSON.parse(raw);
+    } catch {
+      // ignore
+    }
+  }
+
+  // 1. Obtener lista cruda de servicios reales del establecimiento
+  const fromServices = parseServicesList(est.services);
+  const fromKeyPills = Array.isArray(est.key_service_pills)
+    ? parseServicesList(est.key_service_pills)
+    : Array.isArray(localPrereg?.key_service_pills)
+    ? parseServicesList(localPrereg.key_service_pills)
+    : [];
+
+  // Si existe un pre-registro local para este slug, sus pills y badges reflejan la última edición directa
+  const baseRawList =
+    fromServices.length > 0
+      ? fromServices
+      : fromKeyPills;
+
+  // Deduplicar manteniendo orden
+  const rawServices: string[] = [];
+  const seenNorm = new Set<string>();
+  for (const item of [...baseRawList, ...fromKeyPills]) {
+    const norm = normalizeTagToken(item);
+    if (!norm || seenNorm.has(norm)) continue;
+    seenNorm.add(norm);
+    rawServices.push(item.trim());
+  }
+
+  // 2. Resolver flags explícitos si existen en el objeto o en su pre-registro
+  const explicitBadges = est.badges || localPrereg?.badges || null;
+  const featureBadges = est.features?.badges || null;
+
+  const explicitPower: boolean | undefined =
+    typeof est.has_power_plant === "boolean"
+      ? est.has_power_plant
+      : typeof explicitBadges?.has_power_plant === "boolean"
+      ? explicitBadges.has_power_plant
+      : typeof featureBadges?.["C03.4.1"] === "boolean"
+      ? featureBadges["C03.4.1"]
+      : undefined;
+
+  const explicitWater: boolean | undefined =
+    typeof est.has_water_247 === "boolean"
+      ? est.has_water_247
+      : typeof explicitBadges?.has_water_247 === "boolean"
+      ? explicitBadges.has_water_247
+      : typeof featureBadges?.["C03.4.2"] === "boolean"
+      ? featureBadges["C03.4.2"]
+      : undefined;
+
+  const explicitStarlink: boolean | undefined =
+    typeof est.has_starlink === "boolean"
+      ? est.has_starlink
+      : typeof explicitBadges?.has_starlink === "boolean"
+      ? explicitBadges.has_starlink
+      : typeof featureBadges?.["C11.4.6"] === "boolean"
+      ? featureBadges["C11.4.6"]
+      : undefined;
+
+  const explicitPet: boolean | undefined =
+    typeof est.is_pet_friendly === "boolean"
+      ? est.is_pet_friendly
+      : typeof explicitBadges?.is_pet_friendly === "boolean"
+      ? explicitBadges.is_pet_friendly
+      : typeof featureBadges?.["C06.2.1"] === "boolean"
+      ? featureBadges["C06.2.1"]
+      : undefined;
+
+  const hasPowerInTags = rawServices.some(isPowerPlantTag);
+  const hasWaterInTags = rawServices.some(isWater247Tag);
+  const hasStarlinkInTags = rawServices.some(isStarlinkTag);
+  const hasPetInTags = rawServices.some(isPetFriendlyTag);
+
+  const hasPowerPlant = Boolean(explicitPower === true || hasPowerInTags);
+  const hasWater247 = Boolean(explicitWater === true || hasWaterInTags);
+  const hasStarlink = Boolean(explicitStarlink === true || hasStarlinkInTags);
+  const isPetFriendly = Boolean(explicitPet === true || hasPetInTags);
+  const hasHdvSeal = Boolean(
+    est.has_hdv_seal === true ||
+      explicitBadges?.has_hdv_seal === true ||
+      featureBadges?.["C00.5.9"] === true
+  );
+
+  // 3. Construir displayPills (etiquetas secundarias que no repiten los 4 badges principales si ya se muestran arriba)
+  const displayPills: string[] = [];
+  const allDisplayTags: string[] = [];
+  const seenDisplay = new Set<string>();
+
+  const pushAllTag = (label: string) => {
+    const norm = normalizeTagToken(label);
+    if (!norm || seenDisplay.has(norm)) return;
+    seenDisplay.add(norm);
+    allDisplayTags.push(label);
+  };
+
+  if (hasPowerPlant) pushAllTag("Planta Eléctrica 24/7");
+  if (hasWater247) pushAllTag("Agua 24/7");
+  if (hasStarlink) pushAllTag("Starlink");
+  if (isPetFriendly) pushAllTag("Pet Friendly");
+
+  for (const s of rawServices) {
+    // Si el usuario desmarcó explícitamente un badge y no está activo, no mostrarlo
+    if (isPowerPlantTag(s) && !hasPowerPlant) continue;
+    if (isWater247Tag(s) && !hasWater247) continue;
+    if (isStarlinkTag(s) && !hasStarlink) continue;
+    if (isPetFriendlyTag(s) && !isPetFriendly) continue;
+
+    const label = getAmenityLabel(s);
+    pushAllTag(label);
+
+    // En las tarjetas donde los 4 badges operativos ya tienen su propio chip con icono,
+    // evitamos repetir la misma etiqueta en la fila inferior de pills
+    if (
+      isPowerPlantTag(s) ||
+      isWater247Tag(s) ||
+      isStarlinkTag(s) ||
+      isPetFriendlyTag(s)
+    ) {
+      continue;
+    }
+
+    const normLabel = normalizeTagToken(label);
+    if (!displayPills.some((p) => normalizeTagToken(p) === normLabel)) {
+      displayPills.push(label);
+    }
+  }
+
+  return {
+    hasPowerPlant,
+    hasWater247,
+    hasStarlink,
+    isPetFriendly,
+    hasHdvSeal,
+    rawServices,
+    displayPills,
+    allDisplayTags
+  };
+}
+
 /**
  * Devuelve la etiqueta legible de una comodidad o clave.
  */

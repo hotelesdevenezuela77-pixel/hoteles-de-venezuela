@@ -5,6 +5,7 @@ import { ESTABLISHMENTS_MOCK } from "../lib/establishmentsMock";
 import type { Establishment } from "../components/layout/EstablishmentCard";
 import { EstablishmentCard, EstablishmentListItem, getRealEstablishmentPrice } from "../components/layout/EstablishmentCard";
 import { consolidateAndDeduplicateEstablishments } from "../lib/salesDepartmentStore";
+import { getRealEstablishmentBadgesAndTags } from "../lib/amenitiesList";
 import { 
   Search, MapPin, ChevronDown, ChevronUp, X, Filter, Grid, List, Compass, Loader2, 
   Wifi, Car, Waves, Wind, Palmtree, Zap, Droplets, Dog, Star, Sparkles, RotateCcw,
@@ -110,7 +111,60 @@ export function Establecimientos() {
     setSmartQuery("");
   };
 
-  // Helper dinámico para contar cuántos hoteles coinciden con una opción de filtro
+  // Helper que extrae únicamente los tokens de servicios y atributos REALES del establecimiento (sin simulación id % 2)
+  const getRealEstablishmentFilterTokens = (est: Establishment): string[] => {
+    const real = getRealEstablishmentBadgesAndTags(est);
+    const tokens = new Set<string>();
+
+    for (const raw of [...real.rawServices, ...real.allDisplayTags]) {
+      const n = raw
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+      if (!n) continue;
+      tokens.add(n);
+      tokens.add(n.replace(/\s+/g, "_"));
+
+      if (n.includes("wifi") || n.includes("wi-fi") || n.includes("internet") || n.includes("starlink")) {
+        tokens.add("wifi");
+        tokens.add("wifi_fibra");
+      }
+      if (n.includes("piscina") || n.includes("alberca")) tokens.add("piscina");
+      if (n.includes("estacionamiento") || n.includes("parking")) tokens.add("estacionamiento");
+      if (n.includes("aire acondicionado") || n === "aire_acondicionado") tokens.add("aire_acondicionado");
+      if (n.includes("playa")) tokens.add("playa_privada");
+      if (n.includes("restaurante") || n.includes("gastronomia")) tokens.add("restaurante");
+      if (n.includes("desayuno")) tokens.add("desayuno_incluido");
+      if (n.includes("todo incluido") || n.includes("all inclusive")) {
+        tokens.add("todo_incluido");
+        tokens.add("all_inclusive");
+      }
+      if (n.includes("spa")) tokens.add("spa");
+      if (n.includes("jacuzzi") || n.includes("hidromasaje")) tokens.add("jacuzzi");
+      if (n.includes("gimnasio") || n.includes("gym")) tokens.add("gimnasio");
+      if (n.includes("lancha") || n.includes("cayo") || n.includes("muelle")) tokens.add("paseos_lancha");
+      if (n.includes("excursion") || n.includes("tour")) tokens.add("tours_guiados");
+      if (n.includes("balcon") || n.includes("terraza")) tokens.add("balcon");
+      if (n.includes("cocina")) tokens.add("cocina");
+    }
+
+    if (real.hasPowerPlant) tokens.add("planta_electrica");
+    if (real.hasWater247) tokens.add("tanque_agua");
+    if (real.hasStarlink) {
+      tokens.add("starlink");
+      tokens.add("wifi");
+      tokens.add("wifi_fibra");
+    }
+    if (real.isPetFriendly) tokens.add("pet_friendly");
+    if (real.hasHdvSeal || est.has_hdv_seal) tokens.add("sello_hdv");
+    if (est.has_reservations_enabled) tokens.add("reserva_inmediata");
+    if ((est as any).is_circuito_excelencia) tokens.add("circuito_excelencia");
+
+    return Array.from(tokens);
+  };
+
+  // Helper dinámico para contar cuántos hoteles coinciden realmente con una opción de filtro
   const getFilterOptionCount = (filterType: string, value: any): number => {
     return establishments.filter(est => {
       const nameLower = est.name.toLowerCase();
@@ -125,51 +179,7 @@ export function Establecimientos() {
       }
       if (filterType === "subtype") return getSubtype(est) === value;
 
-      // Parse services
-      let estServices: string[] = [];
-      try {
-        if (est.services) {
-          if (Array.isArray(est.services)) {
-            estServices = est.services.map(s => String(s).toLowerCase().trim());
-          } else if (typeof est.services === "string") {
-            const trimmed = est.services.trim();
-            if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
-              estServices = JSON.parse(trimmed).map((s: any) => String(s).toLowerCase().trim());
-            } else {
-              estServices = trimmed.split(",").map(s => s.toLowerCase().trim());
-            }
-          }
-        }
-      } catch (e) {}
-
-      // Servicios simulados / predeterminados
-      if (est.has_hdv_seal || est.membership_tier === "diamante" || est.id % 2 === 0) estServices.push("sello_hdv");
-      if ((est as any).is_circuito_excelencia || nameLower.includes("boutique") || est.id % 3 === 0) estServices.push("circuito_excelencia");
-      if (est.id % 2 === 1) estServices.push("sostenibilidad");
-      if (est.has_reservations_enabled || est.id % 2 === 0) estServices.push("reserva_inmediata");
-      if (est.id % 2 === 0) estServices.push("wifi");
-      if (nameLower.includes("resort") || est.id % 3 === 0) estServices.push("piscina");
-      if (est.id % 2 === 1) estServices.push("estacionamiento");
-      if (est.id % 2 === 0) estServices.push("aire_acondicionado");
-      if (est.destination_slug === "los-roques" || est.destination_slug === "margarita" || est.id % 3 === 0) estServices.push("playa_privada");
-      if (est.id % 2 === 0) estServices.push("planta_electrica");
-      if (est.id % 2 === 1) estServices.push("tanque_agua");
-      if (est.id % 3 === 0) estServices.push("zelle");
-      if (est.id % 2 === 0) estServices.push("pago_movil");
-      if (est.id % 2 === 1) estServices.push("tarjeta_int");
-      if (est.id % 3 === 1) estServices.push("paypal");
-      if (est.id % 3 === 2) estServices.push("pago_bizum");
-      if (est.id % 3 === 0) { estServices.push("usdt_crypto"); estServices.push("pago_crypto"); }
-      if (est.id % 2 === 0) estServices.push("desayuno_incluido");
-      if (nameLower.includes("resort") || est.id % 4 === 0) estServices.push("todo_incluido");
-      if (est.id % 3 === 0) estServices.push("media_pension");
-      if (nameLower.includes("adult") || nameLower.includes("boutique") || est.id % 3 === 0) estServices.push("solo_adultos");
-      if (est.id % 2 === 0) estServices.push("pet_friendly");
-      if (est.id % 3 === 0) estServices.push("travel_proud");
-      if (est.id % 2 === 0) estServices.push("planta_baja");
-      if (est.id % 3 === 0) estServices.push("silla_ruedas");
-      if (nameLower.includes("hotel") || nameLower.includes("resort")) estServices.push("ascensor");
-
+      const estServices = getRealEstablishmentFilterTokens(est);
       return estServices.includes(value);
     }).length;
   };
@@ -484,6 +494,13 @@ export function Establecimientos() {
             services: item.services || "[]",
             membership_tier: item.membership_tier || "basic",
             has_hdv_seal: item.has_hdv_seal || false,
+            has_power_plant: item.has_power_plant,
+            has_water_247: item.has_water_247,
+            has_starlink: item.has_starlink,
+            is_pet_friendly: item.is_pet_friendly,
+            key_service_pills: item.key_service_pills,
+            badges: item.badges,
+            features: item.features,
             has_reservations_enabled: item.has_reservations_enabled || false,
             is_ads_enabled: item.is_ads_enabled || false
           }));
@@ -530,96 +547,9 @@ export function Establecimientos() {
     const matchesCapacity = (adults + children) <= getVirtualCapacity(est);
     const matchesSubtype = !selectedSubtype || getSubtype(est) === selectedSubtype;
     
-    // Parse services in establishment
-    let estServices: string[] = [];
-    try {
-      if (est.services) {
-        if (Array.isArray(est.services)) {
-          estServices = est.services.map(s => String(s).toLowerCase().trim());
-        } else if (typeof est.services === "string") {
-          const trimmed = est.services.trim();
-          if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
-            estServices = JSON.parse(trimmed).map((s: any) => String(s).toLowerCase().trim());
-          } else {
-            estServices = trimmed.split(",").map(s => s.toLowerCase().trim());
-          }
-        }
-      }
-    } catch (e) {
-      console.warn("Error parsing services for filtering:", e);
-    }
-    
-    // Enriquecer dinámicamente servicios para simular todas las características en los 12 bloques
+    // Parse únicamente los servicios y etiquetas reales del establecimiento (sin rellenos simulados por id % 2)
+    const estServices = getRealEstablishmentFilterTokens(est);
     const nameLower = est.name.toLowerCase();
-
-    // 1. Garantía & Certificaciones
-    if (est.has_hdv_seal || est.membership_tier === "diamante" || est.id % 2 === 0) estServices.push("sello_hdv");
-    if ((est as any).is_circuito_excelencia || nameLower.includes("boutique") || est.id % 3 === 0) estServices.push("circuito_excelencia");
-    if (est.id % 2 === 1) estServices.push("sostenibilidad");
-    if (est.has_reservations_enabled || est.id % 2 === 0) estServices.push("reserva_inmediata");
-
-    // 4. Infraestructura Crítica Venezuela
-    if (nameLower.includes("resort") || nameLower.includes("hotel") || est.id % 2 === 0) estServices.push("planta_electrica");
-    if (est.id % 2 === 0 || est.id % 3 === 0) estServices.push("tanque_agua");
-    if (est.id % 4 === 0) estServices.push("ev_charge");
-    estServices.push("wifi_fibra");
-    estServices.push("estacionamiento");
-
-    // 5. Métodos de Pago & Condiciones
-    estServices.push("pago_movil");
-    estServices.push("zelle");
-    if (est.id % 2 === 0) estServices.push("usdt_crypto");
-    if (est.id % 3 === 0) estServices.push("tarjeta_int");
-    if (est.id % 2 === 0) estServices.push("cancelacion_gratis");
-    if (est.id % 3 !== 0) estServices.push("sin_tarjeta");
-
-    // 6. Comidas & Gastronomía
-    if (nameLower.includes("posada") || est.id % 2 === 0) estServices.push("desayuno_incluido");
-    if (nameLower.includes("resort") || nameLower.includes("complex")) estServices.push("all_inclusive");
-    if (est.id % 3 === 0) estServices.push("media_pension");
-    if (nameLower.includes("hotel") || nameLower.includes("resort") || est.id % 2 === 0) estServices.push("restaurante");
-    if (nameLower.includes("apart") || nameLower.includes("villa") || est.id % 3 === 0) estServices.push("cocina");
-
-    // 7. Instalaciones & Bienestar
-    if (nameLower.includes("resort") || nameLower.includes("posada") || est.id % 2 === 0) estServices.push("piscina");
-    if (est.id % 3 === 0) estServices.push("spa");
-    if (est.id % 4 === 0) estServices.push("jacuzzi");
-    if (nameLower.includes("hotel") || est.id % 3 === 0) estServices.push("gimnasio");
-    if (est.id % 2 === 0) estServices.push("solarium");
-    if (nameLower.includes("hotel") || est.id % 2 === 0) estServices.push("recepcion_24h");
-
-    // 8. Habitación & Camas
-    if (est.id % 2 === 0) estServices.push("cama_king");
-    if (est.id % 2 === 1) estServices.push("camas_indiv");
-    if (est.id % 3 === 0) estServices.push("cuna");
-    if (nameLower.includes("posada") || nameLower.includes("resort") || est.id % 2 === 0) estServices.push("balcon");
-    estServices.push("aire_acondicionado");
-    estServices.push("tv");
-    estServices.push("bano_privado");
-
-    // 9. Experiencias & Entretenimiento
-    if (nameLower.includes("posada") || est.destination_slug === "los-roques" || est.id % 2 === 0) estServices.push("tours_guiados");
-    if (est.destination_slug === "los-roques" || est.destination_slug === "margarita" || est.id % 3 === 0) estServices.push("paseos_lancha");
-    if (est.id % 3 === 0) estServices.push("ciclismo");
-    if (est.id % 4 === 0) estServices.push("musica_envivo");
-    if (est.id % 5 === 0) estServices.push("rutas_catas");
-
-    // 10. Tipo de Grupo
-    estServices.push("familiar");
-    if (nameLower.includes("adult") || nameLower.includes("boutique") || est.id % 3 === 0) estServices.push("solo_adultos");
-    if (est.id % 2 === 0) estServices.push("pet_friendly");
-
-    // 11. Accesibilidad
-    if (est.id % 2 === 0) estServices.push("planta_baja");
-    if (est.id % 3 === 0) estServices.push("silla_ruedas");
-    if (nameLower.includes("hotel") || nameLower.includes("resort")) estServices.push("ascensor");
-    if (est.id % 3 === 0) estServices.push("wc_barras");
-    if (est.id % 5 === 0) estServices.push("braille_audio");
-
-    // 12. Ubicación & Distancias
-    if (est.destination_slug === "los-roques" || est.destination_slug === "margarita" || est.destination_slug === "mochima" || est.id % 2 === 0) estServices.push("cerca_mar");
-    if (est.destination_slug === "caracas" || est.destination_slug === "valencia" || est.id % 2 === 1) estServices.push("cerca_centro");
-    if (est.id % 3 === 0) estServices.push("cerca_aeropuerto");
 
     // Evaluation across all 12 blocks
     const matchesCertifications = selectedCertifications.every(k => estServices.includes(k));

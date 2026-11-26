@@ -148,6 +148,7 @@ export async function findExistingEstablishmentMatch(params: {
             primaryImage: primary,
             galleryImages: imgs,
             ratingAvg: Number(item.rating_avg) || 4.8,
+            services: item.services,
             latitude: item.latitude ?? null,
             longitude: item.longitude ?? null
           };
@@ -198,6 +199,7 @@ export async function findExistingEstablishmentMatch(params: {
             primaryImage: item.primary_image,
             galleryImages: Array.isArray(item.images) ? item.images : item.primary_image ? [item.primary_image] : [],
             ratingAvg: Number(item.rating_avg) || 4.8,
+            services: item.services,
             latitude: item.latitude ?? null,
             longitude: item.longitude ?? null
           };
@@ -238,7 +240,8 @@ export async function findExistingEstablishmentMatch(params: {
         description: item.description,
         primaryImage: item.primary_image,
         galleryImages: item.primary_image ? [item.primary_image] : [],
-        ratingAvg: Number(item.rating_avg) || 4.8
+        ratingAvg: Number(item.rating_avg) || 4.8,
+        services: item.services as any
       };
     }
   }

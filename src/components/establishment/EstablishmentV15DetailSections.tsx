@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { TrackedWhatsAppButton } from "@/components/layout/TrackedWhatsAppButton";
 import { isOfficialPriceEnabled } from "@/components/layout/EstablishmentCard";
+import { getRealEstablishmentBadgesAndTags } from "@/lib/amenitiesList";
 import {
   formatDualCurrencyVenezuela,
   sanitizeVenezuelaLegalNotices,
@@ -34,6 +35,14 @@ interface EstablishmentV15DetailSectionsProps {
     latitude?: number;
     longitude?: number;
     services?: string;
+    has_power_plant?: boolean;
+    has_water_247?: boolean;
+    has_starlink?: boolean;
+    is_pet_friendly?: boolean;
+    has_hdv_seal?: boolean;
+    key_service_pills?: string[];
+    badges?: any;
+    features?: any;
   };
   rooms: any[];
   surroundings: { category: string; name: string; distance: string }[];
@@ -77,6 +86,7 @@ export function EstablishmentV15DetailSections({
   const sanitizedCustomLegal = sanitizeVenezuelaLegalNotices(savedWizardConfig?.customLegalNotices || "");
 
   const officialPricesActive = isOfficialPriceEnabled(establishment);
+  const realTags = useMemo(() => getRealEstablishmentBadgesAndTags(establishment), [establishment]);
 
   // Filtered rooms for "Asegura tus fechas" (Prioriza rooms_distribution JSONB V15 o rooms de BD, sin precios inventados)
   const displayRooms = useMemo(() => {
@@ -187,8 +197,11 @@ export function EstablishmentV15DetailSections({
 
   const faqsList = [
     {
-      q: `¿${establishment.name} cuenta con Planta Eléctrica y suministro de agua continuo?`,
-      a: "Sí. El establecimiento cuenta con Planta Eléctrica de respaldo 24/7 (C01.4.1) y sistema hidroneumático con Tanque de Agua de reserva continua (C01.4.2) para garantizar climatización, iluminación y confort ininterrumpido durante toda tu estadía."
+      q: `¿Qué servicios y comodidades principales ofrece ${establishment.name}?`,
+      a:
+        realTags.allDisplayTags.length > 0
+          ? `${establishment.name} cuenta con los siguientes servicios y atributos registrados en su ficha oficial: ${realTags.allDisplayTags.join(", ")}. Puedes consultar cualquier requerimiento adicional directamente por WhatsApp con el anfitrión.`
+          : `Puedes consultar el equipamiento específico por unidad y disponibilidad de servicios directamente por WhatsApp con la recepción de ${establishment.name}.`
     },
     {
       q: `¿Cuáles son los métodos de pago aceptados en Venezuela por ${establishment.name}?`,
@@ -283,20 +296,36 @@ export function EstablishmentV15DetailSections({
       <section id="v15-vista-general" className="scroll-mt-32 bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-          {/* Columna Izquierda: Descripción narrativa y Garantía de Suministros Críticos VE */}
+          {/* Columna Izquierda: Descripción narrativa y Etiquetas Reales del Establecimiento */}
           <div className="lg:col-span-8 space-y-6">
             <div className="flex flex-wrap items-center gap-2">
               <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-[#00C8D4]/10 text-[#00C8D4] border border-[#00C8D4]/30">
                 Ficha Oficial V15 · Verificada
               </span>
-              <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
-                <Zap className="w-3 h-3 text-emerald-600" />
-                Planta Eléctrica 24/7 (C01.4.1)
-              </span>
-              <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-cyan-50 text-cyan-800 border border-cyan-200 flex items-center gap-1">
-                <Droplets className="w-3 h-3 text-[#00C8D4]" />
-                Tanque de Agua Continuo (C01.4.2)
-              </span>
+              {realTags.hasPowerPlant && (
+                <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                  <Zap className="w-3 h-3 text-emerald-600" />
+                  Planta Eléctrica 24/7 (C01.4.1)
+                </span>
+              )}
+              {realTags.hasWater247 && (
+                <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-cyan-50 text-cyan-800 border border-cyan-200 flex items-center gap-1">
+                  <Droplets className="w-3 h-3 text-[#00C8D4]" />
+                  Tanque de Agua Continuo (C01.4.2)
+                </span>
+              )}
+              {realTags.hasStarlink && (
+                <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-purple-50 text-[#9B00CC] border border-purple-200 flex items-center gap-1">
+                  <Wifi className="w-3 h-3 text-[#9B00CC]" />
+                  Starlink Satelital
+                </span>
+              )}
+              {realTags.isPetFriendly && (
+                <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-pink-50 text-[#FF0096] border border-pink-200 flex items-center gap-1">
+                  <Sparkles className="w-3 h-3 text-[#FF0096]" />
+                  Pet Friendly
+                </span>
+              )}
             </div>
 
             <div>
@@ -305,77 +334,96 @@ export function EstablishmentV15DetailSections({
               </h2>
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mt-3">
                 {establishment.description ||
-                  `${establishment.name} ofrece alojamiento verificado en ${establishment.destination_name || establishment.city || "Venezuela"}, equipado con habitaciones climatizadas, conexión WiFi de alta velocidad, recepción 24 horas y respaldo operativo integral de energía y agua para viajes de placer o negocios.`}
+                  `${establishment.name} ofrece alojamiento verificado en ${establishment.destination_name || establishment.city || "Venezuela"}, con atención personalizada y trato directo con el anfitrión sin comisiones de intermediación.`}
               </p>
             </div>
 
-            {/* Bloque Diferenciador Mercado Venezolano: Suministros Críticos C01.4 */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-[#0e011f] to-[#1a0533] text-white border border-[#00C8D4]/30 flex items-start gap-3.5 shadow-md">
-                <div className="w-10 h-10 rounded-xl bg-[#00C8D4] flex items-center justify-center text-white shrink-0">
-                  <Zap className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-[#00C8D4] block">
-                    Etiqueta Crítica C01.4.1
-                  </span>
-                  <h4 className="text-xs sm:text-sm font-bold text-white mt-0.5">
-                    Planta Eléctrica de Respaldo 24/7
-                  </h4>
-                  <p className="text-[11px] text-white/75 mt-1 leading-relaxed">
-                    Generador de encendido automático con cobertura en habitaciones, climatización, ascensores y áreas comunes.
-                  </p>
-                </div>
-              </div>
+            {/* Bloque Diferenciador de Suministros: Se muestra SOLO si el establecimiento tiene Planta Eléctrica o Agua 24/7 realmente activos */}
+            {(realTags.hasPowerPlant || realTags.hasWater247) && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                {realTags.hasPowerPlant && (
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-[#0e011f] to-[#1a0533] text-white border border-[#00C8D4]/30 flex items-start gap-3.5 shadow-md">
+                    <div className="w-10 h-10 rounded-xl bg-[#00C8D4] flex items-center justify-center text-white shrink-0">
+                      <Zap className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-black uppercase tracking-wider text-[#00C8D4] block">
+                        Etiqueta Verificada C01.4.1
+                      </span>
+                      <h4 className="text-xs sm:text-sm font-bold text-white mt-0.5">
+                        Planta Eléctrica de Respaldo 24/7
+                      </h4>
+                      <p className="text-[11px] text-white/75 mt-1 leading-relaxed">
+                        Respaldo eléctrico reportado por el establecimiento para garantizar operatividad y confort.
+                      </p>
+                    </div>
+                  </div>
+                )}
 
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-[#0e011f] to-[#1a0533] text-white border border-[#FF0096]/30 flex items-start gap-3.5 shadow-md">
-                <div className="w-10 h-10 rounded-xl bg-[#FF0096] flex items-center justify-center text-white shrink-0">
-                  <Droplets className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-[#FF0096] block">
-                    Etiqueta Crítica C01.4.2
-                  </span>
-                  <h4 className="text-xs sm:text-sm font-bold text-white mt-0.5">
-                    Tanque de Agua Continuo 24/7
-                  </h4>
-                  <p className="text-[11px] text-white/75 mt-1 leading-relaxed">
-                    Reserva hídrica propia de alta capacidad con sistema hidroneumático y agua caliente permanente.
-                  </p>
-                </div>
+                {realTags.hasWater247 && (
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-[#0e011f] to-[#1a0533] text-white border border-[#FF0096]/30 flex items-start gap-3.5 shadow-md">
+                    <div className="w-10 h-10 rounded-xl bg-[#FF0096] flex items-center justify-center text-white shrink-0">
+                      <Droplets className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-black uppercase tracking-wider text-[#FF0096] block">
+                        Etiqueta Verificada C01.4.2
+                      </span>
+                      <h4 className="text-xs sm:text-sm font-bold text-white mt-0.5">
+                        Tanque de Agua Continuo 24/7
+                      </h4>
+                      <p className="text-[11px] text-white/75 mt-1 leading-relaxed">
+                        Reserva hídrica propia reportada por el establecimiento para suministro continuo.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
+            )}
 
-            {/* Los servicios más populares */}
+            {/* Etiquetas y Servicios Reales del Alojamiento (Sin etiquetas por defecto no seleccionadas) */}
             <div className="pt-2">
               <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 mb-3">
-                Servicios más populares del alojamiento
+                Etiquetas y servicios registrados del alojamiento
               </h3>
-              <div className="flex flex-wrap gap-2.5">
-                {[
-                  { icon: Zap, label: "Planta Eléctrica 24/7", color: "bg-emerald-500" },
-                  { icon: Droplets, label: "Agua Continua 24/7", color: "bg-[#00C8D4]" },
-                  { icon: Wifi, label: "WiFi Gratis Alta Velocidad", color: "bg-[#9B00CC]" },
-                  { icon: Car, label: "Parking en el alojamiento", color: "bg-[#00C8D4]" },
-                  { icon: Utensils, label: "Restaurante & Desayuno", color: "bg-[#FF0096]" },
-                  { icon: ShieldCheck, label: "Recepción y Seguridad 24h", color: "bg-emerald-500" },
-                  { icon: Users, label: "Habitaciones Familiares", color: "bg-[#9B00CC]" },
-                  { icon: Coffee, label: "Servicio de Habitaciones", color: "bg-[#FF0096]" }
-                ].map((srv, idx) => {
-                  const Icon = srv.icon;
-                  return (
-                    <div
-                      key={idx}
-                      className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200/80 text-xs font-bold text-slate-800"
-                    >
-                      <div className={`w-6 h-6 rounded-lg ${srv.color} flex items-center justify-center text-white shrink-0`}>
-                        <Icon className="w-3.5 h-3.5 text-white" />
+              {realTags.allDisplayTags.length > 0 ? (
+                <div className="flex flex-wrap gap-2.5">
+                  {realTags.allDisplayTags.map((tagLabel, idx) => {
+                    const lower = tagLabel.toLowerCase();
+                    const Icon = lower.includes("planta")
+                      ? Zap
+                      : lower.includes("agua")
+                      ? Droplets
+                      : lower.includes("wifi") || lower.includes("starlink")
+                      ? Wifi
+                      : lower.includes("estacionamiento") || lower.includes("parking")
+                      ? Car
+                      : lower.includes("restaurante") || lower.includes("gastronom") || lower.includes("chef")
+                      ? Utensils
+                      : Sparkles;
+                    const boxColors = ["bg-[#00C8D4]", "bg-[#FF0096]", "bg-[#9B00CC]", "bg-emerald-500"];
+                    const color = boxColors[idx % boxColors.length];
+                    return (
+                      <div
+                        key={tagLabel}
+                        className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200/80 text-xs font-bold text-slate-800"
+                      >
+                        <div className={`w-6 h-6 rounded-lg ${color} flex items-center justify-center text-white shrink-0`}>
+                          <Icon className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <span>{tagLabel}</span>
                       </div>
-                      <span>{srv.label}</span>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200/80 text-xs font-bold text-slate-700">
+                  <div className="w-6 h-6 rounded-lg bg-[#00C8D4] flex items-center justify-center text-white shrink-0">
+                    <ShieldCheck className="w-3.5 h-3.5 text-white" />
+                  </div>
+                  <span>Trato directo y atención personalizada con el anfitrión</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -1075,112 +1123,83 @@ export function EstablishmentV15DetailSections({
         </div>
       </section>
 
-      {/* ── 7. TODO LO QUE INCLUYE TU ESTANCIA (SERVICIOS C01–C06 — PÁG. 7-8 DEL PDF) ── */}
+      {/* ── 7. TODO LO QUE INCLUYE TU ESTANCIA (SERVICIOS Y ETIQUETAS REALES DEL ESTABLECIMIENTO) ── */}
       <section id="v15-servicios" className="scroll-mt-32 bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm space-y-6">
-        <div className="border-b border-slate-100 pb-4">
-          <span className="text-[10px] font-black uppercase tracking-widest text-[#00C8D4] block">
-            MAESTRO DE ETIQUETAS V15 · TAXONOMÍA C01 A C06
-          </span>
-          <h2 className="text-2xl font-serif font-bold text-slate-900 mt-0.5">
-            Todo lo que incluye tu estancia — Servicios de {establishment.name}
-          </h2>
-          <p className="text-xs text-slate-500 font-medium mt-1">
-            Buenos servicios · Puntuación verificada de instalaciones y suministros operativos.
-          </p>
+        <div className="border-b border-slate-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-[#00C8D4] block">
+              ATRIBUTOS Y SERVICIOS REALES REGISTRADOS
+            </span>
+            <h2 className="text-2xl font-serif font-bold text-slate-900 mt-0.5">
+              Servicios y Amenidades de {establishment.name}
+            </h2>
+            <p className="text-xs text-slate-500 font-medium mt-1">
+              Listado fiel a las etiquetas y comodidades activadas en la ficha oficial del establecimiento.
+            </p>
+          </div>
+          {realTags.allDisplayTags.length > 0 && (
+            <span className="px-3.5 py-1.5 rounded-full bg-[#0e011f] text-[#00C8D4] border border-[#00C8D4]/30 text-[10px] font-black uppercase tracking-wider shrink-0 self-start sm:self-center">
+              {realTags.allDisplayTags.length} {realTags.allDisplayTags.length === 1 ? "Atributo Activo" : "Atributos Activos"}
+            </span>
+          )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[
-            {
-              title: "Suministros Críticos Venezuela (C01.4)",
-              color: "bg-emerald-500",
-              icon: Zap,
-              items: [
-                "Planta Eléctrica 24/7 (C01.4.1)",
-                "Tanque de Agua continuo (C01.4.2)",
-                "Agua caliente garantizada",
-                "Climatización operativa continua"
-              ]
-            },
-            {
-              title: "Internet y Conectividad (C01.3)",
-              color: "bg-[#00C8D4]",
-              icon: Wifi,
-              items: [
-                "WiFi gratis en todo el establecimiento (C01.3.1)",
-                "Conexión de fibra óptica / alta velocidad",
-                "Zona de trabajo para portátiles (C01.1.8.1)",
-                "Enchufes y cargadores cerca de la cama"
-              ]
-            },
-            {
-              title: "Aparcamiento y Traslados (C03.1–C03.2)",
-              color: "bg-[#9B00CC]",
-              icon: Car,
-              items: [
-                "Parking privado en el alojamiento (C03.1.1)",
-                "Parking vigilado 24 horas (C03.1.5)",
-                "Servicio de traslado al aeropuerto (C03.2.1)",
-                "Parking adaptado para PMR (C03.1.6)"
-              ]
-            },
-            {
-              title: "Comida y Bebida (C02.1)",
-              color: "bg-[#FF0096]",
-              icon: Utensils,
-              items: [
-                "Restaurante a la carta y buffet (C02.1.1)",
-                "Desayuno en la habitación (C02.1.2.1)",
-                "Bar & Cafetería en el alojamiento (C02.1.1.3)",
-                "Menús para dietas especiales bajo petición"
-              ]
-            },
-            {
-              title: "Recepción y Limpieza (C03.4–C03.5)",
-              color: "bg-[#00C8D4]",
-              icon: ShieldCheck,
-              items: [
-                "Recepción 24 horas (C03.4.1)",
-                "Registro de entrada y salida exprés (C03.4.2)",
-                "Servicio de limpieza diario (C03.5.1)",
-                "Guardaequipaje y conserjería (C03.4.4)"
-              ]
-            },
-            {
-              title: "Seguridad y Accesibilidad (C01.5)",
-              color: "bg-emerald-500",
-              icon: Award,
-              items: [
-                "Seguridad 24 horas (C01.5.1.1)",
-                "Cámaras de seguridad en zonas comunes (C01.5.1.2)",
-                "Detectores de humo y extintores (C01.5.2)",
-                "Acceso adaptado para movilidad reducida (C01.5.3)"
-              ]
-            }
-          ].map((group) => {
-            const Icon = group.icon;
-            return (
-              <div key={group.title} className="p-5 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-3">
-                <div className="flex items-center gap-2.5">
-                  <div className={`w-8 h-8 rounded-xl ${group.color} flex items-center justify-center text-white shrink-0`}>
+        {realTags.allDisplayTags.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            {realTags.allDisplayTags.map((tagLabel, idx) => {
+              const lower = tagLabel.toLowerCase();
+              const Icon = lower.includes("planta")
+                ? Zap
+                : lower.includes("agua")
+                ? Droplets
+                : lower.includes("wifi") || lower.includes("starlink")
+                ? Wifi
+                : lower.includes("estacionamiento") || lower.includes("parking")
+                ? Car
+                : lower.includes("restaurante") || lower.includes("gastronom") || lower.includes("chef")
+                ? Utensils
+                : Sparkles;
+              const boxColors = ["bg-[#00C8D4]", "bg-[#FF0096]", "bg-[#9B00CC]", "bg-emerald-500"];
+              const color = boxColors[idx % boxColors.length];
+
+              return (
+                <div
+                  key={tagLabel}
+                  className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 flex items-center gap-3 hover:border-[#00C8D4]/50 transition-all"
+                >
+                  <div className={`w-9 h-9 rounded-xl ${color} flex items-center justify-center text-white shrink-0 shadow-xs`}>
                     <Icon className="w-4 h-4 text-white" />
                   </div>
-                  <h3 className="text-xs font-black uppercase tracking-wider text-slate-900">
-                    {group.title}
-                  </h3>
+                  <div className="min-w-0">
+                    <span className="text-xs font-black text-slate-900 block truncate">
+                      {tagLabel}
+                    </span>
+                    <span className="text-[10px] text-emerald-700 font-bold flex items-center gap-1 mt-0.5">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                      <span>Verificado en ficha</span>
+                    </span>
+                  </div>
                 </div>
-                <ul className="space-y-2 text-xs text-slate-700">
-                  {group.items.map((item) => (
-                    <li key={item} className="flex items-start gap-2">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-[#00C8D4] shrink-0 mt-0.5" />
-                      <span className="font-medium">{item}</span>
-                    </li>
-                  ))}
-                </ul>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-[#00C8D4] flex items-center justify-center text-white shrink-0">
+                <ShieldCheck className="w-5 h-5 text-white" />
               </div>
-            );
-          })}
-        </div>
+              <div>
+                <h3 className="text-sm font-bold text-slate-900">
+                  Consulta directa de servicios y equipamiento con el anfitrión
+                </h3>
+                <p className="text-xs text-slate-600 mt-0.5">
+                  Comunícate por WhatsApp con la recepción de {establishment.name} para conocer en detalle los servicios incluidos según tu reserva.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* ── 8. NORMAS DE LA CASA (C04) Y ECOSISTEMA DE PAGOS DE VENEZUELA (C04.7) — PÁG. 9-10 DEL PDF ── */}

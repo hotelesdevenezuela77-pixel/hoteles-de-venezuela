@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { MapPin, Star, Wifi, Car, Waves, Utensils, TreePine, Dumbbell, Sparkles, Phone, BarChart3, Award, Calendar, Megaphone, Zap, Droplets, ShieldCheck, Heart, Eye } from "lucide-react";
 import { TrackedWhatsAppButton } from "./TrackedWhatsAppButton";
-import { parseServicesList, getAmenityLabel } from "@/lib/amenitiesList";
+import { parseServicesList, getAmenityLabel, getRealEstablishmentBadgesAndTags } from "@/lib/amenitiesList";
 import { optimizeImageUrl } from "@/lib/utils";
 import { OFFICIAL_WHATSAPP_NUMBER } from "@/config/whatsapp";
 
@@ -29,6 +29,19 @@ export interface Establishment {
   services: string;
   membership_tier: string;
   has_hdv_seal?: boolean;
+  has_power_plant?: boolean;
+  has_water_247?: boolean;
+  has_starlink?: boolean;
+  is_pet_friendly?: boolean;
+  key_service_pills?: string[];
+  badges?: {
+    has_power_plant?: boolean;
+    has_water_247?: boolean;
+    has_starlink?: boolean;
+    is_pet_friendly?: boolean;
+    has_hdv_seal?: boolean;
+  };
+  features?: any;
   homepage_priority?: number | null;
   has_reservations_enabled?: boolean;
   is_ads_enabled?: boolean;
@@ -127,7 +140,10 @@ export function EstablishmentCard({
 }) {
   const placeholderImage = "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600&auto=format&fit=crop";
   const tier = tierConfig[establishment.membership_tier?.toLowerCase()] || tierConfig.basico;
-  const services = parseServices(establishment.services);
+  const realTags = getRealEstablishmentBadgesAndTags(establishment);
+  const services = realTags.displayPills;
+  const hasAnyOperationalBadge =
+    realTags.hasPowerPlant || realTags.hasWater247 || realTags.hasStarlink || realTags.isPetFriendly;
   const realPrice = getRealEstablishmentPrice(establishment);
 
   const wrapperClass = isPriority
@@ -224,44 +240,54 @@ export function EstablishmentCard({
                 <span className={`truncate ${isPriority ? "text-gray-300" : "text-gray-400"}`}>{establishment.destination_name || establishment.address || "Venezuela"}</span>
               </div>
 
-              {/* Insignias Operativas de Venezuela (Planta Eléctrica, Agua 24/7, Starlink, Pet Friendly) */}
-              <div className="flex flex-wrap gap-1.5 mt-2.5">
-                <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider flex items-center gap-1 border ${
-                  isPriority 
-                    ? "bg-amber-500/20 border-amber-500/35 text-amber-300" 
-                    : "bg-amber-50 border border-amber-200 text-amber-800"
-                }`} title="Generador de energía continua respaldado 24/7">
-                  <Zap className="w-3 h-3 text-amber-500 fill-amber-400 shrink-0" />
-                  Planta Eléctrica
-                </span>
+              {/* Insignias Operativas Reales (Solo las que el establecimiento tiene verdaderamente activadas) */}
+              {hasAnyOperationalBadge && (
+                <div className="flex flex-wrap gap-1.5 mt-2.5">
+                  {realTags.hasPowerPlant && (
+                    <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider flex items-center gap-1 border ${
+                      isPriority 
+                        ? "bg-amber-500/20 border-amber-500/35 text-amber-300" 
+                        : "bg-amber-50 border border-amber-200 text-amber-800"
+                    }`} title="Generador de energía continua respaldado 24/7">
+                      <Zap className="w-3 h-3 text-amber-500 fill-amber-400 shrink-0" />
+                      Planta Eléctrica
+                    </span>
+                  )}
 
-                <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider flex items-center gap-1 border ${
-                  isPriority 
-                    ? "bg-cyan-500/20 border-cyan-500/35 text-cyan-300" 
-                    : "bg-cyan-50 border border-cyan-200 text-cyan-800"
-                }`} title="Suministro de agua garantizado por tanque y sistema propio">
-                  <Droplets className="w-3 h-3 text-cyan-500 fill-cyan-400 shrink-0" />
-                  Agua 24/7
-                </span>
+                  {realTags.hasWater247 && (
+                    <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider flex items-center gap-1 border ${
+                      isPriority 
+                        ? "bg-cyan-500/20 border-cyan-500/35 text-cyan-300" 
+                        : "bg-cyan-50 border border-cyan-200 text-cyan-800"
+                    }`} title="Suministro de agua garantizado por tanque y sistema propio">
+                      <Droplets className="w-3 h-3 text-cyan-500 fill-cyan-400 shrink-0" />
+                      Agua 24/7
+                    </span>
+                  )}
 
-                <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider flex items-center gap-1 border ${
-                  isPriority 
-                    ? "bg-emerald-500/20 border-emerald-500/35 text-emerald-300" 
-                    : "bg-emerald-50 border border-emerald-200 text-emerald-800"
-                }`} title="Internet de alta velocidad vía satélite Starlink">
-                  <Wifi className="w-3 h-3 text-emerald-500 shrink-0" />
-                  Starlink
-                </span>
+                  {realTags.hasStarlink && (
+                    <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider flex items-center gap-1 border ${
+                      isPriority 
+                        ? "bg-emerald-500/20 border-emerald-500/35 text-emerald-300" 
+                        : "bg-emerald-50 border border-emerald-200 text-emerald-800"
+                    }`} title="Internet de alta velocidad vía satélite Starlink">
+                      <Wifi className="w-3 h-3 text-emerald-500 shrink-0" />
+                      Starlink
+                    </span>
+                  )}
 
-                <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider flex items-center gap-1 border ${
-                  isPriority 
-                    ? "bg-pink-500/20 border-pink-500/35 text-pink-300" 
-                    : "bg-pink-50 border border-pink-200 text-pink-800"
-                }`} title="Admite mascotas">
-                  <Heart className="w-3 h-3 text-pink-500 fill-pink-400 shrink-0" />
-                  Pet Friendly
-                </span>
-              </div>
+                  {realTags.isPetFriendly && (
+                    <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider flex items-center gap-1 border ${
+                      isPriority 
+                        ? "bg-pink-500/20 border-pink-500/35 text-pink-300" 
+                        : "bg-pink-50 border border-pink-200 text-pink-800"
+                    }`} title="Admite mascotas">
+                      <Heart className="w-3 h-3 text-pink-500 fill-pink-400 shrink-0" />
+                      Pet Friendly
+                    </span>
+                  )}
+                </div>
+              )}
 
               {/* Status Badges Row (Sello HDV, Reservas, Ads) */}
               {(establishment.has_hdv_seal || establishment.has_reservations_enabled || establishment.is_ads_enabled) && (
@@ -313,21 +339,22 @@ export function EstablishmentCard({
               )}
             </div>
 
-            {/* Services/Amenities */}
+            {/* Services/Amenities Reales */}
             {services.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mb-3">
-                {services.slice(0, 3).map((service, i) => (
+                {services.slice(0, 4).map((service, i) => (
                   <span
                     key={i}
-                    className={`flex items-center gap-1 px-2.5 py-0.5 text-[10px] rounded-full font-medium ${isPriority ? "bg-white/5 text-white/70 border border-white/10" : "bg-gray-50 text-gray-500 border border-gray-100"}`}
+                    className={`flex items-center gap-1 px-2.5 py-0.5 text-[10px] rounded-full font-medium max-w-[165px] ${isPriority ? "bg-white/10 text-white/85 border border-white/15" : "bg-gray-50 text-gray-600 border border-gray-200"}`}
+                    title={getAmenityLabel(service)}
                   >
-                    {serviceIcons[service.toLowerCase()] || <Sparkles className="w-3 h-3 text-brand-magenta" />}
-                    <span>{getAmenityLabel(service)}</span>
+                    {serviceIcons[service.toLowerCase()] || <Sparkles className="w-3 h-3 text-brand-magenta shrink-0" />}
+                    <span className="truncate">{getAmenityLabel(service)}</span>
                   </span>
                 ))}
-                {services.length > 3 && (
-                  <span className={`px-2 py-0.5 text-[10px] rounded-full font-bold ${isPriority ? "bg-white/5 text-white/50 border border-white/10" : "bg-gray-50 text-gray-400 border border-gray-100"}`}>
-                    +{services.length - 3}
+                {services.length > 4 && (
+                  <span className={`px-2 py-0.5 text-[10px] rounded-full font-bold ${isPriority ? "bg-white/10 text-white/60 border border-white/15" : "bg-gray-50 text-gray-500 border border-gray-200"}`}>
+                    +{services.length - 4}
                   </span>
                 )}
               </div>
@@ -395,7 +422,10 @@ export function EstablishmentListItem({
 }) {
   const placeholderImage = "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600&auto=format&fit=crop";
   const tier = tierConfig[establishment.membership_tier?.toLowerCase()] || tierConfig.basico;
-  const services = parseServices(establishment.services);
+  const realTags = getRealEstablishmentBadgesAndTags(establishment);
+  const services = realTags.displayPills;
+  const hasAnyOperationalBadge =
+    realTags.hasPowerPlant || realTags.hasWater247 || realTags.hasStarlink || realTags.isPetFriendly;
   const realPrice = getRealEstablishmentPrice(establishment);
 
   const wrapperClass = isPriority
@@ -484,6 +514,52 @@ export function EstablishmentListItem({
                   <MapPin className="w-3.5 h-3.5 text-brand-turquesa shrink-0" />
                   <span className={isPriority ? "text-gray-300" : "text-gray-400"}>{establishment.destination_name || establishment.address || "Venezuela"}</span>
                 </div>
+
+                {/* Insignias Operativas Reales en Vista Lista */}
+                {hasAnyOperationalBadge && (
+                  <div className="flex flex-wrap gap-1.5 mt-2.5">
+                    {realTags.hasPowerPlant && (
+                      <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider flex items-center gap-1 border ${
+                        isPriority 
+                          ? "bg-amber-500/20 border-amber-500/35 text-amber-300" 
+                          : "bg-amber-50 border border-amber-200 text-amber-800"
+                      }`}>
+                        <Zap className="w-3 h-3 text-amber-500 fill-amber-400 shrink-0" />
+                        Planta Eléctrica
+                      </span>
+                    )}
+                    {realTags.hasWater247 && (
+                      <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider flex items-center gap-1 border ${
+                        isPriority 
+                          ? "bg-cyan-500/20 border-cyan-500/35 text-cyan-300" 
+                          : "bg-cyan-50 border border-cyan-200 text-cyan-800"
+                      }`}>
+                        <Droplets className="w-3 h-3 text-cyan-500 fill-cyan-400 shrink-0" />
+                        Agua 24/7
+                      </span>
+                    )}
+                    {realTags.hasStarlink && (
+                      <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider flex items-center gap-1 border ${
+                        isPriority 
+                          ? "bg-emerald-500/20 border-emerald-500/35 text-emerald-300" 
+                          : "bg-emerald-50 border border-emerald-200 text-emerald-800"
+                      }`}>
+                        <Wifi className="w-3 h-3 text-emerald-500 shrink-0" />
+                        Starlink
+                      </span>
+                    )}
+                    {realTags.isPetFriendly && (
+                      <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider flex items-center gap-1 border ${
+                        isPriority 
+                          ? "bg-pink-500/20 border-pink-500/35 text-pink-300" 
+                          : "bg-pink-50 border border-pink-200 text-pink-800"
+                      }`}>
+                        <Heart className="w-3 h-3 text-pink-500 fill-pink-400 shrink-0" />
+                        Pet Friendly
+                      </span>
+                    )}
+                  </div>
+                )}
 
                 {/* Status Badges Row (Sello HDV, Reservas, Ads) */}
                 {(establishment.has_hdv_seal || establishment.has_reservations_enabled || establishment.is_ads_enabled) && (

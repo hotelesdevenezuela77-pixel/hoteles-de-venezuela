@@ -48,6 +48,10 @@ import {
   SERVICE_SUBCATEGORIES_V15
 } from "../lib/v15MasterCatalog";
 import {
+  buildConsolidatedServicesArray,
+  getRealEstablishmentBadgesAndTags
+} from "../lib/amenitiesList";
+import {
   SAAS_COMMERCIAL_PLANS,
   OFFICIAL_SALES_AGENTS,
   MAX_FOUNDERS_QUOTA,
@@ -222,23 +226,17 @@ export function PreRegistro() {
   // Estado de Publicación Directa (Agente en Ruta)
   const [publishDirectly, setPublishDirectly] = useState<boolean>(true);
 
-  // Badges Destacados
+  // Badges Destacados (Sin inyección por defecto de Starlink, Pet Friendly, Planta o Agua no seleccionados)
   const [badges, setBadges] = useState<PreRegistrationBadgeFlags>({
-    has_power_plant: true,
-    has_water_247: true,
-    has_starlink: true,
-    is_pet_friendly: true,
+    has_power_plant: false,
+    has_water_247: false,
+    has_starlink: false,
+    is_pet_friendly: false,
     has_hdv_seal: true
   });
 
-  // Pills / Etiquetas Secundarias Seleccionadas
-  const [pills, setPills] = useState<string[]>([
-    "Muelle privado",
-    "Lanchas propias",
-    "Gastronomía de mar",
-    "Excursiones a Cayos",
-    "Confort Premium"
-  ]);
+  // Pills / Etiquetas Secundarias Seleccionadas (Inicia limpia sin etiquetas pre-rellenadas por defecto)
+  const [pills, setPills] = useState<string[]>([]);
 
   const [customPillInput, setCustomPillInput] = useState<string>("");
   const [customPillSuggestions, setCustomPillSuggestions] = useState<string[]>([]);
@@ -688,6 +686,9 @@ export function PreRegistro() {
         new Set([primaryImage, ...galleryImages].filter(Boolean))
       );
 
+      // Arreglo consolidado únicamente con las pills seleccionadas y los badges que estén verdaderamente activos
+      const consolidatedRealServices = buildConsolidatedServicesArray(pills, badges);
+
       // 2. ACTUALIZACIÓN Y CONSOLIDACIÓN EN SUPABASE (`properties`, `establishments` y `establishment_images`) SIN DUPLICAR
       let consolidatedDbId: number | string | null = existingEstId;
       try {
@@ -736,7 +737,7 @@ export function PreRegistro() {
           has_hdv_seal: badges.has_hdv_seal,
           membership_tier: resolvedTier,
           status: publishDirectly ? "approved" : "pending",
-          services: JSON.stringify(pills),
+          services: JSON.stringify(consolidatedRealServices),
           latitude: latitude ? parseFloat(latitude) : null,
           longitude: longitude ? parseFloat(longitude) : null
         };
@@ -830,7 +831,13 @@ export function PreRegistro() {
           base_price: effectiveBasePrice > 0 ? effectiveBasePrice : null,
           show_official_prices: showOfficialPrice && effectiveBasePrice > 0,
           is_featured: resolvedIsFeatured,
-          services: JSON.stringify(pills),
+          services: JSON.stringify(consolidatedRealServices),
+          key_service_pills: pills,
+          badges,
+          has_power_plant: badges.has_power_plant,
+          has_water_247: badges.has_water_247,
+          has_starlink: badges.has_starlink,
+          is_pet_friendly: badges.is_pet_friendly,
           membership_tier: resolvedTier,
           has_hdv_seal: badges.has_hdv_seal,
           latitude: latitude ? parseFloat(latitude) : null,
@@ -1065,6 +1072,20 @@ export function PreRegistro() {
                         }
                         if (detectedExistingMatch.latitude) setLatitude(String(detectedExistingMatch.latitude));
                         if (detectedExistingMatch.longitude) setLongitude(String(detectedExistingMatch.longitude));
+                        const existingRealTags = getRealEstablishmentBadgesAndTags({
+                          slug: detectedExistingMatch.slug,
+                          services: detectedExistingMatch.services,
+                          badges: (detectedExistingMatch as any).badges,
+                          has_hdv_seal: (detectedExistingMatch as any).hasHdvSeal ?? true
+                        });
+                        setBadges({
+                          has_power_plant: existingRealTags.hasPowerPlant,
+                          has_water_247: existingRealTags.hasWater247,
+                          has_starlink: existingRealTags.hasStarlink,
+                          is_pet_friendly: existingRealTags.isPetFriendly,
+                          has_hdv_seal: existingRealTags.hasHdvSeal || true
+                        });
+                        setPills(existingRealTags.displayPills.slice(0, MAX_PILLS_COUNT));
                       }}
                       className="px-3 py-1.5 rounded-xl bg-[#0e011f] hover:bg-[#1a0533] text-[#00C8D4] text-[10px] font-black uppercase tracking-wider shrink-0 cursor-pointer transition-colors"
                     >

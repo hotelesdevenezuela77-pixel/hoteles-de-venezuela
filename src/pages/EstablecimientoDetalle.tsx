@@ -15,10 +15,10 @@ import {
   ArrowLeft, DollarSign, Navigation, Loader2, AlertTriangle, Sparkles,
   Coffee, Compass, Utensils, Plane, Car, Building2,
   Bed, Users, CheckCircle, Maximize2, X, Camera, MessageCircle, Layers,
-  Wine, ChefHat, ShoppingBag, ShieldCheck, Zap, Info, Calendar, CheckCircle2, Award, Video, Wallet
+  Wine, ChefHat, ShoppingBag, ShieldCheck, Zap, Droplets, Dog, Info, Calendar, CheckCircle2, Award, Video, Wallet
 } from "lucide-react";
 
-import { parseServicesList, getAmenityLabel, getAmenityInfo, CERTIFICATIONS_DOCUMENT77 } from "../lib/amenitiesList";
+import { parseServicesList, getAmenityLabel, getAmenityInfo, getRealEstablishmentBadgesAndTags, CERTIFICATIONS_DOCUMENT77 } from "../lib/amenitiesList";
 import { SeoHead } from "@/components/seo/SeoHead";
 import { ClusterAuthorityCtaBlock, buildClusterSchemas } from "@/components/seo/ClusterAuthorityCtaBlock";
 import { EstablishmentV15DetailSections } from "@/components/establishment/EstablishmentV15DetailSections";
@@ -89,6 +89,13 @@ interface EstablishmentDetail {
   services: string;
   membership_tier: string;
   has_hdv_seal?: boolean;
+  has_power_plant?: boolean;
+  has_water_247?: boolean;
+  has_starlink?: boolean;
+  is_pet_friendly?: boolean;
+  key_service_pills?: string[];
+  badges?: any;
+  features?: any;
   images: string[];
   latitude?: number;
   longitude?: number;
@@ -646,6 +653,13 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
           // Deduplicar URLs de imágenes manteniendo el orden curado
           allImages = Array.from(new Set(allImages.map((u) => String(u).trim()).filter(Boolean)));
 
+          // Verificar si existe actualización local de pre-registro para sincronizar etiquetas reales sin pérdidas
+          let preregOverride: any = null;
+          try {
+            const rawPrereg = localStorage.getItem(`hdv_prereg_${dbData.slug || slug}`);
+            if (rawPrereg) preregOverride = JSON.parse(rawPrereg);
+          } catch {}
+
           const mapped: EstablishmentDetail = {
             id: dbData.id,
             slug: dbData.slug,
@@ -666,9 +680,21 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
             review_count: dbData.review_count || 12,
             price_level: dbData.price_level || "$$",
             is_featured: dbData.is_featured || false,
-            services: dbData.services || "[]",
+            services:
+              dbData.services && dbData.services !== "[]"
+                ? dbData.services
+                : preregOverride?.key_service_pills
+                ? JSON.stringify(preregOverride.key_service_pills)
+                : "[]",
             membership_tier: dbData.membership_tier || "basic",
-            has_hdv_seal: dbData.has_hdv_seal || false,
+            has_hdv_seal: dbData.has_hdv_seal ?? preregOverride?.badges?.has_hdv_seal ?? false,
+            has_power_plant: dbData.has_power_plant ?? preregOverride?.badges?.has_power_plant,
+            has_water_247: dbData.has_water_247 ?? preregOverride?.badges?.has_water_247,
+            has_starlink: dbData.has_starlink ?? preregOverride?.badges?.has_starlink,
+            is_pet_friendly: dbData.is_pet_friendly ?? preregOverride?.badges?.is_pet_friendly,
+            key_service_pills: dbData.key_service_pills || preregOverride?.key_service_pills,
+            badges: dbData.badges || preregOverride?.badges,
+            features: dbData.features,
             has_reservations_enabled: dbData.has_reservations_enabled || false,
             images: allImages,
             latitude: dbData.latitude,
@@ -817,7 +843,8 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
   const nextImage = () => setCurrentImageIndex((prev) => (prev + 1) % establishment.images.length);
   const prevImage = () => setCurrentImageIndex((prev) => (prev - 1 + establishment.images.length) % establishment.images.length);
 
-  const servicesList = parseServicesList(establishment.services);
+  const realTags = getRealEstablishmentBadgesAndTags(establishment);
+  const servicesList = realTags.rawServices;
 
   const tierColors: Record<string, string> = {
     diamante: "from-purple-600 via-pink-600 to-purple-800 text-white",
@@ -1015,6 +1042,49 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
               </div>
             </div>
 
+            {/* Insignias Operativas y Etiquetas Reales del Establecimiento (Coherencia 1:1 con la Tarjeta del Directorio) */}
+            {(realTags.hasPowerPlant ||
+              realTags.hasWater247 ||
+              realTags.hasStarlink ||
+              realTags.isPetFriendly ||
+              realTags.displayPills.length > 0) && (
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                {realTags.hasPowerPlant && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black bg-amber-50 text-amber-800 border border-amber-200">
+                    <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-400 shrink-0" />
+                    <span>Planta Eléctrica</span>
+                  </span>
+                )}
+                {realTags.hasWater247 && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black bg-cyan-50 text-cyan-800 border border-cyan-200">
+                    <Droplets className="w-3.5 h-3.5 text-[#00C8D4] fill-cyan-400 shrink-0" />
+                    <span>Agua 24/7</span>
+                  </span>
+                )}
+                {realTags.hasStarlink && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    < Globe className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span>Starlink</span>
+                  </span>
+                )}
+                {realTags.isPetFriendly && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black bg-pink-50 text-pink-800 border border-pink-200">
+                    <Dog className="w-3.5 h-3.5 text-[#FF0096] shrink-0" />
+                    <span>Pet Friendly</span>
+                  </span>
+                )}
+                {realTags.displayPills.map((pill) => (
+                  <span
+                    key={pill}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200"
+                  >
+                    <Sparkles className="w-3 h-3 text-[#FF0096] shrink-0" />
+                    <span>{pill}</span>
+                  </span>
+                ))}
+              </div>
+            )}
+
             {/* Botones de Acción Principales */}
             <div className="flex flex-wrap items-center gap-3.5 pt-2">
               {isGastronomyCategory ? (
@@ -1120,13 +1190,29 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
 
                 <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4 text-left border border-white/15">
                   <span
-                    className="text-2xl sm:text-3xl font-bold !text-white block"
+                    className="text-2xl sm:text-3xl font-bold !text-white block truncate"
                     style={{ fontFamily: "'Playfair Display', serif" }}
                   >
-                    {isCreatorCategory ? "4K Drone" : "Starlink"}
+                    {isCreatorCategory
+                      ? "4K Drone"
+                      : realTags.hasStarlink
+                      ? "Starlink"
+                      : realTags.hasPowerPlant
+                      ? "Planta 24/7"
+                      : realTags.hasWater247
+                      ? "Agua 24/7"
+                      : "Directo"}
                   </span>
-                  <span className="text-[11px] font-semibold text-white/90 mt-1 block">
-                    {isCreatorCategory ? "Producción Audiovisual" : "Wi-Fi & Respaldo Operativo"}
+                  <span className="text-[11px] font-semibold text-white/90 mt-1 block truncate">
+                    {isCreatorCategory
+                      ? "Producción Audiovisual"
+                      : realTags.hasStarlink
+                      ? "Wi-Fi Satelital Activo"
+                      : realTags.hasPowerPlant
+                      ? "Respaldo Eléctrico Activo"
+                      : realTags.hasWater247
+                      ? "Suministro Continuo"
+                      : realTags.displayPills[0] || "Atención con el Anfitrión"}
                   </span>
                 </div>
               </div>
@@ -2532,6 +2618,14 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
               latitude: establishment.latitude,
               longitude: establishment.longitude,
               services: establishment.services,
+              has_power_plant: establishment.has_power_plant,
+              has_water_247: establishment.has_water_247,
+              has_starlink: establishment.has_starlink,
+              is_pet_friendly: establishment.is_pet_friendly,
+              has_hdv_seal: establishment.has_hdv_seal,
+              key_service_pills: establishment.key_service_pills,
+              badges: establishment.badges,
+              features: establishment.features
             }}
             rooms={rooms}
             surroundings={surroundings}

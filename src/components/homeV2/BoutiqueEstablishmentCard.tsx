@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import type { Establishment } from "../layout/EstablishmentCard";
 import { getRealEstablishmentPrice } from "../layout/EstablishmentCard";
+import { getRealEstablishmentBadgesAndTags } from "@/lib/amenitiesList";
 import { TrackedWhatsAppButton } from "../layout/TrackedWhatsAppButton";
 import { OFFICIAL_WHATSAPP_NUMBER } from "@/config/whatsapp";
 
@@ -55,11 +56,13 @@ export function BoutiqueEstablishmentCard({ establishment }: BoutiqueEstablishme
     setCurrentImageIndex(prev => (prev - 1 + images.length) % images.length);
   };
 
-  // Detección de badges operativos relevantes en Venezuela
-  const hasPlanta = establishment.id % 2 === 0 || (establishment.services && String(establishment.services).includes("planta"));
-  const hasAgua = establishment.id % 3 !== 0 || (establishment.services && String(establishment.services).includes("agua"));
-  const hasStarlink = establishment.id % 2 === 1 || (establishment.services && String(establishment.services).includes("wifi"));
-  const isPetFriendly = establishment.id % 3 === 0 || (establishment.services && String(establishment.services).includes("pet"));
+  // Detección estricta de badges y etiquetas reales del establecimiento (sin rellenos por defecto ni id % 2)
+  const realTags = getRealEstablishmentBadgesAndTags(establishment);
+  const hasPlanta = realTags.hasPowerPlant;
+  const hasAgua = realTags.hasWater247;
+  const hasStarlink = realTags.hasStarlink;
+  const isPetFriendly = realTags.isPetFriendly;
+  const displayPills = realTags.displayPills;
 
   // Detección de tarjetas destacadas / recomendadas con fondo de color sólido (Regla #3 AGENTS.md)
   const isFeaturedCard = establishment.is_featured || establishment.has_hdv_seal || establishment.membership_tier === "diamante" || establishment.membership_tier === "gold" || establishment.rating_avg >= 4.9;
@@ -162,44 +165,60 @@ export function BoutiqueEstablishmentCard({ establishment }: BoutiqueEstablishme
             </h3>
           </Link>
 
-          {/* Micro-Chips Operativos de Alta Prioridad en Venezuela (Planta, Agua 24/7, Starlink) */}
-          <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-            {hasPlanta && (
-              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[9px] font-bold ${
-                isFeaturedCard ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" : "bg-amber-50 text-amber-700 border border-amber-200"
-              }`}>
-                <Zap className="w-2.5 h-2.5 fill-current" />
-                <span>Planta 100%</span>
-              </span>
-            )}
+          {/* Micro-Chips Operativos y Etiquetas Reales (Solo los que realmente tiene asignados el establecimiento) */}
+          {(hasPlanta || hasAgua || hasStarlink || isPetFriendly || displayPills.length > 0) && (
+            <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+              {hasPlanta && (
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[9px] font-bold ${
+                  isFeaturedCard ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" : "bg-amber-50 text-amber-700 border border-amber-200"
+                }`}>
+                  <Zap className="w-2.5 h-2.5 fill-current" />
+                  <span>Planta Eléctrica</span>
+                </span>
+              )}
 
-            {hasAgua && (
-              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[9px] font-bold ${
-                isFeaturedCard ? "bg-cyan-500/20 text-[#00C8D4] border border-cyan-500/30" : "bg-cyan-50 text-cyan-700 border border-cyan-200"
-              }`}>
-                <Droplets className="w-2.5 h-2.5 fill-current" />
-                <span>Agua 24/7</span>
-              </span>
-            )}
+              {hasAgua && (
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[9px] font-bold ${
+                  isFeaturedCard ? "bg-cyan-500/20 text-[#00C8D4] border border-cyan-500/30" : "bg-cyan-50 text-cyan-700 border border-cyan-200"
+                }`}>
+                  <Droplets className="w-2.5 h-2.5 fill-current" />
+                  <span>Agua 24/7</span>
+                </span>
+              )}
 
-            {hasStarlink && (
-              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[9px] font-bold ${
-                isFeaturedCard ? "bg-purple-500/20 text-purple-300 border border-purple-500/30" : "bg-purple-50 text-purple-700 border border-purple-200"
-              }`}>
-                <Wifi className="w-2.5 h-2.5" />
-                <span>Starlink</span>
-              </span>
-            )}
+              {hasStarlink && (
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[9px] font-bold ${
+                  isFeaturedCard ? "bg-purple-500/20 text-purple-300 border border-purple-500/30" : "bg-purple-50 text-purple-700 border border-purple-200"
+                }`}>
+                  <Wifi className="w-2.5 h-2.5" />
+                  <span>Starlink</span>
+                </span>
+              )}
 
-            {isPetFriendly && (
-              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[9px] font-bold ${
-                isFeaturedCard ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" : "bg-emerald-50 text-emerald-700 border border-emerald-200"
-              }`}>
-                <Dog className="w-2.5 h-2.5" />
-                <span>Pet Friendly</span>
-              </span>
-            )}
-          </div>
+              {isPetFriendly && (
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[9px] font-bold ${
+                  isFeaturedCard ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" : "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                }`}>
+                  <Dog className="w-2.5 h-2.5" />
+                  <span>Pet Friendly</span>
+                </span>
+              )}
+
+              {displayPills.slice(0, 4).map((pill) => (
+                <span
+                  key={pill}
+                  title={pill}
+                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[9px] font-bold max-w-[140px] ${
+                    isFeaturedCard
+                      ? "bg-white/10 text-slate-200 border border-white/15"
+                      : "bg-slate-100 text-slate-700 border border-slate-200"
+                  }`}
+                >
+                  <span className="truncate">{pill}</span>
+                </span>
+              ))}
+            </div>
+          )}
 
           {/* Descripción corta */}
           <p className={`text-xs font-medium line-clamp-2 leading-relaxed pt-0.5 ${
