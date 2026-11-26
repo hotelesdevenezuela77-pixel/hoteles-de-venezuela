@@ -316,6 +316,11 @@ export async function onRequest(context) {
     return next();
   }
 
+  if (pathname === "/establecimiento/apartoposada-del-mar") {
+    url.pathname = "/establecimiento/aparto-posada-del-mar";
+    return Response.redirect(url.toString(), 301);
+  }
+
   if (pathname.length > 1 && pathname.endsWith("/")) {
     url.pathname = pathname.replace(/\/+$/, "");
     return Response.redirect(url.toString(), 301);
