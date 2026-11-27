@@ -1,3 +1,8 @@
+import {
+  getValidatedPreRegistrationForEstablishment,
+  hasValidatedPreRegistration
+} from "./salesDepartmentStore";
+
 export type AmenityPillar = 
   | "C00" 
   | "C01" 
@@ -1086,8 +1091,10 @@ export function buildConsolidatedServicesArray(
 
 /**
  * Extrae EXCLUSIVAMENTE los badges operativos y etiquetas/amenidades reales que tiene asignados
- * un establecimiento en sus datos (sin inyecciones por defecto, sin módulo `id % 2` / `id % 3`,
- * y sin confundir WiFi común con Starlink).
+ * un establecimiento que haya pasado por la puerta de entrada oficial de /pre-registro.
+ * - Si el establecimiento aún NO ha pasado por /pre-registro (es un registro base del directorio),
+ *   devuelve 0 etiquetas y 0 badges de ejemplo para evitar datos ficticios.
+ * - Si el establecimiento SÍ pasó por /pre-registro, refleja fielmente sus datos reales registrados.
  */
 export function getRealEstablishmentBadgesAndTags(est: any): RealEstablishmentBadgesAndTags {
   if (!est) {
@@ -1103,43 +1110,76 @@ export function getRealEstablishmentBadgesAndTags(est: any): RealEstablishmentBa
     };
   }
 
+  const isPreReg = hasValidatedPreRegistration(est);
+  const validatedReceipt = getValidatedPreRegistrationForEstablishment(est);
+
+  // REGLA GATEKEEPER: Si el establecimiento no ha pasado por /pre-registro,
+  // no mostrar ninguna etiqueta o amenidad ficticia de ejemplo.
+  if (!isPreReg && !validatedReceipt) {
+    return {
+      hasPowerPlant: false,
+      hasWater247: false,
+      hasStarlink: false,
+      isPetFriendly: false,
+      hasHdvSeal: false,
+      rawServices: [],
+      displayPills: [],
+      allDisplayTags: []
+    };
+  }
+
   // Verificar si existe payload local de pre-registro actualizado para este slug
   let localPrereg: any = null;
-  if (typeof window !== "undefined" && est.slug) {
-    try {
-      const raw = localStorage.getItem(`hdv_prereg_${est.slug}`);
-      if (raw) localPrereg = JSON.parse(raw);
-    } catch {
-      // ignore
+  if (typeof window !== "undefined") {
+    const candidateSlugs = [est.slug, validatedReceipt?.establishmentSlug].filter(Boolean);
+    for (const s of candidateSlugs) {
+      try {
+        const raw = localStorage.getItem(`hdv_prereg_${s}`);
+        if (raw) {
+          localPrereg = JSON.parse(raw);
+          break;
+        }
+      } catch {
+        // ignore
+      }
     }
   }
 
-  // 1. Obtener lista cruda de servicios reales del establecimiento
-  const fromServices = parseServicesList(est.services);
-  const fromKeyPills = Array.isArray(est.key_service_pills)
-    ? parseServicesList(est.key_service_pills)
-    : Array.isArray(localPrereg?.key_service_pills)
+  // 1. Obtener lista cruda de servicios reales del pre-registro o del establecimiento auditado
+  const fromReceiptPills = Array.isArray(validatedReceipt?.keyServicePills)
+    ? parseServicesList(validatedReceipt.keyServicePills)
+    : [];
+  const fromLocalPreregPills = Array.isArray(localPrereg?.key_service_pills)
     ? parseServicesList(localPrereg.key_service_pills)
     : [];
+  const fromKeyPills = Array.isArray(est.key_service_pills)
+    ? parseServicesList(est.key_service_pills)
+    : [];
+  const fromServices = parseServicesList(est.services);
 
-  // Si existe un pre-registro local para este slug, sus pills y badges reflejan la última edición directa
+  // Priorizar los datos capturados en el pre-registro real
   const baseRawList =
-    fromServices.length > 0
-      ? fromServices
-      : fromKeyPills;
+    fromLocalPreregPills.length > 0
+      ? fromLocalPreregPills
+      : fromReceiptPills.length > 0
+      ? fromReceiptPills
+      : fromKeyPills.length > 0
+      ? fromKeyPills
+      : fromServices;
 
   // Deduplicar manteniendo orden
   const rawServices: string[] = [];
   const seenNorm = new Set<string>();
-  for (const item of [...baseRawList, ...fromKeyPills]) {
+  for (const item of [...baseRawList, ...fromLocalPreregPills, ...fromReceiptPills, ...fromKeyPills]) {
     const norm = normalizeTagToken(item);
     if (!norm || seenNorm.has(norm)) continue;
     seenNorm.add(norm);
     rawServices.push(item.trim());
   }
 
-  // 2. Resolver flags explícitos si existen en el objeto o en su pre-registro
-  const explicitBadges = est.badges || localPrereg?.badges || null;
+  // 2. Resolver flags explícitos del pre-registro
+  const explicitBadges =
+    localPrereg?.badges || validatedReceipt?.badges || est.badges || null;
   const featureBadges = est.features?.badges || null;
 
   const explicitPower: boolean | undefined =

@@ -205,6 +205,49 @@ export function PreRegistro() {
   const [showOfficialPrice, setShowOfficialPrice] = useState<boolean>(false);
   const [basePriceFrom, setBasePriceFrom] = useState<number>(0);
   const [whatsappNumber, setWhatsappNumber] = useState<string>("+58 412 1234567");
+  const [officialEmail, setOfficialEmail] = useState<string>("");
+  const [officialWebsiteOrInstagram, setOfficialWebsiteOrInstagram] = useState<string>("");
+
+  // Inventario Real de Habitaciones / Unidades (Sin plantillas ficticias; solo lo que el propietario o agente agregue)
+  const [realRoomsInventory, setRealRoomsInventory] = useState<
+    Array<{
+      name: string;
+      capacity: number;
+      price_per_night: number;
+      size_m2?: number;
+      beds_summary: string;
+      amenities: string;
+    }>
+  >([]);
+  const [newRoomName, setNewRoomName] = useState<string>("");
+  const [newRoomCapacity, setNewRoomCapacity] = useState<number>(2);
+  const [newRoomBedsSummary, setNewRoomBedsSummary] = useState<string>("");
+  const [newRoomAmenities, setNewRoomAmenities] = useState<string>("");
+  const [newRoomPrice, setNewRoomPrice] = useState<number>(0);
+
+  const handleAddRealRoom = () => {
+    const cleanName = newRoomName.trim();
+    if (!cleanName) return;
+    setRealRoomsInventory((prev) => [
+      ...prev,
+      {
+        name: cleanName,
+        capacity: Math.max(1, Number(newRoomCapacity) || 2),
+        price_per_night: showOfficialPrice && Number(newRoomPrice) > 0 ? Number(newRoomPrice) : 0,
+        beds_summary: newRoomBedsSummary.trim(),
+        amenities: newRoomAmenities.trim()
+      }
+    ]);
+    setNewRoomName("");
+    setNewRoomCapacity(2);
+    setNewRoomBedsSummary("");
+    setNewRoomAmenities("");
+    setNewRoomPrice(0);
+  };
+
+  const handleRemoveRealRoom = (idx: number) => {
+    setRealRoomsInventory((prev) => prev.filter((_, i) => i !== idx));
+  };
 
   // GPS & Ubicación en tiempo real desde celular/dispositivo
   const [latitude, setLatitude] = useState<string>("");
@@ -583,7 +626,7 @@ export function PreRegistro() {
 
       const effectiveBasePrice = showOfficialPrice && basePriceFrom > 0 ? basePriceFrom : 0;
 
-      const payload: PreRegistrationPayload = {
+      const payload: PreRegistrationPayload & Record<string, any> = {
         service_category_id: serviceCategoryId,
         subcategory_id: subcategoryId,
         category_name: categoryName,
@@ -598,6 +641,9 @@ export function PreRegistro() {
         short_description: shortDescription,
         base_price_from: effectiveBasePrice,
         whatsapp_number: whatsappNumber,
+        official_email: officialEmail.trim(),
+        official_website: officialWebsiteOrInstagram.trim(),
+        real_rooms: realRoomsInventory,
         primary_image: primaryImage,
         gallery_images: galleryImages
       };
@@ -627,7 +673,13 @@ export function PreRegistro() {
         bcvRate: bcvRate || 45.8,
         termsAccepted,
         userId: user?.id || null,
-        userEmail: user?.email || null
+        userEmail: user?.email || null,
+        officialEmail: officialEmail.trim() || undefined,
+        officialWebsite: officialWebsiteOrInstagram.trim() || undefined,
+        shortDescription: shortDescription.trim() || undefined,
+        badges,
+        keyServicePills: pills,
+        realRooms: realRoomsInventory
       });
 
       // Construcción JSONB para features incluyendo trazabilidad del folio y finanzas
@@ -730,6 +782,8 @@ export function PreRegistro() {
           state: state.trim(),
           phone: whatsappNumber.trim(),
           whatsapp: whatsappNumber.trim(),
+          email: officialEmail.trim() || undefined,
+          website: officialWebsiteOrInstagram.trim() || undefined,
           rating_avg: ratingAvg,
           price_min: effectiveBasePrice > 0 ? effectiveBasePrice : null,
           base_price: effectiveBasePrice > 0 ? effectiveBasePrice : null,
@@ -773,8 +827,47 @@ export function PreRegistro() {
             }))
           );
         }
+        // Sincronizar habitaciones reales si se registraron unidades en el Pre-Registro
+        if (consolidatedDbId && typeof consolidatedDbId === "number" && realRoomsInventory.length > 0) {
+          for (const rm of realRoomsInventory) {
+            await supabase.from("rooms").insert({
+              establishment_id: consolidatedDbId,
+              name: rm.name,
+              description: rm.beds_summary || "",
+              capacity: rm.capacity || 2,
+              price_per_night: rm.price_per_night || 0,
+              amenities: rm.amenities || "",
+              is_active: true
+            });
+          }
+        }
       } catch (err) {
         console.warn("Modo local activo al consolidar establecimiento:", err);
+      }
+
+      // Sincronizar habitaciones reales en almacenamiento local `hdv_custom_rooms` si se agregaron
+      if (realRoomsInventory.length > 0) {
+        try {
+          const localRoomsKey = "hdv_custom_rooms";
+          const existingLocalRooms: any[] = JSON.parse(localStorage.getItem(localRoomsKey) || "[]");
+          const estNumericId = typeof consolidatedDbId === "number" ? consolidatedDbId : existingMatch?.id || Date.now();
+          const newLocalRooms = realRoomsInventory.map((rm, idx) => ({
+            id: Date.now() + idx + 10,
+            establishment_id: estNumericId,
+            establishment_slug: slug,
+            name: rm.name,
+            description: rm.beds_summary || "",
+            beds_summary: rm.beds_summary || "",
+            capacity: rm.capacity || 2,
+            price_per_night: rm.price_per_night || 0,
+            amenities: rm.amenities || "",
+            is_active: true
+          }));
+          localStorage.setItem(
+            localRoomsKey,
+            JSON.stringify([...newLocalRooms, ...existingLocalRooms])
+          );
+        } catch {}
       }
 
       // 3. CONSOLIDACIÓN EN LOCALSTORAGE (`hdv_mock_establishments` y `hdv_prereg_<slug>`) SIN DUPLICAR TARJETAS
@@ -813,7 +906,8 @@ export function PreRegistro() {
           state: state.trim(),
           phone: whatsappNumber.trim(),
           whatsapp: whatsappNumber.trim(),
-          website: "",
+          email: officialEmail.trim(),
+          website: officialWebsiteOrInstagram.trim(),
           category_name: categoryName,
           category_slug: generateSlug(categoryName),
           destination_name: destinationName.trim(),
@@ -1412,22 +1506,135 @@ export function PreRegistro() {
                 />
               </div>
 
-              {/* 9. Contacto WhatsApp & Fotos con Captura de Celular / Cámara */}
+              {/* 9. Contacto Oficial Verificable, Inventario Real de Habitaciones & Fotos */}
               <div className="space-y-4">
-                <div>
-                  <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1.5">
-                    9. WhatsApp de Reservas / Contacto *
-                  </label>
-                  <div className="relative">
-                    <Phone className="w-4 h-4 absolute left-3 top-3 text-emerald-500" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1.5">
+                      9. WhatsApp Oficial de Reservas *
+                    </label>
+                    <div className="relative">
+                      <Phone className="w-4 h-4 absolute left-3 top-3 text-emerald-500" />
+                      <input
+                        type="text"
+                        value={whatsappNumber}
+                        onChange={(e) => setWhatsappNumber(e.target.value)}
+                        placeholder="+58 412 1234567"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-4 py-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1.5">
+                      Correo Institucional / Oficial
+                    </label>
                     <input
-                      type="text"
-                      value={whatsappNumber}
-                      onChange={(e) => setWhatsappNumber(e.target.value)}
-                      placeholder="+58 412 1234567"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-4 py-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                      type="email"
+                      value={officialEmail}
+                      onChange={(e) => setOfficialEmail(e.target.value)}
+                      placeholder="reservas@establecimiento.com"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
                     />
                   </div>
+
+                  <div>
+                    <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1.5">
+                      Web o Instagram Oficial
+                    </label>
+                    <div className="relative">
+                      <Globe className="w-4 h-4 absolute left-3 top-3 text-[#00C8D4]" />
+                      <input
+                        type="text"
+                        value={officialWebsiteOrInstagram}
+                        onChange={(e) => setOfficialWebsiteOrInstagram(e.target.value)}
+                        placeholder="@hotel / www.hotel.com"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3.5 py-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Constructor Ágil de Habitaciones / Unidades Reales (Opcional, 100% Datos Reales) */}
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                      <BedDouble className="w-4 h-4 text-[#00C8D4]" />
+                      <span>Unidades / Habitaciones Reales Verificadas ({realRoomsInventory.length})</span>
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-500">
+                      Si agregas unidades aquí, se habilitará la tabla de habitaciones en la ficha pública
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                    <div className="sm:col-span-4">
+                      <input
+                        type="text"
+                        value={newRoomName}
+                        onChange={(e) => setNewRoomName(e.target.value)}
+                        placeholder="Nombre unidad (Ej. Habitación Matrimonial)"
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <input
+                        type="number"
+                        min="1"
+                        max="20"
+                        value={newRoomCapacity}
+                        onChange={(e) => setNewRoomCapacity(Number(e.target.value))}
+                        placeholder="Pax"
+                        title="Capacidad de personas"
+                        className="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                      />
+                    </div>
+                    <div className="sm:col-span-4">
+                      <input
+                        type="text"
+                        value={newRoomBedsSummary}
+                        onChange={(e) => setNewRoomBedsSummary(e.target.value)}
+                        placeholder="Camas / Equipamiento (Ej. 1 Cama Queen, A/A)"
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-[#00C8D4]"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <button
+                        type="button"
+                        onClick={handleAddRealRoom}
+                        className="w-full py-2 px-3 rounded-xl bg-[#00C8D4] hover:bg-[#00b2bd] text-slate-950 text-xs font-black cursor-pointer transition-colors"
+                      >
+                        + Unidad
+                      </button>
+                    </div>
+                  </div>
+
+                  {realRoomsInventory.length > 0 && (
+                    <div className="space-y-1.5 pt-1">
+                      {realRoomsInventory.map((rm, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs"
+                        >
+                          <div className="min-w-0">
+                            <span className="font-black text-slate-900">{rm.name}</span>
+                            <span className="text-slate-500 font-semibold ml-2">
+                              • Máx. {rm.capacity} pax
+                              {rm.beds_summary ? ` • ${rm.beds_summary}` : ""}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveRealRoom(idx)}
+                            className="text-rose-600 hover:text-rose-700 p-1 cursor-pointer shrink-0"
+                            title="Quitar unidad"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Subida Directa de Imagen Principal + Galería de Múltiples Fotos */}

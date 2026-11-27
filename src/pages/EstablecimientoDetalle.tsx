@@ -19,6 +19,11 @@ import {
 } from "lucide-react";
 
 import { parseServicesList, getAmenityLabel, getAmenityInfo, getRealEstablishmentBadgesAndTags, CERTIFICATIONS_DOCUMENT77 } from "../lib/amenitiesList";
+import {
+  hasValidatedPreRegistration,
+  getValidatedPreRegistrationForEstablishment,
+  syncSalesStateFromSupabase
+} from "../lib/salesDepartmentStore";
 import { SeoHead } from "@/components/seo/SeoHead";
 import { ClusterAuthorityCtaBlock, buildClusterSchemas } from "@/components/seo/ClusterAuthorityCtaBlock";
 import { EstablishmentV15DetailSections } from "@/components/establishment/EstablishmentV15DetailSections";
@@ -170,127 +175,15 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
       const key = `hdv_surroundings_${establishment.id}`;
       const saved = localStorage.getItem(key);
       if (saved) {
-        setSurroundings(JSON.parse(saved));
-      } else {
-        const destSlug = establishment.destination_slug?.toLowerCase() || "";
-        let defaults = [];
-
-        if (destSlug.includes("caracas")) {
-          defaults = [
-            { category: "cerca", name: "Plaza Bolívar de Chacao", distance: "300 m" },
-            { category: "cerca", name: "Centro Comercial Sambil Caracas", distance: "600 m" },
-            { category: "cerca", name: "Parque Generalísimo Francisco de Miranda", distance: "1.2 km" },
-            { category: "cerca", name: "Centro Comercial El Recreo", distance: "2.4 km" },
-            { category: "gastronomia", name: "Restaurante El Alazán (Las Mercedes)", distance: "400 m" },
-            { category: "gastronomia", name: "Café Kakao (Altamira)", distance: "150 m" },
-            { category: "atracciones", name: "Teleférico Warairarepano (Ávila)", distance: "2.5 km" },
-            { category: "atracciones", name: "Casa Natal del Libertador Simón Bolívar", distance: "4.8 km" },
-            { category: "playas", name: "Playa Los Ángeles (La Guaira)", distance: "32 km" },
-            { category: "playas", name: "Playa Camurí Chico (La Guaira)", distance: "35 km" },
-            { category: "transporte", name: "Metro - Estación Chacao", distance: "400 m" },
-            { category: "transporte", name: "Terminal La Bandera", distance: "6.5 km" },
-            { category: "aeropuertos", name: "Aeropuerto Int. Simón Bolívar de Maiquetía", distance: "24 km" }
-          ];
-        } else if (destSlug.includes("roques")) {
-          defaults = [
-            { category: "cerca", name: "Plaza Bolívar de Gran Roque", distance: "150 m" },
-            { category: "cerca", name: "Faro Holandés del Gran Roque", distance: "800 m" },
-            { category: "cerca", name: "Muelle de Embarque Principal", distance: "200 m" },
-            { category: "cerca", name: "Centro de Visitantes Inparques", distance: "350 m" },
-            { category: "gastronomia", name: "Restaurante Aki Cabana", distance: "120 m" },
-            { category: "gastronomia", name: "Pizzería La Gotera", distance: "250 m" },
-            { category: "atracciones", name: "Cayo Madrisquí", distance: "1.5 km" },
-            { category: "atracciones", name: "Cayo Francisquí", distance: "2.8 km" },
-            { category: "playas", name: "Cayo de Agua", distance: "16 km" },
-            { category: "playas", name: "Playa de Crasquí", distance: "9 km" },
-            { category: "transporte", name: "Muelle de lanchas cooperativas", distance: "220 m" },
-            { category: "aeropuertos", name: "Aeropuerto de Los Roques (Gran Roque)", distance: "300 m" }
-          ];
-        } else if (destSlug.includes("margarita")) {
-          defaults = [
-            { category: "cerca", name: "Plaza Bolívar de La Asunción", distance: "5 km" },
-            { category: "cerca", name: "Castillo San Carlos Borromeo", distance: "8 km" },
-            { category: "cerca", name: "Centro Comercial Sambil Margarita", distance: "3.5 km" },
-            { category: "cerca", name: "Basílica de la Virgen del Valle", distance: "7.2 km" },
-            { category: "gastronomia", name: "Restaurante Dolphin (Playa El Yaque)", distance: "200 m" },
-            { category: "gastronomia", name: "Café Guacuco", distance: "800 m" },
-            { category: "atracciones", name: "Parque Nacional Laguna de La Restinga", distance: "22 km" },
-            { category: "atracciones", name: "Fortín de La Galera", distance: "14 km" },
-            { category: "playas", name: "Playa El Yaque", distance: "50 m" },
-            { category: "playas", name: "Playa El Agua", distance: "18 km" },
-            { category: "transporte", name: "Terminal de Ferrys de Punta de Piedras", distance: "25 km" },
-            { category: "aeropuertos", name: "Aeropuerto Internacional Santiago Mariño", distance: "8 km" }
-          ];
-        } else if (destSlug.includes("canaima")) {
-          defaults = [
-            { category: "cerca", name: "Laguna de Canaima", distance: "50 m" },
-            { category: "cerca", name: "Mirador Salto Hacha", distance: "450 m" },
-            { category: "cerca", name: "Comunidad Indígena Kamarata", distance: "1.2 km" },
-            { category: "cerca", name: "Campamento Ucaima", distance: "2.0 km" },
-            { category: "gastronomia", name: "Comedor Ecológico Tepuy", distance: "100 m" },
-            { category: "gastronomia", name: "Bar de Canaima Lodge", distance: "150 m" },
-            { category: "atracciones", name: "Salto Ángel (Kerepakupai Vená)", distance: "48 km" },
-            { category: "atracciones", name: "Salto Sapo", distance: "1.8 km" },
-            { category: "playas", name: "Playa de la Laguna de Canaima", distance: "60 m" },
-            { category: "transporte", name: "Puerto de Curiaras de la Laguna", distance: "300 m" },
-            { category: "aeropuertos", name: "Aeropuerto de Canaima", distance: "800 m" }
-          ];
-        } else if (destSlug.includes("merida") || destSlug.includes("mérida")) {
-          defaults = [
-            { category: "cerca", name: "Plaza Bolívar de Mérida", distance: "800 m" },
-            { category: "cerca", name: "Mercado Principal de Mérida", distance: "1.5 km" },
-            { category: "cerca", name: "Plaza Las Heroínas", distance: "400 m" },
-            { category: "cerca", name: "Parque Chorros de Milla", distance: "3.2 km" },
-            { category: "gastronomia", name: "Heladería Coromoto (Récord Guinness)", distance: "600 m" },
-            { category: "gastronomia", name: "Café La Parroquia", distance: "750 m" },
-            { category: "atracciones", name: "Sistema de Teleféricos Mukumbarí", distance: "400 m" },
-            { category: "atracciones", name: "Pico Espejo", distance: "12 km" },
-            { category: "playas", name: "Laguna de Mucubají (Sierra Nevada)", distance: "45 km" },
-            { category: "transporte", name: "Estación de Trolebús Mérida", distance: "1.1 km" },
-            { category: "aeropuertos", name: "Aeropuerto Alberto Carnevalli", distance: "3.5 km" }
-          ];
-        } else if (destSlug.includes("morrocoy") || destSlug.includes("tucacas")) {
-          defaults = [
-            { category: "cerca", name: "Pueblo de Tucacas", distance: "1.2 km" },
-            { category: "cerca", name: "Plaza Bolívar de Chichiriviche", distance: "12 km" },
-            { category: "gastronomia", name: "Restaurante El Faro", distance: "300 m" },
-            { category: "gastronomia", name: "Parrillera El Marino", distance: "500 m" },
-            { category: "atracciones", name: "Cayo Sombrero", distance: "5.5 km" },
-            { category: "atracciones", name: "Cayo Muerto", distance: "4.2 km" },
-            { category: "playas", name: "Playa Varadero", distance: "3.0 km" },
-            { category: "playas", name: "Cayo Sal", distance: "4.8 km" },
-            { category: "transporte", name: "Muelle de Peñeros de Tucacas", distance: "850 m" },
-            { category: "aeropuertos", name: "Aeropuerto de Puerto Cabello (Bartolomé Salom)", distance: "45 km" }
-          ];
-        } else if (destSlug.includes("tovar")) {
-          defaults = [
-            { category: "cerca", name: "Plaza Bolívar de la Colonia Tovar", distance: "200 m" },
-            { category: "cerca", name: "Iglesia de San Martín de Tours", distance: "220 m" },
-            { category: "cerca", name: "Fábrica de Cerveza Artesanal", distance: "600 m" },
-            { category: "gastronomia", name: "Restaurante El Molino", distance: "150 m" },
-            { category: "gastronomia", name: "Café y Fresas con Crema La Gulin", distance: "100 m" },
-            { category: "atracciones", name: "Pico Codazzi", distance: "4.5 km" },
-            { category: "atracciones", name: "Museo de Historia de la Colonia Tovar", distance: "300 m" },
-            { category: "playas", name: "Puerto Cruz (Playa caribeña)", distance: "28 km" },
-            { category: "transporte", name: "Parada de Autobuses Colonia Tovar", distance: "350 m" },
-            { category: "aeropuertos", name: "Aeropuerto de Caracas (Óscar Machado Zuloaga)", distance: "55 km" }
-          ];
-        } else {
-          defaults = [
-            { category: "cerca", name: "Plaza Bolívar Local", distance: "400 m" },
-            { category: "cerca", name: "Alcaldía y Centro Histórico", distance: "600 m" },
-            { category: "cerca", name: "Centro Comercial de la Zona", distance: "1.5 km" },
-            { category: "gastronomia", name: "Restaurante de Comida Típica", distance: "200 m" },
-            { category: "gastronomia", name: "Cafetería y Panadería Local", distance: "150 m" },
-            { category: "atracciones", name: "Parque Nacional / Atracción Natural", distance: "3.5 km" },
-            { category: "atracciones", name: "Museo Histórico de la Ciudad", distance: "1.2 km" },
-            { category: "playas", name: "Playa o Balneario de Río cercano", distance: "4.0 km" },
-            { category: "transporte", name: "Parada de Transporte Público / Autobús", distance: "300 m" },
-            { category: "aeropuertos", name: "Aeropuerto Nacional más cercano", distance: "15 km" }
-          ];
+        try {
+          const parsed = JSON.parse(saved);
+          setSurroundings(Array.isArray(parsed) ? parsed : []);
+        } catch {
+          setSurroundings([]);
         }
-
-        setSurroundings(defaults);
+      } else {
+        // Sin puntos de interés ficticios por defecto
+        setSurroundings([]);
       }
     }
   }, [establishment]);
@@ -309,6 +202,9 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
       try {
         setLoading(true);
         setError(false);
+
+        // 0. Sincronizar comprobantes auditados de Pre-Registro (Gatekeeper HDV-PR-2026-...)
+        await syncSalesStateFromSupabase();
 
         // 1. Try Supabase DB lookup by exact slug or alias
         let dbData: any = null;
@@ -653,54 +549,83 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
           // Deduplicar URLs de imágenes manteniendo el orden curado
           allImages = Array.from(new Set(allImages.map((u) => String(u).trim()).filter(Boolean)));
 
-          // Verificar si existe actualización local de pre-registro para sincronizar etiquetas reales sin pérdidas
+          // Verificar si existe actualización local o comprobante oficial de pre-registro para sincronizar datos reales
           let preregOverride: any = null;
           try {
             const rawPrereg = localStorage.getItem(`hdv_prereg_${dbData.slug || slug}`);
             if (rawPrereg) preregOverride = JSON.parse(rawPrereg);
           } catch {}
 
+          const validatedReceipt = getValidatedPreRegistrationForEstablishment({
+            id: dbData.id,
+            slug: dbData.slug || slug,
+            name: tenantConfigOverride?.name || dbData.name,
+            whatsapp: tenantContact?.whatsapp || dbData.whatsapp || dbData.phone
+          });
+
           const mapped: EstablishmentDetail = {
             id: dbData.id,
             slug: dbData.slug,
-            name: tenantConfigOverride?.name || dbData.name,
-            description: dbData.description || "",
+            name: validatedReceipt?.establishmentTitle || tenantConfigOverride?.name || dbData.name,
+            description: preregOverride?.short_description || validatedReceipt?.shortDescription || dbData.description || "",
             address: dbData.address || "",
-            city: dbData.city || "",
-            state: dbData.state || "",
-            phone: tenantContact?.phone || dbData.phone || "",
-            email: tenantContact?.email || dbData.email || "",
-            website: tenantConfigOverride?.domain || dbData.website || "",
-            category_name: dbData.categories?.name || dbData.category_name || "Establecimiento",
+            city: validatedReceipt?.city || dbData.city || "",
+            state: validatedReceipt?.state || dbData.state || "",
+            phone: validatedReceipt?.whatsappNumber || tenantContact?.phone || dbData.phone || "",
+            email: preregOverride?.official_email || validatedReceipt?.officialEmail || tenantContact?.email || dbData.email || "",
+            website: preregOverride?.official_website || validatedReceipt?.officialWebsite || tenantConfigOverride?.domain || dbData.website || "",
+            category_name: validatedReceipt?.categoryName || dbData.categories?.name || dbData.category_name || "Establecimiento",
             category_slug: dbData.categories?.slug || "posadas",
-            destination_name: dbData.destinations?.name || dbData.destination_name || "Venezuela",
+            destination_name: validatedReceipt?.destinationName || dbData.destinations?.name || dbData.destination_name || "Venezuela",
             destination_slug: dbData.destinations?.slug || "venezuela",
             primary_image: primaryImg,
             rating_avg: dbData.rating_avg || 4.8,
-            review_count: dbData.review_count || 12,
+            review_count: dbData.review_count || 0,
             price_level: dbData.price_level || "$$",
             is_featured: dbData.is_featured || false,
             services:
-              dbData.services && dbData.services !== "[]"
-                ? dbData.services
-                : preregOverride?.key_service_pills
+              preregOverride?.key_service_pills
                 ? JSON.stringify(preregOverride.key_service_pills)
-                : "[]",
+                : validatedReceipt?.keyServicePills
+                ? JSON.stringify(validatedReceipt.keyServicePills)
+                : dbData.services || "[]",
             membership_tier: dbData.membership_tier || "basic",
-            has_hdv_seal: dbData.has_hdv_seal ?? preregOverride?.badges?.has_hdv_seal ?? false,
-            has_power_plant: dbData.has_power_plant ?? preregOverride?.badges?.has_power_plant,
-            has_water_247: dbData.has_water_247 ?? preregOverride?.badges?.has_water_247,
-            has_starlink: dbData.has_starlink ?? preregOverride?.badges?.has_starlink,
-            is_pet_friendly: dbData.is_pet_friendly ?? preregOverride?.badges?.is_pet_friendly,
-            key_service_pills: dbData.key_service_pills || preregOverride?.key_service_pills,
-            badges: dbData.badges || preregOverride?.badges,
+            has_hdv_seal:
+              preregOverride?.badges?.has_hdv_seal ??
+              validatedReceipt?.badges?.has_hdv_seal ??
+              dbData.has_hdv_seal ??
+              false,
+            has_power_plant:
+              preregOverride?.badges?.has_power_plant ??
+              validatedReceipt?.badges?.has_power_plant ??
+              dbData.has_power_plant,
+            has_water_247:
+              preregOverride?.badges?.has_water_247 ??
+              validatedReceipt?.badges?.has_water_247 ??
+              dbData.has_water_247,
+            has_starlink:
+              preregOverride?.badges?.has_starlink ??
+              validatedReceipt?.badges?.has_starlink ??
+              dbData.has_starlink,
+            is_pet_friendly:
+              preregOverride?.badges?.is_pet_friendly ??
+              validatedReceipt?.badges?.is_pet_friendly ??
+              dbData.is_pet_friendly,
+            key_service_pills:
+              preregOverride?.key_service_pills ||
+              validatedReceipt?.keyServicePills ||
+              dbData.key_service_pills,
+            badges:
+              preregOverride?.badges ||
+              validatedReceipt?.badges ||
+              dbData.badges,
             features: dbData.features,
             has_reservations_enabled: dbData.has_reservations_enabled || false,
             images: allImages,
             latitude: dbData.latitude,
             longitude: dbData.longitude,
             hours: dbData.hours,
-            whatsapp: tenantContact?.whatsapp || dbData.whatsapp,
+            whatsapp: validatedReceipt?.whatsappNumber || tenantContact?.whatsapp || dbData.whatsapp,
             status: dbData.status || "approved"
           };
 
@@ -730,11 +655,20 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
     }
   }, [slug]);
 
-  // Load Rooms, Room Photos, and Categorized Area Photos for Establishment
+  // Load Rooms, Room Photos, and Categorized Area Photos ONLY for Pre-Registered Establishments
   useEffect(() => {
     if (!establishment?.id) return;
 
     async function fetchRoomsAndGalleries() {
+      // REGLA GATEKEEPER: Si el establecimiento aún NO ha pasado por /pre-registro,
+      // no cargar ni inyectar habitaciones de ejemplo.
+      if (!hasValidatedPreRegistration(establishment)) {
+        setRooms([]);
+        setRoomPhotos({});
+        setAreaPhotos({});
+        return;
+      }
+
       let dbRooms: any[] = [];
       try {
         const { data, error } = await supabase
@@ -748,9 +682,25 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
 
       const localRoomsKey = "hdv_custom_rooms";
       const localRooms = JSON.parse(localStorage.getItem(localRoomsKey) || "[]")
-        .filter((r: any) => Number(r.establishment_id) === Number(establishment.id));
+        .filter((r: any) => Number(r.establishment_id) === Number(establishment.id) || r.establishment_slug === establishment.slug);
 
-      let combined = [...dbRooms, ...localRooms];
+      let preregRooms: any[] = [];
+      try {
+        const rawPrereg = localStorage.getItem(`hdv_prereg_${establishment.slug}`);
+        if (rawPrereg) {
+          const parsedPrereg = JSON.parse(rawPrereg);
+          if (Array.isArray(parsedPrereg?.real_rooms)) {
+            preregRooms = parsedPrereg.real_rooms;
+          }
+        }
+      } catch {}
+
+      const validatedReceipt = getValidatedPreRegistrationForEstablishment(establishment);
+      const receiptRooms = Array.isArray(validatedReceipt?.realRooms)
+        ? validatedReceipt.realRooms
+        : [];
+
+      const combined = [...dbRooms, ...localRooms, ...preregRooms, ...receiptRooms];
 
       // Filter active rooms and deduplicate by normalized room name/number (avoiding historical duplicate rows)
       const activeRoomsRaw = combined.filter((r: any) => r && r.is_active !== false);
@@ -843,6 +793,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
   const nextImage = () => setCurrentImageIndex((prev) => (prev + 1) % establishment.images.length);
   const prevImage = () => setCurrentImageIndex((prev) => (prev - 1 + establishment.images.length) % establishment.images.length);
 
+  const isPreRegVerified = hasValidatedPreRegistration(establishment);
   const realTags = getRealEstablishmentBadgesAndTags(establishment);
   const servicesList = realTags.rawServices;
 
@@ -1112,22 +1063,24 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                 </div>
               )}
 
-              <button
-                type="button"
-                onClick={() => {
-                  const targetId = isCreatorCategory ? "calendario-reservas-publico" : "seccion-catalogo";
-                  const el = document.getElementById(targetId) || document.getElementById("seccion-catalogo");
-                  el?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="px-6 py-3.5 bg-white hover:bg-slate-50 text-slate-800 font-bold rounded-xl transition-all text-xs cursor-pointer border border-slate-200 shadow-2xs flex items-center gap-2"
-              >
-                {isCreatorCategory ? (
-                  <Calendar className="w-4 h-4 text-[#00C8D4]" />
-                ) : (
-                  <Compass className="w-4 h-4 text-[#00C8D4]" />
-                )}
-                <span>{isGastronomyCategory ? "Ver Áreas & Menú" : isCreatorCategory ? "Agendar en Calendario" : "Ver Habitaciones"}</span>
-              </button>
+              {(isCreatorCategory || isGastronomyCategory || (isPreRegVerified && rooms.length > 0)) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const targetId = isCreatorCategory ? "calendario-reservas-publico" : "seccion-catalogo";
+                    const el = document.getElementById(targetId) || document.getElementById("v15-info-precios");
+                    el?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  className="px-6 py-3.5 bg-white hover:bg-slate-50 text-slate-800 font-bold rounded-xl transition-all text-xs cursor-pointer border border-slate-200 shadow-2xs flex items-center gap-2"
+                >
+                  {isCreatorCategory ? (
+                    <Calendar className="w-4 h-4 text-[#00C8D4]" />
+                  ) : (
+                    <Compass className="w-4 h-4 text-[#00C8D4]" />
+                  )}
+                  <span>{isGastronomyCategory ? "Ver Áreas & Menú" : isCreatorCategory ? "Agendar en Calendario" : "Ver Habitaciones"}</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -1157,10 +1110,22 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                     className="text-2xl sm:text-3xl font-bold !text-white block"
                     style={{ fontFamily: "'Playfair Display', serif" }}
                   >
-                    {isGastronomyCategory ? "4+ Áreas" : isCreatorCategory ? "4+ Servicios" : `${rooms.length || 10}+ Hab.`}
+                    {isGastronomyCategory
+                      ? "4+ Áreas"
+                      : isCreatorCategory
+                      ? "4+ Servicios"
+                      : isPreRegVerified && rooms.length > 0
+                      ? `${rooms.length} ${rooms.length === 1 ? "Unidad" : "Unidades"}`
+                      : "Verificado"}
                   </span>
                   <span className="text-[11px] font-semibold text-white/90 mt-1 block">
-                    {isGastronomyCategory ? "Espacios Gastronómicos" : isCreatorCategory ? "Coberturas & Alianzas" : "Unidades de Hospedaje"}
+                    {isGastronomyCategory
+                      ? "Espacios Gastronómicos"
+                      : isCreatorCategory
+                      ? "Coberturas & Alianzas"
+                      : isPreRegVerified && rooms.length > 0
+                      ? "Unidades Registradas"
+                      : "Ficha en Directorio HDV"}
                   </span>
                 </div>
 
@@ -1169,10 +1134,10 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                     className="text-2xl sm:text-3xl font-bold !text-white block"
                     style={{ fontFamily: "'Playfair Display', serif" }}
                   >
-                    {establishment.rating_avg > 0 ? `${establishment.rating_avg.toFixed(1)}★` : "4.9★"}
+                    {establishment.rating_avg > 0 ? `${establishment.rating_avg.toFixed(1)}★` : "Directo"}
                   </span>
                   <span className="text-[11px] font-semibold text-white/90 mt-1 block">
-                    {isCreatorCategory ? "Marcas & Hoteles" : "Satisfacción Garantizada"}
+                    {isCreatorCategory ? "Marcas & Hoteles" : "Calificación Oficial"}
                   </span>
                 </div>
 
@@ -1619,7 +1584,8 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
 
           <div className="lg:col-span-8 space-y-10">
 
-            {/* ── 3. SECCIÓN: CATÁLOGO DE RUTAS / ÁREAS / HABITACIONES ── */}
+            {/* ── 3. SECCIÓN: CATÁLOGO DE RUTAS / ÁREAS / HABITACIONES REALES (GATEKEEPER: SOLO SI TIENE PRE-REGISTRO Y UNIDADES REALES) ── */}
+            {(isCreatorCategory || isGastronomyCategory || (isPreRegVerified && rooms.length > 0)) && (
             <div id="seccion-catalogo" className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm space-y-6 text-left">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                 <div>
@@ -1989,12 +1955,18 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                                   gallery: photos,
                                   price: isOfficialPriceEnabled(establishment) && Number(room.price_per_night) > 0 && Number(room.price_per_night) !== 100 ? room.price_per_night : undefined,
                                   specs: [
-                                    { label: "Capacidad", value: `${room.capacity || 2} Personas` },
-                                    { label: "Superficie", value: "32 m² Aproximados" },
-                                    { label: "Cama", value: "King Size Confort" },
-                                    { label: "Vista", value: "Vista Panorámica Exterior" }
+                                    ...(room.capacity ? [{ label: "Capacidad", value: `${room.capacity} Personas` }] : []),
+                                    ...(Number(room.size_m2) > 0 ? [{ label: "Superficie", value: `${room.size_m2} m²` }] : []),
+                                    ...(room.beds_summary ? [{ label: "Distribución de Camas", value: String(room.beds_summary) }] : []),
+                                    ...(room.room_number ? [{ label: "Código / Unidad", value: String(room.room_number) }] : [])
                                   ],
-                                  amenities: room.amenities ? room.amenities.split(",").map((a: string) => getRoomAmenityText(a)) : ["Aire Acondicionado", "Baño Privado", "Wi-Fi", "TV Cable"],
+                                  amenities: room.amenities
+                                    ? String(room.amenities)
+                                        .split(",")
+                                        .map((a: string) => a.trim())
+                                        .filter(Boolean)
+                                        .map((a: string) => getRoomAmenityText(a))
+                                    : [],
                                   whatsappCustomMsg: `Hola! Estoy consultando la disponibilidad para la unidad: "${room.name}" en ${establishment.name}.`
                                 })}
                                 className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl transition-all cursor-pointer w-full sm:w-auto"
@@ -2020,6 +1992,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                 </div>
               )}
             </div>
+            )}
 
             {/* ── 4. SECCIÓN: GALERÍAS DE ÁREAS E INSTALACIONES ── */}
             {(() => {
@@ -2157,123 +2130,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
               );
             })()}
 
-            {/* ── 5. SECCIÓN DE SERVICIOS DOCUMENTO 77 (TAXONOMÍA OFICIAL - SOLO HOSPEDAJES Y ESTABLECIMIENTOS FÍSICOS) ── */}
-            {servicesList.length > 0 && !isCreatorCategory && (
-              <div className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
-                  <div>
-                    <h2 className="text-xl font-serif font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-[#9B00CC] flex items-center justify-center text-white shrink-0 shadow-xs">
-                        <Sparkles className="w-4 h-4 text-white" />
-                      </div>
-                      Infraestructura, Servicios y Políticas (Documento 77 V.2)
-                    </h2>
-                    <p className="text-xs text-slate-500 font-semibold mt-1">
-                      Catálogo oficial verificado discriminado por Ámbito (Privado de la Unidad, Zona Común y Servicios).
-                    </p>
-                  </div>
-                  <span
-                    className="px-3 py-1 rounded-full text-[10px] font-black uppercase text-white tracking-wider self-start sm:self-center shadow-xs"
-                    style={{ background: "linear-gradient(135deg, #FF0096 0%, #9B00CC 100%)" }}
-                  >
-                    {servicesList.length} Comodidades
-                  </span>
-                </div>
-
-                {(() => {
-                  const PILLAR_CONFIG: Record<string, { title: string; color: string }> = {
-                    C00: { title: "C00. Configuración Inicial & Datos", color: "#3B82F6" },
-                    C01: { title: "C01. Distribución, Infraestructura y Equipamiento Físico", color: "#00C8D4" },
-                    C02: { title: "C02. Servicios del Establecimiento y Experiencias", color: "#FF0096" },
-                    C03: { title: "C03. Accesibilidad y Seguridad", color: "#9B00CC" },
-                    C04: { title: "C04. Políticas y Normas de la Propiedad", color: "#64748B" },
-                    C05: { title: "C05. Agrupaciones Habitacionales (Campings/Glampings)", color: "#10B981" },
-                    C06: { title: "C06. Específicos Love Hotels & Moteles", color: "#EC4899" },
-                    C07: { title: "C07. Específicos Casas y Chalets de Montaña (Esquí)", color: "#0284C7" },
-                    C08: { title: "C08. Específicos Barcos Alojamiento Estático", color: "#0EA5E9" },
-                    C09: { title: "C09. Específicos Barcos + Navegación Diaria", color: "#2563EB" },
-                    C10: { title: "C10. Específicos Restaurantes & Gastronomía", color: "#F59E0B" }
-                  };
-
-                  const itemsWithInfo = servicesList.map(s => {
-                    const info = getAmenityInfo(s);
-                    return {
-                      rawKey: s,
-                      label: getAmenityLabel(s),
-                      pillar: info?.pillar || "C01",
-                      pillarLabel: info?.pillarLabel || "C01. Infraestructura Físicas",
-                      scope: info?.scope || "privado",
-                      code: info?.code || "",
-                      subCategory: info?.subCategory || "Equipamiento General"
-                    };
-                  });
-
-                  const pillarsToRender = Object.keys(PILLAR_CONFIG).map(pKey => {
-                    const items = itemsWithInfo.filter(i => i.pillar === pKey);
-                    return {
-                      id: pKey,
-                      title: PILLAR_CONFIG[pKey].title,
-                      color: PILLAR_CONFIG[pKey].color,
-                      items
-                    };
-                  }).filter(p => p.items.length > 0);
-
-                  return (
-                    <div className="space-y-6">
-                      {pillarsToRender.map(pillarGroup => (
-                        <div key={pillarGroup.id} className="space-y-3">
-                          <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded-full shrink-0" style={{ background: pillarGroup.color }} />
-                            <h3 className="text-xs font-black uppercase tracking-wider text-slate-800">
-                              {pillarGroup.title}
-                            </h3>
-                            <span className="text-[10px] font-bold text-slate-400">({pillarGroup.items.length})</span>
-                          </div>
-
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-                            {pillarGroup.items.map((item, idx) => {
-                              let scopeTagBg = "bg-cyan-50 text-cyan-800 border-cyan-200";
-                              let scopeLabel = "Privado";
-                              if (item.scope === "comun") {
-                                scopeTagBg = "bg-purple-50 text-purple-800 border-purple-200";
-                                scopeLabel = "Zona Común";
-                              } else if (item.scope === "servicio") {
-                                scopeTagBg = "bg-pink-50 text-pink-800 border-pink-200";
-                                scopeLabel = "Servicio";
-                              }
-
-                              return (
-                                <div key={idx} className="flex items-center justify-between p-3 bg-slate-50/80 border border-slate-200/80 rounded-xl hover:border-slate-300 transition-all">
-                                  <div className="min-w-0 pr-2">
-                                    {item.code && (
-                                      <span className="text-[9px] font-mono font-bold text-slate-400 block leading-none mb-0.5">
-                                        {item.code}
-                                      </span>
-                                    )}
-                                    <span className="text-xs font-bold text-slate-800 leading-tight block">
-                                      {item.label}
-                                    </span>
-                                    <span className="text-[10px] text-slate-500 font-medium leading-tight block">
-                                      {item.subCategory}
-                                    </span>
-                                  </div>
-
-                                  <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider border shrink-0 ${scopeTagBg}`}>
-                                    {scopeLabel}
-                                  </span>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  );
-                })()}
-              </div>
-            )}
-
-            {/* Availability Calendar (Para Influencers va justo debajo de sus Servicios para facilitar la reserva inmediata) */}
+            {/* Availability Calendar (Para Influencers o establecimientos con reservas online habilitadas) */}
             {(establishment.has_reservations_enabled || isCreatorCategory) && (
               <AvailabilityCalendar
                 establishmentId={establishment.id}
@@ -2282,145 +2139,6 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                 whatsapp={establishment.whatsapp || establishment.phone}
                 preselectedServiceId={preselectedCreatorService}
               />
-            )}
-
-            {/* ── 6. SECCIÓN DE TESTIMONIOS Y VALORACIONES ── */}
-            <div className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm space-y-6 text-left">
-              <div className="border-b border-slate-100 pb-4">
-                <span className="text-[10px] tracking-[0.25em] font-extrabold text-[#FF0096] uppercase block mb-1">
-                  {isCreatorCategory ? "ALIANZAS Y COBERTURAS VERIFICADAS" : "OPINIONES VERIFICADAS"}
-                </span>
-                <h2 className="text-xl font-serif font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-amber-500 flex items-center justify-center text-white shrink-0 shadow-xs">
-                    <Star className="w-4 h-4 fill-white text-white" />
-                  </div>
-                  {isCreatorCategory
-                    ? "Lo que dicen los Hoteles, Posadas y Marcas Aliadas"
-                    : "Lo que dicen nuestros huéspedes y comensales"}
-                </h2>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {(isCreatorCategory
-                  ? [
-                      {
-                        name: "Posada La Ardileña (Morrocoy)",
-                        date: "Septiembre 2026",
-                        text: "Agendamos una cobertura 4K y Reels desde su calendario público. Las reservas directas por WhatsApp aumentaron notablemente esa misma semana.",
-                        score: 5
-                      },
-                      {
-                        name: "Campamento Canaima",
-                        date: "Agosto 2026",
-                        text: "Profesionalismo impecable en toda la expedición. El material con Drone 4K y las historias transmitieron la esencia real de nuestro campamento.",
-                        score: 5
-                      },
-                      {
-                        name: "Cala Margarita Boutique",
-                        date: "Julio 2026",
-                        text: "Excelente alianza comercial. Muy fácil reservar sus fechas disponibles en la plataforma y coordinar toda la producción audiovisual.",
-                        score: 5
-                      }
-                    ]
-                  : [
-                      { name: "Carlos Mendoza", date: "Julio 2026", text: "Excelente atención y comodidad impecable. El personal super atento desde nuestra llegada.", score: 5 },
-                      { name: "María Fernanda Silva", date: "Junio 2026", text: "Instalaciones impecables y la comida superó nuestras expectativas. Sin duda volveremos pronto.", score: 5 },
-                      { name: "Alejandro Rivas", date: "Mayo 2026", text: "La ubicación es inmejorable. Muy recomendado tanto para parejas como para vacaciones familiares.", score: 5 }
-                    ]
-                ).map((rev, i) => (
-                  <div key={i} className="p-4 bg-slate-50 border border-slate-200/60 rounded-2xl space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1 text-amber-400">
-                        <Star className="w-3.5 h-3.5 fill-current" />
-                        <Star className="w-3.5 h-3.5 fill-current" />
-                        <Star className="w-3.5 h-3.5 fill-current" />
-                        <Star className="w-3.5 h-3.5 fill-current" />
-                        <Star className="w-3.5 h-3.5 fill-current" />
-                      </div>
-                      <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Verificado</span>
-                    </div>
-                    <p className="text-xs text-slate-600 leading-relaxed font-medium">"{rev.text}"</p>
-                    <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px]">
-                      <span className="font-bold text-slate-800">{rev.name}</span>
-                      <span className="text-slate-400 font-semibold">{rev.date}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* ── 7. SECCIÓN DE ALREDEDORES Y UBICACIÓN GPS (SOLO ESTABLECIMIENTOS FÍSICOS) ── */}
-            {surroundings.length > 0 && !isCreatorCategory && (
-              <div className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm text-left space-y-6">
-                <div className="border-b border-slate-100 pb-4">
-                  <h2 className="text-xl font-serif font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-[#FF0096] flex items-center justify-center text-white shrink-0 shadow-xs">
-                      <Building2 className="w-4 h-4 text-white" />
-                    </div>
-                    Alrededores y Ubicación en el Destino
-                  </h2>
-                  <p className="text-[11px] text-slate-400 font-semibold mt-1">Excelente ubicación con acceso a atractivos turísticos y comerciales.</p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {/* Columna 1 */}
-                  <div className="space-y-4">
-                    {surroundings.filter(s => s.category === "cerca").length > 0 && (
-                      <div className="space-y-2">
-                        <span className="text-xs font-black uppercase text-slate-800 flex items-center gap-1.5">
-                          <MapPin className="w-3.5 h-3.5 text-[#00C8D4]" /> ¿Qué hay cerca?
-                        </span>
-                        <div className="space-y-1.5 text-xs text-slate-600 pl-5 font-semibold">
-                          {surroundings.filter(s => s.category === "cerca").map((p, i) => (
-                            <div key={i} className="flex justify-between">
-                              <span className="truncate max-w-[140px]">{p.name}</span>
-                              <span className="text-slate-400 font-bold">{p.distance}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Columna 2 */}
-                  <div className="space-y-4">
-                    {surroundings.filter(s => s.category === "gastronomia" || s.category === "atracciones").length > 0 && (
-                      <div className="space-y-2">
-                        <span className="text-xs font-black uppercase text-slate-800 flex items-center gap-1.5">
-                          <Utensils className="w-3.5 h-3.5 text-[#FF0096]" /> Gastronomía y Atracciones
-                        </span>
-                        <div className="space-y-1.5 text-xs text-slate-600 pl-5 font-semibold">
-                          {surroundings.filter(s => s.category === "gastronomia" || s.category === "atracciones").map((p, i) => (
-                            <div key={i} className="flex justify-between">
-                              <span className="truncate max-w-[140px]">{p.name}</span>
-                              <span className="text-slate-400 font-bold">{p.distance}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Columna 3 */}
-                  <div className="space-y-4">
-                    {surroundings.filter(s => s.category === "transporte" || s.category === "aeropuertos").length > 0 && (
-                      <div className="space-y-2">
-                        <span className="text-xs font-black uppercase text-slate-800 flex items-center gap-1.5">
-                          <Plane className="w-3.5 h-3.5 text-[#9B00CC]" /> Transporte y Accesos
-                        </span>
-                        <div className="space-y-1.5 text-xs text-slate-600 pl-5 font-semibold">
-                          {surroundings.filter(s => s.category === "transporte" || s.category === "aeropuertos").map((p, i) => (
-                            <div key={i} className="flex justify-between">
-                              <span className="truncate max-w-[140px]">{p.name}</span>
-                              <span className="text-slate-400 font-bold">{p.distance}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
             )}
 
           </div>

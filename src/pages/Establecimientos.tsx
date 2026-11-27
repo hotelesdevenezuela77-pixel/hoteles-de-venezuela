@@ -4,7 +4,7 @@ import { supabase } from "../lib/supabase";
 import { ESTABLISHMENTS_MOCK } from "../lib/establishmentsMock";
 import type { Establishment } from "../components/layout/EstablishmentCard";
 import { EstablishmentCard, EstablishmentListItem, getRealEstablishmentPrice } from "../components/layout/EstablishmentCard";
-import { consolidateAndDeduplicateEstablishments } from "../lib/salesDepartmentStore";
+import { consolidateAndDeduplicateEstablishments, syncSalesStateFromSupabase } from "../lib/salesDepartmentStore";
 import { getRealEstablishmentBadgesAndTags } from "../lib/amenitiesList";
 import { 
   Search, MapPin, ChevronDown, ChevronUp, X, Filter, Grid, List, Compass, Loader2, 
@@ -421,6 +421,8 @@ export function Establecimientos() {
     async function fetchData() {
       try {
         setLoading(true);
+        // Sincronizar comprobantes auditados de Pre-Registro (Gatekeeper HDV-PR-2026-...)
+        await syncSalesStateFromSupabase();
         const { data, error } = await supabase
           .from("establishments")
           .select(`

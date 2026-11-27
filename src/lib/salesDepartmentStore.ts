@@ -442,11 +442,31 @@ export interface SalesPreRegistrationReceipt {
   digitalSignatureHash: string;
   verificationPath: string;         // /verificar-registro/HDV-PR-2026-0001
 
-  // Metadatos opcionales de Edición Administrativa (No destructivos)
+  // Metadatos opcionales de Edición Administrativa y Datos Reales de Inventario (No destructivos)
   notes?: string;
   updatedAtIso?: string;
   updatedAtFormatted?: string;
   updatedByEmail?: string;
+  officialEmail?: string;
+  officialWebsite?: string;
+  shortDescription?: string;
+  badges?: {
+    has_power_plant?: boolean;
+    has_water_247?: boolean;
+    has_starlink?: boolean;
+    is_pet_friendly?: boolean;
+    has_hdv_seal?: boolean;
+  };
+  keyServicePills?: string[];
+  realRooms?: Array<{
+    id?: number;
+    name: string;
+    capacity: number;
+    price_per_night?: number;
+    size_m2?: number;
+    beds_summary?: string;
+    amenities?: string;
+  }>;
 }
 
 const STORAGE_KEYS = {
@@ -687,6 +707,75 @@ export function getReceiptByFolio(folio: string): SalesPreRegistrationReceipt | 
 }
 
 /**
+ * GATEKEEPER DE PRE-REGISTRO OFICIAL (HDV-PR-2026-...):
+ * Devuelve el comprobante auditado si el establecimiento ya pasó por la puerta de entrada
+ * oficial de /pre-registro (por slug, ID, nombre normalizado o WhatsApp real).
+ */
+export function getValidatedPreRegistrationForEstablishment(est?: {
+  id?: number | string | null;
+  slug?: string | null;
+  name?: string | null;
+  title?: string | null;
+  whatsapp?: string | null;
+  phone?: string | null;
+  features?: any;
+} | null): SalesPreRegistrationReceipt | null {
+  if (!est) return null;
+  const receipts = getSalesReceipts();
+  if (!Array.isArray(receipts) || receipts.length === 0) return null;
+
+  const slugClean = String(est.slug || "").trim().toLowerCase();
+  const nameNorm = normalizeEstablishmentName(est.name || est.title);
+  const phoneNorm = normalizePhoneKey(est.whatsapp || est.phone);
+  const isPlaceholderPhone = phoneNorm === "4121234567";
+
+  const matched = receipts.find((r) => {
+    if (!r || !r.folio || !String(r.folio).toUpperCase().startsWith("HDV-PR-")) return false;
+    if (slugClean && r.establishmentSlug && r.establishmentSlug.trim().toLowerCase() === slugClean) {
+      return true;
+    }
+    if (est.id && r.establishmentId && String(r.establishmentId) === String(est.id)) {
+      return true;
+    }
+    const rNameNorm = normalizeEstablishmentName(r.establishmentTitle);
+    if (nameNorm && rNameNorm && (nameNorm === rNameNorm || slugClean === rNameNorm.replace(/\s+/g, "-"))) {
+      return true;
+    }
+    if (
+      phoneNorm &&
+      !isPlaceholderPhone &&
+      normalizePhoneKey(r.whatsappNumber) === phoneNorm
+    ) {
+      return true;
+    }
+    return false;
+  });
+
+  return matched || null;
+}
+
+/**
+ * Determina si un establecimiento ya pasó por el flujo oficial de Pre-Registro auditado.
+ * Los establecimientos base del directorio que aún NO han pasado por /pre-registro
+ * devuelven `false` para no mostrar datos ficticios ni etiquetas de ejemplo.
+ */
+export function hasValidatedPreRegistration(est?: any): boolean {
+  if (!est) return false;
+  if (est.is_prereg_preview === true) return true;
+  const folioFromFeatures = est.features?.pre_registration?.folio;
+  if (typeof folioFromFeatures === "string" && folioFromFeatures.toUpperCase().startsWith("HDV-PR-")) {
+    return true;
+  }
+  if (typeof window !== "undefined" && est.slug) {
+    try {
+      const localPrereg = localStorage.getItem(`hdv_prereg_${est.slug}`);
+      if (localPrereg) return true;
+    } catch {}
+  }
+  return getValidatedPreRegistrationForEstablishment(est) !== null;
+}
+
+/**
  * Sincroniza el estado de contadores y comprobantes con Supabase (`site_settings`)
  * para que los códigos QR sean verificables desde cualquier dispositivo.
  */
@@ -810,6 +899,26 @@ export interface CreateSalesPreRegistrationInput {
   termsAccepted: boolean;
   userId?: string | null;
   userEmail?: string | null;
+  officialEmail?: string;
+  officialWebsite?: string;
+  shortDescription?: string;
+  badges?: {
+    has_power_plant?: boolean;
+    has_water_247?: boolean;
+    has_starlink?: boolean;
+    is_pet_friendly?: boolean;
+    has_hdv_seal?: boolean;
+  };
+  keyServicePills?: string[];
+  realRooms?: Array<{
+    id?: number;
+    name: string;
+    capacity: number;
+    price_per_night?: number;
+    size_m2?: number;
+    beds_summary?: string;
+    amenities?: string;
+  }>;
 }
 
 /**
@@ -969,7 +1078,13 @@ export async function processSalesPreRegistration(
     createdAtIso,
     createdAtFormatted,
     digitalSignatureHash,
-    verificationPath
+    verificationPath,
+    officialEmail: input.officialEmail?.trim() || undefined,
+    officialWebsite: input.officialWebsite?.trim() || undefined,
+    shortDescription: input.shortDescription?.trim() || undefined,
+    badges: input.badges,
+    keyServicePills: input.keyServicePills,
+    realRooms: input.realRooms
   };
 
   // Actualizar contadores y listado de comprobantes

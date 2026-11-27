@@ -5,7 +5,7 @@ import { ESTABLISHMENTS_MOCK } from "../lib/establishmentsMock";
 import { optimizeImageUrl } from "../lib/utils";
 import { DESTINOS_MOCK } from "../lib/destinosMock";
 import type { Establishment } from "../components/layout/EstablishmentCard";
-import { consolidateAndDeduplicateEstablishments } from "../lib/salesDepartmentStore";
+import { consolidateAndDeduplicateEstablishments, syncSalesStateFromSupabase } from "../lib/salesDepartmentStore";
 
 import { HeroSectionV2 } from "../components/homeV2/HeroSectionV2";
 import { BoutiqueEstablishmentCard } from "../components/homeV2/BoutiqueEstablishmentCard";
@@ -155,6 +155,7 @@ export function HomeV2({ isMainHome = false }: { isMainHome?: boolean }) {
     async function loadHomeV2Data() {
       try {
         setLoading(true);
+        await syncSalesStateFromSupabase();
         const [estRes, destRes, sectionRes, blogRes, siteRes, seoRes] = await Promise.all([
           supabase.from("establishments").select(`
             *,
