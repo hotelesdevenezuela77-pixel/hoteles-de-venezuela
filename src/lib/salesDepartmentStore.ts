@@ -1919,9 +1919,9 @@ export const OFFICIAL_PRELOADED_INVITATIONS: PreloadedInvitationTemplate[] = [
     shortDescription:
       "Campamento y resort ecológico de ultra-lujo frente a la mítica Laguna de Canaima con vistas directas a los saltos y tepuyes.",
     primaryImage:
-      "https://images.unsplash.com/photo-1586375300773-8384e3e4916f?w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop",
     galleryImages: [
-      "https://images.unsplash.com/photo-1586375300773-8384e3e4916f?w=800&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop"
     ],
     latitude: "6.244200",
     longitude: "-62.852900",
