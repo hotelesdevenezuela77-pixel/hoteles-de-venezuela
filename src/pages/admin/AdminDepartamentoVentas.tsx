@@ -7,11 +7,13 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
+  Copy,
   DollarSign,
   Edit3,
   ExternalLink,
   FileText,
   Filter,
+  Link2,
   Lock,
   MapPin,
   Phone,
@@ -22,13 +24,18 @@ import {
   RotateCcw,
   Save,
   Search,
+  Send,
   ShieldCheck,
   Sparkles,
   UserCheck,
   Users,
   X
 } from "lucide-react";
+import { ESTABLISHMENTS_MOCK } from "@/lib/establishmentsMock";
 import {
+  buildPreloadedClientReviewUrl,
+  createOrUpdatePreloadedInvitation,
+  ensureWakuLodgePreloadedInvitation,
   getSalesCounters,
   getSalesReceipts,
   MAX_FOUNDERS_QUOTA,
@@ -77,6 +84,142 @@ export function AdminDepartamentoVentas() {
   const [editNotes, setEditNotes] = useState("");
   const [editPrimaryImage, setEditPrimaryImage] = useState("");
   const [isSavingEdit, setIsSavingEdit] = useState(false);
+
+  // =========================================================================
+  // GENERADOR UNIVERSAL DE PRE-REGISTRO PRECARGADO (MODO CLARO EJECUTIVO HDV)
+  // =========================================================================
+  const [selectedDirectorySlug, setSelectedDirectorySlug] = useState<string>("waku-lodge-canaima");
+  const [preloadTitle, setPreloadTitle] = useState<string>("Wakü Lodge Canaima");
+  const [preloadSlug, setPreloadSlug] = useState<string>("waku-lodge-canaima");
+  const [preloadCategory, setPreloadCategory] = useState<string>("Campamento / Eco-Lodge");
+  const [preloadDestination, setPreloadDestination] = useState<string>("Canaima");
+  const [preloadCity, setPreloadCity] = useState<string>("Laguna de Canaima");
+  const [preloadState, setPreloadState] = useState<string>("Bolívar");
+  const [preloadWhatsapp, setPreloadWhatsapp] = useState<string>("+58 414 8882233");
+  const [preloadContactPerson, setPreloadContactPerson] = useState<string>("Lusbelys Castro");
+  const [preloadWebsite, setPreloadWebsite] = useState<string>("https://wakulodge.com");
+  const [preloadEmail, setPreloadEmail] = useState<string>("");
+  const [preloadDescription, setPreloadDescription] = useState<string>(
+    "Campamento y resort ecológico de ultra-lujo frente a la mítica Laguna de Canaima con vistas directas a los saltos y tepuyes."
+  );
+  const [preloadPrimaryImage, setPreloadPrimaryImage] = useState<string>(
+    "https://images.unsplash.com/photo-1586375300773-8384e3e4916f?w=800&auto=format&fit=crop"
+  );
+  const [preloadLatitude, setPreloadLatitude] = useState<string>("6.244200");
+  const [preloadLongitude, setPreloadLongitude] = useState<string>("-62.852900");
+  const [preloadBenefitLevel, setPreloadBenefitLevel] = useState<
+    "prestigio_top50" | "estandar_connect"
+  >("prestigio_top50");
+  const [isGeneratingPreload, setIsGeneratingPreload] = useState<boolean>(false);
+  const [generatedPreloadReceipt, setGeneratedPreloadReceipt] =
+    useState<SalesPreRegistrationReceipt | null>(null);
+  const [copiedLinkFolio, setCopiedLinkFolio] = useState<string | null>(null);
+
+  const handleSelectDirectoryEstablishment = (slugVal: string) => {
+    setSelectedDirectorySlug(slugVal);
+    if (slugVal === "__custom__") {
+      setPreloadTitle("");
+      setPreloadSlug("");
+      setPreloadDestination("");
+      setPreloadCity("");
+      setPreloadState("");
+      setPreloadWhatsapp("");
+      setPreloadContactPerson("");
+      setPreloadWebsite("");
+      setPreloadEmail("");
+      setPreloadDescription("");
+      setPreloadLatitude("");
+      setPreloadLongitude("");
+      return;
+    }
+
+    const found = ESTABLISHMENTS_MOCK.find((item) => item.slug === slugVal);
+    if (!found) return;
+
+    setPreloadTitle(found.name || "");
+    setPreloadSlug(found.slug || "");
+    setPreloadCategory(
+      found.slug === "waku-lodge-canaima"
+        ? "Campamento / Eco-Lodge"
+        : found.category_name || "Posada Boutique"
+    );
+    setPreloadDestination(found.destination_name || "");
+    const addrParts = (found.address || "").split(",").map((s) => s.trim()).filter(Boolean);
+    setPreloadCity(addrParts[0] || found.destination_name || "");
+    setPreloadState(addrParts[addrParts.length - 1] || found.destination_name || "");
+    setPreloadWhatsapp(found.whatsapp || found.phone || "");
+    setPreloadContactPerson(found.slug === "waku-lodge-canaima" ? "Lusbelys Castro" : "");
+    setPreloadWebsite(found.website || "");
+    setPreloadEmail(found.email || "");
+    setPreloadDescription(found.description || "");
+    setPreloadPrimaryImage(found.primary_image || "");
+    setPreloadLatitude(found.slug === "waku-lodge-canaima" ? "6.244200" : "");
+    setPreloadLongitude(found.slug === "waku-lodge-canaima" ? "-62.852900" : "");
+  };
+
+  const handleGeneratePreloadedLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!preloadTitle.trim()) return;
+    setIsGeneratingPreload(true);
+    try {
+      const autoSlug =
+        preloadSlug.trim() ||
+        preloadTitle
+          .toLowerCase()
+          .trim()
+          .replace(/[\s\W-]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+
+      const receipt = await createOrUpdatePreloadedInvitation({
+        establishmentTitle: preloadTitle.trim(),
+        establishmentSlug: autoSlug,
+        categoryName: preloadCategory.trim() || "Posada Boutique",
+        destinationName: preloadDestination.trim() || "Venezuela",
+        state: preloadState.trim() || preloadDestination.trim(),
+        city: preloadCity.trim() || preloadDestination.trim(),
+        whatsappNumber: preloadWhatsapp.trim(),
+        officialEmail: preloadEmail.trim(),
+        officialWebsite: preloadWebsite.trim(),
+        shortDescription: preloadDescription.trim(),
+        primaryImage: preloadPrimaryImage.trim(),
+        galleryImages: preloadPrimaryImage.trim() ? [preloadPrimaryImage.trim()] : [],
+        latitude: preloadLatitude.trim(),
+        longitude: preloadLongitude.trim(),
+        contactPersonName: preloadContactPerson.trim() || "Gerencia General",
+        benefitLevel: preloadBenefitLevel,
+        modality:
+          preloadBenefitLevel === "estandar_connect"
+            ? "comercial_estandar"
+            : "exclusivo_prestigio",
+        createdByEmail: user?.email || "operaciones@hotelesdevenezuela.com",
+        createdByUserId: user?.id || null
+      });
+
+      setGeneratedPreloadReceipt(receipt);
+      setCounters(getSalesCounters());
+      setReceipts(getSalesReceipts());
+    } finally {
+      setIsGeneratingPreload(false);
+    }
+  };
+
+  const handleCopyClientReviewUrl = async (receipt: SalesPreRegistrationReceipt) => {
+    const url = buildPreloadedClientReviewUrl({
+      folio: receipt.folio,
+      establishmentSlug: receipt.establishmentSlug,
+      contactPersonName:
+        receipt.contactPersonName ||
+        receipt.registrantName.replace(/^Propietario \/ Gerente:\s*/i, ""),
+      modality: receipt.modality
+    });
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedLinkFolio(receipt.folio);
+      setTimeout(() => setCopiedLinkFolio(null), 3500);
+    } catch {
+      window.prompt("Copia el enlace oficial de revisión para el cliente:", url);
+    }
+  };
 
   const openEditModal = (r: SalesPreRegistrationReceipt) => {
     setEditingReceipt(r);
@@ -136,8 +279,11 @@ export function AdminDepartamentoVentas() {
   const loadDepartmentData = async () => {
     setLoading(true);
     const synced = await syncSalesStateFromSupabase();
-    setCounters(synced.counters);
-    setReceipts(synced.receipts);
+    // Asegurar que la invitación precargada del primer caso de prueba (Wakü Lodge — Lusbelys Castro) esté lista
+    const wakuReceipt = await ensureWakuLodgePreloadedInvitation();
+    setGeneratedPreloadReceipt((prev) => prev || wakuReceipt);
+    setCounters(getSalesCounters());
+    setReceipts(getSalesReceipts());
     setLoading(false);
   };
 
@@ -444,6 +590,359 @@ export function AdminDepartamentoVentas() {
           </Link>
         </div>
 
+        {/* ========================================================================
+            GENERADOR UNIVERSAL DE PRE-REGISTRO PRECARGADO (MODO CLARO EJECUTIVO HDV)
+        ======================================================================== */}
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-[#00C8D4]/40 shadow-md space-y-6">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+            <div className="flex items-start gap-3.5">
+              <div className="w-12 h-12 rounded-2xl bg-[#00C8D4] text-white flex items-center justify-center shrink-0 shadow-md">
+                <Link2 className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#00C8D4]/15 text-[#008f99] border border-[#00C8D4]/30 text-[10px] font-black uppercase tracking-wider">
+                    Módulo Comercial / Operaciones • Expediciones B2B
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase">
+                    0% Datos Inventados • Validación en 1 Clic
+                  </span>
+                </div>
+                <h2
+                  className="text-xl sm:text-2xl font-black text-slate-900"
+                  style={{ fontFamily: "'Playfair Display', serif" }}
+                >
+                  Generador Universal de Pre-Registro Precargado
+                </h2>
+                <p className="text-xs text-slate-600 mt-1 max-w-3xl">
+                  Genera un enlace único de revisión y activación (<code>?folio=HDV-PR-2026-...</code>) para cualquier establecimiento del directorio o prospecto visitado en expedición. Toma únicamente los datos reales verificados y deja en blanco habitaciones, tarifas o etiquetas no confirmadas.
+                </p>
+              </div>
+            </div>
+
+            <div className="px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-right shrink-0">
+              <span className="block text-[10px] font-black uppercase tracking-wider text-slate-500">
+                Cupo Unificado Top 50
+              </span>
+              <span className="text-sm font-mono font-black text-slate-900">
+                {foundersOccupied} / {MAX_FOUNDERS_QUOTA} Asignados ({foundersRemaining} disponibles)
+              </span>
+            </div>
+          </div>
+
+          <form onSubmit={handleGeneratePreloadedLink} className="space-y-5">
+            {/* Fila 1: Selector de Establecimiento del Directorio & Nivel de Beneficio */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+              <div className="lg:col-span-6">
+                <label className="block text-[11px] font-black uppercase tracking-wider text-slate-600 mb-1.5">
+                  1. Seleccionar Establecimiento del Directorio o Prospecto B2B
+                </label>
+                <select
+                  value={selectedDirectorySlug}
+                  onChange={(e) => handleSelectDirectoryEstablishment(e.target.value)}
+                  className="w-full px-4 py-3 rounded-2xl bg-white border-2 border-slate-200 focus:border-[#00C8D4] text-xs font-black text-slate-900 focus:outline-none cursor-pointer"
+                >
+                  <option value="waku-lodge-canaima">
+                    ★ Wakü Lodge Canaima (Canaima, Bolívar — Contacto: Lusbelys Castro)
+                  </option>
+                  {ESTABLISHMENTS_MOCK.filter((item) => item.slug !== "waku-lodge-canaima").map(
+                    (est) => (
+                      <option key={est.slug} value={est.slug}>
+                        {est.name} ({est.destination_name} — {est.category_name})
+                      </option>
+                    )
+                  )}
+                  <option value="__custom__">
+                    + Ingresar Nuevo Prospecto B2B / Establecimiento de Expedición
+                  </option>
+                </select>
+              </div>
+
+              <div className="lg:col-span-6">
+                <label className="block text-[11px] font-black uppercase tracking-wider text-slate-600 mb-1.5">
+                  2. Nivel de Beneficio Asignado Antes de Generar el Enlace *
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setPreloadBenefitLevel("prestigio_top50")}
+                    className={`p-3 rounded-2xl border-2 text-left transition-all cursor-pointer flex items-start gap-2.5 ${preloadBenefitLevel === "prestigio_top50"
+                        ? "bg-white border-[#FF0096] ring-2 ring-[#FF0096]/15 shadow-sm"
+                        : "bg-white border-slate-200 hover:border-slate-300"
+                      }`}
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-[#FF0096] text-white flex items-center justify-center shrink-0">
+                      <Award className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <span className="block text-xs font-black text-slate-900">
+                        Cliente de Prestigio / Top 50
+                      </span>
+                      <span className="text-[10px] font-bold text-[#FF0096] block">
+                        Exoneración Activa ($0.00) • 0% Comisiones
+                      </span>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setPreloadBenefitLevel("estandar_connect")}
+                    className={`p-3 rounded-2xl border-2 text-left transition-all cursor-pointer flex items-start gap-2.5 ${preloadBenefitLevel === "estandar_connect"
+                        ? "bg-white border-[#00C8D4] ring-2 ring-[#00C8D4]/20 shadow-sm"
+                        : "bg-white border-slate-200 hover:border-slate-300"
+                      }`}
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-[#00C8D4] text-white flex items-center justify-center shrink-0">
+                      <ShieldCheck className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <span className="block text-xs font-black text-slate-900">
+                        Plan Estándar / HDV Connect
+                      </span>
+                      <span className="text-[10px] font-bold text-[#008f99] block">
+                        Trato Directo • 0% Comisiones
+                      </span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Fila 2: Datos Reales Verificados que se Precargan */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-2">
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-wider text-slate-500 mb-1">
+                  Nombre Oficial del Establecimiento *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={preloadTitle}
+                  onChange={(e) => setPreloadTitle(e.target.value)}
+                  placeholder="Ej. Wakü Lodge Canaima"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-wider text-slate-500 mb-1">
+                  Responsable / Contacto Directo *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={preloadContactPerson}
+                  onChange={(e) => setPreloadContactPerson(e.target.value)}
+                  placeholder="Ej. Lusbelys Castro"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-wider text-slate-500 mb-1">
+                  Categoría Verificada
+                </label>
+                <select
+                  value={preloadCategory}
+                  onChange={(e) => setPreloadCategory(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4] cursor-pointer"
+                >
+                  {!UNIFIED_PLATFORM_CATEGORIES.some(
+                    (c) => c.label.toLowerCase() === preloadCategory.toLowerCase()
+                  ) && <option value={preloadCategory}>{preloadCategory}</option>}
+                  {UNIFIED_PLATFORM_CATEGORIES.map((cat) => (
+                    <option key={cat.id} value={cat.label}>
+                      {cat.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-wider text-slate-500 mb-1">
+                  WhatsApp Oficial Verificado *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={preloadWhatsapp}
+                  onChange={(e) => setPreloadWhatsapp(e.target.value)}
+                  placeholder="+58 414 8882233"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-wider text-slate-500 mb-1">
+                  Destino Turístico
+                </label>
+                <input
+                  type="text"
+                  value={preloadDestination}
+                  onChange={(e) => setPreloadDestination(e.target.value)}
+                  placeholder="Ej. Canaima"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-wider text-slate-500 mb-1">
+                  Ciudad / Sector & Estado
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    value={preloadCity}
+                    onChange={(e) => setPreloadCity(e.target.value)}
+                    placeholder="Ciudad/Sector"
+                    className="w-full px-3 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                  />
+                  <input
+                    type="text"
+                    value={preloadState}
+                    onChange={(e) => setPreloadState(e.target.value)}
+                    placeholder="Estado"
+                    className="w-full px-3 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-wider text-slate-500 mb-1">
+                  Sitio Web / Instagram Real
+                </label>
+                <input
+                  type="text"
+                  value={preloadWebsite}
+                  onChange={(e) => setPreloadWebsite(e.target.value)}
+                  placeholder="https://wakulodge.com"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-wider text-slate-500 mb-1">
+                  Coordenadas GPS (Lat / Lng)
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    value={preloadLatitude}
+                    onChange={(e) => setPreloadLatitude(e.target.value)}
+                    placeholder="Latitud"
+                    className="w-full px-3 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                  />
+                  <input
+                    type="text"
+                    value={preloadLongitude}
+                    onChange={(e) => setPreloadLongitude(e.target.value)}
+                    placeholder="Longitud"
+                    className="w-full px-3 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-[#00C8D4]"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 border-t border-slate-100">
+              <p className="text-[11px] text-slate-600 font-semibold">
+                Regla activa:{" "}
+                <strong className="text-slate-900">
+                  0 habitaciones genéricas • 0 etiquetas no confirmadas
+                </strong>
+                . El cliente podrá revisar, editar o cargar sus habitaciones reales y aceptar términos con 1 clic.
+              </p>
+
+              <button
+                type="submit"
+                disabled={isGeneratingPreload}
+                className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#FF0096] to-[#9B00CC] hover:opacity-95 text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-md cursor-pointer shrink-0 disabled:opacity-50"
+              >
+                <Send className="w-4 h-4" />
+                <span>
+                  {isGeneratingPreload
+                    ? "Generando Enlace..."
+                    : "Generar / Actualizar Enlace Precargado"}
+                </span>
+              </button>
+            </div>
+          </form>
+
+          {/* Recuadro de Enlace Directo Listo para Enviar al Cliente */}
+          {generatedPreloadReceipt && (
+            <div className="p-5 rounded-2xl bg-cyan-50/60 border-2 border-[#00C8D4] space-y-3">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <span className="px-2.5 py-0.5 rounded-lg bg-[#0e011f] text-white font-mono text-[11px] font-black">
+                      Folio: {generatedPreloadReceipt.folio}
+                    </span>
+                    {generatedPreloadReceipt.founderSlotNumber && (
+                      <span className="px-2.5 py-0.5 rounded-lg bg-[#FF0096] text-white text-[10px] font-black uppercase">
+                        Cupo Prestigio / Top 50: #{generatedPreloadReceipt.founderSlotNumber} /{" "}
+                        {MAX_FOUNDERS_QUOTA} (Exonerado $0.00)
+                      </span>
+                    )}
+                    <span className="px-2.5 py-0.5 rounded-lg bg-white border border-slate-200 text-slate-800 text-[10px] font-black">
+                      Contacto:{" "}
+                      {generatedPreloadReceipt.contactPersonName ||
+                        generatedPreloadReceipt.registrantName}
+                    </span>
+                  </div>
+                  <p className="text-xs font-black text-slate-900">
+                    Enlace Único de Revisión y Validación Oficial para{" "}
+                    <span className="text-[#9B00CC]">
+                      {generatedPreloadReceipt.establishmentTitle}
+                    </span>
+                    :
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => handleCopyClientReviewUrl(generatedPreloadReceipt)}
+                    className="px-4 py-2 rounded-xl bg-[#00C8D4] hover:bg-[#00b2bd] text-slate-950 text-xs font-black inline-flex items-center gap-1.5 shadow-sm cursor-pointer"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>
+                      {copiedLinkFolio === generatedPreloadReceipt.folio
+                        ? "¡Enlace Copiado!"
+                        : "Copiar Enlace para Cliente"}
+                    </span>
+                  </button>
+
+                  <a
+                    href={buildPreloadedClientReviewUrl(
+                      {
+                        folio: generatedPreloadReceipt.folio,
+                        establishmentSlug: generatedPreloadReceipt.establishmentSlug,
+                        contactPersonName: generatedPreloadReceipt.contactPersonName,
+                        modality: generatedPreloadReceipt.modality
+                      },
+                      ""
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-900 border border-slate-300 text-xs font-black inline-flex items-center gap-1.5 shadow-2xs"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-[#FF0096]" />
+                    <span>Abrir Vista del Cliente</span>
+                  </a>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-white border border-slate-200 font-mono text-xs font-bold text-slate-800 break-all select-all">
+                {buildPreloadedClientReviewUrl({
+                  folio: generatedPreloadReceipt.folio,
+                  establishmentSlug: generatedPreloadReceipt.establishmentSlug,
+                  contactPersonName: generatedPreloadReceipt.contactPersonName,
+                  modality: generatedPreloadReceipt.modality
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Barra de Filtros y Buscador */}
         <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-5">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -586,21 +1085,19 @@ export function AdminDepartamentoVentas() {
 
                       <td className="py-3.5 px-3">
                         <span
-                          className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black ${
-                            r.modality === "fundadores_50"
+                          className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black ${r.modality === "fundadores_50"
                               ? "bg-pink-100 text-pink-700"
                               : r.modality === "exclusivo_prestigio"
-                              ? "bg-purple-100 text-purple-700"
-                              : "bg-cyan-100 text-cyan-800"
-                          }`}
+                                ? "bg-purple-100 text-purple-700"
+                                : "bg-cyan-100 text-cyan-800"
+                            }`}
                         >
                           {r.modalityLabel}
                         </span>
                         {r.founderSlotNumber && (
                           <span
-                            className={`block text-[10px] font-extrabold mt-1 ${
-                              r.modality === "exclusivo_prestigio" ? "text-[#9B00CC]" : "text-[#FF0096]"
-                            }`}
+                            className={`block text-[10px] font-extrabold mt-1 ${r.modality === "exclusivo_prestigio" ? "text-[#9B00CC]" : "text-[#FF0096]"
+                              }`}
                           >
                             Cupo #{r.founderSlotNumber} / {MAX_FOUNDERS_QUOTA} (
                             {r.modality === "exclusivo_prestigio" ? "Prestigio 2026" : "Fundador"})
@@ -610,14 +1107,15 @@ export function AdminDepartamentoVentas() {
 
                       <td className="py-3.5 px-3">
                         <span className="font-bold text-slate-800 block">{r.registrantName}</span>
-                        {r.termsAccepted !== false ? (
+                        {r.termsAccepted !== false && r.invitationStatus !== "precargado_pendiente" ? (
                           <span className="inline-flex items-center gap-1 text-[10px] text-emerald-700 font-bold mt-0.5">
                             <CheckCircle2 className="w-3 h-3" />
                             <span>Términos y Derechos de Imagen Aceptados</span>
                           </span>
                         ) : (
-                          <span className="text-[10px] text-rose-600 font-bold">
-                            Pendiente de confirmación
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-black mt-0.5">
+                            <Clock className="w-3 h-3" />
+                            <span>Precargado • Listo para validar por el cliente</span>
                           </span>
                         )}
                         {r.notes && (
@@ -650,11 +1148,10 @@ export function AdminDepartamentoVentas() {
                         ) : (
                           <div className="space-y-1">
                             <span
-                              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-black ${
-                                r.financialStatus === "pagado"
+                              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-black ${r.financialStatus === "pagado"
                                   ? "bg-emerald-100 text-emerald-800"
                                   : "bg-amber-100 text-amber-800"
-                              }`}
+                                }`}
                             >
                               {r.financialStatus === "pagado" ? (
                                 <CheckCircle2 className="w-3 h-3" />
@@ -688,6 +1185,19 @@ export function AdminDepartamentoVentas() {
 
                       <td className="py-3.5 px-3 text-right">
                         <div className="inline-flex flex-wrap items-center justify-end gap-1.5">
+                          {/* 0. Copiar Enlace Único de Revisión del Cliente (?folio=HDV-PR-2026-...) */}
+                          <button
+                            type="button"
+                            onClick={() => handleCopyClientReviewUrl(r)}
+                            className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-cyan-50 text-slate-900 border-2 border-[#00C8D4] text-[10px] font-black inline-flex items-center gap-1 shadow-2xs transition-all cursor-pointer"
+                            title="Copiar enlace directo de Revisión y Validación para el propietario/gerente"
+                          >
+                            <Link2 className="w-3.5 h-3.5 text-[#008f99]" />
+                            <span>
+                              {copiedLinkFolio === r.folio ? "¡Copiado!" : "Enlace Cliente"}
+                            </span>
+                          </button>
+
                           {/* 1. Ver QR (Turquesa Cian #00C8D4) */}
                           <button
                             type="button"
@@ -812,9 +1322,8 @@ export function AdminDepartamentoVentas() {
                   </span>
                   {editingReceipt.founderSlotNumber && (
                     <span
-                      className={`px-2.5 py-0.5 rounded-full text-white text-[10px] font-black ${
-                        editModality === "exclusivo_prestigio" ? "bg-[#9B00CC]" : "bg-[#FF0096]"
-                      }`}
+                      className={`px-2.5 py-0.5 rounded-full text-white text-[10px] font-black ${editModality === "exclusivo_prestigio" ? "bg-[#9B00CC]" : "bg-[#FF0096]"
+                        }`}
                     >
                       {editModality === "exclusivo_prestigio"
                         ? `Cupo Prestigio Protegido: #${editingReceipt.founderSlotNumber} / ${MAX_FOUNDERS_QUOTA}`

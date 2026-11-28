@@ -54,10 +54,15 @@ import {
 import {
   SAAS_COMMERCIAL_PLANS,
   OFFICIAL_SALES_AGENTS,
+  OFFICIAL_PRELOADED_INVITATIONS,
   MAX_FOUNDERS_QUOTA,
   getSalesCounters,
+  getSalesReceipts,
+  getReceiptByFolio,
   syncSalesStateFromSupabase,
   processSalesPreRegistration,
+  confirmPreloadedPreRegistration,
+  ensureWakuLodgePreloadedInvitation,
   findExistingEstablishmentMatch,
   normalizeEstablishmentName,
   normalizePhoneKey,
@@ -67,6 +72,7 @@ import {
   type SalesPreRegistrationReceipt,
   type SalesCountersState
 } from "../lib/salesDepartmentStore";
+import { ESTABLISHMENTS_MOCK } from "../lib/establishmentsMock";
 import { PreRegistrationReceiptModal } from "../components/sales/PreRegistrationReceiptModal";
 
 export interface UnifiedPreRegCategoryOption {
@@ -307,6 +313,14 @@ export function PreRegistro() {
   const [emittedReceipt, setEmittedReceipt] = useState<SalesPreRegistrationReceipt | null>(null);
   const [detectedExistingMatch, setDetectedExistingMatch] = useState<ExistingEstablishmentMatch | null>(null);
 
+  // =========================================================================
+  // MODO DE REVISIÓN Y VALIDACIÓN DE FICHA OFICIAL (?folio=HDV-PR-2026-... o ?slug=...)
+  // =========================================================================
+  const [isClientReviewMode, setIsClientReviewMode] = useState<boolean>(false);
+  const [protectedFolio, setProtectedFolio] = useState<string | null>(null);
+  const [protectedSlotNumber, setProtectedSlotNumber] = useState<number | null>(null);
+  const [preloadedSlug, setPreloadedSlug] = useState<string | null>(null);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!title.trim() && !whatsappNumber.trim()) {
@@ -324,9 +338,188 @@ export function PreRegistro() {
   }, [title, whatsappNumber]);
 
   useEffect(() => {
-    syncSalesStateFromSupabase().then((res) => {
-      setSalesCounters(res.counters);
-    });
+    async function initPreRegistroAndCheckUrl() {
+      const res = await syncSalesStateFromSupabase();
+      await ensureWakuLodgePreloadedInvitation();
+      setSalesCounters(getSalesCounters());
+
+      if (typeof window === "undefined") return;
+      const params = new URLSearchParams(window.location.search);
+      const urlFolio = (params.get("folio") || "").trim().toUpperCase();
+      const urlSlug = (params.get("slug") || "").trim().toLowerCase();
+      const urlContact = (params.get("contacto") || "").trim();
+      const urlNivel = (params.get("nivel") || "").trim();
+
+      if (!urlFolio && !urlSlug) return;
+
+      const allReceipts = getSalesReceipts();
+      let matchedReceipt =
+        (urlFolio ? getReceiptByFolio(urlFolio) : null) ||
+        allReceipts.find(
+          (r) =>
+            (urlFolio && r.folio.toUpperCase() === urlFolio) ||
+            (urlSlug && r.establishmentSlug && r.establishmentSlug.toLowerCase() === urlSlug)
+        ) ||
+        null;
+
+      // Hidratación directa desde el catálogo de invitaciones precargadas o ESTABLISHMENTS_MOCK
+      // si el cliente abre el enlace desde su celular antes de que exista en su almacenamiento local
+      const officialTemplate = OFFICIAL_PRELOADED_INVITATIONS.find(
+        (tpl) =>
+          (urlFolio && tpl.defaultFolio.toUpperCase() === urlFolio) ||
+          (urlSlug && tpl.slug.toLowerCase() === urlSlug)
+      );
+
+      if (matchedReceipt) {
+        setIsClientReviewMode(true);
+        setProtectedFolio(matchedReceipt.folio);
+        setProtectedSlotNumber(matchedReceipt.founderSlotNumber);
+        setPreloadedSlug(matchedReceipt.establishmentSlug || urlSlug || null);
+
+        setTitle(matchedReceipt.establishmentTitle || "");
+        if (matchedReceipt.categoryName) {
+          handleSelectCategoryByName(matchedReceipt.categoryName);
+        }
+        setDestinationName(matchedReceipt.destinationName || "");
+        setState(matchedReceipt.state || "");
+        setCity(matchedReceipt.city || "");
+        setWhatsappNumber(matchedReceipt.whatsappNumber || "");
+        setOfficialEmail(matchedReceipt.officialEmail || "");
+        setOfficialWebsiteOrInstagram(matchedReceipt.officialWebsite || officialTemplate?.officialWebsite || "");
+        setShortDescription(
+          matchedReceipt.shortDescription ||
+            officialTemplate?.shortDescription ||
+            ""
+        );
+        if (matchedReceipt.primaryImage) {
+          setPrimaryImage(matchedReceipt.primaryImage);
+          setGalleryImages(
+            matchedReceipt.galleryImages && matchedReceipt.galleryImages.length > 0
+              ? matchedReceipt.galleryImages
+              : [matchedReceipt.primaryImage]
+          );
+        }
+        if (matchedReceipt.latitude || officialTemplate?.latitude) {
+          setLatitude(matchedReceipt.latitude || officialTemplate?.latitude || "");
+        }
+        if (matchedReceipt.longitude || officialTemplate?.longitude) {
+          setLongitude(matchedReceipt.longitude || officialTemplate?.longitude || "");
+        }
+
+        // Regla estricta: 0 habitaciones inventadas y 0 etiquetas no confirmadas
+        setBadges({
+          has_power_plant: Boolean(matchedReceipt.badges?.has_power_plant),
+          has_water_247: Boolean(matchedReceipt.badges?.has_water_247),
+          has_starlink: Boolean(matchedReceipt.badges?.has_starlink),
+          is_pet_friendly: Boolean(matchedReceipt.badges?.is_pet_friendly),
+          has_hdv_seal: matchedReceipt.badges?.has_hdv_seal ?? true
+        });
+        setPills(Array.isArray(matchedReceipt.keyServicePills) ? matchedReceipt.keyServicePills : []);
+        setRealRoomsInventory(
+          Array.isArray(matchedReceipt.realRooms)
+            ? matchedReceipt.realRooms.map((rm) => ({
+                name: rm.name,
+                capacity: rm.capacity || 2,
+                price_per_night: rm.price_per_night || 0,
+                size_m2: rm.size_m2,
+                beds_summary: rm.beds_summary || "",
+                amenities: rm.amenities || ""
+              }))
+            : []
+        );
+
+        const cleanContact =
+          urlContact ||
+          matchedReceipt.contactPersonName ||
+          matchedReceipt.registrantName.replace(/^Propietario \/ Gerente:\s*/i, "") ||
+          officialTemplate?.contactPersonName ||
+          "";
+        setOrigin("propietario");
+        setOwnerOrManagerName(cleanContact);
+        setModality(
+          urlNivel === "estandar_connect"
+            ? "comercial_estandar"
+            : matchedReceipt.modality || "exclusivo_prestigio"
+        );
+        // Exigir siempre marcar explícitamente el checkbox "Acepto los términos y condiciones" antes de habilitar "Confirmar y Activar Ficha"
+        setTermsAccepted(false);
+        return;
+      }
+
+      if (officialTemplate) {
+        setIsClientReviewMode(true);
+        setProtectedFolio(urlFolio || officialTemplate.defaultFolio);
+        setPreloadedSlug(officialTemplate.slug);
+        setTitle(officialTemplate.establishmentTitle);
+        handleSelectCategoryByName(officialTemplate.categoryName);
+        setDestinationName(officialTemplate.destinationName);
+        setState(officialTemplate.state);
+        setCity(officialTemplate.city);
+        setWhatsappNumber(officialTemplate.whatsappNumber);
+        setOfficialEmail(officialTemplate.officialEmail || "");
+        setOfficialWebsiteOrInstagram(officialTemplate.officialWebsite || "");
+        setShortDescription(officialTemplate.shortDescription);
+        setPrimaryImage(officialTemplate.primaryImage);
+        setGalleryImages(officialTemplate.galleryImages || [officialTemplate.primaryImage]);
+        setLatitude(officialTemplate.latitude || "");
+        setLongitude(officialTemplate.longitude || "");
+        setBadges({
+          has_power_plant: false,
+          has_water_247: false,
+          has_starlink: false,
+          is_pet_friendly: false,
+          has_hdv_seal: true
+        });
+        setPills([]);
+        setRealRoomsInventory([]);
+        setOrigin("propietario");
+        setOwnerOrManagerName(urlContact || officialTemplate.contactPersonName);
+        setModality(officialTemplate.modality);
+        setTermsAccepted(false);
+        return;
+      }
+
+      // Fallback universal si se pasa ?slug=... de cualquier establecimiento del directorio
+      const dirEst = ESTABLISHMENTS_MOCK.find(
+        (item) => item.slug.toLowerCase() === urlSlug
+      );
+      if (dirEst) {
+        setIsClientReviewMode(true);
+        setProtectedFolio(
+          urlFolio ||
+            `HDV-PR-2026-${String(res.counters.preRegCounter + 1).padStart(4, "0")}`
+        );
+        setPreloadedSlug(dirEst.slug);
+        setTitle(dirEst.name);
+        handleSelectCategoryByName(dirEst.category_name || "Posada Boutique");
+        setDestinationName(dirEst.destination_name || "");
+        const addrParts = (dirEst.address || "").split(",").map((s) => s.trim()).filter(Boolean);
+        setCity(addrParts[0] || dirEst.destination_name || "");
+        setState(addrParts[addrParts.length - 1] || dirEst.destination_name || "");
+        setWhatsappNumber(dirEst.whatsapp || dirEst.phone || "");
+        setOfficialWebsiteOrInstagram(dirEst.website || "");
+        setShortDescription(dirEst.description || "");
+        setPrimaryImage(dirEst.primary_image || "");
+        setGalleryImages(dirEst.primary_image ? [dirEst.primary_image] : []);
+        setBadges({
+          has_power_plant: false,
+          has_water_247: false,
+          has_starlink: false,
+          is_pet_friendly: false,
+          has_hdv_seal: true
+        });
+        setPills([]);
+        setRealRoomsInventory([]);
+        setOrigin("propietario");
+        setOwnerOrManagerName(urlContact || "");
+        setModality(
+          urlNivel === "estandar_connect" ? "comercial_estandar" : "exclusivo_prestigio"
+        );
+        setTermsAccepted(false);
+      }
+    }
+
+    initPreRegistroAndCheckUrl();
     const handleSync = () => setSalesCounters(getSalesCounters());
     window.addEventListener("hdv_sales_v13_updated", handleSync);
     return () => window.removeEventListener("hdv_sales_v13_updated", handleSync);
@@ -616,9 +809,11 @@ export function PreRegistro() {
       });
 
       // Mantener limpio el slug/URL original si ya existía, o usar el nuevo si es un registro nuevo
-      const slug = existingMatch?.slug ? existingMatch.slug : generatedCandidateSlug;
-      const wasConsolidatedExisting = Boolean(existingMatch?.matched);
-      const consolidatedMatchReason = existingMatch?.matchReason || null;
+      const slug =
+        preloadedSlug ||
+        (existingMatch?.slug ? existingMatch.slug : generatedCandidateSlug);
+      const wasConsolidatedExisting = Boolean(isClientReviewMode || existingMatch?.matched);
+      const consolidatedMatchReason = existingMatch?.matchReason || (isClientReviewMode ? "slug" : null);
       const existingEstId = existingMatch?.id ?? null;
 
       const onboardingStatus = publishDirectly ? "COMPLETED" : "PRE_REGISTERED";
@@ -648,39 +843,76 @@ export function PreRegistro() {
         gallery_images: galleryImages
       };
 
-      // 1. Procesar el Pre-Registro en el Motor del Departamento de Ventas + Finanzas + CRM + Logs
-      const receipt = await processSalesPreRegistration({
-        establishmentId: existingEstId,
-        wasConsolidatedExisting,
-        consolidatedMatchReason,
-        establishmentTitle: title.trim(),
-        establishmentSlug: slug,
-        categoryName,
-        destinationName: destinationName.trim(),
-        state: state.trim(),
-        city: city.trim(),
-        whatsappNumber: whatsappNumber.trim(),
-        primaryImage,
-        basePriceFrom: effectiveBasePrice,
-        origin,
-        ownerOrManagerName: ownerOrManagerName.trim() || undefined,
-        salesAgentCode: origin === "agente_ventas" ? selectedAgentCode : undefined,
-        salesAgentName: origin === "agente_ventas" ? customAgentName.trim() : undefined,
-        modality,
-        planId: selectedPlanId,
-        customMonthlyUsd: origin === "agente_ventas" ? customMonthlyUsd : currentPlanObj.defaultMonthlyUsd,
-        initialPaymentStatus,
-        bcvRate: bcvRate || 45.8,
-        termsAccepted,
-        userId: user?.id || null,
-        userEmail: user?.email || null,
-        officialEmail: officialEmail.trim() || undefined,
-        officialWebsite: officialWebsiteOrInstagram.trim() || undefined,
-        shortDescription: shortDescription.trim() || undefined,
-        badges,
-        keyServicePills: pills,
-        realRooms: realRoomsInventory
-      });
+      // 1. Procesar el Pre-Registro:
+      // - Si viene de un enlace precargado o folio existente (isClientReviewMode && protectedFolio),
+      //   confirmamos y actualizamos ese mismo folio inalterable sin duplicar registros ni alterar el contador de 50 cupos.
+      // - Si es un registro nuevo manual, emite el siguiente folio correlativo.
+      const receipt =
+        isClientReviewMode && protectedFolio
+          ? await confirmPreloadedPreRegistration({
+              folio: protectedFolio,
+              establishmentId: existingEstId,
+              establishmentTitle: title.trim(),
+              establishmentSlug: slug,
+              categoryName,
+              destinationName: destinationName.trim(),
+              state: state.trim(),
+              city: city.trim(),
+              whatsappNumber: whatsappNumber.trim(),
+              officialEmail: officialEmail.trim() || undefined,
+              officialWebsite: officialWebsiteOrInstagram.trim() || undefined,
+              shortDescription: shortDescription.trim() || undefined,
+              primaryImage,
+              galleryImages,
+              latitude: latitude || undefined,
+              longitude: longitude || undefined,
+              basePriceFrom: effectiveBasePrice,
+              contactPersonName: ownerOrManagerName.trim() || title.trim(),
+              modality,
+              planId: selectedPlanId,
+              bcvRate: bcvRate || 45.8,
+              termsAccepted: true,
+              badges,
+              keyServicePills: pills,
+              realRooms: realRoomsInventory,
+              userId: user?.id || null,
+              userEmail: user?.email || null
+            })
+          : await processSalesPreRegistration({
+              establishmentId: existingEstId,
+              wasConsolidatedExisting,
+              consolidatedMatchReason,
+              establishmentTitle: title.trim(),
+              establishmentSlug: slug,
+              categoryName,
+              destinationName: destinationName.trim(),
+              state: state.trim(),
+              city: city.trim(),
+              whatsappNumber: whatsappNumber.trim(),
+              primaryImage,
+              basePriceFrom: effectiveBasePrice,
+              origin,
+              ownerOrManagerName: ownerOrManagerName.trim() || undefined,
+              salesAgentCode: origin === "agente_ventas" ? selectedAgentCode : undefined,
+              salesAgentName: origin === "agente_ventas" ? customAgentName.trim() : undefined,
+              modality,
+              planId: selectedPlanId,
+              customMonthlyUsd:
+                origin === "agente_ventas"
+                  ? customMonthlyUsd
+                  : currentPlanObj.defaultMonthlyUsd,
+              initialPaymentStatus,
+              bcvRate: bcvRate || 45.8,
+              termsAccepted,
+              userId: user?.id || null,
+              userEmail: user?.email || null,
+              officialEmail: officialEmail.trim() || undefined,
+              officialWebsite: officialWebsiteOrInstagram.trim() || undefined,
+              shortDescription: shortDescription.trim() || undefined,
+              badges,
+              keyServicePills: pills,
+              realRooms: realRoomsInventory
+            });
 
       // Construcción JSONB para features incluyendo trazabilidad del folio y finanzas
       const initialFeatures = {
@@ -981,14 +1213,29 @@ export function PreRegistro() {
               
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-bold uppercase tracking-wider text-[#00C8D4] mb-3 ml-3">
                 <Sparkles className="w-3.5 h-3.5 text-[#FF0096]" />
-                <span>Módulo Oficial V13 • Onboarding Rápido</span>
+                <span>
+                  {isClientReviewMode
+                    ? `Invitación Oficial Precargada • Folio ${protectedFolio}`
+                    : "Módulo Oficial V13 • Onboarding Rápido"}
+                </span>
               </div>
 
               <h1 className="text-3xl md:text-5xl font-black tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
-                Pre-Registro de Ficha Pública
+                {isClientReviewMode
+                  ? "Revisión y Validación de Ficha Oficial"
+                  : "Pre-Registro de Ficha Pública"}
               </h1>
               <p className="text-sm md:text-base text-slate-300 mt-2 max-w-2xl">
-                Registra tu propiedad capturando <strong>únicamente los datos visibles en la tarjeta pública</strong> para comenzar a recibir reservas inmediatamente por WhatsApp.
+                {isClientReviewMode ? (
+                  <>
+                    Bienvenido(a){ownerOrManagerName ? `, ${ownerOrManagerName}` : ""}. Hemos adelantado la ficha oficial de{" "}
+                    <strong className="text-white">{title}</strong> con sus datos verificados. Revisa, edita o agrega tus habitaciones reales si lo deseas y confirma al final con un clic.
+                  </>
+                ) : (
+                  <>
+                    Registra tu propiedad capturando <strong>únicamente los datos visibles en la tarjeta pública</strong> para comenzar a recibir reservas inmediatamente por WhatsApp.
+                  </>
+                )}
               </p>
             </div>
 
@@ -1034,13 +1281,122 @@ export function PreRegistro() {
                 <CheckCircle2 className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-black">¡Pre-Registro Almacenado Exitosamente en PostgreSQL + JSONB!</p>
-                <p className="text-[11px] text-emerald-700">La ficha pública ha quedado lista en estado <code>PRE_REGISTERED</code>.</p>
+                <p className="text-xs font-black">
+                  ¡Ficha Oficial Confirmada y Activada Exitosamente!
+                </p>
+                <p className="text-[11px] text-emerald-700">
+                  La ficha pública de <strong>{title}</strong> ha quedado verificada y sincronizada en el directorio oficial.
+                </p>
               </div>
             </div>
             <span className="text-[10px] font-mono bg-emerald-100 px-2.5 py-1 rounded-md text-emerald-900 font-bold">
-              {title}
+              {protectedFolio || title}
             </span>
+          </div>
+        )}
+
+        {/* RECUADRO EJECUTIVO DE BENEFICIO ASIGNADO (MODO REVISIÓN DEL CLIENTE) */}
+        {isClientReviewMode && (
+          <div className="mb-8 rounded-3xl bg-white border-2 border-[#00C8D4] p-6 sm:p-7 shadow-md space-y-4">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+              <div className="flex items-start gap-3.5">
+                <div
+                  className={`w-12 h-12 rounded-2xl text-white flex items-center justify-center shrink-0 shadow-md ${
+                    modality === "comercial_estandar" ? "bg-[#00C8D4]" : "bg-[#FF0096]"
+                  }`}
+                >
+                  <Award className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <span className="px-2.5 py-0.5 rounded-lg bg-[#0e011f] text-white font-mono text-[11px] font-black flex items-center gap-1">
+                      <Lock className="w-3 h-3 text-[#00C8D4]" />
+                      <span>Folio de Auditoría Protegido: {protectedFolio}</span>
+                    </span>
+                    {modality !== "comercial_estandar" ? (
+                      <span className="px-2.5 py-0.5 rounded-lg bg-pink-50 border border-[#FF0096]/40 text-[#FF0096] text-[10px] font-black uppercase">
+                        Cliente de Prestigio / Aliado Fundador (Top 50)
+                      </span>
+                    ) : (
+                      <span className="px-2.5 py-0.5 rounded-lg bg-cyan-50 border border-[#00C8D4]/40 text-[#008f99] text-[10px] font-black uppercase">
+                        Plan Estándar / HDV Connect
+                      </span>
+                    )}
+                  </div>
+                  <h2
+                    className="text-xl sm:text-2xl font-black text-slate-900"
+                    style={{ fontFamily: "'Playfair Display', serif" }}
+                  >
+                    {modality !== "comercial_estandar"
+                      ? `Beneficio Especial Activo: Exoneración 100% ($0.00 USD) • Primeros 50 Aliados`
+                      : `Beneficio Activo: Plan Estándar / HDV Connect (0% Comisiones)`}
+                  </h2>
+                  <p className="text-xs text-slate-600 mt-0.5 max-w-3xl">
+                    {modality !== "comercial_estandar" ? (
+                      <>
+                        Su establecimiento <strong>{title}</strong> cuenta con estatus de{" "}
+                        <strong>Cliente de Prestigio / Aliado Fundador</strong> dentro del cupo exclusivo de los primeros{" "}
+                        <strong>{MAX_FOUNDERS_QUOTA} aliados nacionales</strong> (
+                        {protectedSlotNumber
+                          ? `Cupo Reservado #${protectedSlotNumber} / ${MAX_FOUNDERS_QUOTA}`
+                          : `Cupo Oficial Top ${MAX_FOUNDERS_QUOTA}`}
+                        ), con <strong>exoneración total aplicada ($0.00)</strong> y{" "}
+                        <strong>0% de comisiones por reserva</strong>.
+                      </>
+                    ) : (
+                      <>
+                        Su establecimiento <strong>{title}</strong> opera bajo el modelo de{" "}
+                        <strong>Trato Directo con el Anfitrión (0% de comisiones por reserva)</strong>.
+                      </>
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 shrink-0">
+                <div className="px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
+                  <span className="block text-[9px] font-black uppercase text-slate-400">
+                    Cupo Oficial
+                  </span>
+                  <span className="text-xs font-mono font-black text-slate-900">
+                    {modality !== "comercial_estandar"
+                      ? `#${protectedSlotNumber || Math.min(MAX_FOUNDERS_QUOTA, foundersOccupied + 1)} / ${MAX_FOUNDERS_QUOTA}`
+                      : "HDV Connect"}
+                  </span>
+                </div>
+                <div className="px-3.5 py-2.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-center">
+                  <span className="block text-[9px] font-black uppercase text-emerald-700">
+                    Exoneración
+                  </span>
+                  <span className="text-xs font-mono font-black text-emerald-800">
+                    $0.00 USD
+                  </span>
+                </div>
+                <div className="col-span-2 sm:col-span-1 px-3.5 py-2.5 rounded-2xl bg-cyan-50 border border-[#00C8D4]/40 text-center">
+                  <span className="block text-[9px] font-black uppercase text-[#008f99]">
+                    Comisiones OTA
+                  </span>
+                  <span className="text-xs font-mono font-black text-slate-900">
+                    0% (Directo)
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-700">
+              <div className="flex items-center gap-2">
+                <UserCheck className="w-4 h-4 text-[#00C8D4] shrink-0" />
+                <span>
+                  Responsable / Contacto titular:{" "}
+                  <strong className="text-slate-900">
+                    {ownerOrManagerName || "Propietario / Gerente General"}
+                  </strong>
+                </span>
+              </div>
+              <span className="text-[11px] font-bold text-[#9B00CC]">
+                Paso final: Revisa o edita tus datos abajo, marca la casilla de términos y pulsa &ldquo;Confirmar y Activar Ficha&rdquo;.
+              </span>
+            </div>
           </div>
         )}
 
@@ -2196,7 +2552,7 @@ export function PreRegistro() {
                   />
                   <div className="text-xs leading-relaxed text-slate-100">
                     <span className="font-black text-[#00C8D4] uppercase tracking-wider block mb-0.5">
-                      Confirmación Legal y Derechos de Imagen (Obligatorio) *
+                      Acepto los términos y condiciones (Obligatorio) *
                     </span>
                     <span>
                       Acepto los{" "}
@@ -2229,15 +2585,26 @@ export function PreRegistro() {
                   <p className="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
                     <QrCode className="w-3.5 h-3.5 text-[#00C8D4]" />
                     <span>
-                      Próximo Folio Correlativo:{" "}
-                      <strong className="font-mono text-[#0e011f]">
-                        HDV-PR-2026-{String(salesCounters.preRegCounter + 1).padStart(4, "0")}
-                      </strong>
+                      {isClientReviewMode && protectedFolio ? (
+                        <>
+                          Folio Oficial Protegido:{" "}
+                          <strong className="font-mono text-[#0e011f]">{protectedFolio}</strong>
+                        </>
+                      ) : (
+                        <>
+                          Próximo Folio Correlativo:{" "}
+                          <strong className="font-mono text-[#0e011f]">
+                            HDV-PR-2026-{String(salesCounters.preRegCounter + 1).padStart(4, "0")}
+                          </strong>
+                        </>
+                      )}
                     </span>
                   </p>
                   <p className="text-[10px] text-slate-500 max-w-xs">
                     {!termsAccepted
-                      ? "Marca la casilla de Términos y Derechos de Imagen para habilitar el envío."
+                      ? "Marca la casilla obligatoria 'Acepto los términos y condiciones' para habilitar el botón."
+                      : isClientReviewMode
+                      ? "Activa inmediatamente tu ficha verificada y emite tu credencial oficial con QR."
                       : "Emite comprobante automático con QR y sincroniza con Finanzas, CRM y Logs."}
                   </p>
                 </div>
@@ -2248,21 +2615,23 @@ export function PreRegistro() {
                   disabled={isSaving || !termsAccepted}
                   title={
                     !termsAccepted
-                      ? "Debes aceptar los Términos y Condiciones y Derechos de Imagen para continuar"
-                      : "Emitir Comprobante Oficial con Código QR"
+                      ? "Debes marcar 'Acepto los términos y condiciones' para habilitar Confirmar y Activar Ficha"
+                      : "Confirmar y Activar Ficha Oficial"
                   }
                   className="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-[#FF0096] via-[#9B00CC] to-[#00C8D4] hover:opacity-95 text-white font-black text-xs shadow-xl shadow-pink-900/20 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed hover:scale-102 active:scale-98"
                 >
                   {isSaving ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Emitiendo Comprobante QR...</span>
+                      <span>Confirmando y Activando Ficha...</span>
                     </>
                   ) : (
                     <>
-                      <QrCode className="w-4.5 h-4.5" />
+                      <CheckCircle2 className="w-4.5 h-4.5" />
                       <span>
-                        {publishDirectly
+                        {isClientReviewMode
+                          ? "Confirmar y Activar Ficha"
+                          : publishDirectly
                           ? "Publicar y Emitir Comprobante con QR"
                           : "Guardar Pre-Registro y Emitir Comprobante QR"}
                       </span>

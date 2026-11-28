@@ -450,6 +450,14 @@ export interface SalesPreRegistrationReceipt {
   officialEmail?: string;
   officialWebsite?: string;
   shortDescription?: string;
+  latitude?: string;
+  longitude?: string;
+  galleryImages?: string[];
+  contactPersonName?: string;
+  invitationStatus?: "precargado_pendiente" | "confirmado_activo";
+  confirmedAtIso?: string;
+  confirmedAtFormatted?: string;
+  confirmedByIp?: string;
   badges?: {
     has_power_plant?: boolean;
     has_water_247?: boolean;
@@ -731,6 +739,9 @@ export function getValidatedPreRegistrationForEstablishment(est?: {
 
   const matched = receipts.find((r) => {
     if (!r || !r.folio || !String(r.folio).toUpperCase().startsWith("HDV-PR-")) return false;
+    // Si es una invitación precargada que el cliente aún no ha confirmado con el check de términos,
+    // aún no abre el bloque de habitaciones en la ficha pública hasta que pulse "Confirmar y Activar Ficha"
+    if (r.invitationStatus === "precargado_pendiente" || r.termsAccepted === false) return false;
     if (slugClean && r.establishmentSlug && r.establishmentSlug.trim().toLowerCase() === slugClean) {
       return true;
     }
@@ -1837,4 +1848,725 @@ export async function updateSalesPreRegistrationReceipt(
   }
 
   return updatedReceipt;
+}
+
+// ============================================================================
+// GENERADOR UNIVERSAL DE PRE-REGISTRO PRECARGADO & VALIDACIÓN 1-CLIC DEL CLIENTE
+// ============================================================================
+
+export interface PreloadedInvitationTemplate {
+  defaultFolio: string;
+  slug: string;
+  establishmentId?: number | string | null;
+  establishmentTitle: string;
+  categoryName: string;
+  destinationName: string;
+  state: string;
+  city: string;
+  whatsappNumber: string;
+  officialEmail?: string;
+  officialWebsite?: string;
+  shortDescription: string;
+  primaryImage: string;
+  galleryImages?: string[];
+  latitude?: string;
+  longitude?: string;
+  contactPersonName: string;
+  modality: MembershipModality;
+  planId: string;
+}
+
+/**
+ * Catálogo de Invitaciones Oficiales Precargadas (Expediciones y Clientes VIP):
+ * Garantiza que el enlace enviado por WhatsApp o correo funcione de inmediato en
+ * cualquier dispositivo móvil o navegador del cliente con 0 datos ficticios.
+ */
+export const OFFICIAL_PRELOADED_INVITATIONS: PreloadedInvitationTemplate[] = [
+  {
+    defaultFolio: "HDV-PR-2026-0005",
+    slug: "waku-lodge-canaima",
+    establishmentId: 99903,
+    establishmentTitle: "Wakü Lodge Canaima",
+    categoryName: "Campamento / Eco-Lodge",
+    destinationName: "Canaima",
+    state: "Bolívar",
+    city: "Laguna de Canaima",
+    whatsappNumber: "+58 414 8882233",
+    officialEmail: "",
+    officialWebsite: "https://wakulodge.com",
+    shortDescription:
+      "Campamento y resort ecológico de ultra-lujo frente a la mítica Laguna de Canaima con vistas directas a los saltos y tepuyes.",
+    primaryImage:
+      "https://images.unsplash.com/photo-1586375300773-8384e3e4916f?w=800&auto=format&fit=crop",
+    galleryImages: [
+      "https://images.unsplash.com/photo-1586375300773-8384e3e4916f?w=800&auto=format&fit=crop"
+    ],
+    latitude: "6.244200",
+    longitude: "-62.852900",
+    contactPersonName: "Lusbelys Castro",
+    modality: "exclusivo_prestigio",
+    planId: "complejos"
+  }
+];
+
+/**
+ * Construye la URL directa de Revisión y Validación de Ficha Oficial para enviar al cliente.
+ */
+export function buildPreloadedClientReviewUrl(
+  receiptOrParams: {
+    folio: string;
+    establishmentSlug?: string;
+    contactPersonName?: string;
+    modality?: MembershipModality;
+  },
+  baseOrigin = "https://hotelesdevenezuela.com"
+): string {
+  const params = new URLSearchParams();
+  params.set("folio", receiptOrParams.folio);
+  if (receiptOrParams.establishmentSlug) {
+    params.set("slug", receiptOrParams.establishmentSlug);
+  }
+  if (receiptOrParams.contactPersonName) {
+    params.set("contacto", receiptOrParams.contactPersonName);
+  }
+  if (receiptOrParams.modality) {
+    params.set(
+      "nivel",
+      receiptOrParams.modality === "comercial_estandar" ? "estandar_connect" : "prestigio_top50"
+    );
+  }
+  return `${baseOrigin.replace(/\/$/, "")}/pre-registro?${params.toString()}`;
+}
+
+export interface CreateOrUpdatePreloadedInvitationInput {
+  targetFolio?: string;
+  establishmentId?: number | string | null;
+  establishmentTitle: string;
+  establishmentSlug: string;
+  categoryName: string;
+  destinationName: string;
+  state: string;
+  city: string;
+  whatsappNumber: string;
+  officialEmail?: string;
+  officialWebsite?: string;
+  shortDescription?: string;
+  primaryImage: string;
+  galleryImages?: string[];
+  latitude?: string;
+  longitude?: string;
+  contactPersonName: string;
+  benefitLevel: "prestigio_top50" | "estandar_connect";
+  modality?: MembershipModality;
+  planId?: string;
+  createdByEmail?: string | null;
+  createdByUserId?: string | null;
+}
+
+/**
+ * Crea o actualiza de forma no destructiva una Invitación de Pre-Registro Precargado
+ * para cualquier establecimiento del directorio o prospecto B2B:
+ * - Toma únicamente los datos reales verificados (0 habitaciones ficticias, 0 etiquetas no confirmadas).
+ * - Si el establecimiento o folio ya tiene un registro en `receipts`, lo reutiliza/actualiza sin duplicar folios ni alterar cupos.
+ * - Reserva su folio único `HDV-PR-2026-XXXX` y su posición en los primeros 50 aliados si es Top 50 / Prestigio.
+ */
+export async function createOrUpdatePreloadedInvitation(
+  input: CreateOrUpdatePreloadedInvitationInput
+): Promise<SalesPreRegistrationReceipt> {
+  const { counters, receipts } = await syncSalesStateFromSupabase();
+  const cleanTargetFolio = (input.targetFolio || "").trim().toUpperCase();
+  const cleanSlug = (input.establishmentSlug || "").trim().toLowerCase();
+  const normTitle = normalizeEstablishmentName(input.establishmentTitle);
+
+  // 1. Verificar si ya existe un comprobante/precarga para este folio o establecimiento (Idempotente / Anti-Duplicados)
+  const existingReceipt = receipts.find((r) => {
+    if (cleanTargetFolio && r.folio.toUpperCase() === cleanTargetFolio) return true;
+    if (cleanSlug && r.establishmentSlug && r.establishmentSlug.trim().toLowerCase() === cleanSlug) {
+      return true;
+    }
+    if (normTitle && normalizeEstablishmentName(r.establishmentTitle) === normTitle) {
+      return true;
+    }
+    return false;
+  });
+
+  const now = new Date();
+  const nowIso = now.toISOString();
+  const nowFormatted = now.toLocaleString("es-VE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true
+  });
+
+  const effectiveModality: MembershipModality =
+    input.benefitLevel === "estandar_connect"
+      ? "comercial_estandar"
+      : input.modality === "fundadores_50"
+      ? "fundadores_50"
+      : "exclusivo_prestigio";
+
+  const selectedPlan =
+    SAAS_COMMERCIAL_PLANS.find((p) => p.id === (input.planId || "premium")) ||
+    SAAS_COMMERCIAL_PLANS[6];
+
+  if (existingReceipt) {
+    // Actualizar precarga existente sin duplicar folio ni incrementar contadores
+    let preservedSlot = existingReceipt.founderSlotNumber;
+    let nextFoundersCounter = counters.foundersCounter;
+
+    if (
+      (effectiveModality === "exclusivo_prestigio" || effectiveModality === "fundadores_50") &&
+      !preservedSlot
+    ) {
+      const currentUsed = computeUnifiedExoneratedQuotaCount(receipts, counters.foundersCounter);
+      if (currentUsed < MAX_FOUNDERS_QUOTA) {
+        preservedSlot = currentUsed + 1;
+        nextFoundersCounter = preservedSlot;
+      }
+    }
+
+    const modalityLabel =
+      effectiveModality === "exclusivo_prestigio"
+        ? "Cliente de Prestigio / Aliado Fundador (Top 50) — 0% Comisiones"
+        : effectiveModality === "fundadores_50"
+        ? "Membresía Exonerada - Alianza 50 Fundadores (Top 50) — 0% Comisiones"
+        : "Plan Estándar / HDV Connect (0% Comisiones)";
+
+    const financialStatus: FinancialStatus =
+      effectiveModality === "comercial_estandar" ? "exonerado" : "exonerado";
+
+    const financialStatusLabel =
+      effectiveModality === "comercial_estandar"
+        ? "Plan Estándar / HDV Connect — 0% Comisiones por Reserva"
+        : `Exonerado ($0.00) — Cliente de Prestigio / Top 50 [Cupo #${preservedSlot || 1}/${MAX_FOUNDERS_QUOTA}]`;
+
+    const updatedExisting: SalesPreRegistrationReceipt = {
+      ...existingReceipt,
+      establishmentTitle: input.establishmentTitle.trim() || existingReceipt.establishmentTitle,
+      establishmentSlug: cleanSlug || existingReceipt.establishmentSlug,
+      categoryName: input.categoryName.trim() || existingReceipt.categoryName,
+      destinationName: input.destinationName.trim() || existingReceipt.destinationName,
+      state: input.state.trim() || existingReceipt.state,
+      city: input.city.trim() || existingReceipt.city,
+      whatsappNumber: input.whatsappNumber.trim() || existingReceipt.whatsappNumber,
+      officialEmail:
+        input.officialEmail !== undefined
+          ? input.officialEmail.trim()
+          : existingReceipt.officialEmail,
+      officialWebsite:
+        input.officialWebsite !== undefined
+          ? input.officialWebsite.trim()
+          : existingReceipt.officialWebsite,
+      shortDescription:
+        input.shortDescription !== undefined
+          ? input.shortDescription.trim()
+          : existingReceipt.shortDescription,
+      primaryImage: input.primaryImage.trim() || existingReceipt.primaryImage,
+      galleryImages: input.galleryImages || existingReceipt.galleryImages,
+      latitude: input.latitude ?? existingReceipt.latitude,
+      longitude: input.longitude ?? existingReceipt.longitude,
+      contactPersonName:
+        input.contactPersonName.trim() || existingReceipt.contactPersonName || "Gerencia General",
+      registrantName: `Propietario / Gerente: ${
+        input.contactPersonName.trim() ||
+        existingReceipt.contactPersonName ||
+        existingReceipt.establishmentTitle
+      }`,
+      modality: effectiveModality,
+      modalityLabel,
+      founderSlotNumber: preservedSlot,
+      financialStatus,
+      financialStatusLabel,
+      updatedAtIso: nowIso,
+      updatedAtFormatted: nowFormatted
+    };
+
+    const updatedReceipts = receipts.map((r) =>
+      r.folio === existingReceipt.folio ? updatedExisting : r
+    );
+    const updatedCounters: SalesCountersState = {
+      ...counters,
+      foundersCounter: Math.max(
+        counters.foundersCounter,
+        nextFoundersCounter,
+        computeUnifiedExoneratedQuotaCount(updatedReceipts, counters.foundersCounter)
+      )
+    };
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem(STORAGE_KEYS.COUNTERS, JSON.stringify(updatedCounters));
+      localStorage.setItem(STORAGE_KEYS.RECEIPTS, JSON.stringify(updatedReceipts));
+    }
+
+    try {
+      await supabase.from("site_settings").upsert(
+        {
+          setting_key: "hdv_sales_v13_state",
+          setting_value: JSON.stringify({
+            counters: updatedCounters,
+            receipts: updatedReceipts.slice(0, 500)
+          })
+        },
+        { onConflict: "setting_key" }
+      );
+    } catch {}
+
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("hdv_sales_v13_updated"));
+    }
+
+    return updatedExisting;
+  }
+
+  // 2. Es una nueva precarga: generar folio correlativo (o respetar el targetFolio si no está ocupado)
+  let nextPreRegSeq = Math.max(counters.preRegCounter, receipts.length) + 1;
+  if (cleanTargetFolio.startsWith("HDV-PR-2026-")) {
+    const parsedNum = parseInt(cleanTargetFolio.replace("HDV-PR-2026-", ""), 10);
+    if (!Number.isNaN(parsedNum) && parsedNum >= nextPreRegSeq) {
+      nextPreRegSeq = parsedNum;
+    }
+  }
+  const folio = `HDV-PR-2026-${pad4(nextPreRegSeq)}`;
+
+  const currentUnifiedUsed = computeUnifiedExoneratedQuotaCount(receipts, counters.foundersCounter);
+  let founderSlotNumber: number | null = null;
+  let nextFoundersCounter = counters.foundersCounter;
+  const nextExoneratedCounter = counters.exoneratedCounter + 1;
+  const financialCorrelative = `HDV-EXO-2026-${pad4(nextExoneratedCounter)}`;
+
+  if (
+    (effectiveModality === "exclusivo_prestigio" || effectiveModality === "fundadores_50") &&
+    currentUnifiedUsed < MAX_FOUNDERS_QUOTA
+  ) {
+    nextFoundersCounter = currentUnifiedUsed + 1;
+    founderSlotNumber = nextFoundersCounter;
+  }
+
+  const modalityLabel =
+    effectiveModality === "exclusivo_prestigio"
+      ? "Cliente de Prestigio / Aliado Fundador (Top 50) — 0% Comisiones"
+      : effectiveModality === "fundadores_50"
+      ? "Membresía Exonerada - Alianza 50 Fundadores (Top 50) — 0% Comisiones"
+      : "Plan Estándar / HDV Connect (0% Comisiones)";
+
+  const financialStatusLabel =
+    effectiveModality === "comercial_estandar"
+      ? "Plan Estándar / HDV Connect — 0% Comisiones por Reserva"
+      : `Exonerado ($0.00) — Cliente de Prestigio / Top 50 [Cupo #${founderSlotNumber || 1}/${MAX_FOUNDERS_QUOTA}]`;
+
+  const verificationPath = `/verificar-registro/${folio}`;
+  const digitalSignatureHash = buildDigitalSignature(folio, financialCorrelative, nowIso);
+
+  const preloadedReceipt: SalesPreRegistrationReceipt = {
+    id: crypto.randomUUID(),
+    folio,
+    financialCorrelative,
+    invoiceNumber: null,
+    correlativeSequence: nextPreRegSeq,
+    founderSlotNumber,
+    establishmentId: input.establishmentId ?? null,
+    wasConsolidatedExisting: true,
+    consolidatedMatchReason: "slug",
+    establishmentTitle: input.establishmentTitle.trim(),
+    establishmentSlug: cleanSlug,
+    categoryName: input.categoryName.trim(),
+    destinationName: input.destinationName.trim(),
+    state: input.state.trim(),
+    city: input.city.trim(),
+    whatsappNumber: input.whatsappNumber.trim(),
+    primaryImage: input.primaryImage.trim(),
+    galleryImages:
+      input.galleryImages && input.galleryImages.length > 0
+        ? input.galleryImages
+        : input.primaryImage
+        ? [input.primaryImage]
+        : [],
+    latitude: input.latitude || "",
+    longitude: input.longitude || "",
+    basePriceFrom: 0,
+    origin: "propietario",
+    contactPersonName: input.contactPersonName.trim() || "Gerencia General",
+    registrantName: `Propietario / Gerente: ${
+      input.contactPersonName.trim() || input.establishmentTitle.trim()
+    }`,
+    modality: effectiveModality,
+    modalityLabel,
+    planId: selectedPlan.id,
+    planName: selectedPlan.name,
+    monthlyAmountUsd: 0,
+    monthlyAmountVes: 0,
+    bcvRateUsed: 45.8,
+    showAmountOnReceipt: true,
+    financialStatus: "exonerado",
+    financialStatusLabel,
+    // Regla estricta: inicia con termsAccepted = false e invitationStatus = "precargado_pendiente"
+    // hasta que el cliente abra su enlace, marque el check obligatorio y pulse "Confirmar y Activar Ficha"
+    termsAccepted: false,
+    termsAcceptedText:
+      "Acepto los Términos y Condiciones de Hoteles de Venezuela y autorizo expresamente la publicación y uso promocional de la información comercial, logotipo y fotografías del establecimiento.",
+    clientIp: "Pendiente de validación por el cliente",
+    userAgent: "Precarga Oficial HDV Operaciones",
+    createdAtIso: nowIso,
+    createdAtFormatted: nowFormatted,
+    digitalSignatureHash,
+    verificationPath,
+    invitationStatus: "precargado_pendiente",
+    officialEmail: input.officialEmail?.trim() || "",
+    officialWebsite: input.officialWebsite?.trim() || "",
+    shortDescription: input.shortDescription?.trim() || "",
+    // Regla estricta de cero datos inventados: 0 etiquetas no confirmadas y 0 habitaciones ficticias
+    badges: {
+      has_power_plant: false,
+      has_water_247: false,
+      has_starlink: false,
+      is_pet_friendly: false,
+      has_hdv_seal: true
+    },
+    keyServicePills: [],
+    realRooms: []
+  };
+
+  const updatedCounters: SalesCountersState = {
+    preRegCounter: Math.max(counters.preRegCounter, nextPreRegSeq),
+    foundersCounter: Math.max(counters.foundersCounter, nextFoundersCounter),
+    exoneratedCounter: Math.max(counters.exoneratedCounter, nextExoneratedCounter),
+    invoiceCounter: counters.invoiceCounter,
+    initializedAt: counters.initializedAt
+  };
+
+  const updatedReceipts = [preloadedReceipt, ...receipts];
+
+  if (typeof window !== "undefined") {
+    localStorage.setItem(STORAGE_KEYS.COUNTERS, JSON.stringify(updatedCounters));
+    localStorage.setItem(STORAGE_KEYS.RECEIPTS, JSON.stringify(updatedReceipts));
+  }
+
+  try {
+    await supabase.from("site_settings").upsert(
+      {
+        setting_key: "hdv_sales_v13_state",
+        setting_value: JSON.stringify({
+          counters: updatedCounters,
+          receipts: updatedReceipts.slice(0, 500)
+        })
+      },
+      { onConflict: "setting_key" }
+    );
+  } catch (err) {
+    console.warn("Aviso guardando precarga de pre-registro en site_settings:", err);
+  }
+
+  await logActivity(
+    input.createdByUserId || null,
+    input.createdByEmail || "operaciones@hotelesdevenezuela.com",
+    "PRECARGA_PRE_REGISTRO_VIP",
+    `Folio Precargado: ${folio} (${financialCorrelative}) | Establecimiento: ${preloadedReceipt.establishmentTitle} (${preloadedReceipt.destinationName}) | Contacto: ${preloadedReceipt.contactPersonName} | Nivel: ${modalityLabel}`
+  );
+
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("hdv_sales_v13_updated"));
+  }
+
+  return preloadedReceipt;
+}
+
+export interface ConfirmPreloadedPreRegistrationInput {
+  folio: string;
+  establishmentId?: number | string | null;
+  establishmentTitle: string;
+  establishmentSlug: string;
+  categoryName: string;
+  destinationName: string;
+  state: string;
+  city: string;
+  whatsappNumber: string;
+  officialEmail?: string;
+  officialWebsite?: string;
+  shortDescription?: string;
+  primaryImage: string;
+  galleryImages?: string[];
+  latitude?: string;
+  longitude?: string;
+  basePriceFrom: number;
+  contactPersonName?: string;
+  modality: MembershipModality;
+  planId: string;
+  bcvRate: number;
+  termsAccepted: boolean;
+  badges?: {
+    has_power_plant?: boolean;
+    has_water_247?: boolean;
+    has_starlink?: boolean;
+    is_pet_friendly?: boolean;
+    has_hdv_seal?: boolean;
+  };
+  keyServicePills?: string[];
+  realRooms?: Array<{
+    id?: number;
+    name: string;
+    capacity: number;
+    price_per_night?: number;
+    size_m2?: number;
+    beds_summary?: string;
+    amenities?: string;
+  }>;
+  userId?: string | null;
+  userEmail?: string | null;
+}
+
+/**
+ * Confirma y Activa en 1 clic un Pre-Registro Precargado o Existente (`?folio=HDV-PR-2026-...`):
+ * - Mantiene 100% protegido e inalterable el folio original (`HDV-PR-2026-...`) y su correlativo financiero.
+ * - Registra la marca de tiempo de confirmación, IP pública del cliente y aceptación legal de términos.
+ * - Si es miembro de los primeros 50 (Fundador o Prestigio), confirma su cupo en el contador unificado de 50 sin duplicar ni incrementar dos veces.
+ */
+export async function confirmPreloadedPreRegistration(
+  input: ConfirmPreloadedPreRegistrationInput
+): Promise<SalesPreRegistrationReceipt> {
+  const { counters, receipts } = await syncSalesStateFromSupabase();
+  const clientIp = await detectClientPublicIp();
+  const userAgent =
+    typeof navigator !== "undefined" ? navigator.userAgent : "HDV-Client-Browser";
+
+  const now = new Date();
+  const confirmedAtIso = now.toISOString();
+  const confirmedAtFormatted = now.toLocaleString("es-VE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true
+  });
+
+  const cleanFolio = (input.folio || "").trim().toUpperCase();
+  const cleanSlug = (input.establishmentSlug || "").trim().toLowerCase();
+
+  let targetReceipt =
+    receipts.find((r) => r.folio.toUpperCase() === cleanFolio) ||
+    receipts.find(
+      (r) => cleanSlug && r.establishmentSlug && r.establishmentSlug.toLowerCase() === cleanSlug
+    ) ||
+    null;
+
+  // Si el cliente abrió el enlace desde otro dispositivo antes de que la precarga estuviera en su storage local,
+  // la sembramos en el acto con su folio original protegido sin duplicar contadores.
+  if (!targetReceipt) {
+    targetReceipt = await createOrUpdatePreloadedInvitation({
+      targetFolio: cleanFolio || undefined,
+      establishmentId: input.establishmentId,
+      establishmentTitle: input.establishmentTitle,
+      establishmentSlug: input.establishmentSlug,
+      categoryName: input.categoryName,
+      destinationName: input.destinationName,
+      state: input.state,
+      city: input.city,
+      whatsappNumber: input.whatsappNumber,
+      officialEmail: input.officialEmail,
+      officialWebsite: input.officialWebsite,
+      shortDescription: input.shortDescription,
+      primaryImage: input.primaryImage,
+      galleryImages: input.galleryImages,
+      latitude: input.latitude,
+      longitude: input.longitude,
+      contactPersonName: input.contactPersonName || input.establishmentTitle,
+      benefitLevel:
+        input.modality === "comercial_estandar" ? "estandar_connect" : "prestigio_top50",
+      modality: input.modality,
+      planId: input.planId
+    });
+  }
+
+  const latestReceipts = getSalesReceipts();
+  const latestCounters = getSalesCounters();
+
+  let preservedSlot = targetReceipt.founderSlotNumber;
+  let nextFoundersCounter = latestCounters.foundersCounter;
+
+  if (
+    (input.modality === "exclusivo_prestigio" || input.modality === "fundadores_50") &&
+    !preservedSlot
+  ) {
+    const currentUsed = computeUnifiedExoneratedQuotaCount(
+      latestReceipts,
+      latestCounters.foundersCounter
+    );
+    if (currentUsed < MAX_FOUNDERS_QUOTA) {
+      preservedSlot = currentUsed + 1;
+      nextFoundersCounter = preservedSlot;
+    }
+  }
+
+  const modalityLabel =
+    input.modality === "fundadores_50"
+      ? "Membresía Exonerada - Alianza 50 Fundadores"
+      : input.modality === "exclusivo_prestigio"
+      ? "Membresía Exonerada - Selección Exclusiva Prestigio 2026"
+      : "Plan Estándar / HDV Connect (0% Comisiones)";
+
+  const financialStatusLabel =
+    input.modality === "fundadores_50"
+      ? `Exonerado ($0.00) — Alianza 50 Fundadores [Cupo #${preservedSlot || 1}/${MAX_FOUNDERS_QUOTA}]`
+      : input.modality === "exclusivo_prestigio"
+      ? `Exonerado ($0.00) — Selección Exclusiva Prestigio 2026 [Cupo #${preservedSlot || 1}/${MAX_FOUNDERS_QUOTA}]`
+      : "Plan Estándar / HDV Connect — 0% Comisiones por Reserva";
+
+  const contactName =
+    input.contactPersonName?.trim() ||
+    targetReceipt.contactPersonName ||
+    targetReceipt.registrantName.replace(/^Propietario \/ Gerente:\s*/i, "") ||
+    input.establishmentTitle;
+
+  const confirmedReceipt: SalesPreRegistrationReceipt = {
+    ...targetReceipt,
+    // Folio y correlativo estrictamente inmutables
+    folio: targetReceipt.folio,
+    financialCorrelative: targetReceipt.financialCorrelative,
+    correlativeSequence: targetReceipt.correlativeSequence,
+    founderSlotNumber: preservedSlot,
+
+    // Datos validados y/o editados por el cliente
+    establishmentId: input.establishmentId ?? targetReceipt.establishmentId ?? null,
+    wasConsolidatedExisting: true,
+    establishmentTitle: input.establishmentTitle.trim(),
+    establishmentSlug: input.establishmentSlug.trim(),
+    categoryName: input.categoryName.trim(),
+    destinationName: input.destinationName.trim(),
+    state: input.state.trim(),
+    city: input.city.trim(),
+    whatsappNumber: input.whatsappNumber.trim(),
+    officialEmail: input.officialEmail?.trim() || "",
+    officialWebsite: input.officialWebsite?.trim() || "",
+    shortDescription: input.shortDescription?.trim() || "",
+    primaryImage: input.primaryImage.trim(),
+    galleryImages: input.galleryImages || targetReceipt.galleryImages,
+    latitude: input.latitude ?? targetReceipt.latitude,
+    longitude: input.longitude ?? targetReceipt.longitude,
+    basePriceFrom: input.basePriceFrom,
+    contactPersonName: contactName,
+    registrantName: `Propietario / Gerente: ${contactName}`,
+    modality: input.modality,
+    modalityLabel,
+    financialStatusLabel,
+
+    // Confirmación legal y telemetría de aceptación del cliente
+    termsAccepted: true,
+    termsAcceptedText:
+      "Acepto los Términos y Condiciones de Hoteles de Venezuela y autorizo expresamente la publicación y uso promocional de la información comercial, logotipo y fotografías del establecimiento.",
+    clientIp:
+      targetReceipt.clientIp &&
+      !targetReceipt.clientIp.toLowerCase().includes("pendiente")
+        ? targetReceipt.clientIp
+        : clientIp,
+    userAgent,
+    invitationStatus: "confirmado_activo",
+    confirmedAtIso,
+    confirmedAtFormatted,
+    confirmedByIp: clientIp,
+    updatedAtIso: confirmedAtIso,
+    updatedAtFormatted: confirmedAtFormatted,
+    badges: input.badges,
+    keyServicePills: input.keyServicePills || [],
+    realRooms: input.realRooms || []
+  };
+
+  const existsInList = latestReceipts.some((r) => r.folio === confirmedReceipt.folio);
+  const updatedReceipts = existsInList
+    ? latestReceipts.map((r) => (r.folio === confirmedReceipt.folio ? confirmedReceipt : r))
+    : [confirmedReceipt, ...latestReceipts];
+
+  const updatedCounters: SalesCountersState = {
+    ...latestCounters,
+    preRegCounter: Math.max(
+      latestCounters.preRegCounter,
+      confirmedReceipt.correlativeSequence || updatedReceipts.length
+    ),
+    foundersCounter: computeUnifiedExoneratedQuotaCount(
+      updatedReceipts,
+      Math.max(latestCounters.foundersCounter, nextFoundersCounter)
+    )
+  };
+
+  if (typeof window !== "undefined") {
+    localStorage.setItem(STORAGE_KEYS.COUNTERS, JSON.stringify(updatedCounters));
+    localStorage.setItem(STORAGE_KEYS.RECEIPTS, JSON.stringify(updatedReceipts));
+  }
+
+  try {
+    await supabase.from("site_settings").upsert(
+      {
+        setting_key: "hdv_sales_v13_state",
+        setting_value: JSON.stringify({
+          counters: updatedCounters,
+          receipts: updatedReceipts.slice(0, 500)
+        })
+      },
+      { onConflict: "setting_key" }
+    );
+  } catch (err) {
+    console.warn("Aviso guardando confirmación de ficha en site_settings:", err);
+  }
+
+  await logActivity(
+    input.userId || null,
+    input.userEmail || input.officialEmail || "propietario@hotelesdevenezuela.com",
+    "CONFIRMACION_FICHA_PRECARGADA",
+    `Folio Confirmado: ${confirmedReceipt.folio} (${confirmedReceipt.financialCorrelative}) | Establecimiento: ${confirmedReceipt.establishmentTitle} (${confirmedReceipt.destinationName}) | Responsable: ${contactName} | Cupo: ${
+      confirmedReceipt.founderSlotNumber
+        ? `#${confirmedReceipt.founderSlotNumber}/${MAX_FOUNDERS_QUOTA}`
+        : "Estándar"
+    } | Habitaciones Reales Cargadas: ${confirmedReceipt.realRooms?.length || 0} | IP Confirmación: ${clientIp} | Fecha: ${confirmedAtFormatted}`
+  );
+
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("hdv_sales_v13_updated"));
+  }
+
+  return confirmedReceipt;
+}
+
+/**
+ * Garantiza de forma no destructiva que el primer caso de prueba oficial:
+ * "Wakü Lodge" (Canaima — Contacto: Lusbelys Castro, Cliente de Prestigio con exoneración)
+ * esté disponible y precargado en el sistema respetando intactos los 4 pre-registros previos.
+ */
+export async function ensureWakuLodgePreloadedInvitation(): Promise<SalesPreRegistrationReceipt> {
+  const wakuTemplate = OFFICIAL_PRELOADED_INVITATIONS[0];
+  const receipts = getSalesReceipts();
+  const existingWaku = receipts.find(
+    (r) =>
+      r.establishmentSlug?.toLowerCase() === wakuTemplate.slug ||
+      normalizeEstablishmentName(r.establishmentTitle).includes("waku lodge")
+  );
+  if (existingWaku) {
+    return existingWaku;
+  }
+
+  return createOrUpdatePreloadedInvitation({
+    targetFolio: wakuTemplate.defaultFolio,
+    establishmentId: wakuTemplate.establishmentId,
+    establishmentTitle: wakuTemplate.establishmentTitle,
+    establishmentSlug: wakuTemplate.slug,
+    categoryName: wakuTemplate.categoryName,
+    destinationName: wakuTemplate.destinationName,
+    state: wakuTemplate.state,
+    city: wakuTemplate.city,
+    whatsappNumber: wakuTemplate.whatsappNumber,
+    officialEmail: wakuTemplate.officialEmail,
+    officialWebsite: wakuTemplate.officialWebsite,
+    shortDescription: wakuTemplate.shortDescription,
+    primaryImage: wakuTemplate.primaryImage,
+    galleryImages: wakuTemplate.galleryImages,
+    latitude: wakuTemplate.latitude,
+    longitude: wakuTemplate.longitude,
+    contactPersonName: wakuTemplate.contactPersonName,
+    benefitLevel: "prestigio_top50",
+    modality: "exclusivo_prestigio",
+    planId: wakuTemplate.planId
+  });
 }
