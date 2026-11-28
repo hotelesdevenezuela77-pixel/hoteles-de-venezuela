@@ -263,10 +263,10 @@ export function PreRegistro() {
 
   // Fotos & Archivos del Establecimiento
   const [primaryImage, setPrimaryImage] = useState<string>(
-    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop"
+    ""
   );
   const [galleryImages, setGalleryImages] = useState<string[]>([
-    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop"
+    ""
   ]);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState<boolean>(false);
   const [photoUrlInput, setPhotoUrlInput] = useState<string>("");
@@ -407,12 +407,10 @@ export function PreRegistro() {
             ""
         );
         if (matchedReceipt.primaryImage) {
-          const resolvedPrimary = (matchedReceipt.folio === "HDV-PR-2026-0005" || matchedReceipt.establishmentSlug === "waku-lodge-canaima") && (!matchedReceipt.primaryImage || matchedReceipt.primaryImage.includes("1586375300773")) ? "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop" : matchedReceipt.primaryImage;
+          const resolvedPrimary = (matchedReceipt.primaryImage && matchedReceipt.primaryImage.includes("unsplash.com")) ? "" : (matchedReceipt.primaryImage || "");
           setPrimaryImage(resolvedPrimary);
           setGalleryImages(
-            matchedReceipt.galleryImages && matchedReceipt.galleryImages.length > 0 && !matchedReceipt.galleryImages[0]?.includes("1586375300773")
-              ? matchedReceipt.galleryImages
-              : [resolvedPrimary]
+            Array.isArray(matchedReceipt.galleryImages) ? matchedReceipt.galleryImages.filter((u) => !u.includes("unsplash.com")) : (resolvedPrimary ? [resolvedPrimary] : [])
           );
         }
         if (matchedReceipt.latitude || officialTemplate?.latitude) {
@@ -2719,7 +2717,7 @@ export function PreRegistro() {
                 {/* Carrusel / Foto Superior */}
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-900">
                   <img
-                    src={primaryImage || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop"}
+                    src={primaryImage || ""}
                     alt={title}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
