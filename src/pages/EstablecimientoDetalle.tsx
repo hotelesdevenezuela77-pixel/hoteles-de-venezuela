@@ -1582,6 +1582,7 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
 
+            {(isCreatorCategory || isGastronomyCategory || (isPreRegVerified && rooms.length > 0)) && (
           <div className="lg:col-span-8 space-y-10">
 
             {/* ── 3. SECCIÓN: CATÁLOGO DE RUTAS / ÁREAS / HABITACIONES REALES (GATEKEEPER: SOLO SI TIENE PRE-REGISTRO Y UNIDADES REALES) ── */}
@@ -2142,9 +2143,10 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
             )}
 
           </div>
+            )}
 
           {/* ── STICKY SIDEBAR: CONTACTO & RESERVAS ── */}
-          <div className="lg:col-span-4 space-y-6">
+          <div className={(isCreatorCategory || isGastronomyCategory || (isPreRegVerified && rooms.length > 0)) ? "lg:col-span-4 space-y-6" : "lg:col-span-12 space-y-6"}>
 
             {isCreatorCategory ? (
               <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-md space-y-4 text-left">
