@@ -265,9 +265,7 @@ export function PreRegistro() {
   const [primaryImage, setPrimaryImage] = useState<string>(
     ""
   );
-  const [galleryImages, setGalleryImages] = useState<string[]>([
-    ""
-  ]);
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState<boolean>(false);
   const [photoUrlInput, setPhotoUrlInput] = useState<string>("");
 
@@ -639,7 +637,10 @@ export function PreRegistro() {
 
     if (uploadedUrl) {
       setPrimaryImage(uploadedUrl);
-      setGalleryImages((prev) => (prev.includes(uploadedUrl) ? prev : [uploadedUrl, ...prev]));
+      setGalleryImages((prev) => {
+        const base = prev.filter((u) => typeof u === "string" && u.trim().length > 0);
+        return base.includes(uploadedUrl) ? base : [uploadedUrl, ...base];
+      });
     }
     setIsUploadingPhoto(false);
     e.target.value = "";
@@ -690,7 +691,8 @@ export function PreRegistro() {
     }
 
     setGalleryImages((prev) => {
-      const updated = [...prev, ...newImages];
+      const base = prev.filter((u) => typeof u === "string" && u.trim().length > 0);
+      const updated = Array.from(new Set([...base, ...newImages]));
       if (!primaryImage || primaryImage.includes("unsplash.com")) {
         setPrimaryImage(updated[0]);
       }
@@ -703,16 +705,24 @@ export function PreRegistro() {
   // Agregar foto vía URL manual
   const handleAddPhotoUrl = () => {
     if (photoUrlInput.trim()) {
-      setGalleryImages((prev) => [...prev, photoUrlInput.trim()]);
-      if (!primaryImage) setPrimaryImage(photoUrlInput.trim());
+      const cleanUrl = photoUrlInput.trim();
+      setGalleryImages((prev) => {
+        const base = prev.filter((u) => typeof u === "string" && u.trim().length > 0);
+        return base.includes(cleanUrl) ? base : [...base, cleanUrl];
+      });
+      if (!primaryImage || !primaryImage.trim()) {
+        setPrimaryImage(cleanUrl);
+      }
       setPhotoUrlInput("");
     }
   };
 
   const removePhoto = (index: number) => {
-    const updated = galleryImages.filter((_, idx) => idx !== index);
+    const cleanCurrent = galleryImages.filter((u) => typeof u === "string" && u.trim().length > 0);
+    const removedUrl = cleanCurrent[index];
+    const updated = cleanCurrent.filter((_, idx) => idx !== index);
     setGalleryImages(updated);
-    if (primaryImage === galleryImages[index]) {
+    if (primaryImage === removedUrl || !primaryImage.trim()) {
       setPrimaryImage(updated[0] || "");
     }
   };
@@ -859,8 +869,8 @@ export function PreRegistro() {
         official_email: officialEmail.trim(),
         official_website: officialWebsiteOrInstagram.trim(),
         real_rooms: realRoomsInventory,
-        primary_image: primaryImage,
-        gallery_images: galleryImages
+        primary_image: (primaryImage && primaryImage.trim().length > 0 ? primaryImage.trim() : (galleryImages.filter((u) => typeof u === "string" && u.trim().length > 0)[0] || "")),
+        gallery_images: galleryImages.filter((u) => typeof u === "string" && u.trim().length > 0)
       };
 
       // 1. Procesar el Pre-Registro:
@@ -882,8 +892,8 @@ export function PreRegistro() {
               officialEmail: officialEmail.trim() || undefined,
               officialWebsite: officialWebsiteOrInstagram.trim() || undefined,
               shortDescription: shortDescription.trim() || undefined,
-              primaryImage,
-              galleryImages,
+              primaryImage: (primaryImage && primaryImage.trim().length > 0 ? primaryImage.trim() : (galleryImages.filter((u) => typeof u === "string" && u.trim().length > 0)[0] || "")),
+              galleryImages: galleryImages.filter((u) => typeof u === "string" && u.trim().length > 0),
               latitude: latitude || undefined,
               longitude: longitude || undefined,
               basePriceFrom: effectiveBasePrice,
@@ -973,7 +983,7 @@ export function PreRegistro() {
         contact: {
           "C00.3.2.6": whatsappNumber
         },
-        gallery: galleryImages
+        gallery: galleryImages.filter((u) => typeof u === "string" && u.trim().length > 0)
       };
 
       const resolvedTier =
@@ -2717,7 +2727,7 @@ export function PreRegistro() {
                 {/* Carrusel / Foto Superior */}
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-900">
                   <img
-                    src={primaryImage || ""}
+                    src={(primaryImage && primaryImage.trim().length > 0 ? primaryImage.trim() : (galleryImages.filter((u) => typeof u === "string" && u.trim().length > 0)[0] || ""))}
                     alt={title}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
