@@ -422,7 +422,7 @@ export const ESTABLISHMENTS_MOCK: Establishment[] = [
     price_level: "$$$$",
     is_featured: true,
     services: "[\"wifi\", \"restaurante\", \"excursiones\", \"spa\", \"starlink\"]",
-    membership_tier: "diamante",
+    membership_tier: "de prestigio",
     has_hdv_seal: true
   },
   {

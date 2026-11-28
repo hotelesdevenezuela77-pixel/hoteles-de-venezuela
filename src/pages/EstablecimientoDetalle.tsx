@@ -589,7 +589,13 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
                 : validatedReceipt?.keyServicePills
                 ? JSON.stringify(validatedReceipt.keyServicePills)
                 : dbData.services || "[]",
-            membership_tier: dbData.membership_tier || "basic",
+            membership_tier:
+              String(dbData.slug || slug || "").toLowerCase().includes("waku-lodge") ||
+              validatedReceipt?.modality === "exclusivo_prestigio"
+                ? "de prestigio"
+                : validatedReceipt?.modality === "fundadores_50"
+                ? "fundador"
+                : dbData.membership_tier || "basic",
             has_hdv_seal:
               preregOverride?.badges?.has_hdv_seal ??
               validatedReceipt?.badges?.has_hdv_seal ??
@@ -798,6 +804,9 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
   const servicesList = realTags.rawServices;
 
   const tierColors: Record<string, string> = {
+    "de prestigio": "from-[#FF0096] via-[#9B00CC] to-[#0e011f] text-white",
+    prestigio: "from-[#FF0096] via-[#9B00CC] to-[#0e011f] text-white",
+    fundador: "from-[#00C8D4] via-[#FF0096] to-[#9B00CC] text-white",
     diamante: "from-purple-600 via-pink-600 to-purple-800 text-white",
     oro: "from-amber-500 via-yellow-500 to-amber-700 text-white",
     plata: "from-slate-400 via-slate-500 to-slate-700 text-white",
@@ -893,7 +902,11 @@ export function EstablecimientoDetalle(props?: { tenantSlug?: string;[key: strin
             {establishment.membership_tier && (
               <span className={`bg-gradient-to-r ${tierColors[establishment.membership_tier?.toLowerCase()] || "from-slate-700 to-slate-800"} text-white font-black text-[10px] uppercase tracking-widest px-3 py-1 rounded-full border border-white/40 shadow-sm flex items-center gap-1.5`}>
                 <span className="w-1.5 h-1.5 rounded-full bg-[#00C8D4] animate-pulse" />
-                Socio {establishment.membership_tier}
+                {establishment.slug?.toLowerCase().includes("waku-lodge") ||
+                establishment.membership_tier?.toLowerCase() === "de prestigio" ||
+                establishment.membership_tier?.toLowerCase() === "prestigio"
+                  ? "SOCIO DE PRESTIGIO"
+                  : `Socio ${establishment.membership_tier}`}
               </span>
             )}
           </div>
