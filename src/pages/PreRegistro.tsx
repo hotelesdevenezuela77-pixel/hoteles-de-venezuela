@@ -263,10 +263,10 @@ export function PreRegistro() {
 
   // Fotos & Archivos del Establecimiento
   const [primaryImage, setPrimaryImage] = useState<string>(
-    "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop"
+    "https://images.unsplash.com/photo-1586375300773-8384e3e4916f?w=800&auto=format&fit=crop"
   );
   const [galleryImages, setGalleryImages] = useState<string[]>([
-    "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop"
+    "https://images.unsplash.com/photo-1586375300773-8384e3e4916f?w=800&auto=format&fit=crop"
   ]);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState<boolean>(false);
   const [photoUrlInput, setPhotoUrlInput] = useState<string>("");
@@ -1382,7 +1382,7 @@ export function PreRegistro() {
                   </span>
                   <span className="text-xs font-mono font-black text-slate-900">
                     {modality !== "comercial_estandar"
-                      ? `#${protectedSlotNumber || Math.min(MAX_FOUNDERS_QUOTA, foundersOccupied + 1)} / ${MAX_FOUNDERS_QUOTA}`
+                      ? `#${protectedSlotNumber || ((protectedFolio === "HDV-PR-2026-0005" || preloadedSlug === "waku-lodge-canaima") ? 4 : Math.min(MAX_FOUNDERS_QUOTA, foundersOccupied + 1))} / ${MAX_FOUNDERS_QUOTA}`
                       : "HDV Connect"}
                   </span>
                 </div>
@@ -2712,7 +2712,7 @@ export function PreRegistro() {
                 {/* Carrusel / Foto Superior */}
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-900">
                   <img
-                    src={primaryImage || "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800"}
+                    src={primaryImage || "https://images.unsplash.com/photo-1586375300773-8384e3e4916f?w=800&auto=format&fit=crop"}
                     alt={title}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
