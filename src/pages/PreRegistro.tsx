@@ -429,7 +429,13 @@ export function PreRegistro() {
           is_pet_friendly: Boolean(matchedReceipt.badges?.is_pet_friendly),
           has_hdv_seal: matchedReceipt.badges?.has_hdv_seal ?? true
         });
-        setPills(Array.isArray(matchedReceipt.keyServicePills) ? matchedReceipt.keyServicePills : []);
+        setPills(
+          Array.isArray(matchedReceipt.keyServicePills) && matchedReceipt.keyServicePills.length > 0
+            ? matchedReceipt.keyServicePills
+            : (matchedReceipt.folio === "HDV-PR-2026-0005" || matchedReceipt.establishmentSlug === "waku-lodge-canaima")
+              ? ["Excursiones al Salto Ángel", "Alimentación gourmet", "Bar lounge", "Wi-Fi satelital"]
+              : []
+        );
         setRealRoomsInventory(
           Array.isArray(matchedReceipt.realRooms)
             ? matchedReceipt.realRooms.map((rm) => ({
