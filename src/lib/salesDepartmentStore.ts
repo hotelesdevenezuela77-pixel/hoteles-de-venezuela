@@ -518,6 +518,7 @@ export function ensureUnifiedQuotaSlotsOnReceipts(
 
   const usedSlots = new Set<number>();
   for (const r of receipts) {
+    if (r.invitationStatus === "precargado_pendiente" || r.termsAccepted === false) continue;
     if (typeof r.founderSlotNumber === "number" && r.founderSlotNumber > 0) {
       usedSlots.add(r.founderSlotNumber);
     }
@@ -532,6 +533,7 @@ export function ensureUnifiedQuotaSlotsOnReceipts(
   const slotByFolio = new Map<string, number>();
 
   for (const r of chronological) {
+    if (r.invitationStatus === "precargado_pendiente" || r.termsAccepted === false) continue;
     const isUnifiedQuotaModality =
       r.modality === "fundadores_50" || r.modality === "exclusivo_prestigio";
     if (!isUnifiedQuotaModality || r.financialStatus !== "exonerado") continue;
@@ -561,6 +563,20 @@ export function ensureUnifiedQuotaSlotsOnReceipts(
   }
 
   const normalized = receipts.map((r) => {
+    // Una precarga pendiente (aún no confirmada con términos aceptados por el cliente) NO consume cupo hasta su confirmación
+    if (r.invitationStatus === "precargado_pendiente" || r.termsAccepted === false) {
+      if (r.founderSlotNumber !== null) {
+        return {
+          ...r,
+          founderSlotNumber: null,
+          financialStatusLabel:
+            r.modality === "comercial_estandar"
+              ? "Plan Estándar / HDV Connect — 0% Comisiones por Reserva"
+              : "Exonerado ($0.00) — Cliente de Prestigio / Top 50 (Cupo por asignar al confirmar)"
+        };
+      }
+      return r;
+    }
     if (typeof r.founderSlotNumber === "number" && r.founderSlotNumber > 0) {
       return r;
     }
@@ -590,20 +606,26 @@ export function computeUnifiedExoneratedQuotaCount(
   storedCounter = 0
 ): number {
   const { receipts: normalized } = ensureUnifiedQuotaSlotsOnReceipts(receipts);
-  const maxSlotAssigned = normalized.reduce(
+  const confirmedOnly = normalized.filter(
+    (r) => r.invitationStatus !== "precargado_pendiente" && r.termsAccepted !== false
+  );
+  const maxSlotAssigned = confirmedOnly.reduce(
     (max, r) => Math.max(max, typeof r.founderSlotNumber === "number" ? r.founderSlotNumber : 0),
     0
   );
-  const totalQuotaReceipts = normalized.filter(
+  const totalQuotaReceipts = confirmedOnly.filter(
     (r) =>
       (r.modality === "fundadores_50" || r.modality === "exclusivo_prestigio") &&
       (r.founderSlotNumber !== null || r.financialStatus === "exonerado")
   ).length;
 
-  return Math.min(
-    MAX_FOUNDERS_QUOTA,
-    Math.max(storedCounter || 0, maxSlotAssigned, totalQuotaReceipts)
-  );
+  // Si hay comprobantes confirmados en la lista, el contador real se deriva exclusivamente de los confirmados
+  // para que ninguna precarga o visita previa de revisión altere el contador de cupos
+  if (confirmedOnly.length > 0) {
+    return Math.min(MAX_FOUNDERS_QUOTA, Math.max(maxSlotAssigned, totalQuotaReceipts));
+  }
+
+  return Math.min(MAX_FOUNDERS_QUOTA, Math.max(storedCounter || 0, maxSlotAssigned, totalQuotaReceipts));
 }
 
 /**
@@ -2014,20 +2036,14 @@ export async function createOrUpdatePreloadedInvitation(
     SAAS_COMMERCIAL_PLANS[6];
 
   if (existingReceipt) {
-    // Actualizar precarga existente sin duplicar folio ni incrementar contadores
-    let preservedSlot = existingReceipt.founderSlotNumber;
-    let nextFoundersCounter = counters.foundersCounter;
+    // Actualizar precarga existente sin duplicar folio ni incrementar el contador de cupos:
+    // Si sigue en estado "precargado_pendiente" (termsAccepted === false), founderSlotNumber permanece en null
+    // hasta que el cliente confirme y acepte términos.
+    const isAlreadyConfirmed =
+      existingReceipt.invitationStatus === "confirmado_activo" &&
+      existingReceipt.termsAccepted === true;
 
-    if (
-      (effectiveModality === "exclusivo_prestigio" || effectiveModality === "fundadores_50") &&
-      !preservedSlot
-    ) {
-      const currentUsed = computeUnifiedExoneratedQuotaCount(receipts, counters.foundersCounter);
-      if (currentUsed < MAX_FOUNDERS_QUOTA) {
-        preservedSlot = currentUsed + 1;
-        nextFoundersCounter = preservedSlot;
-      }
-    }
+    const preservedSlot = isAlreadyConfirmed ? existingReceipt.founderSlotNumber : null;
 
     const modalityLabel =
       effectiveModality === "exclusivo_prestigio"
@@ -2036,13 +2052,14 @@ export async function createOrUpdatePreloadedInvitation(
         ? "Membresía Exonerada - Alianza 50 Fundadores (Top 50) — 0% Comisiones"
         : "Plan Estándar / HDV Connect (0% Comisiones)";
 
-    const financialStatus: FinancialStatus =
-      effectiveModality === "comercial_estandar" ? "exonerado" : "exonerado";
+    const financialStatus: FinancialStatus = "exonerado";
 
     const financialStatusLabel =
       effectiveModality === "comercial_estandar"
         ? "Plan Estándar / HDV Connect — 0% Comisiones por Reserva"
-        : `Exonerado ($0.00) — Cliente de Prestigio / Top 50 [Cupo #${preservedSlot || 1}/${MAX_FOUNDERS_QUOTA}]`;
+        : isAlreadyConfirmed && preservedSlot
+        ? `Exonerado ($0.00) — Cliente de Prestigio / Top 50 [Cupo #${preservedSlot}/${MAX_FOUNDERS_QUOTA}]`
+        : "Exonerado ($0.00) — Cliente de Prestigio / Top 50 (Cupo por asignar al confirmar)";
 
     const updatedExisting: SalesPreRegistrationReceipt = {
       ...existingReceipt,
@@ -2090,11 +2107,7 @@ export async function createOrUpdatePreloadedInvitation(
     );
     const updatedCounters: SalesCountersState = {
       ...counters,
-      foundersCounter: Math.max(
-        counters.foundersCounter,
-        nextFoundersCounter,
-        computeUnifiedExoneratedQuotaCount(updatedReceipts, counters.foundersCounter)
-      )
+      foundersCounter: computeUnifiedExoneratedQuotaCount(updatedReceipts, counters.foundersCounter)
     };
 
     if (typeof window !== "undefined") {
@@ -2122,7 +2135,8 @@ export async function createOrUpdatePreloadedInvitation(
     return updatedExisting;
   }
 
-  // 2. Es una nueva precarga: generar folio correlativo (o respetar el targetFolio si no está ocupado)
+  // 2. Es una nueva precarga: generar folio correlativo (o respetar el targetFolio si no está ocupado),
+  // pero SIN consumir cupo del contador de 50 aliados hasta que el cliente marque términos y confirme.
   let nextPreRegSeq = Math.max(counters.preRegCounter, receipts.length) + 1;
   if (cleanTargetFolio.startsWith("HDV-PR-2026-")) {
     const parsedNum = parseInt(cleanTargetFolio.replace("HDV-PR-2026-", ""), 10);
@@ -2132,19 +2146,8 @@ export async function createOrUpdatePreloadedInvitation(
   }
   const folio = `HDV-PR-2026-${pad4(nextPreRegSeq)}`;
 
-  const currentUnifiedUsed = computeUnifiedExoneratedQuotaCount(receipts, counters.foundersCounter);
-  let founderSlotNumber: number | null = null;
-  let nextFoundersCounter = counters.foundersCounter;
   const nextExoneratedCounter = counters.exoneratedCounter + 1;
   const financialCorrelative = `HDV-EXO-2026-${pad4(nextExoneratedCounter)}`;
-
-  if (
-    (effectiveModality === "exclusivo_prestigio" || effectiveModality === "fundadores_50") &&
-    currentUnifiedUsed < MAX_FOUNDERS_QUOTA
-  ) {
-    nextFoundersCounter = currentUnifiedUsed + 1;
-    founderSlotNumber = nextFoundersCounter;
-  }
 
   const modalityLabel =
     effectiveModality === "exclusivo_prestigio"
@@ -2156,7 +2159,7 @@ export async function createOrUpdatePreloadedInvitation(
   const financialStatusLabel =
     effectiveModality === "comercial_estandar"
       ? "Plan Estándar / HDV Connect — 0% Comisiones por Reserva"
-      : `Exonerado ($0.00) — Cliente de Prestigio / Top 50 [Cupo #${founderSlotNumber || 1}/${MAX_FOUNDERS_QUOTA}]`;
+      : "Exonerado ($0.00) — Cliente de Prestigio / Top 50 (Cupo por asignar al confirmar)";
 
   const verificationPath = `/verificar-registro/${folio}`;
   const digitalSignatureHash = buildDigitalSignature(folio, financialCorrelative, nowIso);
@@ -2167,7 +2170,9 @@ export async function createOrUpdatePreloadedInvitation(
     financialCorrelative,
     invoiceNumber: null,
     correlativeSequence: nextPreRegSeq,
-    founderSlotNumber,
+    // Regla de Seguridad: founderSlotNumber queda en null mientras está precargado_pendiente
+    // para que crear o abrir el enlace antes de confirmar NUNCA altere el contador de 50 cupos.
+    founderSlotNumber: null,
     establishmentId: input.establishmentId ?? null,
     wasConsolidatedExisting: true,
     consolidatedMatchReason: "slug",
@@ -2230,15 +2235,16 @@ export async function createOrUpdatePreloadedInvitation(
     realRooms: []
   };
 
+  const updatedReceipts = [preloadedReceipt, ...receipts];
+
   const updatedCounters: SalesCountersState = {
     preRegCounter: Math.max(counters.preRegCounter, nextPreRegSeq),
-    foundersCounter: Math.max(counters.foundersCounter, nextFoundersCounter),
+    // foundersCounter NO se incrementa al crear la precarga; sólo al confirmar los términos
+    foundersCounter: computeUnifiedExoneratedQuotaCount(updatedReceipts, counters.foundersCounter),
     exoneratedCounter: Math.max(counters.exoneratedCounter, nextExoneratedCounter),
     invoiceCounter: counters.invoiceCounter,
     initializedAt: counters.initializedAt
   };
-
-  const updatedReceipts = [preloadedReceipt, ...receipts];
 
   if (typeof window !== "undefined") {
     localStorage.setItem(STORAGE_KEYS.COUNTERS, JSON.stringify(updatedCounters));

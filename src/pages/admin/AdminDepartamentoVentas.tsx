@@ -340,15 +340,18 @@ export function AdminDepartamentoVentas() {
     });
   }, [receipts, searchQuery, modalityFilter, originFilter, statusFilter, consolidationFilter]);
 
-  const foundersCount = receipts.filter(
+  const confirmedReceiptsOnly = receipts.filter(
+    (r) => r.invitationStatus !== "precargado_pendiente" && r.termsAccepted !== false
+  );
+  const foundersCount = confirmedReceiptsOnly.filter(
     (r) => r.modality === "fundadores_50" && (r.founderSlotNumber !== null || r.financialStatus === "exonerado")
   ).length;
-  const prestigioCount = receipts.filter(
+  const prestigioCount = confirmedReceiptsOnly.filter(
     (r) => r.modality === "exclusivo_prestigio" && (r.founderSlotNumber !== null || r.financialStatus === "exonerado")
   ).length;
   const foundersOccupied = Math.min(
     MAX_FOUNDERS_QUOTA,
-    Math.max(counters.foundersCounter, foundersCount + prestigioCount)
+    confirmedReceiptsOnly.length > 0 ? foundersCount + prestigioCount : counters.foundersCounter
   );
   const foundersRemaining = Math.max(0, MAX_FOUNDERS_QUOTA - foundersOccupied);
   const foundersPct = Math.min(100, Math.round((foundersOccupied / MAX_FOUNDERS_QUOTA) * 100));

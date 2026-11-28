@@ -62,7 +62,6 @@ import {
   syncSalesStateFromSupabase,
   processSalesPreRegistration,
   confirmPreloadedPreRegistration,
-  ensureWakuLodgePreloadedInvitation,
   findExistingEstablishmentMatch,
   normalizeEstablishmentName,
   normalizePhoneKey,
@@ -317,6 +316,8 @@ export function PreRegistro() {
   // MODO DE REVISIÓN Y VALIDACIÓN DE FICHA OFICIAL (?folio=HDV-PR-2026-... o ?slug=...)
   // =========================================================================
   const [isClientReviewMode, setIsClientReviewMode] = useState<boolean>(false);
+  const [isFolioValidatedAndLocked, setIsFolioValidatedAndLocked] = useState<boolean>(false);
+  const [validatedTimestampLabel, setValidatedTimestampLabel] = useState<string | null>(null);
   const [protectedFolio, setProtectedFolio] = useState<string | null>(null);
   const [protectedSlotNumber, setProtectedSlotNumber] = useState<number | null>(null);
   const [preloadedSlug, setPreloadedSlug] = useState<string | null>(null);
@@ -339,8 +340,9 @@ export function PreRegistro() {
 
   useEffect(() => {
     async function initPreRegistroAndCheckUrl() {
+      // IMPORTANTE: Abrir o visitar el enlace es 100% de SOLO LECTURA (NO muta la base de datos,
+      // NO incrementa el contador de cupos y NO bloquea ni invalida el enlace).
       const res = await syncSalesStateFromSupabase();
-      await ensureWakuLodgePreloadedInvitation();
       setSalesCounters(getSalesCounters());
 
       if (typeof window === "undefined") return;
@@ -353,7 +355,7 @@ export function PreRegistro() {
       if (!urlFolio && !urlSlug) return;
 
       const allReceipts = getSalesReceipts();
-      let matchedReceipt =
+      const matchedReceipt =
         (urlFolio ? getReceiptByFolio(urlFolio) : null) ||
         allReceipts.find(
           (r) =>
@@ -363,7 +365,7 @@ export function PreRegistro() {
         null;
 
       // Hidratación directa desde el catálogo de invitaciones precargadas o ESTABLISHMENTS_MOCK
-      // si el cliente abre el enlace desde su celular antes de que exista en su almacenamiento local
+      // si el cliente o auditor abre el enlace desde su navegador antes de que exista en su almacenamiento local
       const officialTemplate = OFFICIAL_PRELOADED_INVITATIONS.find(
         (tpl) =>
           (urlFolio && tpl.defaultFolio.toUpperCase() === urlFolio) ||
@@ -375,6 +377,19 @@ export function PreRegistro() {
         setProtectedFolio(matchedReceipt.folio);
         setProtectedSlotNumber(matchedReceipt.founderSlotNumber);
         setPreloadedSlug(matchedReceipt.establishmentSlug || urlSlug || null);
+
+        // Un enlace precargado (`precargado_pendiente` o `termsAccepted === false`) permanece 100% abierto y editable.
+        // Solo pasa a estado "Validado / Bloqueado" cuando el cliente ya marcó términos y confirmó (`confirmado_activo`).
+        const alreadyValidatedByClient =
+          matchedReceipt.invitationStatus === "confirmado_activo" &&
+          matchedReceipt.termsAccepted === true;
+
+        setIsFolioValidatedAndLocked(alreadyValidatedByClient);
+        setValidatedTimestampLabel(
+          alreadyValidatedByClient
+            ? matchedReceipt.confirmedAtFormatted || matchedReceipt.updatedAtFormatted || matchedReceipt.createdAtFormatted
+            : null
+        );
 
         setTitle(matchedReceipt.establishmentTitle || "");
         if (matchedReceipt.categoryName) {
@@ -441,8 +456,8 @@ export function PreRegistro() {
             ? "comercial_estandar"
             : matchedReceipt.modality || "exclusivo_prestigio"
         );
-        // Exigir siempre marcar explícitamente el checkbox "Acepto los términos y condiciones" antes de habilitar "Confirmar y Activar Ficha"
-        setTermsAccepted(false);
+        // Si aún está pendiente de validación por el cliente, el checkbox inicia desmarcado
+        setTermsAccepted(alreadyValidatedByClient);
         return;
       }
 
@@ -1184,6 +1199,13 @@ export function PreRegistro() {
       }
       setSalesCounters(getSalesCounters());
       setEmittedReceipt(receipt);
+      if (isClientReviewMode) {
+        setIsFolioValidatedAndLocked(true);
+        setProtectedSlotNumber(receipt.founderSlotNumber);
+        setValidatedTimestampLabel(
+          receipt.confirmedAtFormatted || receipt.updatedAtFormatted || receipt.createdAtFormatted
+        );
+      }
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 6000);
     } catch (err) {
@@ -1384,7 +1406,7 @@ export function PreRegistro() {
             </div>
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-700">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <UserCheck className="w-4 h-4 text-[#00C8D4] shrink-0" />
                 <span>
                   Responsable / Contacto titular:{" "}
@@ -1392,10 +1414,32 @@ export function PreRegistro() {
                     {ownerOrManagerName || "Propietario / Gerente General"}
                   </strong>
                 </span>
+                {isFolioValidatedAndLocked ? (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-black uppercase">
+                    <Lock className="w-3 h-3" />
+                    <span>
+                      Estado: Validado / Bloqueado ({validatedTimestampLabel || "Confirmado"})
+                    </span>
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-black uppercase">
+                    <span>Estado: Abierto para Revisión y Edición (Solo Lectura al Visitar)</span>
+                  </span>
+                )}
               </div>
-              <span className="text-[11px] font-bold text-[#9B00CC]">
-                Paso final: Revisa o edita tus datos abajo, marca la casilla de términos y pulsa &ldquo;Confirmar y Activar Ficha&rdquo;.
-              </span>
+              {isFolioValidatedAndLocked ? (
+                <button
+                  type="button"
+                  onClick={() => setIsFolioValidatedAndLocked(false)}
+                  className="text-[11px] font-black text-[#008f99] hover:text-[#FF0096] underline cursor-pointer"
+                >
+                  Habilitar edición adicional de datos operativos
+                </button>
+              ) : (
+                <span className="text-[11px] font-bold text-[#9B00CC]">
+                  Paso final: Revisa o edita tus datos abajo, marca la casilla de términos y pulsa &ldquo;Confirmar y Activar Ficha&rdquo;.
+                </span>
+              )}
             </div>
           </div>
         )}
@@ -2612,9 +2656,11 @@ export function PreRegistro() {
                 <button
                   type="button"
                   onClick={handleSavePreRegistration}
-                  disabled={isSaving || !termsAccepted}
+                  disabled={isSaving || !termsAccepted || isFolioValidatedAndLocked}
                   title={
-                    !termsAccepted
+                    isFolioValidatedAndLocked
+                      ? "Esta ficha ya fue confirmada y activada oficialmente"
+                      : !termsAccepted
                       ? "Debes marcar 'Acepto los términos y condiciones' para habilitar Confirmar y Activar Ficha"
                       : "Confirmar y Activar Ficha Oficial"
                   }
@@ -2624,6 +2670,11 @@ export function PreRegistro() {
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
                       <span>Confirmando y Activando Ficha...</span>
+                    </>
+                  ) : isFolioValidatedAndLocked ? (
+                    <>
+                      <Lock className="w-4 h-4" />
+                      <span>Ficha Validada y Bloqueada ({protectedFolio})</span>
                     </>
                   ) : (
                     <>
